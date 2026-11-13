@@ -573,6 +573,1591 @@
         ]
       },
       "expected": []
+    },
+    {
+      "name": "session standings › numbers the live leaderboard order with unique positions (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "f38ece05-dde5-48bb-a070-4cf35b88230d",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "5a947e37-ab58-45a4-ae5e-8d0ef1a480bc",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Amy"],
+              "teamB": ["Ben"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "7120b7b6-28c2-4156-a8c9-e200a676344a",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Dan"],
+              "teamB": ["Zoe"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 1,
+          "games": 2
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 1,
+          "games": 2
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "session standings › leaves out players without a counted game, partials and invalid matches (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "d9e763c6-77ba-49bb-9340-140e57a30702",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "d4c0be2c-c2ef-47ae-a6bb-31755b506d11",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "invalid",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Eve"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "invalid",
+                "winningTeam": null,
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        },
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "substitution game credit in results › counts nobody when nobody got the game (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "c24f6a4e-3d47-4f75-a2d3-b49ca7bf32a9",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "d8a8bb5c-5a57-439b-8e3b-e4ad9d01ca1f",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "singles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0,
+                  "creditTo": "none"
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 0,
+          "losses": 2,
+          "games": 2
+        }
+      ]
+    },
+    {
+      "name": "substitution game credit in results › gives the outgoing player the game and the result of their side (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "66fb8708-5e40-4e83-b0c2-fe831cee87ae",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "singles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0,
+                  "creditTo": "outgoing"
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Eve",
+          "name": "Eve",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "substitution game credit in results › keeps the latest choice for a slot (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "f586744b-ddd0-44a6-aaba-eb40dfede188",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "singles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Ben"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0,
+                  "creditTo": "none"
+                },
+                {
+                  "outId": "Zoe",
+                  "inId": "Ben",
+                  "team": "A",
+                  "at": 1,
+                  "creditTo": "outgoing"
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "substitution game credit in results › gives nobody anything from an invalid match (derived, sessionResult)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "club-Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "club-Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "club-Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "club-Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "club-Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "54a6d661-ec81-4274-ba14-56a0c1001bf0",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "invalid",
+              "format": "singles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0,
+                  "creditTo": "incoming"
+                }
+              ],
+              "decision": {
+                "kind": "invalid",
+                "winningTeam": null,
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": []
+    },
+    {
+      "name": "live standings › ranks most wins first and omits players without counted games (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "0681915a-5981-45ab-8e6a-50f9da34e7fd",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "7261e641-abef-4761-b6eb-9b225b404801",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Ben"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 2,
+          "losses": 0,
+          "games": 2
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "live standings › breaks equal wins by fewer losses before head-to-head (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "0d9b7120-3625-4584-8efa-d2e50c26546d",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "dee1ff35-52ee-4918-a72a-14364f54e7f2",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Amy"],
+              "teamB": ["Ben"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "89387f35-9a68-4169-b8da-01d6c297ff90",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Dan"],
+              "teamB": ["Zoe"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "0e779e38-1c6d-42e4-ba19-9bfe67baef7a",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Eve"],
+              "teamB": ["Zoe"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Eve",
+          "name": "Eve",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 1,
+          "games": 2
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 2,
+          "games": 3
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "live standings › uses opposing head-to-head before alphabetical order (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "af4823dc-62f4-4948-b6a8-c7f285f16e55",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "b3f7dfc1-abf3-4051-bcb2-6bb5afb555a9",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Amy"],
+              "teamB": ["Ben"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "94ea20ba-09cf-4079-b326-e9963f143da3",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Dan"],
+              "teamB": ["Zoe"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 1,
+          "games": 2
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 1,
+          "games": 2
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "live standings › uses name when wins, losses and head-to-head are tied (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "247cdfca-f445-456a-88ea-a6386e23ccd8",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        },
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
+    },
+    {
+      "name": "live standings › excludes substitution partials and invalid results (derived, match)",
+      "input": {
+        "args": [
+          [
+            {
+              "id": "Zoe",
+              "sessionId": "s",
+              "clubPlayerId": "Zoe",
+              "nameSnapshot": "Zoe",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Amy",
+              "sessionId": "s",
+              "clubPlayerId": "Amy",
+              "nameSnapshot": "Amy",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Ben",
+              "sessionId": "s",
+              "clubPlayerId": "Ben",
+              "nameSnapshot": "Ben",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Dan",
+              "sessionId": "s",
+              "clubPlayerId": "Dan",
+              "nameSnapshot": "Dan",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            },
+            {
+              "id": "Eve",
+              "sessionId": "s",
+              "clubPlayerId": "Eve",
+              "nameSnapshot": "Eve",
+              "nicknameSnapshot": null,
+              "present": true,
+              "presentChangedAt": 0,
+              "level": "intermediate_mid",
+              "levelLockedAt": 0,
+              "confirmedAt": 0
+            }
+          ],
+          [
+            {
+              "id": "8f5ea4db-e340-40ec-bcdd-7b98716ac04d",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "completed",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [
+                {
+                  "outId": "Eve",
+                  "inId": "Zoe",
+                  "team": "A",
+                  "at": 0
+                }
+              ],
+              "decision": {
+                "kind": "completed",
+                "winningTeam": "A",
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            },
+            {
+              "id": "04bd2a32-0d09-4276-ba73-a518ca9e7bb6",
+              "sessionId": "s",
+              "matchNo": 1,
+              "state": "invalid",
+              "format": "doubles",
+              "queuePosition": 1,
+              "origin": "manual",
+              "manualProtected": true,
+              "teamA": ["Eve"],
+              "teamB": ["Amy"],
+              "courtIds": [],
+              "startedAt": 0,
+              "endedAt": 1,
+              "substitutions": [],
+              "decision": {
+                "kind": "invalid",
+                "winningTeam": null,
+                "teamAScore": null,
+                "teamBScore": null,
+                "confirmedAt": 1
+              }
+            }
+          ]
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 0,
+          "games": 1
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        },
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 0,
+          "losses": 1,
+          "games": 1
+        }
+      ]
     }
   ]
 }

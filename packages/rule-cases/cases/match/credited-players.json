@@ -1,0 +1,190 @@
+{
+  "rule": "match/credited-players",
+  "version": 1,
+  "cases": [
+    {
+      "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match) #1",
+      "input": {
+        "args": [
+          {
+            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben", "Amy"],
+            "teamB": ["Dan", "Hal"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              },
+              {
+                "outId": "Zoe",
+                "inId": "Ben",
+                "team": "A",
+                "at": 1,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match) #2",
+      "input": {
+        "args": [
+          {
+            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben", "Amy"],
+            "teamB": ["Dan", "Hal"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              },
+              {
+                "outId": "Zoe",
+                "inId": "Ben",
+                "team": "A",
+                "at": 1,
+                "creditTo": "incoming"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match) #3",
+      "input": {
+        "args": [
+          {
+            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben", "Amy"],
+            "teamB": ["Dan", "Hal"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              },
+              {
+                "outId": "Zoe",
+                "inId": "Ben",
+                "team": "A",
+                "at": 1,
+                "creditTo": "none"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": {}
+    },
+    {
+      "name": "substitution game credit › keeps the choices of different slots apart (derived, match)",
+      "input": {
+        "args": [
+          {
+            "id": "36b68637-c838-438d-921d-3635f5a8c45f",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Zoe", "Amy"],
+            "teamB": ["Ben", "Hal"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Zoe",
+                "team": "A",
+                "at": 0,
+                "creditTo": "incoming"
+              },
+              {
+                "outId": "Dan",
+                "inId": "Hal",
+                "team": "B",
+                "at": 1,
+                "creditTo": "outgoing"
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": {}
+    }
+  ]
+}

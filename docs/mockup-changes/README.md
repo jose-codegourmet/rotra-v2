@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN PROGRESS: 5 · IN MOCK APP: 134 · CANCELLED: 2 · MOCKUP ONLY: 4
+IN PROGRESS: 0 · IN MOCK APP: 139 · CANCELLED: 2 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -263,14 +263,14 @@ IN PROGRESS: 5 · IN MOCK APP: 134 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-09-queue-club-set-player-pictures](2026-11-09-queue-club-set-player-pictures.md) | Clubs set profile pictures for guests and unclaimed players | edit-player-sheet, avatar, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-guest-linking](2026-11-09-queue-guest-linking.md) | Saved players: “Joined via” marks, and Link to saved player… on a guest's record | saved-player-card, player-profile-sheet, player-picker-sheet, sheet, button | IN MOCK APP — #587 |
 | [2026-11-09-queue-main-queue-search](2026-11-09-queue-main-queue-search.md) | Find a player in the Main Queue | queue match card (qtile), search input | IN MOCK APP — #586 |
-| [2026-11-09-queue-make-match-confirm](2026-11-09-queue-make-match-confirm.md) | Make match asks for confirmation on a court, with Arrange to balance | confirm-make-match sheet, court (pitch), player face with games badge | IN PROGRESS — #586 |
+| [2026-11-09-queue-make-match-confirm](2026-11-09-queue-make-match-confirm.md) | Make match asks for confirmation on a court, with Arrange to balance | confirm-make-match sheet, court (pitch), player face with games badge | IN MOCK APP — #586 |
 | [2026-11-09-queue-match-request-court](2026-11-09-queue-match-request-court.md) | Request a match: the request is laid out on a court | court-pitch, match-request-sheet | IN MOCK APP — #585 (PR #666) |
 | [2026-11-09-queue-match-request-formats](2026-11-09-queue-match-request-formats.md) | Request a match: six format pills, gated by a session setting | match-request-sheet, segmented-control, session-setup-form, key-value-list, match-request-card | IN MOCK APP — #585 |
 | [2026-11-09-queue-match-request-picker-filters](2026-11-09-queue-match-request-picker-filters.md) | Request a match: the partner / opponent picker gets tabs, a skill filter and a sort | player-picker-sheet, tabs, segmented-control, player-tile | IN MOCK APP — #585 (PR #666) |
 | [2026-11-09-queue-next-match-fullscreen](2026-11-09-queue-next-match-fullscreen.md) | The next-match picker is fullscreen on phones | sheet, next-match-sheet | IN MOCK APP — #579 |
 | [2026-11-09-queue-next-match-picker](2026-11-09-queue-next-match-picker.md) | After a result, a next-match picker offers two ready matches (left or right) | sheet, next-match-sheet | IN MOCK APP — #579 (superseded by 2026-11-09-queue-next-match-slider) |
-| [2026-11-09-queue-next-match-slider](2026-11-09-queue-next-match-slider.md) | Next-match picker: a slider of up to five ready matches, #1 first | next-match-sheet, sheet, avatar, chip, button | IN PROGRESS — #586 |
-| [2026-11-09-queue-player-cards-games](2026-11-09-queue-player-cards-games.md) | Players view cards show games played and games for the night | player-card (pc3), player grid | IN PROGRESS — #586 |
+| [2026-11-09-queue-next-match-slider](2026-11-09-queue-next-match-slider.md) | Next-match picker: a slider of up to five ready matches, #1 first | next-match-sheet, sheet, avatar, chip, button | IN MOCK APP — #586 |
+| [2026-11-09-queue-player-cards-games](2026-11-09-queue-player-cards-games.md) | Players view cards show games played and games for the night | player-card (pc3), player grid | IN MOCK APP — #586 |
 | [2026-11-09-queue-player-match-request](2026-11-09-queue-player-match-request.md) | Session page: Request a match (player side) | sheet, segmented-control, player-tile, player-picker-sheet, team-lineup, button | IN MOCK APP — #585 (PR #666) |
 | [2026-11-09-queue-player-my-night-stats](2026-11-09-queue-player-my-night-stats.md) | Session page: My night shows games and Won / Lost as big numbers; Invite only before the start | card, progress-bar, stat-tile, button | IN MOCK APP — #602 |
 | [2026-11-09-queue-player-my-night](2026-11-09-queue-player-my-night.md) | Session page: My night card, refresh bar, Courts now and own standing | card, button, chip, match-card, standings-slide, public-session-details | IN MOCK APP — #585 (PR #666) |
@@ -283,7 +283,7 @@ IN PROGRESS: 5 · IN MOCK APP: 134 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-09-queue-public-you-label](2026-11-09-queue-public-you-label.md) | Session page: the signed-in viewer's own tile is labelled You | public-participant-tile, chip | IN MOCK APP — #585 |
 | [2026-11-09-queue-qm-clear-queue](2026-11-09-queue-qm-clear-queue.md) | Queued matches: a red Clear queue button removes every waiting match | button, confirm-sheet, match-queue-panel | IN MOCK APP — #586 |
 | [2026-11-09-queue-qm-requests-tabs](2026-11-09-queue-qm-requests-tabs.md) | Requests · N with Join and Match tabs: ROTRA-player hints, drop-out notices, match request cards | join-requests-panel, join-request-card, tabs, sheet, notice, chip, list-row, button, level-select | IN MOCK APP — #586 |
-| [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | IN PROGRESS — #586 |
+| [2026-11-09-queue-qm-self-check-in](2026-11-09-queue-qm-self-check-in.md) | Roster: “Checked in themselves” mark, and the club setting Players can check themselves in | roster-row, roster-card, player-pool-card, switch, session-defaults-panel, list-row | IN MOCK APP — #586 |
 | [2026-11-09-queue-session-invite](2026-11-09-queue-session-invite.md) | Session page: Session invite share card for confirmed and waitlisted players | session-join-qr, segmented-control, sheet, button | IN MOCK APP — #602 |
 | [2026-11-10-player-games-share-avatars](2026-11-10-player-games-share-avatars.md) | Games share cards show teams and clear scores | session-games-share-card, share-card, avatar | IN MOCK APP — #682 |
 | [2026-11-10-queue-prep-header-icons](2026-11-10-queue-prep-header-icons.md) | Preparation header: icon buttons, and Cancel/Delete session in a ⋯ menu | page-header, button, icon, overflow-menu, more-options-sheet | IN MOCK APP — #697 (PR #698) |
@@ -312,7 +312,7 @@ IN PROGRESS: 5 · IN MOCK APP: 134 · CANCELLED: 2 · MOCKUP ONLY: 4
 | [2026-11-11-queue-participant-profile-tap](2026-11-11-queue-participant-profile-tap.md) | Tap a participant on the session page to open their profile (#731, proposed) | participant-tile, player-profile-sheet (new public variant), private-profile-card (new), avatar | IN MOCK APP — #731 |
 | [2026-11-11-queue-roster-grid-mobile](2026-11-11-queue-roster-grid-mobile.md) | Roster and levels › Grid view on phones: two compact columns | roster-card, roster-grid | IN MOCK APP — #752 |
 | [2026-11-11-queue-roster-waitlist-overfill](2026-11-11-queue-roster-waitlist-overfill.md) | Admitted players can step down to the waitlist; Queue Master can overfill the roster (#735, proposed) | roster-card, roster-row, player-pool-card, slot-meter (roster summary), confirm-sheet, my-night-card | IN MOCK APP — #735 |
-| [2026-11-11-queue-set-games-played](2026-11-11-queue-set-games-played.md) | Queue Master can set games played, for one player or everyone | set-games-sheet, player-pool-card, confirm-sheet, count-stepper, button | IN PROGRESS — #717 |
+| [2026-11-11-queue-set-games-played](2026-11-11-queue-set-games-played.md) | Queue Master can set games played, for one player or everyone | set-games-sheet, player-pool-card, confirm-sheet, count-stepper, button | IN MOCK APP — #717 (PR #728) |
 | [2026-11-11-queue-share-club-invite-copy-link](2026-11-11-queue-share-club-invite-copy-link.md) | Copy invite link on the Share club invite sheet | club-invite-card, share-card | IN MOCK APP — #708 |
 | [2026-11-11-queue-start-session-online-only](2026-11-11-queue-start-session-online-only.md) | Start session is online only | start-session-sheet, start-session-bar | IN MOCK APP — #721 |
 | [2026-11-11-queue-tab-focus-border](2026-11-11-queue-tab-focus-border.md) | Tabs: no thick focus border after a tap or click; thin ring for the keyboard (#736, proposed) | tabs | IN MOCK APP — #736 |

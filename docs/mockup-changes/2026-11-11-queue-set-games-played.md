@@ -1,6 +1,6 @@
 # Queue Master can set games played, for one player or everyone
 
-Status: IN PROGRESS — #717
+Status: IN MOCK APP — #717 (PR #728)
 Date: 2026-11-11
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Live console › Players tab › header button, card icon button and the Set games played sheet

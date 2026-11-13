@@ -440,7 +440,14 @@
     "./rank-share-card": "./src/components/rank-share-card/RankShareCard.tsx",
     "./profile-share-card": "./src/components/profile-share-card/ProfileShareCard.tsx",
     "./session-result-share-card": "./src/components/session-result-share-card/SessionResultShareCard.tsx",
-    "./session-games-share-card": "./src/components/session-games-share-card/SessionGamesShareCard.tsx"
+    "./session-games-share-card": "./src/components/session-games-share-card/SessionGamesShareCard.tsx",
+    "./rotra-logo": "./src/components/rotra-logo/RotraLogo.tsx",
+    "./copy-field": "./src/components/copy-field/CopyField.tsx",
+    "./share-card/helpers": "./src/components/share-card/ShareCard.helpers.ts",
+    "./share-image": "./src/components/share-image/ShareImage.tsx",
+    "./share-image-picker": "./src/components/share-image-picker/ShareImagePicker.tsx",
+    "./share-image-viewer": "./src/components/share-image-viewer/ShareImageViewer.tsx",
+    "./share-dialog": "./src/components/share-dialog/ShareDialog.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

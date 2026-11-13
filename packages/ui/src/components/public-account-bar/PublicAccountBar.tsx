@@ -4,6 +4,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { RotraLogo } from '@rotra/ui/rotra-logo'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import { DropdownMenu } from 'radix-ui'
 
@@ -52,14 +53,8 @@ export function PublicAccountBar({
   return (
     <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-border bg-bg/92 backdrop-blur-[8px]">
       <div className="flex items-center gap-3 px-page py-2.5">
-        <div
-          role="img"
-          aria-label="ROTRA"
-          className="flex items-baseline gap-2 text-[17px] font-extrabold tracking-[1.5px]"
-        >
-          <span>
-            ROTR<b className="text-accent">A</b>
-          </span>
+        <div className="flex items-center">
+          <RotraLogo />
         </div>
         <div className="flex-1" />
         <ThemeToggle />

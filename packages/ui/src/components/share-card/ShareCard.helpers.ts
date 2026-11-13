@@ -3,7 +3,53 @@ import qrcode from 'qrcode-generator'
 const QUIET_ZONE = 4
 
 export type ShareQrDrawing = { size: number; count: number; path: string }
-export type ShareFormat = 'post' | 'story'
+/** Story (9:16), Facebook post (4:5) and Square (1:1). */
+export type ShareFormat = 'post' | 'story' | 'square'
+
+/** On-screen size of each share image (the prototypes' SH_SIZE); the PNG is 1080 px wide. */
+export const SHARE_IMAGE_SIZE = {
+  story: [270, 480],
+  post: [320, 400],
+  square: [320, 320],
+} as const satisfies Record<ShareFormat, readonly [number, number]>
+
+/** The three sizes every share dialog offers, in the prototypes' SHARE_FMTS order and copy. */
+export const SHARE_FORMATS = [
+  { format: 'story', label: 'Story', hint: '9:16 · Facebook and Instagram stories' },
+  { format: 'post', label: 'Facebook post', hint: '4:5 · Facebook feed' },
+  { format: 'square', label: 'Square', hint: '1:1 · Instagram feed' },
+] as const satisfies readonly { format: ShareFormat; label: string; hint: string }[]
+
+/** PNG height for each format at 1080 px wide. */
+const PNG_HEIGHT: Record<ShareFormat, number> = { post: 1350, story: 1920, square: 1080 }
+
+/** Draws an on-screen SVG (the ROTRA logo) into the canvas with its computed fills. */
+async function drawSvg(
+  ctx: CanvasRenderingContext2D,
+  svg: SVGSVGElement,
+  r: { x: number; y: number; w: number; h: number },
+) {
+  const clone = svg.cloneNode(true) as SVGSVGElement
+  const source = [svg, ...svg.querySelectorAll('*')]
+  const copy = [clone, ...clone.querySelectorAll('*')]
+  source.forEach((element, index) => {
+    const target = copy[index]
+    if (!target) return
+    const style = getComputedStyle(element)
+    target.removeAttribute('class')
+    if (element !== svg && style.fill) target.setAttribute('fill', style.fill)
+  })
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+  clone.setAttribute('width', String(r.w))
+  clone.setAttribute('height', String(r.h))
+  const image = new Image()
+  await new Promise<void>((resolve) => {
+    image.onload = () => resolve()
+    image.onerror = () => resolve()
+    image.src = `data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`
+  })
+  if (image.naturalWidth) ctx.drawImage(image, r.x, r.y, r.w, r.h)
+}
 
 /** Encodes the exact public link with H correction and a four-module quiet zone. */
 export function drawShareQr(link: string): ShareQrDrawing | null {
@@ -50,10 +96,11 @@ export async function loadShareLogo(url: string): Promise<HTMLImageElement | nul
   })
 }
 
-/** Rasterizes the current card's measured layout, so wrapped copy and both formats match the preview. */
+/** Rasterizes the current card's measured layout, so wrapped copy and every format match the preview. */
 export async function renderSharePng(
   card: HTMLElement,
-  qr: ShareQrDrawing,
+  /** Null for share images without a QR (every share except the Session and club invites). */
+  qr: ShareQrDrawing | null,
   logos: Record<string, HTMLImageElement | null>,
   format: ShareFormat,
 ): Promise<Blob | null> {
@@ -63,7 +110,7 @@ export async function renderSharePng(
     if (!bounds.width || !bounds.height) return null
     const canvas = document.createElement('canvas')
     canvas.width = 1080
-    canvas.height = format === 'post' ? 1350 : 1920
+    canvas.height = PNG_HEIGHT[format]
     const ctx = canvas.getContext('2d')
     if (!ctx) return null
     ctx.scale(1080 / bounds.width, canvas.height / bounds.height)
@@ -133,7 +180,7 @@ export async function renderSharePng(
       }
       if (element.hasAttribute('data-qr-tile')) {
         const svg = element.querySelector('svg')
-        if (!svg) return null
+        if (!svg || !qr) return null
         const code = rect(svg)
         ctx.save()
         ctx.translate(code.x, code.y)
@@ -156,6 +203,12 @@ export async function renderSharePng(
         ctx.strokeRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4)
       }
     }
+    // The ROTRA logo artwork (RotraLogo tone="dark") is drawn from its visible SVG.
+    for (const logo of card.querySelectorAll<HTMLElement>('[data-share-logo]'))
+      for (const svg of logo.querySelectorAll('svg')) {
+        const r = rect(svg)
+        if (r.w && r.h) await drawSvg(ctx, svg, r)
+      }
     // Range rectangles preserve the browser's wrapping, alignment, and letter spacing in the PNG.
     for (const element of card.querySelectorAll<HTMLElement>(
       '[data-qr-text], [data-qr-logo] > span',

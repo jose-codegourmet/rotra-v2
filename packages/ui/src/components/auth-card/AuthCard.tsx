@@ -1,5 +1,6 @@
 import { Card } from '@rotra/ui/card'
 import { Notice } from '@rotra/ui/notice'
+import { RotraLogo } from '@rotra/ui/rotra-logo'
 import type { ReactNode } from 'react'
 
 export type AuthCardProps = {
@@ -46,22 +47,16 @@ export function AuthCard({
         {back}
         {showBrand ? (
           product ? (
-            <div className="flex items-baseline gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
-              <span className="text-4xl leading-none font-extrabold tracking-[6px]">
-                ROTR<b className="text-accent">A</b>
-              </span>
+            <div className="flex items-center gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
+              <RotraLogo className="h-[52px]" />
               <span className="text-[15px] font-bold tracking-[0.5px] text-fg2 uppercase">
                 {product}
               </span>
             </div>
           ) : (
             <div className="flex flex-col gap-1.5">
-              <div
-                role="img"
-                aria-label="ROTRA"
-                className="text-[40px] leading-none font-extrabold tracking-[6px]"
-              >
-                ROTR<b className="text-accent">A</b>
+              <div className="flex items-center gap-2.5">
+                <RotraLogo className="h-[52px]" />
               </div>
               {tagline ? <p className="m-0 text-fg2">{tagline}</p> : null}
             </div>

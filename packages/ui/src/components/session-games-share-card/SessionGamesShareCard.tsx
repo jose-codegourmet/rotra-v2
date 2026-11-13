@@ -1,11 +1,18 @@
 'use client'
 import type { PlayerShareGame, PlayerShareParticipant } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
-import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import type { PlayerSessionShareProps } from '@rotra/ui/session-result-share-card'
-import { ShareCard } from '@rotra/ui/share-card'
+import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
+import { ShareImage } from '@rotra/ui/share-image'
+import { ShareImagePicker } from '@rotra/ui/share-image-picker'
 export type SessionGamesShareCardProps = PlayerSessionShareProps & { games: PlayerShareGame[] }
+/** Game rows per size (the prototype's SHARE_GAME_LIMIT). */
+const GAME_LIMIT: Record<ShareFormat, number> = { post: 3, story: 4, square: 2 }
+/**
+ * Share games: the Story, Facebook post and Square images of one published session's games (no QR),
+ * then OR and the Link. `initialFormat` is kept and ignored.
+ */
 export function SessionGamesShareCard({
   link,
   name,
@@ -18,7 +25,10 @@ export function SessionGamesShareCard({
   losses,
   games,
   onCopy,
-  ...rest
+  webShare,
+  onShared,
+  onDownloaded,
+  onError,
 }: SessionGamesShareCardProps) {
   const teams = games.map((game) => ({
     mine: [
@@ -75,90 +85,96 @@ export function SessionGamesShareCard({
       </span>
     </div>
   )
-  return (
-    <ShareCard
-      {...rest}
-      compactQr
-      link={link}
-      fileName="rotra-games"
-      headline={name}
-      subline={nickname ? `“${nickname}”` : undefined}
-      spot={{
-        initials: name
-          .split(/\s+/)
-          .map((w) => w[0])
-          .slice(0, 2)
-          .join(''),
-        imageUrl: picture,
-      }}
-      title={title}
-      infoLines={[]}
-      qrCaption=""
-      qrLabel="QR code that opens your profile"
-      shareTitle="Share games"
-      actions="share-or-download"
-      additionalImages={images}
-      leadingAction={<Button onClick={onCopy}>Copy link</Button>}
-    >
-      {(format) => {
-        const limit = format === 'story' ? 4 : 3
-        return (
-          <div className="flex min-h-0 flex-1 flex-col justify-center gap-2 text-left">
-            <div>
-              <h3
-                data-qr-text
-                title={title}
-                className="truncate text-lg font-extrabold text-share-fg"
-              >
-                {title}
-              </h3>
-              <p data-qr-text className="truncate text-[11px] leading-[15px] text-share-muted">
-                {dateLabel} · {clubName}
-              </p>
-            </div>
-            <div>
-              {games.slice(0, limit).map((game, index) => (
-                <article
-                  key={game.id}
-                  className="relative grid min-h-11 grid-cols-[minmax(0,1fr)_76px_minmax(0,1fr)] items-center gap-1 py-1"
-                  aria-label={`Game ${index + 1}, ${game.result === 'won' ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+  const content = (format: ShareFormat) => {
+    const limit = GAME_LIMIT[format]
+    return (
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-2 text-left">
+        <div>
+          <h3 data-qr-text title={title} className="truncate text-lg font-extrabold text-share-fg">
+            {title}
+          </h3>
+          <p data-qr-text className="truncate text-[11px] leading-[15px] text-share-muted">
+            {dateLabel} · {clubName}
+          </p>
+        </div>
+        <div>
+          {games.slice(0, limit).map((game, index) => (
+            <article
+              key={game.id}
+              className="relative grid min-h-11 grid-cols-[minmax(0,1fr)_76px_minmax(0,1fr)] items-center gap-1 py-1"
+              aria-label={`Game ${index + 1}, ${game.result === 'won' ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
+            >
+              {teamView(teams[index]?.mine ?? [], index, 'mine', game.result === 'won')}
+              <div className="flex flex-col items-center gap-0.5">
+                <b
+                  data-qr-text
+                  className={cn(
+                    'font-mono text-xl leading-[22px] font-extrabold',
+                    game.result === 'won' ? 'text-share-accent' : 'text-share-fg',
+                  )}
                 >
-                  {teamView(teams[index]?.mine ?? [], index, 'mine', game.result === 'won')}
-                  <div className="flex flex-col items-center gap-0.5">
-                    <b
-                      data-qr-text
-                      className={cn(
-                        'font-mono text-xl leading-[22px] font-extrabold',
-                        game.result === 'won' ? 'text-share-accent' : 'text-share-fg',
-                      )}
-                    >
-                      {game.score ?? '—'}
-                    </b>
-                    <span data-qr-text className="text-[9px] leading-[11px] text-share-muted">
-                      {game.score ? (game.result === 'won' ? 'Won' : 'Lost') : 'Winner recorded'}
-                    </span>
-                  </div>
-                  {teamView(teams[index]?.theirs ?? [], index, 'theirs', game.result === 'lost')}
-                  <i
-                    data-share-cell="divider"
-                    className="absolute inset-x-0 bottom-0 h-px bg-share-fg/10"
-                  />
-                </article>
-              ))}
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <b data-qr-text className="text-[13px] text-share-fg">
-                Total W–L {wins}–{losses}
-              </b>
-              {games.length > limit ? (
-                <span data-qr-text className="text-[10px] text-share-muted">
-                  +{games.length - limit} more games
+                  {game.score ?? '—'}
+                </b>
+                <span data-qr-text className="text-[9px] leading-[11px] text-share-muted">
+                  {game.score ? (game.result === 'won' ? 'Won' : 'Lost') : 'Winner recorded'}
                 </span>
-              ) : null}
-            </div>
-          </div>
-        )
-      }}
-    </ShareCard>
+              </div>
+              {teamView(teams[index]?.theirs ?? [], index, 'theirs', game.result === 'lost')}
+              <i
+                data-share-cell="divider"
+                className="absolute inset-x-0 bottom-0 h-px bg-share-fg/10"
+              />
+            </article>
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <b data-qr-text className="text-[13px] text-share-fg">
+            Total W–L {wins}–{losses}
+          </b>
+          {games.length > limit ? (
+            <span data-qr-text className="text-[10px] text-share-muted">
+              +{games.length - limit} more games
+            </span>
+          ) : null}
+        </div>
+      </div>
+    )
+  }
+  return (
+    <ShareImagePicker
+      shareTitle="Share games"
+      pickHint="Tap an image to pick it."
+      images={{ spot: picture, ...images }}
+      link={link}
+      linkLabel="Link"
+      copyLabel="Copy link"
+      onCopy={onCopy}
+      webShare={webShare}
+      onShared={onShared}
+      onError={onError}
+      onDownloaded={(item) => onDownloaded?.(item.format)}
+      items={SHARE_FORMATS.map(({ format, label, hint }) => ({
+        id: format,
+        label,
+        hint,
+        format,
+        fileName: `rotra-games-${format}`,
+        image: (
+          <ShareImage
+            format={format}
+            headline={name}
+            subline={nickname ? `“${nickname}”` : undefined}
+            spot={{ initials, imageUrl: picture }}
+          >
+            {content(format)}
+          </ShareImage>
+        ),
+      }))}
+    />
   )
 }

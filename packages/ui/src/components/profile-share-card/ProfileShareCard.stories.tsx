@@ -32,7 +32,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Ranked: Story = {}
-export const Story: Story = { args: { initialFormat: 'story' } }
+export const Light: Story = { globals: { theme: 'light' } }
+export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const RankedNoPosition: Story = { args: { position: null } }
 export const NotRanked: Story = { args: { levelLabel: null, position: null } }
 export const NoGames: Story = { args: { wins: null } }

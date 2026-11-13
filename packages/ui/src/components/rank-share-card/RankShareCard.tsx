@@ -1,6 +1,9 @@
 'use client'
-import { Button } from '@rotra/ui/button'
-import { ShareCard, type ShareCardProps } from '@rotra/ui/share-card'
+import { cn } from '@rotra/ui/cn'
+import type { ShareCardProps } from '@rotra/ui/share-card'
+import { SHARE_FORMATS } from '@rotra/ui/share-card/helpers'
+import { ShareImage } from '@rotra/ui/share-image'
+import { ShareImagePicker } from '@rotra/ui/share-image-picker'
 import { SkillLadder } from '@rotra/ui/skill-ladder'
 export type RankShareCardProps = Pick<
   ShareCardProps,
@@ -15,6 +18,10 @@ export type RankShareCardProps = Pick<
   position: number | null
   onCopy: () => void
 }
+/**
+ * Share rank: the Story, Facebook post and Square images (level, overall position, skill ladder; no
+ * QR), then OR and the Link. `initialFormat` is kept for older callers and ignored.
+ */
 export function RankShareCard({
   link,
   name,
@@ -24,56 +31,78 @@ export function RankShareCard({
   levelLabel,
   position,
   onCopy,
-  ...rest
+  webShare,
+  onShared,
+  onDownloaded,
+  onError,
 }: RankShareCardProps) {
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
   return (
-    <ShareCard
-      {...rest}
-      compactQr
-      link={link}
-      fileName="rotra-rank"
-      headline={name}
-      subline={nickname ? `“${nickname}”` : undefined}
-      spot={{
-        initials: name
-          .split(/\s+/)
-          .map((w) => w[0])
-          .slice(0, 2)
-          .join(''),
-        imageUrl: picture,
-      }}
-      title={levelLabel}
-      infoLines={[]}
-      qrCaption=""
-      qrLabel="QR code for your profile"
+    <ShareImagePicker
       shareTitle="Share rank"
-      noteStart="The QR opens your profile. Private profiles ask visitors to log in."
-      actions="share-or-download"
-      leadingAction={<Button onClick={onCopy}>Copy link</Button>}
-    >
-      <div className="flex flex-1 flex-col justify-center gap-5 text-left">
-        <div className="flex flex-col items-start gap-4">
-          <b data-qr-text className="text-[22px] font-extrabold text-share-accent">
-            {levelLabel}
-          </b>
-          <div className="text-left">
-            <span data-qr-text className="text-xs text-share-muted">
-              Overall
-            </span>
-            <b
-              data-qr-text
-              className={
-                position
-                  ? 'block font-mono text-[36px] leading-none text-share-accent'
-                  : 'block text-xl text-share-fg'
-              }
+      pickHint="Tap an image to pick it."
+      images={{ spot: picture }}
+      link={link}
+      linkLabel="Link"
+      copyLabel="Copy link"
+      onCopy={onCopy}
+      webShare={webShare}
+      onShared={onShared}
+      onError={onError}
+      onDownloaded={(item) => onDownloaded?.(item.format)}
+      items={SHARE_FORMATS.map(({ format, label, hint }) => ({
+        id: format,
+        label,
+        hint,
+        format,
+        fileName: `rotra-rank-${format}`,
+        image: (
+          <ShareImage
+            format={format}
+            headline={name}
+            subline={nickname ? `“${nickname}”` : undefined}
+            spot={{ initials, imageUrl: picture }}
+          >
+            <div
+              className={cn(
+                'flex flex-1 flex-col justify-center text-left',
+                format === 'square' ? 'gap-3' : 'gap-5',
+              )}
             >
-              {position ? `#${position}` : 'No position'}
-            </b>
-          </div>
-        </div>
-        <SkillLadder level={level} shareCard />
-      </div>
-    </ShareCard>
+              <div
+                className={cn(
+                  'flex items-start',
+                  format === 'square' ? 'flex-row justify-between gap-3' : 'flex-col gap-4',
+                )}
+              >
+                <b data-qr-text className="text-[22px] font-extrabold text-share-accent">
+                  {levelLabel}
+                </b>
+                <div className="text-left">
+                  <span data-qr-text className="text-xs text-share-muted">
+                    Overall
+                  </span>
+                  <b
+                    data-qr-text
+                    className={
+                      position
+                        ? 'block font-mono text-[36px] leading-none text-share-accent'
+                        : 'block text-xl text-share-fg'
+                    }
+                  >
+                    {position ? `#${position}` : 'No position'}
+                  </b>
+                </div>
+              </div>
+              <SkillLadder level={level} shareCard />
+            </div>
+          </ShareImage>
+        ),
+      }))}
+    />
   )
 }

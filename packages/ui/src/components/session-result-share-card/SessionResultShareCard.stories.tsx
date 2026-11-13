@@ -21,8 +21,9 @@ const meta = {
 } satisfies Meta<typeof SessionResultShareCard>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Post: Story = { args: {} }
-export const Story: Story = { args: { initialFormat: 'story' } }
+export const AllSizes: Story = { args: {} }
+export const Light: Story = { globals: { theme: 'light' } }
+export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const LongTitle: Story = {
   args: { title: 'A long Sunday night badminton session title at the club' },
 }

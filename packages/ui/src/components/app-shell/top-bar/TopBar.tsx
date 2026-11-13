@@ -3,6 +3,7 @@
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
+import { RotraLogo } from '@rotra/ui/rotra-logo'
 import type { ElementType, ReactNode } from 'react'
 import { useOptionalAppShell } from '../AppShell.context'
 
@@ -46,9 +47,7 @@ export function TopBar({
 
   const brand = (
     <>
-      <span>
-        ROTR<b className="text-accent">A</b>
-      </span>
+      <RotraLogo variant="responsive" />
       <span
         className={cn(
           'text-sm font-semibold tracking-normal text-fg2',
@@ -59,7 +58,7 @@ export function TopBar({
       </span>
     </>
   )
-  const brandClass = 'flex items-baseline gap-2 text-[17px] font-extrabold tracking-[1.5px]'
+  const brandClass = 'flex items-center gap-2 text-[17px] font-extrabold tracking-[1.5px]'
 
   return (
     <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-border bg-bg/92 backdrop-blur-[8px]">

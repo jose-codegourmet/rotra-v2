@@ -1,4 +1,4 @@
-import { Sheet } from '@rotra/ui/sheet'
+import { ShareDialog } from '@rotra/ui/share-dialog'
 import type { ReactNode } from 'react'
 export type PlayerShareSheetProps = {
   open: boolean
@@ -6,11 +6,11 @@ export type PlayerShareSheetProps = {
   title: string
   children: ReactNode
 }
-/** Card contents reuse ShareCard, including the format selector and canvas export. */
+/** Player's Share profile / rank / result / games dialog: the shared ShareDialog (680 px, Close). */
 export function PlayerShareSheet({ open, onOpenChange, title, children }: PlayerShareSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={title}>
+    <ShareDialog open={open} onOpenChange={onOpenChange} title={title}>
       {children}
-    </Sheet>
+    </ShareDialog>
   )
 }

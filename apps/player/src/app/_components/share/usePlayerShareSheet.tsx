@@ -10,6 +10,7 @@ import { ProfileShareCard } from '@rotra/ui/profile-share-card'
 import { RankShareCard } from '@rotra/ui/rank-share-card'
 import { SessionGamesShareCard } from '@rotra/ui/session-games-share-card'
 import { SessionResultShareCard } from '@rotra/ui/session-result-share-card'
+import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
@@ -35,14 +36,22 @@ export function usePlayerShareSheet(playerId: string | null) {
     profileShare && typeof window !== 'undefined'
       ? new URL(profileShare.link, window.location.origin).href
       : ''
-  const copyLink = async (url: string) => {
+  const copyLink = async (url: string, profileLink = false) => {
     try {
       await navigator.clipboard.writeText(url)
       toast('Link copied')
     } catch {
-      toast.error("Couldn't copy the link. Copy it from the address bar.")
+      toast.error(
+        profileLink
+          ? `Couldn't copy. Your profile link is ${url}`
+          : "Couldn't copy the link. Copy it from the address bar.",
+      )
     }
   }
+  const downloaded = (format: ShareFormat) =>
+    toast(
+      `${SHARE_FORMATS.find((size) => size.format === format)?.label ?? 'Share'} image downloaded`,
+    )
   const common = {
     link,
     name: profile?.fullName ?? '',
@@ -51,7 +60,7 @@ export function usePlayerShareSheet(playerId: string | null) {
     onCopy: () => void copyLink(link),
     onError: (message: string) => toast.error(message),
     onShared: () => toast('Share sheet opened'),
-    onDownloaded: () => toast('Image downloaded'),
+    onDownloaded: downloaded,
   }
   const title =
     selection?.kind === 'profile'
@@ -81,7 +90,7 @@ export function usePlayerShareSheet(playerId: string | null) {
           <ProfileShareCard
             {...common}
             link={profileLink}
-            onCopy={() => void copyLink(profileLink)}
+            onCopy={() => void copyLink(profileLink, true)}
             name={profileShare.profile.fullName}
             nickname={profileShare.profile.nickname}
             picture={pictureSrc(
@@ -96,9 +105,6 @@ export function usePlayerShareSheet(playerId: string | null) {
             }
             position={profileShare.position}
             wins={profileShare.wins}
-            onDownloaded={(format) =>
-              toast(format === 'story' ? 'Story image downloaded' : 'Post image downloaded')
-            }
           />
         ) : (
           <Notice>No share card is available.</Notice>

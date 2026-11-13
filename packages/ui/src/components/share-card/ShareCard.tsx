@@ -3,6 +3,7 @@
 import { Button } from '@rotra/ui/button'
 import { ClubLogo } from '@rotra/ui/club-logo'
 import { cn } from '@rotra/ui/cn'
+import { RotraLogo } from '@rotra/ui/rotra-logo'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -48,7 +49,8 @@ export type ShareCardProps = {
   noteEnd?: string
   /** `both` shows Share (when available) and Download image; `share-or-download` shows one of them. */
   actions?: 'both' | 'share-or-download'
-  initialFormat?: ShareFormat
+  /** Invite cards switch Post and Story only. */
+  initialFormat?: 'post' | 'story'
   /** Overrides the browser's Web Share check (stories and tests). */
   webShare?: boolean
   onShared?: () => void
@@ -93,7 +95,7 @@ export function ShareCard({
   primaryRowAbove,
   additionalImages,
 }: ShareCardProps) {
-  const [format, setFormat] = useState<ShareFormat>(initialFormat)
+  const [format, setFormat] = useState<'post' | 'story'>(initialFormat)
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement | null>>({})
   const [busy, setBusy] = useState(false)
   const [detected, setDetected] = useState(false)
@@ -330,17 +332,7 @@ export function ShareCard({
             </b>
           )}
           {compactQr ? (
-            <div className="text-left">
-              <span className="block text-[13px] font-extrabold tracking-[0.1em]">
-                <span data-qr-text>ROTR</span>
-                <b data-qr-text className="text-share-accent">
-                  A
-                </b>
-              </span>
-              <span data-qr-text className="text-[11px] text-share-muted">
-                Run the game.
-              </span>
-            </div>
+            <RotraLogo tone="dark" className="h-5" />
           ) : (
             <span
               data-qr-text
@@ -351,14 +343,8 @@ export function ShareCard({
           )}
         </div>
         {!compactQr && (
-          <div className="flex items-baseline justify-center gap-2 text-[12px] text-share-muted">
-            <span className="font-extrabold text-share-fg tracking-[0.1em]">
-              <span data-qr-text>ROTR</span>
-              <b data-qr-text className="text-share-accent">
-                A
-              </b>
-            </span>
-            <span data-qr-text>Run the game.</span>
+          <div className="flex items-center justify-center">
+            <RotraLogo tone="dark" className="h-[18px]" />
           </div>
         )}
       </section>

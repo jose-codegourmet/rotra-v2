@@ -231,6 +231,16 @@ export const ICONS = {
     ),
   },
   check: { size: 16, strokeWidth: 2.6, body: <path d="m5 12 4 4 10-10" /> },
+  eye: {
+    size: 20,
+    strokeWidth: 2,
+    body: (
+      <>
+        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+        <circle cx="12" cy="12" r="3" />
+      </>
+    ),
+  },
   up: { size: 16, strokeWidth: 2.4, body: <path d="m6 15 6-6 6 6" /> },
   down: { size: 16, strokeWidth: 2.4, body: <path d="m6 9 6 6 6-6" /> },
   x: { size: 18, strokeWidth: 2.4, body: <path d="M6 6l12 12M18 6 6 18" /> },

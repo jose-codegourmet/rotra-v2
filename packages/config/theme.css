@@ -88,6 +88,15 @@
   --color-share-fg: var(--share-fg);
   --color-share-muted: var(--share-muted);
   --color-share-accent: var(--share-accent);
+  /* Share dialog: the eye button over an image (.sh-eye), the same in both themes. */
+  --color-share-eye: var(--share-eye);
+  /* The ROTRA logo artwork's own colours (docs/branding/materials/logo): Dark BG and Light BG files. */
+  --color-logo-dark-mark: var(--logo-dark-mark);
+  --color-logo-dark-type: var(--logo-dark-type);
+  --color-logo-light-outer: var(--logo-light-outer);
+  --color-logo-light-middle: var(--logo-light-middle);
+  --color-logo-light-core: var(--logo-light-core);
+  --color-logo-light-type: var(--logo-light-type);
 
   /* rounded-lg = --r (10px, cards, buttons); rounded-md = --r-sm (6px, inputs, small rows) */
   --radius-lg: var(--r);
@@ -119,6 +128,14 @@
   --share-muted: #9090a0;
   --share-accent: #00ff88;
   --share-glow: rgba(0, 255, 136, 0.16);
+  --share-eye: rgba(0, 0, 0, 0.62);
+  /* ROTRA logo artwork colours; the theme picks the Dark or Light file, the colours never change. */
+  --logo-dark-mark: #71c173;
+  --logo-dark-type: #ffffff;
+  --logo-light-outer: #83ae87;
+  --logo-light-middle: #518757;
+  --logo-light-core: #2d6e36;
+  --logo-light-type: #000000;
   --bg: #0b0b0c;
   --surface: #1a1a1d;
   --elev: #2a2a2e;

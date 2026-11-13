@@ -1,0 +1,46 @@
+{
+  "rule": "ranking-settings/diff-rows",
+  "version": 1,
+  "cases": [
+    {
+      "name": "diffRows › lists every setting in percentages and matches (rankingSettings)",
+      "input": {
+        "args": [
+          {
+            "version": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "effectiveAt": "2026-01-05T09:00:00+08:00",
+            "createdByEmail": "owner@rotra.example"
+          },
+          {
+            "assessmentWeightBp": 6000,
+            "performanceWeightBp": 4000,
+            "recentStandardMatchThreshold": 10
+          }
+        ]
+      },
+      "expected": [
+        {
+          "label": "Club assessment",
+          "from": 70,
+          "to": 60,
+          "unit": "%"
+        },
+        {
+          "label": "Match performance",
+          "from": 30,
+          "to": 40,
+          "unit": "%"
+        },
+        {
+          "label": "Leaderboard requirement",
+          "from": 10,
+          "to": 10,
+          "unit": " matches"
+        }
+      ]
+    }
+  ]
+}

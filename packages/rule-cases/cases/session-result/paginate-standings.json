@@ -1,0 +1,21 @@
+{
+  "rule": "session-result/paginate-standings",
+  "version": 1,
+  "cases": [
+    {
+      "name": "export frames › titles a single frame plainly and keeps one frame for empty standings (sessionResult)",
+      "input": {
+        "args": [
+          [],
+          "feed"
+        ]
+      },
+      "expected": [
+        {
+          "title": "Standings",
+          "rows": []
+        }
+      ]
+    }
+  ]
+}

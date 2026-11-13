@@ -1,0 +1,24 @@
+{
+  "rule": "ranking-settings/manila-iso-string",
+  "version": 1,
+  "cases": [
+    {
+      "name": "versions › formats any instant with the Manila offset (rankingSettings) #1",
+      "input": {
+        "args": [
+          1767574800000
+        ]
+      },
+      "expected": "2026-01-05T09:00:00+08:00"
+    },
+    {
+      "name": "versions › formats any instant with the Manila offset (rankingSettings) #2",
+      "input": {
+        "args": [
+          1798749000000
+        ]
+      },
+      "expected": "2027-01-01T04:30:00+08:00"
+    }
+  ]
+}

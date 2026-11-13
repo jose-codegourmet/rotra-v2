@@ -811,6 +811,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
     - `{"$undefined": true}` and JSON `null` are **different** inputs, because TypeScript treats them differently. The Go runner must check for the `$undefined` tag before `encoding/json` folds both into nil: `$undefined` becomes an absent argument, and `null` stays an explicit null.
     - `{"$number": "NaN" | "Infinity" | "-Infinity"}` carries the non-finite numbers JSON can't.
     - A list length is an array of `{}` (`toHaveLength(6)` → six `{}`). We keep it instead of a `$length` tag so there is one fewer convention to implement twice.
+    - The tagged values also work inside `expected`; the Go runner decodes both.
+    - Checks that are derived from a result (`toContain`, `.some`, `Set` size) are written as a case that pins the whole result of the rule call.
     - `expected` is a subset match, so an extra key in a result is not caught. This is intentional.
     - **Court-window boundary for #791.** Only `sessionWindowError`, `courtWindowError` and `courtTimeOnSession` (fixed epoch ms) are in JSON. `courtWindowPreview`, `courtNextDay`, `instantOnDate`, `clockTimeFrom` and the locale-formatted `courtAfterSessionEndError` copy stay in TypeScript until the club time zone (T6, Asia/Manila) exists.
     - Money and ranking cases are not restructured without the owner's sign-off, as before.

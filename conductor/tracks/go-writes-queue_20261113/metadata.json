@@ -1,0 +1,19 @@
+{
+  "id": "go-writes-queue_20261113",
+  "title": "Queue writes and offline contract in Go",
+  "type": "refactor",
+  "priority": "critical",
+  "order": 9,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-writes-admin-player",
+  "phases": {
+    "total": 5,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 0
+  }
+}

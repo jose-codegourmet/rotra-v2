@@ -27,7 +27,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # A backend change ships alone: backend paths plus docs only, never app or frontend package code.
+  # A backend change ships alone: backend paths plus docs and conductor plans only, never app or frontend package code.
   # A failure here makes Railway skip the deploy.
   scope:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
             range="${BEFORE}..${AFTER}"
           fi
           outside=$(git diff --name-only "$range" | grep -Ev \
-            '^(apps/api/|packages/rule-cases/|\.railway/|docs/|\.github/workflows/backend\.yml$|[^/]+\.md$)' || true)
+            '^(apps/api/|packages/rule-cases/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)' || true)
           if [ -n "$outside" ]; then
             echo "::error::Backend changes must not include frontend files. Move these to a separate commit or PR:"
             echo "$outside"

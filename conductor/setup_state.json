@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "project_type": "brownfield",
+  "scope": "backend only (apps/api, packages/rule-cases, .railway)",
+  "answers_source": "AGENTS.md, docs/backend, D-2026-11-13-01/02 and the November 13, 2026 planning session; interactive Q&A skipped",
+  "files_created": ["conductor/index.md", "conductor/product.md", "conductor/product-guidelines.md", "conductor/tech-stack.md", "conductor/workflow.md", "conductor/tracks.md", "conductor/code_styleguides/general.md", "conductor/code_styleguides/go.md"],
+  "started_at": "2026-11-13",
+  "last_updated": "2026-11-13"
+}

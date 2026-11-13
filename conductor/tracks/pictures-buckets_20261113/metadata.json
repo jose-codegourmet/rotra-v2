@@ -1,0 +1,19 @@
+{
+  "id": "pictures-buckets_20261113",
+  "title": "Pictures on Railway Buckets",
+  "type": "refactor",
+  "priority": "medium",
+  "order": 11,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-writes-admin-player",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 4,
+    "completed": 0
+  }
+}

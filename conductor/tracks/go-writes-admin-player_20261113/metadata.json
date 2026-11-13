@@ -1,0 +1,19 @@
+{
+  "id": "go-writes-admin-player_20261113",
+  "title": "Admin and Player writes in Go",
+  "type": "refactor",
+  "priority": "high",
+  "order": 8,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-signed-in-reads",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 4,
+    "completed": 0
+  }
+}

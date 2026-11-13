@@ -1,0 +1,19 @@
+{
+  "id": "go-signed-in-reads_20261113",
+  "title": "Signed-in reads in Go",
+  "type": "refactor",
+  "priority": "high",
+  "order": 7,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-sign-in, go-public-reads",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 6,
+    "completed": 0
+  }
+}

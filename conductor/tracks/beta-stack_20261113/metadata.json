@@ -1,0 +1,19 @@
+{
+  "id": "beta-stack_20261113",
+  "title": "Side-by-side beta stack",
+  "type": "chore",
+  "priority": "high",
+  "order": 4,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-api-foundation",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 8,
+    "completed": 0
+  }
+}

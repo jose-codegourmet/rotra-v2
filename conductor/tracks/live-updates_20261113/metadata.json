@@ -1,0 +1,19 @@
+{
+  "id": "live-updates_20261113",
+  "title": "Live updates",
+  "type": "feature",
+  "priority": "high",
+  "order": 10,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-writes-queue (events), beta-stack (B-12 result)",
+  "phases": {
+    "total": 2,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 5,
+    "completed": 0
+  }
+}

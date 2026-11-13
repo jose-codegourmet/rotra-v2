@@ -90,8 +90,8 @@ Railway deploys the Go API **only for backend changes**, and only after the back
 
 | Piece | Where | What it does |
 |---|---|---|
-| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
-| Frontend CI | `.github/workflows/ci.yml` | `paths-ignore` for the same backend paths, `docs/**` and root `*.md`, so a backend-only commit runs no frontend checks |
+| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs, `conductor/` and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
+| Frontend CI | `.github/workflows/ci.yml` | `paths-ignore` for the same backend paths, `docs/**`, `conductor/**` and root `*.md`, so a backend-only commit runs no frontend checks |
 | Railway watch paths | `api` service settings | `/apps/api/**`, `/packages/rule-cases/**`. Commits that don't touch them never build or deploy ([watch paths](https://docs.railway.com/deployments/monorepo#watch-paths)) |
 | Railway "Wait for CI" | `api` service settings | The deploy waits in `WAITING` until the commit's GitHub Actions runs finish, and goes ahead only if they pass ([wait for CI](https://docs.railway.com/deployments/github-autodeploys#wait-for-ci)) |
 | Branch | `api` service settings | `staging` deploys from `main`. `production` takes a commit only when the Go API ships (B-10) |

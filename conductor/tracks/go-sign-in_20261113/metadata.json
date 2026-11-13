@@ -1,0 +1,19 @@
+{
+  "id": "go-sign-in_20261113",
+  "title": "Sign-in owned by Go",
+  "type": "feature",
+  "priority": "critical",
+  "order": 6,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "beta-stack",
+  "phases": {
+    "total": 5,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 15,
+    "completed": 0
+  }
+}

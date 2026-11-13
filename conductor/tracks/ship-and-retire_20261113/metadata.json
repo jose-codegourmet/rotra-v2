@@ -1,0 +1,19 @@
+{
+  "id": "ship-and-retire_20261113",
+  "title": "Ship the Go stack and retire Supabase",
+  "type": "chore",
+  "priority": "medium",
+  "order": 12,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "all earlier tracks",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 7,
+    "completed": 0
+  }
+}

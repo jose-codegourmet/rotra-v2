@@ -1,0 +1,19 @@
+{
+  "id": "go-public-reads_20261113",
+  "title": "Public reads in Go",
+  "type": "refactor",
+  "priority": "high",
+  "order": 5,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "beta-stack",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 7,
+    "completed": 0
+  }
+}

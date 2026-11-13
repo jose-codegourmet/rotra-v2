@@ -1,0 +1,19 @@
+{
+  "id": "rule-cases_20261113",
+  "title": "Shared rule-cases package",
+  "type": "chore",
+  "priority": "critical",
+  "order": 1,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "\u2014",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 0
+  }
+}

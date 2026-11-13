@@ -1,0 +1,19 @@
+{
+  "id": "monitoring_20261113",
+  "title": "Monitoring: Grafana for API, Postgres and pictures",
+  "type": "chore",
+  "priority": "high",
+  "order": 3,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "go-api-foundation",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 6,
+    "completed": 0
+  }
+}

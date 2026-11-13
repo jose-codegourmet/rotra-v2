@@ -1,0 +1,19 @@
+{
+  "id": "go-api-foundation_20261113",
+  "title": "Go API foundation",
+  "type": "feature",
+  "priority": "critical",
+  "order": 2,
+  "status": "pending",
+  "created": "2026-11-13",
+  "updated": "2026-11-13",
+  "depends_on": "rule-cases (for the case runner)",
+  "phases": {
+    "total": 5,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 15,
+    "completed": 0
+  }
+}

@@ -44,6 +44,7 @@ docs/backend/
 - [Infrastructure](infrastructure.md): Railway Infrastructure as Code (`.railway/railway.ts`), services, regions, side-by-side rollout
 - [Sign-in tables](../database_design/product/sign-in.md) (in database design)
 - [Monitoring](../observability.md#planned-go-api-postgres-and-pictures-on-railway) (in observability)
+- [Conductor tracks](../../conductor/tracks.md): the backend work plan, in priority order
 
 ## Related
 

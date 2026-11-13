@@ -2,10 +2,27 @@
 # this reports. A red run on main becomes the next fix ticket (docs/ways-of-working.md §5).
 name: CI
 
+#
+# Backend-only and docs-only changes skip this workflow, so Railway's "Wait for CI" on the Go API
+# sees only Backend CI (backend.yml). A change that also touches frontend files still runs it.
 on:
   pull_request:
+    paths-ignore:
+      - 'apps/api/**'
+      - 'packages/rule-cases/**'
+      - '.railway/**'
+      - '.github/workflows/backend.yml'
+      - 'docs/**'
+      - '*.md'
   push:
     branches: [main]
+    paths-ignore:
+      - 'apps/api/**'
+      - 'packages/rule-cases/**'
+      - '.railway/**'
+      - '.github/workflows/backend.yml'
+      - 'docs/**'
+      - '*.md'
 
 concurrency:
   group: ci-${{ github.ref }}

@@ -150,7 +150,9 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
 
 PRs merge themselves. There is no branch protection and no required check; CI is advisory.
 `.github/workflows/ci.yml` runs lint, type-check, and build on every PR and on `main` for information
-only. A red CI run after merge becomes the next fix ticket.
+only; it skips changes that only touch the Go API, rule cases or docs. A red CI run after merge
+becomes the next fix ticket. Backend changes run `.github/workflows/backend.yml` instead, and Railway
+deploys the Go API only when that passes ([backend CI](backend/infrastructure.md#backend-ci-and-railway-deploys)).
 
 ```bash
 gh pr create --base main --title "<conventional title>" --body-file <body.md>   # body has Closes #<n> + Verified block

@@ -1,0 +1,95 @@
+# Backend CI (D-2026-11-13-01). Railway's "Wait for CI" watches this run before it deploys the Go
+# API, and Railway's watch paths skip any commit that doesn't touch the backend. Frontend commits
+# never reach Railway; backend-only commits don't run the frontend CI (ci.yml paths-ignore).
+# Setup and rules: docs/backend/infrastructure.md#backend-ci-and-railway-deploys
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - 'packages/rule-cases/**'
+      - '.railway/**'
+      - '.github/workflows/backend.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'packages/rule-cases/**'
+      - '.railway/**'
+      - '.github/workflows/backend.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # A backend change ships alone: backend paths plus docs only, never app or frontend package code.
+  # A failure here makes Railway skip the deploy.
+  scope:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Only backend files and docs changed
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="origin/${BASE_REF}...HEAD"
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            range="${AFTER}~1..${AFTER}"
+          else
+            range="${BEFORE}..${AFTER}"
+          fi
+          outside=$(git diff --name-only "$range" | grep -Ev \
+            '^(apps/api/|packages/rule-cases/|\.railway/|docs/|\.github/workflows/backend\.yml$|[^/]+\.md$)' || true)
+          if [ -n "$outside" ]; then
+            echo "::error::Backend changes must not include frontend files. Move these to a separate commit or PR:"
+            echo "$outside"
+            exit 1
+          fi
+          echo "Only backend files and docs changed."
+
+  go:
+    needs: scope
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - name: Go API present
+        id: present
+        working-directory: .
+        run: |
+          if [ -f apps/api/go.mod ]; then echo "yes=true" >> "$GITHUB_OUTPUT"
+          else echo "::notice::apps/api/go.mod not found yet; Go checks skipped."; fi
+      - uses: actions/setup-go@v5
+        if: steps.present.outputs.yes == 'true'
+        with:
+          go-version-file: apps/api/go.mod
+          cache-dependency-path: apps/api/go.sum
+      - name: Vet
+        if: steps.present.outputs.yes == 'true'
+        run: go vet ./...
+      - name: Test (race, coverage)
+        if: steps.present.outputs.yes == 'true'
+        run: go test ./... -race -cover
+      - name: Build
+        if: steps.present.outputs.yes == 'true'
+        run: go build ./...
+      - name: Lint
+        if: steps.present.outputs.yes == 'true'
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: apps/api
+      - name: Vulnerabilities
+        if: steps.present.outputs.yes == 'true'
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...

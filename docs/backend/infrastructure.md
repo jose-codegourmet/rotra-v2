@@ -20,7 +20,7 @@ file, `.railway/railway.ts`, for the whole project.
 - The file imports `railway/iac`, from the `railway` npm package installed at the repo root
   (`nvm use && pnpm add -Dw railway`). Approved as a root dev dependency (B-17,
   [coding conventions](../coding-conventions.md)); it's added in the first infrastructure ticket.
-- `railway plan` shows the changes; `railway apply` always plans first and asks to confirm. The CLI
+- `railway config plan` shows the changes; `railway config apply` always plans first and asks to confirm. The CLI
   finds the nearest `.railway/railway.ts`, so it runs from the repo root.
 
 ## What the file declares
@@ -83,6 +83,34 @@ Notes:
   Never automatic, matching `git.deploymentEnabled: false` for Vercel.
 - A plan that deletes a service, a variable, the database or the bucket is stopped and reviewed with
   the owner.
+
+## Backend CI and Railway deploys
+
+Railway deploys the Go API **only for backend changes**, and only after the backend CI passes.
+
+| Piece | Where | What it does |
+|---|---|---|
+| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
+| Frontend CI | `.github/workflows/ci.yml` | `paths-ignore` for the same backend paths, `docs/**` and root `*.md`, so a backend-only commit runs no frontend checks |
+| Railway watch paths | `api` service settings | `/apps/api/**`, `/packages/rule-cases/**`. Commits that don't touch them never build or deploy ([watch paths](https://docs.railway.com/deployments/monorepo#watch-paths)) |
+| Railway "Wait for CI" | `api` service settings | The deploy waits in `WAITING` until the commit's GitHub Actions runs finish, and goes ahead only if they pass ([wait for CI](https://docs.railway.com/deployments/github-autodeploys#wait-for-ci)) |
+| Branch | `api` service settings | `staging` deploys from `main`. `production` takes a commit only when the Go API ships (B-10) |
+
+Why the frontend CI must skip backend commits: Railway's "Wait for CI" looks at **every** GitHub
+Actions run on the commit, not just one workflow (checks from other GitHub apps are ignored). If
+`ci.yml` also ran on a backend commit, a red frontend check would block a good backend deploy. With
+`paths-ignore` plus the `scope` job, a backend commit has exactly one workflow: Backend CI.
+
+Rules this sets:
+
+- **A backend change ships alone.** One commit or PR touches the backend paths and docs only. A change
+  that needs both a frontend and a backend part is two PRs; the backend one merges first.
+- **Rule cases are shared.** `packages/rule-cases/**` counts as backend for CI. The frontend side of a
+  case change is checked by `make check` (its Vitest runs), as for every change.
+- **CI is still advisory for the frontend** ([ways-of-working §5](../ways-of-working.md#5-branches-commits-prs)).
+  For the backend, a red Backend CI means **no deploy**, which is the gate.
+- Watch paths and "Wait for CI" are service settings. Turn them on in Railway when the `api`
+  service is created; they aren't in the IaC example above.
 
 ## Side by side with the current apps (B-10)
 

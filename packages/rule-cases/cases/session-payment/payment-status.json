@@ -145,6 +145,36 @@
       "expected": {
         "kind": "unpaid"
       }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (derived, sessionPayment) #1",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          55000
+        ]
+      },
+      "expected": {
+        "kind": "reimburse",
+        "toReturn": 4700
+      }
+    },
+    {
+      "name": "payment status (#479) › re-derives after a price change without touching the amount received (derived, sessionPayment) #2",
+      "input": {
+        "args": [
+          {
+            "amountMinor": 59700
+          },
+          65000
+        ]
+      },
+      "expected": {
+        "kind": "partial",
+        "left": 5300
+      }
     }
   ]
 }

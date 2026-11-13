@@ -7,7 +7,7 @@
       "input": {
         "args": [
           {
-            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "id": "db79bf8b-7447-41b7-9b66-b21ce631e0fd",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -46,14 +46,16 @@
           }
         ]
       },
-      "expected": {}
+      "expected": {
+        "$map": [["Zoe", "A"]]
+      }
     },
     {
       "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match) #2",
       "input": {
         "args": [
           {
-            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "id": "db79bf8b-7447-41b7-9b66-b21ce631e0fd",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -92,14 +94,16 @@
           }
         ]
       },
-      "expected": {}
+      "expected": {
+        "$map": [["Ben", "A"]]
+      }
     },
     {
       "name": "substitution game credit › keeps one person per team slot: a later choice replaces the earlier one (derived, match) #3",
       "input": {
         "args": [
           {
-            "id": "d9921329-95ed-4494-8542-d5e6ba2e2204",
+            "id": "db79bf8b-7447-41b7-9b66-b21ce631e0fd",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -138,14 +142,16 @@
           }
         ]
       },
-      "expected": {}
+      "expected": {
+        "$map": [["Zoe", "A"]]
+      }
     },
     {
       "name": "substitution game credit › keeps the choices of different slots apart (derived, match)",
       "input": {
         "args": [
           {
-            "id": "36b68637-c838-438d-921d-3635f5a8c45f",
+            "id": "809d692b-c620-4f17-9a3e-b629eb9e9a49",
             "sessionId": "s",
             "matchNo": 1,
             "state": "completed",
@@ -184,7 +190,9 @@
           }
         ]
       },
-      "expected": {}
+      "expected": {
+        "$map": [["Zoe", "A"], ["Dan", "B"]]
+      }
     }
   ]
 }

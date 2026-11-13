@@ -16,6 +16,7 @@ where something belongs. For *how to write* the code, read [coding-conventions.m
 | `packages/config` | Shared tsconfig and `theme.css`: Tailwind 4 tokens copied from the prototypes (F02.1) |
 | `packages/ui` | Shared visual components and forms with stories and metadata, plus `cn`, `ComponentMeta` and the one Storybook |
 | `packages/schema` | Shared Zod field families, phone/money tests, Vitest (F05.1) |
+| `packages/rule-cases` | JSON test cases only, one file per rule (`cases/<area>/<rule>.json`), plus the case JSON Schema; no code and no rules ([D-2026-11-13-02](mvp/decisions.md#d-2026-11-13-02)) |
 | `packages/data` | In-memory store, mock auth, club/session and Player fixtures, fetchers, query keys and hooks |
 | `packages/db` | Server-only Prisma 7 package (F07.8 scaffold); schema groups and services land through [F07 #241](https://github.com/jose-codegourmet/rotra-v2/issues/241) (§10) |
 | `openspec/` | Focused Player implementation records restored at the product owner’s request; see `openspec/README.md`. Product and prototype docs retain precedence |
@@ -48,6 +49,7 @@ rotra/
 │   ├── ui/           @rotra/ui       Every visual component and form + the one Storybook
 │   ├── data/         @rotra/data     Domain types, fixtures, mock store, fetchers, query keys, hooks
 │   ├── schema/       @rotra/schema   Shared Zod field schemas (email, phone, date, money, …)
+│   ├── rule-cases/   @rotra/rule-cases Shared JSON test cases for server-enforced rules (no code)
 │   ├── config/       @rotra/config   tsconfig bases + Tailwind 4 theme tokens (CSS)
 │   └── db/           @rotra/db       Prisma schema + server services (real mode)
 ├── docs/                             Product, screen, database, and engineering docs

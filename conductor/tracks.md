@@ -4,7 +4,7 @@ Order is the priority order. Status: `[ ]` pending · `[~]` in progress · `[x]`
 
 | # | Status | Track | Type | Priority | Depends on | Phases / tasks |
 |---|---|---|---|---|---|---|
-| 1 | [ ] | [rule-cases_20261113](./tracks/rule-cases_20261113/) — Shared rule-cases package | chore | critical | — | 3 / 9 |
+| 1 | [~] | [rule-cases_20261113](./tracks/rule-cases_20261113/) — Shared rule-cases package | chore | critical | — | 3 / 9 |
 | 2 | [ ] | [go-api-foundation_20261113](./tracks/go-api-foundation_20261113/) — Go API foundation | feature | critical | rule-cases (for the case runner) | 5 / 15 |
 | 3 | [ ] | [monitoring_20261113](./tracks/monitoring_20261113/) — Monitoring: Grafana for API, Postgres and pictures | chore | high | go-api-foundation | 3 / 6 |
 | 4 | [ ] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 4 / 8 |

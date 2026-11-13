@@ -43,7 +43,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
 | [D-2026-11-12-05](#d-2026-11-12-05) | Playwright regression suite on a throwaway local Supabase | approved 2026-11-12 | in progress (feat/e2e-regression) | none | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-01](#d-2026-11-13-01) | Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates | approved 2026-11-13 (B-01 to B-19) | not started | needed | [Backend](workstreams/backend.md) |
-| [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | in progress (feat/rule-cases) | needed | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -795,7 +795,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-13-02"></a>
 ### D-2026-11-13-02 — Shared rule-cases package `@rotra/rule-cases` (for the partner)
 - **Decision status:** approved (November 13, 2026; suggested for the partner, approved in the planning session as B-15 of [D-2026-11-13-01](#d-2026-11-13-01)).
-- **Implementation status:** not started
+- **Implementation status:** in progress (package and cases on `feat/rule-cases`; the Vitest runner follows in the frontend PR)
 - **Ticket:** needed
 - **Roadmap:** first ticket of the Go API epic (useful even before any Go code) — [Backend](workstreams/backend.md)
 - **Decision:**

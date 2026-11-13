@@ -1,6 +1,6 @@
 # ROTRA documentation
 
-**Last verified:** 2026-11-07. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
+**Last verified:** 2026-11-13. Agents start at [AGENTS.md](../AGENTS.md), whose routing table says which
 file to read for each task. This page is the map for people.
 
 Everything here describes the **v1 target**, agreed October 25–27, 2026. The apps run on mock data by
@@ -14,6 +14,7 @@ default, with an opt-in real mode for parts of each app; current build status is
 | [Coding conventions](coding-conventions.md) | You write a component, form, page, hook, style, or Prisma model |
 | [Ways of working](ways-of-working.md) | You write or pick up a ticket, open or review a PR, or find docs that disagree |
 | [Product terms](product-terms.md) | You use a domain word or name something in code |
+| [Backend](backend/README.md) | You need a backend proposal or an open backend question (runtime, hosting, sign-in, storage, jobs) |
 
 ## Product
 
@@ -54,6 +55,7 @@ docs/
                             <product>/modules/<module>.md
   mockup-changes/   one log per mockup change (NEW → TICKETED → IN PROGRESS → IN MOCK APP)
   mvp/              README (hub, status board) · decisions · workstreams/<workstream>.md
+  backend/          README · open-decisions (B-ids) · decisions/<date>-<topic>/01-proposal.md
   ../apps/mockup/   canonical prototype HTML + README per app
   branding/
 ```

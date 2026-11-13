@@ -1,6 +1,6 @@
 # Architecture — ROTRA v1
 
-**Last verified:** 2026-11-07 · **Status:** target architecture for the v1 rebuild. Mock mode is the
+**Last verified:** 2026-11-13 (D-2026-11-13-01 rows) · **Status:** target architecture for the v1 rebuild. Mock mode is the
 default; an opt-in real mode is partly connected (§5, §8, §10). Current status: [MVP hub](mvp/README.md).
 
 **Read this when** you add an app, package, route, provider, data hook, or dependency, or need to know
@@ -205,7 +205,7 @@ serialization/error contracts, account-scoped caches, and the Queue working copy
 engine. Mocks are not a fallback after a real write fails. The [command inventory](database_design/product/command-contracts.md)
 records the existing code surface and unresolved transport decisions; it does not approve API URLs.
 
-**No Supabase Realtime.** Screens refetch with TanStack Query. A live channel needs a decision first.
+**No Supabase Realtime.** Screens refetch with TanStack Query. Live updates are decided for the Go API ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01), B-08) and not built yet; until then nothing pushes, and refresh stays the fallback afterwards.
 
 ---
 
@@ -502,9 +502,10 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Prisma 7 vs 8 | Open; recommend 7 |
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
-| Hosting | Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Functions run in `sin1` (Singapore) via `regions` in `vercel.json`, next to the Supabase database; Vercel's default was `iad1`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
+| Hosting | Next.js apps settled as below. The API and database move to Railway under [D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01) (not built yet). Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Functions run in `sin1` (Singapore) via `regions` in `vercel.json`, next to the Supabase database; Vercel's default was `iad1`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
 | App ports | Settled: 9000 / 9001 / 9002 (F01.1) |
 | Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |
+| Backend runtime, hosting, sign-in, pictures and live updates | Decided 2026-11-13 ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01)): Go API + Postgres on Railway (Singapore), Go-owned sign-in, Railway Buckets, live updates, apps rewrite `/api/*` to the Go API. **Not built yet:** until each area moves, this page describes what runs. Follow-ups in [backend open decisions](backend/open-decisions.md) |
 
 
 ### Player access to a public Queue session (#569)

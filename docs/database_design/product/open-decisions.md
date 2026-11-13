@@ -33,6 +33,10 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 | Admin Sales numbers (revenue, sessions started, matches played, cost per session) are calculated in Postgres (a read-only view or function per report), read by a thin Admin route handler | Owner leaning, November 8, 2026: not sure Next.js is the right place for calculations; Supabase feels right. See [D-2026-11-08-01](../../mvp/decisions.md#d-2026-11-08-01) for the discussion and the AI recommendation | Settled by [D-2026-11-08-01](../../mvp/decisions.md#d-2026-11-08-01): views computed on read, month paid, cost per session as an Admin setting; a totals table only if measured slow |
 | Separate publication data and expiry-cycle IDs | Safe deletion without losing histories | Internal-data retention and restoration after actual deletion |
 
+## Sign-in tables for the Go API (proposed 2026-11-13)
+
+[Sign-in owned by the Go API](sign-in.md) proposes `auth_identities`, `auth_sessions`, `auth_rate_limits` and `auth_events`, and reuses `devices` and `player_password_reset_requests` ([D-2026-11-13-01](../../mvp/decisions.md#d-2026-11-13-01), B-11). Not migration SQL. Still open there: club and admin password policy, rate-limit values, token lifetimes, retention (#248), and when to add the `auth_subject` FKs.
+
 ## Blocking unresolved details
 
 - Rating constants (band edges, step sizes) for the rating-by-wins engine; the engine itself, the 90-day window, Asia/Manila midnight, tie order and recompute-on-save were settled November 11, 2026 (below).

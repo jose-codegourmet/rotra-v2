@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -42,6 +42,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-12-03](#d-2026-11-12-03) | Profile banner: 5:2, nothing overlaps it, banner dialog | approved 2026-11-12 (open points to be confirmed by the owner) | in the mockups and the mock app (#765); real mode shares the same services | #765 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-12-04](#d-2026-11-12-04) | Clubs on every readable profile; Leave club on the club page; no Report a problem | approved 2026-11-12 | in progress (#766) | #766 | [Player](workstreams/player.md) |
 | [D-2026-11-12-05](#d-2026-11-12-05) | Playwright regression suite on a throwaway local Supabase | approved 2026-11-12 | in progress (feat/e2e-regression) | none | [Queue](workstreams/queue.md) |
+| [D-2026-11-13-01](#d-2026-11-13-01) | Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates | approved 2026-11-13 (B-01 to B-19) | not started | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-13-02](#d-2026-11-13-02) | Shared rule-cases package `@rotra/rule-cases` | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -193,6 +195,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Implementation status:** implemented by #542; #567 adds local drafts, explicit Done, framing, animation and multi-format processing. Bucket configuration is deployment setup.
 - **Ticket:** [#522](https://github.com/jose-codegourmet/rotra-v2/issues/522) (mock data), [#542](https://github.com/jose-codegourmet/rotra-v2/issues/542) (Storage and real-mode writer), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
+- **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-06): pictures move to Railway Buckets, served by presigned URL, when the Go API takes over storage. The reuse of the club-logo pattern and the limits stay.
 - **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square image (up to 512 px; #567 preserves JPEG/PNG/WebP/GIF and converts HEIC/HEIF to WebP), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
 - **References:** [architecture.md › Club logos](../architecture.md), [identity](../database_design/product/player-information/modules/identity.md), [mockup log](../mockup-changes/2026-11-08-player-change-avatar.md).
 
@@ -284,6 +287,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** in progress — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md)); the Refresh button, the pull down and the tab-return refresh are in the mockup and the mock app (November 12, 2026, [log](../mockup-changes/2026-11-12-queue-pull-to-refresh.md); the same pull also covers the Player app's leaderboard, club page and My sessions, and the Admin request inboxes)
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-08): screens get live updates from the Go API. Refresh, pull-down and tab-return refresh stay as the fallback. What a player may see (masked names, own standing only, unpublished results out of the page data) is unchanged.
 - **Decision:**
   - **No live updates.** The owner's words: "player view is never live." The page refreshes only its data, never the whole page. The player can pull down or tap **Refresh**, at most once every 10 seconds, and it also refreshes when they come back to the tab. A thin bar shows "Updated 7:42 PM · Refresh", adding "Venue changes haven't synced yet" when the server knows the venue has changes it hasn't received. The QM still calls names out loud. No polling, no push notifications and no Supabase Realtime.
   - **Where it goes.** A **My night** card sits above the Details and Participants tabs. **Courts now** and the read-only **Queue** go inside Details. No new tab.
@@ -387,6 +391,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** not started — mockups updated November 9, 2026 (`NEW` logs dated 2026-11-09 in [mockup-changes](../mockup-changes/README.md))
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
+- **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-08): live push replaces "Not used: … polling, push notifications"; the cached snapshot and the server-side sign-in check stay.
 - **Decision:**
   - **Split the page data in two.** A shared session snapshot (details, courts, queue, roster) is cached on the server for about 10 seconds. It comes in two versions per session: one for visitors (everything masked) and one for signed-in players (registered full names). A small personal part (my status, my games, my requests) isn't cached.
   - **Cost for one session of 24 players over 3 hours:** about 2,000 requests, mostly answered from the cache. If 24 players refresh at once, that costs about one database read.
@@ -536,6 +541,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** built (#722, November 12, 2026): `packages/data/src/outbox/` (IndexedDB outbox next to the device copy, local apply through the mock reducers over the downloaded copy, ordered replay through the real adapters with learned ids, 409 → Q-CONFLICT with Keep the server's version / Retry, `playhistory.json` export/import in Club settings › This device). Still open: Generate matches drafts › Add to Main Queue stays online only; the guest review at Session done is a read-only notice (no link / create-unclaimed services yet, see D-2026-11-07-03); the mockup log is [IN MOCK APP](../mockup-changes/2026-11-11-queue-device-play-history-file.md)
 - **Ticket:** [#722](https://github.com/jose-codegourmet/rotra-v2/issues/722) (unblocked)
 - **Roadmap:** MVP — [Queue offline](workstreams/queue-offline.md)
+- **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-04): offline device enrollment is built with Go-owned sign-in. The outbox, replay and play-history file stay as decided; the rest of the device-stream protocol is still not built for MVP.
 - **Supersedes:** the "CSV export/import" wording of the November 8, 2026 offline decisions (now a JSON file); the full device-stream protocol in [offline-sync.md](../database_design/product/queue/modules/offline-sync.md) is **not** built for MVP.
 - **Decision:**
   - **Engine (option A).** Every change made offline on a downloaded, started session is recorded as a command (name, arguments, `operationId`) in an IndexedDB outbox and applied locally by running the existing mock-store reducers over the downloaded snapshot. When internet returns, the commands replay in order through the existing real adapters, which already carry idempotent operation IDs. A server disagreement (409) goes to Q-CONFLICT for Queue Master review. Nothing is lost on reload: the outbox and the local copy are durable on the device.
@@ -755,3 +761,49 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Real-mode My night read (`/api/public-sessions/[slug]/my-night`).
   - Cross-app origins from `NEXT_PUBLIC_ROTRA_QUEUE_URL`, `NEXT_PUBLIC_ROTRA_PLAYER_URL` and `NEXT_PUBLIC_ROTRA_ADMIN_URL`. Unset in production, so behaviour is unchanged.
 - **References:** [regression suite](../regression.md), `apps/e2e`, `.github/workflows/regression.yml`, `Makefile` (`e2e`, `e2e-ui`, `e2e-down`).
+
+<a id="d-2026-11-13-01"></a>
+### D-2026-11-13-01 — Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates
+- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-19 answered the same day). Nothing is open in [backend open decisions](../backend/open-decisions.md).
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** built and tested side by side with the current stack, shipped when ready for production (B-10) — [Backend](workstreams/backend.md)
+- **Decision:**
+  - **Go API (B-01).** Server code moves from Next.js Route Handlers + `packages/db` to one Go API, one area at a time. Each Route Handler keeps running until its area moves. Mock mode stays the default; screen and hook contracts don't change.
+  - **Rules (B-02).** Rules stay in TypeScript for the device. Their test cases live as JSON in a shared package; Vitest and the Go tests both run them. No rule moves to Go until Go passes every case; money and ranking rules need sign-off on their cases.
+  - **Hosting (B-03).** Go API and Postgres on Railway, Singapore region. The Next.js apps stay on Vercel.
+  - **Sign-in (B-04).** Owned by the Go API, with rate limits (per account, IP and device), a signed-in device list (owner or Admin can sign a device out), and offline device enrollment. Club usernames, Admin-reviewed player recovery, host-only cookies per app and no social login stay.
+  - **Transport (B-05).** Each app rewrites `/api/*` to the Go API; fetcher URLs and cookies stay unchanged.
+  - **Pictures (B-06).** Railway Buckets, served by presigned URL (bucket egress is free; service egress isn't). No CDN for now. Keep current + previous stays.
+  - **Jobs (B-07).** None. Scheduled jobs stay parked ([D-2026-11-11-10](#d-2026-11-11-10)).
+  - **Live updates (B-08).** The reason for the Go API: every app gets server-pushed updates. Refresh, pull-down and tab-return refresh stay as the fallback. What each person may see doesn't change.
+  - **Cost (B-09).** Start on the existing Railway Hobby plan and monitor.
+  - **Rollout (B-10).** A second Vercel project deploys the same apps from `main` with `/api/*` rewritten to the Go API on Railway; the current project keeps running. Separate data while testing; a final data copy and a domain switch ship it. See [infrastructure](../backend/infrastructure.md#side-by-side-with-the-current-apps-b-10).
+  - **Sign-in tables (B-11).** Designed in [database design › sign-in](../database_design/product/sign-in.md) (proposed design, not migration SQL).
+  - **Live transport (B-12).** Try the stream through the rewrite on staging; fall back to a short single-use ticket and the API's own domain.
+  - **CDN (B-13).** None for now. **Hobby limits (B-14).** Just monitor.
+  - **Infrastructure.** Railway Infrastructure as Code (`.railway/railway.ts`), since Railway's `railway.json` / `railway.toml` stop working after 2026-12-01 ([infrastructure](../backend/infrastructure.md)). Monitoring goes to the same Grafana Cloud stack ([observability](../observability.md#planned-go-api-postgres-and-pictures-on-railway)).
+- **Amends:** the Hosting row in [architecture §12](../architecture.md#12-open-architecture-decisions) (API and database); real-mode data flow and "No Supabase Realtime" in [architecture §5](../architecture.md#5-data-flow); [D-2026-11-08-03](#d-2026-11-08-03) (B-06); [D-2026-11-09-04](#d-2026-11-09-04) and [D-2026-11-09-09](#d-2026-11-09-09) (B-08); [D-2026-11-11-04](#d-2026-11-11-04) (B-04, device enrollment).
+  - **Rule cases (B-15).** [D-2026-11-13-02](#d-2026-11-13-02) approved.
+  - **Monitoring (B-16).** Plan approved with the Grafana Alloy service and starting thresholds ([observability](../observability.md#planned-go-api-postgres-and-pictures-on-railway)).
+  - **IaC dependency (B-17).** The `railway` npm package, root dev dependency, only for `.railway/railway.ts`.
+  - **Domains (B-18).** `queue-beta`, `player-beta`, `admin-beta`.rotra.club for the side-by-side project; `api-beta.rotra.club` (staging) and `api.rotra.club` (production) for the Go API.
+  - **Query statistics (B-19).** `pg_stat_statements` is an opt-in on Railway Postgres (Database › Stats › Query Statistics › Enable); turn it on for each ROTRA database.
+- **Not decided yet:** nothing in [backend open decisions](../backend/open-decisions.md).
+- **References:** [proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md), [backend open decisions](../backend/open-decisions.md), [backend docs](../backend/README.md).
+
+<a id="d-2026-11-13-02"></a>
+### D-2026-11-13-02 — Shared rule-cases package `@rotra/rule-cases` (for the partner)
+- **Decision status:** approved (November 13, 2026; suggested for the partner, approved in the planning session as B-15 of [D-2026-11-13-01](#d-2026-11-13-01)).
+- **Implementation status:** not started
+- **Ticket:** needed
+- **Roadmap:** first ticket of the Go API epic (useful even before any Go code) — [Backend](workstreams/backend.md)
+- **Decision:**
+  - **What it is.** A new package `packages/rule-cases` (`@rotra/rule-cases`). It holds **only test cases as JSON**: no code and no rules. The rules stay in `packages/data` and `packages/schema` (TypeScript, also used by the device offline).
+  - **Layout.** One file per rule: `cases/<area>/<rule>.json`, where `<area>` matches the source folder (`match`, `session-cost`, `session-roster`, `session-result`, `ranking-settings`, `license`, `club`, `player`, `money`, `phone`, `court-window`, …). Exposed as `exports` subpaths (`@rotra/rule-cases/match/auto-queue.json`), with no barrel file (AGENTS non-negotiable 8).
+  - **File shape.** `{ "rule": "<id>", "version": <n>, "cases": [{ "name": "…", "input": {…}, "expected": {…} }] }`, with money in integer minor units and ids as strings ([conventions](../database_design/product/conventions.md)).
+  - **Who runs them.** The existing Vitest `*.rules.test.ts` files read the cases next to their own tests. The Go tests read the same files from the repo path; Go's `embed` can't reach outside its module, and tests don't need it.
+  - **Which rules.** Only rules the server enforces (cost, payments, minimum games, queue generation and fills, results and standings, ranking settings, licenses, money/phone/court-window parsing). Rules that only shape the UI stay as they are.
+  - **Change rule.** A rule change edits its case file first, so both sides fail until both are fixed. A money or ranking case changes only with the owner's sign-off ([stop and ask](../ways-of-working.md#10-stop-and-ask)); the #247 ranking constants are still open.
+  - **First step.** Move the existing decided-math cases out of a few `*.rules.test.ts` files into JSON without changing what they test, and prove Vitest still passes.
+- **References:** [D-2026-11-13-01](#d-2026-11-13-01) (B-02), [backend proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md#the-biggest-cost-two-copies-of-the-rules-b-02), [architecture §2–3](../architecture.md#2-the-shape-of-the-system) (new packages need a decision).

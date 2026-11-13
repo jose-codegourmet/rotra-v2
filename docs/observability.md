@@ -1,6 +1,6 @@
 # Observability
 
-**Last verified:** 2026-11-11 · Decision: [D-2026-11-11-01](mvp/decisions.md#d-2026-11-11-01)
+**Last verified:** 2026-11-13 (planned Railway section) · Decision: [D-2026-11-11-01](mvp/decisions.md#d-2026-11-11-01)
 
 The Queue, Player and Admin apps send **OpenTelemetry traces** over OTLP: to **Grafana Cloud** in
 production and to a **local Grafana stack** during development. Telemetry is off unless
@@ -98,3 +98,33 @@ paid observability add-on is needed. If a Vercel tracing integration were ever c
 retention limits; check the current ones on the stack's billing page.
 
 To turn production telemetry off, delete `OTEL_EXPORTER_OTLP_ENDPOINT` in Vercel and redeploy.
+
+## Planned: Go API, Postgres and pictures on Railway
+
+**Decided, not built** ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01); setup in
+[backend infrastructure](backend/infrastructure.md)). Everything goes to the **same Grafana Cloud
+stack** as the apps, so there's one place to look.
+
+| What | How | Gives |
+|---|---|---|
+| Go API | OpenTelemetry SDK, OTLP straight to Grafana Cloud (same variables as above); service name `rotra-api` | Traces (joined to the apps' traces through the `/api/*` rewrite), request rate, errors, latency, DB pool use, open live-update connections, sign-in and rate-limit counts |
+| Postgres | A small **Grafana Alloy** service on Railway, on the private network, running Alloy's Postgres exporter and sending metrics to Grafana Cloud | Connections, transactions, locks, cache hit rate, table and index sizes, the 5 GB Hobby volume (B-14), slow queries from `pg_stat_statements` (opt-in on Railway: Database › Stats › Query Statistics › Enable; B-19) |
+| Pictures bucket | The Go API counts uploads, deletes and bytes added/removed per kind (avatar, club logo, court picture) | Upload volume and growth. The bucket's true total size comes from Railway's usage page; there's no bucket metrics export, and no scheduled job lists it (B-07) |
+| Railway itself | Railway's dashboard: service CPU/memory, database query and vacuum statistics, usage and spend | Railway doesn't export these; its own trace receiver takes traces only, so ROTRA sends to Grafana instead |
+
+- **Alerts** live in Grafana Cloud. Starting thresholds (B-16), tuned after the first weeks of real
+  data:
+
+  | Alert | Fires when |
+  |---|---|
+  | API errors | 5xx above 2% of requests for 5 minutes |
+  | API latency | p95 above 1 s for 10 minutes (live-update streams excluded) |
+  | API down | `/healthz` failing for 2 minutes |
+  | Postgres connections | above 80% of `max_connections` (400 of the 500 shown on an existing Railway Postgres) for 5 minutes |
+  | Postgres volume | above 4 GB (80% of the 5 GB Hobby cap) |
+  | Cache hit rate | below 95% for 15 minutes |
+  | Sign-in abuse | more than 50 rate-limited sign-ins in 10 minutes |
+  | Picture growth | more than 500 MB uploaded in a day |
+- **Spend** is watched with Railway's usage limits and alerts on the Hobby plan (B-09).
+- **Local:** the existing `grafana/otel-lgtm` stack takes the Go API's OTLP output unchanged.
+- Alloy is one more Railway service (a small cost), kept as approved (B-16).

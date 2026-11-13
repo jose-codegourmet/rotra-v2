@@ -14,6 +14,7 @@
 | [Admin](admin/README.md) | Clubs, licenses, configuration, contact approval |
 | [Transaction boundaries](transactions.md) | Operations that must succeed together or be retried safely |
 | [Access and retention](access-retention.md) | Private contacts, public projections, licensing, deletion |
+| [Sign-in owned by the Go API](sign-in.md) | Proposed (D-2026-11-13-01): identities, device sessions, rate limits, device enrollment, sign-in audit |
 | [Decisions before migrations](open-decisions.md) | Technical proposals and remaining blockers |
 | [Command contracts](command-contracts.md) | Current fetchers/hooks, actors, states, retries and decision gates |
 | [Schema dependencies](schema-dependencies.md) | Proposed FK graph, insertion cycles and migration ordering gates |

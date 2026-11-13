@@ -40,6 +40,7 @@ in the same PR.
 | Toasts | Sonner (shadcn's toast) | Only through `@rotra/ui/toaster`; restyled to the prototype toast |
 | Lint/format | Biome | `next lint` no longer exists in Next 16 |
 | Components | Storybook (one, in `@rotra/ui`) | §5 |
+| Railway Infrastructure as Code | `railway` (npm, root dev dependency) | Approved [D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01) (B-17); only `.railway/railway.ts` imports `railway/iac`. Not added yet |
 | Tests | Vitest (`pnpm test`) | Only money, phone parsing, ranking/standings/awards math, queue rules (§14), and saved-player statistics (#301) |
 
 **Adding any other dependency needs a decision.** Ask before adding one, say why, and add it to this table.

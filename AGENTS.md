@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-11-12 · **Budget:** under 200 lines.
+**Last verified:** 2026-11-13 · **Budget:** under 200 lines.
 
 ---
 
@@ -85,6 +85,7 @@ docs/
   database_design/product/ proposed tables and fields per module
   mockup-changes/         one log file per mockup change, with its status (NEW → TICKETED → IN MOCK APP)
   mvp/                    MVP scope, status board, workstreams, decision register (D-ids)
+  backend/                backend proposals and open backend questions (B-ids)
   branding/               brand identity, logo, characters (visuals: the prototypes win)
   email-templates.md      Supabase auth email coverage
 email-templates/          auth email HTML, pasted into the Supabase dashboard by hand
@@ -120,6 +121,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | A **layout / UI change** request | [mockup-changes/README.md](docs/mockup-changes/README.md) → the app's mockup → its business module + database design |
 | Turning **mockup changes into tickets** | [mockup-changes/README.md](docs/mockup-changes/README.md) → [ways-of-working.md](docs/ways-of-working.md) §3 |
 | **MVP scope, status, or decisions** | [mvp/README.md](docs/mvp/README.md) → the workstream page → [mvp/decisions.md](docs/mvp/decisions.md) |
+| **Backend runtime, hosting, sign-in, storage or jobs** | [backend/README.md](docs/backend/README.md) → [backend open decisions](docs/backend/open-decisions.md) → ask |
 | **Regression / e2e suite** | [regression.md](docs/regression.md) |
 | **Two docs disagree** | [ways-of-working.md](docs/ways-of-working.md) §2 |
 

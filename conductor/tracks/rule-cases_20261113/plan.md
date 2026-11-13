@@ -28,7 +28,7 @@ Ticket: needed
 Ticket: needed
 
 - [x] **3.1** Compare case counts before/after; record them in the plan (below)
-- [~] **3.2** `make check` passes; PR lists what was verified (run on the Vitest-runner branch, which holds both PRs' content)
+- [x] **3.2** `make check` passes; PR lists what was verified (`make check` passed on `feat/rule-cases-vitest`, which holds both PRs' content; `node --test` in the package passes. Not run: Go side, browser checks)
 
 ## Case counts (task 3.1)
 

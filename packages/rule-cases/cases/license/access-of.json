@@ -5,10 +5,7 @@
     {
       "name": "accessOf (rotra-admin.html access()) › has no license without terms (license)",
       "input": {
-        "args": [
-          [],
-          "2026-10-27"
-        ]
+        "args": [[], "2026-10-27"]
       },
       "expected": {
         "state": "none"

@@ -259,17 +259,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-2"
-                ],
-                "teamB": [
-                  "s-tonight-player-3",
-                  "s-tonight-player-4"
-                ],
-                "courtIds": [
-                  "s-tonight-court-1"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+                "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+                "courtIds": ["s-tonight-court-1"],
                 "startedAt": 1794538208195,
                 "endedAt": null,
                 "substitutions": [],
@@ -546,17 +538,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-2"
-                ],
-                "teamB": [
-                  "s-tonight-player-3",
-                  "s-tonight-player-4"
-                ],
-                "courtIds": [
-                  "s-tonight-court-1"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+                "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+                "courtIds": ["s-tonight-court-1"],
                 "startedAt": 1794538208195,
                 "endedAt": null,
                 "substitutions": [],
@@ -571,14 +555,8 @@
                 "queuePosition": 2,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-5"
-                ],
-                "teamB": [
-                  "s-tonight-player-7",
-                  "s-tonight-player-8"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+                "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -594,14 +572,8 @@
                 "queuePosition": 3,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-5",
-                  "s-tonight-player-7"
-                ],
-                "teamB": [
-                  "s-tonight-player-8",
-                  "s-tonight-player-9"
-                ],
+                "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+                "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -617,14 +589,8 @@
                 "queuePosition": 4,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-6",
-                  "s-tonight-player-7"
-                ],
-                "teamB": [
-                  "s-tonight-player-8",
-                  "s-tonight-player-9"
-                ],
+                "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+                "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -650,14 +616,8 @@
           "queuePosition": 3,
           "origin": "manual",
           "manualProtected": true,
-          "teamA": [
-            "s-tonight-player-5",
-            "s-tonight-player-7"
-          ],
-          "teamB": [
-            "s-tonight-player-8",
-            "s-tonight-player-9"
-          ],
+          "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+          "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
           "courtIds": [],
           "startedAt": null,
           "endedAt": null,

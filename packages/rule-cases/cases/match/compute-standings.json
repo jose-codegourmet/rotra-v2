@@ -78,12 +78,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe"
-              ],
-              "teamB": [
-                "Amy"
-              ],
+              "teamA": ["Zoe"],
+              "teamB": ["Amy"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -105,12 +101,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe"
-              ],
-              "teamB": [
-                "Ben"
-              ],
+              "teamA": ["Zoe"],
+              "teamB": ["Ben"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -209,14 +201,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe",
-                "Amy"
-              ],
-              "teamB": [
-                "Ben",
-                "Dan"
-              ],
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -245,12 +231,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Eve"
-              ],
-              "teamB": [
-                "Amy"
-              ],
+              "teamA": ["Eve"],
+              "teamB": ["Amy"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -349,14 +331,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe",
-                "Amy"
-              ],
-              "teamB": [
-                "Ben",
-                "Dan"
-              ],
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -463,14 +439,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe",
-                "Amy"
-              ],
-              "teamB": [
-                "Ben",
-                "Dan"
-              ],
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,
@@ -577,14 +547,8 @@
               "queuePosition": 1,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "Zoe",
-                "Amy"
-              ],
-              "teamB": [
-                "Ben",
-                "Dan"
-              ],
+              "teamA": ["Zoe", "Amy"],
+              "teamB": ["Ben", "Dan"],
               "courtIds": [],
               "startedAt": 0,
               "endedAt": 1,

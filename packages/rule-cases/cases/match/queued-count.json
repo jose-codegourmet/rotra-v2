@@ -17,14 +17,8 @@
               "queuePosition": 5,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "s-tonight-player-1",
-                "s-tonight-player-2"
-              ],
-              "teamB": [
-                "s-tonight-player-3",
-                "s-tonight-player-4"
-              ],
+              "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+              "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
               "courtIds": [],
               "startedAt": 1799998200000,
               "endedAt": 1799999400000,
@@ -46,12 +40,8 @@
               "queuePosition": 5,
               "origin": "manual",
               "manualProtected": true,
-              "teamA": [
-                "s-tonight-player-3"
-              ],
-              "teamB": [
-                "s-tonight-player-4"
-              ],
+              "teamA": ["s-tonight-player-3"],
+              "teamB": ["s-tonight-player-4"],
               "courtIds": [],
               "startedAt": 1799998200000,
               "endedAt": 1799999400000,

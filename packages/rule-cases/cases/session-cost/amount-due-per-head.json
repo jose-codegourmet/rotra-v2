@@ -5,9 +5,7 @@
     {
       "name": "session cost estimates in centavos › uses at least one player and handles no costs (sessionCost) #1",
       "input": {
-        "args": [
-          null
-        ]
+        "args": [null]
       },
       "expected": null
     },

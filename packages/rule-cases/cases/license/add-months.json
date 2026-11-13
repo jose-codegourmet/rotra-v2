@@ -5,30 +5,21 @@
     {
       "name": "dates (rotra-admin.html addMonths / diffDays) › clamps to the end of a shorter month (license) #1",
       "input": {
-        "args": [
-          "2026-01-31",
-          1
-        ]
+        "args": ["2026-01-31", 1]
       },
       "expected": "2026-02-28"
     },
     {
       "name": "dates (rotra-admin.html addMonths / diffDays) › clamps to the end of a shorter month (license) #2",
       "input": {
-        "args": [
-          "2028-01-31",
-          1
-        ]
+        "args": ["2028-01-31", 1]
       },
       "expected": "2028-02-29"
     },
     {
       "name": "dates (rotra-admin.html addMonths / diffDays) › clamps to the end of a shorter month (license) #3",
       "input": {
-        "args": [
-          "2026-10-01",
-          6
-        ]
+        "args": ["2026-10-01", 6]
       },
       "expected": "2027-04-01"
     }

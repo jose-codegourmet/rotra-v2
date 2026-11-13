@@ -5,10 +5,7 @@
     {
       "name": "export frames › titles a single frame plainly and keeps one frame for empty standings (sessionResult)",
       "input": {
-        "args": [
-          [],
-          "feed"
-        ]
+        "args": [[], "feed"]
       },
       "expected": [
         {

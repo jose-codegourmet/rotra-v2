@@ -5,20 +5,14 @@
     {
       "name": "dates (rotra-admin.html addMonths / diffDays) › writes a term range with the year once when it does not change (license) #1",
       "input": {
-        "args": [
-          "2026-10-03",
-          "2026-11-02"
-        ]
+        "args": ["2026-10-03", "2026-11-02"]
       },
       "expected": "Oct 3 – Nov 2, 2026"
     },
     {
       "name": "dates (rotra-admin.html addMonths / diffDays) › writes a term range with the year once when it does not change (license) #2",
       "input": {
-        "args": [
-          "2026-04-01",
-          "2027-03-31"
-        ]
+        "args": ["2026-04-01", "2027-03-31"]
       },
       "expected": "Apr 1, 2026 – Mar 31, 2027"
     }

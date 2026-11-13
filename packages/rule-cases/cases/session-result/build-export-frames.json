@@ -63,10 +63,7 @@
             }
           },
           {
-            "slides": [
-              "standings",
-              "awards"
-            ],
+            "slides": ["standings", "awards"],
             "includeOffDay": false
           },
           "story"
@@ -75,17 +72,11 @@
       "expected": [
         {
           "title": "Standings",
-          "rows": [
-            "Player 1",
-            "Player 2",
-            "Player 3"
-          ]
+          "rows": ["Player 1", "Player 2", "Player 3"]
         },
         {
           "title": "Awards",
-          "rows": [
-            "MVP · Player 1"
-          ]
+          "rows": ["MVP · Player 1"]
         }
       ]
     },
@@ -143,9 +134,7 @@
             }
           },
           {
-            "slides": [
-              "awards"
-            ],
+            "slides": ["awards"],
             "includeOffDay": false
           },
           "feed"
@@ -154,9 +143,7 @@
       "expected": [
         {
           "title": "Awards",
-          "rows": [
-            "MVP · none"
-          ]
+          "rows": ["MVP · none"]
         }
       ]
     }

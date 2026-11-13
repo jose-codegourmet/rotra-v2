@@ -262,17 +262,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-2"
-                ],
-                "teamB": [
-                  "s-tonight-player-3",
-                  "s-tonight-player-4"
-                ],
-                "courtIds": [
-                  "s-tonight-court-1"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+                "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+                "courtIds": ["s-tonight-court-1"],
                 "startedAt": 1794538208195,
                 "endedAt": null,
                 "substitutions": [],
@@ -545,17 +537,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-2"
-                ],
-                "teamB": [
-                  "s-tonight-player-3",
-                  "s-tonight-player-4"
-                ],
-                "courtIds": [
-                  "s-tonight-court-1"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+                "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+                "courtIds": ["s-tonight-court-1"],
                 "startedAt": 1794538208195,
                 "endedAt": null,
                 "substitutions": [],
@@ -828,17 +812,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "s-tonight-player-1",
-                  "s-tonight-player-2"
-                ],
-                "teamB": [
-                  "s-tonight-player-3",
-                  "s-tonight-player-4"
-                ],
-                "courtIds": [
-                  "s-tonight-court-1"
-                ],
+                "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+                "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+                "courtIds": ["s-tonight-court-1"],
                 "startedAt": 1794538208195,
                 "endedAt": null,
                 "substitutions": [],

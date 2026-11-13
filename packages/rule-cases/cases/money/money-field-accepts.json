@@ -5,99 +5,77 @@
     {
       "name": "rejects invalid or unsafe amount ''",
       "input": {
-        "args": [
-          ""
-        ]
+        "args": [""]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount ' '",
       "input": {
-        "args": [
-          " "
-        ]
+        "args": [" "]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount '-1'",
       "input": {
-        "args": [
-          "-1"
-        ]
+        "args": ["-1"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount '1.001'",
       "input": {
-        "args": [
-          "1.001"
-        ]
+        "args": ["1.001"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount '1,23'",
       "input": {
-        "args": [
-          "1,23"
-        ]
+        "args": ["1,23"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount '1e3'",
       "input": {
-        "args": [
-          "1e3"
-        ]
+        "args": ["1e3"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount 'NaN'",
       "input": {
-        "args": [
-          "NaN"
-        ]
+        "args": ["NaN"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount '90071992547409.92'",
       "input": {
-        "args": [
-          "90071992547409.92"
-        ]
+        "args": ["90071992547409.92"]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount -1",
       "input": {
-        "args": [
-          -1
-        ]
+        "args": [-1]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount 0.29",
       "input": {
-        "args": [
-          0.29
-        ]
+        "args": [0.29]
       },
       "expected": false
     },
     {
       "name": "rejects invalid or unsafe amount 9007199254740992",
       "input": {
-        "args": [
-          9007199254740992
-        ]
+        "args": [9007199254740992]
       },
       "expected": false
     }

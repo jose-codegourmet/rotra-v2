@@ -6,9 +6,7 @@
       "name": "Most Improved and Off Day baseline › uses full games only: a credited substitute game never changes it (sessionResult)",
       "input": {
         "args": [
-          [
-            "club-Amy"
-          ],
+          ["club-Amy"],
           [
             {
               "clubPlayerId": "club-Amy",
@@ -88,9 +86,7 @@
       "name": "Most Improved and Off Day baseline › has no rate without a full game and ignores sessions not in the player history (sessionResult)",
       "input": {
         "args": [
-          [
-            "club-Amy"
-          ],
+          ["club-Amy"],
           [
             {
               "clubPlayerId": "club-Amy",

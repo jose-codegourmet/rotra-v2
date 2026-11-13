@@ -15,17 +15,9 @@
             "queuePosition": 1,
             "origin": "manual",
             "manualProtected": true,
-            "teamA": [
-              "Migs",
-              "Amy"
-            ],
-            "teamB": [
-              "Ben",
-              "Dan"
-            ],
-            "courtIds": [
-              "c1"
-            ],
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": ["c1"],
             "startedAt": null,
             "endedAt": null,
             "substitutions": [],
@@ -141,17 +133,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Migs",
-                  "Amy"
-                ],
-                "teamB": [
-                  "Ben",
-                  "Dan"
-                ],
-                "courtIds": [
-                  "c1"
-                ],
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
                 "startedAt": null,
                 "endedAt": null,
                 "substitutions": [],
@@ -167,14 +151,8 @@
                 "queuePosition": 3,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Fay"
-                ],
-                "teamB": [
-                  "Gus",
-                  "Hal"
-                ],
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -191,14 +169,8 @@
                 "queuePosition": 4,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Gus"
-                ],
-                "teamB": [
-                  "Fay",
-                  "Hal"
-                ],
+                "teamA": ["Eve", "Gus"],
+                "teamB": ["Fay", "Hal"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -237,14 +209,8 @@
           "queuePosition": 3,
           "origin": "manual",
           "manualProtected": true,
-          "teamA": [
-            "Eve",
-            "Fay"
-          ],
-          "teamB": [
-            "Gus",
-            "Hal"
-          ],
+          "teamA": ["Eve", "Fay"],
+          "teamB": ["Gus", "Hal"],
           "courtIds": [],
           "startedAt": null,
           "endedAt": null,
@@ -268,17 +234,9 @@
             "queuePosition": 1,
             "origin": "manual",
             "manualProtected": true,
-            "teamA": [
-              "Migs",
-              "Amy"
-            ],
-            "teamB": [
-              "Ben",
-              "Dan"
-            ],
-            "courtIds": [
-              "c1"
-            ],
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": ["c1"],
             "startedAt": null,
             "endedAt": null,
             "substitutions": [],
@@ -394,17 +352,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Migs",
-                  "Amy"
-                ],
-                "teamB": [
-                  "Ben",
-                  "Dan"
-                ],
-                "courtIds": [
-                  "c1"
-                ],
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
                 "startedAt": null,
                 "endedAt": null,
                 "substitutions": [],
@@ -420,17 +370,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Fay"
-                ],
-                "teamB": [
-                  "Gus",
-                  "Hal"
-                ],
-                "courtIds": [
-                  "c2"
-                ],
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": ["c2"],
                 "startedAt": 0,
                 "endedAt": null,
                 "substitutions": [],
@@ -446,14 +388,8 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Migs"
-                ],
-                "teamB": [
-                  "Gus",
-                  "Amy"
-                ],
+                "teamA": ["Eve", "Migs"],
+                "teamB": ["Gus", "Amy"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -470,14 +406,8 @@
                 "queuePosition": 2,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Migs",
-                  "Amy"
-                ],
-                "teamB": [
-                  "Ben",
-                  "Dan"
-                ],
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -516,14 +446,8 @@
           "queuePosition": 2,
           "origin": "manual",
           "manualProtected": true,
-          "teamA": [
-            "Migs",
-            "Amy"
-          ],
-          "teamB": [
-            "Ben",
-            "Dan"
-          ],
+          "teamA": ["Migs", "Amy"],
+          "teamB": ["Ben", "Dan"],
           "courtIds": [],
           "startedAt": null,
           "endedAt": null,
@@ -547,17 +471,9 @@
             "queuePosition": 1,
             "origin": "manual",
             "manualProtected": true,
-            "teamA": [
-              "Migs",
-              "Amy"
-            ],
-            "teamB": [
-              "Ben",
-              "Dan"
-            ],
-            "courtIds": [
-              "c1"
-            ],
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": ["c1"],
             "startedAt": null,
             "endedAt": null,
             "substitutions": [],
@@ -673,17 +589,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Migs",
-                  "Amy"
-                ],
-                "teamB": [
-                  "Ben",
-                  "Dan"
-                ],
-                "courtIds": [
-                  "c1"
-                ],
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
                 "startedAt": null,
                 "endedAt": null,
                 "substitutions": [],
@@ -699,20 +607,8 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Fay",
-                  "Gus",
-                  "Hal",
-                  "Migs"
-                ],
-                "teamB": [
-                  "Amy",
-                  "Ben",
-                  "Dan",
-                  "x",
-                  "y"
-                ],
+                "teamA": ["Eve", "Fay", "Gus", "Hal", "Migs"],
+                "teamB": ["Amy", "Ben", "Dan", "x", "y"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,
@@ -756,17 +652,9 @@
             "queuePosition": 1,
             "origin": "manual",
             "manualProtected": true,
-            "teamA": [
-              "Eve",
-              "Fay"
-            ],
-            "teamB": [
-              "Gus",
-              "Hal"
-            ],
-            "courtIds": [
-              "c2"
-            ],
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"],
+            "courtIds": ["c2"],
             "startedAt": 0,
             "endedAt": null,
             "substitutions": [],
@@ -882,17 +770,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Fay"
-                ],
-                "teamB": [
-                  "Gus",
-                  "Hal"
-                ],
-                "courtIds": [
-                  "c2"
-                ],
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
+                "courtIds": ["c2"],
                 "startedAt": 0,
                 "endedAt": null,
                 "substitutions": [],
@@ -935,17 +815,9 @@
             "queuePosition": 1,
             "origin": "manual",
             "manualProtected": true,
-            "teamA": [
-              "Migs",
-              "Amy"
-            ],
-            "teamB": [
-              "Ben",
-              "Dan"
-            ],
-            "courtIds": [
-              "c1"
-            ],
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": ["c1"],
             "startedAt": null,
             "endedAt": null,
             "substitutions": [],
@@ -1061,17 +933,9 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Migs",
-                  "Amy"
-                ],
-                "teamB": [
-                  "Ben",
-                  "Dan"
-                ],
-                "courtIds": [
-                  "c1"
-                ],
+                "teamA": ["Migs", "Amy"],
+                "teamB": ["Ben", "Dan"],
+                "courtIds": ["c1"],
                 "startedAt": null,
                 "endedAt": null,
                 "substitutions": [],
@@ -1087,14 +951,8 @@
                 "queuePosition": 1,
                 "origin": "manual",
                 "manualProtected": true,
-                "teamA": [
-                  "Eve",
-                  "Fay"
-                ],
-                "teamB": [
-                  "Gus",
-                  "Hal"
-                ],
+                "teamA": ["Eve", "Fay"],
+                "teamB": ["Gus", "Hal"],
                 "courtIds": [],
                 "startedAt": null,
                 "endedAt": null,

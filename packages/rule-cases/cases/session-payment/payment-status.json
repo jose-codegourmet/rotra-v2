@@ -5,10 +5,7 @@
     {
       "name": "payment status (#479) › compares the amount received with the current amount due (sessionPayment) #1",
       "input": {
-        "args": [
-          null,
-          70000
-        ]
+        "args": [null, 70000]
       },
       "expected": {
         "kind": "unpaid"
@@ -133,10 +130,7 @@
     {
       "name": "payment status (#479) › treats any mark as paid when no fee is set (sessionPayment) #2",
       "input": {
-        "args": [
-          null,
-          null
-        ]
+        "args": [null, null]
       },
       "expected": {
         "kind": "unpaid"

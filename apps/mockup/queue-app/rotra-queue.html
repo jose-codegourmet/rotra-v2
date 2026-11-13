@@ -4330,7 +4330,10 @@ function bagTeams(s, t) {
   return { teamA, teamB, ...(kept.length ? { reason: `Bagging pair: ${kept.join(', ')} are partners` } : {}) };
 }
 function generateDrafts(s, tab, count, target, fixed) {
-  const players = s.roster.filter((r) => r.present && (tab === 'ahead' || !busyOf(s, r.pid))).map((r) => r.pid);
+  // D-2026-11-13-07: players already in a waiting match in the Main Queue are never available to Generate matches.
+  const pool = s.roster.filter((r) => r.present && (tab === 'ahead' || !busyOf(s, r.pid))).map((r) => r.pid);
+  const players = pool.filter((p) => !queuedCount(s, p));
+  const inQueue = pool.length - players.length;
   const formats = [...(s.doubles ? ['doubles'] : []), ...(s.singles ? ['singles'] : [])];
   if (!formats.length) return { error: 'Enable Singles or Doubles before generating.' };
   if (tab === 'catchup' && (!Number.isInteger(+target) || +target < 1 || target === '')) return { error: 'Enter a whole number of games, 1 or more.' };
@@ -4361,6 +4364,7 @@ function generateDrafts(s, tab, count, target, fixed) {
     if (players.length && remaining === 0) stop = `Everyone available reaches ${target} game${+target === 1 ? '' : 's'} with these matches.`;
     else if (remaining > 0) stop += ` ${remaining} more game${remaining === 1 ? ' is' : 's are'} still needed to reach ${target}.`;
   }
+  if (out.length < count && inQueue) stop = `${stop.replace(/\.$/, '')} · ${inQueue} player${inQueue === 1 ? ' is' : 's are'} already in the Main Queue`;
   return { matches: out, stop };
 }
 

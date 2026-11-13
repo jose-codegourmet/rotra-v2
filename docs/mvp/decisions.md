@@ -48,6 +48,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-04](#d-2026-11-13-04) | Profile card layout and display name (nickname first) | approved 2026-11-13 | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-13-05](#d-2026-11-13-05) | Finished session page (Match history, Leaderboard tab); club profile cards | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-06](#d-2026-11-13-06) | Sharing widened: any public profile, leaderboard, awards and Off Day; no QR on share images | approved 2026-11-13 | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-13-07](#d-2026-11-13-07) | Generate matches leaves out players already in the Main Queue; fewer matches when too few are free | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -869,3 +870,14 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Your own games can be shared before the club publishes** (amends [D-2026-11-09-08](#d-2026-11-09-08); owner: “since it's your profile you can share your own games”): on your own Games page every session has **Share games**, and each counted game has its own share icon (**Share game**). Only **Share result** (your place in the Standings) still waits for the club to share the results.
   - **Share images carry no QR and no grid background**, except the Session QR (Invite Session) and the club invite. The link field under **OR** is how people open the page.
 - **References:** mockup logs [profile card open/share](../mockup-changes/2026-11-13-profile-card-open-share.md), [share leaderboard](../mockup-changes/2026-11-13-share-leaderboard.md), [awards](../mockup-changes/2026-11-13-queue-awards-faces-share.md), [no grid, no QR](../mockup-changes/2026-11-13-share-images-no-grid-no-qr.md).
+
+### D-2026-11-13-07 — Generate matches leaves out players already in the Main Queue; fewer matches when too few are free
+- **Decision status:** approved (owner, November 13, 2026, in chat).
+- **Implementation status:** mockup only — built in the Queue mockup on November 13, 2026; the mock app follows through a ticket.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Queued players are not available.** Generate matches (every tab, Plan Ahead included) never counts a player who is already in any waiting match in the Main Queue as available. Players who are playing or on court stay out as before (Plan Ahead still includes them).
+  - **Fewer matches, said plainly.** When too few players are left, Generate makes only as many matches as the free players allow and says how many players were left out because they are already queued, appended to the batch result: “Made {k} of {n} matches · {q} players are already in the Main Queue”.
+  - Auto Queue court filling, Suggest and Main Queue Regenerate are unchanged.
+- **References:** mockup log [Generate leaves out the Main Queue](../mockup-changes/2026-11-13-queue-generate-excludes-main-queue.md); [Queueing › Generate matches workspace](../business_logic/product/queue/modules/queueing/README.md#generate-matches-workspace); [Q-AUTO](../screens/product/modules/queue/match-queue.md#q-auto--generate-matches-workspace).

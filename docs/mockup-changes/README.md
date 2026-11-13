@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 34 · IN MOCK APP: 139 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 35 · IN MOCK APP: 139 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -343,6 +343,7 @@ NEW: 34 · IN MOCK APP: 139 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-13-queue-change-court-label](2026-11-13-queue-change-court-label.md) | Queue: Change court label in the court menu | — | NEW |
 | [2026-11-13-queue-finished-session-page](2026-11-13-queue-finished-session-page.md) | Finished session page: Match history replaces the Queue; a Leaderboard tab with your position | public-session-tabs, match-history-card, session-standings, public-queue | NEW |
 | [2026-11-13-queue-free-court-timer](2026-11-13-queue-free-court-timer.md) | Free courts show how long they have been free | court-card status chip | NEW |
+| [2026-11-13-queue-generate-excludes-main-queue](2026-11-13-queue-generate-excludes-main-queue.md) | Generate matches leaves out players already in the Main Queue | Generate matches batch result (chip / info notice) | NEW |
 | [2026-11-13-queue-level-select-menu](2026-11-13-queue-level-select-menu.md) | Roster level: a coloured select menu | level-select-menu (new; replaces the native select in the roster) | NEW |
 | [2026-11-13-queue-match-history-courts](2026-11-13-queue-match-history-courts.md) | Finished session page: Match history as courts | game-row court variant (shared with ROTRA Player) | NEW |
 | [2026-11-13-queue-no-show-cancelled](2026-11-13-queue-no-show-cancelled.md) | Queue: No show (cancelled) on the live Players view | — | NEW |

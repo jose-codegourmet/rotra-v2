@@ -90,7 +90,7 @@ Formerly called Auto Queue; renamed 2026-11-06.
 
 **UI component:** `AutoQueueWorkspace` in `@rotra/ui/auto-queue-workspace`. Its props carry draft batches, selection order, session minimum and eligible-player state; the `AutoQueue` container owns mock generation and transfer validation. Drafts are in memory, not durable persistence.
 
-The Queue view switches between Main Queue and Generate matches. Generate matches has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically.
+The Queue view switches between Main Queue and Generate matches. Generate matches has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically. Players already in any waiting match in the Main Queue are never available to Generate, in any tab ([D-2026-11-13-07](../../../../mvp/decisions.md#d-2026-11-13-07)).
 
 **Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, avatars, short names, VS, and the status line (the generation reason, “A player is playing now; this match waits until they are free.”, or a warn-tone attention reason). A **Draft** chip replaces #position; there is no handle and no Put on court / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
 
@@ -135,6 +135,7 @@ Batch results are never errors. A full batch shows as a neutral chip; a shortfal
 - Catch Up met in the plan: “Everyone available reaches {target} games with these matches.” Only eligible players are counted; currently playing players are excluded from Catch Up.
 - Catch Up unable to progress: “Made {k} of {n}: no other match helps anyone reach {target} games.”
 - Catch Up still short: append “{s} more games are still needed to reach {target}.”
+- Players left out because they are queued ([D-2026-11-13-07](../../../../mvp/decisions.md#d-2026-11-13-07)): when the batch has fewer drafts than asked for and present players were left out because they are already in a waiting match, drop the result's final full stop and append “ · {q} players are already in the Main Queue” (“1 player is” for one), e.g. “Made 0 of 4: not enough free players for another match · 6 players are already in the Main Queue”.
 
 Before generating, empty copy is “Choose how many matches, then Generate.”; Catch Up without a valid
 target says “Choose a game target, then Generate.” After choosing inputs, “Generate matches to see

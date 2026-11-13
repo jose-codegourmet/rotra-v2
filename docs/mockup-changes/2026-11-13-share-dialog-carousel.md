@@ -1,6 +1,6 @@
 # Share dialogs: compact carousel
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: queue, player, admin
 Mockup: `.sh-dlg .sh-tiles`, `.sh-car-nav`, SHCAR / shCarInit / shCarSync in apps/mockup/queue-app/rotra-queue.html, apps/mockup/player-app/rotra-player.html, apps/mockup/admin-app/rotra-admin.html

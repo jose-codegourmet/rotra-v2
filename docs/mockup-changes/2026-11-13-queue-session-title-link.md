@@ -1,6 +1,6 @@
 # Session title opens the public page in a new tab
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sessTitle, publicPageUrl, ACT.openPublicTab; used in the preparation, live session (console), session record and session results headers

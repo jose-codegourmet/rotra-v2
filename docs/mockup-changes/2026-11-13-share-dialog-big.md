@@ -1,6 +1,6 @@
 # Share dialogs: big, full-size images, pick several, full-screen view
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: player, queue, admin
 Mockup: apps/mockup/player-app/rotra-player.html › SHEETS.share, shPick, shViewer, downloadShare; apps/mockup/queue-app/rotra-queue.html › SHEETS.shareFinish, SHEETS.shareBoard, shPick, shViewer; apps/mockup/admin-app/rotra-admin.html › shareProfileSheet, shPick, shViewer

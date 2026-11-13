@@ -1,6 +1,6 @@
 # Profile: Recent sessions, Recent games, and a Sessions page
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › latestSessionsCard, recentGamesCard, viewSessions, sessRow, sessListOf, ACT.openSessions, prototype routes

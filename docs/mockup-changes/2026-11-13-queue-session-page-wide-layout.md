@@ -1,6 +1,6 @@
 # Session page: two columns on wide screens
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › public session page (viewPublic); `.pub-page`, `.pub-two`, `.pub-side`, `.pub-main`

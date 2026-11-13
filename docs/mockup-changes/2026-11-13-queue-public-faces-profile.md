@@ -1,6 +1,6 @@
 # Public session page: every player face opens the profile card
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › public session page (viewPublic) › Courts now (courtsNow) and Queue tiles; pubFace helper

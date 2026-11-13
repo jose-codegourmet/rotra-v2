@@ -1,6 +1,6 @@
 # Share leaderboard: several images, pick which
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.shareBoard, LB_SHARE_ROWS; entry points histResultsPane (session record › Results › Standings) and pubLeaderboard (finished session page › Leaderboard)

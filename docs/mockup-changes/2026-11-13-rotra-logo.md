@@ -1,6 +1,6 @@
 # The ROTRA logo replaces the text wordmark
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: queue, player, admin
 Mockup: LOGO, rotraLogo(), rotraLogoDark() and `.rlogo` styles in apps/mockup/queue-app/rotra-queue.html, apps/mockup/player-app/rotra-player.html, apps/mockup/admin-app/rotra-admin.html

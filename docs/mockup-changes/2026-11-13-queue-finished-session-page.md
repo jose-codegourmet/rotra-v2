@@ -1,6 +1,6 @@
 # Finished session page: Match history replaces the Queue; a Leaderboard tab with your position
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › public session page (viewPublic) › pubHistory, pubLeaderboard; My night › Match history

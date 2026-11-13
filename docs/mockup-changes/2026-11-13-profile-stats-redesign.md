@@ -1,6 +1,6 @@
 # Profile stats: Latest stats on the podium grid, a pixel fire that grows with the win rate
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/queue-app/rotra-queue.html › statsSec; apps/mockup/player-app/rotra-player.html › profileCard; apps/mockup/admin-app/rotra-admin.html › Players › Quick view — all through ppStatsBlock

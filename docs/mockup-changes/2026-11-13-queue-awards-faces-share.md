@@ -1,6 +1,6 @@
 # Awards: faces and a Share button per award
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › awardRow, slideAwards, slideOffDay, SHEETS.shareFinish (kind: 'award'), ACT.shareAward

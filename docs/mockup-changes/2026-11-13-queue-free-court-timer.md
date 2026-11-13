@@ -1,6 +1,6 @@
 # Free courts show how long they have been free
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › freeSince, freeChip, mEnd; console court cards, public “Courts now”, replay courts

@@ -1,6 +1,6 @@
 # Share dialog: Story, Facebook post and Square, a big OR, and a copy field with the icon inside
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › SHEETS.share (Share profile, Share rank, Share result, Share games); apps/mockup/queue-app/rotra-queue.html › SHEETS.shareFinish (Leaderboard › Your position › Share)

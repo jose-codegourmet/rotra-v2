@@ -1,6 +1,6 @@
 # Profile page card matches the profile dialog
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewProfile hero (`.p-hero`)

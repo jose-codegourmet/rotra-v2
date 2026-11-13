@@ -1,6 +1,6 @@
 # Generate matches leaves out players already in the Main Queue
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › generateDrafts (Generate matches workspace)

@@ -1,6 +1,6 @@
 # Admin: Quick view becomes the banner profile card with stats; Admin picks the default banner
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Quick view (playerManagementSheet 'Quick view') and Settings › Profile banners (viewBanners)

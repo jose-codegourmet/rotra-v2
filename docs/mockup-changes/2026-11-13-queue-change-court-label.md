@@ -1,6 +1,6 @@
 # Queue: Change court label in the court menu
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › courtMenu, SHEETS.courtLabel, ACT.openCourtLabel / saveCourtLabel

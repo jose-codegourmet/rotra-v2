@@ -1,6 +1,6 @@
 # Share images: no “Run the game.” tagline
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: queue, player, admin
 Mockup: share card footers (`.qs-foot`, `.qc-foot`, `.sh-foot`) and Player's drawShareCard in the three mockups

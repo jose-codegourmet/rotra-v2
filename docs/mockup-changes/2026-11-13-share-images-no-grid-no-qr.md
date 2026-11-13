@@ -1,6 +1,6 @@
 # Share images: no grid background, no QR
 
-Status: NEW
+Status: IN MOCK APP — #808
 Date: 2026-11-13
 App: player, queue, admin
 Mockup: apps/mockup/player-app/rotra-player.html › shareCardHTML, drawShareCard, SHEETS.share; apps/mockup/queue-app/rotra-queue.html › `.qs-card`; apps/mockup/admin-app/rotra-admin.html › `.qs-card`

@@ -1,6 +1,6 @@
 # Playing match: Replace player (fix a mistake) next to Substitute
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.match (footer), SHEETS.replace (playing copy), ACT.confirmReplace

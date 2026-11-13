@@ -1,6 +1,6 @@
 # Profile card: open in a new tab, Share profile
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: queue, player, admin
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.pubProfile, SHEETS.profile (ppName, rotraProfileUrl), SHEETS.shareFinish (kind: 'profile'); apps/mockup/player-app/rotra-player.html › SHEETS.profileCard, shareModel (sh.pid), openShare; apps/mockup/admin-app/rotra-admin.html › playerManagementSheet quick view (qvFoot), shareProfileSheet, rotraProfileUrl

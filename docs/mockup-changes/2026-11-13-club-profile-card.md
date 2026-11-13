@@ -1,6 +1,6 @@
 # Club profile card in the player card's style (Queue, Player, Admin)
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.clubCard (organizer line on the public page); apps/mockup/player-app/rotra-player.html › SHEETS.clubCard (profile Clubs card); apps/mockup/admin-app/rotra-admin.html › clubCardSheet (Clubs and licenses rows)

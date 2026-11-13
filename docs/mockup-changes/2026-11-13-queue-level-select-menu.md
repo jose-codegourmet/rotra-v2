@@ -1,6 +1,6 @@
 # Roster level: a coloured select menu
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › lvMenu, rvLevel, ACT.lvMenuToggle / lvMenuPick; `.lvm*` styles

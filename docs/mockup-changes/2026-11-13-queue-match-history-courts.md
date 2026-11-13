@@ -1,6 +1,6 @@
 # Finished session page: Match history as courts
 
-Status: NEW
+Status: IN MOCK APP — #842
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › pubHistoryMatch (uses courtSVG); `.gm*` styles

@@ -1,6 +1,6 @@
 # Profile: Leaderboard ranking replaces eligibility once a player qualifies
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › rankingCard, eligibility, ACT.seeOnBoard; `.rk-head`, `.rk-near`, `.lb-row.cur`, `.lb-row.flash`

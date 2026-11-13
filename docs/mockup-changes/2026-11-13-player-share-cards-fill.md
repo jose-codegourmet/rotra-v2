@@ -1,6 +1,6 @@
 # Player share images: fill the Story and Facebook post sizes
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › shareCardHTML (class `one`), shareModel (game: `one: true`); `.sh-card.post`, `.sh-card.story`, `.sh-card.one` styles

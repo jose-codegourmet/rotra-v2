@@ -1,6 +1,6 @@
 # Player leaderboard: tapping a player opens the profile card first
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Leaderboard (podium and rows)

@@ -1,6 +1,6 @@
 # Queue profile dialogs: stats on the Queue Master's profile, and each player's own banner
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › profile dialog (SHEETS.profile) and session-page participant card (SHEETS.pubProfile)

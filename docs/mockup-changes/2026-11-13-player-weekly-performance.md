@@ -1,6 +1,6 @@
 # Games page: Weekly performance chart
 
-Status: NEW
+Status: IN MOCK APP — #822
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › weeklyPerf, viewHistory; `.wp*` styles

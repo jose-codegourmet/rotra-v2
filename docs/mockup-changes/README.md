@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 35 · IN MOCK APP: 139 · CANCELLED: 3 · MOCKUP ONLY: 4
+IN MOCK APP: 174 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -323,40 +323,40 @@ NEW: 35 · IN MOCK APP: 139 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-12-player-pull-to-refresh](2026-11-12-player-pull-to-refresh.md) | The leaderboard, a club's page and the own profile refresh when pulled down | pull-to-refresh (shared with the Queue log), leaderboard-list, club-next-up-card, club-calendar, my-sessions-card | IN MOCK APP — PR #763 |
 | [2026-11-12-queue-member-join](2026-11-12-queue-member-join.md) | Club members join upcoming sessions right away; Always require a request | session-link-card, join-request-card | IN MOCK APP — #764 |
 | [2026-11-12-queue-pull-to-refresh](2026-11-12-queue-pull-to-refresh.md) | The session page refreshes when pulled down, and when the tab comes back | pull-to-refresh (new), public-refresh-bar | IN MOCK APP — PR #763 |
-| [2026-11-13-admin-default-banner-quick-view](2026-11-13-admin-default-banner-quick-view.md) | Admin: Quick view becomes the banner profile card with stats; Admin picks the default banner | player-quick-view, profile-banner, banner-library-tile | NEW |
-| [2026-11-13-club-profile-card](2026-11-13-club-profile-card.md) | Club profile card in the player card's style (Queue, Player, Admin) | club-profile-card (new, built on participant-profile-card), player-quick-view | NEW |
-| [2026-11-13-player-default-banner](2026-11-13-player-default-banner.md) | Player: the default banner comes from Admin; always-private players keep their own banner; stats count the calendar year | profile-banner, participant-profile-card | NEW |
-| [2026-11-13-player-game-row-court](2026-11-13-player-game-row-court.md) | Player app: games shown as a small badminton court | game-row (court variant; reuses the Compare court art) | NEW |
+| [2026-11-13-admin-default-banner-quick-view](2026-11-13-admin-default-banner-quick-view.md) | Admin: Quick view becomes the banner profile card with stats; Admin picks the default banner | player-quick-view, profile-banner, banner-library-tile | IN MOCK APP — #814 |
+| [2026-11-13-club-profile-card](2026-11-13-club-profile-card.md) | Club profile card in the player card's style (Queue, Player, Admin) | club-profile-card (new, built on participant-profile-card), player-quick-view | IN MOCK APP — #814 |
+| [2026-11-13-player-default-banner](2026-11-13-player-default-banner.md) | Player: the default banner comes from Admin; always-private players keep their own banner; stats count the calendar year | profile-banner, participant-profile-card | IN MOCK APP — #814 |
+| [2026-11-13-player-game-row-court](2026-11-13-player-game-row-court.md) | Player app: games shown as a small badminton court | game-row (court variant; reuses the Compare court art) | IN MOCK APP — #822 |
 | [2026-11-13-player-latest-matches](2026-11-13-player-latest-matches.md) | Player profile: Recent games → Latest matches | profile-recent-games | CANCELLED — superseded the same day by 2026-11-13-player-latest-sessions.md before it was built; the mockup now shows Latest sessions (superseded by 2026-11-13-player-latest-sessions) |
-| [2026-11-13-player-latest-sessions](2026-11-13-player-latest-sessions.md) | Player profile: Latest sessions, each opening that session's matches | profile-recent-games, session-matches-dialog | NEW |
-| [2026-11-13-player-leaderboard-profile-card](2026-11-13-player-leaderboard-profile-card.md) | Player leaderboard: tapping a player opens the profile card first | leaderboard-row, leaderboard-podium, participant-profile-card | NEW |
-| [2026-11-13-player-profile-hero-like-card](2026-11-13-player-profile-hero-like-card.md) | Profile page card matches the profile dialog | profile-hero (aligned with participant-profile-card) | NEW |
-| [2026-11-13-player-ranking-card](2026-11-13-player-ranking-card.md) | Profile: Leaderboard ranking replaces eligibility once a player qualifies | profile-ranking-card (reuses leaderboard-row) | NEW |
-| [2026-11-13-player-recent-sessions-games](2026-11-13-player-recent-sessions-games.md) | Profile: Recent sessions, Recent games, and a Sessions page | profile-sessions-card, profile-games-card, player-sessions-page | NEW |
-| [2026-11-13-player-share-cards-fill](2026-11-13-player-share-cards-fill.md) | Player share images: fill the Story and Facebook post sizes | share-card | NEW |
-| [2026-11-13-player-stats-visibility](2026-11-13-player-stats-visibility.md) | Privacy and contact: switches for profile stats and weekly performance | privacy-settings (two switches), weekly-performance-chart, participant-profile-card | NEW |
-| [2026-11-13-player-weekly-performance](2026-11-13-player-weekly-performance.md) | Games page: Weekly performance chart | weekly-performance-chart | NEW |
-| [2026-11-13-profile-card-name-layout](2026-11-13-profile-card-name-layout.md) | Profile cards: no title bar, banner to the top edge, nickname first with a Copy RTR ID button | participant-profile-card, player-quick-view, sheet | NEW |
-| [2026-11-13-profile-card-open-share](2026-11-13-profile-card-open-share.md) | Profile card: open in a new tab, Share profile | participant-profile-card, share-dialog | NEW |
-| [2026-11-13-profile-stats-redesign](2026-11-13-profile-stats-redesign.md) | Profile stats: Latest stats on the podium grid, a pixel fire that grows with the win rate | participant-profile-card, player-quick-view, profile-stats | NEW |
-| [2026-11-13-queue-awards-faces-share](2026-11-13-queue-awards-faces-share.md) | Awards: faces and a Share button per award | award-card, share-dialog (award image) | NEW |
-| [2026-11-13-queue-change-court-label](2026-11-13-queue-change-court-label.md) | Queue: Change court label in the court menu | — | NEW |
-| [2026-11-13-queue-finished-session-page](2026-11-13-queue-finished-session-page.md) | Finished session page: Match history replaces the Queue; a Leaderboard tab with your position | public-session-tabs, match-history-card, session-standings, public-queue | NEW |
-| [2026-11-13-queue-free-court-timer](2026-11-13-queue-free-court-timer.md) | Free courts show how long they have been free | court-card status chip | NEW |
-| [2026-11-13-queue-generate-excludes-main-queue](2026-11-13-queue-generate-excludes-main-queue.md) | Generate matches leaves out players already in the Main Queue | Generate matches batch result (chip / info notice) | NEW |
-| [2026-11-13-queue-level-select-menu](2026-11-13-queue-level-select-menu.md) | Roster level: a coloured select menu | level-select-menu (new; replaces the native select in the roster) | NEW |
-| [2026-11-13-queue-match-history-courts](2026-11-13-queue-match-history-courts.md) | Finished session page: Match history as courts | game-row court variant (shared with ROTRA Player) | NEW |
-| [2026-11-13-queue-no-show-cancelled](2026-11-13-queue-no-show-cancelled.md) | Queue: No show (cancelled) on the live Players view | — | NEW |
-| [2026-11-13-queue-profile-stats-banner](2026-11-13-queue-profile-stats-banner.md) | Queue profile dialogs: stats on the Queue Master's profile, and each player's own banner | participant-profile-card, profile-banner | NEW |
-| [2026-11-13-queue-public-faces-profile](2026-11-13-queue-public-faces-profile.md) | Public session page: every player face opens the profile card | public-court-card, public-queue-tile, participant-profile-card | NEW |
-| [2026-11-13-queue-replace-during-play](2026-11-13-queue-replace-during-play.md) | Playing match: Replace player (fix a mistake) next to Substitute | match-sheet actions, replace-player sheet | NEW |
-| [2026-11-13-queue-session-page-wide-layout](2026-11-13-queue-session-page-wide-layout.md) | Session page: two columns on wide screens | public-session-page (layout only) | NEW |
-| [2026-11-13-queue-session-title-link](2026-11-13-queue-session-title-link.md) | Session title opens the public page in a new tab | session-page-header | NEW |
-| [2026-11-13-rotra-logo](2026-11-13-rotra-logo.md) | The ROTRA logo replaces the text wordmark | rotra-logo (new), app-top-bar, sign-in, share-card, session-qr-card | NEW |
-| [2026-11-13-share-dialog-big](2026-11-13-share-dialog-big.md) | Share dialogs: big, full-size images, pick several, full-screen view | share-dialog, share-image-picker, share-image-viewer | NEW |
-| [2026-11-13-share-dialog-carousel](2026-11-13-share-dialog-carousel.md) | Share dialogs: compact carousel | share-image-picker (carousel) | NEW |
-| [2026-11-13-share-dialog](2026-11-13-share-dialog.md) | Share dialog: Story, Facebook post and Square, a big OR, and a copy field with the icon inside | share-sheet, share-card, copy-field (new) | NEW |
-| [2026-11-13-share-images-no-grid-no-qr](2026-11-13-share-images-no-grid-no-qr.md) | Share images: no grid background, no QR | share-card | NEW |
-| [2026-11-13-share-images-no-tagline](2026-11-13-share-images-no-tagline.md) | Share images: no “Run the game.” tagline | share-card, session-qr-card | NEW |
-| [2026-11-13-share-leaderboard](2026-11-13-share-leaderboard.md) | Share leaderboard: several images, pick which | share-dialog, leaderboard-share-card | NEW |
+| [2026-11-13-player-latest-sessions](2026-11-13-player-latest-sessions.md) | Player profile: Latest sessions, each opening that session's matches | profile-recent-games, session-matches-dialog | IN MOCK APP — #822 |
+| [2026-11-13-player-leaderboard-profile-card](2026-11-13-player-leaderboard-profile-card.md) | Player leaderboard: tapping a player opens the profile card first | leaderboard-row, leaderboard-podium, participant-profile-card | IN MOCK APP — #814 |
+| [2026-11-13-player-profile-hero-like-card](2026-11-13-player-profile-hero-like-card.md) | Profile page card matches the profile dialog | profile-hero (aligned with participant-profile-card) | IN MOCK APP — #822 |
+| [2026-11-13-player-ranking-card](2026-11-13-player-ranking-card.md) | Profile: Leaderboard ranking replaces eligibility once a player qualifies | profile-ranking-card (reuses leaderboard-row) | IN MOCK APP — #822 |
+| [2026-11-13-player-recent-sessions-games](2026-11-13-player-recent-sessions-games.md) | Profile: Recent sessions, Recent games, and a Sessions page | profile-sessions-card, profile-games-card, player-sessions-page | IN MOCK APP — #822 |
+| [2026-11-13-player-share-cards-fill](2026-11-13-player-share-cards-fill.md) | Player share images: fill the Story and Facebook post sizes | share-card | IN MOCK APP — #822 |
+| [2026-11-13-player-stats-visibility](2026-11-13-player-stats-visibility.md) | Privacy and contact: switches for profile stats and weekly performance | privacy-settings (two switches), weekly-performance-chart, participant-profile-card | IN MOCK APP — #822 |
+| [2026-11-13-player-weekly-performance](2026-11-13-player-weekly-performance.md) | Games page: Weekly performance chart | weekly-performance-chart | IN MOCK APP — #822 |
+| [2026-11-13-profile-card-name-layout](2026-11-13-profile-card-name-layout.md) | Profile cards: no title bar, banner to the top edge, nickname first with a Copy RTR ID button | participant-profile-card, player-quick-view, sheet | IN MOCK APP — #814 |
+| [2026-11-13-profile-card-open-share](2026-11-13-profile-card-open-share.md) | Profile card: open in a new tab, Share profile | participant-profile-card, share-dialog | IN MOCK APP — #814 |
+| [2026-11-13-profile-stats-redesign](2026-11-13-profile-stats-redesign.md) | Profile stats: Latest stats on the podium grid, a pixel fire that grows with the win rate | participant-profile-card, player-quick-view, profile-stats | IN MOCK APP — #822 |
+| [2026-11-13-queue-awards-faces-share](2026-11-13-queue-awards-faces-share.md) | Awards: faces and a Share button per award | award-card, share-dialog (award image) | IN MOCK APP — #842 |
+| [2026-11-13-queue-change-court-label](2026-11-13-queue-change-court-label.md) | Queue: Change court label in the court menu | — | IN MOCK APP — #832 |
+| [2026-11-13-queue-finished-session-page](2026-11-13-queue-finished-session-page.md) | Finished session page: Match history replaces the Queue; a Leaderboard tab with your position | public-session-tabs, match-history-card, session-standings, public-queue | IN MOCK APP — #842 |
+| [2026-11-13-queue-free-court-timer](2026-11-13-queue-free-court-timer.md) | Free courts show how long they have been free | court-card status chip | IN MOCK APP — #832 |
+| [2026-11-13-queue-generate-excludes-main-queue](2026-11-13-queue-generate-excludes-main-queue.md) | Generate matches leaves out players already in the Main Queue | Generate matches batch result (chip / info notice) | IN MOCK APP — #832 |
+| [2026-11-13-queue-level-select-menu](2026-11-13-queue-level-select-menu.md) | Roster level: a coloured select menu | level-select-menu (new; replaces the native select in the roster) | IN MOCK APP — #832 |
+| [2026-11-13-queue-match-history-courts](2026-11-13-queue-match-history-courts.md) | Finished session page: Match history as courts | game-row court variant (shared with ROTRA Player) | IN MOCK APP — #842 |
+| [2026-11-13-queue-no-show-cancelled](2026-11-13-queue-no-show-cancelled.md) | Queue: No show (cancelled) on the live Players view | — | IN MOCK APP — #832 |
+| [2026-11-13-queue-profile-stats-banner](2026-11-13-queue-profile-stats-banner.md) | Queue profile dialogs: stats on the Queue Master's profile, and each player's own banner | participant-profile-card, profile-banner | IN MOCK APP — #814 |
+| [2026-11-13-queue-public-faces-profile](2026-11-13-queue-public-faces-profile.md) | Public session page: every player face opens the profile card | public-court-card, public-queue-tile, participant-profile-card | IN MOCK APP — #814 |
+| [2026-11-13-queue-replace-during-play](2026-11-13-queue-replace-during-play.md) | Playing match: Replace player (fix a mistake) next to Substitute | match-sheet actions, replace-player sheet | IN MOCK APP — #832 |
+| [2026-11-13-queue-session-page-wide-layout](2026-11-13-queue-session-page-wide-layout.md) | Session page: two columns on wide screens | public-session-page (layout only) | IN MOCK APP — #842 |
+| [2026-11-13-queue-session-title-link](2026-11-13-queue-session-title-link.md) | Session title opens the public page in a new tab | session-page-header | IN MOCK APP — #842 |
+| [2026-11-13-rotra-logo](2026-11-13-rotra-logo.md) | The ROTRA logo replaces the text wordmark | rotra-logo (new), app-top-bar, sign-in, share-card, session-qr-card | IN MOCK APP — #808 |
+| [2026-11-13-share-dialog-big](2026-11-13-share-dialog-big.md) | Share dialogs: big, full-size images, pick several, full-screen view | share-dialog, share-image-picker, share-image-viewer | IN MOCK APP — #808 |
+| [2026-11-13-share-dialog-carousel](2026-11-13-share-dialog-carousel.md) | Share dialogs: compact carousel | share-image-picker (carousel) | IN MOCK APP — #808 |
+| [2026-11-13-share-dialog](2026-11-13-share-dialog.md) | Share dialog: Story, Facebook post and Square, a big OR, and a copy field with the icon inside | share-sheet, share-card, copy-field (new) | IN MOCK APP — #808 |
+| [2026-11-13-share-images-no-grid-no-qr](2026-11-13-share-images-no-grid-no-qr.md) | Share images: no grid background, no QR | share-card | IN MOCK APP — #808 |
+| [2026-11-13-share-images-no-tagline](2026-11-13-share-images-no-tagline.md) | Share images: no “Run the game.” tagline | share-card, session-qr-card | IN MOCK APP — #808 |
+| [2026-11-13-share-leaderboard](2026-11-13-share-leaderboard.md) | Share leaderboard: several images, pick which | share-dialog, leaderboard-share-card | IN MOCK APP — #842 |
 <!-- status-index:end -->

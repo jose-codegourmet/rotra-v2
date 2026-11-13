@@ -1,6 +1,6 @@
 # Profile cards: no title bar, banner to the top edge, nickname first with a Copy RTR ID button
 
-Status: NEW
+Status: IN MOCK APP — #814
 Date: 2026-11-13
 App: player
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.profile and SHEETS.pubProfile; apps/mockup/player-app/rotra-player.html › SHEETS.profileCard; apps/mockup/admin-app/rotra-admin.html › Players › Quick view

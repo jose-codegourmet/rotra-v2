@@ -1,6 +1,6 @@
 # Queue: No show (cancelled) on the live Players view
 
-Status: NEW
+Status: IN MOCK APP — #832
 Date: 2026-11-13
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › poolPane card actions, noShowPanel, SHEETS.noShow, ACT.openNoShow / confirmNoShow / undoNoShow

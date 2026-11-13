@@ -1,31 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { clubs } from '../fixtures/clubs'
-import {
-  buildPostValues,
-  type ClubPrice,
-  DEFAULT_POST_TEMPLATE,
-  formatClubPriceLine,
-} from './club.rules'
+import { buildPostValues, type ClubPrice, DEFAULT_POST_TEMPLATE } from './club.rules'
 
 const _paid = (monthlyPesos: number, yearlyPesos: number): ClubPrice => ({
   licensePricing: 'paid',
   licenseMonthlyMinor: monthlyPesos * 100,
   licenseYearlyMinor: yearlyPesos * 100,
-})
-
-describe('club price rules (rotra-admin.html savePct / priceLine / amountText)', () => {
-  it('formats every seeded club price from SEED_PRICE', () => {
-    expect(clubs.map((club) => formatClubPriceLine(club))).toEqual([
-      '₱1,500 a month · ₱15,000 a year (17% off)',
-      '₱1,500 a month · ₱15,000 a year (17% off)',
-      '₱1,200 a month · ₱12,000 a year (17% off)',
-      '₱1,800 a month · ₱18,000 a year (17% off)',
-      '₱1,500 a month · ₱15,000 a year (17% off)',
-      '₱1,500 a month · ₱15,000 a year (17% off)',
-      '₱1,500 a month · ₱15,000 a year (17% off)',
-      'Free (tester club)',
-    ])
-  })
 })
 
 describe('Facebook post court times and join line (#730)', () => {

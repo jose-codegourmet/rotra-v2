@@ -20,6 +20,8 @@ export type ShareImageProps = {
   children: ReactNode
   /** Right side of the footer, beside the ROTRA logo (Queue leaderboard: “#1–8 of 24”) */
   footerEnd?: ReactNode
+  /** Where the soft green glow sits: Player images 'top' (.sh-card), Queue images 'bottom' (.qs-card) */
+  glow?: 'top' | 'bottom'
   /** Accessible name of the image */
   label?: string
   className?: string
@@ -43,6 +45,7 @@ export function ShareImage({
   spot,
   children,
   footerEnd,
+  glow = 'top',
   label = 'Share image preview',
   className,
 }: ShareImageProps) {
@@ -50,8 +53,12 @@ export function ShareImage({
     <section
       aria-label={label}
       data-share-image={format}
+      data-share-glow={glow}
       className={cn(
-        'box-border flex shrink-0 flex-col gap-3 overflow-hidden rounded-[20px] bg-share-bg p-5 text-left text-share-fg [background-image:radial-gradient(120%_70%_at_50%_0%,var(--share-glow),transparent_60%)]',
+        'box-border flex shrink-0 flex-col gap-3 overflow-hidden rounded-[20px] bg-share-bg p-5 text-left text-share-fg',
+        glow === 'bottom'
+          ? '[background-image:radial-gradient(120%_70%_at_50%_100%,var(--share-glow),transparent_70%)]'
+          : '[background-image:radial-gradient(120%_70%_at_50%_0%,var(--share-glow),transparent_60%)]',
         SIZE[format],
         className,
       )}
@@ -59,6 +66,7 @@ export function ShareImage({
       <div className="flex items-center gap-3">
         <span
           data-qr-logo="spot"
+          data-share-initials={spot.initials}
           className="size-13 shrink-0 overflow-hidden rounded-full bg-share-accent text-share-bg"
         >
           <ClubLogo

@@ -3,7 +3,7 @@
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
-import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
+import { SHARE_FORMATS, type ShareFormat, shareInitials } from '@rotra/ui/share-card/helpers'
 import { ShareImage } from '@rotra/ui/share-image'
 import { ShareImagePicker, type ShareImagePickerItem } from '@rotra/ui/share-image-picker'
 import { useState } from 'react'
@@ -80,6 +80,7 @@ export function LeaderboardShareCard({
       fileName: `rotra-leaderboard-${format}-${k + 1}`,
       image: (
         <ShareImage
+          glow="bottom"
           format={format}
           headline={sessionTitle}
           subline={dateLine}
@@ -119,7 +120,8 @@ export function LeaderboardShareCard({
                   </span>
                   <span
                     data-qr-logo={`lb-${index}`}
-                    className="block size-[22px] overflow-hidden rounded-full bg-share-fg/10"
+                    data-share-initials={shareInitials(row.name)}
+                    className="block size-[22px] overflow-hidden rounded-full bg-share-fg/10 text-share-fg"
                   >
                     <Avatar
                       name={row.name}

@@ -56,6 +56,7 @@ export function WinRateShareCard({
     fileName: `rotra-profile-${format}`,
     image: (
       <ShareImage
+        glow="bottom"
         format={format}
         headline={name}
         subline={rtrId ?? 'ROTRA player'}

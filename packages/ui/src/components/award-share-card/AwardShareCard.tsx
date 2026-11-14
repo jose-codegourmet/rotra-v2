@@ -2,7 +2,7 @@
 
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
-import { SHARE_FORMATS } from '@rotra/ui/share-card/helpers'
+import { SHARE_FORMATS, shareInitials } from '@rotra/ui/share-card/helpers'
 import { ShareImage } from '@rotra/ui/share-image'
 import { ShareImagePicker, type ShareImagePickerItem } from '@rotra/ui/share-image-picker'
 
@@ -85,6 +85,7 @@ export function AwardShareCard(props: AwardShareCardProps) {
     const image =
       props.kind === 'award' ? (
         <ShareImage
+          glow="bottom"
           key={format}
           format={format}
           headline={props.entry.name}
@@ -133,6 +134,7 @@ export function AwardShareCard(props: AwardShareCardProps) {
         </ShareImage>
       ) : (
         <ShareImage
+          glow="bottom"
           key={format}
           format={format}
           headline={club.name}
@@ -162,8 +164,9 @@ export function AwardShareCard(props: AwardShareCardProps) {
                 >
                   <span
                     data-qr-logo={`aw-${i}`}
+                    data-share-initials={shareInitials(entry.name)}
                     className={cn(
-                      'block shrink-0 overflow-hidden rounded-full bg-share-fg/10',
+                      'block shrink-0 overflow-hidden rounded-full bg-share-fg/10 text-share-fg',
                       square ? 'size-8' : 'size-10',
                     )}
                   >

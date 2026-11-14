@@ -33,8 +33,9 @@ export type PlayerGame = {
   note?: string
   /**
    * Faces on the game court (2026-11-13 game row log), in the order of `partners` / `opponents`.
-   * `playerId` is null for a guest or someone with no ROTRA profile. Missing when the source has no
-   * per-player detail (real mode for now): the court then draws names only.
+   * `playerId` is null for a guest or someone with no ROTRA profile. Set by both the mock and the
+   * real read (an always-private player's name is masked there, the picture stays); when missing
+   * the court draws names only.
    */
   partnerPlayers?: PlayerGamePlayer[]
   opponentPlayers?: PlayerGamePlayer[]

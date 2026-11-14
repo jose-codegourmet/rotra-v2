@@ -126,8 +126,11 @@ export async function readMySessions(context: PlayerContext) {
 
 /**
  * The share card's saved results for one finished session of the signed-in player: whether the
- * club shared its standings, the player's published standing, and each game's other players. A
- * guest (no profile with an RTR ID) shows a masked name and no picture, as on public pages.
+ * club shared its standings, the player's published standing, and each of the player's own games'
+ * other players. Own games are shareable before the club publishes (D-2026-11-13-06), so the
+ * people come back for an unpublished session too; only `published` and `position` (Share result)
+ * wait for the standings to be shared. Only games the player played are read. A guest (no profile
+ * with an RTR ID) shows a masked name and no picture, as on public pages.
  */
 export async function readMyShareSession(context: PlayerContext, sessionId: string) {
   const empty = { published: false, position: null, games: {} }
@@ -141,15 +144,13 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
         publishedSnapshot: { select: { standings: true } },
       },
     })
-    if (publication?.state !== 'published' || !publication.publishedSlides.includes('standings'))
-      return empty
+    const published =
+      publication?.state === 'published' && publication.publishedSlides.includes('standings')
     const ids = await myClubPlayerIds(tx, context.playerId)
     const mine = new Set(ids)
-    const standings = Array.isArray(publication.publishedSnapshot?.standings)
-      ? (publication.publishedSnapshot.standings as {
-          clubPlayerId?: unknown
-          position?: unknown
-        }[])
+    const saved = published ? publication?.publishedSnapshot?.standings : undefined
+    const standings = Array.isArray(saved)
+      ? (saved as { clubPlayerId?: unknown; position?: unknown }[])
       : []
     const standing = standings.find(
       (row) => typeof row.clubPlayerId === 'string' && mine.has(row.clubPlayerId),
@@ -188,8 +189,8 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
     )
     const participant = (id: string) => byId.get(id) ?? { name: maskPublicName(''), picture: null }
     return {
-      published: true,
-      position: typeof standing?.position === 'number' ? standing.position : null,
+      published,
+      position: published && typeof standing?.position === 'number' ? standing.position : null,
       games: Object.fromEntries(
         facts.map((f) => [
           f.matchId,

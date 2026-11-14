@@ -259,6 +259,7 @@ export function SwapPickerSheet({
       <div className="flex flex-wrap items-center gap-2">
         <SegmentedControl
           aria-label="Skill level"
+          className="[&_button]:min-h-8 [&_button]:gap-1.5 [&_button]:px-2.5 [&_button]:text-[13px]"
           value={band}
           onChange={(value) => {
             setBand(value as Band)
@@ -295,7 +296,7 @@ export function SwapPickerSheet({
                 title={on ? 'Tap again to reverse' : undefined}
                 onClick={() => pickSort(key)}
                 className={cn(
-                  'inline-flex min-h-9 cursor-pointer items-center gap-1 rounded-[7px] border-0 bg-transparent px-3.5 font-semibold text-fg2 touch:min-h-11',
+                  'inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-[7px] border-0 bg-transparent px-2.5 text-[13px] font-semibold text-fg2',
                   on && 'bg-elev text-fg',
                 )}
               >
@@ -311,7 +312,7 @@ export function SwapPickerSheet({
         </div>
       </div>
       {shown.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2 max-[640px]:grid-cols-4">
           {shown.map((p) => (
             <Tile
               key={p.id}
@@ -445,7 +446,9 @@ export function SwapPickerSheet({
           }}
           title="All players"
           closeLabel="Back to the suggestions"
-          className="bg-bg"
+          dock="bottom"
+          className="max-h-[88dvh] bg-bg"
+          bodyClassName="px-4 pb-4"
         >
           {allPlayers}
         </Sheet>

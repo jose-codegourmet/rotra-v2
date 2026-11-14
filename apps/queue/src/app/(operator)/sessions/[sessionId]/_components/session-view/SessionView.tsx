@@ -426,11 +426,11 @@ export function SessionView({
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
       notOpen: !courtOpen(c, now),
-      // "Free · N min": since the last match on it ended, or since the court opened / the session started.
+      // "Free · N min": since the last match on it ended, or from the planned start, even when opened early (plain "Free" until then), or the session start.
       freeMinutes: live
         ? freeCourtMinutes(
             courtFreeSince(c.id, ctx.matches, now) ??
-              Math.max(c.openedEarlyAt ?? c.startsAt ?? 0, s.startedAt ?? 0),
+              Math.max(c.startsAt ?? s.startedAt ?? s.scheduledStartAt, s.startedAt ?? 0),
             now,
           )
         : null,

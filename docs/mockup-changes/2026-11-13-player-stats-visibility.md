@@ -28,7 +28,7 @@ Superseded by: none
 
 ## Reuse plan
 - Reuses as is: settings switch row.
-- Database: proposed `show_profile_stats`, `show_weekly_performance` (identity.md); migration needed.
+- Database: `show_profile_stats`, `show_weekly_performance` (identity.md); built in `20261114000200_player_stats_visibility` (P11.6 #828) with the Player service and `POST /api/me/stats-visibility`.
 
 ## Pass 2 (artifact comment, November 13, 2026: “clicking on public highlights the privacy setting for this”)
 - The visibility chip on your own Weekly Performance card (Public / Signed-in players / Only you / Hidden) is a button: it opens Privacy and contact, scrolls to **Show my weekly performance**, outlines that row in the accent for about two seconds and puts focus on its switch. Tooltip and accessible name add “Change it in Privacy and contact”.

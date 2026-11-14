@@ -152,3 +152,14 @@ anon/authenticated. Integrity checks: 72 passed, 0 failed, including the two new
 `is_default = true` row is rejected by `profile_banners_one_default`, and moving the default (clear,
 then set) in one transaction is accepted. After the rebuild only `court` is the default. Not applied
 to the shared database; the Admin service and routes were not run against a database.
+
+## P11.6 (#828) — `players.show_profile_stats`, `players.show_weekly_performance` (November 14, 2026)
+
+Disposable local PostgreSQL 16 (`rotra_disposable` on 127.0.0.1), `scripts/disposable-db.sh all`: the
+full history of 29 migrations (through `20261114000200_player_stats_visibility`) rebuilds with no
+drift between the database and the Prisma schema. SQL-only objects unchanged: 182 check constraints,
+1 exclusion constraint, 28 triggers, 24 partial/expression indexes; 0 tables granted to
+anon/authenticated. Integrity checks: 72 passed, 0 failed. Both columns are `boolean`, not null,
+default `true`; after the fictional seed both fixture players read both switches on. No new
+integrity check (the columns have no CHECK). Not applied to the shared database; the Player service
+and route were not run against a database.

@@ -345,6 +345,13 @@ default false); partial unique index `profile_banners_one_default` on `(is_defau
 server keeps the default shown and not deleted (no CHECK or trigger, like the 2-shown rule). See the
 migration's README.
 
+## P11.6 — Stats on your profile (2026-11-13-player-stats-visibility)
+
+`20261114000200_player_stats_visibility` (additive). `players.show_profile_stats` and
+`players.show_weekly_performance` (boolean, not null, default true; existing rows read as shown). No
+CHECK, trigger, index or grant: `players` already has RLS and no anon/authenticated/PUBLIC grants.
+See the migration's README.
+
 ## Match requests and Players can request (D-2026-11-09-05)
 
 `20261112000400_session_match_requests` (additive). `queue_sessions.request_formats`

@@ -25,6 +25,8 @@ const PUBLIC_PLAYER_SELECT = {
   bannerId: true,
   banner: { select: { id: true, image: true } },
   profileVisibility: true,
+  showProfileStats: true,
+  showWeeklyPerformance: true,
   experienceMonths: true,
   experienceRecordedAt: true,
   personalDetails: true,
@@ -92,6 +94,10 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
     picture: row.avatarRef,
     bannerId: row.bannerId,
     profileVisibility: row.profileVisibility,
+    // Stats on your profile: the flags only. The Player app hides Latest stats and the Weekly
+    // performance chart from everyone but the player, like mock mode.
+    showProfileStats: row.showProfileStats,
+    showWeeklyPerformance: row.showWeeklyPerformance,
     playingStyle: masked ? '' : playingStyle(row.personalDetails),
     experienceYears: masked || months == null ? null : Math.floor(months / 12),
     experienceMonths: masked || months == null ? null : months % 12,
@@ -352,6 +358,40 @@ export async function setHiddenFromDirectory(
       })
     }
     return { hiddenFromDirectory: input.hiddenFromDirectory }
+  })
+}
+
+/**
+ * P-PROFILE-PRIVACY › Stats on your profile: Show my profile stats and Show my weekly performance,
+ * under the loaded account revision. A switch left out keeps its value; nothing changed is not a
+ * write. Returns the saved own profile.
+ */
+export async function setStatsVisibility(
+  context: PlayerContext,
+  input: { showProfileStats?: boolean; showWeeklyPerformance?: boolean; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    const data: { showProfileStats?: boolean; showWeeklyPerformance?: boolean } = {}
+    if (input.showProfileStats !== undefined && input.showProfileStats !== player.showProfileStats)
+      data.showProfileStats = input.showProfileStats
+    if (
+      input.showWeeklyPerformance !== undefined &&
+      input.showWeeklyPerformance !== player.showWeeklyPerformance
+    )
+      data.showWeeklyPerformance = input.showWeeklyPerformance
+    if (Object.keys(data).length) {
+      requireRevision(player.revision, input.expectedRevision)
+      await tx.player.update({
+        where: { id: player.id },
+        data: { ...data, revision: { increment: 1 } },
+      })
+    }
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
+    return ownProfile(tx, await profileWithBanner(tx, row, true))
   })
 }
 

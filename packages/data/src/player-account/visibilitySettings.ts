@@ -6,7 +6,11 @@ import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import type { PlayerProfile, ProfileVisibility } from '../player/player.types'
 import { isRealDataMode } from '../real/mode'
-import { realSetHiddenFromDirectory, realSetProfileVisibility } from '../real/player'
+import {
+  realSetHiddenFromDirectory,
+  realSetProfileVisibility,
+  realSetStatsVisibility,
+} from '../real/player'
 import type { MyAccount } from './playerAccount.types'
 
 const SIGN_IN = 'Sign in to change your profile visibility.'
@@ -98,12 +102,11 @@ export type StatsVisibilityInput = { showProfileStats?: boolean; showWeeklyPerfo
 /**
  * P-PROFILE-PRIVACY › Stats on your profile (2026-11-13-player-stats-visibility): Show my profile
  * stats and Show my weekly performance, both on by default. Returns the saved public profile.
- * Real mode has no columns yet (proposed `show_profile_stats`, `show_weekly_performance`; the
- * migration waits for the owner), so it refuses the save and every profile reads as shown.
+ * Real mode stores them in `players.show_profile_stats` and `players.show_weekly_performance`
+ * (`20261114000200_player_stats_visibility`).
  */
 export async function setStatsVisibility(input: StatsVisibilityInput): Promise<PlayerProfile> {
-  if (isRealDataMode())
-    throw new MockError('retryable', "Couldn't save: this setting isn't available yet.")
+  if (isRealDataMode()) return realSetStatsVisibility(input)
   await delay(600)
   const session = await getSession('player')
   if (!session) throw new MockError('permission', 'Sign in to change who sees your stats.')

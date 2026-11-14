@@ -95,7 +95,7 @@ export function GameShareCard({
           </span>
         ))}
         {people.length > 2 ? (
-          <span data-qr-text className="pl-3 text-[9px] text-share-muted">
+          <span data-qr-text className="pl-1.5 text-[9px] text-share-muted">
             +{people.length - 2}
           </span>
         ) : null}
@@ -111,28 +111,31 @@ export function GameShareCard({
   )
 
   const content = (format: ShareFormat) => (
-    <div className="flex min-h-0 flex-1 flex-col justify-center gap-3 text-left">
-      <div>
-        <h3
-          data-qr-text
-          title={title}
-          className={cn(
-            'truncate leading-[1.15] font-extrabold text-share-fg',
-            format === 'square' ? 'text-lg' : 'text-[22px]',
-          )}
-        >
-          {title}
-        </h3>
-        <p
-          data-qr-text
-          className={cn(
-            'truncate text-share-muted',
-            format === 'square' ? 'text-[13px]' : 'text-sm',
-          )}
-        >
-          {dateLabel} · {clubName}
-        </p>
-      </div>
+    <div
+      className={cn(
+        'flex min-h-0 flex-1 flex-col gap-3 text-left',
+        format === 'square' ? 'justify-start' : 'justify-center',
+      )}
+    >
+      <h3
+        data-qr-text
+        title={title}
+        className={cn(
+          'truncate leading-[1.15] font-extrabold text-share-fg',
+          format === 'square' ? 'text-lg' : 'text-[22px]',
+        )}
+      >
+        {title}
+      </h3>
+      <p
+        data-qr-text
+        className={cn(
+          'truncate leading-[1.4] text-share-muted',
+          format === 'square' ? 'text-[13px]' : 'text-sm',
+        )}
+      >
+        {dateLabel} · {clubName}
+      </p>
       <article
         aria-label={`${won ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
         className={cn(
@@ -162,7 +165,7 @@ export function GameShareCard({
       </article>
       <b
         data-qr-text
-        className={cn('text-share-fg', format === 'square' ? 'text-base' : 'text-lg')}
+        className={cn('text-share-fg', format === 'square' ? 'text-base' : 'text-[18px]')}
       >
         {FORMATS[game.format]} · {won ? 'Won' : 'Lost'}
         {game.score ? ` ${game.score}` : ''}

@@ -1,7 +1,9 @@
 import 'server-only'
 import type { LeaderboardEntry } from '@rotra/data/leaderboard/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
+import { readShownProfileBanners } from '../admin/profile-banners'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { APPROVED_RANK_ALGORITHMS } from './projections'
@@ -40,17 +42,28 @@ const ROW_SELECT = {
   playerId: true,
   numericRank: true,
   skillLevel: { select: { code: true } },
-  player: { select: { fullName: true, nickname: true, avatarRef: true, profileVisibility: true } },
+  player: {
+    select: {
+      fullName: true,
+      nickname: true,
+      avatarRef: true,
+      profileVisibility: true,
+      banner: { select: { id: true, image: true } },
+    },
+  },
 } as const
+
+type ShownBanners = Awaited<ReturnType<typeof readShownProfileBanners>>
 
 type Row = Prisma.PlayerRankCurrentGetPayload<{ select: typeof ROW_SELECT }>
 
 /**
  * Public fields only: no contacts, rank components, evidence counts or private identity. This read is
  * cached for every viewer, so an always-private player (D-2026-11-12-01) is masked here for everyone,
- * their own row included; the picture and position stay, the level is hidden.
+ * their own row included; the picture, the Profile banner and position stay, the level is hidden.
+ * The banner is public like the picture (D-2026-11-11-11), so masked rows carry it too.
  */
-const entryOf = (row: Row, position: number): LeaderboardRow => {
+const entryOf = (row: Row, position: number, shownBanners: ShownBanners): LeaderboardRow => {
   const masked = row.player.profileVisibility === 'always_private'
   return {
     id: row.playerId,
@@ -58,6 +71,11 @@ const entryOf = (row: Row, position: number): LeaderboardRow => {
     nickname: masked ? null : row.player.nickname,
     playingLevel: row.skillLevel?.code as PlayingLevel,
     pictureUrl: row.player.avatarRef,
+    ...resolveProfileBanner(
+      row.player.banner?.id ?? null,
+      () => row.player.banner ?? undefined,
+      shownBanners,
+    ),
     position,
     ...(masked ? { masked: true, levelHidden: true } : {}),
   }
@@ -90,7 +108,8 @@ export async function readLeaderboardPage({ offset, limit }: { offset: number; l
     }),
     prisma.playerRankCurrent.count({ where: listedWhere() }),
   ])
-  return { entries: rows.map((row, i) => entryOf(row, offset + i + 1)), total }
+  const shownBanners = await readShownProfileBanners()
+  return { entries: rows.map((row, i) => entryOf(row, offset + i + 1, shownBanners)), total }
 }
 
 /** Name or nickname search over listed players only; the first 50 hits plus the full count. */
@@ -112,8 +131,9 @@ export async function searchLeaderboard(query: string) {
     prisma.playerRankCurrent.findMany({ where, orderBy: ORDER, take: 50, select: ROW_SELECT }),
     prisma.playerRankCurrent.count({ where }),
   ])
+  const shownBanners = await readShownProfileBanners()
   const hits = await Promise.all(
-    rows.map(async (row) => entryOf(row, (await positionOf(row)) ?? 0)),
+    rows.map(async (row) => entryOf(row, (await positionOf(row)) ?? 0, shownBanners)),
   )
   return { hits, total }
 }

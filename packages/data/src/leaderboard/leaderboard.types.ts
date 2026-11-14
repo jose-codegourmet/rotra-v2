@@ -7,4 +7,10 @@ export type LeaderboardEntry = {
   nickname: string | null
   playingLevel: PlayingLevel
   pictureUrl: string | null
+  /**
+   * The resolved Profile banner: public, like the picture, so masked rows keep it; missing draws the
+   * default.
+   */
+  bannerKey?: string | null
+  bannerImageUrl?: string | null
 }

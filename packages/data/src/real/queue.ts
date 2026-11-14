@@ -20,6 +20,7 @@ import type { SaveInventoryItemInput } from '../inventory/fetchers'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
 import type { PlayingLevel } from '../player/player.types'
+import type { ParticipantStats } from '../public-session/publicSession.types'
 import type {
   DownloadState,
   QueueSession,
@@ -607,6 +608,14 @@ export async function realGetDeleteImpact(id: string) {
     `/api/club/players/${encodeURIComponent(id)}/delete-impact`,
   )
   return impact
+}
+/** Stats · YEAR on the player profile dialog: null for guests and unclaimed records. */
+export async function realGetClubPlayerYearStats(id: string, signal?: AbortSignal) {
+  const { stats } = await realRequest<{ stats: ParticipantStats | null }>(
+    `/api/club/players/${encodeURIComponent(id)}/year-stats`,
+    { signal },
+  )
+  return stats
 }
 export function realDeleteClubPlayer(id: string) {
   return realRequest<{ clubPlayerId: string; name: string }>(

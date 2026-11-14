@@ -39,3 +39,4 @@ Superseded by: none
 
 ## Real app work
 - Leaderboard rows and podium open the profile card dialog; the card's Open full profile navigates.
+- Real mode: leaderboard rows (masked ones included) and club page members carry their own Profile banner, so the private card draws it (#821).

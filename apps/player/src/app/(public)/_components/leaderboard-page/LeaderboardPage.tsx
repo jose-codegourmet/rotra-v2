@@ -89,6 +89,8 @@ export function LeaderboardPage({ focusPlayerId }: { focusPlayerId?: string } = 
     playingLevel: PlayingLevel
     masked?: boolean
     levelHidden?: boolean
+    bannerKey?: string | null
+    bannerImageUrl?: string | null
   }) =>
     setCard({
       playerId: entry.id,
@@ -98,6 +100,9 @@ export function LeaderboardPage({ focusPlayerId }: { focusPlayerId?: string } = 
       level: entry.levelHidden ? null : entry.playingLevel,
       isYou: entry.id === account?.id,
       masked: !!entry.masked,
+      // The row's own banner draws the masked/private card; a named card reads the profile's.
+      bannerKey: entry.bannerKey,
+      bannerImageUrl: entry.bannerImageUrl,
     })
   const changeQuery = (value: string) => {
     setQuery(value)

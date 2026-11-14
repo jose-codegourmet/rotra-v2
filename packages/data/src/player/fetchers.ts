@@ -44,7 +44,21 @@ export async function getPlayerGames(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerSessionRecord[]> {
-  if (isRealDataMode()) return realGetPlayerGames(playerId, signal)
+  if (isRealDataMode()) {
+    // The server sends picture references; resolve characters to images as the mock does.
+    const face = (player: PlayerGamePlayer): PlayerGamePlayer => ({
+      ...player,
+      picture: profileCharacterImage(player.picture) ?? player.picture ?? null,
+    })
+    return (await realGetPlayerGames(playerId, signal)).map((session) => ({
+      ...session,
+      games: session.games.map((game) => ({
+        ...game,
+        partnerPlayers: game.partnerPlayers?.map(face),
+        opponentPlayers: game.opponentPlayers?.map(face),
+      })),
+    }))
+  }
   await playerRequest(signal)
   await requireProfileAccess(playerId)
   return (playerProjection().games[playerId] ?? []).map((session) => ({

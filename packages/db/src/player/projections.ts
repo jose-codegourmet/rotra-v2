@@ -1,5 +1,6 @@
 import 'server-only'
 import { WINDOW_DAYS, yearGameStats } from '@rotra/data/player/rules'
+import { maskPublicName } from '@rotra/data/public-session/rules'
 import { awardBaseline, createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -471,10 +472,45 @@ export async function confirmHistoryAttribution(
 }
 
 /**
- * P-HISTORY public read (`player.match-history`): valid finalized sessions only, grouped by
- * session, with each game's counting status. No costs, levels, Off Day or private identity.
+ * One person on a game court (`PlayerGamePlayer`): the entry's name snapshot, the ROTRA player's
+ * picture reference (a photo URL or `character:<id>`; the client resolves it) and player ID. A
+ * guest or unclaimed record (no profile with an RTR ID) has no picture and no player ID; their name
+ * shows as it always has on game rows. With `maskAlwaysPrivate`, an always-private player
+ * (D-2026-11-12-01) shows a masked name; their picture and player ID stay, as on the leaderboard.
  */
-async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[]) {
+type CourtEntry = {
+  nameSnapshot: string
+  playerAtEntry: {
+    id: string
+    avatarRef: string | null
+    profileVisibility: string
+    idAllocation: { rtrId: string } | null
+  } | null
+}
+function courtPlayer(
+  entry: CourtEntry | undefined,
+  maskAlwaysPrivate: boolean,
+): { name: string; picture: string | null; playerId: string | null } {
+  if (!entry) return { name: '', picture: null, playerId: null }
+  const player = entry.playerAtEntry
+  if (!player?.idAllocation) return { name: entry.nameSnapshot, picture: null, playerId: null }
+  return {
+    name:
+      maskAlwaysPrivate && player.profileVisibility === 'always_private'
+        ? maskPublicName(entry.nameSnapshot)
+        : entry.nameSnapshot,
+    picture: player.avatarRef ?? null,
+    playerId: player.id,
+  }
+}
+
+/**
+ * P-HISTORY public read (`player.match-history`): valid finalized sessions only, grouped by
+ * session, with each game's counting status and the faces on its court (`partnerPlayers` /
+ * `opponentPlayers`, in the order of `partners` / `opponents`). No costs, levels, Off Day or
+ * private identity; always-private players are masked unless `maskAlwaysPrivate` is false (Admin).
+ */
+async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPrivate = true) {
   const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
   const [sessions, entries] = await Promise.all([
     tx.queueSession.findMany({
@@ -490,10 +526,22 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[]) {
     }),
     tx.sessionPlayer.findMany({
       where: { sessionId: { in: sessionIds } },
-      select: { id: true, nameSnapshot: true },
+      select: {
+        id: true,
+        nameSnapshot: true,
+        playerAtEntry: {
+          select: {
+            id: true,
+            avatarRef: true,
+            profileVisibility: true,
+            idAllocation: { select: { rtrId: true } },
+          },
+        },
+      },
     }),
   ])
-  const names = new Map(entries.map((e) => [e.id, e.nameSnapshot]))
+  const byId = new Map(entries.map((e) => [e.id, e]))
+  const people = (ids: string[]) => ids.map((id) => courtPlayer(byId.get(id), maskAlwaysPrivate))
   return sessions
     .map((s) => ({
       id: s.id,
@@ -503,27 +551,36 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[]) {
       sessionPageUrl: s.publication?.publishedAt ? `/s/${s.publicSlug}` : null,
       games: facts
         .filter((f) => f.sessionId === s.id)
-        .map((f) => ({
-          id: f.matchId,
-          format: f.format,
-          partners: f.partnerEntryIds.map((id) => names.get(id) ?? ''),
-          opponents: f.opponentEntryIds.map((id) => names.get(id) ?? ''),
-          counting: !f.fullParticipation ? 'partial' : f.standardMatch ? 'counted' : 'fun',
-          result: f.team === f.winningTeam ? 'won' : 'lost',
-          score:
-            f.teamAScore == null || f.teamBScore == null
-              ? null
-              : f.team === 'A'
-                ? `${f.teamAScore}–${f.teamBScore}`
-                : `${f.teamBScore}–${f.teamAScore}`,
-        })),
+        .map((f) => {
+          const partnerPlayers = people(f.partnerEntryIds)
+          const opponentPlayers = people(f.opponentEntryIds)
+          return {
+            id: f.matchId,
+            format: f.format,
+            partners: partnerPlayers.map((p) => p.name),
+            opponents: opponentPlayers.map((p) => p.name),
+            partnerPlayers,
+            opponentPlayers,
+            counting: !f.fullParticipation ? 'partial' : f.standardMatch ? 'counted' : 'fun',
+            result: f.team === f.winningTeam ? 'won' : 'lost',
+            score:
+              f.teamAScore == null || f.teamBScore == null
+                ? null
+                : f.team === 'A'
+                  ? `${f.teamAScore}–${f.teamBScore}`
+                  : `${f.teamBScore}–${f.teamAScore}`,
+          }
+        }),
     }))
     .sort((a, b) => (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''))
 }
 
-export async function readPlayerMatchHistory(playerId: string) {
+/** `maskAlwaysPrivate: false` only behind the Admin account boundary (A-PLAYER games). */
+export async function readPlayerMatchHistory(playerId: string, { maskAlwaysPrivate = true } = {}) {
   if (!UUID.test(playerId)) return []
-  return prisma.$transaction(async (tx) => historyFromFacts(tx, await playerFacts(tx, playerId)))
+  return prisma.$transaction(async (tx) =>
+    historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate),
+  )
 }
 
 /** Admin history for a club-only unclaimed record, scoped to that club's existing match facts. */
@@ -534,7 +591,7 @@ export async function readClubPlayerMatchHistory(clubId: string, clubPlayerId: s
       where: { clubId, clubPlayerId },
       orderBy: [{ playedAt: 'desc' }, { matchId: 'asc' }],
     })
-    return historyFromFacts(tx, facts)
+    return historyFromFacts(tx, facts, false)
   })
 }
 

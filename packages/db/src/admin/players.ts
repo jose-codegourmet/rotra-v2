@@ -240,7 +240,8 @@ export async function readAdminPlayerGames(
     select: { playerId: true },
   })
   let sessions: Awaited<ReturnType<typeof readPlayerMatchHistory>>
-  if (player) sessions = await readPlayerMatchHistory(playerId)
+  // Admin sees every name, as on its other player reads; public reads mask always-private players.
+  if (player) sessions = await readPlayerMatchHistory(playerId, { maskAlwaysPrivate: false })
   else {
     const [clubOnly] = await readClubOnlyRecords(playerId)
     if (!clubOnly?.createdByClubId) throw new ServiceError('not_found')

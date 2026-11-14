@@ -50,8 +50,9 @@ export async function getPlayerShareData(
   }
   if (isRealDataMode()) {
     const saved = await realGetMyShareSession(sessionId, signal)
-    // Own games are shareable before the club publishes (D-2026-11-13-06); until then the server
-    // returns no people, so names are masked and there are no pictures.
+    // Own games are shareable before the club publishes (D-2026-11-13-06): the server returns the
+    // people on the player's own games either way (masked as on public pages); only the position
+    // waits for the standings. A game the server has no people for falls back to masked names.
     const real = (name: string, from?: PlayerShareParticipant): PlayerShareParticipant =>
       from
         ? { name: from.name, picture: profileCharacterImage(from.picture) ?? from.picture }

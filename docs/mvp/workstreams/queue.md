@@ -61,7 +61,7 @@ session page; the November 6 prototype changes (epic #408).
 | Finalization, status, invalid session | implemented | `real/finalization.ts:99,109`, `real/match.ts:632` → `finalization.ts:306,420,474` | #14 closed; #243 open |
 | Results view, publish/unpublish | implemented | `real/match.ts:572-603` → `db/src/queue/results.ts:103,152` | #15 closed |
 | Download result images | partially connected | Client-side frames only; `requestResultExport`/`markExportRendered` (`results.ts:248,305`) have no route | none found |
-| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts`; masked names and aggregate skill mix ([D-06](../decisions.md#d-2026-11-07-06)); preview operator-only (#469); Request to join offers guest form or ROTRA Player login ([D-07](../decisions.md#d-2026-11-07-07)) | #16 closed; #469, #474, #475, #476 |
+| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts`; masked names and aggregate skill mix ([D-06](../decisions.md#d-2026-11-07-06)); preview operator-only (#469); Request to join offers guest form or ROTRA Player login ([D-07](../decisions.md#d-2026-11-07-07)); a finished session's Match history for a signed-in Player from the Player app's `GET …/match-history` (own matches until shared, #850) | #16 closed; #469, #474, #475, #476, #850 |
 
 Notes: the session done review has no guest step (see [queue-offline.md](queue-offline.md)); the rank
 job records evidence only until #247; payment rules are still an open decision (#245).

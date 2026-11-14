@@ -6,6 +6,7 @@ export const matchHistoryMeta = {
     'Finished session page container: the signed-in read’s match history as PublicMatchHistory, with the replay (ReplayCard) on All once the results are shared.',
   usage: [
     'Rendered by PublicSession on the Details tab of a finished session, where the Queue was.',
+    'Mock mode gets the history from the signed-in read; real mode from the Player app’s match-history read (usePublicMatchHistory, #850): only the Player’s own matches until the club shares the results.',
     'Replay state is local: it opens at the end of the night; Play starts from the first match and advances one session minute every 120 ms. On All only matches started by the replay’s time show, newest first, and the ones on court glow.',
     'Faces (cards and replay) open the participant profile card through `onOpenParticipant`.',
     'A visitor (no history) sees the Log in line.',

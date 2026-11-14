@@ -2,6 +2,7 @@ import { playerOrigin } from '../public-session/context'
 import type {
   MyJoinRequest,
   MyNight,
+  PublicMatchHistory,
   PublicSessionPage,
   SendJoinRequestInput,
 } from '../public-session/publicSession.types'
@@ -127,4 +128,17 @@ export async function realGetMyNight(slug: string): Promise<MyNight> {
     ...wire,
     matchRequest: wire.matchRequest && { ...wire.matchRequest, at: msOf(wire.matchRequest.at) },
   }
+}
+
+/**
+ * **Match history** (2026-11-13 finished session log): a finished session's matches for the
+ * signed-in Player, a credentialed read on the Player origin like My night; `null` before the
+ * finish. Times are already epoch ms.
+ */
+export function realGetPublicMatchHistory(slug: string): Promise<PublicMatchHistory | null> {
+  const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
+  if (!origin) throw new Error('Sign in with ROTRA Player to see the match history.')
+  return realRequest<PublicMatchHistory | null>(`${origin}${base(slug)}/match-history`, {
+    credentials: 'include',
+  })
 }

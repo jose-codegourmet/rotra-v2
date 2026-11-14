@@ -252,7 +252,11 @@ export type SignedInPublicSession = PublicSessionPage & {
   courtsNow: PublicCourtNow[]
   /** Waiting matches in queue order; empty reads “No matches queued yet.” */
   queue: PublicQueuedMatch[]
-  /** Finished sessions only: the Match history; null or missing on every other state */
+  /**
+   * Finished sessions only: the Match history; null or missing on every other state. Mock only:
+   * real mode has no signed-in read and gets the same shape from the Player app's `match-history`
+   * read (`usePublicMatchHistory`).
+   */
   history?: PublicMatchHistory | null
 }
 
@@ -281,6 +285,8 @@ export type PublicHistoryMatch = {
 /**
  * A finished session's match history for a signed-in viewer. Until the club shares the results
  * (`shared` false) only the viewer's own matches are listed; `total` still counts every match.
+ * Mock mode builds it in the signed-in read; real mode reads it from the Player app's
+ * `match-history` read (`usePublicMatchHistory`).
  */
 export type PublicMatchHistory = {
   shared: boolean

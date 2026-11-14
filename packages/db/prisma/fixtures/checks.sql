@@ -144,6 +144,10 @@ SELECT pg_temp.expect_rejected('level changed after lock', $q$
   UPDATE session_players SET skill_level_id = 8 WHERE id = 'e1000000-0000-4000-8000-0000000a2001' $q$);
 SELECT pg_temp.expect_rejected('roster entry deleted instead of released', $q$
   DELETE FROM session_players WHERE id = 'e1000000-0000-4000-8000-0000000a3002' $q$);
+SELECT pg_temp.expect_rejected('roster entry both released and a no show (#839)', $q$
+  UPDATE session_players SET released_at = now(), release_reason = 'removed', no_show_at = now() WHERE id = 'e1000000-0000-4000-8000-0000000a3002' $q$);
+SELECT pg_temp.expect_accepted('no show marked on a level-locked live entry (#839)', $q$
+  UPDATE session_players SET no_show_at = now() WHERE id = 'e1000000-0000-4000-8000-0000000a2001' $q$);
 SELECT pg_temp.expect_rejected('second hold on an occupied court', $q$
   INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at)
   VALUES ('c0000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', '3a000000-0000-4000-8000-0000000a2001', now()) $q$);

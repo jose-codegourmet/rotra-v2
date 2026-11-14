@@ -77,10 +77,22 @@ export function liveCourts(tx: Tx, sessionId: string) {
   })
 }
 
-/** Live roster entries (not released) in slot order: confirmed_at, then id. */
+/**
+ * The live-roster filter on `session_players`: not released and not marked No show (cancelled)
+ * (#839). Every roster count, capacity check, standings read, payment list and public or history
+ * read uses it, so a no show is out of all of them until Back to roster clears `no_show_at`.
+ */
+export const LIVE_ENTRY = { releasedAt: null, noShowAt: null } as const
+
+/** True when an entry read by id is off the live roster (released, or a no show). */
+export function isOffRoster(entry: { releasedAt: Date | null; noShowAt: Date | null }) {
+  return entry.releasedAt != null || entry.noShowAt != null
+}
+
+/** Live roster entries (not released, not a no show) in slot order: confirmed_at, then id. */
 export function liveRoster(tx: Tx, sessionId: string) {
   return tx.sessionPlayer.findMany({
-    where: { sessionId, releasedAt: null },
+    where: { sessionId, ...LIVE_ENTRY },
     orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
   })
 }
@@ -111,7 +123,7 @@ export async function recomputeMinimum(tx: Tx, session: QueueSession) {
   if (session.state !== 'prepared' || !session.minimumIsCalculated) return session
   const courts = (await liveCourts(tx, session.id)).length
   const rosterCount = await tx.sessionPlayer.count({
-    where: { sessionId: session.id, releasedAt: null },
+    where: { sessionId: session.id, ...LIVE_ENTRY },
   })
   const minimumGames = estimateMinimum({
     courts,

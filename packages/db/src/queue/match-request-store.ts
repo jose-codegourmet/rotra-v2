@@ -2,7 +2,7 @@ import 'server-only'
 import type { MatchFormat } from '@rotra/data/match/types'
 import type { MatchRequest } from '@rotra/data/match-request/types'
 import type { SessionMatchRequest, SessionMatchRequestSpot } from '../generated/prisma/client'
-import type { Tx } from './session-store'
+import { LIVE_ENTRY, type Tx } from './session-store'
 
 /**
  * Storage helpers for match requests (D-2026-11-09-05) that other queue commands call inside their
@@ -40,7 +40,7 @@ export const namedIds = (row: MatchRequestRow) =>
 /** Ids of the session's live roster entries that are present right now. */
 export async function presentIds(tx: Tx, sessionId: string) {
   const rows = await tx.sessionPlayer.findMany({
-    where: { sessionId, releasedAt: null, present: true },
+    where: { sessionId, ...LIVE_ENTRY, present: true },
     select: { id: true },
   })
   return new Set(rows.map((r) => r.id))

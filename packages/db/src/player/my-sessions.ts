@@ -3,7 +3,7 @@ import { maskPublicName } from '@rotra/data/public-session/rules'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
-import { orderedWaitlist } from '../queue/session-store'
+import { LIVE_ENTRY, orderedWaitlist } from '../queue/session-store'
 import { toIso } from '../service/serialize'
 import { readPlayerMatchHistory } from './projections'
 
@@ -56,7 +56,7 @@ export async function readMySessions(context: PlayerContext) {
       where: {
         state: { in: [...OPEN_STATES] },
         OR: [
-          { rosterEntries: { some: { clubPlayerId: { in: ids }, releasedAt: null } } },
+          { rosterEntries: { some: { clubPlayerId: { in: ids }, ...LIVE_ENTRY } } },
           { waitlistEntries: { some: { clubPlayerId: { in: ids } } } },
           {
             joinRequests: {
@@ -75,7 +75,7 @@ export async function readMySessions(context: PlayerContext) {
         scheduledEndAt: true,
         club: { select: { name: true } },
         rosterEntries: {
-          where: { clubPlayerId: { in: ids }, releasedAt: null },
+          where: { clubPlayerId: { in: ids }, ...LIVE_ENTRY },
           select: { id: true },
           take: 1,
         },

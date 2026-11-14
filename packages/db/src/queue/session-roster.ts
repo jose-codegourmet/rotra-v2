@@ -3,6 +3,7 @@ import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
+import { toIsoOrNull } from '../service/serialize'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
 import { countedGamesByEntry } from './finalization'
 import { closeStaleMatchRequests } from './match-request-store'
@@ -10,6 +11,8 @@ import {
   assessEntry,
   capacityOf,
   derivedId,
+  isOffRoster,
+  LIVE_ENTRY,
   levelIdFor,
   liveRoster,
   lockSession,
@@ -359,7 +362,7 @@ async function addNewPlayerIn(
 
 async function liveEntry(tx: Tx, sessionId: string, rosterId: string) {
   const entry = await tx.sessionPlayer.findUnique({ where: { id: rosterId } })
-  if (!entry || entry.sessionId !== sessionId || entry.releasedAt)
+  if (!entry || entry.sessionId !== sessionId || isOffRoster(entry))
     throw new ServiceError('not_found')
   return entry
 }
@@ -453,7 +456,7 @@ export async function stepDownIn(
   // A retry of the same operation returns what it already did.
   if (await tx.sessionWaitlistEntry.findUnique({ where: { id: waitlistId } }))
     return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
-  if (entry.releasedAt) throw new ServiceError('not_found')
+  if (isOffRoster(entry)) throw new ServiceError('not_found')
   const busy = await tx.matchParticipation.findFirst({
     where: {
       sessionId,
@@ -463,14 +466,7 @@ export async function stepDownIn(
     },
     select: { id: true },
   })
-  if (busy) {
-    const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
-      where: { id: entry.clubPlayerId },
-      select: { nickname: true },
-    })
-    const name = clubPlayer.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot
-    throw new ServiceError('conflict', { player: blocked(name) })
-  }
+  if (busy) throw new ServiceError('conflict', { player: blocked(await shortNameOf(tx, entry)) })
   const now = new Date()
   await tx.sessionPlayer.update({
     where: { id: entry.id },
@@ -489,6 +485,109 @@ export async function stepDownIn(
     },
   })
   return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
+}
+
+/** The short name the roster toasts use: the club nickname, else the first word of the name. */
+async function shortNameOf(tx: Tx, entry: { clubPlayerId: string; nameSnapshot: string }) {
+  const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+    where: { id: entry.clubPlayerId },
+    select: { nickname: true },
+  })
+  return clubPlayer.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot
+}
+
+/** Live roster count and slot capacity, for the No show toasts ("· 23/24"). */
+async function rosterCount(tx: Tx, session: QueueSession) {
+  return {
+    count: await tx.sessionPlayer.count({ where: { sessionId: session.id, ...LIVE_ENTRY } }),
+    capacity: await capacityOf(tx, session),
+  }
+}
+
+/**
+ * No show (cancelled) (#839, D-2026-11-14-02): on a live (`active`) session only, an away entry with
+ * no games and in no match comes off tonight's roster by setting `no_show_at`; the row stays live
+ * (never released, so the level lock and CHECK hold) and its slot opens. A no show owes nothing and
+ * is left out of Payments, the fee split, standings, finalization facts, the public page and the
+ * player's history while marked; a stored paid mark is kept. Refused 409 while the entry is in any
+ * waiting, On court or Playing match. Repeat-safe in effect: marking an entry that is already a no
+ * show returns the same result (`operationId` is accepted for the sync log; no operation row yet).
+ */
+export async function markNoShow(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; rosterId: string },
+) {
+  if (!input.operationId)
+    throw new ServiceError('invalid', { operationId: 'Missing operation id.' })
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    if (session.state !== 'active')
+      throw new ServiceError('conflict', { state: 'This session is not live.' })
+    const entry = await tx.sessionPlayer.findUnique({ where: { id: input.rosterId } })
+    if (!entry || entry.sessionId !== sessionId || entry.releasedAt)
+      throw new ServiceError('not_found')
+    if (entry.noShowAt) return { name: entry.nameSnapshot, ...(await rosterCount(tx, session)) }
+    const busy = await tx.matchParticipation.findFirst({
+      where: {
+        sessionId,
+        sessionPlayerId: entry.id,
+        leftAt: null,
+        match: { state: { in: ['waiting', 'on_court', 'active'] }, removedAt: null },
+      },
+      select: { id: true },
+    })
+    if (busy)
+      throw new ServiceError('conflict', {
+        player: `Remove ${await shortNameOf(tx, entry)} from their match first.`,
+      })
+    const decided = await tx.matchParticipation.findFirst({
+      where: { sessionId, sessionPlayerId: entry.id, match: { decision: { isNot: null } } },
+      select: { id: true },
+    })
+    const games = Math.max(
+      0,
+      ((await countedGamesByEntry(tx, sessionId)).get(entry.id) ?? 0) + entry.gamesAdjustment,
+    )
+    if (entry.present || decided || games > 0)
+      throw new ServiceError('conflict', {
+        player: `${await shortNameOf(tx, entry)} is here or has played tonight.`,
+      })
+    await tx.sessionPlayer.update({
+      where: { id: entry.id },
+      data: { noShowAt: new Date(), revision: { increment: 1 } },
+    })
+    return { name: entry.nameSnapshot, ...(await rosterCount(tx, session)) }
+  })
+}
+
+/**
+ * Back to roster (#839): a no show takes a free slot again by clearing `no_show_at`, keeping its
+ * slot order, level and any paid mark. Refused 409 while the live roster is full. Repeat-safe in
+ * effect: an entry already back returns the same result.
+ */
+export async function undoNoShow(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; rosterId: string },
+) {
+  if (!input.operationId)
+    throw new ServiceError('invalid', { operationId: 'Missing operation id.' })
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    const entry = await tx.sessionPlayer.findUnique({ where: { id: input.rosterId } })
+    if (!entry || entry.sessionId !== sessionId || entry.releasedAt)
+      throw new ServiceError('not_found')
+    const before = await rosterCount(tx, session)
+    if (!entry.noShowAt) return { name: entry.nameSnapshot, ...before }
+    if (before.count >= before.capacity)
+      throw new ServiceError('conflict', {
+        roster: 'The roster is full. Free a slot to bring someone back.',
+      })
+    await tx.sessionPlayer.update({
+      where: { id: entry.id },
+      data: { noShowAt: null, revision: { increment: 1 } },
+    })
+    return { name: entry.nameSnapshot, ...(await rosterCount(tx, session)) }
+  })
 }
 
 export async function setPresence(
@@ -557,7 +656,7 @@ export async function setAllPresence(context: ClubContext, sessionId: string, pr
   return rosterCommand(context, sessionId, async (tx, session) => {
     requireState(session, ['prepared'], 'Mark players individually after the session starts.')
     await tx.sessionPlayer.updateMany({
-      where: { sessionId, releasedAt: null, present: !present },
+      where: { sessionId, ...LIVE_ENTRY, present: !present },
       data: { present, presentChangedAt: new Date(), revision: { increment: 1 } },
     })
     return null
@@ -817,11 +916,19 @@ export async function readSessionRoster(context: ClubContext, sessionId: string)
 async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueSession) {
   const sessionId = session.id
   const roster = await liveRoster(tx, sessionId)
+  // No show (cancelled) entries (#839): still unreleased, off the live roster, oldest first.
+  const noShows = await tx.sessionPlayer.findMany({
+    where: { sessionId, releasedAt: null, noShowAt: { not: null } },
+    orderBy: [{ noShowAt: 'asc' }, { id: 'asc' }],
+  })
   const waitlist = await orderedWaitlist(tx, sessionId)
   const nicknames = new Map(
     (
       await tx.clubPlayer.findMany({
-        where: { clubId: context.clubId, id: { in: roster.map((r) => r.clubPlayerId) } },
+        where: {
+          clubId: context.clubId,
+          id: { in: [...roster, ...noShows].map((r) => r.clubPlayerId) },
+        },
         select: { id: true, nickname: true },
       })
     ).map((p) => [p.id, p.nickname]),
@@ -850,6 +957,10 @@ async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueS
     roster: roster.map((entry) => ({
       ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
       hasPlayedAtClubBefore: returning.has(entry.clubPlayerId),
+    })),
+    noShows: noShows.map((entry) => ({
+      ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
+      noShowAt: toIsoOrNull(entry.noShowAt),
     })),
     waitlist: waitlist.map((entry, index) => waitlistDto(entry, index + 1)),
     joinRequests: requests.map(joinRequestDto),

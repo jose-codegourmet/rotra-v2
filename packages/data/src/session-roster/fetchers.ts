@@ -2,11 +2,15 @@ import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
 import { isRealDataMode } from '../real/mode'
-import { realGetSessionRoster } from '../real/queue'
+import { realGetSessionNoShows, realGetSessionRoster } from '../real/queue'
 
 /** Operator data; join-request contacts never enter saved-player or public directory projections. */
 export async function getSessionRoster(sessionId: string) {
-  if (isRealDataMode()) return realGetSessionRoster(sessionId)
+  if (isRealDataMode()) {
+    // The No show (cancelled) list is its own query (getSessionNoShows); the roster read keeps its shape.
+    const { noShows: _noShows, ...read } = await realGetSessionRoster(sessionId)
+    return read
+  }
   await delay()
   const state = readMockState()
   const session = sessionIn(state, sessionId)
@@ -49,9 +53,9 @@ export async function getSessionRoster(sessionId: string) {
   }
 }
 
-/** No show (cancelled) players of a live session, oldest first; none in real mode yet. */
+/** No show (cancelled) players of a live session, oldest first (real mode: `no_show_at`, #839). */
 export async function getSessionNoShows(sessionId: string) {
-  if (isRealDataMode()) return []
+  if (isRealDataMode()) return realGetSessionNoShows(sessionId)
   await delay()
   return (readMockState().noShows ?? [])
     .filter((n) => n.sessionId === sessionId)

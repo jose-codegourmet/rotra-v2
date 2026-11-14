@@ -42,6 +42,7 @@ import {
 import { loadMatch, type MatchRow, matchCommand, matchContext, matchDto } from './match-store'
 import {
   derivedId,
+  LIVE_ENTRY,
   levelCodeFor,
   liveRoster,
   lockSession,
@@ -93,7 +94,7 @@ async function sessionBySlug(slug: string) {
 /** The signed-in Player's live roster entry in the session, or null. */
 function ownEntry(tx: Tx, sessionId: string, playerId: string) {
   return tx.sessionPlayer.findFirst({
-    where: { sessionId, releasedAt: null, clubPlayer: { playerId } },
+    where: { sessionId, ...LIVE_ENTRY, clubPlayer: { playerId } },
   })
 }
 

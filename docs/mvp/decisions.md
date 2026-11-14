@@ -51,6 +51,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-07](#d-2026-11-13-07) | Generate matches leaves out players already in the Main Queue; fewer matches when too few are free | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -926,3 +927,16 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Amends:** [D-2026-11-13-02](#d-2026-11-13-02) (the cases' role), [D-2026-11-13-08](#d-2026-11-13-08) (bucket 1 keeps one copy, not two).
 - **Not decided yet:** a service worker for the Queue app, so it (and the `.wasm`) loads after an offline reload.
 - **References:** [rule-cases spec](../../conductor/tracks/rule-cases_20261113/spec.md), [AGENTS rule 11](../../AGENTS.md#0-non-negotiables) (new dependencies need a decision), [offline module](../business_logic/product/queue/modules/offline/README.md).
+
+<a id="d-2026-11-14-02"></a>
+### D-2026-11-14-02 — No show (cancelled): no fee, club-only, after Start only
+- **Decision status:** approved (owner, November 14, 2026; answers the open questions of the [No show (cancelled) mockup log](../mockup-changes/2026-11-13-queue-no-show-cancelled.md)).
+- **Implementation status:** in progress — real mode built in #839 (migration `20261114000300_session_players_no_show`, not applied to the shared database; not run against it).
+- **Ticket:** #839
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Fee and Payments.** A no show owes nothing. They are off the Payments list and out of the fee split while marked; their stored paid mark (keyed on the roster entry) is kept and shows again after **Back to roster**. The same rule as Move to waitlist ([D-2026-11-11-06](#d-2026-11-11-06)).
+  - **Visibility.** A no show is not shown on the player's own history (Player app) or on the public session page; only on the live Players view of the Queue console (the **No show (cancelled)** panel). They are out of standings, results and finalization facts like any non-participant.
+  - **Before Start.** Not possible: only while the session is live (`active`). Remove from roster covers a prepared session.
+  - **Storage.** A nullable `session_players.no_show_at` with a CHECK that an entry is never both released and a no show. The live roster everywhere is "not released and not a no show".
+- **References:** [Players module](../business_logic/product/queue/modules/players/README.md), [sessions-roster design](../database_design/product/queue/modules/sessions-roster.md), `packages/db/src/queue/session-roster.ts` (`markNoShow`, `undoNoShow`), `apps/queue/src/app/api/sessions/[sessionId]/roster/[rosterId]/no-show/route.ts`.

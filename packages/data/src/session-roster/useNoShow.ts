@@ -5,7 +5,7 @@ import { getSessionNoShows } from './fetchers'
 import { markNoShow, undoNoShow } from './mutations'
 import { sessionRosterKeys } from './queryKeys'
 
-/** The No show (cancelled) players of a live session, oldest first (empty in real mode for now). */
+/** The No show (cancelled) players of a live session, oldest first. */
 export function useSessionNoShows(sessionId: string) {
   return useQuery({
     queryKey: sessionRosterKeys.noShows(sessionId),

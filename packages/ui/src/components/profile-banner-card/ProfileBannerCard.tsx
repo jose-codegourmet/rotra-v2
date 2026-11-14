@@ -312,7 +312,9 @@ export function ProfileLatestStats({ year, stats }: { year: number; stats: Parti
       className={cn(
         'relative grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,7fr)] overflow-hidden rounded-lg border px-4 py-3.5',
         'border-[color-mix(in_srgb,var(--accent)_35%,var(--border))]',
-        'bg-[radial-gradient(120%_90%_at_0%_100%,color-mix(in_srgb,var(--accent)_16%,transparent),transparent_65%),repeating-linear-gradient(0deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px),var(--surface)]',
+        // The podium grid lit from below. `image:` keeps the colour out of background-image, which the
+        // browser would otherwise drop whole (the prototype uses the `background` shorthand).
+        'bg-surface bg-[image:radial-gradient(120%_90%_at_0%_100%,color-mix(in_srgb,var(--accent)_16%,transparent),transparent_65%),repeating-linear-gradient(0deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px),repeating-linear-gradient(90deg,color-mix(in_srgb,var(--accent)_7%,transparent)_0_1px,transparent_1px_8px)]',
       )}
     >
       <div className="flex flex-col justify-between gap-2 border-r border-[color-mix(in_srgb,var(--accent)_25%,var(--border))] pr-4 max-[420px]:pr-3">

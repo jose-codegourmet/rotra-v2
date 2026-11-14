@@ -70,7 +70,7 @@ export function RankShareCard({
             <div
               className={cn(
                 'flex min-h-0 flex-1 flex-col text-left',
-                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center-safe',
                 format === 'post' && 'gap-3',
                 format === 'story' && 'gap-3.5',
               )}
@@ -78,8 +78,9 @@ export function RankShareCard({
               <b
                 data-qr-text
                 className={cn(
-                  'leading-[1.1] font-extrabold text-share-accent',
+                  'font-extrabold text-share-accent',
                   format === 'square' ? 'text-[22px]' : 'text-[28px]',
+                  'leading-[1.1]',
                 )}
               >
                 {levelLabel}
@@ -95,8 +96,9 @@ export function RankShareCard({
                   <b
                     data-qr-text
                     className={cn(
-                      'font-mono leading-none font-bold text-share-accent',
+                      'font-mono font-bold text-share-accent',
                       format === 'square' ? 'text-[36px]' : 'text-[52px]',
+                      'leading-none',
                     )}
                   >
                     #{position}

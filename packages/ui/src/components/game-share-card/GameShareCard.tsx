@@ -114,15 +114,16 @@ export function GameShareCard({
     <div
       className={cn(
         'flex min-h-0 flex-1 flex-col gap-3 text-left',
-        format === 'square' ? 'justify-start' : 'justify-center',
+        format === 'square' ? 'justify-start' : 'justify-center-safe',
       )}
     >
       <h3
         data-qr-text
         title={title}
         className={cn(
-          'truncate leading-[1.15] font-extrabold text-share-fg',
+          'shrink-0 truncate font-extrabold text-share-fg',
           format === 'square' ? 'text-lg' : 'text-[22px]',
+          'leading-[1.15]',
         )}
       >
         {title}
@@ -130,8 +131,9 @@ export function GameShareCard({
       <p
         data-qr-text
         className={cn(
-          'truncate leading-[1.4] text-share-muted',
+          'shrink-0 truncate text-share-muted',
           format === 'square' ? 'text-[13px]' : 'text-sm',
+          'leading-[1.4]',
         )}
       >
         {dateLabel} · {clubName}
@@ -139,7 +141,8 @@ export function GameShareCard({
       <article
         aria-label={`${won ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
         className={cn(
-          'grid min-h-24 items-center gap-1 border-y border-share-fg/10 py-2.5',
+          'grid items-center gap-1 border-y border-share-fg/10 py-2.5',
+          format === 'square' ? 'min-h-0' : 'min-h-24',
           format === 'story'
             ? 'grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)]'
             : 'grid-cols-[minmax(0,1fr)_92px_minmax(0,1fr)]',
@@ -150,9 +153,10 @@ export function GameShareCard({
           <b
             data-qr-text
             className={cn(
-              'font-mono leading-[1.1] font-extrabold',
+              'font-mono font-extrabold',
               format === 'story' ? 'text-2xl' : 'text-[30px]',
               won ? 'text-share-accent' : 'text-share-fg',
+              'leading-[1.1]',
             )}
           >
             {game.score ?? '—'}

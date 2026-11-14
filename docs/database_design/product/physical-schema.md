@@ -337,6 +337,14 @@ append-only trigger disabled for that statement, and the rows deleted; rows with
 assessment, attribution, projection, rank, account or request references refuse the migration.
 See the migration's README.
 
+## P10.6 — Admin default profile banner (D-2026-11-13-03)
+
+`20261114000100_profile_banner_default` (additive). `profile_banners.is_default` (boolean, not null,
+default false); partial unique index `profile_banners_one_default` on `(is_default) WHERE is_default`
+(at most one default); seed: `court` is the default while it is shown and not deleted. The Admin
+server keeps the default shown and not deleted (no CHECK or trigger, like the 2-shown rule). See the
+migration's README.
+
 ## Match requests and Players can request (D-2026-11-09-05)
 
 `20261112000400_session_match_requests` (additive). `queue_sessions.request_formats`

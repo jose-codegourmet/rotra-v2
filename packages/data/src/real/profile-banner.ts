@@ -8,6 +8,7 @@ type WireBanner = {
   shown: boolean
   uploadedAt: string
   number: number
+  isDefault: boolean
 }
 
 const bannerOf = (wire: WireBanner): ProfileBanner => ({
@@ -16,6 +17,7 @@ const bannerOf = (wire: WireBanner): ProfileBanner => ({
   shown: wire.shown,
   uploadedAt: msOf(wire.uploadedAt),
   number: wire.number,
+  isDefault: wire.isDefault,
 })
 
 const path = (id: string) => `/api/profile-banners/${encodeURIComponent(id)}`
@@ -63,4 +65,13 @@ export async function realRestoreProfileBanner(id: string) {
     method: 'POST',
   })
   return bannerOf(banner)
+}
+
+/** Make default (D-2026-11-13-03): `previousId` is the old default, for Undo. */
+export async function realSetDefaultProfileBanner(id: string) {
+  const { banner, previousId } = await realRequest<{ banner: WireBanner; previousId: string }>(
+    `${path(id)}/default`,
+    { method: 'POST' },
+  )
+  return { banner: bannerOf(banner), previousId }
 }

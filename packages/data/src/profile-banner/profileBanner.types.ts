@@ -20,9 +20,9 @@ export type ProfileBanner = {
   /** Running upload number; Admin labels an upload "Banner <number>" */
   number: number
   /**
-   * The default banner (proposed `profile_banners.is_default`, D-2026-11-13-03): drawn on every
-   * profile that hasn't picked one, and on guests and unclaimed profiles. At most one banner has it;
-   * missing reads as false (real mode has no column yet, so Court stays the default there).
+   * The default banner (`profile_banners.is_default`, D-2026-11-13-03): drawn on every profile that
+   * hasn't picked one, on guests and unclaimed profiles, and on club cards. At most one banner has
+   * it; missing reads as false (then Court while shown is the default).
    */
   isDefault?: boolean
 }

@@ -92,6 +92,11 @@ SELECT pg_temp.expect_rejected('registered player with an unknown banner', $q$
 SELECT pg_temp.expect_rejected('banner used by a player deleted', $q$ DELETE FROM profile_banners WHERE id = 'night' $q$);
 SELECT pg_temp.expect_rejected('banner id outside the key or UUID format', $q$
   INSERT INTO profile_banners (id, image, number) VALUES ('Night 2', '', 99) $q$);
+SELECT pg_temp.expect_rejected('second default banner', $q$
+  UPDATE profile_banners SET is_default = true WHERE id = 'night' $q$);
+SELECT pg_temp.expect_accepted('default banner moved in one transaction', $q$
+  UPDATE profile_banners SET is_default = false WHERE is_default;
+  UPDATE profile_banners SET is_default = true WHERE id = 'night' $q$);
 SELECT pg_temp.expect_rejected('duplicate club invite code', $q$
   UPDATE clubs SET invite_code = 'FICTAAAA01' WHERE id = 'c1000000-0000-4000-8000-00000000000b' $q$);
 SELECT pg_temp.expect_rejected('lowercase club invite code', $q$

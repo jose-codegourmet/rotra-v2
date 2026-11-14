@@ -45,8 +45,6 @@ export const PROFILE_BANNER_DEFAULT_TITLE =
   'The default banner. Make another banner the default before hiding this one.'
 /** Make default with nothing to change, or a hidden banner. */
 export const PROFILE_BANNER_DEFAULT_HIDDEN = 'Show this banner before making it the default.'
-/** Real mode: no `profile_banners.is_default` column yet. */
-export const PROFILE_BANNER_DEFAULT_UNAVAILABLE = "Making a banner the default isn't available yet."
 
 /** The library's default banner: the one marked Default, else Court (the seed default). */
 export const defaultProfileBannerId = (

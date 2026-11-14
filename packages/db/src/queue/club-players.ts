@@ -20,7 +20,7 @@ export type ClubPlayerDto = {
   picture: string | null
   /** Global name used with playerId to reproduce the saved character choice. */
   pictureName: string | null
-  /** The resolved Profile banner of a registered player; null for guests and unclaimed profiles */
+  /** The resolved Profile banner: a registered player's pick, else the default Admin sets (D-2026-11-13-03) */
   bannerKey: string | null
   bannerImageUrl: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
@@ -68,6 +68,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
   })
   const shownBanners = await readShownProfileBanners()
   return rows.map((p) => {
+    // Only a registered player has chosen a banner; guests, unclaimed profiles and players with no
+    // pick draw the default Admin sets (D-2026-11-13-03), as in mock mode.
     const banner =
       p.player?.profileState === 'claimed'
         ? resolveProfileBanner(
@@ -75,7 +77,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
             () => p.player?.banner ?? undefined,
             shownBanners,
           )
-        : null
+        : resolveProfileBanner(null, () => undefined, shownBanners)
     return {
       id: p.id,
       clubId: p.clubId,
@@ -86,8 +88,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       nickname: p.player ? p.player.nickname : p.nickname,
       picture: p.player?.avatarRef ?? null,
       pictureName: p.player?.fullName ?? null,
-      bannerKey: banner?.bannerKey ?? null,
-      bannerImageUrl: banner?.bannerImageUrl ?? null,
+      bannerKey: banner.bannerKey,
+      bannerImageUrl: banner.bannerImageUrl,
       identity: p.player
         ? p.player.profileState === 'claimed'
           ? 'registered'

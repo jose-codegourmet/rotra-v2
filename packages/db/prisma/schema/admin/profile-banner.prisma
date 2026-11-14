@@ -18,6 +18,10 @@ model ProfileBanner {
   number     Int       @unique
   /// Set by Delete, cleared by Undo. A deleted row still resolves for players who use it.
   deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  /// The Admin default banner (D-2026-11-13-03): drawn for players with no pick, guests, unclaimed
+  /// profiles and club cards. At most one row (partial unique index `profile_banners_one_default`
+  /// in SQL); Court at first. The Admin server keeps it shown and not deleted.
+  isDefault  Boolean   @default(false) @map("is_default")
 
   players Player[]
 

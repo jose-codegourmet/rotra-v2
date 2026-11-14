@@ -1,6 +1,6 @@
 'use client'
 import { useClubPage } from '@rotra/data/club-page/useClubPage'
-import { defaultProfileBanner } from '@rotra/data/profile-banner/fetchers'
+import { useDefaultProfileBanner } from '@rotra/data/profile-banner/useDefaultProfileBanner'
 import { Chip } from '@rotra/ui/chip'
 import { ClubProfileCard } from '@rotra/ui/club-profile-card'
 import { useRouter } from 'next/navigation'
@@ -21,6 +21,7 @@ const dayLabel = (at: number) =>
 export function ClubCard({ clubId, onClose }: { clubId: string | null; onClose: () => void }) {
   const router = useRouter()
   const page = useClubPage(clubId ?? '')
+  const banner = useDefaultProfileBanner()
   if (!clubId) return null
   const data = page.data
   const members = data?.members.length ?? 0
@@ -28,7 +29,6 @@ export function ClubCard({ clubId, onClose }: { clubId: string | null; onClose: 
   const next = data?.sessions
     .filter((s) => s.status === 'scheduled' && s.startsAt > Date.now())
     .sort((a, b) => a.startsAt - b.startsAt)[0]
-  const banner = defaultProfileBanner()
   const href = `/clubs/${encodeURIComponent(clubId)}`
   return (
     <ClubProfileCard

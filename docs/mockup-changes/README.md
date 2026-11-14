@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN MOCK APP: 174 · CANCELLED: 3 · MOCKUP ONLY: 4
+IN MOCK APP: 175 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -326,7 +326,7 @@ IN MOCK APP: 174 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-13-admin-default-banner-quick-view](2026-11-13-admin-default-banner-quick-view.md) | Admin: Quick view becomes the banner profile card with stats; Admin picks the default banner | player-quick-view, profile-banner, banner-library-tile | IN MOCK APP — #814 |
 | [2026-11-13-club-profile-card](2026-11-13-club-profile-card.md) | Club profile card in the player card's style (Queue, Player, Admin) | club-profile-card (new, built on participant-profile-card), player-quick-view | IN MOCK APP — #814 |
 | [2026-11-13-player-default-banner](2026-11-13-player-default-banner.md) | Player: the default banner comes from Admin; always-private players keep their own banner; stats count the calendar year | profile-banner, participant-profile-card | IN MOCK APP — #814 |
-| [2026-11-13-player-game-row-court](2026-11-13-player-game-row-court.md) | Player app: games shown as a small badminton court | game-row (court variant; reuses the Compare court art) | IN MOCK APP — #822 |
+| [2026-11-13-player-game-row-court](2026-11-13-player-game-row-court.md) | Player app: games shown as a small badminton court | game-row (a thin wrapper on match-court's Player variant) | IN MOCK APP — #822 |
 | [2026-11-13-player-latest-matches](2026-11-13-player-latest-matches.md) | Player profile: Recent games → Latest matches | profile-recent-games | CANCELLED — superseded the same day by 2026-11-13-player-latest-sessions.md before it was built; the mockup now shows Latest sessions (superseded by 2026-11-13-player-latest-sessions) |
 | [2026-11-13-player-latest-sessions](2026-11-13-player-latest-sessions.md) | Player profile: Latest sessions, each opening that session's matches | profile-recent-games, session-matches-dialog | IN MOCK APP — #822 |
 | [2026-11-13-player-leaderboard-profile-card](2026-11-13-player-leaderboard-profile-card.md) | Player leaderboard: tapping a player opens the profile card first | leaderboard-row, leaderboard-podium, participant-profile-card | IN MOCK APP — #814 |
@@ -359,4 +359,5 @@ IN MOCK APP: 174 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-13-share-images-no-grid-no-qr](2026-11-13-share-images-no-grid-no-qr.md) | Share images: no grid background, no QR | share-card | IN MOCK APP — #808 |
 | [2026-11-13-share-images-no-tagline](2026-11-13-share-images-no-tagline.md) | Share images: no “Run the game.” tagline | share-card, session-qr-card | IN MOCK APP — #808 |
 | [2026-11-13-share-leaderboard](2026-11-13-share-leaderboard.md) | Share leaderboard: several images, pick which | share-dialog, leaderboard-share-card | IN MOCK APP — #842 |
+| [2026-11-14-player-game-row-games-badge](2026-11-14-player-game-row-games-badge.md) | Player app: games badge on every face of a game court | match-court (Player variant), game-row | IN MOCK APP — PR #859 |
 <!-- status-index:end -->

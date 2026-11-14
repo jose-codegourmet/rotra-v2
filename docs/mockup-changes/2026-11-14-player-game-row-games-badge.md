@@ -1,6 +1,6 @@
 # Player app: games badge on every face of a game court
 
-Status: NEW
+Status: IN MOCK APP — PR #859
 Date: 2026-11-14
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › gameRow(g, who, ctx, at); callers sessionBlock, recentGamesCard, SHEETS_SESSION; `.gm-av`, `.gm-g` styles

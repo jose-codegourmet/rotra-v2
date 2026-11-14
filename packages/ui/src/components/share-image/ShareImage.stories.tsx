@@ -32,6 +32,8 @@ export const Story: Story = { args: { format: 'story' }, globals: { theme: 'dark
 export const StoryLight: Story = { args: { format: 'story' }, globals: { theme: 'light' } }
 export const Square: Story = { args: { format: 'square' }, globals: { theme: 'dark' } }
 export const SquareLight: Story = { args: { format: 'square' }, globals: { theme: 'light' } }
+export const GlowBottom: Story = { args: { glow: 'bottom' }, globals: { theme: 'dark' } }
+export const GlowBottomLight: Story = { args: { glow: 'bottom' }, globals: { theme: 'light' } }
 export const FooterEnd: Story = { args: { footerEnd: '#1–8 of 24' }, globals: { theme: 'dark' } }
 export const LongName: Story = {
   args: { headline: 'Maria Cristina Dela Cruz-Santos', subline: 'Lahug Smash Club' },

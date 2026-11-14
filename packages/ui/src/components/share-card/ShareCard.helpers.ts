@@ -23,6 +23,16 @@ export const SHARE_FORMATS = [
 /** PNG height for each format at 1080 px wide. */
 const PNG_HEIGHT: Record<ShareFormat, number> = { post: 1350, story: 1920, square: 1080 }
 
+/** First letters of the first two words, upper-cased ("Mikee Abellana" → "MA"); same as Avatar's. */
+export function shareInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() ?? '')
+    .join('')
+}
+
 /** Draws an on-screen SVG (the ROTRA logo) into the canvas with its computed fills. */
 async function drawSvg(
   ctx: CanvasRenderingContext2D,
@@ -120,10 +130,13 @@ export async function renderSharePng(
     ctx.clip()
     ctx.fillStyle = palette.getPropertyValue('--share-bg').trim()
     ctx.fillRect(0, 0, bounds.width, bounds.height)
-    // Same elliptical glow as the preview's 120% × 70% radial gradient.
+    // Same elliptical glow as the preview's 120% × 70% radial gradient (top: stop 60%, bottom: 70%).
+    const glowBottom = card.dataset.shareGlow === 'bottom'
     ctx.save()
     ctx.scale(1.2 * bounds.width, 0.7 * bounds.height)
-    const glow = ctx.createRadialGradient(0.5 / 1.2, 0, 0, 0.5 / 1.2, 0, 0.6)
+    const glowY = glowBottom ? 1 / 0.7 : 0
+    const glowStop = glowBottom ? 0.7 : 0.6
+    const glow = ctx.createRadialGradient(0.5 / 1.2, glowY, 0, 0.5 / 1.2, glowY, glowStop)
     glow.addColorStop(0, palette.getPropertyValue('--share-glow').trim())
     glow.addColorStop(1, 'transparent')
     ctx.fillStyle = glow
@@ -133,6 +146,20 @@ export async function renderSharePng(
     const rect = (element: Element) => {
       const r = element.getBoundingClientRect()
       return { x: r.left - bounds.left, y: r.top - bounds.top, w: r.width, h: r.height }
+    }
+    // Row tints and dividers go first so they sit under the avatars.
+    for (const cell of card.querySelectorAll<HTMLElement>('[data-share-cell]')) {
+      const r = rect(cell)
+      const style = getComputedStyle(cell)
+      ctx.fillStyle = style.backgroundColor
+      ctx.beginPath()
+      ctx.roundRect(r.x, r.y, r.w, r.h, 2)
+      ctx.fill()
+      if (cell.getAttribute('data-share-cell') === 'current') {
+        ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
+        ctx.lineWidth = 1
+        ctx.strokeRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4)
+      }
     }
     for (const element of card.querySelectorAll<HTMLElement>('[data-qr-tile], [data-qr-logo]')) {
       const r = rect(element)
@@ -167,6 +194,14 @@ export async function renderSharePng(
           r.w,
           r.h,
         )
+      } else if (element.dataset.shareInitials && element.querySelector('img')) {
+        // The screen shows a picture the canvas cannot use (no CORS headers): draw the initials,
+        // as the screen would without the picture. Without an <img> the text pass draws them.
+        ctx.font = `800 ${Math.round(r.h * 0.35)}px ${style.fontFamily}`
+        ctx.fillStyle = style.color
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(element.dataset.shareInitials, r.x + r.w / 2, r.y + r.h / 2)
       }
       ctx.restore()
       if (element.hasAttribute('data-share-winner')) {
@@ -188,19 +223,6 @@ export async function renderSharePng(
         ctx.fillStyle = palette.getPropertyValue('--qr-fg').trim()
         ctx.fill(new Path2D(qr.path))
         ctx.restore()
-      }
-    }
-    for (const cell of card.querySelectorAll<HTMLElement>('[data-share-cell]')) {
-      const r = rect(cell)
-      const style = getComputedStyle(cell)
-      ctx.fillStyle = style.backgroundColor
-      ctx.beginPath()
-      ctx.roundRect(r.x, r.y, r.w, r.h, 2)
-      ctx.fill()
-      if (cell.getAttribute('data-share-cell') === 'current') {
-        ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
-        ctx.lineWidth = 1
-        ctx.strokeRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4)
       }
     }
     // The ROTRA logo artwork (RotraLogo tone="dark") is drawn from its visible SVG.

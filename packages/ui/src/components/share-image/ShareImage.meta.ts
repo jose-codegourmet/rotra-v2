@@ -9,6 +9,7 @@ export const shareImageMeta = {
     'No grid background, no QR and no “Run the game.” tagline (owner, November 13, 2026).',
     'Mark every text node in the content with data-qr-text, pictures with data-qr-logo="<key>" (pass the key in ShareImagePicker images), so the PNG matches the screen.',
     'footerEnd puts text beside the logo (Queue leaderboard “#1–8 of 24”).',
+    'glow="bottom" for Queue images (the prototype\'s .qs-card); Player images keep the default top glow (.sh-card).',
     'Fixed brand colours: it looks the same in both themes.',
   ],
   prototype: {
@@ -19,6 +20,6 @@ export const shareImageMeta = {
     'docs/mockup-changes/2026-11-13-share-images-no-grid-no-qr.md',
     'docs/mockup-changes/2026-11-13-share-images-no-tagline.md',
   ],
-  variants: ['story', 'post', 'square'],
+  variants: ['story', 'post', 'square', 'glow: top | bottom'],
   related: ['ShareImagePicker', 'ShareDialog', 'RotraLogo', 'ShareCard'],
 } satisfies ComponentMeta

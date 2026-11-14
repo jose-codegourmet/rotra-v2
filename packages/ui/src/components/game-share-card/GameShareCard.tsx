@@ -3,7 +3,7 @@ import type { PlayerShareGame, PlayerShareParticipant } from '@rotra/data/player
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import type { PlayerSessionShareProps } from '@rotra/ui/session-result-share-card'
-import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
+import { SHARE_FORMATS, type ShareFormat, shareInitials } from '@rotra/ui/share-card/helpers'
 import { ShareImage } from '@rotra/ui/share-image'
 import { ShareImagePicker } from '@rotra/ui/share-image-picker'
 
@@ -75,9 +75,10 @@ export function GameShareCard({
           <span
             key={`${slot}-${p.name}`}
             data-qr-logo={`game-${side}-${slot}`}
+            data-share-initials={shareInitials(p.name)}
             data-share-winner={winning ? '' : undefined}
             className={cn(
-              'block shrink-0 overflow-hidden rounded-full bg-share-fg/10 ring-2',
+              'block shrink-0 overflow-hidden rounded-full bg-share-fg/10 text-share-fg ring-2',
               format === 'story' ? 'size-[34px]' : 'size-11',
               winning ? 'ring-share-accent' : 'ring-share-bg',
             )}

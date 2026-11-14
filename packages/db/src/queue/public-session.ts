@@ -26,6 +26,7 @@ import { placeClubMember, stepDownIn } from './session-roster'
 import {
   capacityOf,
   derivedId,
+  LIVE_ENTRY,
   levelCodeFor,
   liveCourts,
   liveRoster,
@@ -362,7 +363,7 @@ async function playerStanding(tx: Tx, playerId: string, sessionId: string) {
   })
   if (!player) throw new ServiceError('forbidden')
   const roster = await tx.sessionPlayer.findFirst({
-    where: { sessionId, releasedAt: null, clubPlayer: { playerId } },
+    where: { sessionId, ...LIVE_ENTRY, clubPlayer: { playerId } },
     select: { id: true },
   })
   const waitlist = await orderedWaitlist(tx, sessionId)
@@ -567,7 +568,7 @@ export async function readMyNight(context: PlayerContext, slug: string) {
     const own = await tx.sessionPlayer.findFirst({
       where: {
         sessionId: session.id,
-        releasedAt: null,
+        ...LIVE_ENTRY,
         clubPlayer: { playerId: context.playerId },
       },
       select: { id: true },
@@ -850,7 +851,7 @@ export async function movePlayerToWaitlist(
       const entry = await tx.sessionPlayer.findFirst({
         where: {
           sessionId: session.id,
-          releasedAt: null,
+          ...LIVE_ENTRY,
           clubPlayer: { playerId: context.playerId },
         },
         select: { id: true },

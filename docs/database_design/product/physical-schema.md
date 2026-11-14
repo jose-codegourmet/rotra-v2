@@ -115,7 +115,7 @@ UUID from another club or session is rejected.
 | `queue_sessions` | PK `id`; unique `(club_id, id)`, `public_slug`, `source_command_id`; partial unique `club_id WHERE state IN (active, finalizing)`; index `(club_id, scheduled_start_at desc, id)` | end > start; minimum ≥ 0; players per court 2–20; invalid ⇒ reason; completed ⇔ `finalized_at`; started unless prepared/invalid/cancelled; cancelled ⇔ `cancelled_at`, never started; reason null or 1–120 characters, only when cancelled; **exclusion** no overlapping sessions per club among prepared/active/finalizing/completed, so invalid and cancelled never clash (`btree_gist`; cancelled since `20261106000100`) | `(club_id, venue_id)`, `(club_id, start_license_term_id)` |
 | `club_session_reservations` | PK `club_id`; unique `session_id` | — | `(club_id, session_id)` |
 | `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal; `opened_early_at` ⇒ `starts_at`; set `open_until` > set `starts_at` | `(club_id, session_id)` |
-| `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
+| `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; never both released and a no show (`session_players_no_show_check`, nullable `no_show_at`, #839); **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
 | `session_waitlist` | PK `id`; unique `(session_id, club_player_id)` (also serves the per-session read; the order index was dropped in `20261031001100`) | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time (so `closed` carries one); confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `club_assessments` | PK `id`; unique `source_operation_id`, `(club_id, club_player_id, id)`, `(club_id, session_id, session_player_id, id)`; rank indexes per ranking.md | actor = owning club; **append-only** trigger | `(club_id, club_player_id)`, `(club_id, session_id)`, `(club_id, session_id, session_player_id)`, `(club_id, club_player_id, supersedes_id)` |
@@ -134,7 +134,10 @@ them, so the rewritten checks and the exclusion predicate list the old values in
 session's lifetime. Demotion and preparation removal set `released_at` + `release_reason`; rows are
 never deleted (trigger) and all references are `RESTRICT`, so paid marks and assessments keyed on the
 entry are never cascaded. Regaining a slot reactivates the same row. Waitlist rows are deleted on Give
-slot.
+slot. **No show (cancelled)** (#839, migration `20261114000300_session_players_no_show`) sets the
+nullable `no_show_at` on a live, level-locked entry instead of releasing it (CHECK
+`session_players_no_show_check`: never both released and a no show); the live roster is
+`released_at IS NULL AND no_show_at IS NULL`, and Back to roster clears it.
 
 **Waitlist order (proposal, #245).** Demoted entries first (latest demotion batch at the front), each
 batch in original slot order (`demoted_confirmed_at`); then everyone else by `added_at`; `id` breaks

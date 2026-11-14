@@ -32,6 +32,7 @@ import { levelLabel, shortName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
   SessionJoinRequest,
+  SessionNoShow,
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
@@ -489,6 +490,8 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
 
 export type WireRosterRead = {
   roster: WireRosterEntry[]
+  /** No show (cancelled) entries (#839), oldest first; missing on older servers means none */
+  noShows?: (WireRosterEntry & { noShowAt: string | null })[]
   waitlist: WireWaitlistEntry[]
   joinRequests: WireJoinRequest[]
 }
@@ -496,6 +499,12 @@ export type WireRosterRead = {
 export function rosterReadOf(wire: WireRosterRead) {
   return {
     roster: wire.roster.map(rosterOf),
+    noShows: (wire.noShows ?? []).map(
+      ({ noShowAt, ...entry }): SessionNoShow => ({
+        ...rosterOf(entry),
+        noShowAt: msOrNull(noShowAt) ?? 0,
+      }),
+    ),
     waitlist: wire.waitlist.map(
       (entry): SessionWaitlistEntry => ({
         id: entry.id,
@@ -518,6 +527,36 @@ export async function realGetSessionRoster(sessionId: string) {
   return rosterReadOf(
     await realRequest<WireRosterRead>(`/api/sessions/${encodeURIComponent(sessionId)}/roster`),
   )
+}
+
+/** The No show (cancelled) players of a live session, oldest first (#839), from the roster read. */
+export async function realGetSessionNoShows(sessionId: string) {
+  return (await realGetSessionRoster(sessionId)).noShows
+}
+
+type NoShowReply = { name: string; count: number; capacity: number }
+const noShowPath = (input: { sessionId: string; rosterId: string }) =>
+  `/api/sessions/${encodeURIComponent(input.sessionId)}/roster/${encodeURIComponent(input.rosterId)}/no-show`
+
+/** No show (cancelled) (#839): "NAME marked No show (cancelled) · 23/24", as the mock words it. */
+export async function realMarkNoShow(input: { sessionId: string; rosterId: string }) {
+  const reply = await realRequest<NoShowReply>(noShowPath(input), {
+    method: 'POST',
+    body: { operationId: crypto.randomUUID() },
+  })
+  return accepted(
+    null,
+    `${reply.name} marked No show (cancelled) · ${reply.count}/${reply.capacity}`,
+  )
+}
+
+/** Back to roster (#839): "NAME back on the roster · 24/24"; refused (409) while the roster is full. */
+export async function realUndoNoShow(input: { sessionId: string; rosterId: string }) {
+  const reply = await realRequest<NoShowReply>(noShowPath(input), {
+    method: 'DELETE',
+    body: { operationId: crypto.randomUUID() },
+  })
+  return accepted(null, `${reply.name} back on the roster · ${reply.count}/${reply.capacity}`)
 }
 
 export async function realAddNewPlayerToSession(input: {

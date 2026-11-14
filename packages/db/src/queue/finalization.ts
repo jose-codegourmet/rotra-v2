@@ -5,7 +5,13 @@ import type { Prisma, ProjectionKind, SessionFinalization } from '../generated/p
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 import { closeSessionMatchRequests } from './match-request-store'
-import { lockSession, mapDatabaseError, requireSessionAccess, type Tx } from './session-store'
+import {
+  LIVE_ENTRY,
+  lockSession,
+  mapDatabaseError,
+  requireSessionAccess,
+  type Tx,
+} from './session-store'
 import { sessionCompleteness } from './sync'
 
 /** Reducer versions. A version is never permission to change a winner. */
@@ -133,7 +139,7 @@ const normalizedName = (name: string | null | undefined) =>
  */
 async function unresolvedGuests(tx: Tx, clubId: string, sessionId: string) {
   const roster = await tx.sessionPlayer.findMany({
-    where: { sessionId, releasedAt: null, clubPlayer: { playerId: null } },
+    where: { sessionId, ...LIVE_ENTRY, clubPlayer: { playerId: null } },
     select: {
       id: true,
       clubPlayerId: true,
@@ -239,7 +245,7 @@ async function completedParticipations(tx: Tx, sessionId: string) {
  */
 async function belowMinimum(tx: Tx, sessionId: string, minimumGames: number) {
   if (minimumGames <= 0) return []
-  const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
+  const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
   const games = await countedGamesByEntry(tx, sessionId)
   return roster
     .map((r) => ({ sessionPlayerId: r.id, name: r.nameSnapshot, games: games.get(r.id) ?? 0 }))
@@ -444,7 +450,7 @@ export async function finalizeSession(
           },
         })
         if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
-        const roster = await tx.sessionPlayer.findMany({ where: { sessionId, releasedAt: null } })
+        const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
         await tx.clubSessionPlayerSummary.createMany({
           data: summaries(
             sessionId,

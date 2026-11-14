@@ -16,9 +16,9 @@ Source: artifact comment on the live Players cards: “you should have the optio
 - Screen: `docs/screens/product/modules/queue/players-roster.md`.
 - Business: `docs/business_logic/product/queue/modules/players/README.md`.
 - Terms: `docs/product-terms.md` (No show (cancelled)).
-- Database (proposed `session_players.no_show_at`, no migration): `docs/database_design/product/queue/modules/sessions-roster.md`.
+- Database (`session_players.no_show_at`, migration `20261114000300_session_players_no_show`, #839): `docs/database_design/product/queue/modules/sessions-roster.md`.
 
-## Open (ask the owner before ticketing)
-- Does a no show still owe the session fee and keep their paid mark on Payments? (The mockup keeps the mark with the no-show entry but leaves them off Payments.)
-- Is it shown on the player's own history or the public page?
-- Should it be possible before Start, or is Remove from roster enough there?
+## Decisions (November 14, 2026, #839, D-2026-11-14-02)
+- **Fee and Payments:** a no show owes nothing. They are off the Payments list and out of the fee split while marked; their stored paid mark is kept and shows again after Back to roster (the same rule as Move to waitlist).
+- **Visibility:** not shown on the player's own history or the public session page; only on the live Players view of the Queue console. Out of standings and finalization like any non-participant.
+- **Before Start:** not possible. Remove from roster covers a prepared session.

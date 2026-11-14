@@ -25,7 +25,6 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { isRealDataMode } from '@rotra/data/real/mode'
 import {
   inUnfinishedMatch,
   stepDownBlockedText,
@@ -402,13 +401,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 onStepDown={() => {
                   void setPresence.flush().then(() => stepDownPlayer(row.player))
                 }}
-                // No show (cancelled): away, no games and in no match (mock only for now).
+                // No show (cancelled): after Start, away, no games and in no match (#839).
                 onNoShow={
-                  !isRealDataMode() &&
-                  s.state === 'active' &&
-                  !row.player.present &&
-                  row.games === 0 &&
-                  !row.playing
+                  s.state === 'active' && !row.player.present && row.games === 0 && !row.playing
                     ? () => {
                         void setPresence.flush().then(() => {
                           setNoShowError(undefined)

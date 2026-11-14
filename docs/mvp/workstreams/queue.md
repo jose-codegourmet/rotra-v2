@@ -132,6 +132,7 @@ Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-202
 - [D-2026-11-07-05](../decisions.md#d-2026-11-07-05) — payment amounts.
 - [D-2026-11-07-06](../decisions.md#d-2026-11-07-06) — masked public names.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — guest invites now open registration (#490); Request to join still offers guest entry or login.
+- [D-2026-11-14-02](../decisions.md#d-2026-11-14-02) — No show (cancelled): no fee, club-only, after Start only (#839).
 
 ## Blocking open decisions
 

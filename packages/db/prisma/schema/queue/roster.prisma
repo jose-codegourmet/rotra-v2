@@ -37,6 +37,9 @@ model SessionPlayer {
   overBudgetAt     DateTime?            @map("over_budget_at") @db.Timestamptz(6)
   releasedAt       DateTime?            @map("released_at") @db.Timestamptz(6)
   releaseReason    RosterReleaseReason? @map("release_reason")
+  /// No show (cancelled) (#839): set after Start on a live entry that will not come; never together
+  /// with released_at (CHECK in SQL). The live roster excludes it; Back to roster clears it.
+  noShowAt         DateTime?            @map("no_show_at") @db.Timestamptz(6)
   /// Set games played (#717): requested − games counted from completed matches at override time.
   /// Displayed games played = counted + this, floored at 0; may be negative. Session-running aid only.
   gamesAdjustment  Int                  @default(0) @map("games_adjustment")

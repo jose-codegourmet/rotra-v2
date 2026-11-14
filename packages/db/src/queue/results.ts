@@ -11,7 +11,7 @@ import type {
 } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
-import { derivedId, lockSession, requireSessionAccess, type Tx } from './session-store'
+import { derivedId, LIVE_ENTRY, lockSession, requireSessionAccess, type Tx } from './session-store'
 
 /**
  * Private results and explicit publication (Q-RESULTS). The private snapshot (with ids, scores and
@@ -71,7 +71,7 @@ function publicCopy(
 async function pageProjections(tx: Tx, sessionId: string) {
   const session = await tx.queueSession.findUniqueOrThrow({ where: { id: sessionId } })
   const roster = await tx.sessionPlayer.findMany({
-    where: { sessionId, releasedAt: null },
+    where: { sessionId, ...LIVE_ENTRY },
     orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
     select: {
       nameSnapshot: true,

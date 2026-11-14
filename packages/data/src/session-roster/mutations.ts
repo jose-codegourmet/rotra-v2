@@ -20,8 +20,10 @@ import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
 import {
   realAddDirectoryPlayerToSession,
+  realMarkNoShow,
   realPlayerDirectorySearch,
   realSetRosterLevel,
+  realUndoNoShow,
 } from '../real/queue'
 import {
   realConfirmJoinRequest,
@@ -316,15 +318,14 @@ export async function stepDownToWaitlist(input: StepDownInput) {
     rosterMutation(input.sessionId, (s) => stepDownChange(s, input)),
   )
 }
-const NO_SHOW_NOT_REAL = 'No show (cancelled) is not available in real mode yet.'
 /**
  * No show (cancelled) on the live Players view: an away player with no games and in no match comes
  * off tonight's roster and their slot opens. Refused with "Remove NAME from their match first." when
- * they were put in a match meanwhile. Mock only for now (the owner's open questions on fees, history
- * and before-Start use are unanswered).
+ * they were put in a match meanwhile. After Start only; a no show owes nothing and stays off the
+ * player's history and the public page (D-2026-11-14-02). Real mode sets `no_show_at` (#839).
  */
 export async function markNoShow(input: { sessionId: string; rosterId: string }) {
-  if (isRealDataMode()) fail(NO_SHOW_NOT_REAL)
+  if (isRealDataMode()) return realMarkNoShow(input)
   return rosterMutation(input.sessionId, (s) => {
     if (sessionIn(s, input.sessionId).state !== 'active') fail('This session is not live.')
     const p = row(s, input.rosterId, input.sessionId)
@@ -344,7 +345,7 @@ export async function markNoShow(input: { sessionId: string; rosterId: string })
 }
 /** Back to roster: a No show (cancelled) player takes a free slot again; refused while the roster is full. */
 export async function undoNoShow(input: { sessionId: string; rosterId: string }) {
-  if (isRealDataMode()) fail(NO_SHOW_NOT_REAL)
+  if (isRealDataMode()) return realUndoNoShow(input)
   return rosterMutation(input.sessionId, (s) => {
     const x = (s.noShows ?? []).find(
       (n) => n.id === input.rosterId && n.sessionId === input.sessionId,

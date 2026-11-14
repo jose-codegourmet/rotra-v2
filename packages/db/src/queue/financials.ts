@@ -20,6 +20,7 @@ import { ServiceError } from '../service/errors'
 import { toDecimalString, toIso, toIsoOrNull, toMoney } from '../service/serialize'
 import {
   derivedId,
+  isOffRoster,
   liveCourts,
   liveRoster,
   lockSession,
@@ -396,7 +397,7 @@ async function applyMark(
   const mark = await tx.sessionPaymentMark.findUnique({ where: key })
   if (input.paid) {
     if (mark) return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
-    if (entry.releasedAt)
+    if (isOffRoster(entry))
       throw new ServiceError('invalid', { player: 'Player not in this session.' })
     if (input.amountMinor === null) throw new ServiceError('invalid', { fee: NO_FEE_TICK })
     const created = await tx.sessionPaymentMark.create({
@@ -503,7 +504,7 @@ export async function setPaymentAmount(
     const mark = await tx.sessionPaymentMark.findUnique({ where: key })
     if (mark && mark.sourceOperationId === input.operationId)
       return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
-    if (entry.releasedAt)
+    if (isOffRoster(entry))
       throw new ServiceError('invalid', { player: 'Player not in this session.' })
     if (mark) await tx.sessionPaymentMark.delete({ where: key })
     if (!amountMinor) return { paid: false, amount: null }

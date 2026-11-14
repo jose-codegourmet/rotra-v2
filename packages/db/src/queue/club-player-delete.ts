@@ -5,6 +5,7 @@ import type { Prisma } from '../generated/prisma/client'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { closeStaleMatchRequests } from './match-request-store'
+import { LIVE_ENTRY } from './session-store'
 
 type Tx = Prisma.TransactionClient
 
@@ -26,7 +27,7 @@ async function liveEntry(tx: Tx, context: ClubContext, clubPlayerId: string) {
     where: {
       clubId: context.clubId,
       clubPlayerId,
-      releasedAt: null,
+      ...LIVE_ENTRY,
       session: { state: 'active' },
     },
     select: { id: true, sessionId: true, session: { select: { title: true } } },
@@ -95,7 +96,7 @@ export async function deleteClubPlayer(context: ClubContext, clubPlayerId: strin
       where: {
         clubId: context.clubId,
         clubPlayerId,
-        releasedAt: null,
+        ...LIVE_ENTRY,
         session: { state: 'prepared' },
       },
       data: { releasedAt: now, releaseReason: 'removed', revision: { increment: 1 } },

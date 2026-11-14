@@ -79,7 +79,7 @@ export function SessionResultShareCard({
             <div
               className={cn(
                 'flex min-h-0 flex-1 flex-col text-left',
-                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center-safe',
                 format === 'post' && 'gap-3',
                 format === 'story' && 'gap-3.5',
               )}
@@ -88,8 +88,9 @@ export function SessionResultShareCard({
               <h3
                 data-qr-text
                 className={cn(
-                  'leading-[1.15] font-extrabold text-balance text-share-fg',
+                  'font-extrabold text-balance text-share-fg',
                   format === 'square' ? 'text-[22px]' : 'text-[26px]',
+                  'leading-[1.15]',
                 )}
               >
                 {title}
@@ -97,8 +98,9 @@ export function SessionResultShareCard({
               <p
                 data-qr-text
                 className={cn(
-                  'leading-[1.4] text-share-muted',
+                  'text-share-muted',
                   format === 'square' ? 'text-[13px]' : 'text-sm',
+                  'leading-[1.4]',
                 )}
               >
                 {dateLabel} · {clubName}
@@ -107,12 +109,13 @@ export function SessionResultShareCard({
                 <b
                   data-qr-text
                   className={cn(
-                    'font-mono leading-none font-bold text-share-accent',
+                    'font-mono font-bold text-share-accent',
                     format === 'story'
                       ? 'text-[64px]'
                       : format === 'post'
                         ? 'text-[56px]'
                         : 'text-[40px]',
+                    'leading-none',
                   )}
                 >
                   {position ? `#${position}` : 'No position'}

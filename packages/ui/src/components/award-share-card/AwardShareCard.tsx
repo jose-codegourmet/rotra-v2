@@ -104,8 +104,9 @@ export function AwardShareCard(props: AwardShareCardProps) {
             <b
               data-qr-text
               className={cn(
-                'leading-[1.05] font-extrabold text-share-accent',
+                'font-extrabold text-share-accent',
                 square ? 'text-[30px]' : 'text-[40px]',
+                'leading-[1.05]',
               )}
             >
               {props.entry.award}

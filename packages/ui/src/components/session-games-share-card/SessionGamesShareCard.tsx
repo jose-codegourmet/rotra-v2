@@ -97,7 +97,7 @@ export function SessionGamesShareCard({
       <div
         className={cn(
           'flex min-h-0 flex-1 flex-col text-left',
-          format === 'square' ? 'justify-start gap-2' : 'justify-center',
+          format === 'square' ? 'justify-start gap-2' : 'justify-center-safe',
           format === 'post' && 'gap-3',
           format === 'story' && 'gap-2',
         )}

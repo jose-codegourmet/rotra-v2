@@ -259,8 +259,9 @@ export function ShareCard({
                 <h3
                   data-qr-text
                   className={cn(
-                    'm-0 mb-1.5 text-share-fg text-balance font-extrabold leading-[1.15] [overflow-wrap:anywhere]',
+                    'm-0 mb-1.5 text-share-fg text-balance font-extrabold [overflow-wrap:anywhere]',
                     format === 'post' ? 'text-[22px]' : 'text-[24px]',
+                    'leading-[1.15]',
                   )}
                 >
                   {title}

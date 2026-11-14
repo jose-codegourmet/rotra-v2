@@ -56,7 +56,7 @@ export function SessionPerformanceShareCard({
       <div
         className={cn(
           'flex min-h-0 flex-1 flex-col text-left',
-          tall ? 'justify-center' : 'justify-start gap-2',
+          tall ? 'justify-center-safe' : 'justify-start gap-2',
           format === 'post' && 'gap-3',
           format === 'story' && 'gap-3.5',
         )}
@@ -64,15 +64,16 @@ export function SessionPerformanceShareCard({
         <h3
           data-qr-text
           className={cn(
-            'leading-[1.15] font-extrabold text-balance text-share-fg',
+            'font-extrabold text-balance text-share-fg',
             tall ? 'text-[26px]' : 'text-[22px]',
+            'leading-[1.15]',
           )}
         >
           {title}
         </h3>
         <p
           data-qr-text
-          className={cn('leading-[1.4] text-share-muted', tall ? 'text-sm' : 'text-[13px]')}
+          className={cn('text-share-muted', tall ? 'text-sm' : 'text-[13px]', 'leading-[1.4]')}
         >
           {dateLabel} · {clubName}
         </p>
@@ -80,12 +81,13 @@ export function SessionPerformanceShareCard({
           <b
             data-qr-text
             className={cn(
-              'font-mono leading-none font-bold text-share-accent',
+              'font-mono font-bold text-share-accent',
               format === 'story'
                 ? 'text-[64px]'
                 : format === 'post'
                   ? 'text-[56px]'
                   : 'text-[40px]',
+              'leading-none',
             )}
           >
             {wins}–{losses}
@@ -117,8 +119,9 @@ export function SessionPerformanceShareCard({
                 <b
                   data-qr-text
                   className={cn(
-                    'font-mono leading-[1.1] font-bold text-share-fg',
+                    'font-mono font-bold text-share-fg',
                     tall ? 'text-[28px]' : 'text-xl',
+                    'leading-[1.1]',
                   )}
                 >
                   {value}

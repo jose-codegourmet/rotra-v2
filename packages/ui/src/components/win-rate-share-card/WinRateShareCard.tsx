@@ -74,8 +74,9 @@ export function WinRateShareCard({
               <b
                 data-qr-text
                 className={cn(
-                  'font-mono leading-none font-bold text-share-accent',
+                  'font-mono font-bold text-share-accent',
                   format === 'square' ? 'text-[44px]' : 'text-[56px]',
+                  'leading-none',
                 )}
               >
                 {Math.round(stats.winRate)}%

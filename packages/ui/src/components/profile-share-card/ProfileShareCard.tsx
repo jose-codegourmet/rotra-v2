@@ -80,7 +80,7 @@ export function ProfileShareCard({
             <div
               className={cn(
                 'flex min-h-0 flex-1 flex-col text-left',
-                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center-safe',
                 format === 'post' && 'gap-3',
                 format === 'story' && 'gap-3.5',
               )}
@@ -88,9 +88,10 @@ export function ProfileShareCard({
               <b
                 data-qr-text
                 className={cn(
-                  'leading-[1.1] font-extrabold',
+                  'font-extrabold',
                   format === 'square' ? 'text-[22px]' : 'text-[28px]',
                   levelLabel ? 'text-share-accent' : 'text-share-fg',
+                  'leading-[1.1]',
                 )}
               >
                 {levelLabel ?? 'Not ranked yet'}
@@ -107,8 +108,9 @@ export function ProfileShareCard({
                     <b
                       data-qr-text
                       className={cn(
-                        'font-mono leading-none font-bold text-share-accent',
+                        'font-mono font-bold text-share-accent',
                         format === 'square' ? 'text-[36px]' : 'text-[52px]',
+                        'leading-none',
                       )}
                     >
                       #{position.toLocaleString('en-PH')}
@@ -150,8 +152,9 @@ export function ProfileShareCard({
                       <b
                         data-qr-text
                         className={cn(
-                          'font-mono leading-[1.1] font-bold text-share-fg',
+                          'font-mono font-bold text-share-fg',
                           format === 'square' ? 'text-[20px]' : 'text-[28px]',
+                          'leading-[1.1]',
                         )}
                       >
                         {wins}

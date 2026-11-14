@@ -79,6 +79,8 @@ The operator may change lineups before a start (by editing the waiting match, or
 
 **Replace during play: fixing a mistake (owner, November 13, 2026; [log](../../../../../mockup-changes/2026-11-13-queue-replace-during-play.md)).** A Playing match also has **Replace player**, for when the Queue Master put the wrong player in. It is a correction, not a substitution: the replacement is recorded as having played the whole game, the player taken out gets nothing from it, and nothing is recorded as a substitution or asks who gets the game. Same candidates as a substitution (present, not in this match, not busy). The rule the owner gave: **replace** is when the QM makes a mistake; **substitute** is when a player really needs a sub.
 
+Real mode stores it the same way (November 14, 2026, #840): the outgoing player's segment is not closed but handed to the replacement in place, so the replacement inherits the whole stretch (joined time, started with the match, team, any earlier substitution's credit) and the player taken out has no segment from it. A replacement for an original lineup member is a full participant at Match done.
+
 **During play.** A substitution in a Playing match picks the player coming off, then a replacement who is present, not in this match, and not busy elsewhere. The replacement joins the same team. A match can have more than one substitution, and each is recorded and shown on the match.
 
 **Who gets this game? (owner decision, November 6, 2026).** At confirmation the operator chooses one of:

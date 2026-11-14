@@ -79,8 +79,10 @@ export function ProfileShareCard({
           >
             <div
               className={cn(
-                'flex flex-1 flex-col justify-center text-left',
-                format === 'square' ? 'gap-2.5' : 'gap-4',
+                'flex min-h-0 flex-1 flex-col text-left',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'post' && 'gap-3',
+                format === 'story' && 'gap-3.5',
               )}
             >
               <b
@@ -93,15 +95,15 @@ export function ProfileShareCard({
               >
                 {levelLabel ?? 'Not ranked yet'}
               </b>
-              <div className={cn('flex gap-4', format === 'square' ? 'flex-row' : 'flex-col')}>
-                {position ? (
-                  <div className="flex flex-col gap-0.5">
-                    <span
-                      data-qr-text
-                      className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
-                    >
-                      Overall
-                    </span>
+              {levelLabel === null && position === null ? null : (
+                <div className="flex flex-col gap-0.5">
+                  <span
+                    data-qr-text
+                    className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
+                  >
+                    Overall
+                  </span>
+                  {position ? (
                     <b
                       data-qr-text
                       className={cn(
@@ -111,44 +113,62 @@ export function ProfileShareCard({
                     >
                       #{position.toLocaleString('en-PH')}
                     </b>
-                  </div>
-                ) : null}
-                {wins === null ? (
-                  <b
-                    data-qr-text
-                    className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-lg')}
-                  >
-                    No games yet this year
-                  </b>
-                ) : (
-                  <div className="flex flex-col gap-0.5">
-                    <span
-                      data-qr-text
-                      className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
-                    >
-                      In {year}
-                    </span>
-                    <b
-                      data-qr-text
-                      className={cn(
-                        'font-mono leading-[1.1] font-bold text-share-fg',
-                        format === 'square' ? 'text-[20px]' : 'text-[28px]',
-                      )}
-                    >
-                      {wins}
+                  ) : (
+                    <b data-qr-text className="text-xl text-share-fg">
+                      No position
                     </b>
-                    <span
-                      data-qr-text
-                      className={cn(
-                        'text-share-muted',
-                        format === 'square' ? 'text-[10px]' : 'text-xs',
-                      )}
-                    >
-                      Wins
-                    </span>
+                  )}
+                </div>
+              )}
+              {wins === null ? (
+                <b
+                  data-qr-text
+                  className={cn(
+                    'text-share-fg',
+                    format === 'square' ? 'text-[15px]' : 'text-[18px]',
+                  )}
+                >
+                  No games yet this year
+                </b>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <span
+                    data-qr-text
+                    className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
+                  >
+                    In {year}
+                  </span>
+                  <div
+                    className={cn(
+                      'grid gap-2',
+                      format === 'story'
+                        ? 'grid-cols-2 gap-y-3.5'
+                        : 'auto-cols-[minmax(0,1fr)] grid-flow-col',
+                    )}
+                  >
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <b
+                        data-qr-text
+                        className={cn(
+                          'font-mono leading-[1.1] font-bold text-share-fg',
+                          format === 'square' ? 'text-[20px]' : 'text-[28px]',
+                        )}
+                      >
+                        {wins}
+                      </b>
+                      <span
+                        data-qr-text
+                        className={cn(
+                          'text-share-muted',
+                          format === 'square' ? 'text-[10px]' : 'text-[12px]',
+                        )}
+                      >
+                        Wins
+                      </span>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </ShareImage>
         ),

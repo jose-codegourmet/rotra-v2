@@ -78,23 +78,28 @@ export function SessionResultShareCard({
           >
             <div
               className={cn(
-                'flex flex-1 flex-col justify-center text-left',
-                format === 'square' ? 'gap-2' : 'gap-3.5',
+                'flex min-h-0 flex-1 flex-col text-left',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'post' && 'gap-3',
+                format === 'story' && 'gap-3.5',
               )}
             >
-              {/* Story and Facebook post fill the free space, set larger (share cards fill log). */}
+              {/* Square is top-aligned; Story and Facebook post centre and set larger (share cards fill log). */}
               <h3
                 data-qr-text
                 className={cn(
-                  'leading-[1.15] font-extrabold text-share-fg',
-                  format === 'square' ? 'truncate text-[22px]' : 'text-[26px]',
+                  'leading-[1.15] font-extrabold text-balance text-share-fg',
+                  format === 'square' ? 'text-[22px]' : 'text-[26px]',
                 )}
               >
                 {title}
               </h3>
               <p
                 data-qr-text
-                className={cn('text-share-muted', format === 'square' ? 'text-[13px]' : 'text-sm')}
+                className={cn(
+                  'leading-[1.4] text-share-muted',
+                  format === 'square' ? 'text-[13px]' : 'text-sm',
+                )}
               >
                 {dateLabel} · {clubName}
               </p>
@@ -102,7 +107,7 @@ export function SessionResultShareCard({
                 <b
                   data-qr-text
                   className={cn(
-                    'font-mono leading-none text-share-accent',
+                    'font-mono leading-none font-bold text-share-accent',
                     format === 'story'
                       ? 'text-[64px]'
                       : format === 'post'
@@ -116,7 +121,7 @@ export function SessionResultShareCard({
                   data-qr-text
                   className={cn(
                     'text-share-muted',
-                    format === 'square' ? 'text-sm' : 'text-[15px]',
+                    format === 'square' ? 'text-[13px]' : 'text-[15px]',
                   )}
                 >
                   in Standings
@@ -124,7 +129,7 @@ export function SessionResultShareCard({
               </div>
               <b
                 data-qr-text
-                className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-lg')}
+                className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-[18px]')}
               >
                 {games} {games === 1 ? 'game' : 'games'} · {wins}–{losses}
               </b>

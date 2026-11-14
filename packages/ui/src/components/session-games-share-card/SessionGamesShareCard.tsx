@@ -50,7 +50,7 @@ export function SessionGamesShareCard({
     side: 'mine' | 'theirs',
     winning: boolean,
   ) => (
-    <div className={cn('flex min-w-0 flex-col gap-0.5', side === 'theirs' && 'items-end')}>
+    <div className={cn('flex min-w-0 flex-col gap-[3px]', side === 'theirs' && 'items-end')}>
       <div className="flex items-center -space-x-1">
         {players.slice(0, 2).map((player, slot) => (
           <span
@@ -72,7 +72,7 @@ export function SessionGamesShareCard({
           </span>
         ))}
         {players.length > 2 ? (
-          <span data-qr-text className="pl-2 text-[9px] text-share-muted">
+          <span data-qr-text className="pl-1.5 text-[9px] text-share-muted">
             +{players.length - 2}
           </span>
         ) : null}
@@ -94,15 +94,30 @@ export function SessionGamesShareCard({
   const content = (format: ShareFormat) => {
     const limit = GAME_LIMIT[format]
     return (
-      <div className="flex min-h-0 flex-1 flex-col justify-center gap-2 text-left">
-        <div>
-          <h3 data-qr-text title={title} className="truncate text-lg font-extrabold text-share-fg">
-            {title}
-          </h3>
-          <p data-qr-text className="truncate text-[11px] leading-[15px] text-share-muted">
-            {dateLabel} · {clubName}
-          </p>
-        </div>
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 flex-col text-left',
+          format === 'square' ? 'justify-start gap-2' : 'justify-center',
+          format === 'post' && 'gap-3',
+          format === 'story' && 'gap-2',
+        )}
+      >
+        <h3
+          data-qr-text
+          title={title}
+          className="truncate text-lg leading-[1.15] font-extrabold text-share-fg"
+        >
+          {title}
+        </h3>
+        <p
+          data-qr-text
+          className={cn(
+            'truncate leading-[1.4] text-share-muted',
+            format === 'square' ? 'text-[13px]' : 'text-sm',
+          )}
+        >
+          {dateLabel} · {clubName}
+        </p>
         <div>
           {games.slice(0, limit).map((game, index) => (
             <article
@@ -111,11 +126,11 @@ export function SessionGamesShareCard({
               aria-label={`Game ${index + 1}, ${game.result === 'won' ? 'Won' : 'Lost'}, ${game.score ?? 'Winner recorded'}`}
             >
               {teamView(teams[index]?.mine ?? [], index, 'mine', game.result === 'won')}
-              <div className="flex flex-col items-center gap-0.5">
+              <div className="flex flex-col items-center gap-px">
                 <b
                   data-qr-text
                   className={cn(
-                    'font-mono text-xl leading-[22px] font-extrabold',
+                    'font-mono text-xl leading-[1.1] font-extrabold',
                     game.result === 'won' ? 'text-share-accent' : 'text-share-fg',
                   )}
                 >
@@ -133,16 +148,17 @@ export function SessionGamesShareCard({
             </article>
           ))}
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <b data-qr-text className="text-[13px] text-share-fg">
-            Total W–L {wins}–{losses}
-          </b>
-          {games.length > limit ? (
-            <span data-qr-text className="text-[10px] text-share-muted">
-              +{games.length - limit} more games
-            </span>
-          ) : null}
-        </div>
+        {games.length > limit ? (
+          <span data-qr-text className="text-[11px] text-share-muted">
+            +{games.length - limit} more games
+          </span>
+        ) : null}
+        <b
+          data-qr-text
+          className={cn('text-share-fg', format === 'square' ? 'text-[15px]' : 'text-[18px]')}
+        >
+          Total W–L {wins}–{losses}
+        </b>
       </div>
     )
   }

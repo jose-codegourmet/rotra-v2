@@ -69,44 +69,43 @@ export function RankShareCard({
           >
             <div
               className={cn(
-                'flex flex-1 flex-col justify-center text-left',
-                format === 'square' ? 'gap-3' : 'gap-5',
+                'flex min-h-0 flex-1 flex-col text-left',
+                format === 'square' ? 'justify-start gap-2' : 'justify-center',
+                format === 'post' && 'gap-3',
+                format === 'story' && 'gap-3.5',
               )}
             >
-              <div
+              <b
+                data-qr-text
                 className={cn(
-                  'flex items-start',
-                  format === 'square' ? 'flex-row justify-between gap-3' : 'flex-col gap-4',
+                  'leading-[1.1] font-extrabold text-share-accent',
+                  format === 'square' ? 'text-[22px]' : 'text-[28px]',
                 )}
               >
-                {/* Story and Facebook post are set larger (share cards fill log). */}
-                <b
+                {levelLabel}
+              </b>
+              <div className="flex flex-col gap-0.5">
+                <span
                   data-qr-text
-                  className={cn(
-                    'font-extrabold text-share-accent',
-                    format === 'square' ? 'text-[22px]' : 'text-[28px]',
-                  )}
+                  className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
                 >
-                  {levelLabel}
-                </b>
-                <div className="text-left">
-                  <span data-qr-text className="text-xs text-share-muted">
-                    Overall
-                  </span>
+                  Overall
+                </span>
+                {position ? (
                   <b
                     data-qr-text
-                    className={
-                      position
-                        ? cn(
-                            'block font-mono leading-none text-share-accent',
-                            format === 'square' ? 'text-[36px]' : 'text-[52px]',
-                          )
-                        : 'block text-xl text-share-fg'
-                    }
+                    className={cn(
+                      'font-mono leading-none font-bold text-share-accent',
+                      format === 'square' ? 'text-[36px]' : 'text-[52px]',
+                    )}
                   >
-                    {position ? `#${position}` : 'No position'}
+                    #{position}
                   </b>
-                </div>
+                ) : (
+                  <b data-qr-text className="text-xl text-share-fg">
+                    No position
+                  </b>
+                )}
               </div>
               <SkillLadder level={level} shareCard />
             </div>

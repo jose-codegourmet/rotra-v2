@@ -55,8 +55,10 @@ export function SessionPerformanceShareCard({
     return (
       <div
         className={cn(
-          'flex min-h-0 flex-1 flex-col justify-center text-left',
-          tall ? 'gap-3.5' : 'gap-2',
+          'flex min-h-0 flex-1 flex-col text-left',
+          tall ? 'justify-center' : 'justify-start gap-2',
+          format === 'post' && 'gap-3',
+          format === 'story' && 'gap-3.5',
         )}
       >
         <h3

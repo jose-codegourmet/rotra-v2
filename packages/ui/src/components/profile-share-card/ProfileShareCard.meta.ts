@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const profileShareCardMeta = {
   name: 'ProfileShareCard',
   description:
-    'The own-profile Share profile: Story, Facebook post and Square images (picture, level, overall position, wins this calendar year under “In YEAR”, or “No games yet this year”; no QR) in ShareImagePicker, then OR and the Profile link field with the copy icon.',
+    'The own-profile Share profile: Story, Facebook post and Square images (picture, level, overall position, wins this calendar year under “In YEAR”, or “No games yet this year”; no QR) in ShareImagePicker, then OR and the Profile link field with the copy icon. Square is top-aligned; Story and Facebook post centre the content and set it larger (the prototype .sh-card rules).',
   usage: ['Use in the Share profile sheet on the signed-in player’s own profile.'],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

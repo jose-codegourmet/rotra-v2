@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionPerformanceShareCardMeta = {
   name: 'SessionPerformanceShareCard',
   description:
-    'Share performance: your night in one card (record big, win rate, Games, Won, Lost and Standing once published) at Story, Facebook post and Square sizes.',
+    'Share performance: your night in one card (record big, win rate, Games, Won, Lost and Standing once published) at Story, Facebook post and Square sizes. Square is top-aligned; Story and Facebook post centre the content and set it larger (the prototype .sh-card rules).',
   usage: [
     'Put it inside a ShareDialog titled “Share performance”.',
     '`wins` and `losses` are counted singles and doubles; `games` is every game played that night.',

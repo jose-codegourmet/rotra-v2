@@ -76,6 +76,7 @@ export const QueuedTonight: Story = {
 export const AwayTonight: Story = {
   args: { tonightLevel: 'intermediate_high', tonight: { kind: 'away' } },
 }
+export const StatsHidden: Story = { args: { showStats: false } }
 export const NoLevelYet: Story = { args: { level: null, tonightLevel: null } }
 export const WithPhotoButton: Story = { args: { onPhotoClick: fn() } }
 export const Light: Story = {

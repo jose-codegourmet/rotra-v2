@@ -13,6 +13,7 @@ import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { statsYear } from '@rotra/data/player/rules'
+import { isStatsHidden, visibleStats } from '@rotra/data/public-session/rules'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -344,7 +345,8 @@ export function SavedPlayers() {
           rtrId={profile.rtrId}
           profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
           year={statsYear(Date.now())}
-          stats={profileStats.data ?? null}
+          stats={visibleStats(profileStats.data)}
+          showStats={!isStatsHidden(profileStats.data)}
           statsLoading={profileStats.isPending}
           addedLabel={longDateLabel(profile.addedAt)}
           joinedVia={joinedViaProp(profile.joinedVia)}

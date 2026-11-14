@@ -6,7 +6,7 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { statsYear } from '@rotra/data/player/rules'
-import { tonightStatus } from '@rotra/data/public-session/rules'
+import { isStatsHidden, tonightStatus, visibleStats } from '@rotra/data/public-session/rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
@@ -79,7 +79,8 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         rtrId={profile.rtrId}
         profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
         year={statsYear(Date.now())}
-        stats={stats.data ?? null}
+        stats={visibleStats(stats.data)}
+        showStats={!isStatsHidden(stats.data)}
         statsLoading={stats.isPending}
         addedLabel={longDateLabel(profile.addedAt)}
         sessionsHere={profile.sessionsHere}

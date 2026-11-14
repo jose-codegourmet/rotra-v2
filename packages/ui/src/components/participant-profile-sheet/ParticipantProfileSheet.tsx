@@ -43,6 +43,11 @@ export type ParticipantProfileSheetProps = {
   /** The stats read failed: the section says so instead of “No games yet this year” */
   statsError?: boolean
   /**
+   * false when the player turned off Show my profile stats and the viewer is someone else: Latest
+   * stats is left out. Default true.
+   */
+  showStats?: boolean
+  /**
    * The Player app's public profile (`/find/<RTR>`), opened in a new tab from the icon right of the
    * name and from Open ROTRA profile; both hidden when missing
    */
@@ -74,6 +79,7 @@ export function ParticipantProfileSheet({
   stats,
   statsLoading = false,
   statsError = false,
+  showStats = true,
   profileHref,
   onShare,
 }: ParticipantProfileSheetProps) {
@@ -128,7 +134,14 @@ export function ParticipantProfileSheet({
         <ProfileCardSection label="About">
           <KeyValueList items={[{ label: 'Registered in', value: registeredCity ?? '—' }]} />
         </ProfileCardSection>
-        <ProfileStatsSection year={year} stats={stats} loading={statsLoading} error={statsError} />
+        {showStats ? (
+          <ProfileStatsSection
+            year={year}
+            stats={stats}
+            loading={statsLoading}
+            error={statsError}
+          />
+        ) : null}
       </ProfileBannerCard>
     </Sheet>
   )

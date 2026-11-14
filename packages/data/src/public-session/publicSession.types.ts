@@ -27,6 +27,14 @@ export type ParticipantProfileKind = 'registered' | 'private' | 'guest'
 /** Stats · YEAR (the current calendar year) on the profile cards; null is "No games yet this year". */
 export type ParticipantStats = { games: number; wins: number; losses: number; winRate: number }
 
+/**
+ * What the stats reads (Queue Master's profile dialog, the session page's participant card) return:
+ * the numbers, null for “No games yet this year”, or `{ hidden: true }` when the player turned off
+ * Show my profile stats (2026-11-13-player-stats-visibility). Hidden is decided where the read is
+ * answered and carries no numbers; only the player themself still gets the stats.
+ */
+export type ParticipantStatsRead = ParticipantStats | { hidden: true } | null
+
 /** Public-safe participant or waitlist entry. */
 export type PublicSessionParticipant = {
   /** Masked on the server (`maskPublicName`): "J*** A***". The full name never enters the page. */

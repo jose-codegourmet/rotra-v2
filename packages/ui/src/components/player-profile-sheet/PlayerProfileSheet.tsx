@@ -50,6 +50,8 @@ export type PlayerProfileSheetProps = {
   /** Latest stats; null is “No games yet this year” */
   stats: ParticipantStats | null
   statsLoading?: boolean
+  /** false when the player turned off Show my profile stats: Latest stats is left out. Default true. */
+  showStats?: boolean
   /** Long date the club saved them, e.g. "October 3, 2026" */
   addedLabel: string
   sessionsHere: number
@@ -107,6 +109,7 @@ export function PlayerProfileSheet({
   year,
   stats,
   statsLoading = false,
+  showStats = true,
   addedLabel,
   sessionsHere,
   phoneHidden,
@@ -204,7 +207,9 @@ export function PlayerProfileSheet({
             ]}
           />
         </ProfileCardSection>
-        <ProfileStatsSection year={year} stats={stats} loading={statsLoading} />
+        {showStats ? (
+          <ProfileStatsSection year={year} stats={stats} loading={statsLoading} />
+        ) : null}
         <ProfileCardSection label="In your club">
           <KeyValueList
             items={[

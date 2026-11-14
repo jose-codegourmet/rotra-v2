@@ -199,6 +199,7 @@ export async function readAdminPlayerEdit(context: AdminContext, playerId: strin
       experienceMonths: true,
       experienceRecordedAt: true,
       profileVisibility: true,
+      showProfileStats: true,
       privateContact: { select: { playerId: true } },
       socialLinks: { select: { provider: true, url: true } },
     },
@@ -222,6 +223,8 @@ export async function readAdminPlayerEdit(context: AdminContext, playerId: strin
     experienceMonths: months == null ? null : months % 12,
     socialLinks,
     profilePrivate: player ? player.profileVisibility !== 'public' : false,
+    /** Show my profile stats (2026-11-13-player-stats-visibility); a club-only record has no setting. */
+    showProfileStats: player ? player.showProfileStats : true,
     previousPicture: player?.avatarPreviousRef ?? null,
     hasAccount: Boolean(player?.privateContact) || !player,
     passwordSetAt: passwordEvent?.occurredAt.toISOString() ?? null,

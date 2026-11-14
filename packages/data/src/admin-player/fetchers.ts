@@ -194,6 +194,8 @@ export async function getAdminPlayerProfile(
   /** The resolved Profile banner for Quick view (mock mode); missing draws the default */
   bannerKey?: string
   bannerImageUrl?: string | null
+  /** false when the player turned off Show my profile stats: Quick view leaves Latest stats out. Missing = shown. */
+  showProfileStats?: boolean
 } | null> {
   if (isRealDataMode()) return realGetAdminPlayerSocialLinks(id, signal)
   if ((await getAdminSession()).kind !== 'owner')
@@ -201,7 +203,11 @@ export async function getAdminPlayerProfile(
   await delay(400, signal)
   const profile = readMockState().playerProfiles.find((entry) => entry.playerId === id)
   return profile
-    ? { socialLinks: profile.socialLinks, ...resolveMockProfileBanner(profile.bannerId) }
+    ? {
+        socialLinks: profile.socialLinks,
+        showProfileStats: profile.showProfileStats !== false,
+        ...resolveMockProfileBanner(profile.bannerId),
+      }
     : null
 }
 

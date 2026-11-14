@@ -161,7 +161,9 @@ describe('Public session › participant profile cards (#731)', () => {
     const state = mockStore.getSnapshot()
     const jose = state.players.find((p) => p.id === JOSE_PLAYER_ID)
     const stats = await getParticipantStats(jose?.rtrId ?? '', JOSE_PLAYER_ID)
-    expect(stats === null || stats.games === stats.wins + stats.losses).toBe(true)
+    expect(stats === null || 'hidden' in stats || stats.games === stats.wins + stats.losses).toBe(
+      true,
+    )
     const hidden = state.playerProfiles.find((p) => p.profileVisibility === 'always_private')
     await expect(getParticipantStats(hidden?.rtrId ?? '', JOSE_PLAYER_ID)).rejects.toThrow()
     // The player themselves still reads their own stats.

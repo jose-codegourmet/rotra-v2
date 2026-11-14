@@ -270,7 +270,7 @@ export function PlayerDirectory() {
         bannerImageUrl={
           profile.data?.bannerKey ? profile.data.bannerImageUrl : defaultBanner.bannerImageUrl
         }
-        year={statsYear(Date.now())}
+        year={profile.data?.showProfileStats === false ? undefined : statsYear(Date.now())}
         stats={(() => {
           const year = countYearCountedWins(games.data ?? [], Date.now())
           return profileStats(year.games, year.wins)

@@ -7,7 +7,7 @@ export const participantProfileSheetMeta = {
   usage: [
     'Opened from a registered participant’s or waitlist tile on the public session page (PublicParticipants onOpenParticipant), and from the viewer’s own tile whatever their visibility. Never for visitors.',
     'Public fields only: no phone, contacts or club-private rows (those belong to PlayerProfileSheet on operator screens).',
-    'stats comes from useParticipantStats (the calendar year, reset on January 1); pass statsLoading while it loads and statsError when it failed. null is “No games yet this year”.',
+    'stats comes from useParticipantStats (the calendar year, reset on January 1); pass statsLoading while it loads and statsError when it failed. null is “No games yet this year”. showStats false (the player turned off Show my profile stats and the viewer is someone else) leaves Latest stats out.',
     'profileHref is the Player app’s /find/<RTR> profile, opened in a new tab from the name icon and Open ROTRA profile; both hide without it. onShare opens the share dialog (Share profile).',
     'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716, usePhotoViewer keeps the state). Initials never open anything.',
   ],

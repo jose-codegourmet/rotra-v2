@@ -17,7 +17,11 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
 import { yearGameStats } from '../player/player.rules'
 import { playerProjection } from '../player/projection'
-import { isAlwaysPrivatePlayer, PROFILE_PRIVATE_MESSAGE } from '../player/visibility'
+import {
+  isAlwaysPrivatePlayer,
+  isStatsHiddenFrom,
+  PROFILE_PRIVATE_MESSAGE,
+} from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
@@ -52,7 +56,7 @@ import type {
   MyNightMatch,
   MyNightStage,
   ParticipantProfileKind,
-  ParticipantStats,
+  ParticipantStatsRead,
   ParticipantTonight,
   PlayerSessionAccess,
   PublicCourtNow,
@@ -819,7 +823,8 @@ export async function getMyJoinRequest(slug: string): Promise<MyJoinRequest | nu
 
 /**
  * Stats · YEAR (the calendar year) for the participant profile card (#731), by the RTR ID the signed-in read
- * gave: games, wins, losses and win rate over the rank window, or null ("No games yet"). Signed-in
+ * gave: games, wins, losses and win rate over the rank window, null ("No games yet") or `{ hidden: true }`
+ * when the player turned off Show my profile stats (not for the player themself). Signed-in
  * Players only. An always-private player's stats are refused to everyone but themselves. Real mode
  * reads the Player app's `/api/rtr-ids/<RTR>/stats` with the Player cookie (same-site, #687).
  */
@@ -827,7 +832,7 @@ export async function getParticipantStats(
   rtrId: string,
   viewerPlayerId: string | null,
   signal?: AbortSignal,
-): Promise<ParticipantStats | null> {
+): Promise<ParticipantStatsRead> {
   if (isRealDataMode()) {
     const origin = playerOrigin(location.origin)
     if (!origin) throw new MockError('retryable', "Couldn't load these stats. Try again.")
@@ -840,7 +845,7 @@ export async function getParticipantStats(
     if (response.status === 401 || response.status === 403)
       throw new MockError('permission', 'Sign in with ROTRA Player to see this.')
     if (!response.ok) throw new MockError('retryable', "Couldn't load these stats. Try again.")
-    return ((await response.json()) as { stats: ParticipantStats | null }).stats
+    return ((await response.json()) as { stats: ParticipantStatsRead }).stats
   }
   await delay()
   const { state } = serverState()
@@ -851,6 +856,8 @@ export async function getParticipantStats(
   if (player.id !== viewerPlayerId && isAlwaysPrivatePlayer(player.id))
     throw new MockError('permission', PROFILE_PRIVATE_MESSAGE)
   // Mock histories are dated from the fixture clock, like rank.
+  // Show my profile stats off: hidden from everyone but the player (the Queue Master included).
+  if (isStatsHiddenFrom(player.id, viewerPlayerId)) return { hidden: true }
   return yearGameStats(playerProjection().games[player.id] ?? [], PLAYER_FIXTURE_NOW)
 }
 

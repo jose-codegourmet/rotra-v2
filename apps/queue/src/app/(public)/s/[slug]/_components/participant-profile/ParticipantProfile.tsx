@@ -2,6 +2,7 @@
 
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import { statsYear } from '@rotra/data/player/rules'
+import { isStatsHidden, visibleStats } from '@rotra/data/public-session/rules'
 import { useParticipantStats } from '@rotra/data/public-session/useParticipantStats'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { ParticipantProfileSheet } from '@rotra/ui/participant-profile-sheet'
@@ -89,7 +90,8 @@ export function ParticipantProfile({
         registeredCity={registeredCity(participant.rtrId ?? null)}
         rtrId={participant.rtrId ?? null}
         year={statsYear(Date.now())}
-        stats={stats.data ?? null}
+        stats={visibleStats(stats.data)}
+        showStats={!isStatsHidden(stats.data)}
         statsLoading={!!participant.rtrId && stats.isPending}
         statsError={stats.isError}
         profileHref={participant.href}
@@ -110,7 +112,7 @@ export function ParticipantProfile({
           rtrId={participant.rtrId ?? null}
           picture={participant.pictureUrl ?? null}
           year={statsYear(Date.now())}
-          stats={stats.data ?? null}
+          stats={visibleStats(stats.data)}
           onCopy={() => void copyLink()}
           onError={(message) => toast.error(message)}
           onDownloaded={(item) => toast(`${item.label} image downloaded`)}

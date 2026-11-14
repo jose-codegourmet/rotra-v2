@@ -1,8 +1,6 @@
 import type { PlayerGame, PlayerGamePlayer } from '@rotra/data/player/types'
-import { Avatar } from '@rotra/ui/avatar'
-import { Chip } from '@rotra/ui/chip'
-import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { MatchCourt, type MatchCourtPlayer } from '@rotra/ui/match-court'
 
 /** One face on the court; `playerId` null is a guest or someone with no ROTRA profile. */
 export type GameRowPlayer = PlayerGamePlayer
@@ -33,45 +31,11 @@ const FORMATS = {
 
 const firstName = (name: string) => name.split(/\s+/)[0] ?? name
 
-/** The Queue app's court art (viewBox 134 × 61): solid court green, white lines, the dashed net. */
-function CourtArt() {
-  return (
-    <svg
-      viewBox="0 0 134 61"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      className="absolute inset-0 block size-full"
-    >
-      <rect width={134} height={61} fill="var(--color-court)" />
-      <g
-        fill="none"
-        stroke="var(--color-court-line)"
-        strokeWidth={1.5}
-        vectorEffect="non-scaling-stroke"
-      >
-        <rect x={0.75} y={0.75} width={132.5} height={59.5} vectorEffect="non-scaling-stroke" />
-        <path
-          d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134"
-          vectorEffect="non-scaling-stroke"
-        />
-      </g>
-      <path
-        d="M67 0V61"
-        stroke="var(--color-court-line)"
-        strokeWidth={3}
-        strokeDasharray="4 3"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  )
-}
-
 /**
  * A player game as a small badminton court (P-MATCH-HISTORY, 2026-11-13 game row log; the
- * prototype's gameRow): the player and partner on the left, opponents on the right, each a face
- * with the first name, the winning side ringed in the accent. The score and the Won / Lost (Not
- * counted) chip sit in a dark box on the net; the format is a pill top-left and, on your own games,
- * a share icon top-right. Faces open the profile card.
+ * prototype's gameRow): the Player variant of the shared MatchCourt. The player and partner are on
+ * the left, opponents on the right; the format is the corner pill and, on your own games, a share
+ * icon sits top-right. Faces open the profile card.
  */
 export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowProps) {
   const partial = game.counting === 'partial'
@@ -84,67 +48,42 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
     game.opponentPlayers ?? game.opponents.map((name) => ({ name, picture: null }))
   const meLabel = me?.label ?? 'Player'
 
-  const face = (player: GameRowPlayer, label: string, lit: boolean, openable: boolean) => {
-    const body = (
-      <>
-        <Avatar
-          name={player.name}
-          src={player.picture ?? undefined}
-          size={44}
-          className={cn(
-            'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
-            lit ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
-            openable &&
-              'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
-          )}
-        />
-        <b className="max-w-full truncate rounded-full bg-court-level-label px-[7px] text-xs leading-[1.3] font-bold text-on-photo">
-          {label}
-        </b>
-      </>
-    )
-    const className =
-      'group/face flex min-w-0 max-w-[84px] flex-col items-center gap-[3px] rounded-lg border-0 bg-transparent p-0.5 text-on-photo max-[480px]:max-w-14'
-    return openable && onOpenPlayer ? (
-      <button
-        key={`${player.playerId ?? ''}-${player.name}`}
-        type="button"
-        aria-label={`${player.name}. View profile`}
-        onClick={() => onOpenPlayer(player)}
-        className={cn(className, 'cursor-pointer focus-visible:outline-none')}
-      >
-        {body}
-      </button>
-    ) : (
-      <span key={`${player.playerId ?? ''}-${player.name}`} className={className}>
-        {body}
-      </span>
-    )
-  }
+  const face = (player: GameRowPlayer, label: string, openable: boolean): MatchCourtPlayer => ({
+    key: `${player.playerId ?? ''}-${player.name}`,
+    name: player.name,
+    label,
+    pictureUrl: player.picture,
+    onOpen: openable && onOpenPlayer ? () => onOpenPlayer(player) : undefined,
+  })
 
-  const side = 'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5 px-1 py-3'
+  const left: MatchCourtPlayer[] = [
+    ...(me
+      ? [
+          face(
+            { name: me.name, picture: me.picture ?? null, playerId: me.playerId },
+            me.label,
+            true,
+          ),
+        ]
+      : []),
+    ...partners.map((p) => face(p, firstName(p.name), known)),
+  ]
+  const right = opponents.map((p) => face(p, firstName(p.name), known))
+
   return (
-    <div className="flex flex-col gap-1.5 border-t border-border py-3 first:border-t-0">
-      <fieldset
-        aria-label={`${FORMATS[game.format]}: ${meLabel}${partners.length ? ` and ${partners.map((p) => p.name).join(' and ')}` : ''} versus ${opponents.map((p) => p.name).join(' and ')}`}
-        className="relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 pt-2.5 max-[480px]:min-h-[100px]"
-      >
-        <CourtArt />
-        <div className={side}>
-          {me
-            ? face(
-                { name: me.name, picture: me.picture ?? null, playerId: me.playerId },
-                me.label,
-                won && !partial,
-                true,
-              )
-            : null}
-          {partners.map((p) => face(p, firstName(p.name), won && !partial, known))}
-        </div>
-        <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] text-on-photo/85 uppercase">
-          {FORMATS[game.format]}
-        </span>
-        {onShare && !partial ? (
+    <MatchCourt
+      cornerLabel={FORMATS[game.format]}
+      ariaLabel={`${FORMATS[game.format]}: ${meLabel}${partners.length ? ` and ${partners.map((p) => p.name).join(' and ')}` : ''} versus ${opponents.map((p) => p.name).join(' and ')}`}
+      left={left}
+      right={right}
+      winner={won ? 'left' : 'right'}
+      score={game.score ?? null}
+      mine
+      notCounted={partial}
+      note={game.note ?? undefined}
+      dateLine={dateLine}
+      action={
+        onShare && !partial ? (
           <button
             type="button"
             onClick={onShare}
@@ -154,33 +93,9 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
           >
             <Icon name="share" size={14} />
           </button>
-        ) : null}
-        <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
-          {game.score ? (
-            <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
-              <span className="sr-only">Score </span>
-              {game.score}
-            </span>
-          ) : (
-            <span
-              title="Winner recorded; score not entered"
-              className="text-[13px] font-semibold whitespace-nowrap text-on-photo/80 max-[480px]:text-[11px]"
-            >
-              No score
-            </span>
-          )}
-          {partial ? (
-            <Chip>Not counted</Chip>
-          ) : (
-            <Chip tone={won ? 'accent' : 'error'}>{won ? 'Won' : 'Lost'}</Chip>
-          )}
-        </div>
-        <div className={side}>
-          {opponents.map((p) => face(p, firstName(p.name), !won && !partial, known))}
-        </div>
-      </fieldset>
-      {game.note ? <div className="text-[13px] text-warn">{game.note} · not counted</div> : null}
-      {dateLine ? <p className="text-[13px] text-fg2">{dateLine}</p> : null}
-    </div>
+        ) : undefined
+      }
+      className="gap-1.5 border-t border-border py-3 first:border-t-0"
+    />
   )
 }

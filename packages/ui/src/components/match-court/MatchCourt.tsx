@@ -1,6 +1,7 @@
 import { Avatar } from '@rotra/ui/avatar'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import type { ReactNode } from 'react'
 
 /** One face on the court: the masked or full name for the accessible name, the pill's first name. */
 export type MatchCourtPlayer = {
@@ -16,10 +17,22 @@ export type MatchCourtPlayer = {
 }
 
 export type MatchCourtProps = {
-  /** “#N” */
-  number: number
+  /** “#N”; with `timeLabel` it makes the corner pill “#N · time” (Queue variant) */
+  number?: number
   /** “7:10–7:30 PM” */
-  timeLabel: string
+  timeLabel?: string
+  /** Player variant: the whole corner pill text instead of “#N · time”, drawn small caps (“Doubles”) */
+  cornerLabel?: string
+  /** Accessible name of the court; defaults to “Match N: A versus B” */
+  ariaLabel?: string
+  /** Top-right slot on the court, e.g. the round Share button of your own game */
+  action?: ReactNode
+  /** Player variant: counted games only ring the winners; “Not counted” replaces Won / Lost */
+  notCounted?: boolean
+  /** Player variant: warn line under the court, “NOTE · not counted” */
+  note?: string
+  /** Muted line under the court (Recent games: “session · date · club”) */
+  dateLine?: string
   /** A fun format: “· Fun” in the corner pill */
   fun?: boolean
   /** The viewer's pair when it is their match, else Team A */
@@ -82,6 +95,12 @@ export function MatchCourtArt() {
 export function MatchCourt({
   number,
   timeLabel,
+  cornerLabel,
+  ariaLabel,
+  action,
+  notCounted = false,
+  note,
+  dateLine,
   fun,
   left,
   right,
@@ -132,6 +151,8 @@ export function MatchCourt({
   const side = 'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5 px-1 py-3'
   const names = (players: MatchCourtPlayer[]) => players.map((p) => p.name).join(' and ')
   const leftWon = winner === 'left'
+  const ring = !invalid && !notCounted
+  const playerVariant = cornerLabel !== undefined
   return (
     <article
       data-now={now || undefined}
@@ -139,19 +160,27 @@ export function MatchCourt({
     >
       <fieldset
         data-court
-        aria-label={`Match ${number}: ${names(left)} versus ${names(right)}`}
+        aria-label={ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`}
         className={cn(
-          'relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 pt-3 transition-shadow motion-reduce:transition-none max-[480px]:min-h-[112px]',
+          'relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 transition-shadow motion-reduce:transition-none',
+          playerVariant ? 'pt-2.5 max-[480px]:min-h-[100px]' : 'pt-3 max-[480px]:min-h-[112px]',
           now &&
             'shadow-[0_0_0_3px_var(--accent),0_0_18px_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]',
         )}
       >
         <MatchCourtArt />
-        <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
-          #{number} · {timeLabel}
-          {fun ? ' · Fun' : ''}
-        </span>
-        <div className={side}>{left.map((p) => face(p, !invalid && leftWon))}</div>
+        {playerVariant ? (
+          <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
+            {cornerLabel}
+          </span>
+        ) : (
+          <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
+            #{number} · {timeLabel}
+            {fun ? ' · Fun' : ''}
+          </span>
+        )}
+        {action}
+        <div className={side}>{left.map((p) => face(p, ring && leftWon))}</div>
         <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
           {invalid ? null : score ? (
             <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
@@ -168,6 +197,8 @@ export function MatchCourt({
           )}
           {invalid ? (
             <Chip tone="error">Invalid</Chip>
+          ) : notCounted ? (
+            <Chip>Not counted</Chip>
           ) : winner && mine ? (
             <Chip tone={leftWon ? 'accent' : 'error'}>{leftWon ? 'Won' : 'Lost'}</Chip>
           ) : winner ? (
@@ -176,8 +207,10 @@ export function MatchCourt({
             </span>
           ) : null}
         </div>
-        <div className={side}>{right.map((p) => face(p, !invalid && winner === 'right'))}</div>
+        <div className={side}>{right.map((p) => face(p, ring && winner === 'right'))}</div>
       </fieldset>
+      {note ? <div className="text-[13px] text-warn">{note} · not counted</div> : null}
+      {dateLine ? <p className="text-[13px] text-fg2">{dateLine}</p> : null}
     </article>
   )
 }

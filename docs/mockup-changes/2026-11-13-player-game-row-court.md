@@ -7,7 +7,7 @@ Mockup: apps/mockup/player-app/rotra-player.html › gameRow(g, who) (uses cmpCo
 Route: /player/players/<id>/games, /player/players/<id> (Recent games), the session matches dialog
 Screen ID: P-MATCH-HISTORY
 Artifact: https://claude.ai/artifact/NzmSBUkRihAY6Bx7QQE9DZ
-Components: game-row (court variant; reuses the Compare court art)
+Components: game-row (a thin wrapper on match-court's Player variant)
 Supersedes: the text game row (W/L badge, “Doubles with …”, “vs …”, score)
 Superseded by: none
 
@@ -27,8 +27,8 @@ Superseded by: none
 - Known differences: opponent faces in the prototype are drawn from the name; the real app uses each player's picture and the profile privacy rules.
 
 ## Reuse plan
-- Reuses as is: Compare court art, avatar, chip.
-- New: game-row court variant.
+- Reuses as is: match-court (the one shared court: art, faces, net box; Queue and Player variants), avatar, chip.
+- New: game-row, a thin mapping of a player game onto match-court's Player variant.
 
 ## Pass 2 (artifact comment, November 13, 2026: “I don't mind the court height might appear bigger · put the score and status in the middle of the pairs”)
 - The court is taller (112 px; 100 px on phones) with 44 px faces (36 px on phones). The format, score (or “No score”) and Won / Lost / Not counted chip now sit in a small box on the net, between the two pairs, instead of a column on the right; the row is the court alone at every width.

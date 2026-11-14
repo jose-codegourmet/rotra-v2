@@ -1,3 +1,4 @@
+import { Icon } from '@rotra/ui/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MatchCourt, type MatchCourtPlayer } from './MatchCourt'
 
@@ -33,3 +34,37 @@ export const FunSingles: Story = {
 }
 export const Invalid: Story = { args: { invalid: true, winner: null, score: null } }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
+
+/** Player variant (GameRow): the format pill, a share action top-right, a date line. */
+export const PlayerVariant: Story = {
+  args: {
+    cornerLabel: 'Doubles',
+    ariaLabel: 'Doubles: You and Maya versus Ben and Y',
+    action: (
+      <button
+        type="button"
+        aria-label="Share this game"
+        className="absolute top-1.5 right-1.5 z-2 grid size-[30px] place-items-center rounded-full border-0 bg-court-level-label p-0 text-on-photo"
+      >
+        <Icon name="share" size={14} />
+      </button>
+    ),
+    dateLine: 'Sunday Night Queue · Sun, Oct 26 · Lahug Smash Club',
+  },
+  globals: { theme: 'dark' },
+}
+export const PlayerVariantLight: Story = {
+  args: PlayerVariant.args,
+  globals: { theme: 'light' },
+}
+export const PlayerNotCountedWithNote: Story = {
+  args: { cornerLabel: 'Doubles', notCounted: true, note: 'Partner left early' },
+}
+export const PlayerVariantPhone: Story = {
+  args: {
+    cornerLabel: 'Singles',
+    left: [face('Jose Buctuanon', 'You')],
+    right: [face('Ben Cruz')],
+  },
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}

@@ -9,7 +9,7 @@ export const playerProfileSheetMeta = {
     'Opened from inside a dialog, pass backLabel ("suggestion", "match" or "payments") and onBack to return to that dialog in the same state; otherwise the footer says Close.',
     'The phone number is never a prop: pass only phoneHidden. Invite shows for guests and unclaimed profiles.',
     'An unclaimed player is the club\'s own record (D-2026-11-11-03): the identity line reads "Saved by your club with a phone. Not registered with ROTRA yet"; with rtrId null there is no Copy RTR ID button and no profile icon.',
-    'Latest stats: pass year, stats (null is “No games yet this year”) and statsLoading. No Share profile here (the Queue Master’s own player card gets only the name icon, from profileHref).',
+    'Latest stats: pass year, stats (null is “No games yet this year”) and statsLoading; showStats false (the player turned off Show my profile stats) leaves Latest stats out. No Share profile here (the Queue Master’s own player card gets only the name icon, from profileHref).',
     'The level badge reads “LEVEL tonight” from tonightLevel (the player is on tonight’s roster), else “LEVEL · suggestion” from level, else “No level yet”. Pass tonight (ParticipantTonight) for the status pill only while the session is live; leave it out otherwise.',
     'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716). Initials never open anything.',
     'joinedVia ("club", "session" or null) sets the Joined row: "Joined via club link", "Joined via session link" or "Added by the club".',

@@ -13,6 +13,12 @@ const ALWAYS_PRIVATE_PLAYER_IDS = [
   '85ae7866-ff62-59fc-8af8-985a594bb5b2',
   '9f83495f-9359-5f7f-82ad-4cf01b826471',
 ]
+/**
+ * 2026-11-13-player-stats-visibility: one registered player on tonight's roster (p6 Dexter, a saved
+ * player, in Admin) has turned off Show my profile stats, so Queue's and Admin's profile cards,
+ * and the Player app's, leave Latest stats out.
+ */
+const STATS_HIDDEN_PLAYER_IDS = ['a5c35992-7597-55cd-bdf9-20c7a9440af4']
 /** Two sample private profiles (leaderboard positions 6 and 10), so visitors see the masking and the gate. */
 const PRIVATE_PLAYER_IDS = [leaderboardPlayers[5]?.id, leaderboardPlayers[9]?.id]
 /** Three registered players hidden from Player Information (rotra-player.html HIDDEN_SEED: positions 4, 21 and 42). */
@@ -32,6 +38,7 @@ export const playerProfiles: PlayerProfile[] = players.map((player) => {
         ? 'private'
         : 'public',
     hiddenFromDirectory: HIDDEN_FROM_DIRECTORY_IDS.includes(player.id),
+    ...(STATS_HIDDEN_PLAYER_IDS.includes(player.id) ? { showProfileStats: false } : {}),
     playerId: player.id,
     rtrId: player.rtrId,
     fullName: player.fullName,

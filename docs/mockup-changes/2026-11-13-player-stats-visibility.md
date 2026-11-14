@@ -24,7 +24,7 @@ Superseded by: none
 - States: both on (default), each off, viewed by the owner, by a signed-in player, by a visitor; profile card opened from the leaderboard, a club page and Queue.
 - Copy: “Stats on your profile”, “Show my profile stats”, “Show my weekly performance”, helper lines, “Saved: …”, toasts, chip “Hidden”.
 - Tokens: none
-- Known differences: Queue's and Admin's profile cards should honour the stats switch too; their mock players don't carry the setting yet.
+- Known differences: none. Queue's profile cards (Queue Master dialog, Saved players, Preparation roster, the session page's participant card) and Admin's player Quick view leave Latest stats out when the player turned the switch off, for everyone but the player (the Queue Master and Admin are not exempt). The mock player Dexter has it off. Queue and Admin never show the weekly chart, so Show my weekly performance changes nothing there (#829).
 
 ## Reuse plan
 - Reuses as is: settings switch row.

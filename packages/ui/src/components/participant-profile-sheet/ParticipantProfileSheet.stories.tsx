@@ -43,6 +43,7 @@ export const Initials: Story = {
 export const NoGamesYet: Story = { args: { stats: null } }
 export const StatsLoading: Story = { args: { stats: null, statsLoading: true } }
 export const StatsFailed: Story = { args: { stats: null, statsError: true } }
+export const StatsHidden: Story = { args: { showStats: false } }
 export const GettingReady: Story = {
   args: { tonight: { kind: 'getting-ready', courtLabel: 'Court 1' } },
 }

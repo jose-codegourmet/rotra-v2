@@ -13,7 +13,9 @@ export async function GET(_request: Request, ctx: RouteContext<'/api/players/[pl
   return handleAccountRequest('admin', routeCookieAdapter(await cookies()), async (admin) => {
     requireAdmin(admin)
     const edit = await readAdminPlayerEdit(admin, playerId)
-    return { body: { edit, socialLinks: edit.socialLinks } }
+    return {
+      body: { edit, socialLinks: edit.socialLinks, showProfileStats: edit.showProfileStats },
+    }
   })
 }
 

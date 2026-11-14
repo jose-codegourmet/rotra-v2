@@ -413,3 +413,17 @@ export async function readClubVisiblePhone(context: ClubContext, clubPlayerId: s
   if (!player || player.hidePhoneFromClubs) return { phoneE164: null, hidden: !!player }
   return { phoneE164: player.privateContact?.phoneE164 ?? null, hidden: false }
 }
+
+/**
+ * Show my profile stats (2026-11-13-player-stats-visibility): true when the player behind this RTR
+ * ID turned the switch off and the viewer is someone else. The stats read answers `{ hidden: true }`
+ * then, without numbers. An unknown RTR ID is not hidden (the stats read reports not found).
+ */
+export async function isStatsHiddenByRtrId(rtrId: string, viewerPlayerId: string) {
+  const allocation = await prisma.playerIdAllocation.findUnique({
+    where: { rtrId: rtrId.trim().toUpperCase() },
+    select: { playerId: true, player: { select: { showProfileStats: true } } },
+  })
+  if (!allocation || allocation.playerId === viewerPlayerId) return false
+  return allocation.player?.showProfileStats === false
+}

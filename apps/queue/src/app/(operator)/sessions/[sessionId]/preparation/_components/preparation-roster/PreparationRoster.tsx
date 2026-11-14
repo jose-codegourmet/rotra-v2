@@ -8,7 +8,7 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { statsYear } from '@rotra/data/player/rules'
-import { selfCheckInMark } from '@rotra/data/public-session/rules'
+import { isStatsHidden, selfCheckInMark, visibleStats } from '@rotra/data/public-session/rules'
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
@@ -304,7 +304,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           rtrId={profile.rtrId}
           profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}
           year={statsYear(Date.now())}
-          stats={profileStats.data ?? null}
+          stats={visibleStats(profileStats.data)}
+          showStats={!isStatsHidden(profileStats.data)}
           statsLoading={profileStats.isPending}
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}

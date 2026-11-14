@@ -52,6 +52,7 @@ export async function realGetAdminPlayerSocialLinks(id: string, signal?: AbortSi
   try {
     return await realRequest<{
       socialLinks: import('../player/player.types').PlayerProfile['socialLinks']
+      showProfileStats?: boolean
       edit: Omit<AdminPlayerEdit, 'revision'> & { revision: string }
     }>(`/api/players/${encodeURIComponent(id)}`, { signal })
   } catch (error) {

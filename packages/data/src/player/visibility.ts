@@ -33,6 +33,16 @@ export function isPrivatePlayer(playerId: string) {
 export function isAlwaysPrivatePlayer(playerId: string | null | undefined) {
   return !!playerId && profileVisibility(playerId) === 'always_private'
 }
+/**
+ * Show my profile stats (2026-11-13-player-stats-visibility): off hides Latest stats from everyone
+ * but the player. Queue Master and Admin are not exempt. Missing setting = shown.
+ */
+export function isStatsHiddenFrom(playerId: string, viewerPlayerId?: string | null) {
+  if (viewerPlayerId && viewerPlayerId === playerId) return false
+  return (
+    readMockState().playerProfiles.find((p) => p.playerId === playerId)?.showProfileStats === false
+  )
+}
 /** Hide me from Player Information: not found by Queue's Add player or RTR ID search. */
 export function isHiddenFromDirectory(playerId: string) {
   return !!readMockState().playerProfiles.find((p) => p.playerId === playerId)?.hiddenFromDirectory

@@ -6,6 +6,8 @@ import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type {
+  ParticipantStats,
+  ParticipantStatsRead,
   ParticipantTonight,
   PublicSessionParticipant,
   PublicSkillMix,
@@ -214,4 +216,14 @@ export function tonightStatus(
   return startedAt === undefined
     ? { kind: 'free' }
     : { kind: 'free', restMinutes: waitMinutes(entry, matches, startedAt, now) }
+}
+
+/** True when a stats read says the player hid their stats: the card leaves Latest stats out. */
+export function isStatsHidden(read: ParticipantStatsRead | undefined): read is { hidden: true } {
+  return !!read && 'hidden' in read
+}
+
+/** The numbers of a stats read, or null (“No games yet this year”, hidden or not loaded). */
+export function visibleStats(read: ParticipantStatsRead | undefined): ParticipantStats | null {
+  return read && !('hidden' in read) ? read : null
 }

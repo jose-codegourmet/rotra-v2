@@ -455,6 +455,7 @@
     "./profile-banner/crop": "./src/profile-banner/crop.ts",
     "./profile-banner/useProfileBanners": "./src/profile-banner/useProfileBanners.ts",
     "./profile-banner/useShownProfileBanners": "./src/profile-banner/useShownProfileBanners.ts",
+    "./profile-banner/useDefaultProfileBanner": "./src/profile-banner/useDefaultProfileBanner.ts",
     "./profile-banner/useProfileBannerMutations": "./src/profile-banner/useProfileBannerMutations.ts",
     "./profile-banner/types": "./src/profile-banner/profileBanner.types.ts",
     "./profile-banner/rules": "./src/profile-banner/profileBanner.rules.ts",

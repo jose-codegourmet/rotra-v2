@@ -1,6 +1,9 @@
 import 'server-only'
 import {
+  DEFAULT_PROFILE_BANNER_ID,
   PROFILE_BANNER_ALREADY_BACK,
+  PROFILE_BANNER_DEFAULT_HIDDEN,
+  PROFILE_BANNER_DEFAULT_REFUSAL,
   PROFILE_BANNER_DELETE_REFUSAL,
   PROFILE_BANNER_HIDE_REFUSAL,
   PROFILE_BANNER_MAX_BYTES,
@@ -40,6 +43,8 @@ export type ProfileBannerDto = {
   shown: boolean
   uploadedAt: string
   number: number
+  /** The Admin default banner (D-2026-11-13-03); at most one row has it */
+  isDefault: boolean
 }
 
 const dto = (row: ProfileBanner): ProfileBannerDto => ({
@@ -48,6 +53,7 @@ const dto = (row: ProfileBanner): ProfileBannerDto => ({
   shown: row.shown,
   uploadedAt: toIso(row.uploadedAt),
   number: row.number,
+  isDefault: row.isDefault,
 })
 
 const missing = () => new ServiceError('conflict', { banner: PROFILE_BANNER_MISSING })
@@ -89,8 +95,8 @@ export async function isProfileBannerPickable(id: string, db: Db = prisma) {
 
 /**
  * The banner a profile card draws for a stored `players.banner_id`: the chosen row when it still
- * exists (hidden and deleted rows included, so players keep it); otherwise the default, Court while
- * it is shown, else the first shown banner (owner, 2026-11-12). `chosen` is the row the profile read
+ * exists (hidden and deleted rows included, so players keep it); otherwise the Admin default
+ * (`is_default`, D-2026-11-13-03), else Court while it is shown, else the first shown banner. `chosen` is the row the profile read
  * already joined, when it has one.
  */
 export async function resolvePlayerBanner(
@@ -206,7 +212,8 @@ async function current(tx: Tx, id: string) {
 
 /**
  * A-BANNERS › click a banner: hide or show it. Hiding one of only 2 shown banners is a conflict with
- * PROFILE_BANNER_HIDE_REFUSAL. The same value as now changes nothing and logs nothing.
+ * PROFILE_BANNER_HIDE_REFUSAL; hiding the default is a conflict with PROFILE_BANNER_DEFAULT_REFUSAL
+ * (checked first). The same value as now changes nothing and logs nothing.
  */
 export async function setProfileBannerShown(
   context: AdminContext,
@@ -217,6 +224,8 @@ export async function setProfileBannerShown(
     await lock(tx)
     const row = await current(tx, input.id)
     if (row.shown === input.shown) return dto(row)
+    if (!input.shown && row.isDefault)
+      throw new ServiceError('conflict', { banner: PROFILE_BANNER_DEFAULT_REFUSAL })
     if (!input.shown && (await shownCount(tx)) <= PROFILE_BANNER_MIN_SHOWN)
       throw new ServiceError('conflict', { banner: PROFILE_BANNER_HIDE_REFUSAL })
     const saved = await tx.profileBanner.update({
@@ -235,7 +244,8 @@ export async function setProfileBannerShown(
 
 /**
  * A-BANNERS › ×: a soft delete. Deleting a shown banner when only 2 are shown is a conflict with
- * PROFILE_BANNER_DELETE_REFUSAL; a hidden banner can always go. The row and the stored image stay,
+ * PROFILE_BANNER_DELETE_REFUSAL; a hidden banner can always go, except the default
+ * (PROFILE_BANNER_DEFAULT_REFUSAL, checked first). The row and the stored image stay,
  * so players who use it keep it, and Undo (`restoreProfileBanner`) brings it back in place.
  */
 export async function deleteProfileBanner(context: AdminContext, id: string) {
@@ -243,6 +253,8 @@ export async function deleteProfileBanner(context: AdminContext, id: string) {
   return prisma.$transaction(async (tx) => {
     await lock(tx)
     const row = await current(tx, id)
+    if (row.isDefault)
+      throw new ServiceError('conflict', { banner: PROFILE_BANNER_DEFAULT_REFUSAL })
     if (row.shown && (await shownCount(tx)) <= PROFILE_BANNER_MIN_SHOWN)
       throw new ServiceError('conflict', { banner: PROFILE_BANNER_DELETE_REFUSAL })
     const saved = await tx.profileBanner.update({
@@ -281,5 +293,45 @@ export async function restoreProfileBanner(context: AdminContext, id: string) {
       metadata: { number: saved.number },
     })
     return dto(saved)
+  })
+}
+
+/**
+ * A-BANNERS › Make default (D-2026-11-13-03): the banner every profile with no pick, every guest and
+ * unclaimed profile, and every club card draws. The banner must be shown (else a conflict with
+ * PROFILE_BANNER_DEFAULT_HIDDEN). The old default is cleared and the new one set in one transaction.
+ * Returns `{ banner, previousId }` so Undo can make the previous default the default again;
+ * `previousId` is Court when no row was marked. The same banner as now changes nothing.
+ */
+export async function setDefaultProfileBanner(context: AdminContext, id: string) {
+  requireAdmin(context)
+  return prisma.$transaction(async (tx) => {
+    await lock(tx)
+    const row = await current(tx, id)
+    const previous = await tx.profileBanner.findFirst({ where: { isDefault: true } })
+    const previousId = previous?.id ?? DEFAULT_PROFILE_BANNER_ID
+    if (row.isDefault) return { banner: dto(row), previousId: row.id }
+    if (!row.shown) throw new ServiceError('conflict', { banner: PROFILE_BANNER_DEFAULT_HIDDEN })
+    await tx.profileBanner.updateMany({ where: { isDefault: true }, data: { isDefault: false } })
+    const saved = await tx.profileBanner.update({
+      where: { id: row.id },
+      data: { isDefault: true },
+    })
+    const previousNumber =
+      previous?.number ??
+      (
+        await tx.profileBanner.findUnique({
+          where: { id: DEFAULT_PROFILE_BANNER_ID },
+          select: { number: true },
+        })
+      )?.number ??
+      null
+    await recordAudit(tx, context, {
+      action: 'profile_banner.default_set',
+      targetType: 'profile_banner',
+      targetId: saved.id,
+      metadata: { number: saved.number, previousId, previousNumber },
+    })
+    return { banner: dto(saved), previousId }
   })
 }

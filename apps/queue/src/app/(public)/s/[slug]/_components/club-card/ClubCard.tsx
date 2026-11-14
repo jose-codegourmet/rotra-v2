@@ -3,7 +3,7 @@
 import { appOrigin } from '@rotra/data/app-origins'
 import { useClubPage } from '@rotra/data/club-page/useClubPage'
 import { statsYear } from '@rotra/data/player/rules'
-import { defaultProfileBanner } from '@rotra/data/profile-banner/fetchers'
+import { useDefaultProfileBanner } from '@rotra/data/profile-banner/useDefaultProfileBanner'
 import { Chip } from '@rotra/ui/chip'
 import { ClubProfileCard } from '@rotra/ui/club-profile-card'
 
@@ -38,7 +38,7 @@ export function ClubCard({ open, onClose, club }: ClubCardProps) {
   const ran = data?.sessions.filter(
     (s) => s.status === 'done' && statsYear(s.startsAt) === year,
   ).length
-  const banner = defaultProfileBanner()
+  const banner = useDefaultProfileBanner()
   return (
     <ClubProfileCard
       open={open}

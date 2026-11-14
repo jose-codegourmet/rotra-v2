@@ -10,7 +10,7 @@ import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
 import { countYearCountedWins, statsYear } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
-import { defaultProfileBanner } from '@rotra/data/profile-banner/fetchers'
+import { useDefaultProfileBanner } from '@rotra/data/profile-banner/useDefaultProfileBanner'
 import { AdminPlayerCard } from '@rotra/ui/admin-player-card'
 import { AdminPlayerFilters } from '@rotra/ui/admin-player-filters'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
@@ -77,6 +77,7 @@ export function PlayerDirectory() {
     } catch {}
   }, [])
   const view = (search.get('view') ?? rememberedView) === 'grid' ? 'grid' : 'list'
+  const defaultBanner = useDefaultProfileBanner()
   const list = useAdminPlayers(filters),
     clubs = useAdminClubs()
   const peek = search.get('peek') ?? '',
@@ -265,11 +266,9 @@ export function PlayerDirectory() {
         }
         open={!!peek && !sharing}
         onClose={closePeek}
-        bannerKey={profile.data?.bannerKey ?? defaultProfileBanner().bannerKey}
+        bannerKey={profile.data?.bannerKey ?? defaultBanner.bannerKey}
         bannerImageUrl={
-          profile.data?.bannerKey
-            ? profile.data.bannerImageUrl
-            : defaultProfileBanner().bannerImageUrl
+          profile.data?.bannerKey ? profile.data.bannerImageUrl : defaultBanner.bannerImageUrl
         }
         year={statsYear(Date.now())}
         stats={(() => {

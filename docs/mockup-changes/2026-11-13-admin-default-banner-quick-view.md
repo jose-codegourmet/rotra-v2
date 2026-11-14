@@ -39,4 +39,4 @@ Superseded by: none
 - Screen docs: screens/product/modules/admin/configuration.md (A-BANNERS), screens/product/modules/admin/players-requests.md (Quick view).
 
 ## Real app work
-- Migration for `profile_banners.is_default` (ask first: migration); Admin service and route for Make default; refuse hide/delete of the default; Quick view banner card and stats; every banner read resolves null to the default.
+- Migration for `profile_banners.is_default` (built: `20261114000100_profile_banner_default`, P10.6 #820, with the Admin Make default service and route and the hide/delete refusals; real-mode cards read the default through `/api/profile-banners/shown` in all three apps); Admin service and route for Make default; refuse hide/delete of the default; Quick view banner card and stats; every banner read resolves null to the default.

@@ -141,3 +141,14 @@ are local verification artifacts outside the repository. Reduced-motion emulatio
 (`xvsgwgihgbuqkcazikek`), with the matching checksum recorded in Prisma migration history. Read-only
 verification found RLS enabled, zero public-client grants, 6 CHECK constraints, 2 foreign keys,
 7 indexes and zero request rows. This schema check did not generate a live link or reset a password.
+
+## P10.6 (#820) — `profile_banners.is_default` (November 14, 2026)
+
+Disposable local PostgreSQL 16 (`rotra_disposable` on 127.0.0.1), `scripts/disposable-db.sh all`: the
+full history of 28 migrations (through `20261114000100_profile_banner_default`) rebuilds with no
+drift between the database and the Prisma schema. SQL-only objects: 182 check constraints, 1
+exclusion constraint, 28 triggers, 24 partial/expression indexes; 0 tables granted to
+anon/authenticated. Integrity checks: 72 passed, 0 failed, including the two new ones: a second
+`is_default = true` row is rejected by `profile_banners_one_default`, and moving the default (clear,
+then set) in one transaction is accepted. After the rebuild only `court` is the default. Not applied
+to the shared database; the Admin service and routes were not run against a database.

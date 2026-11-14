@@ -3,7 +3,7 @@
 import type { AdminClubListItem } from '@rotra/data/club/types'
 import { useAdminClub } from '@rotra/data/club/useAdminClub'
 import type { ClubAccessState } from '@rotra/data/license/types'
-import { defaultProfileBanner } from '@rotra/data/profile-banner/fetchers'
+import { useDefaultProfileBanner } from '@rotra/data/profile-banner/useDefaultProfileBanner'
 import { formatPeso } from '@rotra/schema/money'
 import { Chip } from '@rotra/ui/chip'
 import { ClubProfileCard } from '@rotra/ui/club-profile-card'
@@ -40,7 +40,7 @@ export function ClubCard({
   onOpenClub: () => void
 }) {
   const detail = useAdminClub(club.id)
-  const banner = defaultProfileBanner()
+  const banner = useDefaultProfileBanner()
   const free = club.licensePricing === 'free'
   return (
     <ClubProfileCard

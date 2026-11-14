@@ -470,14 +470,13 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       const isViewer = !!club?.playerId && club.playerId === context.playerId
       const alwaysPrivate = registered && club?.player?.profileVisibility === 'always_private'
       const showFull = registered && (!alwaysPrivate || isViewer)
-      // The banner is public, like the picture: registered and always-private players only.
-      const chosen = club?.player?.banner ?? undefined
-      const banner = registered
-        ? resolveProfileBanner(chosen?.id ?? null, () => chosen, shownBanners)
-        : null
+      // The banner is public, like the picture: a registered (or always-private) player's own pick;
+      // guests and unclaimed profiles draw the default Admin sets (D-2026-11-13-03), as in mock mode.
+      const chosen = registered ? (club?.player?.banner ?? undefined) : undefined
+      const banner = resolveProfileBanner(chosen?.id ?? null, () => chosen, shownBanners)
       return {
-        bannerKey: banner?.bannerKey ?? null,
-        bannerImageUrl: banner?.bannerImageUrl ?? null,
+        bannerKey: banner.bannerKey,
+        bannerImageUrl: banner.bannerImageUrl,
         name: showFull ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
         masked: !showFull,
         nickname: showFull ? (club?.player?.nickname ?? null) : null,

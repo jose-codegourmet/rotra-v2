@@ -14,6 +14,7 @@ import {
   realGetShownProfileBanners,
   realListProfileBanners,
   realRestoreProfileBanner,
+  realSetDefaultProfileBanner,
   realSetProfileBannerShown,
 } from '../real/profile-banner'
 import { cropProfileBannerToWide } from './crop'
@@ -23,7 +24,6 @@ import {
   PROFILE_BANNER_ALREADY_BACK,
   PROFILE_BANNER_DEFAULT_HIDDEN,
   PROFILE_BANNER_DEFAULT_REFUSAL,
-  PROFILE_BANNER_DEFAULT_UNAVAILABLE,
   PROFILE_BANNER_DELETE_REFUSAL,
   PROFILE_BANNER_HIDE_REFUSAL,
   PROFILE_BANNER_MISSING,
@@ -72,16 +72,6 @@ export function resolveMockProfileBanner(bannerId: string | null | undefined) {
     (id) => library.find((b) => b.id === id) ?? retainedBanners.get(id),
     inBannerUploadOrder(library.filter((b) => b.shown)),
   )
-}
-
-/**
- * The default banner Admin picks (D-2026-11-13-03), for cards with no banner of their own (clubs).
- * Real mode has no default column yet: Court.
- */
-export function defaultProfileBanner() {
-  return isRealDataMode()
-    ? { bannerKey: 'court', bannerImageUrl: null as string | null }
-    : resolveMockProfileBanner(null)
 }
 
 /** Whether a player can newly pick this banner: it is in the library and shown. */
@@ -232,13 +222,16 @@ export function deleteProfileBanner(id: string) {
 /**
  * A-BANNERS › Make default (D-2026-11-13-03): applies at once; the banner must be shown. Resolves
  * with `{ banner, previousId }` so Undo can make the previous default the default again. The same
- * banner as now changes nothing. Real mode has no `profile_banners.is_default` column yet (needs a
- * migration, ask first), so it rejects with PROFILE_BANNER_DEFAULT_UNAVAILABLE.
+ * banner as now changes nothing. Real mode saves `profile_banners.is_default` on the Admin server,
+ * which refuses a hidden banner the same way.
  */
-export function setDefaultProfileBanner(id: string) {
+export function setDefaultProfileBanner(id: string): Promise<{
+  banner: ProfileBanner
+  previousId: string
+}> {
   if (isRealDataMode()) {
     requireAdminOnline()
-    return Promise.reject(new MockError('conflict', PROFILE_BANNER_DEFAULT_UNAVAILABLE))
+    return realSetDefaultProfileBanner(id)
   }
   return adminMutation(300, (draft) => {
     checkMockSave()

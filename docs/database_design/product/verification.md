@@ -150,8 +150,14 @@ drift between the database and the Prisma schema. SQL-only objects: 182 check co
 exclusion constraint, 28 triggers, 24 partial/expression indexes; 0 tables granted to
 anon/authenticated. Integrity checks: 72 passed, 0 failed, including the two new ones: a second
 `is_default = true` row is rejected by `profile_banners_one_default`, and moving the default (clear,
-then set) in one transaction is accepted. After the rebuild only `court` is the default. Not applied
-to the shared database; the Admin service and routes were not run against a database.
+then set) in one transaction is accepted. After the rebuild only `court` is the default. The Admin service and routes were not run against a
+database.
+
+**Hosted: applied November 14, 2026** to ROTRA v2 ASIA (`xvsgwgihgbuqkcazikek`) over the Supabase
+connector (no `DIRECT_URL` in that session), as one transaction holding the migration SQL and the
+Prisma history row with the file's checksum (`1ae1cc…31ba2`), the same record `prisma migrate deploy`
+writes. Read-only check afterwards: `is_default` boolean not null default false, the partial unique
+index `profile_banners_one_default` present, `court` the only default, RLS still on.
 
 ## P11.6 (#828) — `players.show_profile_stats`, `players.show_weekly_performance` (November 14, 2026)
 
@@ -161,5 +167,12 @@ drift between the database and the Prisma schema. SQL-only objects unchanged: 18
 1 exclusion constraint, 28 triggers, 24 partial/expression indexes; 0 tables granted to
 anon/authenticated. Integrity checks: 72 passed, 0 failed. Both columns are `boolean`, not null,
 default `true`; after the fictional seed both fixture players read both switches on. No new
-integrity check (the columns have no CHECK). Not applied to the shared database; the Player service
-and route were not run against a database.
+integrity check (the columns have no CHECK). The Player service and route were not run against a
+database.
+
+**Hosted: applied November 14, 2026** to ROTRA v2 ASIA (`xvsgwgihgbuqkcazikek`) over the Supabase
+connector (no `DIRECT_URL` in that session), right after `20261114000100_profile_banner_default`, as
+one transaction holding the migration SQL and the Prisma history row with the file's checksum
+(`c958b4…ff50d`). Read-only check afterwards: 29 of 29 migrations in `_prisma_migrations`, none rolled
+back, the latest `20261114000200_player_stats_visibility`; both columns boolean not null default
+true; all 32 players read both switches on; RLS on `players` still on.

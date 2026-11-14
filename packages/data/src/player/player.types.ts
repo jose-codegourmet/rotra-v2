@@ -80,14 +80,14 @@ export type PlayerProfile = {
    */
   hiddenFromDirectory?: boolean
   /**
-   * Privacy and contact › Show my profile stats (2026-11-13-player-stats-visibility, proposed
+   * Privacy and contact › Show my profile stats (2026-11-13-player-stats-visibility,
    * `players.show_profile_stats`). Unset or true shows Latest stats on the profile card to others;
-   * false hides it from everyone but the player. Mock only for now: real mode has no column yet.
+   * false hides it from everyone but the player.
    */
   showProfileStats?: boolean
   /**
-   * Privacy and contact › Show my weekly performance (proposed `players.show_weekly_performance`).
-   * Unset or true shows the Weekly Performance chart (profile, Games page) to others. Mock only.
+   * Privacy and contact › Show my weekly performance (`players.show_weekly_performance`).
+   * Unset or true shows the Weekly Performance chart (profile, Games page) to others.
    */
   showWeeklyPerformance?: boolean
   /** Shown only on the signed-in player account, not public profile cards. */

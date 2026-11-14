@@ -21,31 +21,37 @@ enum ProfileVisibility {
 }
 
 model Player {
-  id                   String             @id @default(uuid(7)) @db.Uuid
-  fullName             String             @map("full_name")
-  nickname             String?
-  avatarRef            String?            @map("avatar_ref")
+  id                    String             @id @default(uuid(7)) @db.Uuid
+  fullName              String             @map("full_name")
+  nickname              String?
+  avatarRef             String?            @map("avatar_ref")
   /// Picture before the most recent Admin picture change.
-  avatarPreviousRef    String?            @map("avatar_previous_ref")
-  profileState         PlayerProfileState @default(unclaimed) @map("profile_state")
-  hidePhoneFromClubs   Boolean            @default(false) @map("hide_phone_from_clubs")
+  avatarPreviousRef     String?            @map("avatar_previous_ref")
+  profileState          PlayerProfileState @default(unclaimed) @map("profile_state")
+  hidePhoneFromClubs    Boolean            @default(false) @map("hide_phone_from_clubs")
   /// New registrations default to private; the player raises or lowers it in Privacy and contact.
-  profileVisibility    ProfileVisibility  @default(private) @map("profile_visibility")
+  profileVisibility     ProfileVisibility  @default(private) @map("profile_visibility")
   /// Hide from Player Information: left out of Queue's Add player search, RTR ID search and public
   /// club member lists. Saved players, Admin and the public session page are unaffected.
-  hiddenFromDirectory  Boolean            @default(false) @map("hidden_from_directory")
+  hiddenFromDirectory   Boolean            @default(false) @map("hidden_from_directory")
+  /// Privacy and contact › Show my profile stats. False hides Latest stats on the profile card from
+  /// everyone but the player. No effect on the leaderboard or rank.
+  showProfileStats      Boolean            @default(true) @map("show_profile_stats")
+  /// Privacy and contact › Show my weekly performance. False hides the Weekly performance chart (the
+  /// profile and the Games page) from everyone but the player. No effect on the leaderboard or rank.
+  showWeeklyPerformance Boolean            @default(true) @map("show_weekly_performance")
   /// The chosen profile banner (`profile_banners.id`); null = the default banner. A hidden or deleted
   /// banner still resolves for players who already use it.
-  bannerId             String?            @map("banner_id")
+  bannerId              String?            @map("banner_id")
   /// Optional self-reported snapshot; not rating credit.
-  experienceMonths     Int?               @map("experience_months")
-  experienceRecordedAt DateTime?          @map("experience_recorded_at") @db.Timestamptz(6)
+  experienceMonths      Int?               @map("experience_months")
+  experienceRecordedAt  DateTime?          @map("experience_recorded_at") @db.Timestamptz(6)
   /// Validated playing-style fields (`@rotra/schema/personal-details`); final schema pending.
-  personalDetails      Json?              @map("personal_details")
-  detailsVersion       Int?               @map("details_version")
-  createdAt            DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt            DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision             BigInt             @default(1)
+  personalDetails       Json?              @map("personal_details")
+  detailsVersion        Int?               @map("details_version")
+  createdAt             DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision              BigInt             @default(1)
 
   banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
   privateContact        PlayerPrivateContact?

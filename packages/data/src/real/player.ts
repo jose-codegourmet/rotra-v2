@@ -235,6 +235,27 @@ export async function realSetHiddenFromDirectory(input: { hiddenFromDirectory: b
   return myAccountOf(account)
 }
 
+/** P-PROFILE-PRIVACY › Stats on your profile; a switch left out keeps its value. */
+export async function realSetStatsVisibility(input: {
+  showProfileStats?: boolean
+  showWeeklyPerformance?: boolean
+}) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
+    '/api/me/stats-visibility',
+    {
+      method: 'POST',
+      body: {
+        showProfileStats: input.showProfileStats,
+        showWeeklyPerformance: input.showWeeklyPerformance,
+        expectedRevision: loadedRevision,
+      },
+    },
+  )
+  loadedRevision = revision
+  return profile
+}
+
 /** The same explicit Done picture command as mock mode, sent to the authenticated server. */
 export async function realSetMyProfilePicture(choice: PlayerPictureChoice) {
   if (!loadedRevision) await realGetMyAccount()

@@ -4,7 +4,11 @@ import { readJsonBody, text } from '@rotra/db/service/request'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
-/** Q-ON-COURT › Replace player: a plain lineup change on an On court match, not a substitution. */
+/**
+ * Q-ON-COURT / Q-MATCH › Replace player: a lineup change on an On court or Playing match, never a
+ * substitution. On a Playing match it fixes a mistake: the replacement is recorded as having played
+ * the whole game and the player taken out gets nothing.
+ */
 export async function POST(
   request: Request,
   ctx: RouteContext<'/api/sessions/[sessionId]/matches/[matchId]/replace'>,

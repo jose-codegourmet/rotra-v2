@@ -412,7 +412,10 @@ export async function realStartMatch(input: {
   return accepted(null, `Match ${match.matchNo} started on ${courtNames(match, courts)}`)
 }
 
-/** One On court command on the shown match; the reply is the changed match (or matches). */
+/**
+ * One On court command on the shown match (also Replace player while Playing); the reply is the
+ * changed match (or matches).
+ */
 function onCourtCommand<T>(sessionId: string, matchId: string, action: string, body: unknown) {
   return queueCommand<T>(sessionId, `/matches/${encodeURIComponent(matchId)}/${action}`, { body })
 }
@@ -456,7 +459,11 @@ export async function realMoveCourt(input: {
   )
 }
 
-/** Replace player: a plain lineup change on an On court match, never a substitution. */
+/**
+ * Replace player: a lineup change on an On court or Playing match, never a substitution. On a
+ * Playing match it fixes a mistake: the replacement is recorded as having played the whole game,
+ * the player taken out gets nothing, and no game-credit choice is asked.
+ */
 export async function realReplacePlayer(input: {
   matchId: string
   outId: string

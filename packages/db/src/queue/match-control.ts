@@ -329,6 +329,14 @@ function requireOnCourt(match: MatchRow) {
 }
 
 /**
+ * An on_court or active match without a decision (Replace player), or a conflict ("Something
+ * changed") for anything else: waiting, completed, invalid, or any decided match.
+ */
+function requireLineupEditable(match: MatchRow) {
+  if ((match.state !== 'on_court' && match.state !== 'active') || match.decision) throw conflict()
+}
+
+/**
  * Waiting matches in queue order with `match` placed at `index` (0-based); renumbers positions 1..n
  * so the order is exact. Returns the match's 1-based queue position.
  */
@@ -435,11 +443,28 @@ export async function moveCourt(
 }
 
 /**
- * Q-ON-COURT · Replace player. A plain lineup change on an on_court match: the outgoing player's
- * segment is removed (never closed, so no substitution is derived and no credit is asked), the
- * incoming player gets a full segment on the same team, and the player holds follow the lineup.
- * Rechecks that the incoming player is present and not busy. The match becomes manual and
- * protected. Keyed on the incoming segment's operation.
+ * Q-ON-COURT / Q-MATCH · Replace player. A lineup change on an On court match, or the fix for a
+ * mistake on a Playing (active) match (owner, November 13, 2026; real mode November 14, 2026,
+ * #840). Never a substitution: no segment is closed, so none is derived and no credit is asked.
+ * Rechecks that the incoming player is present and not busy; the player holds follow the lineup;
+ * the match becomes manual and protected.
+ *
+ * - **On court:** the outgoing player's segment is removed and the incoming player gets a fresh
+ *   segment on the same team, keyed on this operation (`joined_operation_id`).
+ * - **Playing:** segments of a started match are never deleted (the `match_evidence_frozen`
+ *   trigger), so the outgoing player's open segment is handed to the incoming player in place: the
+ *   same row gets the incoming `session_player_id` and their next `segment_no`, and keeps its
+ *   `joined_at`, `started_with_match`, `team`, `credit_to` and `joined_operation_id`. The outgoing
+ *   player is left with nothing from this stretch, and the replacement is recorded as having
+ *   played it: from the start (a full game at Match done: one segment, started and finished) or,
+ *   if the segment came from an earlier substitution, as that substitution's incoming player. The
+ *   kept `joined_operation_id` still matches the earlier segment's `left_operation_id`, so
+ *   `slotSegments` and the substitution credit stay intact.
+ *
+ * Idempotent: a retry (or replayed offline upload) returns the match when this operation's segment
+ * exists (On court), or when the incoming player is in the lineup and the outgoing one is not
+ * (Playing: the row keeps the earlier operation, and before the replace that state cannot occur,
+ * since the outgoing player must be in the lineup and the incoming one must not).
  */
 export async function replacePlayer(
   context: ClubContext,
@@ -448,13 +473,16 @@ export async function replacePlayer(
 ) {
   return matchCommand(context, sessionId, {}, async (tx, session) => {
     const match = await activeMatch(tx, session.id, input.matchId)
+    const open = (id: string) =>
+      match.participations.some((p) => p.sessionPlayerId === id && !p.leftAt)
     if (
       match.participations.some(
         (p) => p.joinedOperationId === input.operationId && p.sessionPlayerId === input.inId,
-      )
+      ) ||
+      (match.state === 'active' && !match.decision && open(input.inId) && !open(input.outId))
     )
       return matchDto(match)
-    requireOnCourt(match)
+    requireLineupEditable(match)
     const { ctx, roster } = await matchContext(tx, session)
     const view = ctx.matches.find((m) => m.id === match.id)
     const outgoing = match.participations.find(
@@ -463,20 +491,28 @@ export async function replacePlayer(
     if (!view || !outgoing || !canReplacePlayer(view, input.outId, input.inId, ctx))
       throw conflict()
     const now = new Date()
-    await tx.matchParticipation.delete({ where: { id: outgoing.id } })
-    await tx.matchParticipation.create({
-      data: {
-        id: await derivedId(input.operationId, `${match.id}:${input.inId}`),
-        clubId: session.clubId,
-        sessionId: session.id,
-        matchId: match.id,
-        sessionPlayerId: input.inId,
-        team: outgoing.team,
-        segmentNo: 1,
-        joinedOperationId: input.operationId,
-        joinedAt: now,
-      },
-    })
+    if (match.state === 'active') {
+      const segments = match.participations.filter((p) => p.sessionPlayerId === input.inId).length
+      await tx.matchParticipation.update({
+        where: { id: outgoing.id },
+        data: { sessionPlayerId: input.inId, segmentNo: segments + 1 },
+      })
+    } else {
+      await tx.matchParticipation.delete({ where: { id: outgoing.id } })
+      await tx.matchParticipation.create({
+        data: {
+          id: await derivedId(input.operationId, `${match.id}:${input.inId}`),
+          clubId: session.clubId,
+          sessionId: session.id,
+          matchId: match.id,
+          sessionPlayerId: input.inId,
+          team: outgoing.team,
+          segmentNo: 1,
+          joinedOperationId: input.operationId,
+          joinedAt: now,
+        },
+      })
+    }
     await tx.match.update({
       where: { id: match.id },
       data: { origin: 'manual', manualProtected: true, revision: { increment: 1 } },

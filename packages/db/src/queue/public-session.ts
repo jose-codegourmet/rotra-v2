@@ -10,7 +10,15 @@ import {
   publicLevel,
   publicSkillMix,
 } from '@rotra/data/public-session/rules'
-import type { MyNightStage } from '@rotra/data/public-session/types'
+import type {
+  MyNightStage,
+  PublicHistoryMatch,
+  PublicMatchHistory,
+  PublicMatchPlayer,
+} from '@rotra/data/public-session/types'
+import { sessionRecordHistory } from '@rotra/data/queue-session/sessionRecord.rules'
+import type { SessionCourt as CourtView } from '@rotra/data/queue-session/types'
+import type { SessionPlayer as RosterView } from '@rotra/data/session-roster/types'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import { type ClubContext, loadAccountContext, type PlayerContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
@@ -658,6 +666,123 @@ export async function readMyNight(context: PlayerContext, slug: string) {
   })
   const { matchRequest } = await readMyMatchRequest(context, slug)
   return { ...night, matchRequest }
+}
+
+/**
+ * Q-PUBLIC-JOIN › Match history (2026-11-13 finished session and match history courts logs) in real
+ * mode: a finished session's matches for the signed-in Player, in the `PublicMatchHistory` shape
+ * (`@rotra/data/public-session/types`), epoch-ms times, newest first, with the replay's courts and
+ * bounds. `null` for any session that is not completed. Publication gate (results module ›
+ * Publishing): until the club shares the results (a `published` publication with a public copy)
+ * only the matches the Player played in are listed and `courtLabels` is empty; `total` always
+ * counts every finished or invalid match. Faces follow the signed-in name rule, first name only;
+ * `participant` is the face's index in the access read's roster (confirmation order), sent only
+ * while the Player is on the live roster (the access read's full roster). Never player IDs,
+ * contacts, presence, operator notes or waiting matches.
+ */
+export async function readPublicMatchHistory(
+  context: PlayerContext,
+  slug: string,
+): Promise<PublicMatchHistory | null> {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, publication: { select: { state: true } } },
+  })
+  if (!found || found.publication?.state === 'deleted') throw new ServiceError('not_found')
+  return prisma.$transaction(async (tx) => {
+    const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
+    if (session.state !== 'completed') return null
+    const { ctx, roster: live } = await matchContext(tx, session)
+    // Every entry, released and no show too, so a player who played and then left keeps their face.
+    const [entries, courts] = await Promise.all([
+      tx.sessionPlayer.findMany({
+        where: { sessionId: session.id },
+        orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
+      }),
+      // Removed courts too: a match played on a court removed later keeps its label.
+      tx.sessionCourt.findMany({
+        where: { sessionId: session.id },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      }),
+    ])
+    const record = sessionRecordHistory({
+      fallbackStart: (session.startedAt ?? session.scheduledStartAt).getTime(),
+      courts: courts.map(
+        (c): CourtView => ({
+          id: c.id,
+          sessionId: c.sessionId,
+          label: c.label,
+          startsAt: c.startsAt?.getTime(),
+          openedEarlyAt: c.openedEarlyAt?.getTime() ?? null,
+          openUntil: c.openUntil?.getTime() ?? null,
+          removedAt: c.removedAt?.getTime() ?? null,
+        }),
+      ),
+      roster: entries.map(
+        (r): RosterView => ({
+          id: r.id,
+          sessionId: r.sessionId,
+          clubPlayerId: r.clubPlayerId,
+          nameSnapshot: r.nameSnapshot,
+          nicknameSnapshot: null,
+          present: r.present,
+          presentChangedAt: r.presentChangedAt.getTime(),
+          level: levelCodeFor(r.skillLevelId),
+          levelLockedAt: r.levelLockedAt?.getTime() ?? null,
+          confirmedAt: r.confirmedAt.getTime(),
+        }),
+      ),
+      matches: ctx.matches,
+    })
+    const people = await peopleFor(tx, entries, context.playerId)
+    const levels = new Map(entries.map((r) => [r.id, levelCodeFor(r.skillLevelId)]))
+    // The access read sends the full roster only while the Player is on the live roster.
+    const fullRoster = live.some((entry) => people.get(entry.id)?.isViewer)
+    const indexes = new Map(live.map((entry, index) => [entry.id, index]))
+    const face = (id: string): PublicMatchPlayer => {
+      const person = people.get(id)
+      const participant = fullRoster ? indexes.get(id) : undefined
+      return {
+        name: publicFirstName(person?.name ?? ''),
+        level: levels.get(id) ?? null,
+        pictureUrl: person?.pictureUrl ?? null,
+        masked: person?.masked ?? true,
+        isViewer: person?.isViewer ?? false,
+        ...(participant !== undefined ? { participant } : {}),
+      }
+    }
+    const formats = new Map(ctx.matches.map((m) => [m.id, m.format]))
+    const all = record.matches
+      .map(
+        (m): PublicHistoryMatch => ({
+          id: m.id,
+          number: m.number,
+          format: formats.get(m.id) ?? 'doubles',
+          courtLabels: m.courtLabels,
+          startedAt: m.startedAt,
+          endedAt: m.endedAt,
+          replayEndAt: m.replayEndAt,
+          teamA: m.teamA.map((p) => face(p.id)),
+          teamB: m.teamB.map((p) => face(p.id)),
+          winningTeam: m.winningTeam,
+          teamAScore: m.teamAScore,
+          teamBScore: m.teamBScore,
+          invalid: m.invalid,
+        }),
+      )
+      .sort((a, b) => b.number - a.number)
+    const shared = (await readPublishedResults(session.id, tx)) !== null
+    return {
+      shared,
+      total: all.length,
+      matches: shared
+        ? all
+        : all.filter((m) => [...m.teamA, ...m.teamB].some((p) => p.isViewer === true)),
+      courtLabels: shared ? record.courtLabels : [],
+      from: record.from,
+      to: record.to,
+    }
+  })
 }
 
 /** The Player's latest club level as a stated band, for a one-tap request; `unsure` without one. */

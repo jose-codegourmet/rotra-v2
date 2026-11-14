@@ -18,6 +18,7 @@ import { useCancelMyJoinRequest } from '@rotra/data/public-session/useCancelMyJo
 import { useJoinAsPlayer } from '@rotra/data/public-session/useJoinAsPlayer'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { useMyNight } from '@rotra/data/public-session/useMyNight'
+import { usePublicMatchHistory } from '@rotra/data/public-session/usePublicMatchHistory'
 import {
   usePublicSession,
   useSignedInPublicSession,
@@ -283,7 +284,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
   // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
   // mode has no Player session in this app: the Player app's access read (below) says who is
-  // signed in, for the join card (#687) and My night; the other signed-in reads are mock only.
+  // signed in, for the join card (#687), My night and a finished session's Match history (#850);
+  // the other signed-in reads (names, Courts now, the Queue) are mock only.
   const playerSession = useSession('player')
   const viewerAccount =
     viewer === 'visitor' && !isRealDataMode() && playerSession.data?.account.audience === 'player'
@@ -314,6 +316,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       ? { id: realPlayer.playerId, name: realPlayer.name }
       : null
   const night = useMyNight(slug, nightViewer?.id)
+  // Real mode (#850): a finished session's Match history from the Player app's own read; the mock
+  // signed-in read carries it as `history`.
+  const realHistory = usePublicMatchHistory(
+    slug,
+    realPlayer?.playerId ?? null,
+    isRealDataMode() && page.data?.status === 'completed',
+  )
   // `auto` until the visitor picks a tab: a finished session with shared Standings opens on
   // Leaderboard, anything else on Details (2026-11-13-queue-finished-session-page).
   const [tab, setTab] = useState<SavedTab>('auto')
@@ -562,7 +571,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // 2026-11-13-queue-public-faces-profile: for a signed-in player the faces on Courts now and the
   // Queue open the same profile card as the Participants tab.
   const openFace =
-    profileViewerId && signedRead
+    profileViewerId && (signedRead || realPlayer)
       ? (index: number | null) => {
           const target = index === null ? undefined : participants[index]
           if (target?.profile) setProfileOf(target)
@@ -709,7 +718,14 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                           history={signedRead.history}
                           onOpenParticipant={openParticipant}
                         />
-                      ) : viewerAccount || realPlayer ? null : (
+                      ) : realPlayer ? (
+                        realHistory.data ? (
+                          <MatchHistory
+                            history={realHistory.data}
+                            onOpenParticipant={openParticipant}
+                          />
+                        ) : null
+                      ) : viewerAccount ? null : (
                         <MatchHistory history={null} />
                       )
                     ) : viewer === 'visitor' ? (

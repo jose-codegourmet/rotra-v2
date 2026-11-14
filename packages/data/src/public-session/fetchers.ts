@@ -31,6 +31,7 @@ import { isRealDataMode } from '../real/mode'
 import {
   realGetMyJoinRequest,
   realGetMyNight,
+  realGetPublicMatchHistory,
   realGetPublicSession,
   realSendJoinRequest,
 } from '../real/public-session'
@@ -589,6 +590,24 @@ function myMatchOf(state: MockState, match: Match, rosterId: string, viewer: Vie
       opponents.map((p) => p.name),
     ),
   }
+}
+
+/**
+ * A finished session's **Match history** for the signed-in Player (2026-11-13 finished session log):
+ * every finished or invalid match once the club shares the results, only their own until then;
+ * `null` before the finish. Real mode: the Player app's own read (its sign-in says who); `playerId`
+ * only keys the cache.
+ */
+export async function getPublicMatchHistory(
+  slug: string,
+  playerId: string,
+): Promise<PublicMatchHistory | null> {
+  if (isRealDataMode()) return realGetPublicMatchHistory(slug)
+  await delay()
+  const { state } = serverState()
+  requireSignedInPlayer(state, playerId)
+  const session = sessionBySlug(state, slug)
+  return session.state === 'completed' ? projectHistory(state, session, { playerId }) : null
 }
 
 /**

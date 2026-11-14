@@ -7,6 +7,9 @@ export const publicSessionKeys = {
   /** The small personal part: My night, own standing, requests */
   myNight: (slug: string, playerId: string) =>
     ['public-session', 'my-night', slug, playerId] as const,
+  /** A finished session's Match history for the signed-in Player (own matches until shared) */
+  history: (slug: string, playerId: string) =>
+    ['public-session', 'history', slug, playerId] as const,
   /** Present players and allowed formats for Request a match */
   matchRequestOptions: (slug: string, playerId: string) =>
     ['public-session', 'match-request-options', slug, playerId] as const,

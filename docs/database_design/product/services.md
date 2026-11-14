@@ -51,13 +51,14 @@ screen loaded one, and returns an allowlisted DTO.
 
 | Module | Commands |
 |---|---|
-| `queue/public-session` | `readPublicSession` (`public-session.page`: allowlisted `PublicSessionPage`, accepted state only; `finalizing` shows as active); `sendJoinRequest` (client UUID `requestId`, same fields → same request; prepared or active + accepting only; per-session pending cap; duplicate pending phone refused); `readMyJoinRequest` (needs the receipt) |
+| `queue/public-session` | `readPublicSession` (`public-session.page`: allowlisted `PublicSessionPage`, accepted state only; `finalizing` shows as active); `sendJoinRequest` (client UUID `requestId`, same fields → same request; prepared or active + accepting only; per-session pending cap; duplicate pending phone refused); `readMyJoinRequest` (needs the receipt); `readPublicMatchHistory` (#850: signed-in Player, finished session only, else null; the `PublicMatchHistory` shape with epoch-ms times, newest first; own matches only and no courts until the results are shared) |
 | `service/handler` | `handleVisitorRequest` for account-less visitor calls with private, no-store headers |
 
 - Ownership (proposal, #248): the receipt is an HMAC of the request ID under `ROTRA_VISITOR_RECEIPT_SECRET`, kept in an httpOnly cookie. Nothing about it is stored; a wrong receipt, another slug or an unknown ID are all `not_found`.
 - A request never reserves a slot. Confirmation and decline stay in `queue/session-roster`, where the session lock serializes capacity and the waitlist.
 - Request phones are returned only to the club (`joinRequestDto`), never by these reads.
 - Queue Route Handlers (#398): `GET /api/public-sessions/[slug]` (public read), `POST /api/public-sessions/[slug]/join-request` (sets the receipt cookie `rotra_join_request`, httpOnly, same-site, browser session, path `/api/public-sessions/[slug]`; the body never carries it), `GET /api/public-sessions/[slug]/my-request` (null without a matching receipt).
+- Player Route Handler (#850): `GET /api/public-sessions/[slug]/match-history` on the Player origin, credentialed (the Player's own sign-in), callable only from the paired Queue origin (CORS), like the access and My night reads. JSON `PublicMatchHistory` or null before the finish. Until the club shares the results (a `published` publication with a public copy) only the Player's own matches are listed; `total` counts every finished or invalid match. Faces follow the signed-in name rule, first name only; a face's `participant` is its index in the access read's roster (confirmation order), sent only while the Player is on the live roster. Never player IDs, contacts, presence, operator notes or waiting matches. Courts removed later keep their labels.
 
 ## F07.25 · Revision-safe waiting queue commands
 

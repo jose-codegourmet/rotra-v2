@@ -14,6 +14,12 @@ export type MatchCourtPlayer = {
   pictureUrl?: string | null
   /** Opens the profile card; without it the face is not a button */
   onOpen?: () => void
+  /**
+   * Player variant (2026-11-14 games badge log): how many games this person had played in that
+   * session up to and including this one, as a small round badge on the picture's top-right
+   * corner (the Queue console's face badge). Nothing when missing.
+   */
+  badge?: number
 }
 
 export type MatchCourtProps = {
@@ -112,19 +118,36 @@ export function MatchCourt({
   className,
 }: MatchCourtProps) {
   const face = (player: MatchCourtPlayer, won: boolean) => {
+    const games = player.badge ? `, game ${player.badge} of that session` : ''
     const body = (
       <>
-        <Avatar
-          name={player.name}
-          src={player.pictureUrl ?? undefined}
-          size={44}
-          className={cn(
-            'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
-            won ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
-            player.onOpen &&
-              'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
-          )}
-        />
+        <span className="relative block leading-none">
+          <Avatar
+            name={player.name}
+            src={player.pictureUrl ?? undefined}
+            size={44}
+            className={cn(
+              'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
+              won ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
+              player.onOpen &&
+                'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
+            )}
+          />
+          {player.badge ? (
+            <i
+              role="img"
+              aria-label={`${player.name}: game ${player.badge} of that session`}
+              className={cn(
+                'absolute -top-[3px] -right-[7px] grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[11px] leading-none font-extrabold not-italic tabular-nums max-[480px]:-right-1.5 max-[480px]:h-4 max-[480px]:min-w-4 max-[480px]:text-[10px]',
+                won
+                  ? 'bg-accent text-on-accent'
+                  : 'bg-on-photo/90 text-[color:var(--bg)] [:is(html[data-theme=light])_&]:text-fg',
+              )}
+            >
+              {player.badge}
+            </i>
+          ) : null}
+        </span>
         <b className="max-w-full truncate rounded-full bg-court-level-label px-[7px] text-xs leading-[1.3] font-bold text-on-photo">
           {player.label}
         </b>
@@ -136,7 +159,7 @@ export function MatchCourt({
       <button
         key={player.key}
         type="button"
-        aria-label={`${player.name}. View profile`}
+        aria-label={`${player.name}${games}. View profile`}
         onClick={player.onOpen}
         className={cn(base, 'cursor-pointer focus-visible:outline-none')}
       >

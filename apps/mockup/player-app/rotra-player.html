@@ -612,6 +612,11 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-pl { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; max-width: 84px; padding: 2px; border: 0; border-radius: 8px; background: none; color: #fff; font: inherit; cursor: pointer; }
 .gm-pl .avatar { width: 46px; height: 46px; font-size: 14px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .9); }
 .gm-pl.won .avatar { box-shadow: 0 0 0 3px var(--accent); }
+/* Owner, November 14, 2026 ("it should show how many games that person had while playing that match"): the Queue console's face
+   badge (.pf-g) on every face: how many games that person had played in that session, this one included. */
+.gm-av { position: relative; display: block; line-height: 0; }
+.gm-g { position: absolute; top: -3px; right: -7px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 800; line-height: 1; color: #0b0b0c; background: rgba(255, 255, 255, .9); }
+.gm-pl.won .gm-g { background: var(--accent); color: var(--on-accent); }
 .gm-pl:hover .avatar, .gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px rgba(255, 255, 255, .5); }
 .gm-pl b { font-size: 12px; font-weight: 700; line-height: 1.3; padding: 0 7px; border-radius: 999px; background: rgba(0, 0, 0, .72); color: #fff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
@@ -624,7 +629,7 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-share svg { width: 14px; height: 14px; }
 .gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
 .gm-note { color: var(--warn); }
-@media (max-width: 480px) { .gm-court { min-height: 100px; } .gm-pl .avatar { width: 36px; height: 36px; font-size: 12px; } .gm-pl { max-width: 56px; } .gm-res { min-width: 0; padding: 8px 8px; margin: 0 2px; } .gm-score { font-size: 17px; } .gm-noscore { font-size: 11px; } }
+@media (max-width: 480px) { .gm-court { min-height: 100px; } .gm-pl .avatar { width: 36px; height: 36px; font-size: 12px; } .gm-pl { max-width: 56px; } .gm-g { min-width: 16px; height: 16px; font-size: 10px; right: -6px; } .gm-res { min-width: 0; padding: 8px 8px; margin: 0 2px; } .gm-score { font-size: 17px; } .gm-noscore { font-size: 11px; } }
 .rg-item + .rg-item { border-top: 1px solid var(--border); }
 .rg-item .game { padding-bottom: 2px; }
 .rg-src { margin: -4px 0 10px; }
@@ -1349,14 +1354,19 @@ const people = (names) => listNames(names.map(esc));
 // solid court green, white lines, a dashed net — with faces ringed in white and names on dark pills.
 const gmCourtSVG = () => `<svg class="gm-svg" viewBox="0 0 134 61" preserveAspectRatio="none" aria-hidden="true"><rect width="134" height="61" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"><rect x="0.75" y="0.75" width="132.5" height="59.5" vector-effect="non-scaling-stroke"/><path d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134" vector-effect="non-scaling-stroke"/></g><path d="M67 0V61" stroke="var(--court-line)" stroke-width="3" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/></svg>`;
 const idByName = (n) => { const a = Object.keys(S.accounts).find((k) => S.accounts[k].name === n); if (a) return a; const i = BASE.findIndex((e) => e.name === n); return i >= 0 ? `b${i}` : null; };
-function gameRow(g, who, ctx = null) {
+function gameRow(g, who, ctx = null, at = null) {
   const won = g.res === 'W', partial = g.kind === 'partial';
+  // Owner, November 14, 2026: each face carries how many games that person had played in that session up to and
+  // including this one (the Queue console's face badge). The profile owner's count is the game's place in the session;
+  // the others count their appearances in the session's games so far.
+  const played = (n) => at ? at.s.games.slice(0, at.gi + 1).filter((x) => x.partner.includes(n) || x.opp.includes(n)).length : null;
+  const badge = (n, label) => n ? `<i class="gm-g tnum" role="img" aria-label="${esc(label)}: game ${n} of that session">${n}</i>` : '';
   // Artifact comment, same day ("since there are avatars they should open a dialog"): every face opens the profile card.
-  const face = (q, label, lit) => { const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(q.name)}"`; return `<button type="button" class="gm-pl${lit ? ' won' : ''}" data-act="openProfileCard" ${a} aria-label="${esc(q.name)}. View profile">${avatar(q.real ? q.p : q)}<b>${esc(label)}</b></button>`; };
+  const face = (q, label, lit, n) => { const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(q.name)}"`; return `<button type="button" class="gm-pl${lit ? ' won' : ''}" data-act="openProfileCard" ${a} aria-label="${esc(q.name)}${n ? `, game ${n} of that session` : ''}. View profile"><span class="gm-av">${avatar(q.real ? q.p : q)}${badge(n, q.name)}</span><b>${esc(label)}</b></button>`; };
   const other = (n) => { const id = idByName(n); return id ? { real: true, id, name: n, p: profileOf(id) } : { id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
   const meLabel = who ? (who.id === S.me ? 'You' : firstName(who)) : 'Player';
-  const mine = [who ? face({ real: true, id: who.id, name: who.name, p: who }, meLabel, won && !partial) : '', ...g.partner.map((n) => face(other(n), n.split(' ')[0], won && !partial))].join('');
-  const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial)).join('');
+  const mine = [who ? face({ real: true, id: who.id, name: who.name, p: who }, meLabel, won && !partial, at ? at.gi + 1 : null) : '', ...g.partner.map((n) => face(other(n), n.split(' ')[0], won && !partial, played(n)))].join('');
+  const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial, played(n))).join('');
   const res = partial ? '<span class="chip">Not counted</span>' : `<span class="chip ${won ? 'ok' : 'bad'}">${won ? 'Won' : 'Lost'}</span>`;
   const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
   return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)} · not counted</div>` : ''}</div>`;
@@ -1379,7 +1389,7 @@ function recentGamesCard(p) {
   const games = sessListOf(p).flatMap((s) => s.games.slice().reverse().map((g) => ({ g, s })));
   const total = p.sessions.reduce((n, s) => n + s.games.length, 0);
   return `<section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${esc(p.id)}">All games (${total})</button>` : ''}</div>
-        ${games.length ? `<div class="rg-list">${games.slice(0, 3).map(({ g, s }) => `<div class="rg-item">${gameRow(g, p, p.id === S.me ? { sid: s.id, gi: s.games.indexOf(g) } : null)}<p class="small muted rg-src">${esc(s.title)} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></div>`).join('')}</div>` : '<div class="empty">No games recorded yet.</div>'}
+        ${games.length ? `<div class="rg-list">${games.slice(0, 3).map(({ g, s }) => `<div class="rg-item">${gameRow(g, p, p.id === S.me ? { sid: s.id, gi: s.games.indexOf(g) } : null, { s, gi: s.games.indexOf(g) })}<p class="small muted rg-src">${esc(s.title)} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></div>`).join('')}</div>` : '<div class="empty">No games recorded yet.</div>'}
       </section>`;
 }
 function viewSessions() {
@@ -1399,7 +1409,7 @@ function sessionBlock(s, kinds, own = false, who = null, gf = null) {
   return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</p></div>
     ${s.pageGone ? '<span class="small muted">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(s.title)}">Session page ${I.ext}</button>`}</div>
     ${own && kinds.includes('counted') ? shareRow(s) : ''}
-    ${games.map((g) => gameRow(g, who, own ? { sid: s.id, gi: s.games.indexOf(g) } : null)).join('')}</section>`;
+    ${games.map((g) => gameRow(g, who, own ? { sid: s.id, gi: s.games.indexOf(g) } : null, { s, gi: s.games.indexOf(g) })).join('')}</section>`;
 }
 // Share result / Share games on a session of the signed-in player's own history. Only after the Queue Master publishes (D-2026-11-09-08).
 function shareRow(s) {
@@ -2659,7 +2669,7 @@ const SHEETS_SESSION = (sh) => {
   if (!x) return sheetWrap('Session', '<div class="empty">This session could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
   const r = sessRecord(x), who = p.id === S.me ? 'Your' : `${esc(p.nick || p.name)}'s`;
   return sheetWrap(esc(x.title), `<div class="ls-head">${sessDate(x.ago)}<div class="main"><b>${fmtDay(x.ago)}</b><span class="small muted">${esc(x.club)}</span></div><span class="ls-rec big"><b class="tnum"><span class="w">${r.w}W</span> · <span class="l">${r.l}L</span></b><span class="small muted">counted</span></span></div>
-    <div><span class="label">${who} matches · ${r.n}</span>${x.games.map((g, gi) => gameRow(g.kind === 'fun' ? { ...g, note: 'Fun game' } : g, p, p.id === S.me ? { sid: x.id, gi } : null)).join('')}</div>`,
+    <div><span class="label">${who} matches · ${r.n}</span>${x.games.map((g, gi) => gameRow(g.kind === 'fun' ? { ...g, note: 'Fun game' } : g, p, p.id === S.me ? { sid: x.id, gi } : null, { s: x, gi })).join('')}</div>`,
     `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.id === S.me ? `<button class="btn" data-act="openShare" data-kind="perf" data-sid="${esc(x.id)}">${I.share} Share performance</button>` : ''}${x.pageGone ? '' : `<button class="btn primary" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}`);
 };
 const SHEETS = {

@@ -6,6 +6,7 @@ export const gameRowMeta = {
   usage: [
     'Pass `me` (label “You” on your own profile) so the profile owner is drawn first on the left.',
     'Pass `onOpenPlayer` to make every face a button that opens the profile card; a face with no playerId is a guest (Not on ROTRA yet).',
+    'Each face shows its games badge from `sessionGameNumber` (the game’s own for the owner, each player’s for the others): how many games they had played in that session, this one included.',
     'Pass `onShare` only on your own games: the round share icon opens Share game. Partial games never show it.',
     'Read-only: no result editing controls. A thin mapping onto MatchCourt’s Player variant; the court art lives there only.',
   ],
@@ -16,6 +17,7 @@ export const gameRowMeta = {
   docs: [
     'docs/screens/product/modules/player-information/ranking-history.md',
     'docs/mockup-changes/2026-11-13-player-game-row-court.md',
+    'docs/mockup-changes/2026-11-14-player-game-row-games-badge.md',
   ],
   related: ['MatchCourt'],
 } satisfies ComponentMeta

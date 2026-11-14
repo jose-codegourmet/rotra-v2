@@ -63,11 +63,23 @@ export async function getPlayerGames(
   await requireProfileAccess(playerId)
   return (playerProjection().games[playerId] ?? []).map((session) => ({
     ...session,
-    games: session.games.map((game) => ({
-      ...game,
-      partnerPlayers: game.partners.map(gamePlayer),
-      opponentPlayers: game.opponents.map(gamePlayer),
-    })),
+    // Games are stored oldest first; each face counts that person's games so far, this one included.
+    games: session.games.map((game, index) => {
+      const played = (name: string) =>
+        session.games
+          .slice(0, index + 1)
+          .filter((g) => g.partners.includes(name) || g.opponents.includes(name)).length
+      const face = (name: string): PlayerGamePlayer => ({
+        ...gamePlayer(name),
+        sessionGameNumber: played(name),
+      })
+      return {
+        ...game,
+        sessionGameNumber: index + 1,
+        partnerPlayers: game.partners.map(face),
+        opponentPlayers: game.opponents.map(face),
+      }
+    }),
   }))
 }
 /** A face on a game court: a ROTRA profile by full name or nickname, else a guest (no playerId). */

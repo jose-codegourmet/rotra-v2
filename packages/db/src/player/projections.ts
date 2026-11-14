@@ -512,7 +512,7 @@ function courtPlayer(
  */
 async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPrivate = true) {
   const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
-  const [sessions, entries] = await Promise.all([
+  const [sessions, entries, allFacts] = await Promise.all([
     tx.queueSession.findMany({
       where: { id: { in: sessionIds }, state: 'completed' },
       select: {
@@ -539,9 +539,30 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
         },
       },
     }),
+    // Every match of those sessions, oldest first, for the games badge on each face (2026-11-14
+    // log): how many games that entry had played in the session up to and including a match.
+    tx.playerMatchFact.findMany({
+      where: { sessionId: { in: sessionIds } },
+      select: { sessionId: true, sessionPlayerId: true, matchId: true },
+      orderBy: [{ playedAt: 'asc' }, { matchId: 'asc' }],
+    }),
   ])
   const byId = new Map(entries.map((e) => [e.id, e]))
-  const people = (ids: string[]) => ids.map((id) => courtPlayer(byId.get(id), maskAlwaysPrivate))
+  const gameNumbers = new Map<string, number>()
+  const running = new Map<string, number>()
+  for (const f of allFacts) {
+    const key = `${f.sessionId}:${f.sessionPlayerId}`
+    const n = (running.get(key) ?? 0) + 1
+    running.set(key, n)
+    gameNumbers.set(`${key}:${f.matchId}`, n)
+  }
+  const gameNumber = (sessionId: string, entryId: string, matchId: string) =>
+    gameNumbers.get(`${sessionId}:${entryId}:${matchId}`)
+  const people = (ids: string[], sessionId: string, matchId: string) =>
+    ids.map((id) => ({
+      ...courtPlayer(byId.get(id), maskAlwaysPrivate),
+      sessionGameNumber: gameNumber(sessionId, id, matchId),
+    }))
   return sessions
     .map((s) => ({
       id: s.id,
@@ -552,11 +573,12 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
       games: facts
         .filter((f) => f.sessionId === s.id)
         .map((f) => {
-          const partnerPlayers = people(f.partnerEntryIds)
-          const opponentPlayers = people(f.opponentEntryIds)
+          const partnerPlayers = people(f.partnerEntryIds, f.sessionId, f.matchId)
+          const opponentPlayers = people(f.opponentEntryIds, f.sessionId, f.matchId)
           return {
             id: f.matchId,
             format: f.format,
+            sessionGameNumber: gameNumber(f.sessionId, f.sessionPlayerId, f.matchId),
             partners: partnerPlayers.map((p) => p.name),
             opponents: opponentPlayers.map((p) => p.name),
             partnerPlayers,

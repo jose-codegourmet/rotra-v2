@@ -1,6 +1,8 @@
 import 'server-only'
 import { clubSessionStatus, projectMember, sessionPageKept } from '@rotra/data/club-page/rules'
 import type { ClubPageMember, ClubPageSessionStatus } from '@rotra/data/club-page/types'
+import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
+import { readShownProfileBanners } from '../admin/profile-banners'
 import { loadAccountContext } from '../auth/account-context'
 import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
@@ -78,7 +80,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
     },
   })
   if (!club) throw new ServiceError('not_found')
-  const [rows, sessions, viewerRow] = await Promise.all([
+  const [rows, sessions, viewerRow, shownBanners] = await Promise.all([
     prisma.clubPlayer.findMany({
       where: {
         clubId,
@@ -91,7 +93,13 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
         playerId: true,
         displayName: true,
         player: {
-          select: { fullName: true, nickname: true, avatarRef: true, profileVisibility: true },
+          select: {
+            fullName: true,
+            nickname: true,
+            avatarRef: true,
+            profileVisibility: true,
+            banner: { select: { id: true, image: true } },
+          },
         },
         assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
@@ -115,6 +123,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
           select: { id: true },
         })
       : null,
+    readShownProfileBanners(),
   ])
   const now = Date.now()
   const members = rows
@@ -129,6 +138,12 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
                 nickname: row.player.nickname,
                 picture: row.player.avatarRef,
                 level: levelCodeFor(row.assessments[0]?.skillLevelId ?? null),
+                // Public like the picture, so masked members keep it too (as in mock mode).
+                ...resolveProfileBanner(
+                  row.player.banner?.id ?? null,
+                  () => row.player?.banner ?? undefined,
+                  shownBanners,
+                ),
               },
               { alwaysPrivate: row.player.profileVisibility === 'always_private' },
               viewerId,

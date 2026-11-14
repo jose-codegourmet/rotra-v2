@@ -2,6 +2,7 @@ import { getSession } from '../auth/fetchers'
 import { readMockState } from '../mock/store'
 import { playerProjection } from '../player/projection'
 import { isAlwaysPrivatePlayer, isPrivatePlayer } from '../player/visibility'
+import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { maskPublicName } from '../public-session/publicSession.rules'
 import {
   realGetLeaderboardPage,
@@ -20,9 +21,17 @@ export async function getLeaderboardPage(
   const { entries } = playerProjection()
   const viewerId = (await getSession('player'))?.account.id ?? null
   return {
-    entries: entries.slice(offset, offset + limit).map((e) => maskedEntry(e, viewerId)),
+    entries: entries.slice(offset, offset + limit).map((e) => maskedEntry(withBanner(e), viewerId)),
     total: entries.length,
   }
+}
+/**
+ * The entry's own Profile banner: public, like the picture, so masked rows keep it and their
+ * private card draws it (as in real mode).
+ */
+function withBanner<T extends { playerId: string }>(entry: T) {
+  const profile = readMockState().playerProfiles.find((p) => p.playerId === entry.playerId)
+  return { ...entry, ...resolveMockProfileBanner(profile?.bannerId) }
 }
 /**
  * D-2026-11-12-01: a visitor sees a private player's name masked with no picture; an always-private
@@ -65,7 +74,7 @@ export async function searchLeaderboard(query: string, signal?: AbortSignal) {
       !readMockState().adminPlayerRecords[e.playerId]?.archivedAt &&
       (e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q)),
   )
-  return { hits: hits.slice(0, 50), total: hits.length }
+  return { hits: hits.slice(0, 50).map(withBanner), total: hits.length }
 }
 export async function getMyLeaderboardPosition(signal?: AbortSignal) {
   if (isRealDataMode()) return realGetMyLeaderboardPosition(signal)

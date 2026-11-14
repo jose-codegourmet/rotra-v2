@@ -1,14 +1,18 @@
 import 'server-only'
+import { yearGameStats } from '@rotra/data/player/rules'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
+import type { ParticipantStats } from '@rotra/data/public-session/types'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import { readPlayerMatchHistory } from '../player/projections'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { clubPlayerForProfile, createClubPlayer } from './session-roster'
 import { levelCodeFor, mapDatabaseError } from './session-store'
 
 const SEARCH_LIMIT = 20
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /** One saved club player as Saved players and the Add player sheet show them. Never carries a phone. */
 export type ClubPlayerDto = {
@@ -241,4 +245,27 @@ export async function addNewSavedPlayer(
     if (error instanceof ServiceError) throw error
     mapDatabaseError(error)
   }
+}
+
+/**
+ * Stats · YEAR on the Queue Master's player profile dialog (2026-11-13-queue-profile-stats-banner):
+ * the linked ROTRA player's official games this calendar year, the same numbers as the session
+ * page's participant card. Guests and unclaimed records have no ROTRA history yet: null
+ * (“No games yet this year”). A player the club hasn't saved (or removed) is not found.
+ */
+export async function readClubPlayerYearStats(
+  context: ClubContext,
+  clubPlayerId: string,
+): Promise<ParticipantStats | null> {
+  if (!UUID.test(clubPlayerId)) throw new ServiceError('not_found')
+  const row = await prisma.clubPlayer.findFirst({
+    where: { id: clubPlayerId, clubId: context.clubId, removedAt: null },
+    select: { playerId: true, player: { select: { profileState: true } } },
+  })
+  if (!row) throw new ServiceError('not_found')
+  if (!row.playerId || row.player?.profileState !== 'claimed') return null
+  const stats = yearGameStats(await readPlayerMatchHistory(row.playerId), Date.now())
+  if (!stats) return null
+  // Allowlisted fields only.
+  return { games: stats.games, wins: stats.wins, losses: stats.losses, winRate: stats.winRate }
 }

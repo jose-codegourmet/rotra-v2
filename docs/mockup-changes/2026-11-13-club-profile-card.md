@@ -42,3 +42,4 @@ One change across the three apps; logged under `player`.
 
 ## Real app work
 - A club profile card component; wire it to the three entry points.
+- Real mode: the Queue public session page's club card reads its counts from Queue's own `/api/clubs/<id>` (#821).

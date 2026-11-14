@@ -39,3 +39,4 @@ Superseded by: none
 
 ## Real app work
 - Queue profile dialog: add the stats block (same data as the participant card, counted over the calendar year) and pass each player's banner to the card; resolve no pick to the Admin default.
+- Real mode: the Stats · YEAR read is built (`/api/club/players/<id>/year-stats`, #821).

@@ -176,3 +176,21 @@ one transaction holding the migration SQL and the Prisma history row with the fi
 (`c958b4…ff50d`). Read-only check afterwards: 29 of 29 migrations in `_prisma_migrations`, none rolled
 back, the latest `20261114000200_player_stats_visibility`; both columns boolean not null default
 true; all 32 players read both switches on; RLS on `players` still on.
+
+## Q20.7 (#839) — `session_players.no_show_at` (November 14, 2026)
+
+Disposable local PostgreSQL 16 (`rotra_disposable` on 127.0.0.1), `scripts/disposable-db.sh all`: the
+full history of 30 migrations (through `20261114000300_session_players_no_show`) rebuilds with no
+drift between the database and the Prisma schema. SQL-only objects: 183 check constraints (one new,
+`session_players_no_show_check`), 1 exclusion constraint, 28 triggers, 24 partial/expression indexes;
+0 tables granted to anon/authenticated. Integrity checks: 74 passed, 0 failed, including two new ones:
+an entry both released and a no show is rejected, and `no_show_at` on a level-locked live entry is
+accepted. The services and routes were not run against a database.
+
+**Hosted: applied November 14, 2026** to ROTRA v2 ASIA (`xvsgwgihgbuqkcazikek`) over the Supabase
+connector (no `DIRECT_URL` in that session; the owner allowed all SQL except drops for the epic #832
+batch), after the merge of #856, as one statement batch holding the migration SQL and the Prisma
+history row with the file's checksum (`76110e…7ed5`). Read-only check afterwards: 30 of 30 migrations
+in `_prisma_migrations`, none rolled back, the latest `20261114000300_session_players_no_show`;
+`no_show_at` is `timestamp with time zone`, nullable; the CHECK `(no_show_at IS NULL) OR
+(released_at IS NULL)` is present; RLS on `session_players` still on; no row is a no show yet.

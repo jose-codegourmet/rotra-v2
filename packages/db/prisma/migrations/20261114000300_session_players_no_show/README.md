@@ -55,4 +55,5 @@ anon/authenticated; 74 integrity checks passed, 0 failed, including two new ones
 `prisma/fixtures/checks.sql`: an entry both released and a no show is rejected
 (`session_players_no_show_check`), and `no_show_at` on a level-locked live entry is accepted.
 `db:validate`, `db:generate` and `tsc --noEmit` for `@rotra/db` pass. The services and routes were not
-run against a database. Not applied to the shared database.
+run against a database. Applied to the hosted database on November 14, 2026 after the merge
+(see docs/database_design/product/verification.md).

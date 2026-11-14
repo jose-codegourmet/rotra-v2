@@ -10,6 +10,7 @@ export const sheetMeta = {
     'For an irreversible or important confirmation (D- dialogs) use ConfirmSheet.',
     'Set dismissible={false} and hideClose while a permanent save is pending.',
     'fullscreen fills the whole screen on phones (header on top, footer pinned, body scrolls between); wide screens keep the centered dialog.',
+    "dock='bottom' keeps the bottom-sheet layout and slide-up motion at every width (the stacked All players dialog under 900 px).",
     'Motion matches the prototype and is instant under reduced motion.',
   ],
   prototype: {

@@ -41,6 +41,11 @@ export type SheetProps = {
    * frosted 30 px circle over the banner; the body has no padding so the card runs edge to edge.
    */
   headerless?: boolean
+  /**
+   * `'bottom'` docks it to the bottom edge with the slide-up motion at every width, not only on phones
+   * (the prototype's .sp-stack: the stacked All players under 900 px). Unset: centered above 640 px.
+   */
+  dock?: 'bottom'
 }
 
 // Durations and easing from the prototypes: scrim fades in 0.15 s; the sheet pops in 0.16 s
@@ -69,9 +74,11 @@ export function Sheet({
   headerClassName,
   closeLabel = 'Close',
   headerless = false,
+  dock,
 }: SheetProps) {
-  const phone = useMediaQuery(PHONE_QUERY)
-  const full = Boolean(fullscreen && phone && !side)
+  const isPhone = useMediaQuery(PHONE_QUERY)
+  const phone = isPhone || dock === 'bottom'
+  const full = Boolean(fullscreen && isPhone && !side)
   const reduced = useReducedMotion()
   const titleRef = useRef<HTMLHeadingElement>(null)
 

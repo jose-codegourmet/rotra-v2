@@ -1,19 +1,19 @@
 {
   "id": "rule-cases_20261113",
-  "title": "Shared rule-cases package",
+  "title": "Shared queue rules (one Go copy, run on the device as WebAssembly)",
   "type": "chore",
   "priority": "critical",
   "order": 1,
   "status": "pending",
   "created": "2026-11-13",
-  "updated": "2026-11-13",
-  "depends_on": "\u2014",
+  "updated": "2026-11-14",
+  "depends_on": "go-api-foundation (phases 4-6 only)",
   "phases": {
-    "total": 3,
+    "total": 7,
     "completed": 0
   },
   "tasks": {
-    "total": 9,
+    "total": 30,
     "completed": 0
   }
 }

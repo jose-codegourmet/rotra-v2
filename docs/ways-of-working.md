@@ -134,6 +134,7 @@ Epics are titled `Epic <key> · <Product> › <Module>`.
 ## 5. Branches, commits, PRs
 
 - Branch from `main`: `<type>/<issue#>-<short-kebab>`, e.g. `feat/42-court-card`.
+- **Exception: `go-stack`** ([B-20](backend/open-decisions.md)). Tickets that change the UI for the Go API branch from and target the long-lived `go-stack` branch instead; it is merged from `main` at least weekly and merges into `main` once, at ship, in an owner-reviewed PR.
 - **Conventional Commits:** `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `style:`, `perf:`,
   `build:`, `ci:`, `revert:`. Scope with the package when it helps: `feat(ui): add CourtCard`.
 - One ticket per PR. The PR body says `Closes #<n>` and includes the verification block (§7).

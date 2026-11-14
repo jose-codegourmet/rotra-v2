@@ -1,7 +1,7 @@
 # Track specification: Side-by-side beta stack
 
 **Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 12) · **Created:** 2026-11-13
-**Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-12, B-18 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-12, B-18, B-20 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -11,10 +11,11 @@ The Go API is built and tested next to the current apps, with real-mode screens,
 
 ### R1: Second Vercel project
 
-Same repo and apps from `main`, real data mode, domains `queue-beta`, `player-beta`, `admin-beta`.rotra.club, cross-app URLs pointing at the beta domains.
+Same repo and apps, built from the long-lived `go-stack` branch (created off `main` in this track, B-20), real data mode, domains `queue-beta`, `player-beta`, `admin-beta`.rotra.club, cross-app URLs pointing at the beta domains.
 
 **Accepted when:**
 
+- [ ] `go-stack` branch exists (backlog [BL-5](../../tracks.md#backlog)); the beta project builds it and the current project still builds `main`
 - [ ] The three beta apps load in real mode
 
 ### R2: Env-gated rewrites
@@ -45,7 +46,7 @@ Prove a long-lived stream through the Vercel rewrite; if it fails, use the ticke
 
 ## Scope
 
-**In:** Vercel project, rewrites, data copy, the stream test.
+**In:** Vercel project, the `go-stack` branch, rewrites, data copy, the stream test. The env-gated rewrites (R2) merge into `main`; they are inert without `ROTRA_GO_API_URL`.
 
 **Out:** Moving any area; Shipping to production.
 

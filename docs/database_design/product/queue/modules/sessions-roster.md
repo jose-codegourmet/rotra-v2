@@ -46,6 +46,7 @@ Duplicate offline entries can conflict on linking. Quarantine the link operation
 | `players_per_court` | Positive integer (default from `clubs.default_players_per_court`, 8); slots = this × non-removed courts |
 | `expected_players` | Nullable positive integer used before the roster has players |
 | `queue_revision` | Bigint for coherent reorder/regenerate commands |
+| `rules_version` | Proposed (B-22, Go stack): integer, the shared queue rules version stamped at Start; device and server run this version for the whole session. Not migrated yet |
 | `started_at`, `finalized_at` | Nullable until corresponding transition |
 | `series_id` | Nullable UUID shared by sessions created together as a repeating series; each session stays independent |
 | `start_license_term_id` | Nullable FK before start; retained start authorization evidence |

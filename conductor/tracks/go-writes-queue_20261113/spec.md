@@ -17,6 +17,30 @@ Idempotent `operationId`, revision checks with the same 409 for Q-CONFLICT, `GET
 
 - [ ] The device outbox replays against Go with no false conflicts (outbox tests + a scripted replay)
 
+### R1a: Device time and sent lineups (owner, 2026-11-13; [rule-cases Q2/Q3](../rule-cases_20261113/spec.md#owner-answers-2026-11-13))
+
+- **Time.** Replay uses the command's `recordedAt` as `now`, checked against the schedule (inside the
+  session plus a grace period, not after receipt, in order per match and court, inside the court's
+  booking window). A time that doesn't fit goes to Q-CONFLICT. Grace period and checks need owner OK (backlog [BL-2](../../tracks.md#backlog)).
+- **Lineups.** Auto Queue, Regenerate and Suggest send the lineups the device made instead of `n`;
+  the server checks them with the shared match guards and no longer generates. Its own ticket (backlog [BL-3](../../tracks.md#backlog)), before
+  the port: the Go side merges into `main`, rule changes follow the rules versions of B-22, the device side lands on `go-stack` (B-20), so the current
+  apps keep sending `n`. Old-shape outbox commands (`n` only) keep the old path until they drain.
+
+- **Rules version (B-22).** Start stamps `rules_version` on the Queue Session (migration: stop and ask
+  before applying): the highest version both the Go API and the live `rules-manifest.json` carry, capped
+  by `RULES_VERSION_MAX` (rule-cases G14). Every command, online or replayed, runs through `rules.For(session.rulesVersion)`.
+  A retired version is rejected and the session moves to the current version at its next sync, with a
+  notice to the Queue Master (mockup first for the notice). See [rule-cases: Rules versions](../rule-cases_20261113/spec.md#rules-versions-b-22).
+
+**Accepted when:**
+
+- [ ] Start stamps the rules version; replay uses the session's version, not the latest
+- [ ] With the manifest lacking the newest Go version, or unreadable, Start stamps the last confirmed version
+- [ ] A retired version is rejected and the session moves to the current version with a notice
+- [ ] Replayed offline changes keep the device's time; out-of-schedule times reach Q-CONFLICT
+- [ ] The server stores exactly the lineups the device showed; old-shape commands still replay
+
 ### R2: Session, roster, matches, queue
 
 All session commands: preparation, roster and presence, join requests, match control, match requests, Generate matches add, results, finalization, cancel/delete.
@@ -24,11 +48,11 @@ All session commands: preparation, roster and presence, join requests, match con
 **Accepted when:**
 
 - [ ] Characterization tests pass for every command
-- [ ] Every rule passes its shared cases first
+- [ ] Shared rules come from `internal/rules` as built by the rule-cases track (R5), not ported again; Go-only rules (rule-cases bucket 2) port their Vitest cases as Go tests
 
 ### R3: Money
 
-Cost, payments, mark-all, amounts, inventory.
+Cost, payments, mark-all, amounts, inventory. Go only (owner, 2026-11-13): the device records marks offline and Go computes amounts on sync; the offline "last synced amount" screen change goes through the mockup first (backlog [BL-4](../../tracks.md#backlog)).
 
 **Accepted when:**
 

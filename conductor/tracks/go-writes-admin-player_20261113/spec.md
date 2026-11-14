@@ -28,7 +28,7 @@ Registration, profile and visibility, contact-change requests, club join/leave, 
 
 ### R3: Rules
 
-Any rule a write enforces runs in Go only after it passes its `@rotra/rule-cases` cases.
+These rules are Go-only ([rule-cases bucket 2](../rule-cases_20261113/spec.md#bucket-2-go-only-port-directly-in-the-owning-track)): port their Vitest cases into Go tests; no shared JSON.
 
 **Accepted when:**
 

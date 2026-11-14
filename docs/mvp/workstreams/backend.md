@@ -37,7 +37,7 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 - [ ] Scheduler for license-lapse refresh, retention sweep and ageing jobs ([D-2026-11-08-04](../decisions.md#d-2026-11-08-04)): **parked, not for MVP** ([D-2026-11-11-10](../decisions.md#d-2026-11-11-10)); license state, ageing and eligibility are computed on read. Tickets: #545, #546, #547 (parked).
 - [x] Decision gates answered November 11, 2026 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04) to [D-10](../decisions.md#d-2026-11-11-10)): #243 closed as overtaken; #244, #245, #247, #248 unblocked and carry only their remaining implementation items; #246 stays as before.
 - [ ] RLS / `anon` grant fix. Ticket: #387.
-- [ ] Go API on Railway ([D-2026-11-13-01](../decisions.md#d-2026-11-13-01)): epic and tickets needed; built side by side in a second Vercel project, shipped when ready (B-10). First ticket: the rule-cases package ([D-2026-11-13-02](../decisions.md#d-2026-11-13-02)). Ticket: needed.
+- [ ] Go API on Railway ([D-2026-11-13-01](../decisions.md#d-2026-11-13-01)): epic and tickets needed; built side by side in a second Vercel project from the `go-stack` branch (B-10, B-20), shipped when ready. First ticket: the rule-cases package ([D-2026-11-13-02](../decisions.md#d-2026-11-13-02)). Ticket: needed.
 
 ## Related decisions
 
@@ -45,6 +45,8 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — offline mandatory; online-only launch not approved.
 - [D-2026-11-11-01](../decisions.md#d-2026-11-11-01) — OpenTelemetry traces to Grafana Cloud ([observability](../../observability.md)).
 - [D-2026-11-13-02](../decisions.md#d-2026-11-13-02) — **approved 2026-11-13**: shared rule-cases package `@rotra/rule-cases`.
+- [D-2026-11-13-08](../decisions.md#d-2026-11-13-08) — **approved 2026-11-13**: only queue and matchmaking rules are shared; money and every other rule move to Go; TypeScript copies deleted and the UI updated on the `go-stack` branch (B-20).
+- [D-2026-11-14-01](../decisions.md#d-2026-11-14-01) — **approved 2026-11-14**: the shared queue rules get one Go copy, run on the device as WebAssembly, after a spike (fallback: two copies with guards). Tool and hosting decided in B-21 (standard Go if it passes, else TinyGo; ships with the apps on Vercel); versioned per Queue Session in B-22; types generated with `tygo` in B-23.
 - [D-2026-11-13-01](../decisions.md#d-2026-11-13-01) — **approved 2026-11-13**: Go API on Railway, Go-owned sign-in, Railway Buckets, live updates ([proposal](../../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md), [backend open decisions](../../backend/open-decisions.md)).
 
 ## Blocking open decisions

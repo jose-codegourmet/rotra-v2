@@ -90,11 +90,11 @@ Railway deploys the Go API **only for backend changes**, and only after the back
 
 | Piece | Where | What it does |
 |---|---|---|
-| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs, `conductor/` and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
+| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `packages/rules-wasm/**` (once it exists, D-2026-11-14-01), `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs, `conductor/` and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
 | Frontend CI | `.github/workflows/ci.yml` | `paths-ignore` for the same backend paths, `docs/**`, `conductor/**` and root `*.md`, so a backend-only commit runs no frontend checks |
-| Railway watch paths | `api` service settings | `/apps/api/**`, `/packages/rule-cases/**`. Commits that don't touch them never build or deploy ([watch paths](https://docs.railway.com/deployments/monorepo#watch-paths)) |
+| Railway watch paths | `api` service settings | `/apps/api/**`, `/packages/rule-cases/**`, `/packages/rules-wasm/**`. Commits that don't touch them never build or deploy ([watch paths](https://docs.railway.com/deployments/monorepo#watch-paths)) |
 | Railway "Wait for CI" | `api` service settings | The deploy waits in `WAITING` until the commit's GitHub Actions runs finish, and goes ahead only if they pass ([wait for CI](https://docs.railway.com/deployments/github-autodeploys#wait-for-ci)) |
-| Branch | `api` service settings | `staging` deploys from `main`. `production` takes a commit only when the Go API ships (B-10) |
+| Branch | `api` service settings | `staging` deploys from `main` (the Go API merges into `main`; only UI changes use `go-stack`, B-20). `production` takes a commit only when the Go API ships (B-10) |
 
 Why the frontend CI must skip backend commits: Railway's "Wait for CI" looks at **every** GitHub
 Actions run on the commit, not just one workflow (checks from other GitHub apps are ignored). If
@@ -107,6 +107,12 @@ Rules this sets:
   that needs both a frontend and a backend part is two PRs; the backend one merges first.
 - **Rule cases are shared.** `packages/rule-cases/**` counts as backend for CI. The frontend side of a
   case change is checked by `make check` (its Vitest runs), as for every change.
+- **The rules `.wasm` is shared too** ([D-2026-11-14-01](../mvp/decisions.md#d-2026-11-14-01)).
+  `packages/rules-wasm/**` counts as backend for CI, so a Go rule change and its rebuilt `.wasm` merge
+  in one PR. `make check` checks the frontend side: the fingerprint of the Go rule files and the cases
+  through the wrapper. The apps publish `rules-manifest.json`; the Go API stamps new Queue Sessions
+  only with a version that manifest lists, capped by `RULES_VERSION_MAX` on the `api` service
+  (normally unset) ([B-22](open-decisions.md)).
 - **CI is still advisory for the frontend** ([ways-of-working §5](../ways-of-working.md#5-branches-commits-prs)).
   For the backend, a red Backend CI means **no deploy**, which is the gate.
 - Watch paths and "Wait for CI" are service settings. Turn them on in Railway when the `api`
@@ -116,11 +122,14 @@ Rules this sets:
 
 ```text
  Current (unchanged)                         New (testing the Go API)
- queue/player/admin.rotra.club               a second Vercel project, same repo and apps
+ queue/player/admin.rotra.club               a second Vercel project, same repo, `go-stack` branch
    Vercel → Route Handlers → Supabase          Vercel → /api/* rewrite → Go API (Railway staging) → Railway Postgres
 ```
 
-- The **same apps and the same `main`** are deployed to a second Vercel project. No code is forked.
+- The **same apps**, built from the long-lived **`go-stack` branch** (B-20), are deployed to a second
+  Vercel project. `go-stack` holds only the UI changes that need the Go API; everything else (rule
+  cases, `apps/api`, Railway) merges into `main`. `main` is merged into `go-stack` at least weekly and
+  after every Queue epic. Shipping merges `go-stack` into `main` in one owner-reviewed PR.
 - The rewrite must only exist in the new project. A rewrite in the shared `vercel.json` would hit
   both projects, so it goes in each app's `next.config` and is turned on only when
   `ROTRA_GO_API_URL` is set. That variable is set only in the new project.

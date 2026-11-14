@@ -49,6 +49,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-05](#d-2026-11-13-05) | Finished session page (Match history, Leaderboard tab); club profile cards | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-13-06](#d-2026-11-13-06) | Sharing widened: any public profile, leaderboard, awards and Off Day; no QR on share images | approved 2026-11-13 | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-13-07](#d-2026-11-13-07) | Generate matches leaves out players already in the Main Queue; fewer matches when too few are free | approved 2026-11-13 | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
+| [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 
 ## Status conventions
 
@@ -769,7 +771,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 <a id="d-2026-11-13-01"></a>
 ### D-2026-11-13-01 — Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates
-- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-19 answered the same day). Nothing is open in [backend open decisions](../backend/open-decisions.md).
+- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-20 answered the same day). Nothing is open in [backend open decisions](../backend/open-decisions.md).
 - **Implementation status:** not started
 - **Ticket:** needed
 - **Roadmap:** built and tested side by side with the current stack, shipped when ready for production (B-10) — [Backend](workstreams/backend.md)
@@ -783,7 +785,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Jobs (B-07).** None. Scheduled jobs stay parked ([D-2026-11-11-10](#d-2026-11-11-10)).
   - **Live updates (B-08).** The reason for the Go API: every app gets server-pushed updates. Refresh, pull-down and tab-return refresh stay as the fallback. What each person may see doesn't change.
   - **Cost (B-09).** Start on the existing Railway Hobby plan and monitor.
-  - **Rollout (B-10).** A second Vercel project deploys the same apps from `main` with `/api/*` rewritten to the Go API on Railway; the current project keeps running. Separate data while testing; a final data copy and a domain switch ship it. See [infrastructure](../backend/infrastructure.md#side-by-side-with-the-current-apps-b-10).
+  - **Rollout (B-10).** A second Vercel project deploys the same apps (from the `go-stack` branch, B-20) with `/api/*` rewritten to the Go API on Railway; the current project keeps running. Separate data while testing; a final data copy and a domain switch ship it. See [infrastructure](../backend/infrastructure.md#side-by-side-with-the-current-apps-b-10).
   - **Sign-in tables (B-11).** Designed in [database design › sign-in](../database_design/product/sign-in.md) (proposed design, not migration SQL).
   - **Live transport (B-12).** Try the stream through the rewrite on staging; fall back to a short single-use ticket and the API's own domain.
   - **CDN (B-13).** None for now. **Hobby limits (B-14).** Just monitor.
@@ -793,6 +795,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Monitoring (B-16).** Plan approved with the Grafana Alloy service and starting thresholds ([observability](../observability.md#planned-go-api-postgres-and-pictures-on-railway)).
   - **IaC dependency (B-17).** The `railway` npm package, root dev dependency, only for `.railway/railway.ts`.
   - **Domains (B-18).** `queue-beta`, `player-beta`, `admin-beta`.rotra.club for the side-by-side project; `api-beta.rotra.club` (staging) and `api.rotra.club` (production) for the Go API.
+  - **Go-stack branch (B-20, owner, November 13, 2026; amends B-10).** Changes that only make sense with the Go API behind them, such as screens calling Go endpoints, the offline payments amount, form checks moving to Go, mock mode per area, and deleting the TypeScript copies of Go-only rules, go on a long-lived `go-stack` branch off `main`. The beta Vercel project builds from `go-stack`. `packages/rule-cases`, the Go API (`apps/api`) and Railway changes still merge into `main`, since they don't change the current apps. `main` is merged into `go-stack` at least weekly and after every Queue epic, so it never drifts far. Mockup changes still land on `main` first (AGENTS rule 15); their Go-stack implementation lands on `go-stack`. Shipping merges `go-stack` into `main` in one owner-reviewed PR (not auto-merged), after `make check`.
   - **Query statistics (B-19).** `pg_stat_statements` is an opt-in on Railway Postgres (Database › Stats › Query Statistics › Enable); turn it on for each ROTRA database.
 - **Not decided yet:** nothing in [backend open decisions](../backend/open-decisions.md).
 - **References:** [proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md), [backend open decisions](../backend/open-decisions.md), [backend docs](../backend/README.md).
@@ -811,6 +814,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Which rules.** Only rules the server enforces (cost, payments, minimum games, queue generation and fills, results and standings, ranking settings, licenses, money/phone/court-window parsing). Rules that only shape the UI stay as they are.
   - **Change rule.** A rule change edits its case file first, so both sides fail until both are fixed. A money or ranking case changes only with the owner's sign-off ([stop and ask](../ways-of-working.md#10-stop-and-ask)); the #247 ranking constants are still open.
   - **First step.** Move the existing decided-math cases out of a few `*.rules.test.ts` files into JSON without changing what they test, and prove Vitest still passes.
+- **Amended by:** [D-2026-11-14-01](#d-2026-11-14-01) and [B-22](../backend/open-decisions.md): the layout becomes `cases/v<n>/<area>/<rule>.json`, one folder per rules version; the cases become the parity check for the switch to one Go copy run as WebAssembly, and stay as the Go tests afterwards. [D-2026-11-13-08](#d-2026-11-13-08): "Which rules" narrows to the queue and matchmaking rules the offline device runs; every other rule has one copy, in Go.
 - **References:** [D-2026-11-13-01](#d-2026-11-13-01) (B-02), [backend proposal](../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md#the-biggest-cost-two-copies-of-the-rules-b-02), [architecture §2–3](../architecture.md#2-the-shape-of-the-system) (new packages need a decision).
 
 <a id="d-2026-11-13-03"></a>
@@ -881,3 +885,44 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Fewer matches, said plainly.** When too few players are left, Generate makes only as many matches as the free players allow and says how many players were left out because they are already queued, appended to the batch result: “Made {k} of {n} matches · {q} players are already in the Main Queue”.
   - Auto Queue court filling, Suggest and Main Queue Regenerate are unchanged.
 - **References:** mockup log [Generate leaves out the Main Queue](../mockup-changes/2026-11-13-queue-generate-excludes-main-queue.md); [Queueing › Generate matches workspace](../business_logic/product/queue/modules/queueing/README.md#generate-matches-workspace); [Q-AUTO](../screens/product/modules/queue/match-queue.md#q-auto--generate-matches-workspace).
+
+<a id="d-2026-11-13-08"></a>
+### D-2026-11-13-08 — Which rules are shared, which move to Go, and deleting the TypeScript copies
+- **Decision status:** approved (owner, November 13, 2026, refining track 1 of the Go API plan)
+- **Implementation status:** not started
+- **Ticket:** needed (rule-cases track; the lineup contract change; the offline payment amount mockup change; the TypeScript clean-up when the Go stack ships)
+- **Roadmap:** with the Go API ([D-2026-11-13-01](#d-2026-11-13-01)) — [Backend](workstreams/backend.md)
+- **Decision:**
+  - **One copy per rule.** A rule keeps two copies (TypeScript and Go) only when both sides must run it, and then both run the same `@rotra/rule-cases` cases. Every other rule has one copy, in Go.
+  - **Shared: queue and matchmaking only.** The rules the offline outbox commands run on the device and the server runs again on sync: court fill, match checks, courts and time, game counts, roster and waitlist.
+  - **Money is Go only.** Session cost and payment rules are not shared. Offline the device still records paid marks and amounts received; Go works out the amount due and the status when the change syncs.
+  - **Match generation is device-only.** Auto Queue, Regenerate and Suggest send the lineups the device made; the server checks them with the shared match checks instead of generating its own. No shared random numbers.
+  - **Device time on sync.** An offline change keeps the time the device recorded. The server checks it against the schedule and the records it already has; a time that doesn't fit goes to Q-CONFLICT, never silently fixed or dropped. The grace period and exact checks need the owner's OK in the queue writes track.
+  - **Delete the TypeScript copies of Go-only rules** on the `go-stack` branch ([B-20](#d-2026-11-13-01)), tested in the beta project; they leave `main` when `go-stack` merges at ship. Until then the current apps on `main` still run them. On `go-stack` the browser asks the Go API instead of running its own copy.
+  - **The UI is updated on the `go-stack` branch**, so it can be tested and adjusted in the beta project before the Go stack goes live, wherever a screen ran a deleted rule itself. Known so far: the setup form's cost and minimum-games previews (they come from the API, so they need internet); form checks that use `@rotra/schema` money, phone and court-window rules (Go's field errors become the source); the offline payments screen (shows the last synced amount due, checked when synced); and mock mode, which loses the deleted rules for those areas. Each goes through the mockup first (AGENTS rule 15).
+- **Amends:** [D-2026-11-13-02](#d-2026-11-13-02) ("Which rules").
+- **Amended by:** [D-2026-11-14-01](#d-2026-11-14-01): the shared rules no longer keep two copies; one Go copy runs on the server and, compiled to WebAssembly, on the device.
+- **Not decided yet:** what mock mode does for each area once its rules are deleted (fixture answers or no mock mode); decided per area before the delete (backlog BL-1 in [conductor/tracks.md](../../conductor/tracks.md#backlog)).
+- **References:** [rule-cases spec](../../conductor/tracks/rule-cases_20261113/spec.md), [ship-and-retire track](../../conductor/tracks/ship-and-retire_20261113/spec.md), [offline module](../business_logic/product/queue/modules/offline/README.md).
+
+<a id="d-2026-11-14-01"></a>
+### D-2026-11-14-01 — Shared queue rules: one Go copy, run on the device as WebAssembly
+- **Decision status:** approved (owner, November 14, 2026), behind a spike gate; spike pass marks confirmed by the owner the same day.
+- **Implementation status:** not started
+- **Ticket:** needed (rule-cases track: spike, port, WebAssembly build, swap)
+- **Roadmap:** with the Go API ([D-2026-11-13-01](#d-2026-11-13-01)) — [Backend](workstreams/backend.md)
+- **Decision:**
+  - **Why.** Two copies of the shared rules (TypeScript on the device, Go on the server) drift in ways example cases don't catch: name sorting (`localeCompare` vs byte order), unstable sorts and map order, rounding, time zones, null vs missing. One copy removes that whole class of bug.
+  - **One copy, in Go.** The shared rules of [D-2026-11-13-08](#d-2026-11-13-08) (court fill, match checks, courts and time, game counts, roster and waitlist) are written once, in Go, under `apps/api/internal/rules`. The server calls them directly. A WebAssembly build of the same code (`apps/api/cmd/ruleswasm`) runs them on the device, offline included.
+  - **Where the device gets it.** A package (`packages/rules-wasm`) holds the built `.wasm` file and a typed TypeScript wrapper with the same function names and signatures as today's rules, so hook and screen contracts don't change. `packages/data` imports the wrapper; packages never import from `apps/`. The wrapper loads the WebAssembly once at app start (and in the mock store and the Vitest setup), then calls it synchronously.
+  - **Buckets unchanged.** Bucket 2 (Go only) and bucket 3 (device only, including match generation) stay as decided. Only bucket 1 changes from two copies to one.
+  - **The cases stay.** `@rotra/rule-cases` becomes the parity check for the switch: the same cases run against today's TypeScript and against the WebAssembly build. A TypeScript bucket 1 rule is deleted only when its cases pass on both. Afterwards they are the Go tests.
+  - **Branches (B-20).** The Go rules, the WebAssembly build and the wrapper package merge into `main`; nothing on `main` imports them. Swapping `packages/data` to the wrapper and deleting the TypeScript bucket 1 rules happen on `go-stack`. The current TypeScript server (`packages/db`) keeps its TypeScript rules until ship.
+  - **Versioned per Queue Session ([B-22](../backend/open-decisions.md), owner, November 14, 2026).** One `rulesVersion` for the whole shared set, stamped on the session at Start (online only): the highest version both the Go API and the live apps' `rules-manifest.json` carry, so separate Railway and Vercel deploys can't strand a session; `RULES_VERSION_MAX` caps it. Device and server both run the session's version, so a rule change never applies mid-session and an old cached `.wasm` can't run the wrong rules. Strategy with a versioned registry: `rules.For(version)` returns a `Ruleset`; a change adds a new function only for the rule that changed. One `.wasm` carries every live version (normally current and previous). A buggy version can be `retired` (owner's call): the server rejects it and the device moves the session to the current version at its next sync, with a notice. Needs a `rules_version` column on `queue_sessions`.
+  - **Spike first.** Before any port, a throwaway spike builds two or three bucket 1 rules (one guard, `waitMinutes`, one courts-and-time rule) with standard Go and with TinyGo, and measures: compressed size, load time on a mid-range phone, call cost for court fill on a 12-court session, Vitest under Node, mock mode, offline load from cache, and the Vercel build. Pass marks (owner, November 14, 2026; size raised by B-21): under 1.5 MB compressed, under 300 ms first load, under 5 ms per court-fill call.
+  - **If the spike fails.** Fall back to two copies with four guards: a determinism checklist for the Go port, a TypeScript-vs-Go comparison test over random inputs, versioning per Queue Session (B-22), and Go case tests in `make check`.
+  - **Tool and hosting ([B-21](../backend/open-decisions.md), owner, November 14, 2026).** Standard Go if it passes the spike, TinyGo if not. The built `.wasm` is committed and checked by CI, ships with the apps on Vercel (no S3), has a content-hashed name served as immutable, and is cached like the app's JavaScript, so each rules version downloads once.
+  - **Wiring (owner, November 14, 2026; [rule-cases G8–G12](../../conductor/tracks/rule-cases_20261113/spec.md#wiring-g8g12)).** The wrapper loads in the browser, on the server, in Vitest and in Storybook; session screens wait on a "rules ready" step and fixtures compute when first used, because screens call the rules while drawing (on the server too). On `go-stack`, `packages/db` calls the wrapper instead of the deleted TypeScript rules. Every exported Go function recovers from a panic and the wrapper restarts the WebAssembly if it stops. TypeScript types are generated from Go with `tygo` ([B-23](../backend/open-decisions.md)). `make check` checks a fingerprint of the Go rule files against the committed build, and `packages/rules-wasm/` is a backend CI path. A device fetches the latest `.wasm` when a session it downloads needs a version it lacks. The `.wasm` is cached like the app's JavaScript; offline after a reload waits for a service worker (not planned yet). The public session page never loads it.
+- **Amends:** [D-2026-11-13-02](#d-2026-11-13-02) (the cases' role), [D-2026-11-13-08](#d-2026-11-13-08) (bucket 1 keeps one copy, not two).
+- **Not decided yet:** a service worker for the Queue app, so it (and the `.wasm`) loads after an offline reload.
+- **References:** [rule-cases spec](../../conductor/tracks/rule-cases_20261113/spec.md), [AGENTS rule 11](../../AGENTS.md#0-non-negotiables) (new dependencies need a decision), [offline module](../business_logic/product/queue/modules/offline/README.md).

@@ -1,7 +1,7 @@
 # Track specification: Go API foundation
 
 **Track ID:** go-api-foundation_20261113 · **Type:** feature · **Priority:** critical (order 2 of 12) · **Created:** 2026-11-13
-**Depends on:** rule-cases (for the case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -36,7 +36,7 @@ Errors and serialization match `@rotra/db/service/{errors,serialize}` exactly (c
 
 ### R4: Rule-case runner
 
-Go test helper that loads `@rotra/rule-cases` files by path and runs a Go rule against them.
+Go test helper that loads `@rotra/rule-cases` files by path and runs a Go rule against them. Also create the empty `internal/rules` tree laid out in the [rule map](../rule-cases_20261113/spec.md#where-the-rules-live). The bucket 1 rules, `cmd/ruleswasm` and `packages/rules-wasm` are added by the rule-cases track (R5, R6), not here.
 
 **Accepted when:**
 

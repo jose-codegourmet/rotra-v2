@@ -39,9 +39,20 @@ export type PlayerGame = {
    */
   partnerPlayers?: PlayerGamePlayer[]
   opponentPlayers?: PlayerGamePlayer[]
+  /**
+   * The profile owner's games in that session up to and including this one (2026-11-14 games badge
+   * log): 1 for their first game that night. Set by both the mock and the real read.
+   */
+  sessionGameNumber?: number
 }
-/** One person on a game court: the picture follows the profile privacy rules (null when masked). */
-export type PlayerGamePlayer = PlayerShareParticipant & { playerId?: string | null }
+/**
+ * One person on a game court: the picture follows the profile privacy rules (null when masked);
+ * `sessionGameNumber` is that person's games in the session up to and including this game.
+ */
+export type PlayerGamePlayer = PlayerShareParticipant & {
+  playerId?: string | null
+  sessionGameNumber?: number
+}
 export type PlayerSessionRecord = {
   id: string
   title: string

@@ -7,11 +7,18 @@ const withFaces = (session: number, index: number) => {
   const game = joseGame(session, index)
   return {
     ...game,
-    partnerPlayers: game.partners.map((name) => ({ name, picture: null, playerId: null })),
+    sessionGameNumber: index + 1,
+    partnerPlayers: game.partners.map((name, i) => ({
+      name,
+      picture: null,
+      playerId: null,
+      sessionGameNumber: index + 2 + i,
+    })),
     opponentPlayers: game.opponents.map((name, i) => ({
       name,
       picture: null,
       playerId: i === 0 ? `p-${name}` : null,
+      sessionGameNumber: index + 1 + i,
     })),
   }
 }

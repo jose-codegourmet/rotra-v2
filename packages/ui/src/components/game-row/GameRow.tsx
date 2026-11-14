@@ -35,7 +35,8 @@ const firstName = (name: string) => name.split(/\s+/)[0] ?? name
  * A player game as a small badminton court (P-MATCH-HISTORY, 2026-11-13 game row log; the
  * prototype's gameRow): the Player variant of the shared MatchCourt. The player and partner are on
  * the left, opponents on the right; the format is the corner pill and, on your own games, a share
- * icon sits top-right. Faces open the profile card.
+ * icon sits top-right. Faces open the profile card and carry the games badge (how many games that
+ * person had played in the session, this one included; 2026-11-14 log).
  */
 export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowProps) {
   const partial = game.counting === 'partial'
@@ -54,13 +55,19 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
     label,
     pictureUrl: player.picture,
     onOpen: openable && onOpenPlayer ? () => onOpenPlayer(player) : undefined,
+    badge: player.sessionGameNumber,
   })
 
   const left: MatchCourtPlayer[] = [
     ...(me
       ? [
           face(
-            { name: me.name, picture: me.picture ?? null, playerId: me.playerId },
+            {
+              name: me.name,
+              picture: me.picture ?? null,
+              playerId: me.playerId,
+              sessionGameNumber: game.sessionGameNumber,
+            },
             me.label,
             true,
           ),

@@ -39,6 +39,14 @@ export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phon
 export const PlayerVariant: Story = {
   args: {
     cornerLabel: 'Doubles',
+    left: [
+      { ...face('Jose Buctuanon', 'You'), badge: 4 },
+      { ...face('Maya Santos'), badge: 2 },
+    ],
+    right: [
+      { ...face('Ben Cruz'), badge: 5 },
+      { ...face('Y*** R***'), badge: 1 },
+    ],
     ariaLabel: 'Doubles: You and Maya versus Ben and Y',
     action: (
       <button
@@ -63,8 +71,8 @@ export const PlayerNotCountedWithNote: Story = {
 export const PlayerVariantPhone: Story = {
   args: {
     cornerLabel: 'Singles',
-    left: [face('Jose Buctuanon', 'You')],
-    right: [face('Ben Cruz')],
+    left: [{ ...face('Jose Buctuanon', 'You'), badge: 3 }],
+    right: [{ ...face('Ben Cruz'), badge: 2 }],
   },
   globals: { theme: 'dark', viewport: { value: 'phone' } },
 }

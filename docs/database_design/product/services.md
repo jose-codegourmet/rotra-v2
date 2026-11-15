@@ -151,7 +151,7 @@ screen loaded one, and returns an allowlisted DTO.
 | `queue/results` | `readSessionResults` (club-only snapshot, publication and exports); `publishResults` (Publish and Publish again); `readPublishedResults` (used by `readPublicSession`); `requestResultExport`, `exportAssetKey`, `markExportRendered` |
 
 - Off Day is excluded unless the publish call sends `includeOffDay: true`; it is never carried over from the previous publish. Every publish appends a `session_publication_events` row and is repeat-safe on its command.
-- The public copy holds names and counts only (standings: position, name, W/L, games; awards: names and prior-session counts). No IDs, scores evidence, levels, contacts, financials or raw evidence; the public page never joins the private snapshot.
+- The public copy holds names and counts only (standings: position, name, W/L, games; awards: names and prior-session counts). No IDs, scores evidence, levels, contacts, financials or raw evidence; the public page never joins the private snapshot. Faces on the public page's standings, awards and Off Day rows come from the live roster's players by name at read time (the same source as `participants`; a shared name gets no picture), never from the snapshot.
 - Exports are private; their ID comes from the command and the storage key from the ID, so a re-render overwrites the same object. Rendering and storage are later work; a render failure leaves the finalization and snapshot untouched.
 - Unpublish, bucket policy and public asset access are not built.
 - Queue Route Handlers (#396): `GET /api/sessions/[sessionId]/results` (`readSessionResults`; null for an invalid session), `POST …/results/publication` (`{ commandId, slides, includeOffDay }`). Exports have no route.

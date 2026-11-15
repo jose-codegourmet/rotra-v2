@@ -1,0 +1,22 @@
+# tygo generates the TypeScript wire types for the rules wasm into packages/rules-wasm/src/generated.
+# Run it with `make tygo` (tygo is pinned in the Makefile and never in go.mod).
+#
+# Mapping rules (Go -> TypeScript):
+#   *T            -> T | null        (optional_type: null; a Go pointer is always present as null or a value)
+#   Opt[T]        -> T | null        (via a tstype tag; its keys are made optional in src/types.ts)
+#   json.RawMessage -> unknown
+#   string unions (state, team, format...) come from tstype tags on the Go fields.
+packages:
+  - path: "github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
+    output_path: "../../packages/rules-wasm/src/generated/model.ts"
+    exclude_files:
+      - context.go
+      - opt.go
+    optional_type: "null"
+    type_mappings:
+      "json.RawMessage": "unknown"
+  - path: "github.com/jose-codegourmet/rotra-v2/apps/api/cmd/ruleswasm"
+    output_path: "../../packages/rules-wasm/src/generated/wire.ts"
+    optional_type: "null"
+    type_mappings:
+      "json.RawMessage": "unknown"

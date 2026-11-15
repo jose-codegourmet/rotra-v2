@@ -151,7 +151,7 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 		}
 		for _, c := range f.Cases {
 			total++
-			req, _ := json.Marshal(envelope{Version: 1, Rule: area + "/" + rule, Now: c.Now, Input: c.Input})
+			req, _ := json.Marshal(Envelope{Version: 1, Rule: area + "/" + rule, Now: c.Now, Input: c.Input})
 			g := parse(t, Call(string(req)))
 			if !g.OK {
 				t.Errorf("%s/%s %q: %s", area, rule, c.Name, g.Error)

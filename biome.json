@@ -49,7 +49,8 @@
       "!exported",
       "!otf-web-fonts",
       "!openspec",
-      "!packages/rules-wasm/wasm"
+      "!packages/rules-wasm/wasm",
+      "!packages/rules-wasm/src/generated"
     ]
   },
   "vcs": {

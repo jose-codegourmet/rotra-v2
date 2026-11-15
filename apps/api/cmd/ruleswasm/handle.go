@@ -23,14 +23,17 @@ import (
 // ruleAutoFill is the rule the dedicated autoFillPlacements export always runs.
 const ruleAutoFill = "courtfill/autoFillPlacements"
 
-type envelope struct {
+// Envelope is the request every call carries (the TypeScript type is generated from it by tygo).
+type Envelope struct {
 	Version int             `json:"version"`
 	Rule    string          `json:"rule"`
 	Now     *int64          `json:"now"`
 	Input   json.RawMessage `json:"input"`
 }
 
-type reply struct {
+// Reply is the response: ok with a result, or not ok with an error. It is one flat struct here; the
+// TypeScript wrapper narrows it to a union (packages/rules-wasm/src/types.ts).
+type Reply struct {
 	OK     bool            `json:"ok"`
 	Result json.RawMessage `json:"result,omitempty"`
 	Error  string          `json:"error,omitempty"`
@@ -74,7 +77,7 @@ func (h *handler) runners(version int) (map[string]rules.Runner, error) {
 }
 
 func fail(format string, args ...any) string {
-	out, _ := json.Marshal(reply{Error: fmt.Sprintf(format, args...)})
+	out, _ := json.Marshal(Reply{Error: fmt.Sprintf(format, args...)})
 	return string(out)
 }
 
@@ -86,7 +89,7 @@ func (h *handler) call(raw, forceRule string) (out string) {
 			out = fail("panic: %v", r)
 		}
 	}()
-	var env envelope
+	var env Envelope
 	if err := json.Unmarshal([]byte(raw), &env); err != nil {
 		return fail("bad request: %v", err)
 	}

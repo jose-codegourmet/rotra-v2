@@ -1,44 +1,36 @@
-// Hand-written wire types for the bucket 1 rules, matching what `@rotra/data` uses today.
-// TODO(rule-cases 5.5, B-23): replace this file with types generated from the Go structs by `tygo`
-// and checked in CI. Nothing here imports `@rotra/data` (it will import this package, not the reverse).
+// The wire types of the bucket 1 rules. The data shapes are generated from the Go structs in
+// apps/api/internal/rules/model by `make tygo` (apps/api/tygo.yaml, checked by `make tygo-check`), into
+// ./generated; this file re-exports them under the names `@rotra/data` uses and adds what Go has no
+// struct for. Nothing here imports `@rotra/data` (it will import this package, not the reverse).
+//
+// How Go's `Opt[T]` maps. Go keeps three states apart: absent (key left out), null, and a value.
+// tygo cannot express that, so the Go field carries a `tstype:"T | null"` tag (null or a value) and the
+// key is made optional here with `Absent` (absent). Result: `key?: T | null`. A plain Go pointer `*T`
+// is `T | null` with the key always present. The Opt keys are marked "Opt keys" below.
+import type {
+  Court as GoCourt,
+  Match as GoMatch,
+  Player as GoPlayer,
+  Session as GoSession,
+  Substitution as GoSubstitution,
+} from './generated/model'
+
+/** Makes the listed keys optional (absent allowed) and leaves their `T | null` value type alone. */
+type Absent<T, K extends keyof T> = Omit<T, K> & { [P in K]?: T[P] }
+
 export type PlayingLevel = string
-export type MatchFormat = 'singles' | 'doubles' | 'fun_1v2' | 'fun_3v3' | 'fun_4v4' | 'fun_5v5'
-export type MatchOrigin = 'manual' | 'suggested' | 'auto'
-export type MatchState = 'waiting' | 'on_court' | 'active' | 'completed' | 'invalid'
-export type SubstitutionCredit = 'none' | 'incoming' | 'outgoing'
-export type Team = 'A' | 'B'
+export type MatchFormat = GoMatch['format']
+export type MatchOrigin = GoMatch['origin']
+export type MatchState = GoMatch['state']
+export type Team = GoSubstitution['team']
+export type SubstitutionCredit = NonNullable<GoSubstitution['creditTo']>
 
-export type Substitution = {
-  outId: string
-  inId: string
-  team: Team
-  at: number
-  creditTo?: SubstitutionCredit
-}
+/** Opt keys: creditTo. */
+export type Substitution = Absent<GoSubstitution, 'creditTo'>
 
-export type Match = {
-  id: string
-  sessionId: string
-  matchNo: number
-  state: MatchState
-  format: MatchFormat
-  queuePosition: number
-  origin: MatchOrigin
-  manualProtected: boolean
-  teamA: string[]
-  teamB: string[]
-  courtIds: string[]
-  placedAt?: number | null
-  startedAt: number | null
-  endedAt: number | null
+/** Opt keys: placedAt. */
+export type Match = Absent<Omit<GoMatch, 'substitutions'>, 'placedAt'> & {
   substitutions: Substitution[]
-  decision: {
-    kind: 'completed' | 'invalid'
-    winningTeam: Team | null
-    teamAScore: number | null
-    teamBScore: number | null
-    confirmedAt: number
-  } | null
 }
 
 export type MatchLineup = Pick<Match, 'format' | 'teamA' | 'teamB'>
@@ -48,32 +40,14 @@ export type MatchStatus = {
   reason: string
 }
 
-export type SessionPlayer = {
-  id: string
-  sessionId: string
-  clubPlayerId: string
-  nameSnapshot: string
-  nicknameSnapshot: string | null
-  present: boolean
-  presentChangedAt: number | null
-  level: PlayingLevel | null
-  levelLockedAt: number | null
-  confirmedAt: number
-  hasPlayedAtClubBefore?: boolean
-  selfCheckedInAt?: number | null
-  leftAt?: number | null
-  gamesAdjustment?: number
-}
+/** Opt keys: hasPlayedAtClubBefore, selfCheckedInAt, leftAt, gamesAdjustment. */
+export type SessionPlayer = Absent<
+  GoPlayer,
+  'hasPlayedAtClubBefore' | 'selfCheckedInAt' | 'leftAt' | 'gamesAdjustment'
+>
 
-export type SessionCourt = {
-  id: string
-  sessionId: string
-  label: string
-  startsAt?: number
-  openedEarlyAt?: number | null
-  openUntil: number | null
-  removedAt: number | null
-}
+/** `startsAt` and `openedEarlyAt` are `omitempty` pointers in Go: absent or a time. */
+export type SessionCourt = Absent<GoCourt, 'startsAt' | 'openedEarlyAt'>
 
 export type CourtFillMode = 'manual' | 'auto'
 
@@ -97,14 +71,18 @@ export type SwapTarget = Record<string, unknown> & { id?: string }
 export type Placement = { matchId: string; courtIds: string[] }
 export type Standing = Record<string, unknown>
 export type EndCourts = Pick<SessionCourt, 'label' | 'startsAt' | 'openUntil' | 'removedAt'>[]
-export type SessionSettings = { allowSingles: boolean; allowDoubles: boolean }
+export type SessionSettings = GoSession
 export type FillOptions = {
   exceptMatchId?: string
   onlyCourtIds?: string[]
   exceptCourtIds?: string[]
 }
 
-/** The reply shape every call crosses the boundary in. */
+/** The request every call carries; generated from the Go `Envelope`. */
+export type { Envelope } from './generated/wire'
+
+/** The reply every call crosses the boundary in. Go has one flat `Reply` struct (src/generated/wire.ts);
+ *  this is its two real shapes, which is what `engine.ts` narrows on. */
 export type Reply = { ok: true; result: unknown } | { ok: false; error: string }
 
 /** What `rules-manifest.json` holds (written by build.mjs). */

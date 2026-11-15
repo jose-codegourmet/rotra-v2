@@ -85,6 +85,21 @@ jobs:
     # Skipped (counts as passing) when no backend path changed, so frontend PRs are never held up.
     if: needs.scope.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    # Real Postgres for the Go tests (no testcontainers). Tests read DATABASE_URL_TEST; each test makes its own database.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_TEST: postgres://postgres:test@localhost:5432/postgres?sslmode=disable
     defaults:
       run:
         working-directory: apps/api
@@ -110,6 +125,10 @@ jobs:
       - name: Build
         if: steps.present.outputs.yes == 'true'
         run: go build ./...
+      # sqlc is pinned in apps/api/Makefile; generated code must equal a fresh run.
+      - name: Generated queries are fresh
+        if: steps.present.outputs.yes == 'true'
+        run: make sqlc-check
       - name: Lint
         if: steps.present.outputs.yes == 'true'
         uses: golangci/golangci-lint-action@v6

@@ -73,6 +73,12 @@ Notes:
   on per database ([Railway PostgreSQL](https://docs.railway.com/databases/postgresql)). On Hobby the
   volume is capped at 5 GB; that's monitored, not acted on (B-14). Turn on **Query Statistics**
   (`pg_stat_statements`) in Database › Stats for each ROTRA database (B-19). It isn't on by default.
+- **Signing key rotation (B-47).** Passes carry a key id; the public key list holds the current and the next key.
+  Routine: add the new key in Railway → publish both → sign with the new → remove the old after 15 minutes plus
+  the apps' key cache (about 10 minutes). Emergency: swap and remove at once. Nobody is signed out either way
+  (refresh passes are database digests). If refresh digests leak too: revoke all sessions.
+- **Deploy draining (B-44).** `RAILWAY_DEPLOYMENT_DRAINING_SECONDS=30` on `api`: on SIGTERM the old copy stops
+  taking streams, sends spread-out reconnect hints, finishes writes in progress and exits.
 - **Housekeeping (B-34).** The `api` service runs an hourly in-process loop (no cron, no extra
   service) that deletes old rows in batches of about 1,000 under an advisory lock: live-update events
   after 7 days, `auth_events` after 90 days, ended `auth_sessions` 90 days after they end. Retention

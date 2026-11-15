@@ -20,19 +20,21 @@ Pick and pin the Go version, router, and query tool (`pgx` + a generator such as
 
 ### R2: Service skeleton
 
-`apps/api` with config from env (fail fast), structured logs with request ids, `/healthz` and `/readyz`, graceful shutdown.
+`apps/api` with config from env (fail fast), structured logs with request ids, `/healthz` and `/readyz`, graceful shutdown. Per [B-44](../../../docs/backend/open-decisions.md#settled): on SIGTERM, `/readyz` fails, writes in progress finish and background loops stop within the 30-second draining time (`RAILWAY_DEPLOYMENT_DRAINING_SECONDS=30` in `.railway/railway.ts`).
 
 **Accepted when:**
 
 - [ ] `/readyz` fails when Postgres is down
+- [ ] On SIGTERM, a write in progress completes and the process exits before 30 seconds
 
 ### R3: Contracts
 
-Errors and serialization match `@rotra/db/service/{errors,serialize}` exactly (codes, messages, bigint as decimal strings, dates).
+Errors and serialization match `@rotra/db/service/{errors,serialize}` exactly (codes, messages, bigint as decimal strings, dates). From then on ([B-45](../../../docs/backend/open-decisions.md#settled)): adding fields or routes is free; a rename or removal keeps the old one for one more release.
 
 **Accepted when:**
 
 - [ ] Golden tests compare Go output with captured Route Handler output for each error kind
+- [ ] Changing an existing field in a golden response fails the test until the golden file is updated on purpose
 
 ### R4: Rule-case runner
 

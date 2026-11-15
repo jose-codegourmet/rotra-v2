@@ -1,7 +1,7 @@
 # Track specification: Live updates
 
 **Track ID:** live-updates_20261113 · **Type:** feature · **Priority:** high (order 10 of 12) · **Created:** 2026-11-13
-**Depends on:** go-writes-queue (events), beta-stack (B-12 result) · **Decisions:** B-08, B-12 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** go-writes-queue (events), beta-stack (ticket route, B-41) · **Decisions:** B-08, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -11,7 +11,7 @@ The reason for the Go API: screens update by themselves. Refresh stays as the fa
 
 ### R1: Stream
 
-One stream per signed-in screen (and visitors on public session pages), fed by the outbox events through in-process fan-out on Postgres notifications.
+One stream per signed-in screen (and visitors on public session pages), opened straight on the Go API domain with a single-use ticket from the app's `/api/*` ([B-41](../../../docs/backend/open-decisions.md#settled); never through `proxy.ts`), fed by the outbox events through in-process fan-out on Postgres notifications.
 
 **Transactional outbox ([B-26](../../../docs/backend/open-decisions.md#settled)).**
 
@@ -19,7 +19,7 @@ One stream per signed-in screen (and visitors on public session pages), fed by t
 - `NOTIFY` is only a nudge to read now. The listener holds **one direct (unpooled) connection**; PgBouncer doesn't support LISTEN/NOTIFY. All other queries use the pool.
 - On start and after any reconnect the publisher reads from the table again, so a missed nudge loses nothing. No delivery-status or retry table.
 - Phones reconnect with their last event id (`Last-Event-ID`) and get one "changed, now at #M" per topic that moved.
-- On deploy the old instance closes its streams cleanly so phones reconnect to the new one.
+- On deploy ([B-44](../../../docs/backend/open-decisions.md#settled)) the old instance stops taking streams, sends each open stream a reconnect hint with a random 1–5 s wait and closes it. Phones reconnect after that wait with their last event id; repeated failures back off up to 30 s, with the Refresh bar meanwhile.
 - During the beta, writes through the beta's Route Handlers (areas not moved yet) add events too, so those screens update live.
 - A separate broker only when the API runs more than one instance.
 
@@ -29,6 +29,8 @@ One stream per signed-in screen (and visitors on public session pages), fed by t
 
 - [ ] Event reaches a connected screen in under a second on staging
 - [ ] Reconnect resumes from the last event id
+- [ ] During a deploy, reconnects spread over about 5 seconds instead of landing at once; a phone that can't reconnect backs off up to 30 s and the Refresh bar still works
+- [ ] Limits ([B-43](../../../docs/backend/open-decisions.md#settled)): the 51st stream from one IP and streams past the total cap are refused and the screen falls back to the Refresh bar; more than 60 tickets a minute from one IP are refused; signed-in screens are never limited
 - [ ] A reconnect with an id older than the kept events (B-34, 7 days) gets "changed" for every topic and the screen re-reads
 - [ ] The listener uses a direct connection; with the listener cut (or the database restarted), events committed meanwhile still reach connected screens after it reconnects
 - [ ] An API restart mid-session: phones reconnect and catch up with no manual refresh

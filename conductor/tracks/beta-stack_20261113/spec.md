@@ -1,7 +1,7 @@
 # Track specification: Side-by-side beta stack
 
 **Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 12) · **Created:** 2026-11-13
-**Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-12, B-18, B-20 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-18, B-20, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -20,7 +20,7 @@ Same repo and apps, built from the long-lived `go-stack` branch (created off `ma
 
 ### R2: Env-gated forwarding
 
-Each app's `proxy.ts` forwards the `/api/*` paths of **moved areas** to the Go API only when `ROTRA_GO_API_URL` is set; the list of moved areas is one setting. The shared `vercel.json` is not changed. Per [B-30](../../../docs/backend/open-decisions.md#settled) (amends B-05, which used `next.config` rewrites), the forwarded request carries the secret proxy header `ROTRA_PROXY_SECRET` and the client IP. Per [B-32](../../../docs/backend/open-decisions.md#settled), with `ROTRA_GO_API_URL` set `proxy.ts` forwards moved paths first, checks sign-in only with Go's pass and never calls Supabase (everyone is signed out before go-sign-in), and matches moved paths on whole path segments.
+Each app's `proxy.ts` forwards the `/api/*` paths of **moved areas** to the Go API only when `ROTRA_GO_API_URL` is set; the list of moved areas is one setting. The shared `vercel.json` is not changed. Per [B-30](../../../docs/backend/open-decisions.md#settled) (amends B-05, which used `next.config` rewrites), the forwarded request carries the secret proxy header `ROTRA_PROXY_SECRET` and the client IP. Per [B-32](../../../docs/backend/open-decisions.md#settled), with `ROTRA_GO_API_URL` set `proxy.ts` forwards moved paths first, checks sign-in only with Go's pass and never calls Supabase (everyone is signed out before go-sign-in), and matches moved paths on whole path segments. Per [B-46](../../../docs/backend/open-decisions.md#settled), each forwarded call times out after 10 seconds with no retry, and the apps show their existing offline / network error.
 
 **Accepted when:**
 
@@ -29,6 +29,7 @@ Each app's `proxy.ts` forwards the `/api/*` paths of **moved areas** to the Go A
 - [ ] The beta loads public pages with no Supabase keys set
 - [ ] A moved path reaches Go while its Route Handler file still exists
 - [ ] Moving `/api/sessions` doesn't catch `/api/sessions-export` (whole-segment match)
+- [ ] With Go stopped or hanging, a forwarded call fails within 10 seconds and the screen shows the existing offline / network error; Queue keeps working on a downloaded session
 - [ ] Go sees the real client IP through the forwarding; a direct call with a faked `X-Forwarded-For` and no secret is not trusted, and gets 404 except `/healthz` and the stream-ticket route
 
 ### R3: Beta data
@@ -49,13 +50,16 @@ Railway Postgres in staging starts from a copy of the Supabase database. Route H
 - [ ] The beta Vercel project has no Supabase variables in any environment (checked in the Vercel dashboard and recorded in the plan)
 - [ ] A Supabase-backed action on beta (for example sign-in before go-sign-in) returns an error and changes nothing in Supabase
 
-### R4: Live stream through the rewrite (B-12)
+### R4: Live stream on the ticket route (B-41)
 
-Prove a long-lived stream through the `proxy.ts` forwarding (B-30); if it fails, use the ticket fallback.
+Per [B-41](../../../docs/backend/open-decisions.md#settled) (replaces B-12): the app's `/api/*` issues a short, single-use stream ticket through `proxy.ts`, and the browser opens the stream straight on `api-beta.rotra.club`. No stream goes through `proxy.ts`.
 
 **Accepted when:**
 
-- [ ] Result recorded in backend open decisions
+- [ ] A beta app opens a stream on the Go API domain with a ticket; it stays open for an hour on staging
+- [ ] A used, expired or forged ticket is refused
+- [ ] CORS allows only the app domains, on the stream route only
+- [ ] No stream request shows up in Vercel's function logs
 
 ## Scope
 

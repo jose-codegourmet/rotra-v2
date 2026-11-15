@@ -30,8 +30,8 @@ Ticket: #803
 
 Ticket: #804
 
-- [ ] **4.1** Minimal Go stream endpoint behind the rewrite; measure connection life on Vercel
-- [ ] **4.2** Record the B-12 outcome
+- [ ] **4.1** Stream ticket route (through `proxy.ts`) and a minimal Go stream endpoint on the API domain (B-41)
+- [ ] **4.2** CORS for the app domains on the stream route; an hour-long stream test on staging
 
 ## Deviations log
 

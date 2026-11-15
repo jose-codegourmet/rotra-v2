@@ -107,7 +107,7 @@ stack** as the apps, so there's one place to look.
 
 | What | How | Gives |
 |---|---|---|
-| Go API | OpenTelemetry SDK, OTLP straight to Grafana Cloud (same variables as above); service name `rotra-api` | Traces (joined to the apps' traces through the `/api/*` rewrite), request rate, errors, latency, DB pool use, open live-update connections, live-update listener lag (newest event id vs last published), snapshot cache size and API memory (B-25), sign-in and rate-limit counts |
+| Go API | OpenTelemetry SDK, OTLP straight to Grafana Cloud (same variables as above); service name `rotra-api` | Traces (joined to the apps' traces through the `/api/*` rewrite), request rate, errors, latency, DB pool use, open live-update connections, live-update listener lag (newest event id vs last published), snapshot cache size and API memory (B-25), sign-in and rate-limit counts, visitor-limit refusals per limit (B-43) |
 | Postgres | A small **Grafana Alloy** service on Railway, on the private network, running Alloy's Postgres exporter and sending metrics to Grafana Cloud | Connections, transactions, locks, cache hit rate, table and index sizes, the 5 GB Hobby volume (B-14), slow queries from `pg_stat_statements` (opt-in on Railway: Database › Stats › Query Statistics › Enable; B-19) |
 | Pictures bucket | The Go API counts uploads, deletes and bytes added/removed per kind (avatar, club logo, court picture) | Upload volume and growth. The bucket's true total size and request counts come from Cloudflare's R2 dashboard (plan A, B-31; watch the free tier: 10 GB, 1 million writes, 10 million reads a month) or Railway's usage page (plan B); no scheduled job lists it (B-07) |
 | Railway itself | Railway's dashboard: service CPU/memory, database query and vacuum statistics, usage and spend | Railway doesn't export these; its own trace receiver takes traces only, so ROTRA sends to Grafana instead |
@@ -124,6 +124,7 @@ stack** as the apps, so there's one place to look.
   | Postgres volume | above 4 GB (80% of the 5 GB Hobby cap) |
   | Cache hit rate | below 95% for 15 minutes |
   | Sign-in abuse | more than 50 rate-limited sign-ins in 10 minutes |
+  | Stream cap | total open live-update streams reach the cap (3,000, B-43) |
   | Picture growth | more than 500 MB uploaded in a day |
 - **Deploy timing (B-26).** A Grafana panel shows, now and by hour of the week over recent weeks:
   Queue Sessions running, open live-update streams and API request rate. Production deploys go out

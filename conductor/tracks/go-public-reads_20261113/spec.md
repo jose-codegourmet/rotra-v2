@@ -1,7 +1,7 @@
 # Track specification: Public reads in Go
 
 **Track ID:** go-public-reads_20261113 · **Type:** refactor · **Priority:** high (order 5 of 12) · **Created:** 2026-11-13
-**Depends on:** beta-stack · **Decisions:** B-01, D-2026-11-09-09 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** beta-stack · **Decisions:** B-01, B-43, D-2026-11-09-09 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -26,6 +26,7 @@ Public session reads (`/api/public-sessions/*` on Queue and Player) with the sha
 
 - [ ] One database read per snapshot window under concurrent refreshes
 - [ ] Unpublished results never in the data
+- [ ] More than 300 public reads a minute from one IP get 429 ([B-43](../../../docs/backend/open-decisions.md#settled)); the limit uses the trusted IP only
 
 ## Scope
 

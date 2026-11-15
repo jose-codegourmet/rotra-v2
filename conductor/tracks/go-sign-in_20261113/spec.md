@@ -24,6 +24,8 @@ Club username, player email, Admin; argon2id; bcrypt import rehash; host-only co
 
 **Accepted when:**
 
+- [ ] Key rotation ([B-47](../../../docs/backend/open-decisions.md#settled)): passes carry a key id; with two keys published, passes from both are accepted; after the old key is removed, an old access pass refreshes silently and nobody is signed out
+- [ ] "Revoke all sessions" signs every device out on its next refresh
 - [ ] Each audience signs in on beta
 - [ ] Refresh rotation and reuse detection tested
 - [ ] Grace window ([B-29](../../../docs/backend/open-decisions.md#settled)): the previous refresh pass within 30 s gets an access pass only and the session stays; after 30 s it revokes the session; two tabs and a page load refreshing together never sign the device out

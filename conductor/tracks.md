@@ -19,7 +19,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 7 | [ ] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 4 / 6 |
 | 8 | [ ] | [go-writes-admin-player_20261113](./tracks/go-writes-admin-player_20261113/) — Admin and Player writes in Go | refactor | high | go-signed-in-reads | 3 / 4 |
 | 9 | [ ] | [go-writes-queue_20261113](./tracks/go-writes-queue_20261113/) — Queue writes and offline contract in Go | refactor | critical | go-writes-admin-player | 5 / 9 |
-| 10 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (B-12 result) | 2 / 5 |
+| 10 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
 | 11 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
 | 12 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | all earlier tracks | 3 / 7 |
 
@@ -37,6 +37,7 @@ Open items set aside on 2026-11-13. Not scheduled; each says when it must be pic
 | BL-6 | Service worker for the Queue app, so it and the rules `.wasm` load after an offline reload | [D-2026-11-14-01](../docs/mvp/decisions.md#d-2026-11-14-01), rule-cases G12 | real clubs relying on offline reloads |
 | BL-7 | Mockup change: "Sign in to sync N waiting changes", the revoked-device message, the sign-out warning with waiting changes, and the revoke dialog's offline-copy warning | [B-28](../docs/backend/open-decisions.md#settled) | go-sign-in R3 |
 | BL-8 | Mockup change + ticket: read-only switch for the cutover (one setting; writes refused with a "ROTRA is updating" message) | [B-35](../docs/backend/open-decisions.md#settled) | ship-and-retire R2 |
+| BL-9 | Backups and a restore drill: confirm what Railway Hobby includes, production schedule (suggested daily + weekly; point-in-time recovery after pricing), a timed restore drill on staging, a manual off-Railway `pg_dump` before ship and risky migrations | [B-40](../docs/backend/open-decisions.md#will-hurt-later) | ship-and-retire R1 |
 
 `monitoring` and `beta-stack` can run in parallel after the foundation; `go-public-reads` and `go-sign-in` can run in parallel after `beta-stack`.
 

@@ -106,7 +106,7 @@ Go 1.22.0 locally (re-check the pinned version: `wasm_exec.js` path and size); s
 | 2026-11-15 | 3.5 | No waitlist fill order / give slot / duplicate cases | No pure function exists; logic is inline in store mutations | Extract in the Go port or go-writes-queue |
 | 2026-11-15 | 3.6 | `computeStandings` uses `localeCompare` with no locale | Machine-dependent; cases generated under en_US | Owner: pin locale before swap; Go must match en-US collation |
 | 2026-11-15 | 3.x | JSON and Vitest switch in one commit | Owner: one branch | Separate-PR rule waived |
-| 2026-11-15 | 1.1 | TinyGo not built | Standard Go passed every measurable mark (B-21) | Revisit only if phone load fails |
+| 2026-11-15 | 1.1 | TinyGo 0.44.0 compared after all (owner asked) | Spike on the real `cmd/ruleswasm`, Node only | Both pass 264/264 tests. Raw: std 4.81 MB, TinyGo 1.25 MB. Gzip: 1.31 vs 0.45 MB. Brotli: 0.96 vs 0.32 MB. Node load: 40 vs 26 ms. 12-court-sized fill call median: 0.27 vs 0.33 ms. TinyGo needs Binaryen `wasm-opt` (asyncify) and its own `wasm_exec.js`. Standard Go kept (B-21: passes every mark); TinyGo is the fallback if size or phone load becomes a problem |
 | 2026-11-15 | 4.1 | First runner rule is `courtsNeeded`, not money parsing | Money is Go only and has no JSON cases | Also first piece of 4.1 |
 | 2026-11-15 | 4.1 | Name order uses a hand-made en-US collation subset (`internal/rules/collate`), not ICU | No `golang.org/x/text` approved | Matches every committed case; differs on ß/æ, Greek, Cyrillic, symbols, stacked marks. Owner accepted the subset on 2026-11-15 |
 | 2026-11-15 | 5.1 | Wasm is 4.8 MB raw, 1.30 MB gzip (spike 0.76 MB) | `encoding/json` weight on Go 1.27.4 | Under 1.5 MB mark with ~0.2 MB spare; brotli or tuning before bucket 2 |

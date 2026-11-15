@@ -13,11 +13,13 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 import { PlayerProfile } from '../player-profile/PlayerProfile'
 
 export type PaymentsPanelProps = { sessionId: string; asSheet?: boolean; className?: string }
 export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelProps) {
   const payments = useSessionPayments(sessionId)
+  const { pictureOf } = useClubPlayerPictures()
   const marks = useSetPaymentMarks(sessionId, {
     onSuccess: (outcome) => toast(outcome.message),
     onError: (error) => toast.error(error.message),
@@ -71,6 +73,11 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
     <>
       <PaymentsChecklist
         {...payments.data}
+        // The saved player's own picture (or character) when the read carries none (real mode).
+        players={payments.data.players.map((p) => ({
+          ...p,
+          picture: p.picture ?? pictureOf(p.clubPlayerId) ?? null,
+        }))}
         className={className}
         saveError={marks.error?.message}
         filter={filter}

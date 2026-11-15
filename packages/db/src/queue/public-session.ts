@@ -61,26 +61,32 @@ export const MAX_PENDING_REQUESTS_PER_SESSION = 60
 /**
  * Faces on the published results (2026-11-13 finished session and awards logs): the public copy
  * holds names and counts only, so each standings row, award winner and Off Day row gets its
- * picture from the live roster's players by name, the same source as `participants`. A name that
- * two roster entries share stays without a picture. The private snapshot is never read here.
+ * picture, and its `participant` index (the live roster order, which the signed-in read's
+ * `participants` share, so the face opens the profile card), from the live roster by name, the
+ * same source as `participants`. A name that two roster entries share gets neither. The private
+ * snapshot is never read here.
  */
 function withResultPictures(
   results: Record<string, unknown> | null,
   roster: { name: string; pictureUrl: string | null }[],
 ) {
   if (!results) return results
-  const seen = new Map<string, string | null>()
+  const seen = new Map<string, { pictureUrl: string | null; participant: number }>()
   const clash = new Set<string>()
-  for (const entry of roster) {
+  roster.forEach((entry, participant) => {
     if (seen.has(entry.name)) clash.add(entry.name)
-    else seen.set(entry.name, entry.pictureUrl)
+    else seen.set(entry.name, { pictureUrl: entry.pictureUrl, participant })
+  })
+  const face = <T>(row: T): T => {
+    if (!row || typeof row !== 'object' || !('name' in row)) return row
+    const name = (row as { name: unknown }).name
+    const match = typeof name === 'string' && !clash.has(name) ? seen.get(name) : undefined
+    return {
+      ...row,
+      pictureUrl: match?.pictureUrl ?? null,
+      ...(match ? { participant: match.participant } : {}),
+    }
   }
-  const pictureOf = (name: unknown) =>
-    typeof name === 'string' && !clash.has(name) ? (seen.get(name) ?? null) : null
-  const face = <T>(row: T): T =>
-    row && typeof row === 'object' && 'name' in row
-      ? { ...row, pictureUrl: pictureOf((row as { name: unknown }).name) }
-      : row
   const out: Record<string, unknown> = { ...results }
   if (Array.isArray(out.standings)) out.standings = out.standings.map(face)
   if (Array.isArray(out.offDay)) out.offDay = out.offDay.map(face)

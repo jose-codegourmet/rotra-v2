@@ -57,6 +57,9 @@ comes back as `{"ok":false,...}`). It builds only for WebAssembly:
 GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o rules.wasm ./cmd/ruleswasm
 ```
 
+The committed build lives in `packages/rules-wasm/wasm/`. After any change under `internal/rules` or `cmd/ruleswasm`
+run `make wasm` and commit the result; `make check` fails while the recorded fingerprint is stale.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

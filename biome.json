@@ -48,7 +48,8 @@
       "!email-templates",
       "!exported",
       "!otf-web-fonts",
-      "!openspec"
+      "!openspec",
+      "!packages/rules-wasm/wasm"
     ]
   },
   "vcs": {

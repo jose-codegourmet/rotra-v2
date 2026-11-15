@@ -100,7 +100,7 @@ export function LeaderboardShareCard({
               return (
                 <li
                   key={row.position}
-                  data-share-cell={row.isViewer ? 'current' : undefined}
+                  data-share-cell={row.isViewer ? 'current' : 'row'}
                   className={cn(
                     'grid grid-cols-[20px_22px_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2 text-[12px] leading-[1.25]',
                     format === 'story' ? 'py-[3px]' : 'py-0.5',
@@ -143,6 +143,7 @@ export function LeaderboardShareCard({
                     {row.isViewer ? (
                       <em
                         data-qr-text
+                        data-share-cell="chip"
                         className="ml-1.5 flex-none rounded-[4px] bg-share-accent px-[5px] text-[9px] font-extrabold tracking-[0.5px] text-share-bg uppercase not-italic"
                       >
                         You

@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
 
 func main() {
@@ -37,8 +38,20 @@ func run() error {
 	}
 	defer pool.Close()
 
+	tracing, err := telemetry.New(context.Background(), os.LookupEnv)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		// Flush last spans after the server has drained; a dead collector cannot hold the exit past 5 s.
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = tracing.Shutdown(ctx)
+	}()
+	log.Info("tracing", slog.Bool("enabled", tracing.Enabled()))
+
 	ready := httpapi.NewReadiness()
-	handler := httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: ready})
+	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: ready}))
 	srv := &http.Server{
 		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,

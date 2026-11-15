@@ -93,3 +93,52 @@ func TestLoadPortRange(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadDatabaseAndHousekeepingDefaults(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := cfg.Housekeeping
+	if cfg.DBMaxConns != 10 || h.Interval != time.Hour || h.BatchSize != 1000 {
+		t.Fatalf("unexpected defaults: %+v %d", h, cfg.DBMaxConns)
+	}
+	// B-34 starting values.
+	if h.LiveUpdateEventsDays != 7 || h.AuthEventsDays != 90 || h.AuthSessionsDays != 90 {
+		t.Fatalf("B-34 retention defaults wrong: %+v", h)
+	}
+}
+
+func TestLoadDatabaseAndHousekeepingOverrides(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{
+		"DATABASE_URL": "postgres://x", "DB_MAX_CONNS": "4", "HOUSEKEEPING_INTERVAL": "30m", "HOUSEKEEPING_BATCH_SIZE": "250",
+		"RETENTION_LIVE_UPDATE_EVENTS_DAYS": "3", "RETENTION_AUTH_EVENTS_DAYS": "30", "RETENTION_AUTH_SESSIONS_DAYS": "45",
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := cfg.Housekeeping
+	if cfg.DBMaxConns != 4 || h.Interval != 30*time.Minute || h.BatchSize != 250 ||
+		h.LiveUpdateEventsDays != 3 || h.AuthEventsDays != 30 || h.AuthSessionsDays != 45 {
+		t.Fatalf("unexpected: %+v %d", h, cfg.DBMaxConns)
+	}
+}
+
+func TestLoadRejectsBadDatabaseAndHousekeepingValues(t *testing.T) {
+	for name, env := range map[string]map[string]string{
+		"DB_MAX_CONNS":                       {"DB_MAX_CONNS": "0"},
+		"DB_MAX_CONNS text":                  {"DB_MAX_CONNS": "many"},
+		"HOUSEKEEPING_INTERVAL":              {"HOUSEKEEPING_INTERVAL": "soon"},
+		"HOUSEKEEPING_INTERVAL non-positive": {"HOUSEKEEPING_INTERVAL": "0s"},
+		"HOUSEKEEPING_BATCH_SIZE":            {"HOUSEKEEPING_BATCH_SIZE": "-5"},
+		"RETENTION_AUTH_EVENTS_DAYS":         {"RETENTION_AUTH_EVENTS_DAYS": "0"},
+		"RETENTION_AUTH_SESSIONS_DAYS":       {"RETENTION_AUTH_SESSIONS_DAYS": "x"},
+		"RETENTION_LIVE_UPDATE_EVENTS_DAYS":  {"RETENTION_LIVE_UPDATE_EVENTS_DAYS": "-1"},
+	} {
+		env["DATABASE_URL"] = "postgres://x"
+		_, err := Load(lookup(env))
+		if err == nil {
+			t.Errorf("%s: expected error", name)
+		}
+	}
+}

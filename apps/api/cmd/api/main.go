@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
-	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/pgprobe"
 )
 
 func main() {
@@ -31,13 +31,14 @@ func run() error {
 	}
 	log := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: cfg.LogLevel})).
 		With(slog.String("service", "rotra-api"))
-	probe, err := pgprobe.FromURL(cfg.DatabaseURL)
+	pool, err := db.Open(context.Background(), cfg.DatabaseURL, db.Options{MaxConns: cfg.DBMaxConns})
 	if err != nil {
 		return err
 	}
+	defer pool.Close()
 
 	ready := httpapi.NewReadiness()
-	handler := httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: probe, Readiness: ready})
+	handler := httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: ready})
 	srv := &http.Server{
 		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,

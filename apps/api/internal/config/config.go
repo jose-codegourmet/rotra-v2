@@ -19,6 +19,18 @@ type Config struct {
 	DatabaseURL     string
 	LogLevel        slog.Level
 	ShutdownTimeout time.Duration
+	DBMaxConns      int32
+	Housekeeping    Housekeeping
+}
+
+// Housekeeping is the B-34 cleanup loop: how often it runs, rows per delete statement, and how many
+// days each growing table keeps its rows.
+type Housekeeping struct {
+	Interval             time.Duration
+	BatchSize            int
+	LiveUpdateEventsDays int
+	AuthEventsDays       int
+	AuthSessionsDays     int
 }
 
 // MissingError lists every required variable that is unset or blank.
@@ -73,6 +85,41 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 	}
 	if cfg.ShutdownTimeout <= 0 || cfg.ShutdownTimeout >= DrainingSeconds*time.Second {
 		return Config{}, fmt.Errorf("SHUTDOWN_TIMEOUT must be above 0 and under %ds (Railway draining time)", DrainingSeconds)
+	}
+
+	cfg.DBMaxConns = 10
+	if v := get("DB_MAX_CONNS"); v != "" {
+		n, err := strconv.Atoi(v)
+		if err != nil || n < 1 || n > 1000 {
+			return Config{}, fmt.Errorf("DB_MAX_CONNS must be a number from 1 to 1000, got %q", v)
+		}
+		cfg.DBMaxConns = int32(n)
+	}
+
+	cfg.Housekeeping = Housekeeping{Interval: time.Hour, BatchSize: 1000, LiveUpdateEventsDays: 7, AuthEventsDays: 90, AuthSessionsDays: 90}
+	if v := get("HOUSEKEEPING_INTERVAL"); v != "" {
+		d, err := time.ParseDuration(v)
+		if err != nil || d <= 0 {
+			return Config{}, fmt.Errorf("HOUSEKEEPING_INTERVAL must be a positive duration such as 1h, got %q", v)
+		}
+		cfg.Housekeeping.Interval = d
+	}
+	for _, f := range []struct {
+		name string
+		dst  *int
+	}{
+		{"HOUSEKEEPING_BATCH_SIZE", &cfg.Housekeeping.BatchSize},
+		{"RETENTION_LIVE_UPDATE_EVENTS_DAYS", &cfg.Housekeeping.LiveUpdateEventsDays},
+		{"RETENTION_AUTH_EVENTS_DAYS", &cfg.Housekeeping.AuthEventsDays},
+		{"RETENTION_AUTH_SESSIONS_DAYS", &cfg.Housekeeping.AuthSessionsDays},
+	} {
+		if v := get(f.name); v != "" {
+			n, err := strconv.Atoi(v)
+			if err != nil || n < 1 {
+				return Config{}, fmt.Errorf("%s must be a whole number of 1 or more, got %q", f.name, v)
+			}
+			*f.dst = n
+		}
 	}
 	return cfg, nil
 }

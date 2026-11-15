@@ -1,0 +1,12 @@
+# Generated code is committed; regenerate with `make sqlc` (sqlc is pinned in the Makefile, never a go.mod dependency).
+# The schema is the Prisma migrations, read as plain SQL. The glob sorts lexically, which is Prisma's apply order.
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/db/queries"
+    schema: "../../packages/db/prisma/migrations/*/migration.sql"
+    gen:
+      go:
+        package: "sqlcgen"
+        out: "internal/db/sqlcgen"
+        sql_package: "pgx/v5"

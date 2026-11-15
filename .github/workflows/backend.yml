@@ -129,6 +129,10 @@ jobs:
       - name: Generated queries are fresh
         if: steps.present.outputs.yes == 'true'
         run: make sqlc-check
+      # tygo is pinned in apps/api/Makefile; the generated rules wasm wire types must equal a fresh run.
+      - name: Generated rules types are fresh
+        if: steps.present.outputs.yes == 'true'
+        run: make tygo-check
       - name: Lint
         if: steps.present.outputs.yes == 'true'
         uses: golangci/golangci-lint-action@v6

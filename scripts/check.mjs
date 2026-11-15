@@ -2,6 +2,8 @@
 // Each step runs quietly; the first failure prints the tail of its output and exits non-zero.
 // Run through `make check` so nvm has already picked the Node version from .nvmrc.
 import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { computeFingerprint } from '../packages/rules-wasm/fingerprint.mjs'
 
 // Vitest files for rules the owner has decided: session cost, minimum games,
 // payment status and totals, substitution game credit, rank eligibility and award baselines.
@@ -17,6 +19,24 @@ const DECIDED_MATH_TESTS = [
 // The shared queue rule cases (`@rotra/rule-cases`): every JSON case against today's TypeScript
 // rules, and every case file against its schema.
 const RULE_CASE_TESTS = ['src/rule-cases/']
+
+// The committed rules .wasm must come from the Go rule files in this checkout (rule-cases G15). The hash of
+// those files is recomputed here in Node, so this gate needs no Go. Rebuild with `make wasm` in apps/api.
+function checkRulesFingerprint() {
+  const recorded = readFileSync(
+    new URL('../packages/rules-wasm/wasm/rules.fingerprint', import.meta.url),
+    'utf8',
+  ).trim()
+  if (computeFingerprint() === recorded) return
+  console.error('── rules .wasm is stale ──')
+  console.error('The Go rule files (apps/api/internal/rules, cmd/ruleswasm) changed since the')
+  console.error(
+    'committed packages/rules-wasm/wasm/ was built. Run `make wasm` in apps/api and commit it.',
+  )
+  console.error('check: FAILED at rules fingerprint')
+  process.exit(1)
+}
+checkRulesFingerprint()
 
 const STEPS = [
   ['lint', 'pnpm', ['lint', '--output-logs=errors-only']],
@@ -35,6 +55,11 @@ const STEPS = [
       ...RULE_CASE_TESTS,
       '--reporter=dot',
     ],
+  ],
+  [
+    'rules wasm',
+    'pnpm',
+    ['--filter', '@rotra/rules-wasm', 'exec', 'vitest', 'run', '--reporter=dot'],
   ],
   [
     'rule-case schema',

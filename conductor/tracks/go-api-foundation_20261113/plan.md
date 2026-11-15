@@ -56,3 +56,5 @@ sqlc v1.30.0: go (verified; 31 migrations parse, glob works, no file list needed
 | 2026-11-15 | R7-R9 | Added tasks 6.1-6.3 | Plan covered R1-R6 only | |
 | 2026-11-15 | 2.3 | TCP-dial stand-in replaced by pgxpool ping | pgx approved | Done in 2.5 |
 | 2026-11-15 | 6.3 | No cleanup registered yet | Tables don't exist until go-sign-in / go-writes-queue | Use `housekeeping.OlderThanDays` |
+| 2026-11-16 | 3.2 | `ToMoney` now errors past the JS safe-integer limit; Go lowered to 1.26.11 | Owner decisions | Done |
+| 2026-11-16 | R8 | Ruleset (owner, GitHub admin) should require the `scope` job only; push protection skipped for now; Railway staging (5.x) skipped for now | Owner | |

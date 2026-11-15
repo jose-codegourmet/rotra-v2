@@ -10,6 +10,7 @@ on:
     paths-ignore:
       - 'apps/api/**'
       - 'packages/rule-cases/**'
+      - 'packages/rules-wasm/**'
       - '.railway/**'
       - '.github/workflows/backend.yml'
       - 'docs/**'
@@ -20,6 +21,7 @@ on:
     paths-ignore:
       - 'apps/api/**'
       - 'packages/rule-cases/**'
+      - 'packages/rules-wasm/**'
       - '.railway/**'
       - '.github/workflows/backend.yml'
       - 'docs/**'

@@ -42,6 +42,24 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
 - `internal/rulecases`: test helper that runs a Go rule over `packages/rule-cases/cases/v1/<area>/<rule>.json`.
 - `internal/rules/<area>`: pure rules (see the rule map in the rule-cases spec).
 
+## Shared queue rules (bucket 1)
+
+`internal/rules/{match,courts,roster,courtfill}` are the Go copy of the shared queue rules, on `internal/rules/model`
+types, behind the versioned registry `rules.For(version)` (B-22; version 1 is today's behavior). Every JSON case in
+`packages/rule-cases/cases/v1` runs through `rules.For(1)` (`internal/rules/rulestest`, strict input decoding).
+Names in standings are ordered by `internal/rules/collate`, a documented en-US subset (see its package comment;
+regenerate its table with `node testdata/gen.mjs`).
+
+`cmd/ruleswasm` exports the rules to JavaScript as `globalThis.rotraRules` (JSON string in, JSON string out; a panic
+comes back as `{"ok":false,...}`). It builds only for WebAssembly:
+
+```bash
+GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o rules.wasm ./cmd/ruleswasm
+```
+
+The committed build lives in `packages/rules-wasm/wasm/`. After any change under `internal/rules` or `cmd/ruleswasm`
+run `make wasm` and commit the result; `make check` fails while the recorded fingerprint is stale.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

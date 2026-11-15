@@ -1,0 +1,13 @@
+{
+  "wasm": "rules.8440ae307ade.wasm",
+  "sha256": "8440ae307ade7ea925be3867ad941a4aba335404c61888222bb201b3e65af43b",
+  "bytes": 3789932,
+  "versions": [
+    1
+  ],
+  "goVersion": "go1.26.11",
+  "wasmExec": {
+    "file": "wasm_exec.js",
+    "sha256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14"
+  }
+}

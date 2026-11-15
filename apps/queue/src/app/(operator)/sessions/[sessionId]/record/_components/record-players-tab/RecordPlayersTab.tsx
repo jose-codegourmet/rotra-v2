@@ -7,6 +7,7 @@ import { RecordPlayerCard } from '@rotra/ui/record-player-card'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { useState } from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 
 export type RecordPlayersTabProps = {
   sessionId: string
@@ -21,6 +22,7 @@ export type RecordPlayersTabProps = {
 export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
   const invalid = record.state === 'invalid'
   const standings = useLiveStandings(sessionId)
+  const { pictureOf } = useClubPlayerPictures()
   const [profileId, setProfileId] = useState<string | null>(null)
 
   const rankOf = new Map(
@@ -43,7 +45,7 @@ export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
           <RecordPlayerCard
             key={p.sessionPlayerId}
             variant={invalid ? 'not-counted' : 'counted'}
-            player={{ id: p.sessionPlayerId, name: p.name }}
+            player={{ id: p.sessionPlayerId, name: p.name, photoUrl: pictureOf(p.clubPlayerId) }}
             levelLabel={levelLabel(p.level)}
             rank={rankOf.get(p.sessionPlayerId)}
             games={p.completedGames}

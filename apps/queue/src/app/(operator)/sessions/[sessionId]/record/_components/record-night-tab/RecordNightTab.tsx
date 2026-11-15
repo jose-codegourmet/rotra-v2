@@ -15,6 +15,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 
 export type RecordNightTabProps = {
   sessionId: string
@@ -38,6 +39,7 @@ const EXPLAINER =
 export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
   const invalid = record.state === 'invalid'
   const history = useSessionRecordHistory(sessionId)
+  const { pictureOf } = useClubPlayerPictures()
   const [moment, setMoment] = useState<number | null>(null)
   const [playing, setPlaying] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -88,9 +90,25 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
     )
 
   const t = Math.min(h.to, Math.max(h.from, moment ?? h.from))
-  const columns = h.courtLabels.map((label) => ({
+  // Faces: each roster entry's saved player picture, on the replay courts and the match cards.
+  const clubPlayerOf = new Map(
+    record.playerSummaries.map((p) => [p.sessionPlayerId, p.clubPlayerId]),
+  )
+  const withPicture = <P extends { id: string }>(player: P) => ({
+    ...player,
+    photoUrl: pictureOf(clubPlayerOf.get(player.id)),
+  })
+  const faces = {
+    ...h,
+    matches: h.matches.map((m) => ({
+      ...m,
+      teamA: m.teamA.map(withPicture),
+      teamB: m.teamB.map(withPicture),
+    })),
+  }
+  const columns = faces.courtLabels.map((label) => ({
     label,
-    matches: h.matches
+    matches: faces.matches
       .filter((m) => m.courtLabels[0] === label)
       .map((m) => ({
         id: m.id,
@@ -116,7 +134,7 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
     <div className="flex flex-col gap-4">
       {header}
       <ReplayCard
-        courts={replayCourtsAt(h, t)}
+        courts={replayCourtsAt(faces, t)}
         from={h.from}
         to={h.to}
         value={t}

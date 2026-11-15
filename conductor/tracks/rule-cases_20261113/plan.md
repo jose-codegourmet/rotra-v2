@@ -108,7 +108,7 @@ Go 1.22.0 locally (re-check the pinned version: `wasm_exec.js` path and size); s
 | 2026-11-15 | 3.x | JSON and Vitest switch in one commit | Owner: one branch | Separate-PR rule waived |
 | 2026-11-15 | 1.1 | TinyGo not built | Standard Go passed every measurable mark (B-21) | Revisit only if phone load fails |
 | 2026-11-15 | 4.1 | First runner rule is `courtsNeeded`, not money parsing | Money is Go only and has no JSON cases | Also first piece of 4.1 |
-| 2026-11-15 | 4.1 | Name order uses a hand-made en-US collation subset (`internal/rules/collate`), not ICU | No `golang.org/x/text` approved | Matches every committed case; differs on ß/æ, Greek, Cyrillic, symbols, stacked marks. Owner: accept, allow x/text, or pin locale in TS |
+| 2026-11-15 | 4.1 | Name order uses a hand-made en-US collation subset (`internal/rules/collate`), not ICU | No `golang.org/x/text` approved | Matches every committed case; differs on ß/æ, Greek, Cyrillic, symbols, stacked marks. Owner accepted the subset on 2026-11-15 |
 | 2026-11-15 | 5.1 | Wasm is 4.8 MB raw, 1.30 MB gzip (spike 0.76 MB) | `encoding/json` weight on Go 1.27.4 | Under 1.5 MB mark with ~0.2 MB spare; brotli or tuning before bucket 2 |
 | 2026-11-15 | 5.2 | `putOnCourt` returns a copy; `FORMAT_TEAM_SIZES` is `formatTeamSizes()`; `now` defaults in wrapper | JSON boundary | Handle in the phase 6 swap |
 | 2026-11-15 | 5.5 | `tygo` types not generated | Tool not approved | Ask owner |

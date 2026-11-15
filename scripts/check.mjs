@@ -14,6 +14,10 @@ const DECIDED_MATH_TESTS = [
   'src/queue-session/queueSession.rules.test.ts',
 ]
 
+// The shared queue rule cases (`@rotra/rule-cases`): every JSON case against today's TypeScript
+// rules, and every case file against its schema.
+const RULE_CASE_TESTS = ['src/rule-cases/']
+
 const STEPS = [
   ['lint', 'pnpm', ['lint', '--output-logs=errors-only']],
   ['type-check', 'pnpm', ['type-check', '--output-logs=errors-only']],
@@ -21,7 +25,16 @@ const STEPS = [
   [
     'test',
     'pnpm',
-    ['--filter', '@rotra/data', 'exec', 'vitest', 'run', ...DECIDED_MATH_TESTS, '--reporter=dot'],
+    [
+      '--filter',
+      '@rotra/data',
+      'exec',
+      'vitest',
+      'run',
+      ...DECIDED_MATH_TESTS,
+      ...RULE_CASE_TESTS,
+      '--reporter=dot',
+    ],
   ],
   [
     'rule-case schema',

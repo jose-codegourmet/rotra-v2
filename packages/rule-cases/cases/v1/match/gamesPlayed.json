@@ -1,0 +1,1026 @@
+{
+  "kind": "rule",
+  "rule": "gamesPlayed",
+  "version": 1,
+  "cases": [
+    {
+      "name": "equals the counted games when there is no adjustment",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "name": "equals the counted games when the adjustment is 0",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987,
+          "gamesAdjustment": 0
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 1
+    },
+    {
+      "name": "adds a positive adjustment",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987,
+          "gamesAdjustment": 4
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 5
+    },
+    {
+      "name": "floors the result at 0 when the adjustment cancels every game",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987,
+          "gamesAdjustment": -1
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "name": "floors the result at 0 when the adjustment is below the count",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987,
+          "gamesAdjustment": -6
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 0
+    },
+    {
+      "name": "a later completed game adds one to the adjusted count",
+      "input": {
+        "player": {
+          "id": "s-tonight-player-2",
+          "sessionId": "s-tonight",
+          "clubPlayerId": "62dc8cc2-6673-5356-b659-51e1fa5d533c",
+          "nameSnapshot": "Aaron",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794560400000,
+          "level": "intermediate_high",
+          "levelLockedAt": 1794560400000,
+          "confirmedAt": 1794563999987,
+          "gamesAdjustment": 2
+        },
+        "matches": [
+          {
+            "id": "console-match-1",
+            "sessionId": "s-tonight",
+            "matchNo": 1,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": ["s-tonight-court-1"],
+            "startedAt": 1794562200000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-2",
+            "sessionId": "s-tonight",
+            "matchNo": 2,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 2,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-5"],
+            "teamB": ["s-tonight-player-7", "s-tonight-player-8"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-3",
+            "sessionId": "s-tonight",
+            "matchNo": 3,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 3,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-4",
+            "sessionId": "s-tonight",
+            "matchNo": 4,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 4,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-6", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          },
+          {
+            "id": "console-match-5",
+            "sessionId": "s-tonight",
+            "matchNo": 5,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-6",
+            "sessionId": "s-tonight",
+            "matchNo": 6,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 6,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-5", "s-tonight-player-7"],
+            "teamB": ["s-tonight-player-8", "s-tonight-player-9"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "console-match-7",
+            "sessionId": "s-tonight",
+            "matchNo": 7,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 7,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-1", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1794563400000
+            }
+          },
+          {
+            "id": "another-completed",
+            "sessionId": "s-tonight",
+            "matchNo": 99,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 5,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["s-tonight-player-10", "s-tonight-player-2"],
+            "teamB": ["s-tonight-player-3", "s-tonight-player-4"],
+            "courtIds": [],
+            "startedAt": 1794562200000,
+            "endedAt": 1794563400000,
+            "substitutions": [
+              {
+                "outId": "s-tonight-player-1",
+                "inId": "s-tonight-player-10",
+                "team": "A",
+                "at": 1794562800000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": 21,
+              "teamBScore": 17,
+              "confirmedAt": 1794563400000
+            }
+          }
+        ]
+      },
+      "expected": 4
+    }
+  ]
+}

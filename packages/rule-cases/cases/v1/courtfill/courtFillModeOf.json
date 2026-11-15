@@ -1,0 +1,32 @@
+{
+  "kind": "rule",
+  "rule": "courtFillModeOf",
+  "version": 1,
+  "cases": [
+    {
+      "name": "no mode is Manual Queue",
+      "input": {
+        "session": {}
+      },
+      "expected": "manual"
+    },
+    {
+      "name": "manual",
+      "input": {
+        "session": {
+          "courtFillMode": "manual"
+        }
+      },
+      "expected": "manual"
+    },
+    {
+      "name": "auto",
+      "input": {
+        "session": {
+          "courtFillMode": "auto"
+        }
+      },
+      "expected": "auto"
+    }
+  ]
+}

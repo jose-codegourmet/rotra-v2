@@ -1,0 +1,82 @@
+{
+  "kind": "rule",
+  "rule": "isBookingEnded",
+  "version": 1,
+  "cases": [
+    {
+      "name": "before the booking ends",
+      "now": 999,
+      "input": {
+        "court": {
+          "id": "c",
+          "sessionId": "s",
+          "label": "C",
+          "removedAt": null,
+          "openUntil": 1000
+        },
+        "sessionEnd": 5000
+      },
+      "expected": false
+    },
+    {
+      "name": "at the booking end",
+      "now": 1000,
+      "input": {
+        "court": {
+          "id": "c",
+          "sessionId": "s",
+          "label": "C",
+          "removedAt": null,
+          "openUntil": 1000
+        },
+        "sessionEnd": 5000
+      },
+      "expected": true
+    },
+    {
+      "name": "after the booking end",
+      "now": 1001,
+      "input": {
+        "court": {
+          "id": "c",
+          "sessionId": "s",
+          "label": "C",
+          "removedAt": null,
+          "openUntil": 1000
+        },
+        "sessionEnd": 5000
+      },
+      "expected": true
+    },
+    {
+      "name": "a court that follows the session end, before it",
+      "now": 4999,
+      "input": {
+        "court": {
+          "id": "c",
+          "sessionId": "s",
+          "label": "C",
+          "removedAt": null,
+          "openUntil": null
+        },
+        "sessionEnd": 5000
+      },
+      "expected": false
+    },
+    {
+      "name": "a court that follows the session end, at it",
+      "now": 5000,
+      "input": {
+        "court": {
+          "id": "c",
+          "sessionId": "s",
+          "label": "C",
+          "removedAt": null,
+          "openUntil": null
+        },
+        "sessionEnd": 5000
+      },
+      "expected": true
+    }
+  ]
+}

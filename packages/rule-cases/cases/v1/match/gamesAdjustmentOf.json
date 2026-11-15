@@ -1,0 +1,28 @@
+{
+  "kind": "rule",
+  "rule": "gamesAdjustmentOf",
+  "version": 1,
+  "cases": [
+    {
+      "name": "no player is 0",
+      "input": {},
+      "expected": 0
+    },
+    {
+      "name": "a player without an adjustment is 0",
+      "input": {
+        "player": {}
+      },
+      "expected": 0
+    },
+    {
+      "name": "a negative adjustment is kept",
+      "input": {
+        "player": {
+          "gamesAdjustment": -2
+        }
+      },
+      "expected": -2
+    }
+  ]
+}

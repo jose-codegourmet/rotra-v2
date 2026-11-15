@@ -1,0 +1,83 @@
+{
+  "kind": "rule",
+  "rule": "courtOpen",
+  "version": 1,
+  "cases": [
+    {
+      "name": "an early open that happens after now does not count",
+      "now": 1794569400000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": 1794569400001
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "a court opens at exactly its planned start",
+      "now": 1794573000000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "a court is closed one millisecond before its planned start",
+      "now": 1794572999999,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "a court without a start is open",
+      "now": 0,
+      "input": {
+        "court": {
+          "id": "x",
+          "sessionId": "s",
+          "label": "Court X",
+          "openUntil": null,
+          "removedAt": null
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "an early open before now opens a court with a later start",
+      "now": 1794569400000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": 1794569400000
+        }
+      },
+      "expected": true
+    }
+  ]
+}

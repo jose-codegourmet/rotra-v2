@@ -1,0 +1,52 @@
+{
+  "kind": "rule",
+  "rule": "holdsCourt",
+  "version": 1,
+  "cases": [
+    {
+      "name": "waiting does not hold a court",
+      "input": {
+        "match": {
+          "state": "waiting"
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "on_court holds a court",
+      "input": {
+        "match": {
+          "state": "on_court"
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "active holds a court",
+      "input": {
+        "match": {
+          "state": "active"
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "completed does not hold a court",
+      "input": {
+        "match": {
+          "state": "completed"
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "invalid does not hold a court",
+      "input": {
+        "match": {
+          "state": "invalid"
+        }
+      },
+      "expected": false
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "kind": "rule",
+  "rule": "openSlots",
+  "version": 1,
+  "cases": [
+    {
+      "name": "capacity minus the roster",
+      "input": {
+        "capacity": 24,
+        "rosterCount": 20
+      },
+      "expected": 4
+    },
+    {
+      "name": "a full roster has none",
+      "input": {
+        "capacity": 24,
+        "rosterCount": 24
+      },
+      "expected": 0
+    },
+    {
+      "name": "an over-full roster never goes below 0",
+      "input": {
+        "capacity": 24,
+        "rosterCount": 27
+      },
+      "expected": 0
+    }
+  ]
+}

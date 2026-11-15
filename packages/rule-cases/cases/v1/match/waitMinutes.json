@@ -1,0 +1,426 @@
+{
+  "kind": "rule",
+  "rule": "waitMinutes",
+  "version": 1,
+  "cases": [
+    {
+      "name": "waits from the last end of a completed match",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794558600000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "game-71",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1794563400000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ],
+        "startedAt": 1794558000000
+      },
+      "expected": 10
+    },
+    {
+      "name": "rounds down: 59.999 seconds is 0 minutes",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794563940001,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": null
+      },
+      "expected": 0
+    },
+    {
+      "name": "exactly one minute is 1",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794563940000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": null
+      },
+      "expected": 1
+    },
+    {
+      "name": "rounds down: 119.999 seconds is 1 minute",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794563880001,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": null
+      },
+      "expected": 1
+    },
+    {
+      "name": "never negative when a time is in the future",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794564300000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": null
+      },
+      "expected": 0
+    },
+    {
+      "name": "invalid matches count as the last end too",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794558600000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "game-72",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "invalid",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1794563700000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ],
+        "startedAt": null
+      },
+      "expected": 5
+    },
+    {
+      "name": "a match still waiting does not count",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794562200000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "w",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "waiting",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": null,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null,
+            "placedAt": null
+          }
+        ],
+        "startedAt": null
+      },
+      "expected": 30
+    },
+    {
+      "name": "a substituted-out player waits from the match end",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Eve",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794558600000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "game-74",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1794562800000,
+            "substitutions": [
+              {
+                "outId": "Eve",
+                "inId": "Migs",
+                "team": "A",
+                "at": 0
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ],
+        "startedAt": null
+      },
+      "expected": 20
+    },
+    {
+      "name": "a completed match with no end time counts as time 0",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794562200000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "game-75",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Migs", "Amy"],
+            "teamB": ["Ben", "Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ],
+        "startedAt": null
+      },
+      "expected": 30
+    },
+    {
+      "name": "no presence time falls back to the session start",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": null,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": 1794561300000
+      },
+      "expected": 45
+    },
+    {
+      "name": "no presence time and no start waits 0",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": null,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": null
+      },
+      "expected": 0
+    },
+    {
+      "name": "a presence time of 0 is a real time",
+      "now": 5400000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 0,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [],
+        "startedAt": 1794561300000
+      },
+      "expected": 90
+    },
+    {
+      "name": "someone else’s match does not count",
+      "now": 1794564000000,
+      "input": {
+        "player": {
+          "id": "Migs",
+          "sessionId": "s",
+          "clubPlayerId": "Migs",
+          "nameSnapshot": "Migs",
+          "nicknameSnapshot": null,
+          "present": true,
+          "presentChangedAt": 1794561000000,
+          "level": "intermediate_mid",
+          "levelLockedAt": 0,
+          "confirmedAt": 0
+        },
+        "matches": [
+          {
+            "id": "game-76",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy", "Ben"],
+            "teamB": ["Dan", "Eve"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1794563700000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ],
+        "startedAt": null
+      },
+      "expected": 50
+    }
+  ]
+}

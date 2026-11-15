@@ -10,8 +10,6 @@ import {
   END_AFTER_NOW_ERROR,
   END_WITHIN_DAY_ERROR,
   START_NEEDS_NEW_END,
-  sessionEndCourtConflict,
-  sessionEndError,
   startBlocker,
   startNeedsNewEnd,
   startNewEndError,
@@ -70,63 +68,10 @@ describe('late or other-day start (T3)', () => {
   })
 })
 
-describe('Set end time rule (T2)', () => {
-  const startedAt = plannedStart + 5 * 60_000
-  const now = startedAt + HOUR
-  const court = (label: string, startsAt?: number, openUntil: number | null = null) => ({
-    label,
-    startsAt,
-    openUntil,
-    removedAt: null,
-  })
-  const live = (endAt: number, courts = [court('Court 1')]) =>
-    sessionEndError({ startedAt, scheduledStartAt: plannedStart, endAt, now, courts })
-
-  it('takes any time after now, later or earlier, up to 24 hours after play began', () => {
-    expect(live(now)).toBe(END_AFTER_NOW_ERROR)
-    expect(live(now + 60_000)).toBeNull()
-    expect(live(plannedEnd - HOUR)).toBeNull()
-    expect(live(startedAt + 24 * HOUR)).toBeNull()
-    expect(live(startedAt + 24 * HOUR + 1)).toBe(END_WITHIN_DAY_ERROR)
-  })
-
-  it('uses the setup window before the session starts', () => {
-    const prepared = (endAt: number) =>
-      sessionEndError({ startedAt: null, scheduledStartAt: plannedStart, endAt, now, courts: [] })
-    expect(prepared(plannedStart)).toBe('Choose an end after the start.')
-    expect(prepared(plannedStart + 24 * HOUR + 1)).toBe('Choose an end after the start.')
-    expect(prepared(plannedStart + 4 * HOUR)).toBeNull()
-  })
-
-  it('is blocked by a court that opens at or after the new end', () => {
-    const opensAt = startedAt + 3 * HOUR
-    expect(live(opensAt, [court('Court 3', opensAt)])).toBe(
-      `Court 3 opens ${atWhenLabel(opensAt, now)}. Pick a later end, or edit that court first.`,
-    )
-    expect(live(opensAt + 1, [court('Court 3', opensAt)])).toBeNull()
-  })
-
-  it('is blocked by a court booked past the new end; courts that follow the end move with it', () => {
-    const until = startedAt + 4 * HOUR
-    expect(live(until - HOUR, [court('Court 2', undefined, until)])).toBe(
-      `Court 2 is booked until ${whenLabel(until, now)}. Pick a later end, or edit that court first.`,
-    )
-    expect(live(until, [court('Court 2', undefined, until)])).toBeNull()
-    expect(live(now + 60_000, [court('Court 1'), court('Court 4', startedAt)])).toBeNull()
-  })
-
-  it('ignores removed courts', () => {
-    const opensAt = startedAt + 3 * HOUR
-    expect(
-      sessionEndCourtConflict(
-        [{ label: 'Court 3', startsAt: opensAt, openUntil: null, removedAt: now }],
-        opensAt - HOUR,
-        startedAt,
-        now,
-      ),
-    ).toBeNull()
-  })
-
+// Set end time rule (T2): its cases are in `@rotra/rule-cases` (courts/sessionEndError,
+// courts/sessionEndCourtConflict). The labels below are copy, so they stay here.
+describe('Set end time labels (T2)', () => {
+  const now = plannedStart + 5 * 60_000 + HOUR
   it('says the day when the time is not today', () => {
     expect(atWhenLabel(now, now)).toBe(`at ${clubTimeLabel(now)}`)
     expect(whenLabel(now + 24 * HOUR, now)).toBe(`tomorrow ${clubTimeLabel(now)}`)

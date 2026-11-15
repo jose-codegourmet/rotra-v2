@@ -1,0 +1,136 @@
+{
+  "kind": "rule",
+  "rule": "putOnCourt",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a waiting match takes its court, gets a placement time and no start",
+      "now": 1794564000000,
+      "input": {
+        "match": {
+          "id": "w",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "waiting",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Eve", "Fay"],
+          "teamB": ["Gus", "Hal"],
+          "courtIds": [],
+          "startedAt": null,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null,
+          "placedAt": null
+        },
+        "courtIds": ["c1"]
+      },
+      "expected": {
+        "id": "w",
+        "sessionId": "s",
+        "matchNo": 1,
+        "state": "on_court",
+        "format": "doubles",
+        "queuePosition": 1,
+        "origin": "manual",
+        "manualProtected": true,
+        "teamA": ["Eve", "Fay"],
+        "teamB": ["Gus", "Hal"],
+        "courtIds": ["c1"],
+        "startedAt": null,
+        "endedAt": null,
+        "substitutions": [],
+        "decision": null,
+        "placedAt": 1794564000000
+      }
+    },
+    {
+      "name": "a 5v5 match takes two courts",
+      "now": 1794564000000,
+      "input": {
+        "match": {
+          "id": "w",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "waiting",
+          "format": "fun_5v5",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Eve", "Fay"],
+          "teamB": ["Gus", "Hal"],
+          "courtIds": [],
+          "startedAt": null,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null,
+          "placedAt": null
+        },
+        "courtIds": ["c1", "c2"]
+      },
+      "expected": {
+        "id": "w",
+        "sessionId": "s",
+        "matchNo": 1,
+        "state": "on_court",
+        "format": "fun_5v5",
+        "queuePosition": 1,
+        "origin": "manual",
+        "manualProtected": true,
+        "teamA": ["Eve", "Fay"],
+        "teamB": ["Gus", "Hal"],
+        "courtIds": ["c1", "c2"],
+        "startedAt": null,
+        "endedAt": null,
+        "substitutions": [],
+        "decision": null,
+        "placedAt": 1794564000000
+      }
+    },
+    {
+      "name": "a started match is reset to not started",
+      "now": 1794564000000,
+      "input": {
+        "match": {
+          "id": "p",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "active",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Eve", "Fay"],
+          "teamB": ["Gus", "Hal"],
+          "courtIds": ["c2"],
+          "startedAt": 5,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null,
+          "placedAt": 0
+        },
+        "courtIds": ["c1"]
+      },
+      "expected": {
+        "id": "p",
+        "sessionId": "s",
+        "matchNo": 1,
+        "state": "on_court",
+        "format": "doubles",
+        "queuePosition": 1,
+        "origin": "manual",
+        "manualProtected": true,
+        "teamA": ["Eve", "Fay"],
+        "teamB": ["Gus", "Hal"],
+        "courtIds": ["c1"],
+        "startedAt": null,
+        "endedAt": null,
+        "substitutions": [],
+        "decision": null,
+        "placedAt": 1794564000000
+      }
+    }
+  ]
+}

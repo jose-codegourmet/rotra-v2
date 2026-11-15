@@ -1,0 +1,23 @@
+{
+  "kind": "rule",
+  "rule": "slotCapacity",
+  "version": 1,
+  "cases": [
+    {
+      "name": "courts times players per court",
+      "input": {
+        "courts": 4,
+        "playersPerCourt": 6
+      },
+      "expected": 24
+    },
+    {
+      "name": "no courts",
+      "input": {
+        "courts": 0,
+        "playersPerCourt": 6
+      },
+      "expected": 0
+    }
+  ]
+}

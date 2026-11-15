@@ -1,0 +1,61 @@
+{
+  "kind": "rule",
+  "rule": "courtsNeeded",
+  "version": 1,
+  "cases": [
+    {
+      "name": "singles needs one court",
+      "input": {
+        "match": {
+          "format": "singles"
+        }
+      },
+      "expected": 1
+    },
+    {
+      "name": "doubles needs one court",
+      "input": {
+        "match": {
+          "format": "doubles"
+        }
+      },
+      "expected": 1
+    },
+    {
+      "name": "fun_1v2 needs one court",
+      "input": {
+        "match": {
+          "format": "fun_1v2"
+        }
+      },
+      "expected": 1
+    },
+    {
+      "name": "fun_3v3 needs one court",
+      "input": {
+        "match": {
+          "format": "fun_3v3"
+        }
+      },
+      "expected": 1
+    },
+    {
+      "name": "fun_4v4 needs one court",
+      "input": {
+        "match": {
+          "format": "fun_4v4"
+        }
+      },
+      "expected": 1
+    },
+    {
+      "name": "fun_5v5 needs two courts",
+      "input": {
+        "match": {
+          "format": "fun_5v5"
+        }
+      },
+      "expected": 2
+    }
+  ]
+}

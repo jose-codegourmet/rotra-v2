@@ -38,15 +38,6 @@ const courtIn = (id: string) => readMockState().courts.find((c) => c.id === id)!
 const logLength = () => readMockState().sync.log.length
 
 describe('Start anyway', () => {
-  it('treats an early-opened court as open and free before its planned start', () => {
-    const early = fixture.courts.map((c) =>
-      c.id === court4.id ? { ...c, openedEarlyAt: start } : c,
-    )
-    expect(freeCourts(fixture.courts, [], start)).toHaveLength(3)
-    expect(freeCourts(early, [], start)).toHaveLength(4)
-    expect(courtOpen({ ...court4, openedEarlyAt: start + 1 }, start)).toBe(false)
-  })
-
   it('opens one court early, keeps its booking, logs once and fixes its start', async () => {
     const before = logLength()
     const result = await openCourtEarly({ sessionId, courtId: court4.id })

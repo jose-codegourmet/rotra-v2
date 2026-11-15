@@ -91,7 +91,7 @@ func TestEqualAndEmpty(t *testing.T) {
 	if Compare("", "a") >= 0 || Compare("a", "") <= 0 {
 		t.Error("the empty string sorts first")
 	}
-	if Compare("a‍b", "ab") != 0 {
+	if Compare("a\u200db", "ab") != 0 {
 		t.Error("a zero-width joiner is ignorable")
 	}
 	if Compare("a\x01b", "ab") != 0 {

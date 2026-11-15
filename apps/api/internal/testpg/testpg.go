@@ -114,7 +114,7 @@ func NewDatabase(t testing.TB) string {
 	if err != nil {
 		t.Fatalf("connect admin: %v", err)
 	}
-	defer admin.Close(ctx)
+	defer func() { _ = admin.Close(ctx) }()
 	if _, err := admin.Exec(ctx, "CREATE DATABASE "+name); err != nil {
 		t.Fatalf("create database: %v", err)
 	}
@@ -123,7 +123,7 @@ func NewDatabase(t testing.TB) string {
 		if err != nil {
 			return
 		}
-		defer c.Close(context.Background())
+		defer func() { _ = c.Close(context.Background()) }()
 		_, _ = c.Exec(context.Background(), "DROP DATABASE IF EXISTS "+name+" WITH (FORCE)")
 	})
 	u, err := url.Parse(adminURL)
@@ -158,13 +158,13 @@ func ApplyMigrations(t testing.TB, dsn string) {
 	if err != nil {
 		t.Fatalf("connect: %v", err)
 	}
-	defer c.Close(ctx)
+	defer func() { _ = c.Close(ctx) }()
 	// Supabase provides these roles; the migrations revoke from and grant to them. Roles are cluster-wide,
 	// so another package's test may have created them already.
 	for _, role := range []string{"anon", "authenticated", "service_role"} {
 		var pgErr *pgconn.PgError
 		if _, err := c.Exec(ctx, "CREATE ROLE "+role+" NOLOGIN"); err != nil &&
-			!(errors.As(err, &pgErr) && (pgErr.Code == "42710" || pgErr.Code == "23505")) {
+			(!errors.As(err, &pgErr) || (pgErr.Code != "42710" && pgErr.Code != "23505")) {
 			t.Fatalf("create role %s: %v", role, err)
 		}
 	}

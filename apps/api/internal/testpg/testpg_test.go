@@ -21,7 +21,7 @@ func TestNewDatabaseIsIsolated(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer ca.Close(ctx)
+	defer func() { _ = ca.Close(ctx) }()
 	if _, err := ca.Exec(ctx, "CREATE TABLE only_in_a (id int)"); err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +29,7 @@ func TestNewDatabaseIsIsolated(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cb.Close(ctx)
+	defer func() { _ = cb.Close(ctx) }()
 	if _, err := cb.Exec(ctx, "SELECT 1 FROM only_in_a"); err == nil {
 		t.Fatal("table leaked across databases")
 	}
@@ -43,7 +43,7 @@ func TestApplyMigrations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close(ctx)
+	defer func() { _ = c.Close(ctx) }()
 	var n int
 	if err := c.QueryRow(ctx, "SELECT count(*) FROM location_codes").Scan(&n); err != nil || n < 6 {
 		t.Fatalf("seeded locations: %d %v", n, err)

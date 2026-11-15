@@ -16,6 +16,7 @@ One stream per signed-in screen (and visitors on public session pages), opened s
 **Transactional outbox ([B-26](../../../docs/backend/open-decisions.md#settled)).**
 
 - The events table (written in the same transaction as each write, go-writes-queue R4) is the record. A publisher in the Go API reads the events after the last id it pushed and publishes them to an in-memory pub/sub hub with topics per session, club and player; each screen's stream subscribes to its topics.
+- **No skipped events ([B-48](../../../docs/backend/open-decisions.md#settled)).** The publisher reads in transaction order: events with `(xact_id, id) > cursor` and `xact_id < pg_snapshot_xmin(pg_current_snapshot())`, ordered by `xact_id, id`. The SSE event id and `Last-Event-ID` carry that position as `"<xact_id>:<id>"`; the live message still carries the session's event id as its snapshot version.
 - `NOTIFY` is only a nudge to read now. The listener holds **one direct (unpooled) connection**; PgBouncer doesn't support LISTEN/NOTIFY. All other queries use the pool.
 - On start and after any reconnect the publisher reads from the table again, so a missed nudge loses nothing. No delivery-status or retry table.
 - Phones reconnect with their last event id (`Last-Event-ID`) and get one "changed, now at #M" per topic that moved.
@@ -29,6 +30,8 @@ One stream per signed-in screen (and visitors on public session pages), opened s
 
 - [ ] Event reaches a connected screen in under a second on staging
 - [ ] Reconnect resumes from the last event id
+- [ ] Write R takes its transaction id first and inserts its event last; write E inserts first and commits last. Both reach a connected screen, and a reconnect with `Last-Event-ID` gets both (B-48)
+- [ ] A write left idle in a transaction is ended by `idle_in_transaction_session_timeout`, and publisher lag shows in Grafana
 - [ ] During a deploy, reconnects spread over about 5 seconds instead of landing at once; a phone that can't reconnect backs off up to 30 s and the Refresh bar still works
 - [ ] Limits ([B-43](../../../docs/backend/open-decisions.md#settled)): the 51st stream from one IP and streams past the total cap are refused and the screen falls back to the Refresh bar; more than 60 tickets a minute from one IP are refused; signed-in screens are never limited
 - [ ] A reconnect with an id older than the kept events (B-34, 7 days) gets "changed" for every topic and the screen re-reads

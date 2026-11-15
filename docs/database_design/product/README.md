@@ -15,6 +15,7 @@
 | [Transaction boundaries](transactions.md) | Operations that must succeed together or be retried safely |
 | [Access and retention](access-retention.md) | Private contacts, public projections, licensing, deletion |
 | [Sign-in owned by the Go API](sign-in.md) | Proposed (D-2026-11-13-01): identities, device sessions, rate limits, device enrollment, sign-in audit |
+| [Live-update events](live-updates.md) | Approved design (B-50): the live-update outbox table, transaction-order cursor (B-48), player topic, `queue_sessions.latest_event_id`; not built |
 | [Decisions before migrations](open-decisions.md) | Technical proposals and remaining blockers |
 | [Command contracts](command-contracts.md) | Current fetchers/hooks, actors, states, retries and decision gates |
 | [Schema dependencies](schema-dependencies.md) | Proposed FK graph, insertion cycles and migration ordering gates |

@@ -62,11 +62,16 @@ Cost, payments, mark-all, amounts, inventory. Go only (owner, 2026-11-13): the d
 
 ### R4: Outbox events
 
-Each write appends its live-update event in the same transaction (used by the live-updates track). Event ids increase per session, and the session's latest event id is its snapshot version ([B-25](../../../docs/backend/open-decisions.md#settled)), so every write that changes what the session snapshot shows (details, courts, queue, roster) must append one.
+Table design: [live-update events](../../../docs/database_design/product/live-updates.md) ([B-50](../../../docs/backend/open-decisions.md#settled)); its migration PR needs owner sign-off on the SQL (B-36).
+
+Each write appends its live-update event in the same transaction (used by the live-updates track). Event ids come from one global id; within a session they follow commit order, because the write locks its session row before appending ([B-49](../../../docs/backend/open-decisions.md#settled)). The session's latest event id (`queue_sessions.latest_event_id`) is its snapshot version ([B-25](../../../docs/backend/open-decisions.md#settled)), so every write that changes what the session snapshot shows (details, courts, queue, roster) must append one.
 
 **Accepted when:**
 
 - [ ] Event written iff the write commits
+- [ ] Writes that change a registered player's own results (match finished or invalid, session finalized) list them in `player_ids` (B-50)
+- [ ] Two writes to the same session commit in id order, and writes to different sessions don't wait on each other (B-49)
+- [ ] Each event stores its writing transaction's id (`xact_id`, `pg_current_xact_id()`) so the publisher can read in transaction order and never skips a slow write ([B-48](../../../docs/backend/open-decisions.md#settled))
 - [ ] Every write that changes the session snapshot appends an event, so the snapshot version moves
 - [ ] The session row keeps its latest event id; events older than 7 days are deleted by the housekeeping loop ([B-34](../../../docs/backend/open-decisions.md#settled)) and the snapshot version is unchanged
 

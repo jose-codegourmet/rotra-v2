@@ -775,7 +775,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 <a id="d-2026-11-13-01"></a>
 ### D-2026-11-13-01 — Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates
-- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-20 answered the same day). B-24 to B-37 opened November 14, 2026 from an architecture review (B-24 to B-32 settled the same day; B-31 moves pictures to Cloudflare R2 first, amending B-06 and B-13); see [backend open decisions](../backend/open-decisions.md).
+- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-20 answered the same day). B-24 to B-37 opened November 14, 2026 from an architecture review (B-24 to B-32 settled the same day; B-31 moves pictures to Cloudflare R2 first, amending B-06 and B-13); B-48 (the live-update publisher never moves past a write still in progress) and B-49 (one global event id, in commit order within a session), both amended to a transaction-order cursor, and B-50 (the live-update events table) settled November 15, 2026; see [backend open decisions](../backend/open-decisions.md).
 - **Implementation status:** not started
 - **Ticket:** needed
 - **Roadmap:** built and tested side by side with the current stack, shipped when ready for production (B-10) — [Backend](workstreams/backend.md)

@@ -1,0 +1,49 @@
+{
+  "helpers": {
+    "toIso": "2026-03-04T05:06:07.089Z",
+    "toIsoWholeSecond": "2026-03-04T05:06:07.000Z",
+    "toIsoOrNullNull": null,
+    "toDecimalString": "9007199254740993",
+    "toDateOnly": "2026-03-04",
+    "toMoney": {
+      "amountMinor": 15000,
+      "currency": "PHP"
+    },
+    "toMoneyNull": null,
+    "toMoneyZero": {
+      "amountMinor": 0,
+      "currency": "PHP"
+    }
+  },
+  "document": {
+    "id": "club_1",
+    "revision": "9007199254740993",
+    "sequence": "0",
+    "negative": "-42",
+    "createdAt": "2026-03-04T05:06:07.089Z",
+    "wholeSecond": "2026-03-04T05:06:07.000Z",
+    "endedAt": null,
+    "sessionDate": "2026-03-04",
+    "fee": {
+      "amountMinor": 15000,
+      "currency": "PHP"
+    },
+    "noFee": null,
+    "zeroFee": {
+      "amountMinor": 0,
+      "currency": "PHP"
+    },
+    "flag": false,
+    "count": 3,
+    "tags": [
+      "a",
+      null,
+      "b"
+    ],
+    "nested": {
+      "at": "2026-12-31T16:00:00.000Z",
+      "big": "123",
+      "none": null
+    }
+  }
+}

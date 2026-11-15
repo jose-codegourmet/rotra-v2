@@ -1,0 +1,178 @@
+{
+  "private_headers": {
+    "Cache-Control": "private, no-store",
+    "Vary": "Cookie",
+    "Content-Type": "application/json"
+  },
+  "public_headers": {
+    "Cache-Control": "public, max-age=0, must-revalidate",
+    "Content-Type": "application/json"
+  },
+  "internal": {
+    "status": 500,
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "fields": {
+    "email": "Enter a valid email.",
+    "name": "Name is required."
+  },
+  "codes": {
+    "unauthenticated": {
+      "status": 401,
+      "body": {
+        "error": {
+          "code": "unauthenticated",
+          "message": "Sign in to continue."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "unauthenticated",
+          "message": "Sign in to continue.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "wrong_account": {
+      "status": 403,
+      "body": {
+        "error": {
+          "code": "wrong_account",
+          "message": "This account cannot use this app."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "wrong_account",
+          "message": "This account cannot use this app.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "forbidden": {
+      "status": 403,
+      "body": {
+        "error": {
+          "code": "forbidden",
+          "message": "You do not have access to this."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "forbidden",
+          "message": "You do not have access to this.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "entitlement_required": {
+      "status": 403,
+      "body": {
+        "error": {
+          "code": "entitlement_required",
+          "message": "This club does not have an active license."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "entitlement_required",
+          "message": "This club does not have an active license.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "not_found": {
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "not_found",
+          "message": "Not found."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "not_found",
+          "message": "Not found.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "conflict": {
+      "status": 409,
+      "body": {
+        "error": {
+          "code": "conflict",
+          "message": "This changed since you loaded it. Refresh and try again."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "conflict",
+          "message": "This changed since you loaded it. Refresh and try again.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "invalid": {
+      "status": 422,
+      "body": {
+        "error": {
+          "code": "invalid",
+          "message": "Check the details and try again."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "invalid",
+          "message": "Check the details and try again.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    },
+    "unavailable": {
+      "status": 503,
+      "body": {
+        "error": {
+          "code": "unavailable",
+          "message": "This is not available right now."
+        }
+      },
+      "bodyWithFields": {
+        "error": {
+          "code": "unavailable",
+          "message": "This is not available right now.",
+          "fields": {
+            "email": "Enter a valid email.",
+            "name": "Name is required."
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,7 +32,7 @@ version both sides carry.
 
 ```json
 { "wasm": "rules.<hash>.wasm", "sha256": "…", "bytes": 0, "versions": [1],
-  "goVersion": "go1.27.4", "wasmExec": { "file": "wasm_exec.js", "sha256": "…" } }
+  "goVersion": "go1.26.11", "wasmExec": { "file": "wasm_exec.js", "sha256": "…" } }
 ```
 
 ## Use

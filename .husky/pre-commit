@@ -9,3 +9,13 @@
 #   set -e
 # fi
 # pnpm lint
+
+# Secret scan (B-39): staged files only, so it stays fast and does not bring back the workspace lint.
+# A missing gitleaks stops the commit instead of skipping the scan.
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "gitleaks is not installed, so staged files cannot be scanned for secrets." >&2
+  echo "Install it once per machine:  brew install gitleaks   (https://github.com/gitleaks/gitleaks#installing)" >&2
+  echo "then commit again." >&2
+  exit 1
+fi
+gitleaks git --pre-commit --staged --redact --no-banner

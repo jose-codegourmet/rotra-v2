@@ -55,3 +55,7 @@ apps/e2e/.e2e/
 # Local Supabase CLI state
 supabase/.temp/
 supabase/.branches/
+
+# Local development signing key (B-27/B-39): generated on setup, never committed; the real key exists only in Railway
+apps/api/.local/
+*.pem

@@ -1,6 +1,6 @@
 # Tracks — backend
 
-Order is the priority order. Epic: #788; each plan links its tickets.
+Order is the priority order. Epic: #869; each track is one issue, linked in its plan.
 
 **Branches (B-20).** Rule cases, the Go API (`apps/api`) and Railway changes merge into `main`. The shared queue rules' Go code and WebAssembly build also merge into `main`; nothing
 there imports them until the swap (D-2026-11-14-01). UI changes

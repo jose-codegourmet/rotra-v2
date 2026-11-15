@@ -2,7 +2,7 @@
 
 Approved libraries only (every other library is a dependency decision): `pgx/v5` (pgxpool), the OpenTelemetry Go SDK
 with the OTLP HTTP exporter and `otelhttp`, and `sqlc` as a dev tool (never in `go.mod`). Router is `net/http` ServeMux.
-Go version is pinned in `go.mod` (`go 1.27.4`); with `GOTOOLCHAIN=auto` (the default) `go` downloads it on first use.
+Go version is pinned in `go.mod` (`go 1.26.11`); with `GOTOOLCHAIN=auto` (the default) `go` downloads it on first use.
 
 ```bash
 cd apps/api

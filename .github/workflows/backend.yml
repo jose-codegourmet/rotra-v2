@@ -43,7 +43,7 @@ jobs:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
         run: |
-          allowed='^(apps/api/|packages/rule-cases/|packages/rules-wasm/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)'
+          allowed='^(apps/api/|packages/rule-cases/|packages/rules-wasm/|\.railway/|docs/|conductor/|scripts/check\.mjs$|biome\.json$|pnpm-lock\.yaml$|\.github/workflows/(ci|secrets)\.yml$|\.github/workflows/backend\.yml$|[^/]+\.md$)'
           backend='^(apps/api/|packages/rule-cases/|packages/rules-wasm/|\.railway/|\.github/workflows/backend\.yml$)'
           # B-37: a shared-rule change updates its cases in the same PR, so TypeScript shared-rule files in
           # packages/data are allowed, but only together with packages/rule-cases/ in the same change.

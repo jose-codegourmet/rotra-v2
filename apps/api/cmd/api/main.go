@@ -14,6 +14,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
@@ -65,6 +66,19 @@ func run() error {
 	// SIGTERM is what Railway sends at the start of draining; SIGINT is Ctrl+C in development.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
+
+	// Housekeeping shares the signal context, so it stops when draining starts (B-44). Tracks that add a
+	// growing table register its cleanup here, using cfg.Housekeeping retention (go-sign-in, go-writes-queue).
+	hk := housekeeping.New(pool.Raw(), log, housekeeping.Options{Interval: cfg.Housekeeping.Interval, BatchSize: cfg.Housekeeping.BatchSize})
+	hkDone := make(chan struct{})
+	go func() {
+		defer close(hkDone)
+		hk.Run(ctx)
+	}()
+
 	log.Info("listening", slog.String("addr", ln.Addr().String()))
-	return httpapi.Serve(ctx, srv, ln, ready, cfg.ShutdownTimeout, log)
+	err = httpapi.Serve(ctx, srv, ln, ready, cfg.ShutdownTimeout, log)
+	stop()
+	<-hkDone // the loop has released its lock and connection before the pool closes
+	return err
 }

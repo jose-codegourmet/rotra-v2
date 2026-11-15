@@ -4,7 +4,7 @@
   "type": "feature",
   "priority": "critical",
   "order": 2,
-  "status": "pending",
+  "status": "in_progress",
   "created": "2026-11-13",
   "updated": "2026-11-13",
   "depends_on": "rule-cases (for the case runner)",
@@ -13,7 +13,7 @@
     "completed": 0
   },
   "tasks": {
-    "total": 15,
-    "completed": 0
+    "total": 18,
+    "completed": 11
   }
 }

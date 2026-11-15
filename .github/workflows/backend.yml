@@ -4,18 +4,17 @@
 # Setup and rules: docs/backend/infrastructure.md#backend-ci-and-railway-deploys
 name: Backend CI
 
+# Runs on EVERY pull request (B-33: the ruleset requires this workflow's result on main). The scope job
+# always runs; the Go job is skipped when no backend path changed, which GitHub counts as passing.
+# Pushes to main only run for backend paths, so a frontend commit has no Backend CI run.
 on:
   pull_request:
-    paths:
-      - 'apps/api/**'
-      - 'packages/rule-cases/**'
-      - '.railway/**'
-      - '.github/workflows/backend.yml'
   push:
     branches: [main]
     paths:
       - 'apps/api/**'
       - 'packages/rule-cases/**'
+      - 'packages/rules-wasm/**'
       - '.railway/**'
       - '.github/workflows/backend.yml'
 
@@ -31,18 +30,24 @@ jobs:
   # A failure here makes Railway skip the deploy.
   scope:
     runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.scope.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Only backend files and docs changed
+        id: scope
         env:
           BASE_REF: ${{ github.base_ref }}
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
         run: |
-          allowed='^(apps/api/|packages/rule-cases/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)'
-          backend='^(apps/api/|packages/rule-cases/|\.railway/|\.github/workflows/backend\.yml$)'
+          allowed='^(apps/api/|packages/rule-cases/|packages/rules-wasm/|\.railway/|docs/|conductor/|\.github/workflows/backend\.yml$|[^/]+\.md$)'
+          backend='^(apps/api/|packages/rule-cases/|packages/rules-wasm/|\.railway/|\.github/workflows/backend\.yml$)'
+          # B-37: a shared-rule change updates its cases in the same PR, so TypeScript shared-rule files in
+          # packages/data are allowed, but only together with packages/rule-cases/ in the same change.
+          shared_rules='^packages/data/src/(.*\.rules(\.test)?\.ts|queue-session/courtFill\.ts|rule-cases/.*)$'
           # A PR is squash-merged, so its whole diff is one change. A push may carry several commits:
           # each commit that touches backend paths must be backend-only on its own.
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -53,25 +58,48 @@ jobs:
             changes=$(git rev-list --reverse "${BEFORE}..${AFTER}")
           fi
           failed=0
+          touched=false
           for change in $changes; do
             case "$change" in
               *...*) files=$(git diff --name-only "$change") ;;
               *) files=$(git diff-tree --no-commit-id --name-only -r "$change") ;;
             esac
             echo "$files" | grep -Eq "$backend" || continue
+            touched=true
             outside=$(echo "$files" | grep -Ev "$allowed" || true)
+            if echo "$files" | grep -q '^packages/rule-cases/'; then
+              outside=$(echo "$outside" | grep -Ev "$shared_rules" || true)
+            fi
             if [ -n "$outside" ]; then
               echo "::error::$change mixes backend and frontend files. Split it; outside the backend:"
               echo "$outside"
               failed=1
             fi
           done
+          echo "backend=$touched" >> "$GITHUB_OUTPUT"
           [ "$failed" = 0 ] && echo "Backend changes contain only backend files and docs."
           exit "$failed"
 
   go:
     needs: scope
+    # Skipped (counts as passing) when no backend path changed, so frontend PRs are never held up.
+    if: needs.scope.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    # Real Postgres for the Go tests (no testcontainers). Tests read DATABASE_URL_TEST; each test makes its own database.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_TEST: postgres://postgres:test@localhost:5432/postgres?sslmode=disable
     defaults:
       run:
         working-directory: apps/api
@@ -97,11 +125,23 @@ jobs:
       - name: Build
         if: steps.present.outputs.yes == 'true'
         run: go build ./...
+      # sqlc is pinned in apps/api/Makefile; generated code must equal a fresh run.
+      - name: Generated queries are fresh
+        if: steps.present.outputs.yes == 'true'
+        run: make sqlc-check
       - name: Lint
         if: steps.present.outputs.yes == 'true'
         uses: golangci/golangci-lint-action@v6
         with:
           working-directory: apps/api
+      # Hook point for rule-cases phase 5 (R6): the committed .wasm and generated types must equal a fresh
+      # build, so a Go rule change with a stale .wasm cannot merge. The script lands with packages/rules-wasm.
+      - name: Rules .wasm is fresh
+        if: steps.present.outputs.yes == 'true'
+        working-directory: .
+        run: |
+          if [ -f packages/rules-wasm/check-fresh.sh ]; then sh packages/rules-wasm/check-fresh.sh
+          else echo "::notice::packages/rules-wasm/check-fresh.sh not found yet; stale .wasm check skipped."; fi
       - name: Vulnerabilities
         if: steps.present.outputs.yes == 'true'
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...

@@ -8,12 +8,16 @@ export const shareImageViewerMeta = {
     'Opened by the eye on an image in ShareImagePicker; you rarely use it on its own.',
     'Esc, the × (“Close full screen”) or a tap on the backdrop closes it; Esc leaves the share dialog open.',
     'The backdrop and × use the photo viewer tokens, the same in both themes.',
+    'downloadLabel: ShareImagePicker passes “Save to Photos” on iPhone and iPad, where the button opens the share sheet.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Share sheet › shViewer (.sh-view)',
   },
-  docs: ['docs/mockup-changes/2026-11-13-share-dialog-big.md'],
-  variants: ['story', 'post', 'square'],
+  docs: [
+    'docs/mockup-changes/2026-11-13-share-dialog-big.md',
+    'docs/mockup-changes/2026-11-15-share-save-to-photos.md',
+  ],
+  variants: ['story', 'post', 'square', 'save-to-photos'],
   related: ['ShareImagePicker', 'PhotoViewer'],
 } satisfies ComponentMeta

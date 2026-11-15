@@ -4,7 +4,12 @@ import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { CopyField } from '@rotra/ui/copy-field'
 import { Icon } from '@rotra/ui/icon'
-import { loadShareLogo, renderSharePng, type ShareFormat } from '@rotra/ui/share-card/helpers'
+import {
+  isAppleMobile,
+  loadShareLogo,
+  renderSharePng,
+  type ShareFormat,
+} from '@rotra/ui/share-card/helpers'
 import { ShareImageViewer } from '@rotra/ui/share-image-viewer'
 import {
   type ReactNode,
@@ -54,6 +59,11 @@ export type ShareImagePickerProps = {
   initialPicked?: string[]
   /** Overrides the browser's Web Share check (stories and tests) */
   webShare?: boolean
+  /**
+   * Overrides the iPhone / iPad check (stories and tests). There, with Web Share, Download becomes
+   * Save to Photos: it opens the system share sheet, whose Save Image puts the PNGs in Photos.
+   */
+  saveToPhotos?: boolean
   /** Once per downloaded image, for the “<Label> image downloaded” toast */
   onDownloaded?: (item: ShareImagePickerItem) => void
   onShared?: () => void
@@ -81,6 +91,7 @@ export function ShareImagePicker({
   initialPicked,
   startAt,
   webShare,
+  saveToPhotos,
   onDownloaded,
   onShared,
   onError,
@@ -96,6 +107,7 @@ export function ShareImagePicker({
   const [viewing, setViewing] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [detected, setDetected] = useState(false)
+  const [apple, setApple] = useState(false)
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement | null>>({})
   const [edges, setEdges] = useState({ left: false, right: false, active: 0 })
   const [dragging, setDragging] = useState(false)
@@ -107,6 +119,7 @@ export function ShareImagePicker({
   const chosen = items.filter((item) => picked.includes(item.id))
   const n = chosen.length
   const canShare = webShare ?? detected
+  const photos = canShare && (saveToPhotos ?? apple)
   const imagesKey = JSON.stringify(images ?? {})
   const loading = Object.values(images ?? {}).some((url) => !!url && !(url in loaded))
 
@@ -130,6 +143,7 @@ export function ShareImagePicker({
     } catch {
       setDetected(false)
     }
+    setApple(isAppleMobile())
   }, [])
 
   // The prototypes' shCarSync: masks on the sides with hidden images, the dot of the centred image.
@@ -243,11 +257,12 @@ export function ShareImagePicker({
       setBusy(false)
     }
   }
-  const share = async () => {
+  // Save to Photos uses the same share sheet; it reports nothing back, so it calls no callback.
+  const share = async (list = chosen, save = false) => {
     setBusy(true)
     try {
       const files: File[] = []
-      for (const item of chosen) {
+      for (const item of list) {
         const blob = await makePng(item)
         if (blob) files.push(new File([blob], `${item.fileName}.png`, { type: 'image/png' }))
       }
@@ -256,10 +271,14 @@ export function ShareImagePicker({
         return
       }
       await navigator.share({ files, title: shareTitle })
-      onShared?.()
+      if (!save) onShared?.()
     } catch (error) {
       if (!(error instanceof DOMException && error.name === 'AbortError'))
-        onError?.("Couldn't share the images here. Download them instead.")
+        onError?.(
+          save
+            ? "Couldn't open the share menu. Try again."
+            : "Couldn't share the images here. Download them instead.",
+        )
     } finally {
       setBusy(false)
     }
@@ -388,15 +407,27 @@ export function ShareImagePicker({
         </div>
       ) : null}
       <div className="flex flex-wrap justify-center gap-2">
-        <Button disabled={disabled} onClick={() => void download(chosen)}>
-          {n ? `Download ${n} ${n === 1 ? 'image' : 'images'}` : 'Download images'}
-        </Button>
+        {photos ? (
+          <Button disabled={disabled} onClick={() => void share(chosen, true)}>
+            Save to Photos
+          </Button>
+        ) : (
+          <Button disabled={disabled} onClick={() => void download(chosen)}>
+            {n ? `Download ${n} ${n === 1 ? 'image' : 'images'}` : 'Download images'}
+          </Button>
+        )}
         {canShare ? (
           <Button variant="primary" disabled={disabled} onClick={() => void share()}>
             Share
           </Button>
         ) : null}
       </div>
+      {photos ? (
+        <p className="m-0 max-w-[34ch] text-[13px] leading-[1.45] text-fg2">
+          Save to Photos opens the share menu. Tap{' '}
+          <b className="text-fg">{n > 1 ? `Save ${n} Images` : 'Save Image'}</b> there.
+        </p>
+      ) : null}
       {link !== undefined && onCopy ? (
         <>
           <div className="my-1.5 flex w-full items-center gap-3.5">
@@ -414,7 +445,8 @@ export function ShareImagePicker({
           label={viewed.label}
           format={viewed.format}
           downloadDisabled={busy || loading}
-          onDownload={() => void download([viewed])}
+          downloadLabel={photos ? 'Save to Photos' : undefined}
+          onDownload={() => void (photos ? share([viewed], true) : download([viewed]))}
         >
           {viewed.image}
         </ShareImageViewer>

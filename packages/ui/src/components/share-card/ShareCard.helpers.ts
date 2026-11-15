@@ -6,6 +6,18 @@ export type ShareQrDrawing = { size: number; count: number; path: string }
 /** Story (9:16), Facebook post (4:5) and Square (1:1). */
 export type ShareFormat = 'post' | 'story' | 'square'
 
+/**
+ * iPhone and iPad (iPadOS reports itself as a Mac with touch). Safari there saves downloads to the
+ * Files app, so share dialogs offer Save to Photos through the system share sheet instead.
+ */
+export function isAppleMobile(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return (
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  )
+}
+
 /** On-screen size of each share image (the prototypes' SH_SIZE); the PNG is 1080 px wide. */
 export const SHARE_IMAGE_SIZE = {
   story: [270, 480],

@@ -16,9 +16,11 @@ export type ShareImageViewerProps = {
   format: ShareFormat
   /** The share image itself (a ShareImage), scaled to fit the screen */
   children: ReactNode
-  /** Downloads this one image */
+  /** Downloads this one image (on iPhone and iPad: opens the share sheet to save it to Photos) */
   onDownload: () => void
   downloadDisabled?: boolean
+  /** The button's label; “Download” when left out, “Save to Photos” on iPhone and iPad */
+  downloadLabel?: string
 }
 
 /** The prototypes' shViewer scale: fit the window, never under 0.5× or over 2.4×. */
@@ -41,6 +43,7 @@ export function ShareImageViewer({
   children,
   onDownload,
   downloadDisabled,
+  downloadLabel = 'Download',
 }: ShareImageViewerProps) {
   const [scale, setScale] = useState(() => fitScale(format))
   useEffect(() => {
@@ -90,7 +93,7 @@ export function ShareImageViewer({
           <div className="flex cursor-default items-center gap-3">
             <b>{label}</b>
             <Button variant="primary" disabled={downloadDisabled} onClick={onDownload}>
-              Download
+              {downloadLabel}
             </Button>
           </div>
         </Dialog.Content>

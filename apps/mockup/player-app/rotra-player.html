@@ -550,6 +550,7 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-thumb.story .sh-scale { transform: scale(.4167); } .sh-thumb.post .sh-scale, .sh-thumb.square .sh-scale { transform: scale(.5); }
 .sh-thumb .sh-card, .sh-img .sh-card, .sh-view-in .sh-card { width: 320px; } .sh-thumb.story .sh-card, .sh-img .sh-card.story, .sh-view-in .sh-card.story { width: 270px; }
 .sh-acts { justify-content: center; }
+.sh-photos-hint { max-width: 34ch; margin: 0; color: var(--fg2); font-size: 13px; line-height: 1.45; } .sh-photos-hint b { color: var(--fg); }
 .rk-card { gap: 12px; }
 .rk-compact { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
 .rk-c-lv { display: flex; flex-direction: column; gap: 4px; min-width: 0; justify-content: center; }
@@ -2422,10 +2423,17 @@ const SHARE_GAME_LIMIT = { post: 3, story: 4, square: 2 };
 // then a big OR, then the link in one field with the copy icon inside it.
 const SHARE_FMTS = [['story', 'Story', '9:16 · Facebook and Instagram stories'], ['post', 'Facebook post', '4:5 · Facebook feed'], ['square', 'Square', '1:1 · Instagram feed']];
 // Owner artifact comment, November 13, 2026: big share dialogs with full-size images, pick several, eye icon opens full screen.
+// Save to Photos (2026-11-15): on iPhone and iPad, Safari saves downloads to the Files app, so where the share sheet takes
+// files the share dialogs swap Download for Save to Photos, which opens that sheet (its Save Image puts the PNGs in Photos).
+// Add ?ios to the URL to preview it on a computer.
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) || new URLSearchParams(location.search).has('ios');
+const SAVE_PHOTOS = IS_IOS && (!!navigator.share || new URLSearchParams(location.search).has('ios'));
+const savePhotosHint = (n) => `<p class="sh-photos-hint">Save to Photos opens the share menu. Tap <b>${n > 1 ? `Save ${n} Images` : 'Save Image'}</b> there.</p>`;
+const savePhotosBtn = (act, n) => `<button class="btn" data-act="${act}" ${n ? '' : 'disabled'}>Save to Photos</button>`;
 const SH_SIZE = { story: [270, 480], post: [320, 400], square: [320, 320] };
 const shPick = (o) => `<div class="sh-pick"><button type="button" class="sh-img${o.on ? ' on' : ''}" ${o.pick} aria-pressed="${o.on}" aria-label="${o.label}${o.hint ? `, ${o.hint}` : ''}. ${o.on ? 'Picked' : 'Not picked'}">${o.card}<i class="sh-chk" aria-hidden="true">✓</i></button><button type="button" class="sh-eye" ${o.view} aria-label="View ${o.label} full screen" title="View full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button><span class="sh-cap"><b>${o.label}</b>${o.hint ? `<span class="small muted">${o.hint}</span>` : ''}</span></div>`;
 const shViewer = (o) => { const [w, h] = SH_SIZE[o.fmt], s = Math.max(0.5, Math.min((innerWidth - 32) / w, (innerHeight - 160) / h, 2.4));
-  return `<div class="sh-view" role="dialog" aria-modal="true" aria-label="${o.label}, full screen" ${o.close}><button type="button" class="sh-view-x" ${o.close} aria-label="Close full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="sh-view-fit" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="sh-view-in" style="transform:scale(${s.toFixed(3)})">${o.card}</div></div><div class="sh-view-bar"><b>${o.label}</b><button type="button" class="btn primary" ${o.dl}>Download</button></div></div>`; };
+  return `<div class="sh-view" role="dialog" aria-modal="true" aria-label="${o.label}, full screen" ${o.close}><button type="button" class="sh-view-x" ${o.close} aria-label="Close full screen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="sh-view-fit" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="sh-view-in" style="transform:scale(${s.toFixed(3)})">${o.card}</div></div><div class="sh-view-bar"><b>${o.label}</b><button type="button" class="btn primary" ${SAVE_PHOTOS ? o.dl.replace(/data-act="(\w+)"/, 'data-act="$1" data-photos="1"') : o.dl}>${SAVE_PHOTOS ? 'Save to Photos' : 'Download'}</button></div></div>`; };
 // Share carousel (artifact comment, November 13, 2026): mouse drag scrolls the strip (touch scrolls natively), a drag never counts as
 // a click, the strip keeps its position when the dialog re-renders, and the fade masks show only on a side with hidden images.
 const SHCAR = { x: 0, drag: null, moved: false };
@@ -2751,7 +2759,7 @@ const SHEETS = {
     return sheetWrap(m.title, `<div class="stack sh-wrap">
       <div class="sh-pickbar"><span class="small muted">Tap an image to pick it. ${n} of ${SHARE_FMTS.length} picked · <button type="button" class="sh-linkish" data-act="shareAllPick">${n === SHARE_FMTS.length ? 'Clear' : 'Pick all'}</button></span></div>
       <div class="sh-tiles" role="group" aria-label="Images">${SHARE_FMTS.map(tile).join('')}</div>
-      <div class="row sh-acts"><button class="btn" data-act="downloadShare" ${n ? '' : 'disabled'}>Download ${n || ''} ${n === 1 ? 'image' : 'images'}</button>${navigator.share ? `<button class="btn primary" data-act="shareNative" ${n ? '' : 'disabled'}>Share</button>` : ''}</div>
+      <div class="row sh-acts">${SAVE_PHOTOS ? savePhotosBtn('savePhotos', n) : `<button class="btn" data-act="downloadShare" ${n ? '' : 'disabled'}>Download ${n || ''} ${n === 1 ? 'image' : 'images'}</button>`}${navigator.share || SAVE_PHOTOS ? `<button class="btn primary" data-act="shareNative" ${n ? '' : 'disabled'}>Share</button>` : ''}</div>${SAVE_PHOTOS ? savePhotosHint(n) : ''}
       <div class="or-div" role="separator"><span>OR</span></div>
       ${copyField('sh-link', m.link, m.kind === 'profile' ? 'Profile link' : 'Link', 'copyShareLink')}</div>`,
       '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', true).replace('class="sheet wide"', 'class="sheet wide sh-dlg"')
@@ -2923,7 +2931,9 @@ const ACT = {
     try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. Your profile link is ${link}`)); } catch (e) { toast(`Couldn't copy. Your profile link is ${link}`); }
   },
   shareNative: () => toast('Share sheet opened'),
+  savePhotos: () => toast('Share menu opened. Tap Save Image to add it to Photos.'),
   downloadShare: (el) => {
+    if (el?.dataset?.photos) { toast('Share menu opened. Tap Save Image to add it to Photos.'); return; }
     const sh = S.ui.sheet, m = sh && sh.type === 'share' ? shareModel(sh) : null;
     if (!m) return;
     const list = el?.dataset?.v ? [el.dataset.v] : (Array.isArray(sh.pick) ? sh.pick : SHARE_FMTS.map(([k]) => k));

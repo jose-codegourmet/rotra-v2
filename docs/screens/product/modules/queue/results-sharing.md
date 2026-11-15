@@ -51,6 +51,8 @@ Copy: “Player ranks already updated; publishing doesn't change them.” Action
 
 Re-publishing replaces the published selection. Full withdrawal is not specified.
 
+**Save to Photos (owner, November 15, 2026; [log](../../../mockup-changes/2026-11-15-share-save-to-photos.md)).** In **Share leaderboard** and **Share your finish**, on iPhone and iPad where the system share sheet takes files, **Download N images** becomes **Save to Photos** (it opens the share sheet; its **Save Image** puts the PNGs in Photos) with the hint “Save to Photos opens the share menu. Tap **Save Image** there.” The full-screen view's button reads **Save to Photos**. Android and computers keep **Download**. **Download images** (Q-EXPORT) is unchanged.
+
 ## Q-EXPORT — Download images
 
 Sheet **Download images**:

@@ -59,6 +59,39 @@ const JOIN_REQUESTS_STARTED = 'The session has started, so online join requests 
 export const MAX_PENDING_REQUESTS_PER_SESSION = 60
 
 /**
+ * Faces on the published results (2026-11-13 finished session and awards logs): the public copy
+ * holds names and counts only, so each standings row, award winner and Off Day row gets its
+ * picture from the live roster's players by name, the same source as `participants`. A name that
+ * two roster entries share stays without a picture. The private snapshot is never read here.
+ */
+function withResultPictures(
+  results: Record<string, unknown> | null,
+  roster: { name: string; pictureUrl: string | null }[],
+) {
+  if (!results) return results
+  const seen = new Map<string, string | null>()
+  const clash = new Set<string>()
+  for (const entry of roster) {
+    if (seen.has(entry.name)) clash.add(entry.name)
+    else seen.set(entry.name, entry.pictureUrl)
+  }
+  const pictureOf = (name: unknown) =>
+    typeof name === 'string' && !clash.has(name) ? (seen.get(name) ?? null) : null
+  const face = <T>(row: T): T =>
+    row && typeof row === 'object' && 'name' in row
+      ? { ...row, pictureUrl: pictureOf((row as { name: unknown }).name) }
+      : row
+  const out: Record<string, unknown> = { ...results }
+  if (Array.isArray(out.standings)) out.standings = out.standings.map(face)
+  if (Array.isArray(out.offDay)) out.offDay = out.offDay.map(face)
+  if (out.awards && typeof out.awards === 'object') {
+    const awards = out.awards as Record<string, unknown>
+    out.awards = { ...awards, mvp: face(awards.mvp), mostImproved: face(awards.mostImproved) }
+  }
+  return out
+}
+
+/**
  * Visitor ownership (proposal pending #248): a request is owned by whoever holds its receipt, an
  * HMAC of the request ID under a server secret. The Route Handler keeps it in an httpOnly,
  * same-site cookie scoped to the session page, so a reload keeps the visitor's view and nobody
@@ -196,7 +229,16 @@ export async function readPublicSession(slug: string) {
       alwaysRequireRequest: session.alwaysRequireRequest,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
-      results: session.state === 'completed' ? await readPublishedResults(session.id, tx) : null,
+      results:
+        session.state === 'completed'
+          ? withResultPictures(
+              await readPublishedResults(session.id, tx),
+              roster.map((entry) => ({
+                name: entry.nameSnapshot,
+                pictureUrl: byId.get(entry.clubPlayerId)?.player?.avatarRef ?? null,
+              })),
+            )
+          : null,
     }
   })
 }

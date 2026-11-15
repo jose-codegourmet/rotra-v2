@@ -43,7 +43,7 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 - [x] **5.2** `packages/rules-wasm`: the build and a typed wrapper with today's names and signatures; expose one batched court-fill call (per-match `canPlace` calls cost 62 ms vs the 5 ms mark)
 - [x] **5.3** Every bucket 1 case passes through the wrapper in Vitest
 - [x] **5.4** Loader for browser, server (Node), Vitest and Storybook; panic recovery and restart; `wasm_exec.js` pinned
-- [ ] **5.5** _(blocked: `tygo` not yet approved; types hand-written with TODO)_ `tygo` types generated and checked in CI (B-23)
+- [x] **5.5** `tygo` types generated and checked in CI (B-23); tygo v0.2.21 pinned in the Makefile, owner approved 2026-11-16
 - [x] **5.6** Fingerprint of the Go rule files checked in `make check`; `rules-manifest.json` published with the apps
 - [x] **5.7** `packages/rules-wasm/` added to the backend CI paths and frontend CI's `paths-ignore`, like `packages/rule-cases/`
 
@@ -111,5 +111,6 @@ Go 1.22.0 locally (re-check the pinned version: `wasm_exec.js` path and size); s
 | 2026-11-15 | 4.1 | Name order uses a hand-made en-US collation subset (`internal/rules/collate`), not ICU | No `golang.org/x/text` approved | Matches every committed case; differs on ß/æ, Greek, Cyrillic, symbols, stacked marks. Owner accepted the subset on 2026-11-15 |
 | 2026-11-15 | 5.1 | Wasm is 4.8 MB raw, 1.30 MB gzip (spike 0.76 MB) | `encoding/json` weight on Go 1.27.4 | Under 1.5 MB mark with ~0.2 MB spare; brotli or tuning before bucket 2 |
 | 2026-11-15 | 5.2 | `putOnCourt` returns a copy; `FORMAT_TEAM_SIZES` is `formatTeamSizes()`; `now` defaults in wrapper | JSON boundary | Handle in the phase 6 swap |
-| 2026-11-15 | 5.5 | `tygo` types not generated | Tool not approved | Ask owner |
+| 2026-11-16 | 5.5 | `tygo` approved by owner and added as a dev tool (not in go.mod) | B-23 | Done; `Opt` maps to `key?: T \| null` |
 | 2026-11-15 | 6.x | Phase 6 not done here | Swap belongs on `go-stack` | Needs that branch |
+| 2026-11-16 | all | Go lowered from 1.27.4 to 1.26.11; wasm 3.79 MB raw, 1.03 MB gzip, 0.78 MB brotli; build now `-buildvcs=false` | `golangci-lint-action` may not accept a 1.27 module; rebuilds differed by git state | Rebuilds byte-identical |

@@ -12,7 +12,7 @@ replaced by the [fallback](./spec.md#fallback-if-the-spike-fails).
 
 - [x] **1.1** Build `canPlace`, `waitMinutes`, `courtOpen` to WebAssembly with standard Go and with TinyGo, behind a wrapper
 - [~] **1.2** Measure size, phone load time, court-fill call cost, Vitest, mock mode, offline load, Vercel build
-- [~] **1.3** Record results below; pick the tool by the B-21 rule; owner asked only if both tools fail (pass marks confirmed 2026-11-14, size 1.5 MB)
+- [x] **1.3** Record results below; pick the tool by the B-21 rule; owner asked only if both tools fail (pass marks confirmed 2026-11-14, size 1.5 MB)
 
 ## Phase 2: Cases package and shapes (R1, R2) · `main`
 
@@ -40,7 +40,7 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 ## Phase 5: WebAssembly build and wrapper (R6) · `main`
 
 - [ ] **5.1** `cmd/ruleswasm` exports the bucket 1 rules
-- [ ] **5.2** `packages/rules-wasm`: the build and a typed wrapper with today's names and signatures
+- [ ] **5.2** `packages/rules-wasm`: the build and a typed wrapper with today's names and signatures; expose one batched court-fill call (per-match `canPlace` calls cost 62 ms vs the 5 ms mark)
 - [ ] **5.3** Every bucket 1 case passes through the wrapper in Vitest
 - [ ] **5.4** Loader for browser, server (Node), Vitest and Storybook; panic recovery and restart; `wasm_exec.js` pinned
 - [ ] **5.5** `tygo` types generated and checked in CI (B-23)
@@ -58,7 +58,7 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 
 ## Phase 7: Verify
 
-- [x] **7.1** Case counts per rule before/after, recorded below
+- [ ] **7.1** Case counts per rule before/after, recorded below
 - [ ] **7.2** `make check` passes; PR lists what was verified
 
 ## Spike results
@@ -74,17 +74,18 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 | Rebuilds identically; Vercel serves it | yes | Not measured | not run |
 | Vercel cold start added | under 200 ms | Not measured | not run |
 
-Go 1.22.0 locally; spike was in the scratchpad, not the repo. TinyGo not needed on current evidence. Owner go/fallback
-still open (1.3).
+Go 1.22.0 locally (re-check the pinned version: `wasm_exec.js` path and size); spike was in the scratchpad, not the repo. TinyGo not needed on current evidence. Owner said go on 2026-11-15 (standard Go). Phone, browser, Vercel rows still unmeasured (1.2 stays open).
 
 ## Case counts
 
-| Rule group | Vitest `it` before (files) | JSON cases after |
+| Rule group | Vitest `it` before | JSON after |
 |---|---|---|
-| match (guards, standings, counts, waits) | 30 + 12 in match/autoFill | 140 |
-| courtfill | autoFill 12 | 57 |
-| courts | courts 7 + sessionEnd 14 | 46 |
-| roster | presence/roster batch (store-level, stay) | 13 |
+| match: standings and credit | match.rules 30 (shared) | computeStandings 18, countsFor 12, creditedPlayers 4, isPartial 3, others 3 |
+| match: guards | | canPlace 5, canStart 9, canMoveCourt 6, canReplacePlayer 7, canSendBack 3, swapTarget 5, validateResult 14, completeLineup 8, courtsNeeded 6, holdsCourt 5, other 8 |
+| match: counts and waits | gamesAdjustment 13 | gamesPlayed 6, gamesAdjustmentOf 3, waitMinutes 13, queuedCount 2, gamesPlayedFor 2 |
+| courtfill | autoFill 12 | autoFillPlacements 21, nextEligibleForCourt 12, nextMatchCandidates 18, courtFillModeOf 3, putOnCourt 3 |
+| courts | courts 7 + sessionEnd 14 | freeCourts 7, courtOpen 5, openedEarly 6, isBookingEnded 5, sessionEndError 18, sessionEndCourtConflict 5 |
+| roster | (store-level, stay) | inUnfinishedMatch 8, slotCapacity 2, openSlots 3 |
 
 256 JSON cases in 41 files. One `it` became several single-call cases; counts don't map 1:1. Store-level tests
 (`control`, `courtFill`, `presenceBatch`, `rosterBatch`) stay in Vitest for go-writes-queue command cases.
@@ -105,3 +106,5 @@ still open (1.3).
 | 2026-11-15 | 3.5 | No waitlist fill order / give slot / duplicate cases | No pure function exists; logic is inline in store mutations | Extract in the Go port or go-writes-queue |
 | 2026-11-15 | 3.6 | `computeStandings` uses `localeCompare` with no locale | Machine-dependent; cases generated under en_US | Owner: pin locale before swap; Go must match en-US collation |
 | 2026-11-15 | 3.x | JSON and Vitest switch in one commit | Owner: one branch | Separate-PR rule waived |
+| 2026-11-15 | 1.1 | TinyGo not built | Standard Go passed every measurable mark (B-21) | Revisit only if phone load fails |
+| 2026-11-15 | 4.1 | First runner rule is `courtsNeeded`, not money parsing | Money is Go only and has no JSON cases | Also first piece of 4.1 |

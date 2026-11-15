@@ -147,13 +147,15 @@ export async function renderSharePng(
       const r = element.getBoundingClientRect()
       return { x: r.left - bounds.left, y: r.top - bounds.top, w: r.width, h: r.height }
     }
-    // Row tints and dividers go first so they sit under the avatars.
+    // Row tints, chips and dividers go first so they sit under the avatars and the text; each keeps
+    // its own corner radius (rows 8 px, the YOU chip 4 px, ladder cells 2 px).
     for (const cell of card.querySelectorAll<HTMLElement>('[data-share-cell]')) {
       const r = rect(cell)
       const style = getComputedStyle(cell)
+      const radius = Number.parseFloat(style.borderTopLeftRadius) || 2
       ctx.fillStyle = style.backgroundColor
       ctx.beginPath()
-      ctx.roundRect(r.x, r.y, r.w, r.h, 2)
+      ctx.roundRect(r.x, r.y, r.w, r.h, Math.min(radius, r.h / 2))
       ctx.fill()
       if (cell.getAttribute('data-share-cell') === 'current') {
         ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
@@ -253,9 +255,14 @@ export async function renderSharePng(
       const metrics = ctx.measureText('Mg')
       const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
       let node = walker.nextNode()
-      while (node) {
+      // Where the last drawn character ended: a truncated name's hidden characters report no
+      // advance (Safari puts them all at the ellipsis), so the first one that does not move on
+      // ends the text with one “…”.
+      let lastRight = Number.NEGATIVE_INFINITY
+      let cut = false
+      while (node && !cut) {
         const value = node.textContent ?? ''
-        for (let i = 0; i < value.length; ) {
+        for (let i = 0; i < value.length && !cut; ) {
           const character = String.fromCodePoint(value.codePointAt(i) ?? 0)
           const range = document.createRange()
           range.setStart(node, i)
@@ -268,14 +275,19 @@ export async function renderSharePng(
               (metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent) -
               (metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent)) /
               2
-          if (!ellipsis || r.right - bounds.left <= textBounds.x + textBounds.w - ellipsisWidth) {
+          const fits =
+            r.right - bounds.left <= textBounds.x + textBounds.w - ellipsisWidth &&
+            (character.trim() === '' || r.right > lastRight + 0.5)
+          if (!ellipsis || fits) {
             ctx.fillText(
               style.textTransform === 'uppercase' ? character.toUpperCase() : character,
               r.left - bounds.left,
               baseline,
             )
-          } else if (ellipsis) {
-            ctx.fillText('…', textBounds.x + textBounds.w - ellipsisWidth, baseline)
+            lastRight = Math.max(lastRight, r.right)
+          } else {
+            ctx.fillText('…', Math.max(lastRight - bounds.left, textBounds.x), baseline)
+            cut = true
           }
           i += character.length
         }

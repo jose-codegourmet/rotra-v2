@@ -1,7 +1,7 @@
 // Builds apps/api/cmd/ruleswasm to wasm/rules.<hash>.wasm and records everything that goes with it:
 // Go's wasm_exec.js (same Go version), rules-manifest.json and rules.fingerprint. Needs Go. Run
 // `node build.mjs`, `pnpm --filter @rotra/rules-wasm build:wasm` or `make wasm` in apps/api.
-// The build is deterministic (-trimpath, no build id): the same sources and Go give the same hash.
+// The build is deterministic (-trimpath, -buildvcs=false, no build id): the same sources and Go give the same hash.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import {
@@ -29,7 +29,7 @@ const go = (args, opts = {}) =>
 
 mkdirSync(out, { recursive: true })
 const tmp = join(out, 'rules.tmp.wasm')
-go(['build', '-trimpath', '-ldflags=-s -w', '-o', tmp, './cmd/ruleswasm'], {
+go(['build', '-trimpath', '-buildvcs=false', '-ldflags=-s -w', '-o', tmp, './cmd/ruleswasm'], {
   env: { ...process.env, GOOS: 'js', GOARCH: 'wasm', CGO_ENABLED: '0' },
 })
 

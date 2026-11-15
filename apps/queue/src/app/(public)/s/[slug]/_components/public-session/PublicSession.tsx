@@ -582,7 +582,17 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // A finished session (2026-11-13-queue-finished-session-page): the Leaderboard tab exists only
   // once the club shared the Standings, and the page then opens on it.
   const finished = p.status === 'completed'
-  const standings = finished ? p.results?.standings : undefined
+  // The published rows carry no viewer flag in real mode (the public copy is cacheable, D-2026-11-09-09);
+  // the signed-in read's participants do, and each row points at its participant, so your row is
+  // marked here: the leaderboard highlights it and shows Your position.
+  const standings = finished
+    ? p.results?.standings?.map((row) => ({
+        ...row,
+        isViewer:
+          row.isViewer ??
+          (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
+      }))
+    : undefined
   const activeTab =
     tab === 'auto' || (tab === 'leaderboard' && !standings)
       ? standings

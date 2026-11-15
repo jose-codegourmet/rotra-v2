@@ -158,9 +158,19 @@ export async function renderSharePng(
       ctx.roundRect(r.x, r.y, r.w, r.h, Math.min(radius, r.h / 2))
       ctx.fill()
       if (cell.getAttribute('data-share-cell') === 'current') {
+        // The preview's 1.5 px inset ring, following the row's rounded corners.
+        const ring = 1.5
         ctx.strokeStyle = palette.getPropertyValue('--share-accent').trim()
-        ctx.lineWidth = 1
-        ctx.strokeRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4)
+        ctx.lineWidth = ring
+        ctx.beginPath()
+        ctx.roundRect(
+          r.x + ring / 2,
+          r.y + ring / 2,
+          r.w - ring,
+          r.h - ring,
+          Math.max(0, Math.min(radius, r.h / 2) - ring / 2),
+        )
+        ctx.stroke()
       }
     }
     for (const element of card.querySelectorAll<HTMLElement>('[data-qr-tile], [data-qr-logo]')) {

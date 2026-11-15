@@ -1,7 +1,7 @@
 # Track specification: Shared queue rules (one Go copy, run on the device as WebAssembly)
 
 **Track ID:** rule-cases_20261113 · **Type:** chore · **Priority:** critical (order 1 of 12) · **Created:** 2026-11-13 · **Refined:** 2026-11-14
-**Depends on:** phases 1–3 nothing; phases 4–6 go-api-foundation (the Go module) · **Decisions:** D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-02, B-20, B-21, B-22, B-23 ([register](../../../docs/mvp/decisions.md#d-2026-11-14-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** phases 1–3 nothing; phases 4–6 go-api-foundation (the Go module) · **Decisions:** D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-02, B-20, B-21, B-22, B-23, B-37 ([register](../../../docs/mvp/decisions.md#d-2026-11-14-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -187,7 +187,7 @@ Who builds what:
 - **Storybook** gets a decorator that loads the `.wasm` for stories that use rules.
 - **Content security policy:** none today; if one is added, it must allow `wasm-unsafe-eval`.
 
-## Shipping a rule change (G13–G15)
+## Shipping a rule change (G13–G16)
 
 - **G13. CI paths.** Backend CI's `scope` job only allows `apps/api/`, `packages/rule-cases/`, Railway
   files and docs, but a Go rule change must commit the rebuilt `.wasm` and generated types in the same
@@ -205,11 +205,18 @@ Who builds what:
 - **G15. The build check is advisory.** CI never blocks, and `make check` runs without Go. **Fix:**
   `packages/rules-wasm` records a fingerprint (hash) of the Go rule files it was built from; `make check`
   recomputes it in Node and fails if it differs. No Go needed, and it is a real gate.
+- **G16. Rule changes during the port ([B-37](../../../docs/backend/open-decisions.md#settled)).** No
+  freeze. A Queue PR on `main` that changes what a shared rule returns updates its JSON cases in the
+  **same PR**: the `scope` job allows `packages/rule-cases/**` together with the TypeScript rule files
+  in `packages/data` (that commit runs both workflows). The Go copy follows in its own PR before the
+  next Go merge; Backend CI's case tests stay red until it does. Before the swap (R7), `v1` is edited
+  in place; after it, the bumping rule below applies. The PR template gets one checklist line:
+  "Changed a shared queue rule? Cases updated here; Go copy follows."
 
 ## Rules versions (B-22)
 
 One `rulesVersion` number covers the whole shared set. Start is online only, so the server stamps the
-Queue Session with the newest version that both the server and the live `.wasm` carry ([G14](#shipping-a-rule-change-g13g15)); the device stores it with its offline copy. Every offline
+Queue Session with the newest version that both the server and the live `.wasm` carry ([G14](#shipping-a-rule-change-g13g16)); the device stores it with its offline copy. Every offline
 command runs under the session's version on the device and again on the server at replay, so a rule
 change never applies mid-session.
 
@@ -229,7 +236,7 @@ change never applies mid-session.
   session's version when the session loads, so hooks and screens still call the same names.
 - **Cases per version:** `cases/v<n>/<area>/<rule>.json`; tests run every live version.
 - **Live versions:** removed once no open or unsynced session uses them; normally current and previous.
-- **Bumping:** any change to what a shared rule returns bumps the version; a refactor with identical
+- **Bumping:** after the swap, any change to what a shared rule returns bumps the version (before it, `v1` is edited in place, G16); a refactor with identical
   results doesn't, and the cases prove it.
 - **Retired:** a version with a real bug is marked `retired` (owner's call, rare). The server rejects it;
   the device loads the latest build and moves the session to the current version at its next sync,
@@ -256,6 +263,7 @@ passes every mark, TinyGo if not; the owner is asked only if both fail.
 | Runs in mock mode in the Queue app | yes |
 | Second visit loads from the browser cache; rules keep working offline with the tab open | yes |
 | Committed file rebuilds identically in CI; Vercel serves it with no Go installed | yes |
+| Added cold start on a Vercel function that draws a Queue screen (preview deploy, B-37) | under 200 ms |
 
 **Accepted when:**
 
@@ -397,7 +405,8 @@ All answers are recorded as [D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2
 - **`main`:** R1–R4 (cases, TypeScript only), R5 (Go rules), R6 (build and wrapper; nothing on `main` imports it).
 - **`go-stack`:** R7 (the swap and the deletes).
 - Backend CI's `scope` job rejects a change that mixes backend paths with frontend packages, so the
-  JSON files and the Vitest switch go in separate PRs. `packages/rules-wasm/` is a backend path (G13),
+  JSON files and the Vitest switch go in separate PRs. Exception (G16): a later rule change updates its
+  TypeScript rule and its cases together. `packages/rules-wasm/` is a backend path (G13),
   so a Go rule change, its rebuilt `.wasm`, its generated types and the wrapper merge in **one** PR.
   Switching `packages/data` to the wrapper is a frontend PR on `go-stack`.
 

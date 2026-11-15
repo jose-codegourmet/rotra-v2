@@ -24,6 +24,7 @@ Request rate, errors, latency, DB pool, open live connections, sign-in and rate-
 **Accepted when:**
 
 - [ ] Metrics visible for the staging API
+- [ ] Deploy-timing panel ([B-26](../../../docs/backend/open-decisions.md#settled)): Queue Sessions running, open live-update streams and request rate, now and by hour of the week
 
 ### R3: Alerts
 

@@ -1,7 +1,7 @@
 # Track specification: Go API foundation
 
 **Track ID:** go-api-foundation_20261113 · **Type:** feature · **Priority:** critical (order 2 of 12) · **Created:** 2026-11-13
-**Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, B-34, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -58,8 +58,47 @@ OpenTelemetry traces to Grafana Cloud, service name `rotra-api`, trace context j
 
 - [ ] `railway config plan` shows only intended resources
 - [ ] Staging `/readyz` green on `api-beta.rotra.club`
+- [ ] Railway default domain test ([B-30](../../../docs/backend/open-decisions.md#settled)): with `api-beta.rotra.club` as `ROTRA_GO_API_URL`, the beta apps on their subdomains reach Go; then the `*.up.railway.app` domain is removed and the same check repeated. Result recorded in backend open decisions (removed, or kept behind the proxy-secret rule)
 - [ ] Watch paths and Wait for CI turned on for `api`
 - [ ] `pg_stat_statements` enabled
+
+### R7: Secret scanning (B-39)
+
+Three layers per [B-39](../../../docs/backend/open-decisions.md#settled), before the signing key (B-27) exists anywhere:
+
+- GitHub push protection turned on for the repo (owner, in repo Settings › Code security; needs admin rights).
+- `.husky/pre-commit` runs `gitleaks git --pre-commit --staged`; it stops with install instructions when gitleaks is missing. Staged files only; the disabled workspace lint stays disabled.
+- `.github/workflows/secrets.yml` runs gitleaks (pinned version) on every PR and push.
+- Local development generates a throwaway signing key on setup; its file is git-ignored.
+
+**Accepted when:**
+
+- [ ] A test commit with a fake private key is refused by the hook, by CI and by push protection
+- [ ] A normal commit is not slowed noticeably and passes all three
+- [ ] The local key file is in `.gitignore`; setup steps documented
+
+### R8: Required Backend CI (B-33)
+
+Before the first Go code merges: a GitHub ruleset on `main` requires the Backend CI result; `backend.yml` runs on every PR, with a first job that checks the changed paths and Go jobs skipped when nothing backend changed ([B-33](../../../docs/backend/open-decisions.md#settled)). Frontend CI stays advisory. Recorded in the backend decisions only; AGENTS.md is not changed.
+
+**Accepted when:**
+
+- [ ] A Go PR with a failing test can't merge, and auto-merge waits for Backend CI
+- [ ] A frontend-only PR merges without waiting on Go jobs (they show as skipped)
+- [ ] A Go rule change with a stale `.wasm` can't merge
+- [ ] Railway's Wait for CI still deploys a passing backend commit
+- [ ] A PR changing a TypeScript shared rule and its cases together passes `scope` (B-37); one mixing `apps/api` with frontend files still fails
+- [ ] The PR template has the shared-rule checklist line (B-37)
+
+### R9: Housekeeping loop (B-34)
+
+An hourly loop inside the API process ([B-34](../../../docs/backend/open-decisions.md#settled)): takes a Postgres advisory lock, runs each registered cleanup in batches of about 1,000 rows until none are left, logs and measures rows deleted. Retention values from env with the B-34 defaults. Tracks that add a growing table register its cleanup (go-sign-in: `auth_events`, `auth_sessions`; go-writes-queue: live-update events). No cron and no extra Railway service (B-07).
+
+**Accepted when:**
+
+- [ ] With two instances, only one runs a cleanup at a time
+- [ ] A cleanup of many rows runs in batches and never blocks a normal write for long
+- [ ] Shutdown stops the loop cleanly mid-batch
 
 ## Scope
 

@@ -16,6 +16,8 @@ Idempotent `operationId`, revision checks with the same 409 for Q-CONFLICT, `GET
 **Accepted when:**
 
 - [ ] The device outbox replays against Go with no false conflicts (outbox tests + a scripted replay)
+- [ ] Sign-in and replay ([B-28](../../../docs/backend/open-decisions.md#settled)): after more than 15 minutes offline, replay renews the access pass first and shows no sync problem; an expired-pass answer renews once and retries
+- [ ] The outbox survives sign-out and expiry, replays only under the same club account, and shows "Sign in to sync N waiting changes" until then; signing out with waiting changes asks first
 
 ### R1a: Device time and sent lineups (owner, 2026-11-13; [rule-cases Q2/Q3](../rule-cases_20261113/spec.md#owner-answers-2026-11-13))
 
@@ -60,11 +62,13 @@ Cost, payments, mark-all, amounts, inventory. Go only (owner, 2026-11-13): the d
 
 ### R4: Outbox events
 
-Each write appends its live-update event in the same transaction (used by the live-updates track).
+Each write appends its live-update event in the same transaction (used by the live-updates track). Event ids increase per session, and the session's latest event id is its snapshot version ([B-25](../../../docs/backend/open-decisions.md#settled)), so every write that changes what the session snapshot shows (details, courts, queue, roster) must append one.
 
 **Accepted when:**
 
 - [ ] Event written iff the write commits
+- [ ] Every write that changes the session snapshot appends an event, so the snapshot version moves
+- [ ] The session row keeps its latest event id; events older than 7 days are deleted by the housekeeping loop ([B-34](../../../docs/backend/open-decisions.md#settled)) and the snapshot version is unchanged
 
 ## Scope
 

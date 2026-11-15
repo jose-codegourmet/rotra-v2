@@ -1,7 +1,7 @@
 # Track specification: Ship the Go stack and retire Supabase
 
 **Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 12 of 12) · **Created:** 2026-11-13
-**Depends on:** all earlier tracks · **Decisions:** B-10, B-20, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** all earlier tracks · **Decisions:** B-10, B-20, B-35, B-36, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -21,18 +21,32 @@ Every area moved; regression suite passes against the beta stack; monitoring and
 
 Merge `main` into `go-stack` one last time, then `go-stack` into `main` in one owner-reviewed PR after `make check` (B-20); final data copy Supabase → Railway production, account import, production domains moved to the new project; the old project and Supabase kept untouched until sign-off.
 
+**Runbook ([B-35](../../../docs/backend/open-decisions.md#settled)):**
+
+1. Pick a quiet time from the deploy-timing panel (B-26); tell clubs in advance, by hand or with the in-app notice if B-38 is built (optional).
+2. Pre-check: no running Queue Session and no device with unsynced changes; otherwise wait or postpone. Prepared sessions are fine.
+3. Freeze the old stack with the read-only switch (BL-8): writes refused with an "updating" message.
+4. Final copy, account import, row counts compared.
+5. Switch domains, smoke test; everyone signs in again.
+6. Rollback = switch the domains back, only until the first real write (deadline about 30 minutes). After that, fix forward; no reverse copy.
+7. Sessions finished on the old stack get `rules_version` 1. Supabase stays read-only until sign-off.
+
 **Accepted when:**
 
-- [ ] Rollback rehearsed
+- [ ] The whole runbook rehearsed on beta, including a rollback before the first write
+- [ ] The read-only switch refuses every write on the old stack and shows the message
+- [ ] The pre-check lists running sessions and unsynced devices
+- [ ] Copied old sessions read as `rules_version` 1
 
 ### R3: Retire
 
-Remove moved Route Handlers and `packages/db` services; move the regression suite to local Postgres + Go; schema ownership decided; Supabase removed after sign-off.
+Remove moved Route Handlers and `packages/db` services; move the regression suite to local Postgres + Go; Supabase removed after sign-off. **Schema moves to the Go API ([B-36](../../../docs/backend/open-decisions.md#settled)):** pick the Go migration tool (dependency decision, owner approves), carry the existing migration history over as its baseline, then retire Prisma migrations and `packages/db`.
 
 **Accepted when:**
 
 - [ ] TypeScript copies of Go-only rules deleted on `go-stack` and gone from `main` after the merge ([D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2026-11-13-08); [rule map](../rule-cases_20261113/spec.md#where-the-rules-live)); the shared queue and matchmaking rules run from the Go WebAssembly build (rule-cases R7, [D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01)), with no TypeScript copy left
 - [ ] UI updated on `go-stack` where a screen ran a deleted rule: setup form previews, `@rotra/schema` form checks, offline payments amount, mock mode per area. Each through the mockup first (mockup change on `main`)
+- [ ] Go migrations own the schema; a new migration from `apps/api` applies cleanly to a copy of production; Prisma no longer runs migrations
 - [ ] Docs updated: architecture, AGENTS, coding conventions, observability (including AGENTS rule 6 on `@rotra/schema`)
 
 ## Scope

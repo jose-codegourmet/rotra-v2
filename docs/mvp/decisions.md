@@ -204,6 +204,7 @@ Then add a row to the [index](#index) and link the entry from the workstream pag
 - **Ticket:** [#522](https://github.com/jose-codegourmet/rotra-v2/issues/522) (mock data), [#542](https://github.com/jose-codegourmet/rotra-v2/issues/542) (Storage and real-mode writer), epic [#502](https://github.com/jose-codegourmet/rotra-v2/issues/502)
 - **Roadmap:** MVP candidate — [Player workstream](workstreams/player.md)
 - **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-06): pictures move to Railway Buckets, served by presigned URL, when the Go API takes over storage. The reuse of the club-logo pattern and the limits stay.
+- **Amended by:** [B-31](../backend/open-decisions.md#settled) (November 14, 2026): pictures move to a public Cloudflare R2 bucket on a ROTRA picture subdomain first (stored addresses stay permanent and public, as today), with Railway Buckets behind a stable redirect address as the fallback.
 - **Decision:** Reuse the club-logo pattern (#374) instead of building a new one. The Player app's existing `/api/me/profile` route (behind `requireOwnPlayer`) receives the photo, the server normalizes it to a square image (up to 512 px; #567 preserves JPEG/PNG/WebP/GIF and converts HEIC/HEIF to WebP), uploads it to a public **`player-avatars`** Supabase Storage bucket, and saves its immutable URL in `players.avatar_ref`. A character is saved as `character:<id>`; Use my initials saves null. No direct browser upload, no Edge Function, no migration (`avatar_ref` already exists). Old files are kept like club logo snapshots.
 - **References:** [architecture.md › Club logos](../architecture.md), [identity](../database_design/product/player-information/modules/identity.md), [mockup log](../mockup-changes/2026-11-08-player-change-avatar.md).
 
@@ -400,6 +401,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Ticket:** needed
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md), [Backend](workstreams/backend.md)
 - **Amended by:** [D-2026-11-13-01](#d-2026-11-13-01) (B-08): live push replaces "Not used: … polling, push notifications"; the cached snapshot and the server-side sign-in check stay.
+- **Amended by:** [B-25](../backend/open-decisions.md#settled) (November 14, 2026): with the Go API the shared snapshot is cached **per version** (the session's latest live-update event id), not for a flat 10 seconds. A newer version replaces the cached copy, so a screen re-reading after a live message never gets an older one. One copy per session and view, held in the API's memory with a size cap; 24 players refreshing at once still cost about one database read.
+- **Amended by:** [B-27](../backend/open-decisions.md#settled) (November 14, 2026): with Go-owned sign-in, the server-side sign-in check stays local: `proxy.ts` checks Go's access pass with Go's public key, like `getClaims` today.
 - **Decision:**
   - **Split the page data in two.** A shared session snapshot (details, courts, queue, roster) is cached on the server for about 10 seconds. It comes in two versions per session: one for visitors (everything masked) and one for signed-in players (registered full names). A small personal part (my status, my games, my requests) isn't cached.
   - **Cost for one session of 24 players over 3 hours:** about 2,000 requests, mostly answered from the cache. If 24 players refresh at once, that costs about one database read.
@@ -772,7 +775,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 <a id="d-2026-11-13-01"></a>
 ### D-2026-11-13-01 — Go API on Railway: API, database, sign-in and pictures off Vercel functions and Supabase; live updates
-- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-20 answered the same day). Nothing is open in [backend open decisions](../backend/open-decisions.md).
+- **Decision status:** approved (planning session, November 13, 2026; B-02 as agreed with the partner; B-10 to B-20 answered the same day). B-24 to B-37 opened November 14, 2026 from an architecture review (B-24 to B-32 settled the same day; B-31 moves pictures to Cloudflare R2 first, amending B-06 and B-13); see [backend open decisions](../backend/open-decisions.md).
 - **Implementation status:** not started
 - **Ticket:** needed
 - **Roadmap:** built and tested side by side with the current stack, shipped when ready for production (B-10) — [Backend](workstreams/backend.md)

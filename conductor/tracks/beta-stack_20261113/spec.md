@@ -18,27 +18,40 @@ Same repo and apps, built from the long-lived `go-stack` branch (created off `ma
 - [ ] `go-stack` branch exists (backlog [BL-5](../../tracks.md#backlog)); the beta project builds it and the current project still builds `main`
 - [ ] The three beta apps load in real mode
 
-### R2: Env-gated rewrites
+### R2: Env-gated forwarding
 
-Each app's `next.config` rewrites the `/api/*` paths of **moved areas** to the Go API only when `ROTRA_GO_API_URL` is set; the list of moved areas is one setting. The shared `vercel.json` is not changed.
+Each app's `proxy.ts` forwards the `/api/*` paths of **moved areas** to the Go API only when `ROTRA_GO_API_URL` is set; the list of moved areas is one setting. The shared `vercel.json` is not changed. Per [B-30](../../../docs/backend/open-decisions.md#settled) (amends B-05, which used `next.config` rewrites), the forwarded request carries the secret proxy header `ROTRA_PROXY_SECRET` and the client IP. Per [B-32](../../../docs/backend/open-decisions.md#settled), with `ROTRA_GO_API_URL` set `proxy.ts` forwards moved paths first, checks sign-in only with Go's pass and never calls Supabase (everyone is signed out before go-sign-in), and matches moved paths on whole path segments.
 
 **Accepted when:**
 
 - [ ] Without the variable, behavior is identical to today (current project)
 - [ ] With it, a moved path reaches Go; an unmoved path still reaches its Route Handler
+- [ ] The beta loads public pages with no Supabase keys set
+- [ ] A moved path reaches Go while its Route Handler file still exists
+- [ ] Moving `/api/sessions` doesn't catch `/api/sessions-export` (whole-segment match)
+- [ ] Go sees the real client IP through the forwarding; a direct call with a faked `X-Forwarded-For` and no secret is not trusted, and gets 404 except `/healthz` and the stream-ticket route
 
 ### R3: Beta data
 
-Railway Postgres in staging starts from a copy of the Supabase database. Route Handlers in the beta project use that database too, so moved and unmoved areas see the same data; sign-in stays on the current Supabase Auth until the sign-in track lands.
+Railway Postgres in staging starts from a copy of the Supabase database. Route Handlers in the beta project use that database too, so moved and unmoved areas see the same data.
+
+**Sign-in on beta is Go only ([B-24](../../../docs/backend/open-decisions.md#settled)).** The beta never signs anyone in through Supabase Auth:
+
+- The beta Vercel project holds **no Supabase keys** (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`). Any Supabase call left in a beta Route Handler fails with an error instead of reaching real users' logins.
+- Until [go-sign-in](../go-sign-in_20261113/spec.md) lands, the beta serves only what needs no sign-in (public pages and reads). Signed-in areas are tested on beta once Go owns sign-in.
+- Route Handlers that still write to Supabase Auth (the Admin player password reset and player email edit, until [go-writes-admin-player](../go-writes-admin-player_20261113/spec.md) moves them) fail on beta by design; they are tested there once they move to Go.
+- Real users are not given the beta domains until go-sign-in is done.
 
 **Accepted when:**
 
 - [ ] Copy rehearsed and documented; row counts compared
 - [ ] Beta Route Handlers work against Railway Postgres
+- [ ] The beta Vercel project has no Supabase variables in any environment (checked in the Vercel dashboard and recorded in the plan)
+- [ ] A Supabase-backed action on beta (for example sign-in before go-sign-in) returns an error and changes nothing in Supabase
 
 ### R4: Live stream through the rewrite (B-12)
 
-Prove a long-lived stream through the Vercel rewrite; if it fails, use the ticket fallback.
+Prove a long-lived stream through the `proxy.ts` forwarding (B-30); if it fails, use the ticket fallback.
 
 **Accepted when:**
 
@@ -46,7 +59,7 @@ Prove a long-lived stream through the Vercel rewrite; if it fails, use the ticke
 
 ## Scope
 
-**In:** Vercel project, the `go-stack` branch, rewrites, data copy, the stream test. The env-gated rewrites (R2) merge into `main`; they are inert without `ROTRA_GO_API_URL`.
+**In:** Vercel project, the `go-stack` branch, forwarding, data copy, the stream test. The env-gated forwarding (R2) merges into `main`; they are inert without `ROTRA_GO_API_URL`.
 
 **Out:** Moving any area; Shipping to production.
 

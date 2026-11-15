@@ -37,7 +37,7 @@ export default defineRailway((ctx) => {
   const prod = ctx.environment === "production";
 
   const db = postgres("postgres");
-  const pictures = bucket("pictures", { region: "<singapore region id>" }); // immutable after creation
+  const pictures = bucket("pictures", { region: "<singapore region id>" }); // plan B only (B-31); immutable after creation
 
   const api = service("api", {
     source: github("jose-codegourmet/rotra-v2", { rootDirectory: "apps/api" }),
@@ -45,7 +45,7 @@ export default defineRailway((ctx) => {
     replicas: 1, // one instance: live updates fan out in-process (B-08); more only when measured
     env: {
       DATABASE_URL: db.env.DATABASE_URL,
-      ROTRA_AUTH_SIGNING_KEY: preserve(), // secrets are set in Railway, never in the file
+      ROTRA_AUTH_SIGNING_KEY: preserve(), // private signing key (B-27): Railway only, never in the file, the repo or Vercel
       OTEL_EXPORTER_OTLP_ENDPOINT: preserve(),
       OTEL_EXPORTER_OTLP_HEADERS: preserve(),
     },
@@ -66,13 +66,24 @@ Notes:
   [region list](https://docs.railway.com/deployments/regions#region-options), next to Vercel `sin1`.
   The exact string is checked when the file is written. **Bucket regions can't be changed after
   creation**, so the bucket must be right the first time.
+- **Live-update listener (B-26).** The API's live-update listener uses a **direct** database
+  connection (one connection), because Railway's PgBouncer doesn't support LISTEN/NOTIFY. Everything
+  else goes through the pool, so the `api` service gets both addresses.
 - **Database.** High availability, backups / point-in-time recovery and connection pooling are turned
   on per database ([Railway PostgreSQL](https://docs.railway.com/databases/postgresql)). On Hobby the
   volume is capped at 5 GB; that's monitored, not acted on (B-14). Turn on **Query Statistics**
   (`pg_stat_statements`) in Database › Stats for each ROTRA database (B-19). It isn't on by default.
-- **Pictures** are served by presigned URL: bucket egress is free, service egress isn't
-  ([buckets billing](https://docs.railway.com/storage-buckets/billing)). The API never streams a
-  picture.
+- **Housekeeping (B-34).** The `api` service runs an hourly in-process loop (no cron, no extra
+  service) that deletes old rows in batches of about 1,000 under an advisory lock: live-update events
+  after 7 days, `auth_events` after 90 days, ended `auth_sessions` 90 days after they end. Retention
+  values are configuration (`ROTRA_RETENTION_*`). Product scheduled jobs stay parked (B-07).
+- **Pictures (B-31).** Plan A is a public **Cloudflare R2** bucket on a ROTRA picture subdomain,
+  outside Railway; the `pictures` bucket in the example above exists only if the pictures track
+  falls back to plan B. Plan A needs `rotra.club` as a Cloudflare zone (nameservers on Cloudflare's
+  free plan, Vercel records DNS only). Plan B: Railway buckets are private only, so pictures are
+  served by presigned URL behind a stable ROTRA picture address: bucket egress is free, service
+  egress isn't ([buckets billing](https://docs.railway.com/storage-buckets/billing)). Either way the
+  API never streams a picture's bytes to viewers.
 - **Secrets** use `preserve()`, so `apply` keeps the value set in Railway and the file never holds one.
 - **Environments:** `staging` (the side-by-side test) and `production`.
 
@@ -90,7 +101,7 @@ Railway deploys the Go API **only for backend changes**, and only after the back
 
 | Piece | Where | What it does |
 |---|---|---|
-| Backend CI | `.github/workflows/backend.yml` | Runs on PRs and `main` pushes that touch `apps/api/**`, `packages/rule-cases/**`, `packages/rules-wasm/**` (once it exists, D-2026-11-14-01), `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs, `conductor/` and root `*.md`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
+| Backend CI | `.github/workflows/backend.yml` | Required check on `main` (B-33): runs on every PR, with its Go jobs skipped unless the change touches `apps/api/**`, `packages/rule-cases/**`, `packages/rules-wasm/**` (once it exists, D-2026-11-14-01), `.railway/**` or itself. Job `scope` fails if the change also includes anything outside those paths, docs, `conductor/` and root `*.md`; one exception (B-37): `packages/rule-cases/**` may change together with the TypeScript shared-rule files in `packages/data`. Job `go` runs `go vet`, `go test -race -cover`, `go build`, golangci-lint and govulncheck (skipped with a notice until `apps/api/go.mod` exists) |
 | Frontend CI | `.github/workflows/ci.yml` | `paths-ignore` for the same backend paths, `docs/**`, `conductor/**` and root `*.md`, so a backend-only commit runs no frontend checks |
 | Railway watch paths | `api` service settings | `/apps/api/**`, `/packages/rule-cases/**`, `/packages/rules-wasm/**`. Commits that don't touch them never build or deploy ([watch paths](https://docs.railway.com/deployments/monorepo#watch-paths)) |
 | Railway "Wait for CI" | `api` service settings | The deploy waits in `WAITING` until the commit's GitHub Actions runs finish, and goes ahead only if they pass ([wait for CI](https://docs.railway.com/deployments/github-autodeploys#wait-for-ci)) |
@@ -113,8 +124,11 @@ Rules this sets:
   through the wrapper. The apps publish `rules-manifest.json`; the Go API stamps new Queue Sessions
   only with a version that manifest lists, capped by `RULES_VERSION_MAX` on the `api` service
   (normally unset) ([B-22](open-decisions.md)).
-- **CI is still advisory for the frontend** ([ways-of-working §5](../ways-of-working.md#5-branches-commits-prs)).
-  For the backend, a red Backend CI means **no deploy**, which is the gate.
+- **Backend CI is a required check on `main` (B-33).** A GitHub ruleset requires it, so a red
+  Backend CI blocks the merge (auto-merge waits) as well as the deploy. `backend.yml` runs on every
+  PR and skips its Go jobs when no backend path changed, so frontend PRs pass straight through. CI
+  stays advisory for the frontend ([ways-of-working §5](../ways-of-working.md#5-branches-commits-prs));
+  this exception is for backend paths only.
 - Watch paths and "Wait for CI" are service settings. Turn them on in Railway when the `api`
   service is created; they aren't in the IaC example above.
 
@@ -130,11 +144,19 @@ Rules this sets:
   Vercel project. `go-stack` holds only the UI changes that need the Go API; everything else (rule
   cases, `apps/api`, Railway) merges into `main`. `main` is merged into `go-stack` at least weekly and
   after every Queue epic. Shipping merges `go-stack` into `main` in one owner-reviewed PR.
-- The rewrite must only exist in the new project. A rewrite in the shared `vercel.json` would hit
-  both projects, so it goes in each app's `next.config` and is turned on only when
-  `ROTRA_GO_API_URL` is set. That variable is set only in the new project.
+- The forwarding must only exist in the new project. A rewrite in the shared `vercel.json` would hit
+  both projects, so it goes in each app's `proxy.ts` (B-30; it was `next.config` before) and is
+  turned on only when `ROTRA_GO_API_URL` is set. That variable is set only in the new project.
+- **Proxy secret (B-30).** `proxy.ts` adds a secret header (`ROTRA_PROXY_SECRET`, set in the beta
+  Vercel project and Railway) and the client IP. Go trusts the forwarded IP only with the secret,
+  and without it answers only `/healthz` and the stream-ticket route.
+- **Railway's default domain (B-30).** Removing `*.up.railway.app` is optional until tested in
+  go-api-foundation R6; if it stays, the proxy-secret rule protects it.
 - The two stacks have **separate data**: the new one starts from a copy of the Supabase database,
   rehearsed with the import in [sign-in](../database_design/product/sign-in.md#moving-accounts-from-supabase).
+- **Sign-in on beta is Go only (B-24).** The beta Vercel project holds no Supabase keys, so nothing on
+  beta can reach production Supabase Auth; a leftover Supabase call fails instead. Until Go sign-in
+  lands, the beta serves only what needs no sign-in, and real users don't get the beta domains.
 - **Shipping** = a final copy of the data, then the production domains move to the new project and the
   old project is kept, untouched, until the owner signs off.
 - **Domains (B-18):**

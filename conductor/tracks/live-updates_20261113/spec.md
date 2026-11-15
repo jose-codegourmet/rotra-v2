@@ -13,10 +13,29 @@ The reason for the Go API: screens update by themselves. Refresh stays as the fa
 
 One stream per signed-in screen (and visitors on public session pages), fed by the outbox events through in-process fan-out on Postgres notifications.
 
+**Transactional outbox ([B-26](../../../docs/backend/open-decisions.md#settled)).**
+
+- The events table (written in the same transaction as each write, go-writes-queue R4) is the record. A publisher in the Go API reads the events after the last id it pushed and publishes them to an in-memory pub/sub hub with topics per session, club and player; each screen's stream subscribes to its topics.
+- `NOTIFY` is only a nudge to read now. The listener holds **one direct (unpooled) connection**; PgBouncer doesn't support LISTEN/NOTIFY. All other queries use the pool.
+- On start and after any reconnect the publisher reads from the table again, so a missed nudge loses nothing. No delivery-status or retry table.
+- Phones reconnect with their last event id (`Last-Event-ID`) and get one "changed, now at #M" per topic that moved.
+- On deploy the old instance closes its streams cleanly so phones reconnect to the new one.
+- During the beta, writes through the beta's Route Handlers (areas not moved yet) add events too, so those screens update live.
+- A separate broker only when the API runs more than one instance.
+
+**Snapshot versions ([B-25](../../../docs/backend/open-decisions.md#settled)).** Each live message carries the session's new event id. The screen re-reads asking for at least that id; the session snapshot cache (D-2026-11-09-09) is keyed by session + view (visitor or signed-in) + event id, so an older cached copy is rebuilt once (one build per version, e.g. `singleflight`) and shared. One copy per session and view in the API's memory: a newer version replaces the older one, slots unread for about 10 minutes are dropped, and a size cap (about 64 MB) drops the least recently read copy first. The app client puts the version in the request, never in the TanStack Query key.
+
 **Accepted when:**
 
 - [ ] Event reaches a connected screen in under a second on staging
 - [ ] Reconnect resumes from the last event id
+- [ ] A reconnect with an id older than the kept events (B-34, 7 days) gets "changed" for every topic and the screen re-reads
+- [ ] The listener uses a direct connection; with the listener cut (or the database restarted), events committed meanwhile still reach connected screens after it reconnects
+- [ ] An API restart mid-session: phones reconnect and catch up with no manual refresh
+- [ ] A write through a beta Route Handler reaches a connected screen
+- [ ] A re-read right after a live message returns the new snapshot, never the cached older one
+- [ ] Many screens re-reading the same new version cause one snapshot build
+- [ ] The cache holds at most one copy per session and view and stays under its size cap; API memory is on the Grafana dashboard
 
 ### R2: Authorization
 

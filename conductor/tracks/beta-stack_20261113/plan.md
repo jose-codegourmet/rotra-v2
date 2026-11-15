@@ -24,6 +24,7 @@ Ticket: #803
 
 - [ ] **3.1** Dump/restore Supabase → Railway staging; compare counts (stop and ask: data copy)
 - [ ] **3.2** Point beta Route Handlers at Railway Postgres
+- [ ] **3.3** Check the beta Vercel project has no Supabase variables (B-24); confirm a Supabase-backed action fails on beta and changes nothing in Supabase
 
 ## Phase 4: Stream test
 

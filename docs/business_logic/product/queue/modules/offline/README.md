@@ -61,6 +61,22 @@ They describe the target, not functionality currently implemented.
 | Tick players paid / not paid | Works offline; syncs like other changes |
 | Club settings (view or change club details, name-change request, password, license) | Online only; offline the page is unavailable |
 
+## Sign-in while offline (B-28)
+
+Decided November 14, 2026 for the Go stack ([B-28](../../../../../backend/open-decisions.md#settled)). Not built; the messages go
+through the mockups first.
+
+- **Expired pass.** Access passes last 15 minutes (B-27), so almost every offline stretch ends with
+  an expired one. Replay renews it with the refresh pass first, and on an expired-pass answer renews
+  once and retries. The Queue Master sees no sync problem for this.
+- **Signed out or refresh expired.** The waiting changes stay on the device and replay only under
+  the same club account. Until someone signs in with it, the device shows "Sign in to sync N waiting
+  changes". Signing in with another club account never sends them.
+- **Revoked device.** A device revoked by its owner or Admin is untrusted: its waiting changes are
+  refused, and it shows that N changes were not synced. The revoke dialog warns first when the device
+  holds an offline copy of a Queue Session.
+- **Signing out with waiting changes** asks first; the changes stay on the device.
+
 ## Download and sync status
 
 Each device downloads a session for itself: **Not downloaded on this device**, **Downloading…**, or **Ready on this device** (with **Update download**). A download on one device does not prepare another.

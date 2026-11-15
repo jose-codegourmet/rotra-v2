@@ -83,6 +83,7 @@ CREATE TABLE auth_sessions (
   device_label            text NOT NULL CHECK (device_label <> ''),  -- e.g. "Chrome on Android"
   refresh_digest          bytea NOT NULL UNIQUE CHECK (octet_length(refresh_digest) = 32),
   previous_refresh_digest bytea UNIQUE CHECK (octet_length(previous_refresh_digest) = 32),
+  refreshed_at            timestamptz,                 -- last rotation; reuse grace window (B-29)
   created_ip              inet,
   last_ip                 inet,
   last_seen_at            timestamptz NOT NULL,
@@ -106,7 +107,10 @@ CREATE INDEX auth_sessions_device ON auth_sessions (club_id, device_id)
 
 - **Refresh rotation.** Only SHA-256 digests are stored. Each refresh moves `refresh_digest` to
   `previous_refresh_digest` and stores the new one. A request carrying a digest that matches
-  `previous_refresh_digest` is reuse: revoke the session with `refresh_reused`.
+  `previous_refresh_digest` is reuse: revoke the session with `refresh_reused`, **except within
+  30 seconds of the rotation** ([B-29](../../backend/open-decisions.md#settled)): then it gets a new access pass only, with no new
+  refresh pass and the refresh cookie left alone. The rotation time is needed for this, so the
+  table gains `refreshed_at timestamptz` (set on each rotation).
 - **Signing out a device** sets `revoked_at` + reason. Rows stay for the list and the audit trail;
   removal follows the retention rules, which are still open (#248).
 - **Changing a password** revokes every other session of that identity (`password_changed`).
@@ -151,7 +155,10 @@ CREATE UNLOGGED TABLE auth_rate_limits (
   IP and login, never the only one.
 - Old windows are deleted by the sign-in request itself (delete expired windows for the same subject
   in the same statement batch). This follows the "no scheduled jobs" decision (B-07).
-- Limits and window sizes are configuration, not schema. Their values are open.
+- Limits and window sizes are configuration, not schema. Starting values ([B-30](../../backend/open-decisions.md#settled)): wrong
+  passwords per account 5 per 15 min; attempts per device 10 per 15 min; attempts per IP 100 per
+  15 min; claims and reset requests per IP 30 per hour. The IP is trusted only when it arrives with
+  the proxy secret.
 
 ### `auth_events` — sign-in audit trail
 
@@ -162,7 +169,7 @@ CREATE TABLE auth_events (
   session_id  uuid REFERENCES auth_sessions (id) ON DELETE RESTRICT,
   audience    text NOT NULL CHECK (audience IN ('club', 'player', 'admin')),
   event       text NOT NULL CHECK (event IN ('sign_in', 'sign_in_failed', 'rate_limited',
-                'refresh', 'refresh_reused', 'sign_out', 'session_revoked',
+                'refresh_reused', 'sign_out', 'session_revoked',
                 'password_changed', 'password_reset_issued', 'password_reset_used',
                 'device_enrolled', 'device_revoked')),
   ip          inet,
@@ -180,7 +187,12 @@ CREATE INDEX auth_events_session ON auth_events (session_id) WHERE session_id IS
   identity.
 - Admin actions that change an account (disable, reset, sign out a device) still go to
   `admin_audit_events` as today. `auth_events` records the sign-in side.
-- Retention: open with the other retention rules (#248).
+- **Retention (B-34).** Routine refreshes are not logged (a refresh every 15 minutes per device
+  would outgrow everything else); `refresh_reused` is. The API's hourly housekeeping loop deletes
+  rows older than 90 days, then ended `auth_sessions` (signed out, revoked or expired) 90 days after
+  they end, in that order so `session_id` references stay valid. The append-only trigger still
+  refuses updates; deletes are allowed only past the retention window (proposal: the loop sets a
+  transaction-local flag the trigger checks). Retention values are configuration.
 
 ### Recovery — reuses `player_password_reset_requests`
 
@@ -212,7 +224,7 @@ with owner sign-off like every shared-database migration.
 | Command | One transaction |
 |---|---|
 | Sign in | rate-limit upsert · identity + account checks · rehash if `bcrypt` · `devices` upsert (club) · `auth_sessions` insert · `auth_events` insert |
-| Refresh | session lock (`FOR UPDATE`) · reuse check · digest rotation · `last_seen_at` · event |
+| Refresh | session lock (`FOR UPDATE`) · reuse check · digest rotation · `last_seen_at` · no event unless reuse (B-34) |
 | Sign out a device | session update · event (+ `admin_audit_events` when Admin does it) |
 | Claim (player) | existing claim transaction + `auth_identities` insert + `player_accounts` with `auth_provider = 'rotra'`: one transaction now, since provider and database are the same system |
 | Password reset used | consume reset row · new hash · revoke all sessions · event |
@@ -221,10 +233,30 @@ with owner sign-off like every shared-database migration.
 The claim row simplifies the staged provisioning in [identity](player-information/modules/identity.md#registration-links):
 there's no longer a separate provider call to keep consistent.
 
+## Passes and lifetimes (B-27)
+
+Decided November 14, 2026 ([B-27](../../backend/open-decisions.md#settled)).
+
+- **Signing.** The Go API signs access passes with a private key held only in Railway. It publishes
+  the public key set (with key ids, so a key can be rotated with two live); each app's `proxy.ts`
+  checks passes locally with the cached public key, with no round trip.
+- **Two passes.** A 15-minute access pass, and a refresh pass whose SHA-256 digest is
+  `auth_sessions.refresh_digest`. A refresh happens in `proxy.ts` on a page load or after a 401 on
+  an API call.
+- **Revocation.** A revoked `auth_sessions` row refuses the next refresh. Reads may continue for at
+  most one access pass (15 minutes); every write also checks the session row isn't revoked.
+- **Lifetimes** (`auth_sessions.expires_at` is the refresh lifetime):
+
+  | Audience | Access pass | Refresh |
+  |---|---|---|
+  | `club` | 15 min | 30 days, extended on use |
+  | `player` | 15 min | 30 days, extended on use |
+  | `admin` | 15 min | 12 hours, not extended |
+
+- **Cookies.** Host-only per app, `HttpOnly`, `Secure`, `SameSite=Lax`; the refresh cookie is
+  limited to the refresh path.
+
 ## Open
 
 - Club and admin password policy; email verification stays as decided for claims (none).
-- Rate-limit thresholds and window sizes.
-- Access-token lifetime and refresh lifetime (`expires_at`).
-- Retention of revoked sessions and `auth_events` (#248).
 - When the `auth_subject` FKs are added (after every account is `rotra`).

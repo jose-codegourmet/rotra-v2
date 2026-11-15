@@ -173,9 +173,9 @@ func TestSerializationHelpersMatchTypeScript(t *testing.T) {
 		"toIsoOrNullNull":  ToIsoOrNull(nil),
 		"toDecimalString":  ToDecimalString(9007199254740993),
 		"toDateOnly":       ToDateOnly(late),
-		"toMoney":          ToMoney(ptr(int64(15000)), "PHP"),
-		"toMoneyNull":      ToMoney(nil, "PHP"),
-		"toMoneyZero":      ToMoney(ptr(int64(0)), "PHP"),
+		"toMoney":          mustMoney(t, ptr(int64(15000)), "PHP"),
+		"toMoneyNull":      mustMoney(t, nil, "PHP"),
+		"toMoneyZero":      mustMoney(t, ptr(int64(0)), "PHP"),
 	}
 	for name, want := range g.Helpers {
 		raw, err := json.Marshal(got[name])
@@ -234,9 +234,9 @@ func TestTypedDocumentMatchesToJson(t *testing.T) {
 		WholeSecond: Instant(time.Date(2026, 3, 4, 5, 6, 7, 0, time.UTC)),
 		EndedAt:     nil,
 		SessionDate: DateOnly(time.Date(2026, 3, 4, 23, 59, 59, 999_000_000, time.UTC)),
-		Fee:         ToMoney(ptr(int64(15000)), "PHP"),
-		NoFee:       ToMoney(nil, "PHP"),
-		ZeroFee:     ToMoney(ptr(int64(0)), "PHP"),
+		Fee:         mustMoney(t, ptr(int64(15000)), "PHP"),
+		NoFee:       mustMoney(t, nil, "PHP"),
+		ZeroFee:     mustMoney(t, ptr(int64(0)), "PHP"),
 		Count:       3,
 		Tags:        []*string{ptr("a"), nil, ptr("b")},
 		Nested:      nested{At: Instant(time.Date(2026, 12, 31, 16, 0, 0, 0, time.UTC)), Big: 123},
@@ -289,5 +289,32 @@ func TestSerializedTypesRoundTrip(t *testing.T) {
 	}
 	if err := json.Unmarshal([]byte(`5`), &d); err == nil {
 		t.Fatal("non-string date must be refused")
+	}
+}
+
+func mustMoney(t *testing.T, amountMinor *int64, currency string) *Money {
+	t.Helper()
+	m, err := ToMoney(amountMinor, currency)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return m
+}
+
+// toMoney in serialize.ts throws beyond Number.MAX_SAFE_INTEGER (2^53-1); so does ToMoney.
+func TestToMoneyRejectsBeyondSafeInteger(t *testing.T) {
+	const maxSafe = int64(9007199254740991)
+	for _, v := range []int64{maxSafe, -maxSafe} {
+		if m, err := ToMoney(&v, "PHP"); err != nil || m == nil || m.AmountMinor != v {
+			t.Errorf("ToMoney(%d) = %v, %v; want ok", v, m, err)
+		}
+	}
+	for _, v := range []int64{maxSafe + 1, -maxSafe - 1, 1<<63 - 1, -1 << 63} {
+		if m, err := ToMoney(&v, "PHP"); err == nil || m != nil {
+			t.Errorf("ToMoney(%d) = %v, %v; want error", v, m, err)
+		}
+	}
+	if m, err := ToMoney(nil, "PHP"); err != nil || m != nil {
+		t.Errorf("ToMoney(nil) = %v, %v; want nil, nil", m, err)
 	}
 }

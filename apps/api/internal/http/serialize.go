@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -39,13 +40,19 @@ type Money struct {
 	Currency    string `json:"currency"`
 }
 
-// ToMoney is toMoney: nil stays null, never 0. Callers keep amounts within JavaScript's safe
-// integer range (2^53-1), which the TypeScript side enforces.
-func ToMoney(amountMinor *int64, currency string) *Money {
+// maxSafeInteger is Number.MAX_SAFE_INTEGER (2^53-1).
+const maxSafeInteger = 1<<53 - 1
+
+// ToMoney is toMoney: nil stays null, never 0, and an amount outside JavaScript's safe integer
+// range (±(2^53-1)) is an error, as the TypeScript side throws.
+func ToMoney(amountMinor *int64, currency string) (*Money, error) {
 	if amountMinor == nil {
-		return nil
+		return nil, nil
 	}
-	return &Money{AmountMinor: *amountMinor, Currency: currency}
+	if *amountMinor > maxSafeInteger || *amountMinor < -maxSafeInteger {
+		return nil, errors.New("money must be integer minor units within the safe integer range")
+	}
+	return &Money{AmountMinor: *amountMinor, Currency: currency}, nil
 }
 
 // BigInt is a 64-bit integer that travels as a decimal string.

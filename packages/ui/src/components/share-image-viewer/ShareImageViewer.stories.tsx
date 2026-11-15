@@ -41,3 +41,12 @@ export const Square: Story = {
   args: { label: 'Square', format: 'square', children: image('square') },
   globals: { theme: 'light' },
 }
+export const SaveToPhotos: Story = {
+  args: {
+    label: 'Story',
+    format: 'story',
+    children: image('story'),
+    downloadLabel: 'Save to Photos',
+  },
+  globals: { theme: 'dark' },
+}

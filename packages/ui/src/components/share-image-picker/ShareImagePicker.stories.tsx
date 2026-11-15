@@ -88,3 +88,11 @@ export const NoLink: Story = {
   args: { link: undefined, onCopy: undefined },
   globals: { theme: 'dark' },
 }
+export const SaveToPhotos: Story = {
+  args: { webShare: true, saveToPhotos: true },
+  globals: { theme: 'dark' },
+}
+export const SaveToPhotosLight: Story = {
+  args: { webShare: true, saveToPhotos: true },
+  globals: { theme: 'light' },
+}

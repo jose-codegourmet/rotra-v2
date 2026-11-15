@@ -10,26 +10,26 @@ replaced by the [fallback](./spec.md#fallback-if-the-spike-fails).
 
 ## Phase 1: Spike (R0, throwaway branch `spike/rules-wasm`)
 
-- [ ] **1.1** Build `canPlace`, `waitMinutes`, `courtOpen` to WebAssembly with standard Go and with TinyGo, behind a wrapper
-- [ ] **1.2** Measure size, phone load time, court-fill call cost, Vitest, mock mode, offline load, Vercel build
-- [ ] **1.3** Record results below; pick the tool by the B-21 rule; owner asked only if both tools fail (pass marks confirmed 2026-11-14, size 1.5 MB)
+- [x] **1.1** Build `canPlace`, `waitMinutes`, `courtOpen` to WebAssembly with standard Go and with TinyGo, behind a wrapper
+- [~] **1.2** Measure size, phone load time, court-fill call cost, Vitest, mock mode, offline load, Vercel build
+- [~] **1.3** Record results below; pick the tool by the B-21 rule; owner asked only if both tools fail (pass marks confirmed 2026-11-14, size 1.5 MB)
 
 ## Phase 2: Cases package and shapes (R1, R2) · `main`
 
-- [ ] **2.1** Create `packages/rule-cases` with `exports` and no barrel; cases under `v1/` (B-22)
-- [ ] **2.2** JSON Schema for rule cases and command cases (`now` where a rule reads the clock)
-- [ ] **2.3** Vitest check that every case file matches the schema
+- [x] **2.1** Create `packages/rule-cases` with `exports` and no barrel; cases under `v1/` (B-22)
+- [x] **2.2** JSON Schema for rule cases and command cases (`now` where a rule reads the clock)
+- [x] **2.3** Vitest check that every case file matches the schema
 
 ## Phase 3: Bucket 1 cases, no behavior change (R3, R4) · `main`
 
 JSON files and the Vitest switch go in separate PRs (see spec).
 
-- [ ] **3.1** Match guards: `canPlace` / `canStart` / `canMoveCourt` / `canReplacePlayer`, `swapTarget`, `validateResult`, team sizes
-- [ ] **3.2** Game counts: counted games, substitution credit, games adjustment, `waitMinutes`, standings
-- [ ] **3.3** Court fill: `autoFillPlacements`, `nextEligibleForCourt`, `nextMatchCandidates` (new), `putOnCourt`
-- [ ] **3.4** Courts and time: court open / early / booking ended, session end and court conflict
-- [ ] **3.5** Roster: step-down guard, duplicate, slots, waitlist fill order and give slot (new)
-- [ ] **3.6** Language-edge cases (new): standings ties with accented and mixed-case names, rounding edges, court-fill ties
+- [x] **3.1** Match guards: `canPlace` / `canStart` / `canMoveCourt` / `canReplacePlayer`, `swapTarget`, `validateResult`, team sizes
+- [x] **3.2** Game counts: counted games, substitution credit, games adjustment, `waitMinutes`, standings
+- [x] **3.3** Court fill: `autoFillPlacements`, `nextEligibleForCourt`, `nextMatchCandidates` (new), `putOnCourt`
+- [x] **3.4** Courts and time: court open / early / booking ended, session end and court conflict
+- [x] **3.5** Roster: step-down guard, duplicate, slots, waitlist fill order and give slot (new)
+- [x] **3.6** Language-edge cases (new): standings ties with accented and mixed-case names, rounding edges, court-fill ties
 
 ## Phase 4: Port bucket 1 to Go (R5) · `main`
 
@@ -58,18 +58,36 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 
 ## Phase 7: Verify
 
-- [ ] **7.1** Case counts per rule before/after, recorded below
+- [x] **7.1** Case counts per rule before/after, recorded below
 - [ ] **7.2** `make check` passes; PR lists what was verified
 
 ## Spike results
 
 | Check | Pass mark | Standard Go | TinyGo |
 |---|---|---|---|
+| Compressed `.wasm` size | under 1.5 MB | Pass: raw 2.67 MB, gzip 0.76 MB, brotli 0.57 MB (host must compress `.wasm`) | not run |
+| First load, mid-range Android | under 300 ms | Not measured (Node: 38 ms) | not run |
+| 12-court fill, JSON in/out | under 5 ms | Pass as one batched call (median 0.84 ms); fails as 120 per-match calls (62 ms), so expose a batched fill | not run |
+| Runs under Node (Vitest) | yes | Pass in plain Node; Vitest not run | not run |
+| Mock mode in Queue app | yes | Not measured | not run |
+| Cache and offline with tab open | yes | Not measured | not run |
+| Rebuilds identically; Vercel serves it | yes | Not measured | not run |
+| Vercel cold start added | under 200 ms | Not measured | not run |
+
+Go 1.22.0 locally; spike was in the scratchpad, not the repo. TinyGo not needed on current evidence. Owner go/fallback
+still open (1.3).
 
 ## Case counts
 
-| Rule | Vitest before | JSON after |
+| Rule group | Vitest `it` before (files) | JSON cases after |
 |---|---|---|
+| match (guards, standings, counts, waits) | 30 + 12 in match/autoFill | 140 |
+| courtfill | autoFill 12 | 57 |
+| courts | courts 7 + sessionEnd 14 | 46 |
+| roster | presence/roster batch (store-level, stay) | 13 |
+
+256 JSON cases in 41 files. One `it` became several single-call cases; counts don't map 1:1. Store-level tests
+(`control`, `courtFill`, `presenceBatch`, `rosterBatch`) stay in Vitest for go-writes-queue command cases.
 
 ## Deviations log
 
@@ -82,3 +100,8 @@ JSON files and the Vitest switch go in separate PRs (see spec).
 | 2026-11-14 | 2.1, 4.1, 5.1 | Cases and rules versioned per Queue Session | Owner (B-22): device and server run the session's rules version | Registry and `v<n>` case folders; stamping and replay in go-writes-queue |
 | 2026-11-14 | 5.4–5.5, 6.2–6.6 | Wiring gaps G8–G12 added | Code check: rules run while screens render and on the server, `packages/db` imports them, panics stop the Go program, hand-written types drift, no service worker | Wiring section in the spec; B-23 for `tygo` |
 | 2026-11-14 | 5.6–5.7 | Shipping gaps G13–G15 added | CI scope blocks Go + `.wasm` in one PR; separate deploys can stamp a version the live `.wasm` lacks; the `.wasm` check was advisory | Manifest-based stamping (no maintenance mode), fingerprint in `make check`, CI paths |
+| 2026-11-15 | all | One branch `chore/rule-cases` for all phases; spike run in scratchpad | Owner instruction | Phases 4-6 blocked until go-api-foundation exists |
+| 2026-11-15 | 2.2 | Shapes defined in zod v4 (`@rotra/schema/rule-cases`), JSON Schema emitted; no ajv | No new dependencies | Rule cases gain optional top-level `now` |
+| 2026-11-15 | 3.5 | No waitlist fill order / give slot / duplicate cases | No pure function exists; logic is inline in store mutations | Extract in the Go port or go-writes-queue |
+| 2026-11-15 | 3.6 | `computeStandings` uses `localeCompare` with no locale | Machine-dependent; cases generated under en_US | Owner: pin locale before swap; Go must match en-US collation |
+| 2026-11-15 | 3.x | JSON and Vitest switch in one commit | Owner: one branch | Separate-PR rule waived |

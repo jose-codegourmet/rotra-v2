@@ -31,7 +31,7 @@ const EXPLAINER =
 
 /**
  * The How the night ran tab of the session record (Q-HISTORY): the ReplayCard, then one column per
- * court of MatchRecordCards in start order, with the matches on court at the replay moment
+ * court of matches drawn on the shared MatchCourt in start order, with the matches on court at the replay moment
  * highlighted. Replay state is local: Play advances one session minute every 120 ms and stops at
  * the end; scrubbing pauses and moves the moment. Switching tabs unmounts the panel, which stops
  * playback. An invalid session shows the no-match-history notice.

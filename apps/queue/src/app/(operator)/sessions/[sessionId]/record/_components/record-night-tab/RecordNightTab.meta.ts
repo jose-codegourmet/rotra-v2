@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const recordNightTabMeta = {
   name: 'RecordNightTab',
   description:
-    'How the night ran tab of the session record: RecordTabHeader with the explainer copy, the ReplayCard and RecordCourtColumns (one column per court of MatchRecordCards in start order, "N matches" / "No matches."), all from useSessionRecordHistory. An invalid session shows InvalidSessionNotice (night variant).',
+    'How the night ran tab of the session record: RecordTabHeader with the explainer copy, the ReplayCard and RecordCourtColumns (one column per court of MatchCourts in start order, "N matches" / "No matches."), all from useSessionRecordHistory. An invalid session shows InvalidSessionNotice (night variant).',
   usage: [
     'Rendered inside SessionRecord\'s "How the night ran" TabsContent with { sessionId, record: SessionRecordSummary }.',
     'Replay state is local: Play advances one session minute every 120 ms (a three-hour night in about 20 seconds) and stops at the last match end; Play at the end starts again from the first match. Scrubbing pauses and moves the moment. The matches on court at that moment are highlighted in the columns. Switching tabs unmounts the panel, which stops playback.',
@@ -18,7 +18,7 @@ export const recordNightTabMeta = {
     'SessionRecord',
     'ReplayCard',
     'RecordCourtColumns',
-    'MatchRecordCard',
+    'MatchCourt',
     'RecordTabHeader',
     'PlayerProfile',
     'InvalidSessionNotice',

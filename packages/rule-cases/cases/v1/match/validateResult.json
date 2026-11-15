@@ -1,0 +1,158 @@
+{
+  "kind": "rule",
+  "rule": "validateResult",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a winner alone",
+      "input": {
+        "winner": "A"
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "no winner and no score",
+      "input": {},
+      "expected": {
+        "winner": null,
+        "error": "Pick a winner or enter the final score."
+      }
+    },
+    {
+      "name": "a null winner and null scores",
+      "input": {
+        "winner": null,
+        "scoreA": null,
+        "scoreB": null
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick a winner or enter the final score."
+      }
+    },
+    {
+      "name": "a score decides the winner",
+      "input": {
+        "scoreA": 21,
+        "scoreB": 17
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "a score decides for B",
+      "input": {
+        "scoreA": 10,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "a score that agrees with the picked winner",
+      "input": {
+        "winner": "B",
+        "scoreA": 10,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "a score that disagrees with the picked winner",
+      "input": {
+        "winner": "A",
+        "scoreA": 10,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": null,
+        "error": "The score says Team B won, but Team A is picked. Fix one of them."
+      }
+    },
+    {
+      "name": "a tied score",
+      "input": {
+        "scoreA": 21,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": null,
+        "error": "A tie can’t decide a winner. Correct the score, or clear it and pick a winner."
+      }
+    },
+    {
+      "name": "a tied score of zero",
+      "input": {
+        "scoreA": 0,
+        "scoreB": 0
+      },
+      "expected": {
+        "winner": null,
+        "error": "A tie can’t decide a winner. Correct the score, or clear it and pick a winner."
+      }
+    },
+    {
+      "name": "only one score",
+      "input": {
+        "scoreA": 21
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter both scores as whole numbers, or clear them."
+      }
+    },
+    {
+      "name": "only the other score",
+      "input": {
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter both scores as whole numbers, or clear them."
+      }
+    },
+    {
+      "name": "a negative score",
+      "input": {
+        "scoreA": -1,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter both scores as whole numbers, or clear them."
+      }
+    },
+    {
+      "name": "a fractional score",
+      "input": {
+        "scoreA": 21.5,
+        "scoreB": 10
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter both scores as whole numbers, or clear them."
+      }
+    },
+    {
+      "name": "a zero score for the loser",
+      "input": {
+        "scoreA": 21,
+        "scoreB": 0
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    }
+  ]
+}

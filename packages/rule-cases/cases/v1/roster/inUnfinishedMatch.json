@@ -1,0 +1,113 @@
+{
+  "kind": "rule",
+  "rule": "inUnfinishedMatch",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a waiting match blocks the step down",
+      "input": {
+        "rosterId": "Eve",
+        "matches": [
+          {
+            "state": "waiting",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "a on_court match blocks the step down",
+      "input": {
+        "rosterId": "Eve",
+        "matches": [
+          {
+            "state": "on_court",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "a active match blocks the step down",
+      "input": {
+        "rosterId": "Eve",
+        "matches": [
+          {
+            "state": "active",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "a completed match does not block",
+      "input": {
+        "rosterId": "Eve",
+        "matches": [
+          {
+            "state": "completed",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "a invalid match does not block",
+      "input": {
+        "rosterId": "Eve",
+        "matches": [
+          {
+            "state": "invalid",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "a player on the other team is found",
+      "input": {
+        "rosterId": "Hal",
+        "matches": [
+          {
+            "state": "waiting",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "a player in no match",
+      "input": {
+        "rosterId": "Zed",
+        "matches": [
+          {
+            "state": "waiting",
+            "teamA": ["Eve", "Fay"],
+            "teamB": ["Gus", "Hal"]
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "no matches",
+      "input": {
+        "rosterId": "Eve",
+        "matches": []
+      },
+      "expected": false
+    }
+  ]
+}

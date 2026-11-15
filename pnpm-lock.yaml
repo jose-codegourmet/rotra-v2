@@ -262,6 +262,9 @@ importers:
       '@rotra/config':
         specifier: workspace:*
         version: link:../config
+      '@rotra/rule-cases':
+        specifier: workspace:*
+        version: link:../rule-cases
       '@types/react':
         specifier: ~19.2.14
         version: 19.2.14
@@ -315,6 +318,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/rule-cases: {}
+
   packages/schema:
     dependencies:
       zod:
@@ -324,6 +329,9 @@ importers:
       '@rotra/config':
         specifier: workspace:*
         version: link:../config
+      '@rotra/rule-cases':
+        specifier: workspace:*
+        version: link:../rule-cases
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

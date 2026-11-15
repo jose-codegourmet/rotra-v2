@@ -1,0 +1,37 @@
+{
+  "kind": "rule",
+  "rule": "replacedLineup",
+  "version": 1,
+  "cases": [
+    {
+      "name": "the incoming player takes the outgoing player’s slot",
+      "input": {
+        "lineup": {
+          "id": "placed",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "on_court",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Migs", "Amy"],
+          "teamB": ["Ben", "Dan"],
+          "courtIds": ["c1"],
+          "startedAt": null,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null,
+          "placedAt": 0
+        },
+        "outId": "Amy",
+        "inId": "Gus"
+      },
+      "expected": {
+        "format": "doubles",
+        "teamA": ["Migs", "Gus"],
+        "teamB": ["Ben", "Dan"]
+      }
+    }
+  ]
+}

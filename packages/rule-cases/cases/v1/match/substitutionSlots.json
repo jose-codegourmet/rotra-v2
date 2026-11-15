@@ -1,0 +1,29 @@
+{
+  "kind": "rule",
+  "rule": "substitutionSlots",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a substitute replaced in the same team shares the first slot",
+      "input": {
+        "substitutions": [
+          {
+            "outId": "Eve",
+            "inId": "Zoe",
+            "team": "A",
+            "at": 0,
+            "creditTo": "incoming"
+          },
+          {
+            "outId": "Zoe",
+            "inId": "Ben",
+            "team": "A",
+            "at": 1,
+            "creditTo": "outgoing"
+          }
+        ]
+      },
+      "expected": [0, 0]
+    }
+  ]
+}

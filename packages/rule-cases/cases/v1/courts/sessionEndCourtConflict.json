@@ -1,0 +1,94 @@
+{
+  "kind": "rule",
+  "rule": "sessionEndCourtConflict",
+  "version": 1,
+  "cases": [
+    {
+      "name": "ignores removed courts",
+      "now": 1793876700000,
+      "input": {
+        "courts": [
+          {
+            "label": "Court 3",
+            "startsAt": 1793883900000,
+            "openUntil": null,
+            "removedAt": 1793876700000
+          }
+        ],
+        "endAt": 1793880300000,
+        "courtBase": 1793873100000
+      },
+      "expected": null
+    },
+    {
+      "name": "a court without its own start counts from the court base",
+      "now": 1793876700000,
+      "input": {
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ],
+        "endAt": 1793873100000,
+        "courtBase": 1793873100000
+      },
+      "expected": "Court 1 opens at 6:05 PM. Pick a later end, or edit that court first."
+    },
+    {
+      "name": "a court without its own start before the end does not block",
+      "now": 1793876700000,
+      "input": {
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ],
+        "endAt": 1793873100001,
+        "courtBase": 1793873100000
+      },
+      "expected": null
+    },
+    {
+      "name": "the opening conflict is reported before the booking conflict",
+      "now": 1793876700000,
+      "input": {
+        "courts": [
+          {
+            "label": "Court 9",
+            "openUntil": 1793891100000,
+            "removedAt": null
+          },
+          {
+            "label": "Court 8",
+            "startsAt": 1793880300000,
+            "openUntil": null,
+            "removedAt": null
+          }
+        ],
+        "endAt": 1793880300000,
+        "courtBase": 1793873100000
+      },
+      "expected": "Court 8 opens at 8:05 PM. Pick a later end, or edit that court first."
+    },
+    {
+      "name": "a booking at the new end does not block",
+      "now": 1793876700000,
+      "input": {
+        "courts": [
+          {
+            "label": "Court 2",
+            "openUntil": 1793880300000,
+            "removedAt": null
+          }
+        ],
+        "endAt": 1793880300000,
+        "courtBase": 1793873100000
+      },
+      "expected": null
+    }
+  ]
+}

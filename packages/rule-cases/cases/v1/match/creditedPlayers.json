@@ -1,0 +1,183 @@
+{
+  "kind": "rule",
+  "rule": "creditedPlayers",
+  "version": 1,
+  "cases": [
+    {
+      "name": "one person per slot: the later outgoing choice replaces the earlier",
+      "input": {
+        "match": {
+          "id": "game-25",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Ben", "Amy"],
+          "teamB": ["Dan", "Hal"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Zoe",
+              "inId": "Ben",
+              "team": "A",
+              "at": 1,
+              "creditTo": "outgoing"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        }
+      },
+      "expected": [["Zoe", "A"]]
+    },
+    {
+      "name": "one person per slot: the later incoming choice replaces the earlier",
+      "input": {
+        "match": {
+          "id": "game-25",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Ben", "Amy"],
+          "teamB": ["Dan", "Hal"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Zoe",
+              "inId": "Ben",
+              "team": "A",
+              "at": 1,
+              "creditTo": "incoming"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        }
+      },
+      "expected": [["Ben", "A"]]
+    },
+    {
+      "name": "nobody in a later substitution leaves the earlier choice alone",
+      "input": {
+        "match": {
+          "id": "game-25",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Ben", "Amy"],
+          "teamB": ["Dan", "Hal"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Zoe",
+              "inId": "Ben",
+              "team": "A",
+              "at": 1,
+              "creditTo": "none"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        }
+      },
+      "expected": [["Zoe", "A"]]
+    },
+    {
+      "name": "the choices of different slots stay apart",
+      "input": {
+        "match": {
+          "id": "game-26",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Zoe", "Amy"],
+          "teamB": ["Ben", "Hal"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            },
+            {
+              "outId": "Dan",
+              "inId": "Hal",
+              "team": "B",
+              "at": 1,
+              "creditTo": "outgoing"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        }
+      },
+      "expected": [["Zoe", "A"], ["Dan", "B"]]
+    }
+  ]
+}

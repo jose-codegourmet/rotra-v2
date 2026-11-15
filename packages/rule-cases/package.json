@@ -1,0 +1,11 @@
+{
+  "name": "@rotra/rule-cases",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared queue rule cases (JSON only). Read by the TypeScript rules today, by Go and WebAssembly later.",
+  "exports": {
+    "./package.json": "./package.json",
+    "./v1/*": "./cases/v1/*",
+    "./schema/*": "./schema/*"
+  }
+}

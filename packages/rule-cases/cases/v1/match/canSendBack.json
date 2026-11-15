@@ -1,0 +1,34 @@
+{
+  "kind": "rule",
+  "rule": "canSendBack",
+  "version": 1,
+  "cases": [
+    {
+      "name": "sends back an On court match",
+      "input": {
+        "match": {
+          "state": "on_court"
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "does not send back a Playing match",
+      "input": {
+        "match": {
+          "state": "active"
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "does not send back a waiting match",
+      "input": {
+        "match": {
+          "state": "waiting"
+        }
+      },
+      "expected": false
+    }
+  ]
+}

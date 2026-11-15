@@ -31,36 +31,8 @@ const playerAt = (i: number): SessionPlayer => {
 // Roster row 1 played the whole completed match 5 in the console fixture (row 0 was substituted out).
 const played = playerAt(1)
 
-describe('gamesPlayed (#717): counted games plus the Set games played adjustment', () => {
-  it('equals the counted games when there is no adjustment', () => {
-    expect(countedGames(played.id, fixture.matches)).toBeGreaterThan(0)
-    expect(gamesPlayed(played, fixture.matches)).toBe(countedGames(played.id, fixture.matches))
-    expect(gamesPlayed({ ...played, gamesAdjustment: 0 }, fixture.matches)).toBe(
-      countedGames(played.id, fixture.matches),
-    )
-  })
-  it('adds a positive or negative adjustment and floors the result at 0', () => {
-    const counted = countedGames(played.id, fixture.matches)
-    expect(gamesPlayed({ ...played, gamesAdjustment: 4 }, fixture.matches)).toBe(counted + 4)
-    expect(gamesPlayed({ ...played, gamesAdjustment: -counted }, fixture.matches)).toBe(0)
-    expect(gamesPlayed({ ...played, gamesAdjustment: -counted - 5 }, fixture.matches)).toBe(0)
-  })
-  it('keeps counting up: a later completed game adds one to the adjusted count', () => {
-    const adjusted = { ...played, gamesAdjustment: 2 }
-    const before = gamesPlayed(adjusted, fixture.matches)
-    const completed = fixture.matches.find((m) => m.state === 'completed')
-    if (!completed) throw new Error('No completed match in the fixture')
-    const another = { ...completed, id: 'another-completed', matchNo: 99 }
-    expect(gamesPlayed(adjusted, [...fixture.matches, another])).toBe(before + 1)
-  })
-  it('resolves the adjustment by roster id from a MatchContext', () => {
-    const roster = ctx.roster.map((p) => (p.id === played.id ? { ...p, gamesAdjustment: 3 } : p))
-    expect(gamesPlayedFor(played.id, { ...ctx, roster })).toBe(
-      countedGames(played.id, fixture.matches) + 3,
-    )
-    expect(gamesPlayedFor('nobody', ctx)).toBe(0)
-  })
-})
+// gamesPlayed, gamesPlayedFor and the adjusted standings have their cases in `@rotra/rule-cases`
+// (match/gamesPlayed, match/gamesPlayedFor, match/gamesAdjustmentOf, match/computeStandings).
 
 describe('consumers read the adjusted count', () => {
   const roster = ctx.roster.map((p) => (p.id === played.id ? { ...p, gamesAdjustment: 5 } : p))
@@ -98,14 +70,6 @@ describe('consumers read the adjusted count', () => {
     )
     const games = sameState.map((p) => gamesPlayed(p, fixture.matches))
     for (let i = 1; i < games.length; i++) expect(games[i]!).toBeGreaterThanOrEqual(games[i - 1]!)
-  })
-  it('standings show the adjusted games with wins and losses as recorded', () => {
-    const plain = computeStandings(ctx.roster, fixture.matches).find(
-      (r) => r.playerId === played.id,
-    )
-    const row = computeStandings(roster, fixture.matches).find((r) => r.playerId === played.id)
-    expect(plain).toBeDefined()
-    expect(row).toMatchObject({ wins: plain!.wins, losses: plain!.losses, games: plain!.games + 5 })
   })
 })
 

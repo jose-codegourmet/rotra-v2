@@ -1,0 +1,121 @@
+{
+  "kind": "rule",
+  "rule": "isPartial",
+  "version": 1,
+  "cases": [
+    {
+      "name": "both sides of a substitution are partial: outgoing",
+      "input": {
+        "match": {
+          "id": "game-27",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Zoe", "Amy"],
+          "teamB": ["Ben", "Dan"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        },
+        "id": "Eve"
+      },
+      "expected": true
+    },
+    {
+      "name": "both sides of a substitution are partial: incoming",
+      "input": {
+        "match": {
+          "id": "game-28",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Zoe", "Amy"],
+          "teamB": ["Ben", "Dan"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        },
+        "id": "Zoe"
+      },
+      "expected": true
+    },
+    {
+      "name": "a player who stayed is not partial",
+      "input": {
+        "match": {
+          "id": "game-29",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 1,
+          "origin": "manual",
+          "manualProtected": true,
+          "teamA": ["Zoe", "Amy"],
+          "teamB": ["Ben", "Dan"],
+          "courtIds": [],
+          "startedAt": 0,
+          "endedAt": 1,
+          "substitutions": [
+            {
+              "outId": "Eve",
+              "inId": "Zoe",
+              "team": "A",
+              "at": 0,
+              "creditTo": "incoming"
+            }
+          ],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 1
+          }
+        },
+        "id": "Amy"
+      },
+      "expected": false
+    }
+  ]
+}

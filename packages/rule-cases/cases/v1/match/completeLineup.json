@@ -1,0 +1,95 @@
+{
+  "kind": "rule",
+  "rule": "completeLineup",
+  "version": 1,
+  "cases": [
+    {
+      "name": "a full doubles lineup",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "a doubles lineup short one player",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a"],
+          "teamB": ["c", "d"]
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "a lineup with a player on both teams",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["b", "d"]
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "singles 1v1",
+      "input": {
+        "lineup": {
+          "format": "singles",
+          "teamA": ["a"],
+          "teamB": ["b"]
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "1v2 fun",
+      "input": {
+        "lineup": {
+          "format": "fun_1v2",
+          "teamA": ["a"],
+          "teamB": ["b", "c"]
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "1v2 fun with the teams swapped",
+      "input": {
+        "lineup": {
+          "format": "fun_1v2",
+          "teamA": ["a", "b"],
+          "teamB": ["c"]
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "5v5 fun",
+      "input": {
+        "lineup": {
+          "format": "fun_5v5",
+          "teamA": ["a", "b", "c", "d", "e"],
+          "teamB": ["f", "g", "h", "i", "j"]
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "an unknown format is never complete",
+      "input": {
+        "lineup": {
+          "format": "nope",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        }
+      },
+      "expected": false
+    }
+  ]
+}

@@ -17,7 +17,8 @@
     "./ranking-settings": "./src/ranking-settings.ts",
     "./court-window": "./src/court-window.ts",
     "./court-label": "./src/court-label.ts",
-    "./admin-player": "./src/admin-player.ts"
+    "./admin-player": "./src/admin-player.ts",
+    "./rule-cases": "./src/rule-cases.ts"
   },
   "scripts": {
     "lint": "biome check .",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@rotra/config": "workspace:*",
+    "@rotra/rule-cases": "workspace:*",
     "typescript": "^5.9.3",
     "vitest": "^5.0.5"
   }

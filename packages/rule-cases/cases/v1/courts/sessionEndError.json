@@ -1,0 +1,298 @@
+{
+  "kind": "rule",
+  "rule": "sessionEndError",
+  "version": 1,
+  "cases": [
+    {
+      "name": "live: an end at now is refused",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793876700000,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Choose an end time after now."
+    },
+    {
+      "name": "live: an end one minute after now is accepted",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793876760000,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "live: an earlier end than planned is accepted",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793880000000,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "live: 24 hours after play began is accepted",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793959500000,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "live: one millisecond past 24 hours is refused",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793959500001,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Choose an end at most 24 hours after play began."
+    },
+    {
+      "name": "live: an end before now is refused",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793876699999,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Choose an end time after now."
+    },
+    {
+      "name": "live: a time that is not a number",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": null,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Enter a date and time."
+    },
+    {
+      "name": "prepared: an end at the start is refused",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": null,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793872800000,
+        "courts": []
+      },
+      "expected": "Choose an end after the start."
+    },
+    {
+      "name": "prepared: more than 24 hours after the start is refused",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": null,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793959200001,
+        "courts": []
+      },
+      "expected": "Choose an end after the start."
+    },
+    {
+      "name": "prepared: four hours after the start is accepted",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": null,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793887200000,
+        "courts": []
+      },
+      "expected": null
+    },
+    {
+      "name": "prepared: exactly 24 hours after the start",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": null,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793959200000,
+        "courts": []
+      },
+      "expected": null
+    },
+    {
+      "name": "a court that opens at the new end blocks it",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793883900000,
+        "courts": [
+          {
+            "label": "Court 3",
+            "startsAt": 1793883900000,
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Court 3 opens at 9:05 PM. Pick a later end, or edit that court first."
+    },
+    {
+      "name": "a court that opens one millisecond after the new end does not block it",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793883900001,
+        "courts": [
+          {
+            "label": "Court 3",
+            "startsAt": 1793883900000,
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "a court booked past the new end blocks it",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793883900000,
+        "courts": [
+          {
+            "label": "Court 2",
+            "openUntil": 1793887500000,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Court 2 is booked until 10:05 PM. Pick a later end, or edit that court first."
+    },
+    {
+      "name": "a court booked exactly to the new end does not block it",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793887500000,
+        "courts": [
+          {
+            "label": "Court 2",
+            "openUntil": 1793887500000,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "courts that follow the end move with it",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793876760000,
+        "courts": [
+          {
+            "label": "Court 1",
+            "openUntil": null,
+            "removedAt": null
+          },
+          {
+            "label": "Court 4",
+            "startsAt": 1793873100000,
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "a court booked to tomorrow names the day",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793945100000,
+        "courts": [
+          {
+            "label": "Court 2",
+            "openUntil": 1793952300000,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Court 2 is booked until tomorrow 4:05 PM. Pick a later end, or edit that court first."
+    },
+    {
+      "name": "a court opening on another day names the day",
+      "now": 1793876700000,
+      "input": {
+        "startedAt": 1793873100000,
+        "scheduledStartAt": 1793872800000,
+        "endAt": 1793880300000,
+        "courts": [
+          {
+            "label": "Court 6",
+            "startsAt": 1793981100000,
+            "openUntil": null,
+            "removedAt": null
+          }
+        ]
+      },
+      "expected": "Court 6 opens Sat, Nov 7 · 12:05 AM. Pick a later end, or edit that court first."
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "kind": "rule",
+  "rule": "openedEarly",
+  "version": 1,
+  "cases": [
+    {
+      "name": "opened early and still before its planned start",
+      "now": 1794569400000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": 1794569400000
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "after its planned start the early open is only history",
+      "now": 1794573000000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": 1794569400000
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "one millisecond before its planned start is still early",
+      "now": 1794572999999,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": 1794569400000
+        }
+      },
+      "expected": true
+    },
+    {
+      "name": "never opened early",
+      "now": 1794569400000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "a null early open is not early",
+      "now": 1794569400000,
+      "input": {
+        "court": {
+          "id": "window-court-4",
+          "sessionId": "s-tonight",
+          "label": "Court 4",
+          "startsAt": 1794573000000,
+          "openUntil": null,
+          "removedAt": null,
+          "openedEarlyAt": null
+        }
+      },
+      "expected": false
+    },
+    {
+      "name": "a court without a start is not early",
+      "now": 10,
+      "input": {
+        "court": {
+          "id": "x",
+          "sessionId": "s",
+          "label": "Court X",
+          "openedEarlyAt": 5,
+          "openUntil": null,
+          "removedAt": null
+        }
+      },
+      "expected": false
+    }
+  ]
+}

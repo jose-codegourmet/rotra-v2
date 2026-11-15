@@ -1,4 +1,5 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
+import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
 import { playerRequest } from '../leaderboard/request'
@@ -52,6 +53,10 @@ export async function getPlayerGames(
     })
     return (await realGetPlayerGames(playerId, signal)).map((session) => ({
       ...session,
+      // The server sends the public session page as a path on the Queue app; link it there.
+      sessionPageUrl: session.sessionPageUrl?.startsWith('/')
+        ? `${appOrigin('queue')}${session.sessionPageUrl}`
+        : (session.sessionPageUrl ?? null),
       games: session.games.map((game) => ({
         ...game,
         partnerPlayers: game.partnerPlayers?.map(face),

@@ -25,7 +25,12 @@ func (f fakePinger) Ping(ctx context.Context) error {
 }
 
 func newTestHandler(p Pinger, r *Readiness, extra ...func(*http.ServeMux)) http.Handler {
-	return NewHandler(Deps{Logger: discardLogger(), Pinger: p, Readiness: r, PingTimeout: 50 * time.Millisecond}, extra...)
+	inner := NewHandler(Deps{Logger: discardLogger(), Pinger: p, Readiness: r, PingTimeout: 50 * time.Millisecond, ProxySecret: testSecret}, extra...)
+	// Behave like a proxied caller, so these tests keep exercising the routes themselves.
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.Header.Set(ProxySecretHeader, testSecret)
+		inner.ServeHTTP(w, req)
+	})
 }
 
 func get(h http.Handler, path string) *httptest.ResponseRecorder {

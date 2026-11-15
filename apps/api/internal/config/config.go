@@ -5,6 +5,7 @@ package config
 import (
 	"fmt"
 	"log/slog"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +22,10 @@ type Config struct {
 	ShutdownTimeout time.Duration
 	DBMaxConns      int32
 	Housekeeping    Housekeeping
+	// ProxySecret is ROTRA_PROXY_SECRET (B-30). Empty means no request is trusted as coming from a proxy.
+	ProxySecret string
+	// AllowedOrigins is ROTRA_ALLOWED_ORIGINS: exact app origins allowed by CORS on the stream routes (B-41).
+	AllowedOrigins []string
 }
 
 // Housekeeping is the B-34 cleanup loop: how often it runs, rows per delete statement, and how many
@@ -121,5 +126,25 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 			*f.dst = n
 		}
 	}
+
+	cfg.ProxySecret = get("ROTRA_PROXY_SECRET")
+	for _, o := range strings.Split(get("ROTRA_ALLOWED_ORIGINS"), ",") {
+		if o = strings.TrimSpace(o); o == "" {
+			continue
+		}
+		if !validOrigin(o) {
+			return Config{}, fmt.Errorf("ROTRA_ALLOWED_ORIGINS must list exact origins such as https://queue.rotra.club (no *, path or trailing slash), got %q", o)
+		}
+		cfg.AllowedOrigins = append(cfg.AllowedOrigins, o)
+	}
 	return cfg, nil
+}
+
+// validOrigin accepts only scheme://host[:port] with an http or https scheme and no wildcard.
+func validOrigin(o string) bool {
+	u, err := url.Parse(o)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" || strings.Contains(u.Host, "*") {
+		return false
+	}
+	return u.Path == "" && u.RawQuery == "" && u.Fragment == "" && u.User == nil && !strings.HasSuffix(o, "/")
 }

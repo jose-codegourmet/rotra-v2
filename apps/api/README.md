@@ -29,6 +29,20 @@ OpenTelemetry via standard env, service name `rotra-api` (`OTEL_SERVICE_NAME` ov
 (`http/protobuf`). `/healthz` and `/readyz` are not traced. Incoming `traceparent` is continued.
 Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` stack.
 
+## Proxy secret, stream tickets, CORS (B-30, B-41, B-43)
+
+- `ROTRA_PROXY_SECRET` (optional): the value each app's `proxy.ts` sends in header `X-Rotra-Proxy-Secret`. Compared in
+  constant time. `X-Real-IP` / `X-Forwarded-For` is trusted only with a correct secret; otherwise the connection address is
+  the client IP (`httpapi.ClientIPFrom(ctx)`). Without a correct secret every path except `/healthz`, `POST /api/stream/ticket`
+  and `GET /stream` answers 404. If the variable is unset, no request is trusted, so only those three answer (including
+  local dev: set a secret and send the header to reach other routes).
+- `POST /api/stream/ticket` returns `{ticket, expiresInSeconds}`: 32 random bytes, valid 60 s, single use, held in memory
+  (one instance, B-43; a restart only drops tickets that were 60 s from expiring). 60 tickets a minute per client IP, then 429.
+- `GET /stream?ticket=...` is Server-Sent Events: the ticket is consumed on open (used, expired, forged or missing: 401, nothing
+  streamed), a `: ping` comment every 20 s, open until the client leaves or draining starts.
+- `ROTRA_ALLOWED_ORIGINS` (optional): comma-separated exact origins (`https://queue.rotra.club,http://localhost:9000`; no `*`,
+  path or trailing slash, validated at start). CORS headers are sent on the two stream routes only, only for a listed origin.
+
 ## Housekeeping (B-34)
 
 `internal/housekeeping` runs hourly (`HOUSEKEEPING_INTERVAL`, default 1h) under a Postgres advisory lock, in batches of

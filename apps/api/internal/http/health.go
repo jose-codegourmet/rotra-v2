@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -14,12 +15,30 @@ type Pinger interface {
 }
 
 // Readiness turns false for good once shutdown begins (B-44).
-type Readiness struct{ draining atomic.Bool }
+type Readiness struct {
+	draining atomic.Bool
+	once     sync.Once
+	done     chan struct{}
+}
 
 func NewReadiness() *Readiness { return &Readiness{} }
 
-// SetDraining marks the process as shutting down; /readyz fails from now on.
-func (r *Readiness) SetDraining() { r.draining.Store(true) }
+func (r *Readiness) init() { r.once.Do(func() { r.done = make(chan struct{}) }) }
+
+// SetDraining marks the process as shutting down; /readyz fails from now on and Done closes, which
+// ends open streams so shutdown never waits on them.
+func (r *Readiness) SetDraining() {
+	r.init()
+	if r.draining.CompareAndSwap(false, true) {
+		close(r.done)
+	}
+}
+
+// Done is closed once draining has begun.
+func (r *Readiness) Done() <-chan struct{} {
+	r.init()
+	return r.done
+}
 
 // Draining reports whether shutdown has begun.
 func (r *Readiness) Draining() bool { return r.draining.Load() }
@@ -30,6 +49,12 @@ type Deps struct {
 	Pinger      Pinger
 	Readiness   *Readiness
 	PingTimeout time.Duration // default 2 s
+
+	// ProxySecret is ROTRA_PROXY_SECRET (B-30). Empty: no request is trusted as proxied.
+	ProxySecret string
+	// AllowedOrigins are the exact app origins CORS allows on the stream routes (B-41).
+	AllowedOrigins []string
+	Stream         StreamOptions
 }
 
 // NewHandler builds the router (Go's ServeMux patterns) wrapped in request id, access log and panic
@@ -57,6 +82,7 @@ func NewHandler(d Deps, extra ...func(*http.ServeMux)) http.Handler {
 		}
 		WriteJSON(w, http.StatusOK, map[string]string{"status": "ready"}, Private)
 	})
+	registerStream(mux, d, newTicketStore(d.Stream.withDefaults()))
 	for _, register := range extra {
 		register(mux)
 	}
@@ -64,6 +90,7 @@ func NewHandler(d Deps, extra ...func(*http.ServeMux)) http.Handler {
 
 	var h http.Handler = mux
 	h = Recover(d.Logger)(h)
+	h = ProxyGuard(d.ProxySecret)(h)
 	h = AccessLog(d.Logger)(h)
 	return RequestID(h)
 }

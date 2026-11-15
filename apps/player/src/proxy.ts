@@ -1,6 +1,7 @@
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
 import { dataMode } from '@rotra/db/auth/data-mode'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
+import { forwardToGo, goApiEnabled } from '@rotra/db/proxy/go-forward'
 import { type NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -9,6 +10,10 @@ import { type NextRequest, NextResponse } from 'next/server'
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  // Beta (B-32): moved paths reach Go first; with Go in front nobody is signed in and Supabase is never called.
+  const moved = await forwardToGo(request)
+  if (moved) return moved
+  const goMode = goApiEnabled()
   const protectedPath =
     /^\/players\/[^/]+\/compare\/?$/.test(path) ||
     ['/me', '/profile'].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
@@ -17,6 +22,7 @@ export async function proxy(request: NextRequest) {
     login.searchParams.set('returnTo', `${path}${request.nextUrl.search}`)
     return NextResponse.redirect(login)
   }
+  if (goMode) return protectedPath ? toLogin() : NextResponse.next()
   if (dataMode() === 'real') {
     const session = await refreshProxySession('player', request, () =>
       NextResponse.next({ request }),

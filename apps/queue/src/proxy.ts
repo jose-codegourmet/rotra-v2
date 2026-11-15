@@ -1,6 +1,7 @@
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
 import { dataMode } from '@rotra/db/auth/data-mode'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
+import { forwardToGo, goApiEnabled } from '@rotra/db/proxy/go-forward'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_PAGE_PREVIEW = /^\/sessions\/[^/]+\/public-page\/?$/
@@ -11,6 +12,10 @@ const PUBLIC_PAGE_PREVIEW = /^\/sessions\/[^/]+\/public-page\/?$/
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  // Beta (B-32): moved paths reach Go first; with Go in front nobody is signed in and Supabase is never called.
+  const moved = await forwardToGo(request)
+  if (moved) return moved
+  const goMode = goApiEnabled()
   // Route Handlers authorize themselves at the service boundary and answer in JSON, never a redirect.
   // The operator preview decides itself (#469): anyone but the owning club goes to /s/<slug>.
   const protectedPath =
@@ -19,6 +24,11 @@ export async function proxy(request: NextRequest) {
     !path.startsWith('/s/') &&
     !path.startsWith('/api/') &&
     !PUBLIC_PAGE_PREVIEW.test(path)
+  if (goMode) {
+    return protectedPath
+      ? NextResponse.redirect(new URL('/login', request.url))
+      : NextResponse.next()
+  }
   if (dataMode() === 'real') {
     const session = await refreshProxySession('club', request, () => NextResponse.next({ request }))
     if (protectedPath && !session.signedIn) {

@@ -1,6 +1,7 @@
 import { ADMIN_COOKIE_NAME, parseAdminSession } from '@rotra/data/admin-account/cookie'
 import { dataMode } from '@rotra/db/auth/data-mode'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
+import { forwardToGo, goApiEnabled } from '@rotra/db/proxy/go-forward'
 import { type NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -10,6 +11,10 @@ import { type NextRequest, NextResponse } from 'next/server'
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  // Beta (B-32): moved paths reach Go first; with Go in front nobody is signed in and Supabase is never called.
+  const moved = await forwardToGo(request)
+  if (moved) return moved
+  const goMode = goApiEnabled()
   // Route Handlers authorize themselves at the service boundary and answer in JSON, never a redirect.
   const route = (signedIn: boolean) =>
     path.startsWith('/api/')
@@ -21,6 +26,15 @@ export async function proxy(request: NextRequest) {
         : signedIn
           ? null
           : '/login'
+
+  if (goMode) {
+    const destination = route(false)
+    const response = destination
+      ? NextResponse.redirect(new URL(destination, request.url))
+      : NextResponse.next()
+    response.headers.set('Cache-Control', 'private, no-store')
+    return response
+  }
 
   if (dataMode() === 'real') {
     const session = await refreshProxySession('admin', request, () =>

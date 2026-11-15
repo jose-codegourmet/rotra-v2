@@ -19,10 +19,12 @@ func readyz(t *testing.T, p *db.Pool) int {
 	t.Helper()
 	h := httpapi.NewHandler(httpapi.Deps{
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)), Pinger: p,
-		Readiness: httpapi.NewReadiness(), PingTimeout: 2 * time.Second,
+		Readiness: httpapi.NewReadiness(), PingTimeout: 2 * time.Second, ProxySecret: "test-secret",
 	})
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/readyz", nil))
+	req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+	req.Header.Set(httpapi.ProxySecretHeader, "test-secret")
+	h.ServeHTTP(rec, req)
 	return rec.Code
 }
 

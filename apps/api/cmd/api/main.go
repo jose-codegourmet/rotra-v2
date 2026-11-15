@@ -49,10 +49,16 @@ func run() error {
 		defer cancel()
 		_ = tracing.Shutdown(ctx)
 	}()
+	if cfg.ProxySecret == "" {
+		log.Warn("ROTRA_PROXY_SECRET is not set: only /healthz and the stream routes answer")
+	}
 	log.Info("tracing", slog.Bool("enabled", tracing.Enabled()))
 
 	ready := httpapi.NewReadiness()
-	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: ready}))
+	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{
+		Logger: log, Pinger: pool, Readiness: ready,
+		ProxySecret: cfg.ProxySecret, AllowedOrigins: cfg.AllowedOrigins,
+	}))
 	srv := &http.Server{
 		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,

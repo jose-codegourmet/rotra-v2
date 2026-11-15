@@ -6,8 +6,8 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 
 ## Phase 1: Rewrites (TypeScript, frontend PR)
 
-- [ ] **1.1** Env-gated rewrites in each app's `next.config`
-- [ ] **1.2** `make check`; verify the current project is unchanged
+- [x] **1.1** Env-gated forwarding in each app's `proxy.ts` (B-30; shared helper `@rotra/db/proxy/go-forward`)
+- [x] **1.2** `make check`; verify the current project is unchanged
 
 ## Phase 2: Beta project
 
@@ -22,10 +22,14 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Stream test
 
-- [ ] **4.1** Stream ticket route (through `proxy.ts`) and a minimal Go stream endpoint on the API domain (B-41)
-- [ ] **4.2** CORS for the app domains on the stream route; an hour-long stream test on staging
+- [x] **4.1** Stream ticket route (through `proxy.ts`) and a minimal Go stream endpoint on the API domain (B-41)
+- [ ] **4.2** CORS for the app domains on the stream route (done in Go, tested); an hour-long stream test on staging (owner-gated, open)
 
 ## Deviations log
 
 | Date | Task | Deviation | Reason | Resolution |
 |---|---|---|---|---|
+| 2026-11-16 | 1.1 | `proxy.ts` forwarding instead of `next.config` rewrites | B-30 replaced B-05; rewrites can't add the secret header | Done in `proxy.ts` |
+| 2026-11-16 | 2.1, 2.2, 3.1, 3.3, 4.2 (hour test) | Left open | Infrastructure and data copy are stop-and-ask; no Vercel tool, Supabase MCP unauthenticated | Owner decision needed |
+| 2026-11-16 | 4.1 | Go ticket route `POST /api/stream/ticket`, stream `GET /stream`; tickets in memory | One instance (B-43), 60s lifetime | Add the ticket path to `ROTRA_GO_MOVED_AREAS` on beta |
+| 2026-11-16 | 4.1 | Unset `ROTRA_PROXY_SECRET` also 404s `/readyz` | B-30 allows only `/healthz` and the ticket route | Health tests send the secret |

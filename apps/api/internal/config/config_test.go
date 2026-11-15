@@ -142,3 +142,38 @@ func TestLoadRejectsBadDatabaseAndHousekeepingValues(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadProxySecretAndOriginsDefaultToNothing(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.ProxySecret != "" || len(cfg.AllowedOrigins) != 0 {
+		t.Fatalf("unexpected: %+v", cfg)
+	}
+}
+
+func TestLoadProxySecretAndOrigins(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{
+		"DATABASE_URL": "postgres://x", "ROTRA_PROXY_SECRET": "  s3cret ",
+		"ROTRA_ALLOWED_ORIGINS": " https://queue.rotra.club, http://localhost:9000 ,,",
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.ProxySecret != "s3cret" {
+		t.Fatalf("secret %q", cfg.ProxySecret)
+	}
+	if len(cfg.AllowedOrigins) != 2 || cfg.AllowedOrigins[0] != "https://queue.rotra.club" || cfg.AllowedOrigins[1] != "http://localhost:9000" {
+		t.Fatalf("origins %v", cfg.AllowedOrigins)
+	}
+}
+
+func TestLoadRejectsBadOrigins(t *testing.T) {
+	for _, v := range []string{"*", "https://a.club/path", "queue.rotra.club", "https://a.club/", "ftp://a.club", "https://*.rotra.club"} {
+		_, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_ALLOWED_ORIGINS": v}))
+		if err == nil || !strings.Contains(err.Error(), "ROTRA_ALLOWED_ORIGINS") {
+			t.Errorf("%q: want an ROTRA_ALLOWED_ORIGINS error, got %v", v, err)
+		}
+	}
+}

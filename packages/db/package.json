@@ -9,6 +9,7 @@
     "./admin/club-identity": "./src/admin/club-identity.ts",
     "./player/rtr-id": "./src/player/rtr-id.ts",
     "./auth/data-mode": "./src/auth/data-mode.ts",
+    "./proxy/go-forward": "./src/proxy/go-forward.ts",
     "./auth/supabase": "./src/auth/supabase.ts",
     "./auth/proxy-session": "./src/auth/proxy-session.ts",
     "./auth/account-context": "./src/auth/account-context.ts",

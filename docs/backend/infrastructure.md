@@ -143,7 +143,7 @@ Rules this sets:
 ```text
  Current (unchanged)                         New (testing the Go API)
  queue/player/admin.rotra.club               a second Vercel project, same repo, `go-stack` branch
-   Vercel → Route Handlers → Supabase          Vercel → /api/* rewrite → Go API (Railway staging) → Railway Postgres
+   Vercel → Route Handlers → Supabase          Vercel → proxy.ts /api/* → Go API (Railway staging) → Railway Postgres
 ```
 
 - The **same apps**, built from the long-lived **`go-stack` branch** (B-20), are deployed to a second

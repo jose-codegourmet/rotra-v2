@@ -22,7 +22,7 @@ Storage; Vercel `sin1`.
 | Pictures | Railway Buckets, presigned URLs, no CDN | B-06, B-13 |
 | Live updates | Outbox events in the write transaction → in-process fan-out (Postgres notifications) → stream to browsers straight on the API domain (ticket route); refresh is the fallback | B-08, B-41 |
 | Rules | Shared queue rules: one Go copy in `apps/api/internal/rules`, built to WebAssembly for the device (`packages/rules-wasm`, types by `tygo`), versioned per Queue Session; JSON cases in `@rotra/rule-cases`. Go-only rules in Go; device-only rules (generation, labels) in TypeScript | B-02, D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-21–B-23 |
-| Transport | Each app rewrites `/api/*` to the Go API (env-gated) | B-05 |
+| Transport | Each app's `proxy.ts` forwards `/api/*` of moved areas to the Go API (env-gated, proxy secret, 10 s timeout) | B-05, B-30, B-46 |
 | Infrastructure | Railway IaC, `.railway/railway.ts` (`railway` dev dependency) | B-17 |
 | Observability | OpenTelemetry to Grafana Cloud; Grafana Alloy for Postgres | B-16 |
 | CI | `.github/workflows/backend.yml`; Railway watch paths + Wait for CI | [backend CI](../docs/backend/infrastructure.md#backend-ci-and-railway-deploys) |

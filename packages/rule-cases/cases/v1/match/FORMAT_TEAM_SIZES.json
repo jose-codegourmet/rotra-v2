@@ -1,0 +1,19 @@
+{
+  "kind": "rule",
+  "rule": "FORMAT_TEAM_SIZES",
+  "version": 1,
+  "cases": [
+    {
+      "name": "team sizes by format",
+      "input": {},
+      "expected": {
+        "singles": [1, 1],
+        "doubles": [2, 2],
+        "fun_1v2": [1, 2],
+        "fun_3v3": [3, 3],
+        "fun_4v4": [4, 4],
+        "fun_5v5": [5, 5]
+      }
+    }
+  ]
+}

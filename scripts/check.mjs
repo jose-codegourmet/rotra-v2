@@ -23,6 +23,19 @@ const STEPS = [
     'pnpm',
     ['--filter', '@rotra/data', 'exec', 'vitest', 'run', ...DECIDED_MATH_TESTS, '--reporter=dot'],
   ],
+  [
+    'rule-case schema',
+    'pnpm',
+    [
+      '--filter',
+      '@rotra/schema',
+      'exec',
+      'vitest',
+      'run',
+      'src/rule-cases.test.ts',
+      '--reporter=dot',
+    ],
+  ],
 ]
 
 const TAIL_LINES = 40

@@ -1,0 +1,4 @@
+# Local signing key (B-27/B-39): generated on setup, never committed
+.local/
+*.pem
+*.key

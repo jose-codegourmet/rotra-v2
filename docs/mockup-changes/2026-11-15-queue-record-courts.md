@@ -1,6 +1,6 @@
 # Queue session record: How the night ran matches as courts
 
-Status: NEW
+Status: IN MOCK APP — PR #862
 Date: 2026-11-15
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › historyMatch(s, m) (uses courtSVG, `.gm*` styles); caller histNightPane

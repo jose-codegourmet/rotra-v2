@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN MOCK APP: 175 · CANCELLED: 3 · MOCKUP ONLY: 4
+IN MOCK APP: 176 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -360,4 +360,5 @@ IN MOCK APP: 175 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-13-share-images-no-tagline](2026-11-13-share-images-no-tagline.md) | Share images: no “Run the game.” tagline | share-card, session-qr-card | IN MOCK APP — #808 |
 | [2026-11-13-share-leaderboard](2026-11-13-share-leaderboard.md) | Share leaderboard: several images, pick which | share-dialog, leaderboard-share-card | IN MOCK APP — #842 |
 | [2026-11-14-player-game-row-games-badge](2026-11-14-player-game-row-games-badge.md) | Player app: games badge on every face of a game court | match-court (Player variant), game-row | IN MOCK APP — PR #859 |
+| [2026-11-15-queue-record-courts](2026-11-15-queue-record-courts.md) | Queue session record: How the night ran matches as courts | match-court (Queue variant), record-court-columns | IN MOCK APP — PR #862 |
 <!-- status-index:end -->

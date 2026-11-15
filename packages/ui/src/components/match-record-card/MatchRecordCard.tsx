@@ -39,7 +39,8 @@ export type MatchRecordCardProps = {
   className?: string
 }
 
-function substitutionCreditLine(
+/** One credit line per substitution (Q-MATCH-RECORD); shared with the record's court columns. */
+export function substitutionCreditLine(
   s: { outName: string; inName: string; creditTo?: 'nobody' | 'incoming' | 'outgoing' },
   invalid: boolean,
 ) {

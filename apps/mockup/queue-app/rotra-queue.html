@@ -3038,11 +3038,17 @@ function ensureHistory() {
   save();
 }
 function historyMatch(s, m) {
-  const team = (ids, won) => `<div class="hm-team ${won ? 'won' : ''}">${ids.map((p) => `<button class="qf" data-act="openProfile" data-id="${p}" title="${esc(nm(p))}" aria-label="${esc(nm(p))}. View profile">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span></button>`).join('')}${won ? `<span class="hm-w">${I.check} Won</span>` : ''}</div>`;
-  const score = m.status === 'invalid' ? chip('Invalid', 'bad') : m.scoreA != null ? `<b class="tnum">${m.scoreA}–${m.scoreB}</b>` : '<span class="small muted">no score</span>';
-  return `<article class="hm ${m.status === 'invalid' ? 'invalid' : ''}" data-mid="${m.id}">
-    <div class="hm-top"><span class="mono small">#${m.seq}</span><span class="small muted">${fmtRange(m.startedAt, m.endedAt, s.start)}</span>${FUN.includes(m.format) ? chip('Fun') : ''}</div>
-    ${team(m.teamA, m.winner === 'A')}<div class="hm-score">${score}</div>${team(m.teamB, m.winner === 'B')}
+  // Owner, November 15, 2026 ("please update these to use the court layout"): the session record's court columns draw each match as the
+  // same small court as the finished session page's Match history (pubHistoryMatch, .gm*): "#N · start–end" (· Fun) as a corner pill,
+  // faces with first names on dark pills (the winning pair ringed in the accent), the score (or "No score") and "◀ Won" / "Won ▶" on the
+  // net, Invalid on a desaturated court. Team A is on the left. Faces open the player profile. Substitution lines stay under the court.
+  const invalid = m.status === 'invalid', wl = invalid ? null : m.winner === 'A';
+  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}" data-act="openProfile" data-id="${pid}" title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}. View profile">${avatar(P(pid))}<b>${esc(short(pid))}</b></button>`;
+  const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
+  const score = invalid ? '' : m.scoreA != null ? `<span class="gm-score tnum">${m.scoreA}–${m.scoreB}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+  const res = invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
+  return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${m.id}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${m.teamA.map((x) => esc(nm(x))).join(' and ')} versus ${m.teamB.map((x) => esc(nm(x))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
+    <span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
     ${(m.subs || []).map((x) => `<p class="small muted">${esc(subLine(x, m))}</p>`).join('')}
   </article>`;
 }

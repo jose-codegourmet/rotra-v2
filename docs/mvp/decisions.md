@@ -55,7 +55,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID | approved 2026-11-16 (search results, mistyped email and guest linking open) | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID | approved 2026-11-16 (search result and changed RTR ID open) | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -1006,11 +1006,11 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID
-- **Decision status:** approved (owner discussion, November 16, 2026); what a search result shows, fixing a mistyped email and guest linking are not decided.
+- **Decision status:** approved (owner discussion, November 16, 2026); what another club's search result shows and what happens to a changed RTR ID are not decided.
 - **Implementation status:** not started. No mockup, business, screen or database doc is changed yet; they still describe [D-2026-11-11-03](#d-2026-11-11-03).
 - **Ticket:** needed
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
-- **Supersedes:** in part [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
+- **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
 - **Decision:**
   - **Four statuses.** **Guest**, **Unclaimed**, **Registered**, **Verified**. Verified sits on top of Registered ([D-2026-11-16-02](#d-2026-11-16-02)).
   - **Guest:** a name only. No email, no phone, no account, no RTR ID.
@@ -1019,22 +1019,23 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **A guest becomes unclaimed** when the Queue Master adds an email, and gets the RTR ID then.
   - **Other clubs can find an unclaimed player** by name, email or RTR ID (owner choice; the proposal was exact email or RTR ID only).
   - **Location in the RTR ID** comes from the first club that entered the email and never changes, also when the person later registers through another club's link.
-  - **The email is never edited by a club.** How a mistyped email is put right is open (see below); a mistaken RTR ID is retired and never reused.
+  - **The email is never edited by a club.** To fix a mistyped email the Queue Master deletes the record and makes it again; the mistaken RTR ID is retired and never reused.
+  - **Admin can edit the email and the RTR ID.** When Admin changes the registration place or date, the RTR ID is updated to match. This changes the read-only RTR ID of [D-2026-11-09-14](#d-2026-11-09-14) and the "permanent" RTR ID in [product terms](../product-terms.md).
   - **On registration** the person keeps the same RTR ID, and every club's record under that email joins the account.
   - **Each club keeps its own version of the person.** Club 1 and Club 2 can each set a different name, picture and level, and each edits only its own.
   - **Claiming: the person picks their identity.** On registration a dialog shows each club's version as a card ("which of the following identities are correct") and the person picks one.
   - **Unclaimed players are Public.** In the owner's words: "thats the point of unclaimed. they get to be public. making sure that the real person must be eager enough to register so they can make it private". Privacy settings come with registration.
-  - **Unclaimed players are on the leaderboard.**
+  - **Unclaimed players are on the leaderboard only while one club has them.** An unclaimed person saved by more than one club doesn't qualify until they register.
+  - **Link and Link to saved player… are removed** ([D-2026-11-09-06](#d-2026-11-09-06)). Adding an email to a guest does that job.
+  - **Verified stays the three Google checks** of [D-2026-11-16-02](#d-2026-11-16-02). ROTRA doesn't call it KYC.
   - **A guest stays in Saved players.** A guest's games never join an account by themselves. They come along only after the club makes the guest unclaimed by adding an email.
   - **Today's unclaimed records with a phone and no email** get a tag (the owner's wording: "details required" or "needs attention"). The Queue Master adds an email or deletes the record. Deleting them automatically comes later.
   - **Unclaimed players can rank** (owner choice; the proposal was to wait until they register).
 - **Risk, accepted by the owner:** a person who never signed up gets a public, ranked profile that other clubs can find. Their email and phone stay private as everywhere else.
 - **Open:**
-  - Which name, picture and level a search result and the leaderboard show while two clubs name the person differently.
-  - How a mistyped email is put right if a club can never edit it (delete and add again, or Admin).
-  - Whether **Link** and **Link to saved player…** ([D-2026-11-09-06](#d-2026-11-09-06)) are removed, since adding an email to a guest now does that job.
+  - Which name, picture and level another club's search result shows while two clubs name the person differently.
+  - What happens to an old RTR ID after Admin changes it: QR codes and links already shared, and whether the old ID is retired.
   - Whether the **Confirm player** step applies when a club adds another club's unclaimed player.
   - Whether a phone still links a record on registration (the email is the key now).
   - Which email is matched on registration (the ROTRA email, the Google email, or both).
-  - Whether Verified stays the three checks of [D-2026-11-16-02](#d-2026-11-16-02) or becomes an identity (KYC) check.
 - **References:** [product terms](../product-terms.md) (Guest, Unclaimed profile, Player ID / RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [identity database design](../database_design/product/player-information/modules/identity.md).

@@ -19,7 +19,7 @@ RTR ID retains the original club founding-city/date context. Do not display it a
 | State | Presentation |
 |---|---|
 | Newly created, sparse history | Real identity plus provisional/no-calculation explanation; no invented numeric rating |
-| Below leaderboard threshold | Profile remains public; explain no overall position yet |
+| Not in any top 50 | Profile remains public; nothing is said about a position ([D-2026-11-16-05](../../../../mvp/decisions.md#d-2026-11-16-05)) |
 | Eligible | Show skill label and global position from a fresh accepted projection |
 | Needs reassessment | Keep old label visible with that status; no active leaderboard position |
 | Rank update processing | Distinguish last calculated data from pending session update |
@@ -27,6 +27,8 @@ RTR ID retains the original club founding-city/date context. Do not display it a
 | Offline cached | Show cached age; no edits claimed saved to server |
 | Private profile, viewer not signed in | The profile, its games and its comparison show only "Log in with ROTRA to see this profile." and a **Sign in** button (back to that page after signing in). Same gate for guests. Signed-in ROTRA players see the full profile. Private is the default ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07), default and levels changed by [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)) |
 | Always private profile | For everyone but the player themselves, signed in or not: the picture and banner, the masked name and the text **This player keeps their profile private.**, with no sign-in button. Name, level and games are not shown. The player sees their own profile in full ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)) |
+
+**Leaderboard boxes** ([D-2026-11-16-05](../../../../mvp/decisions.md#d-2026-11-16-05), [log](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md)): the card that held "Leaderboard ranking" or "Leaderboard eligibility" now holds the shared rank (label, chips, Share, How this rank works) and, titled **Leaderboards**, one box for each list the player is in the top 50 of: "Top annual", "#17", "106 wins this year". A box opens that list on the player's row. No box and no title when the player is in none. The profile dialog, an unclaimed player's card and Compare show the same places ("Top annual #39" chips; Compare rows named after the lists); share images label the place "Top annual" and leave it out when there is none. A Provisional rank reads "This rank is still settling: 7 of 10 standard matches in the last three months."
 
 Unclaimed profiles can exist without a login; the public view does not let any visitor claim one by clicking its public ID. Account-link delivery remains operator-issued.
 

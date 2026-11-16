@@ -14,7 +14,7 @@ Superseded by: none
 ## What changed
 - Before: the prototype kept phones with spaces and printed them as stored.
 - After: a phone is kept as E.164 with no spaces ("+639175550142"). Wherever Admin sees a phone it is grouped the same way, "+63 917 555 0142", whatever form it was typed or stored in. The Edit profile phone field shows the grouped number and converts what is typed to the stored form on save. A save from before this change is converted when the prototype loads.
-- **Not masked.** Admin still reads the full number, because approving a contact change means comparing the current and the requested number. The owner said "all phone numbers must be masked"; whether that includes Admin is asked, not assumed.
+- **Not masked.** Admin reads the full number. Owner, November 16, 2026: "admin should always see it" ([D-2026-11-16-06](../mvp/decisions.md#d-2026-11-16-06)).
 
 ## Why
 - Owner, November 16, 2026: "all phone numbers must be masked and formated correctly but it should still match how the data is. if the db data has no space all of the inputs should convert it".

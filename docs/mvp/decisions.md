@@ -56,8 +56,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (who qualifies and the period boundaries open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 (Admin masking open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -1044,14 +1044,14 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the **Confirm player** step applies when a club adds another club's unclaimed player.
   - Whether a phone still links a record on registration (the email is the key now).
   - Which email is matched on registration (the ROTRA email, the Google email, or both).
-  - A returning guest who sends a new join request gets a second guest record, because nothing links the two any more.
+  - A returning guest who sends a new join request gets a second guest record, because a guest has no email or phone to match on. The owner asked why this matters ("they're guarded via the email and phone anyway"); the guard starts only once the Queue Master adds an email. Not decided.
   - The **Same person as NAME?** confirmation in the Queue mockup (the email typed for a guest already belongs to a saved player) is new and not yet confirmed by the owner.
   - Whether picking an identity card also carries over the playing style, playing since and links (the mockup prefills the name, nickname, picture and level).
   - Whether a registered player's profile card should show the same standing and stats block as an unclaimed player's.
 - **References:** [product terms](../product-terms.md) (Guest, Unclaimed profile, Player ID / RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [identity database design](../database_design/product/player-information/modules/identity.md).
 
 ### D-2026-11-16-05 — Three leaderboards: Top annual, Top monthly, Top weekly
-- **Decision status:** approved (owner, November 16, 2026); who qualifies for the monthly and weekly lists and the exact period boundaries are not decided.
+- **Decision status:** approved (owner, November 16, 2026); the meaning of "calendars roll" is to be confirmed.
 - **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-leaderboard-periods.md)). The mock app, real mode and rank calculation still have one overall list ordered by rating.
 - **Ticket:** needed
 - **Roadmap:** MVP — [Player](workstreams/player.md)
@@ -1064,17 +1064,19 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Movement mark:** beside each place, an up or down mark when the player moved, or **New**; in the owner's words, "top or bottom icons if player has recently ranked up or ranked down or show \"new\"". Hovering shows where the player was before.
   - **Compared with the previous period** (owner choice): weekly with last week's final place, monthly with last month, annual with last year. **New** means the player wasn't on that list in the previous period.
   - **Below the top 50:** a signed-in player sees "You're not in the top 50 this year" with their own wins and the wins of place 50. The Player mockup has a Prototype control for it (owner request).
+  - **Just by wins** (owner, later the same day: "it is just by wins"): nothing but wins in the period decides who is on a list. The earlier requirement of 10 standard matches in the last three months no longer applies to the leaderboards.
+  - **Calendar periods** (owner: "calendars roll"), read as: the lists follow the calendar year, month and week, and each starts again when a new one begins.
+  - **Profiles** (owner: "profile should not say it if it doesnt qualify for top 50. and should show if 3 boxes if qualified for each category"): a profile names no overall position. It shows one box for each list the player is in the top 50 of (the place and the wins), and nothing about a position when they are in none.
 - **Open:**
-  - Who qualifies for the monthly and weekly lists. The mockup lists every player who qualifies today (10 standard matches in the last three months) and played at least one standard match in the period.
-  - Whether the periods are calendar ones (this year, this month, Monday to Sunday in Manila time, as the mockup shows) or rolling (the last 365, 30 and 7 days).
-  - What the rating is still used for, now that it no longer orders the main list (the skill label and Provisional stay as they are in the mockup).
-  - What a profile shows as its position now that only the top 50 are listed. Profiles in the mockup still say "#128 of 1,284 overall".
-  - A further tie-break after win rate (the old list used counted games, then name).
+  - The owner's "calendars roll" is recorded as calendar periods that start again; to confirm it does not mean rolling windows (the last 7, 30 and 365 days).
+  - What the rating and the "N of 10 standard matches" count are still used for. In the mockup they only describe the skill rank ("This rank is still settling").
+  - A further tie-break after win rate.
+  - The Admin mockup still marks players "On leaderboard" or "Not on leaderboard" by the old rule.
   - Whether the Queue session page and the club's share images are affected. They are not changed.
 - **References:** [ranking module](../business_logic/product/player-information/modules/ranking/README.md), [ranking and history screens](../screens/product/modules/player-information/ranking-history.md).
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
-- **Decision status:** approved (owner, November 16, 2026); whether Admin also sees masked phones is not decided.
+- **Decision status:** approved (owner, November 16, 2026).
 - **Implementation status:** mockup only: [Player](../mockup-changes/2026-11-16-player-phone-mask-format.md) and [Admin](../mockup-changes/2026-11-16-admin-phone-format.md) logs. The real app already stores E.164 (`phoneField` in `packages/schema`) and has `maskPhone` and `formatPhoneForDisplay`; where it still shows a player their full phone is to be checked when ticketed.
 - **Ticket:** needed
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
@@ -1083,7 +1085,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Stored:** a phone is kept as E.164 with no spaces ("+639175550142").
   - **Typed:** an input accepts 09…, 639… or +63 9…, with spaces or hyphens, and converts it to the stored form on save. The field groups the digits while typing and is not masked.
   - **Shown:** every phone shown as text uses one grouping. In the Player app it is masked, "+63 917 ••• ••42", including the player's own number.
+  - **Admin always sees the full number** (owner, later the same day: "admin should always see it"), grouped as "+63 917 555 0142".
 - **Open:**
-  - Whether Admin also sees masked phones. The Admin mockup shows the full number grouped ("+63 917 555 0142"), because approving a contact change means comparing the current and the requested number.
   - Whether a player may reveal their own full number anywhere.
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/data/src/player-account/playerAccount.rules.ts`.

@@ -644,6 +644,10 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sh-acts { justify-content: center; }
 .sh-photos-hint { max-width: 34ch; margin: 0; color: var(--fg2); font-size: 13px; line-height: 1.45; } .sh-photos-hint b { color: var(--fg); }
 .rk-card { gap: 12px; }
+.lb-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.lb-box { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.lb-box:hover { border-color: var(--accent); }
+.lb-box b { font-family: var(--mono); font-size: 28px; line-height: 1.1; font-weight: 600; color: var(--accent); }
 .rk-compact { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
 .rk-c-lv { display: flex; flex-direction: column; gap: 4px; min-width: 0; justify-content: center; }
 .rk-c-pos { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); color: inherit; font: inherit; cursor: pointer; }
@@ -1484,14 +1488,27 @@ function boardList() {
   });
   return out;
 }
-const positionOf = (pid) => { const i = boardList().findIndex((e) => e.id === pid); return i < 0 ? null : i + 1; };
+// Owner, November 16, 2026: the leaderboards are just by wins. Every player with a standard match in the period can be
+// on a list; the 10-match rule no longer decides who is listed. (boardList keeps the older qualified set for the
+// rank status text.)
+function boardAll() {
+  if (S.board === 'empty') return [];
+  const out = [];
+  const migs = migsOnBoard();
+  BASE.forEach((e, i) => {
+    if (i === MIGS_SLOT && S.rank !== 'new') out.push({ id: 'u1', name: S.accounts.u1.name, nick: S.accounts.u1.nick, photo: S.accounts.u1.photo, face: S.accounts.u1.face, photoUrl: S.accounts.u1.photoUrl, level: S.accounts.u1.level, profilePrivate: S.accounts.u1.profilePrivate, alwaysPrivate: S.accounts.u1.alwaysPrivate });
+    out.push(e);
+  });
+  return out;
+}
+// A player's place on Top annual, only while they are in its top 50 (used by the compare page and the share images).
+const positionOf = (pid) => topPlace(pid, 'year');
 function rankStatus(p, pos) {
   const t = T(), own = p.id === S.me, first = own ? 'you' : firstName(p), plays = own ? 'play' : 'plays', has = own ? 'You now have' : `${firstName(p)} now has`;
   if (p.level == null) return { chips: chip('Not calculated'), text: `ROTRA calculates a rank once a club has assessed ${first} and a session with that assessment is done. Until then there is no rank to show.` };
-  if (p.state === 'reassess') return { chips: chip('Needs reassessment', 'warn'), stale: true, text: `Last played more than three months ago, so this rank is out of date and not on the leaderboard. To return, a club gives ${first} a fresh assessment and ${first} ${plays} ${t} standard matches within three months.` };
-  if (pos) return { chips: p.state === 'processing' ? chip('Updating', 'warn') : chip('On the leaderboard', 'ok'), text: `${num(pos)} of ${num(boardList().length)} players on the overall ROTRA leaderboard.` };
-  if (p.recent >= t) return { chips: chip('Qualifies', 'ok'), text: `${has} enough recent matches. The position appears after the next leaderboard update.` };
-  return { chips: chip('Provisional'), text: `No overall position yet. ${p.recent} of ${t} standard matches in the last three months.` };
+  if (p.state === 'reassess') return { chips: chip('Needs reassessment', 'warn'), stale: true, text: `Last played more than three months ago, so this rank is out of date. A club gives ${first} a fresh assessment to bring it up to date.` };
+  if (p.recent >= t) return { chips: p.state === 'processing' ? chip('Updating', 'warn') : '', text: '' };
+  return { chips: chip('Provisional'), text: `This rank is still settling: ${p.recent} of ${t} standard matches in the last three months.` };
 }
 
 // ---------- Shared fragments ----------
@@ -1578,30 +1595,13 @@ function shareRow(s) {
 // Artifact comment, same day ("no need to put this here", on the Shared rank card): the profile no longer has a separate Shared rank card.
 // The rank label, Share rank and How this rank works move into the head of the ranking / eligibility card; the ladder lives on the rank page.
 const rankHead = (p, own, st) => `<div class="rk-lv"><div class="stack tight"><span class="label">Shared rank</span><div class="row" style="gap:8px"><b class="rk-lvl${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</b>${st ? st.chips : ''}</div></div><div class="row">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${esc(p.id)}">How this rank works</button></div></div>`;
-function rankingCard(p, own, pos, st) {
-  // Artifact comment, same day ("I just want the leaderboard ranking but just her information · I expect it to be compact"): only this
-  // player's rank and position, no neighbouring rows, in a compact card.
-  const n = boardList().length, t = T();
-  return `<section class="card stack rk-card"><div class="between"><h2>Leaderboard ranking</h2>${chip('Qualifies', 'ok')}</div>
-    <div class="rk-compact"><div class="rk-c-lv"><span class="label">Shared rank</span><b class="rk-lvl${p.level == null ? ' dim' : ''}">${lvLabel(p.level)}</b>${st && st.chips ? `<div class="row" style="gap:6px">${st.chips}</div>` : ''}</div>
-      <button type="button" class="rk-c-pos" data-act="seeOnBoard" data-id="${esc(p.id)}" aria-label="Overall number ${num(pos)} of ${num(n)}. See on the leaderboard"><span class="label">Overall</span><b class="tnum">#${num(pos)}</b><span class="small muted">of ${num(n)}</span></button></div>
-    <div class="rk-c-foot"><span class="small muted">${p.recent} of ${t} standard matches · last three months</span><div class="row" style="gap:6px">${own && p.level != null ? `<button class="btn xs" data-act="openShare" data-kind="rank">${I.share} Share</button>` : ''}<button class="btn xs ghost" data-act="openRank" data-id="${esc(p.id)}">How this rank works</button></div></div></section>`;
-}
+// Owner, November 16, 2026: the profile no longer names an overall position or a leaderboard requirement. The card shows the
+// shared rank and, under it, one box for each leaderboard the player is in the top 50 of.
 function eligibility(p, own, st) {
-  const t = T(), pct = Math.min(100, Math.round((p.recent / t) * 100));
-  { const pos = p.recent >= t && p.state !== 'reassess' ? positionOf(p.id) : null; if (pos) return rankingCard(p, own, pos, st); }
-  const older = countedAll(p.sessions) - p.recent;
-  const you = own ? 'you' : firstName(p);
-  let text;
-  if (p.state === 'reassess') text = `${own ? 'You have' : `${firstName(p)} has`} no standard matches in the last three months${older ? `; ${older} older matches no longer count` : ''}. A fresh club assessment plus ${t} new matches brings ${own ? 'you' : 'them'} back.`;
-  else if (p.recent >= t) text = `${own ? 'You meet' : 'Meets'} the requirement of ${t} completed singles or doubles matches in the last three months. Falling below it removes the leaderboard position, though the rank stays visible.`;
-  else text = `${t - p.recent} more standard ${t - p.recent === 1 ? 'match' : 'matches'} in the next few weeks would put ${you} on the leaderboard. Older matches drop out of the count as they pass three months.`;
-  return `<section class="card stack"><div class="between"><h2>Leaderboard eligibility</h2>${p.recent >= t && p.state !== 'reassess' ? chip('Qualifies', 'ok') : chip('Not yet', p.state === 'reassess' ? 'warn' : '')}</div>
+  const boxes = lbBoxes(p);
+  return `<section class="card stack rk-card">${boxes ? '<div class="between"><h2>Leaderboards</h2></div>' : ''}
     ${rankHead(p, own, st)}${st && st.text ? `<p class="small muted">${st.text}</p>` : ''}
-    <div class="between" style="align-items:baseline"><span class="big-count">${p.recent} <span class="muted" style="font-size:15px">of ${t}</span></span><span class="small muted">standard matches · last three months</span></div>
-    <div class="prog ${p.state === 'reassess' ? 'warn' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${t}" aria-valuenow="${Math.min(p.recent, t)}" aria-label="Standard matches in the last three months"><i style="width:${pct}%"></i></div>
-    <p class="small muted">${text}</p>
-    <p class="small muted">Fun games, partial games after a substitution, and invalid games or sessions don't count.</p></section>`;
+    ${boxes}</section>`;
 }
 
 // ---------- Top bar ----------
@@ -1641,7 +1641,7 @@ const lbWhen = (k) => { const d = new Date(); if (k === 'year') return String(d.
 const LB_TOP = 50;
 let lbCache = { key: '', list: [], full: [] };
 function periodList(k = lbP()) {
-  const base = boardList(), key = `${k}|${base.length}|${S.me}|${S.board}|${S.ui.lbMe || 'auto'}`;
+  const base = S.board === 'empty' ? [] : boardAll(), key = `${k}|${base.length}|${S.me}|${S.board}|${S.rank}|${S.ui.lbMe || 'auto'}`;
   if (lbCache.key === key) return lbCache.list;
   const rows = base.map((e, i) => {
     const h = hashStr(`lb-${k}-${e.id}`);
@@ -1664,6 +1664,13 @@ function periodList(k = lbP()) {
   return lbCache.list;
 }
 // A player's own place and wins in the period, also below the top 50 (their own "Your position" card only).
+// A place in the top 50 of one list, or null. A profile only ever names a place from here.
+const topPlace = (id, k) => { const i = periodList(k).findIndex((e) => e.id === id); return i < 0 ? null : i + 1; };
+// Owner, same day: "profile should not say it if it doesnt qualify for top 50. and should show 3 boxes if qualified for each
+// category". One box per list the player is in the top 50 of; nothing at all when they are in none.
+const topPlaces = (id) => LB_PERIODS.map(([k, label]) => { const pos = topPlace(id, k); return pos ? { k, label, pos, wins: periodList(k)[pos - 1].lbW } : null; }).filter(Boolean);
+const lbBoxes = (p) => { const tp = topPlaces(p.id); return tp.length ? `<div class="lb-boxes">${tp.map((x) => `<button type="button" class="lb-box" data-act="lbGo" data-v="${x.k}" data-id="${esc(p.id)}" aria-label="${x.label}: number ${x.pos}, ${x.wins} wins. See on the leaderboard"><span class="label">${x.label}</span><b class="tnum">#${num(x.pos)}</b><span class="small muted">${num(x.wins)} ${x.wins === 1 ? 'win' : 'wins'} ${LB_WORDS[x.k][0]}</span></button>`).join('')}</div>` : ''; };
+const lbChips = (p) => topPlaces(p.id).map((x) => chip(`${x.label} #${num(x.pos)}`)).join('');
 const periodPlace = (id, k = lbP()) => { periodList(k); const i = lbCache.full.findIndex((e) => e.id === id); return i < 0 ? null : { pos: i + 1, e: lbCache.full[i] }; };
 const LB_ARROW = { up: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1 9.5 8.5H.5z" fill="currentColor"/></svg>', down: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 9 .5 1.5h9z" fill="currentColor"/></svg>' };
 // [class, mark, words]. The words are the tooltip and are read out with the row.
@@ -1714,7 +1721,7 @@ function viewBoard() {
   } else if (S.board === 'error') {
     body = `${notice('bad', '<b>Couldn\'t load the leaderboard.</b> Check your connection, then try again.')}<div class="row"><button class="btn sm" data-act="retryBoard">Try again</button></div>`;
   } else if (!list.length) {
-    body = `<div class="empty">${boardList().length ? `No one on the leaderboard has played a standard match ${now} yet.` : `No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.`}</div>`;
+    body = `<div class="empty">No one has won a standard match ${now} yet. The list fills as clubs finish sessions.</div>`;
   } else if (q && !isId) {
     const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromViewer(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
     body = hits.length
@@ -1743,13 +1750,12 @@ function viewBoard() {
     </section>
     <section class="card stack tight"><h2>Who appears here</h2>
       <ul class="bul muted">
-        <li>Players with <b style="color:var(--fg)">${T()} completed singles or doubles matches</b> in the last three months. It's a rolling count, not a lifetime total.</li>
+        <li><b style="color:var(--fg)">Top annual, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">50 players with the most wins</b> in standard matches in that year, month or week. Nothing else decides who is listed. Win rate breaks a tie.</li>
+        <li>Each list starts again when a new year, month or week begins.</li>
         <li>Fun games, partial games after a substitution, and invalid games or sessions don't count.</li>
-        <li>After three months without playing, a player leaves the list until a club reassesses them.</li>
-        <li><b style="color:var(--fg)">Top annual, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">top ${LB_TOP}</b> of those players by wins in standard matches in that year, month or week. Win rate breaks a tie.</li>
         <li>The mark beside a place shows the move since the period before: up, down, or <b style="color:var(--fg)">New</b> when the player wasn't on that list then. Point at it to see their earlier place.</li>
         <li>Players marked <b style="color:var(--fg)">Not registered yet</b> were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register.</li>
-        <li>Positions come from club assessments and match results. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
+        <li>A player's skill rank is separate and isn't shown here. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
       </ul></section>
   </main>`;
 }
@@ -1945,8 +1951,8 @@ function heroFacts(p, pos) {
   const gs = p.sessions.filter((x) => x.ago <= YEAR_DAYS()).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
   const w = gs.filter((g) => g.res === 'W').length;
   return `<div class="pp-card hero-facts"><div class="pp-body">
-      <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : chip('Not on the leaderboard yet')}</div>
-      <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Saved by</dt><dd>${esc(savedByName(p))}</dd><dt>Standing</dt><dd>${pos ? `#${num(pos)} of ${num(boardList().length)} overall` : `No overall position yet. ${p.recent} of ${T()} standard matches in the last three months`}</dd></dl></div>
+      <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${lbChips(p)}</div>
+      <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Saved by</dt><dd>${esc(savedByName(p))}</dd></dl></div>
       ${ppStatsBlock(gs.length, w)}
     </div></div>`;
 }
@@ -2202,7 +2208,7 @@ function viewCompare() {
     </section>` : `<section class="card stack">
       <div class="cmp-head">${who(me, true)}<span class="cmp-vs" aria-hidden="true">${I.versus}</span>${who(them, false)}</div>
       ${row('Level', esc(lvLabel(me.level)), esc(lvLabel(them.level)), hi(me.level, them.level))}
-      ${row('Overall position', pm ? `#${num(pm)}` : '—', pt ? `#${num(pt)}` : '—', hi(pm, pt, true))}
+      ${LB_PERIODS.map(([k, label]) => { const a1 = topPlace(me.id, k), b1 = topPlace(them.id, k); return a1 || b1 ? row(label, a1 ? `#${num(a1)}` : '—', b1 ? `#${num(b1)}` : '—', hi(a1, b1, true)) : ''; }).join('')}
       ${flt === 'h2h' ? `${row('Games counted (3 months)', num(me.recent), num(them.recent), hi(me.recent, them.recent))}${row('Win rate overall', sm.pct == null ? '—' : `${sm.pct}%`, st.pct == null ? '—' : `${st.pct}%`, hi(sm.pct, st.pct))}` : ''}
       ${row(flt === 'all' ? 'Shared games' : flt === 'h2h' ? 'Games against each other' : 'Games as partners', n, n, '')}
       ${row('Wins in these games', myWins, theirWins, hi(myWins, theirWins))}
@@ -2917,7 +2923,7 @@ function shareModel(sh) {
   if (sh.kind === 'rank') {
     if (p.level == null) return null;
     const pos = positionOf(p.id);
-    return { kind: 'rank', title: 'Share rank', top, link, blocks: [{ t: 'rank', label: lvLabel(p.level), pos }, { t: 'ladder', level: p.level }] };
+    return { kind: 'rank', title: 'Share rank', top, link, blocks: [{ t: 'rank', label: lvLabel(p.level), pos, hidePos: pos == null }, { t: 'ladder', level: p.level }] };
   }
   if (!s || (sh.kind === 'result' && s.published !== true)) return null;
   if (sh.kind === 'perf') {
@@ -2948,7 +2954,7 @@ function shareCardHTML(m, fmt) {
   const blk = (b) => {
     if (b.t === 'h') return `<h3>${esc(b.text)}</h3>`;
     if (b.t === 'p') return `<p>${esc(b.text)}</p>`;
-    if (b.t === 'rank') return `<div class="sh-lv${b.dim ? ' dim' : ''}">${esc(b.label)}</div>${b.hidePos && !b.pos ? '' : `<div class="sh-pos"><span>Overall</span>${b.pos ? `<b>#${num(b.pos)}</b>` : '<b class="none">No position</b>'}</div>`}`;
+    if (b.t === 'rank') return `<div class="sh-lv${b.dim ? ' dim' : ''}">${esc(b.label)}</div>${b.hidePos && !b.pos ? '' : `<div class="sh-pos"><span>Top annual</span>${b.pos ? `<b>#${num(b.pos)}</b>` : '<b class="none">No position</b>'}</div>`}`;
     if (b.t === 'stats') return `<div class="sh-stats"><span>${esc(b.note)}</span><div class="g">${b.items.map(([k, v]) => `<div><b>${esc(v)}</b><em>${esc(k)}</em></div>`).join('')}</div></div>`;
     if (b.t === 'ladder') return `<div class="sh-ladder" aria-hidden="true">${TIERS.map(([name, bands]) => `<div class="t"><div class="bs">${bands.map((i) => `<i class="${i === b.level ? 'cur' : i < b.level ? 'on' : ''}"></i>`).join('')}</div><em>${name}</em></div>`).join('')}</div>`;
     if (b.t === 'big') return `<div class="sh-big"><b>${esc(b.value)}</b><span>${esc(b.label)}</span></div>`;
@@ -3006,7 +3012,7 @@ async function drawShareCard(m, fmt) {
     else if (b.t === 'rank') {
       font(800, 22); x.fillStyle = b.dim ? FG : ACC; y += 24; x.fillText(b.label, pad, y - 3); y += 10;
       if (b.hidePos && !b.pos) { y += 6; continue; }
-      font(600, 11); x.fillStyle = DIM; x.fillText('OVERALL', pad, y + 8); y += 12;
+      font(600, 11); x.fillStyle = DIM; x.fillText('TOP ANNUAL', pad, y + 8); y += 12;
       if (b.pos) { font(700, 36, MONO); x.fillStyle = ACC; x.fillText(`#${num(b.pos)}`, pad, y + 34); y += 44; }
       else { font(700, 20); x.fillStyle = FG; x.fillText('No position', pad, y + 20); y += 28; }
       y += 6;
@@ -3165,7 +3171,7 @@ const SHEETS = {
     // Owner comment, November 13, 2026: named by the nickname, else the full name.
     return sheetWrap(esc(p.nick || p.name), `<div class="pp-card">${head}<div class="pp-body">
         <div class="pp-name"><span class="pp-nm"><b>${esc(p.nick || p.name)}</b><a class="pp-ext" href="${esc(profileLink(p.id))}" data-act="openProfile" data-id="${esc(p.id)}" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile" title="Open ROTRA profile">${I.fwd}</a></span>${p.nick ? `<span class="pp-full">${esc(p.name)}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy player ID ${esc(p.rtr)}" title="Copy player ID">${esc(p.rtr)}${I.copy}</button>` : ''}</div>
-        <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : ''}${p.id === S.me ? chip('You', 'ok') : ''}${isUnclaimed(p) ? unclaimedChip() : ''}</div>
+        <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${lbChips(p)}${p.id === S.me ? chip('You', 'ok') : ''}${isUnclaimed(p) ? unclaimedChip() : ''}</div>
         ${isUnclaimed(p) ? `<div class="pp-sec"><span class="label">Unclaimed</span><p class="muted" style="margin:0">${esc(savedByName(p))} saved this player. This is the club's version of them, public until they register with ROTRA.</p></div>
         <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Saved by</dt><dd>${esc(savedByName(p))}</dd></dl></div>` : `<div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd></dl></div>`}
         ${p.hideStats && p.id !== S.me ? '' : ppStatsBlock(gs.length, w)}
@@ -3402,6 +3408,7 @@ const ACT = {
   closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; bannerDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
   showMore: () => { S.shown += 25; render(); },
   lbPeriod: (el) => { S.ui.lbP = el.dataset.v; S.shown = 25; render(); },
+  lbGo: (el) => { const id = el.dataset.id; S.ui.lbP = el.dataset.v; const pos = topPlace(id, S.ui.lbP) || 1; go('board'); S.q = ''; S.shown = Math.max(25, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
   jumpMe: (el) => {
     S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
     const row = document.getElementById(`row-${S.me}`);

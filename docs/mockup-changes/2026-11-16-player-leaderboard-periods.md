@@ -25,11 +25,19 @@ Superseded by: none
 
 - **Prototype control (owner request, same day):** Prototype panel › Leaderboard › "My place on the leaderboard (signs in as Migs)" with As played · In the top 50 · Not in the top 50. It signs in as Migs, opens the leaderboard and puts him at #17 or below place 50 on all three lists. When his wins equal place 50's, the card adds "and a better win rate".
 
+- **Owner answers, same day (profiles and who is listed):**
+  - The lists are just by wins: every player with a standard match in the period can be listed; the 10-match rule no longer decides it. "Who appears here" is rewritten, with "Each list starts again when a new year, month or week begins."
+  - A profile names no overall position. The "Leaderboard ranking" / "Leaderboard eligibility" card is replaced by a card with the shared rank and, titled "Leaderboards", one box per list the player is in the top 50 of ("Top annual", "#17", "106 wins this year"); a box opens that list on the player's row. Nothing when they are in none (`lbBoxes`, `topPlaces`, `lbGo`).
+  - The same places show as chips ("Top annual #39") in the profile dialog and an unclaimed player's card, as rows named after the lists in Compare, and as "Top annual" on share images (left out when there is no place).
+  - Rank status text no longer mentions the leaderboard: Provisional reads "This rank is still settling: 7 of 10 standard matches in the last three months."; Needs reassessment reads "Last played more than three months ago, so this rank is out of date. A club gives NAME a fresh assessment to bring it up to date."
+
 ## Why
 - Owner, November 16, 2026: "leaderboards should be top annual, top monthly, top weekly. there should also be top or bottom icons if player has recently ranked up or ranked down or show \"new\". hovering on icon should show tooltip if when was that person's place before?"
 - Owner choices the same day: ordered by wins in the period; Top annual replaces the overall list; compared with the previous period. Decision: [D-2026-11-16-05](../mvp/decisions.md#d-2026-11-16-05).
 
 - Owner, November 16, 2026 (follow-up): "we should make leaderboards to be top 50 only and should not show the skill level for now just show # of wins".
+
+- Owner, November 16, 2026 (answers): "profile should not say it if it doesnt qualify for top 50. and should show if 3 boxes if qualified for each category"; "it is just by wins. and calendars roll".
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

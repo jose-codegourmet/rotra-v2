@@ -24,8 +24,8 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Operator adds and confirms all slots | [Roster](modules/queue/players-roster.md) | No public Request to join/Cancel attendance controls |
 | Club remembers returning players and guests | [Saved players](modules/queue/players-roster.md) | Club list searched first; no formal membership workflow implied |
 | Name lookup suggests global identity | [Identity confirmation](modules/queue/players-roster.md) | Name match does not auto-link two different people |
-| Phone uniquely links a registered player across clubs (unclaimed profiles stay in their club, D-2026-11-11-03) | [Identity confirmation](modules/queue/players-roster.md) | Same phone resolves existing profile; conflict is explicit |
-| No phone means guest; account not needed to play | [Add player](modules/queue/players-roster.md) | Slot can be confirmed without email/phone; no global ID invented |
+| One email is one person and one RTR ID across clubs, registered or unclaimed ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | [Add player](modules/queue/players-roster.md) | Lookup by exact RTR ID or exact email only; another club's unclaimed player shows no name, picture or level |
+| No email means guest; account not needed to play | [Add player](modules/queue/players-roster.md) | Slot can be confirmed without email/phone; no RTR ID for a guest |
 | Incomplete profile enrichment or operator-issued registration link | [Roster](modules/queue/players-roster.md), [claim](modules/player-information/access-registration.md) | Missing socials do not block participation; no offline fake claim link |
 | Offline late arrival allowed | [Roster](modules/queue/players-roster.md), [sync](modules/queue/offline-recovery.md) | Name/level/optional phone saved locally; link waits for connection |
 | One of nine levels assigned; global rank only a suggestion | [Assessment selector](modules/queue/players-roster.md) | All nine levels; local Beginner allowed despite higher global label |
@@ -94,14 +94,14 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Club name change needs approval | [Club settings](modules/queue/access-home.md), [Admin club detail](modules/admin/clubs-licenses.md) | Old name shown until approved; one pending request; cancellable |
 | Club password change | [Club settings](modules/queue/access-home.md) | Requires the correct current password; forgotten passwords reset by the platform owner |
 | Club settings online only | [Club settings](modules/queue/access-home.md) | Offline shows only the connection message |
-| Registered players need no identity check | [Add player](modules/queue/players-roster.md) | Only unclaimed profiles require RTR ID / QR / phone confirmation |
+| Registered players need no identity check | [Add player](modules/queue/players-roster.md) | The Confirm player step for unclaimed profiles was withdrawn November 11, 2026; whether it applies to another club's unclaimed player is open |
 | Light and dark themes | [Top bar](modules/queue/access-home.md) | Dark default; switch remembered per device |
 | Guest join requests from the session link | [Public join](modules/queue/public-session.md), [preparation](modules/queue/session-setup.md), [console](modules/queue/session-console.md) | A request holds no slot; QM confirms with a level or declines; full sessions confirm to the waitlist in request order; requests can be turned off |
 | Live vs upcoming is unmistakable on the dashboard | [Home](modules/queue/access-home.md) | LIVE NOW filled badge with live numbers, or UPCOMING outlined badge with a countdown |
 | Slots left before the waitlist | [Preparation](modules/queue/session-setup.md) | “14/24 slots · 10 left before the waitlist”; amber at 2 or fewer; full and over-budget states |
 | Level vs suggestion prompt | [Preparation](modules/queue/session-setup.md) | May be too high / may be too low / matches, by step count; prompt only |
 | Saved players “Right now” filter | [Saved players](modules/queue/players-roster.md) | Playing now / at the session / in the live session; disabled when nothing is live |
-| Adding several players in a row | [Add player](modules/queue/players-roster.md) | Dialog stays open; already-added players are not listed; registered players add in one tap; unclaimed open Confirm player |
+| Adding several players in a row | [Add player](modules/queue/players-roster.md) | Dialog stays open; already-added players are not listed; registered players and saved players with a level add in one tap |
 | Sign out is confirmed | [Dialogs](dialogs.md) | Warns about unsynced changes, a live session, and being offline |
 | Usable on phones | [Experience contract](experience-contract.md) | No sideways scrolling at 375 px; tabs and action rows fit; tables become labelled cards |
 | Touch-sized controls | [Experience contract](experience-contract.md) | On touch screens or at 1024 px and narrower: buttons 44–48 px, icon buttons 44 × 44 px, bigger switches and queue-card pictures |

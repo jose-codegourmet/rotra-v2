@@ -3,7 +3,7 @@
 > **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
 
 
-**Last verified:** 2026-11-12 for the round-2 answers ([D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01)); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for the player statuses ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)); 2026-11-12 for the round-2 answers ([D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01)); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -19,7 +19,8 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 | Conflicting permanent outcomes | Q-CONFLICT | No last-write-wins or generic winner edit |
 | Final policy for games still in play / unused waiting queue | Q-SESSION-DONE | V1 blocks Session done while any match is Playing, until it is finished or invalidated; unplayed waiting matches and On court matches never started are dropped from results (the latter settled November 6, 2026); never manufacture winners or silently invalidate |
 | Releasing the active-session slot after invalidation | Q-INVALID-SESSION | Invalidity is permanent, as explicitly agreed; slot-release mechanics still need definition |
-| Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | Profile/ID creation on successful entry sync and inclusion of earlier guest games after identity confirmation are settled below. No name-only transfer or invented offline permanent ID; confirmation evidence and conflict resolution remain open |
+| Historical guest identity confirmation and link conflicts | Q-ADD-PLAYER, P-ID-QR, P-MATCH-HISTORY | **Changed November 16, 2026 ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)):** **Link** and **Link to saved player…** are removed; a guest's games join an account only after the club adds the guest's email. No name-only transfer or invented offline RTR ID. Open: a returning guest who sends a new join request creates a second guest record, because nothing links them |
+| Player lookup and the RTR ID after D-2026-11-16-04 | Q-ADD-PLAYER, Q-IDENTIFY, P-ID-QR, P-CLAIM, A-PLAYER-EDIT | Settled: lookup by exact RTR ID or exact email only, for registered and unclaimed players; names only within the club's Saved players. Open: whether lookup by phone and by QR code stay; whether an old RTR ID in a QR code or link already shared still leads to the player after Admin changes it; whether the Confirm player step applies to another club's unclaimed player; whether a phone still links a record on registration; which email is matched on registration (ROTRA email, Google email, or both) |
 | Post-claim operator edits and contact verification | Q-ADD-PLAYER, P-CLAIM, A-PLAYER-DETAIL | No unrestricted personal/contact overwrite |
 | Claim email verification, password policy, loss of contacts | P-CLAIM, P-CLAIM-STATUS, P-FORGOT, P-RESET, P-CONTACT-REQUEST | **Settled November 11, 2026 ([D-2026-11-11-08](../../mvp/decisions.md#d-2026-11-11-08)):** no email verification; password at least 8 characters; links last 24 hours. Loss of contacts stays an Admin review |
 | Final rank/pairing/award formulas and window boundary | Q-SUGGEST, Q-AUTO, Q-AWARDS-SLIDE, P-RANK-DETAIL, A-RANK-CONFIG | **Settled November 11, 2026 ([D-2026-11-11-05](../../mvp/decisions.md#d-2026-11-11-05)):** rating by wins; prototype pairing weights and award formula approved as is; 90 days. A-RANK-CONFIG loses the two weight fields and gains the five rating settings (mockup-first, log pending). No win probabilities shown to operators |
@@ -86,8 +87,8 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 
 | Area | Decision | Screens |
 |---|---|---|
-| Profile and RTR ID availability | Show the real profile/ID after successful entry sync; do not wait for Session done. Lookup pending remains truthful until matching/allocation succeeds | Q-ADD-PLAYER, P-ID-QR |
-| Earlier guest games | After identity confirmation, include earlier valid games in personal history and ranking under existing eligibility/window rules. Keep counts accurate during processing and never transfer by name alone | P-MATCH-HISTORY, P-RANK-DETAIL, P-ELIGIBILITY |
+| Profile and RTR ID availability | Show the real profile/ID after successful entry sync; do not wait for Session done. Lookup pending remains truthful until matching/allocation succeeds. Since November 16, 2026 the email is what is matched ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | Q-ADD-PLAYER, P-ID-QR |
+| Earlier guest games | After the club adds the guest's email and the person registers ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04); before: after identity confirmation), include earlier valid games in personal history and ranking under existing eligibility/window rules. Keep counts accurate during processing and never transfer by name alone | P-MATCH-HISTORY, P-RANK-DETAIL, P-ELIGIBILITY |
 
 ## Settled by the prototype (October 26, 2026)
 
@@ -106,7 +107,7 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 | Branding ownership | Logo: edited by the club. Name: club requests, platform owner approves in Admin | Q-CLUB, A-CLUB-DETAIL |
 | Payment per player vs entrance fee | Payment is the full amount (break-even or custom); entrance fee is a misc cost line | Q-FINANCIALS, Q-PAYMENTS |
 | Reducing the slot budget | Latest-added players move to the front of the waitlist on save | Q-SETUP, Q-PREPARE |
-| Identity confirmation | Unclaimed profiles only | Q-ADD-PLAYER, Q-IDENTIFY |
+| Identity confirmation | Unclaimed profiles only; withdrawn November 11, 2026, and open again for another club's unclaimed player ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | Q-ADD-PLAYER, Q-IDENTIFY |
 | Queue reordering controls | Drag handle (arrow keys on the handle); no Earlier / Later buttons | Q-QUEUE |
 | Switching players between teams | Drag a player onto the other team (press and hold on touch; ← / → on keyboard); swaps, protects the waiting match. Since November 6, 2026 also allowed while On court, until Start match | Q-QUEUE, Q-SUGGEST, Q-MANUAL, Q-DISPATCH, Q-ON-COURT |
 | Theme | Dark default with a light/dark switch in the top bar | All Queue screens |

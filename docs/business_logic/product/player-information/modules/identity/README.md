@@ -1,24 +1,41 @@
 # Player identity and accounts
 
-**Last verified:** 2026-11-16 for mandatory Google sign-in, account verification ([D-2026-11-16-01](../../../../../mvp/decisions.md#d-2026-11-16-01), [D-2026-11-16-02](../../../../../mvp/decisions.md#d-2026-11-16-02)); 2026-11-12 for club-only unclaimed profiles in the services (P08.9: registered-only search, link-only sync, automatic linking at registration, club-record invites); 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for the four player statuses, unclaimed players with an email and an RTR ID, and lookup by exact RTR ID or email ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04); mockups only, the services still follow the November 11 rules); 2026-11-16 for mandatory Google sign-in, account verification ([D-2026-11-16-01](../../../../../mvp/decisions.md#d-2026-11-16-01), [D-2026-11-16-02](../../../../../mvp/decisions.md#d-2026-11-16-02)); 2026-11-12 for club-only unclaimed profiles in the services (P08.9: registered-only search, link-only sync, automatic linking at registration, club-record invites); 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
 ## Identity states
 
+Four statuses (owner, November 16, 2026, [D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04), superseding in part [D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)). Verified sits on top of Registered.
+
 | State | Behavior |
 |---|---|
-| Name-only guest | Remembered by the club; no automatic Player Information profile |
-| Phone-linked, unclaimed profile | A club's saved player with a phone who has not registered. Lives only in that club: no RTR ID, never in another club's search ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)) |
-| Registered/claimed profile | Required phone and email supplied; password set; player can sign in and edit permitted personal details |
+| Guest | A name only, in one club's Saved players. No email, no phone, no account, no RTR ID. A guest's games never join an account by themselves; they come along only after the club adds an email and the guest becomes unclaimed |
+| Unclaimed | A person a club saved with a **required email** who has not registered. Gets an RTR ID when saved. Found by other clubs by exact RTR ID or exact email. Public; no privacy settings until they register |
+| Registered | Claimed the profile: required phone and email, signs in with Google (older accounts with a password); can edit permitted personal details |
+| Verified | A registered player who passes the three checks under [Account verification](#account-verification), or is Verified by Admin. Unchanged ([D-2026-11-16-02](../../../../../mvp/decisions.md#d-2026-11-16-02)) |
 
-Phone number uniquely identifies a **registered** player across clubs. Unclaimed profiles never link across clubs: two clubs that save the same phone keep separate records until the person registers, and then every record with that phone links to the account automatically ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)). Name matches only suggest possible identities. Registered players hiding their phone can identify themselves with RTR ID or QR code.
+**One email is one person and one RTR ID.** ROTRA keeps a thin shared entry for an unclaimed person (the email and the RTR ID). A second club that enters the same email gets the same person and the same RTR ID. Each club keeps its own version of them (name, nickname, picture, level and an optional phone) and edits only its own; no club is shown another club's name, picture or level.
 
-**Accepted risk (owner answer, November 12, 2026):** registration does not verify the phone (no SMS). With automatic linking, someone who registers with another person's number collects that person's guest records from every club. Accepted for MVP, like the ranking risk in [D-2026-11-09-06](../../../../../mvp/decisions.md#d-2026-11-09-06); revisit when SMS verification exists. There is no Queue Master **Link** tap.
+**A club can never edit the email.** To fix a mistyped email the Queue Master deletes the record and adds the player again; the mistaken RTR ID is retired and never reused. Admin can edit the email.
 
-**Owner decisions, October 28, 2026:** profile creation and permanent RTR ID allocation happen on successful entry sync, without waiting for Session done. Existing profiles are reused. *Superseded in part on November 11, 2026 ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)): sync only links a phone to a registered player; the RTR ID is given on registration.* Match performance remains gated by valid session finalization.
+**Player lookup** (Queue › Add player › Player Information, and Saved players › Add player) is by **exact RTR ID or exact email only**, for registered and unclaimed players alike. There is no name search there; names are searched only within the club's own Saved players. A guest is never found by another club.
 
-When a returning guest's identity is confirmed and linked to a profile, include their earlier valid games in personal history and ranking under the existing eligibility rules. Use the original game dates for rolling windows; linking does not make an old game newly played. Preserve club history and permanent results, and count each game once. The confirmation evidence, mistaken-link resolution, and public presentation of fun/partial games remain separate open details.
+**On registration** the person keeps the RTR ID, and every club's record under that email joins the account with its games, with no Queue Master tap. When more than one club saved the email, a dialog shows each club's version as a card and the person picks one as their starting profile; every club's record joins whichever they pick.
+
+**Unclaimed players are public and can rank.** Privacy settings come with registration. An unclaimed player is on the leaderboard only while exactly one club has saved them; a person saved by more than one club is not listed until they register.
+
+**Older records.** An unclaimed record from before November 16, 2026 that has a phone and no email shows the tag **Details required**. The Queue Master adds an email or deletes the record.
+
+**Accepted risk (owner, November 16, 2026):** a person who never signed up gets a public, ranked profile that other clubs can find by email or RTR ID. Their email and phone stay private as everywhere else. This replaces the phone-linking risk accepted on November 12, 2026. There is no Queue Master **Link** tap.
+
+**Still open ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):** whether lookup by phone and by QR code stay; whether a phone still links a record on registration; which email is matched on registration (the ROTRA email, the Google email, or both); whether the Queue Master's Confirm player step applies to another club's unclaimed player. See [open decisions](../../../open-decisions.md).
+
+**Owner decisions, October 28, 2026:** profile creation and permanent RTR ID allocation happen on successful entry sync, without waiting for Session done. Existing profiles are reused. *Superseded in part on November 11, 2026 ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03)) and again on November 16, 2026 ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)): the RTR ID is given when a club first saves the person's email, or on registration when no club did.* Match performance remains gated by valid session finalization.
+
+When a club's record joins a profile, include its earlier valid games in personal history and ranking under the existing eligibility rules. Use the original game dates for rolling windows; joining does not make an old game newly played. Preserve club history and permanent results, and count each game once. Public presentation of fun/partial games remains a separate open detail.
+
+**Code:** real mode (P08.1 storage, P08.9 services) still follows the November 11 rules: an unclaimed record is a club's record with a phone and no RTR ID, search finds registered players only, and records link by phone at registration. It changes when D-2026-11-16-04 is built.
 
 ## Profile fields and registration
 
@@ -34,6 +51,8 @@ ask the person whether that account is theirs. Before creating a second account,
 **No** returns to contact correction or contacting ROTRA. A profile that has not registered yet
 requires its existing club-issued claim link. Never create duplicate contacts or treat answering
 yes as proof of ownership. No matched identity or private details are revealed.
+
+*Updated November 16, 2026 ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):* there is no separate linking invitation. A guest who registers starts a new account without their guest games; to keep the games, the club adds the guest's email first (the guest becomes unclaimed), and registering with that email then claims the record. An email that clubs already saved as an unclaimed player claims that record on registration and no longer needs the club's claim link ([registration screens](../../../../../screens/product/modules/player-information/access-registration.md)). The phone-or-email check on the email-and-password form is unchanged until the open questions above are answered.
 
 Guest registration opens `/register/[clubId]`. The inviting club supplies the existing founding-city
 context for RTR ID allocation only; no guest ID or name is in the URL. New profiles have no club
@@ -81,7 +100,7 @@ Earlier rules, still true for password accounts until the deadline:
   - **No email verification on claim.** Opening the club's link is the proof; the claim confirms the email at once.
   - **Password rule:** at least 8 characters, nothing else.
   - **A link claimed by the wrong person is not undone.** The Queue Master is responsible for the links and creates a new player for the right person; the short lifetime is the guard.
-  - **Name-only guests** can be invited once the club adds a phone or email to the record.
+  - **Name-only guests** can be invited once the club adds a phone or email to the record. *Since November 16, 2026 ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):* adding an email makes the guest an unclaimed player with an RTR ID.
   - **RTR ID sequence:** the database hands out the next number first come, first served. The RTR ID is display only; every record keys on the player UUID. Founding cities are added by the platform owner from Admin ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
 - Still open: contact-change approval evidence beyond the owner's manual review, and failed provider application recovery beyond "Application failed".
 
@@ -105,7 +124,7 @@ Players may edit their own personal information after claiming the profile. They
 
 Registered players may hide their phone number from club operators. Phone/email are not public profile or leaderboard fields. A hidden phone must not leak through player search; ID/QR supports identification instead.
 
-**Profile visibility** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), superseding in part [D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07), which had one Public/Private switch with Public as the default). A player picks one of three levels; **the default is Private**, including for new registrations:
+**Profile visibility** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), superseding in part [D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07), which had one Public/Private switch with Public as the default). A player picks one of three levels; **the default is Private**, including for new registrations. An **unclaimed** player has no visibility setting and is Public until they register ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):
 
 | Level | Who sees the profile |
 |---|---|
@@ -117,13 +136,15 @@ Visibility changes nothing about phone privacy.
 
 **Always private, what is exposed.** Face and banner are the only parts of an always-private player that others can see: the picture (photo, character or initials as the player chose) and the profile banner. The name is masked as "first letter of each word followed by `***`" everywhere another person would see it (leaderboard, podium, club member lists, session participants, share images). Level, games and stats stay hidden. The player themselves always sees everything about their own profile.
 
-**Hide from Player Information** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)). A separate switch, off by default, in the Player Information card of Privacy and contact. When on, clubs can't find the player in Queue's **Add player › Player Information** search or by RTR ID, and the player is left out of the member list of a [public club page](../../README.md#public-club-page-737-epic-p07). It does not hide them from a club's **Saved players**, from Admin or from the public session page, and a club that already saved the player can still add them from Saved players. The player joins sessions themselves (a club link or a session link), so they only join a queue when they intend to (owner, November 11, 2026). It is independent of profile visibility and of phone privacy.
+**Hide from Player Information** ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)). A separate switch, off by default, in the Player Information card of Privacy and contact. When on, clubs can't find the player in Queue's **Add player › Player Information** lookup (by RTR ID or email), and the player is left out of the member list of a [public club page](../../README.md#public-club-page-737-epic-p07). It does not hide them from a club's **Saved players**, from Admin or from the public session page, and a club that already saved the player can still add them from Saved players. The player joins sessions themselves (a club link or a session link), so they only join a queue when they intend to (owner, November 11, 2026). It is independent of profile visibility and of phone privacy.
 
-Players cannot change phone or email themselves. They must contact the platform owner or submit a request, and the owner manually approves the change in Admin. A contact change does not replace the permanent RTR ID.
+Players cannot change phone or email themselves. They must contact the platform owner or submit a request, and the owner manually approves the change in Admin. A contact change does not change the RTR ID.
 
 Whether club operators can continue editing non-ranking personal details after a profile is claimed was not answered and remains open.
 
-## Permanent RTR ID
+## RTR ID
+
+*Updated November 16, 2026 ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):* the RTR ID is no longer strictly permanent. No club or player can change it, but Admin can.
 
 Format: **`RTR-PH-CEB-102926-0001`**.
 
@@ -132,12 +153,12 @@ Format: **`RTR-PH-CEB-102926-0001`**.
 | `RTR` | ROTRA prefix |
 | `PH` | Country/region code in the user's example |
 | `CEB` | City from the creating club's fixed founding address, not the player's home or session venue |
-| `102926` | First profile-sync date in MMDDYY form; example is October 29, 2026 |
-| `0001` | Sequence restarting for each city on each sync day |
+| `102926` | The day the RTR ID was given, in MMDDYY form; example is October 29, 2026 |
+| `0001` | Sequence restarting for each city on each day |
 
-Assign the permanent ID **when the player registers** ([D-2026-11-11-03](../../../../../mvp/decisions.md#d-2026-11-11-03); before November 11, 2026 it was the first entry sync), never offline. The date part is the registration day. Existing IDs keep their value when another club adds the player.
+Assign the ID **when a club first saves the person's email** (they become unclaimed), or when the player registers if no club saved them ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04); from November 11 to 16, 2026 it was only on registration, before that the first entry sync), never offline. The place comes from the first club that entered the email and the date is that day; neither changes when another club adds the player or when the person later registers, also through another club's link. The person keeps the same ID on registration.
 
-The ID remains permanent even after address, club, phone, or email changes. Code mappings, date timezone, allocation under concurrent sync, and large-sequence formatting need technical specification; do not create provisional offline IDs in this permanent format.
+The ID stays the same after address, club, phone, or email changes. **Admin can change it** by changing the registration place or date; the ID follows both and keeps its number at the end, and it is never typed by hand. The change cascades: every record that holds the old ID is updated to the new one. An ID retired because a club deleted a record with a mistyped email is never reused. Whether an old ID in a QR code or link a player already shared still leads to them is open. Code mappings, date timezone, allocation under concurrent sync, and large-sequence formatting need technical specification; do not create provisional offline IDs in this format.
 
 See [claim/recovery flow](flow/claim-and-recover.md) and [Admin contact changes](../../../admin/modules/player-management/README.md).
 

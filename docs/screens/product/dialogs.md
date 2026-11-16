@@ -126,13 +126,13 @@ Every **Sign out** (sidebar, home, Club settings → Account, Prototype panel) o
 
 ## D-CLUB-NAME — Approve club name change
 
-Admin, from club detail. Show the club, its current name, the requested name, and when it was sent. **Approve name change** applies the new name everywhere it appears (dashboard, public pages, future result images); **Reject** closes the request and the club keeps its current name. Permanent RTR IDs and the founding location never change. Recover request status before retrying after a timeout.
+Admin, from club detail. Show the club, its current name, the requested name, and when it was sent. **Approve name change** applies the new name everywhere it appears (dashboard, public pages, future result images); **Reject** closes the request and the club keeps its current name. RTR IDs and the founding location don't change with a club name. Recover request status before retrying after a timeout.
 
 The Queue side has no dialog: **Request change** sends the request with a toast, and **Cancel request** withdraws it.
 
 ## D-CONTACT — Approve contact change
 
-Show player/RTR ID, changed contact field, proposed value, and review context. Explain unchanged permanent ID/history and that application may take a separate step. Primary **Approve change**; secondary Return to request. A provider failure must remain an application failure, not an Applied success.
+Show player/RTR ID, changed contact field, proposed value, and review context. Explain that the RTR ID and history are unchanged and that application may take a separate step. Primary **Approve change**; secondary Return to request. A provider failure must remain an application failure, not an Applied success.
 
 ## D-CONFIG — Save effective business settings
 
@@ -152,9 +152,10 @@ Owner decisions and comments, November 11, 2026 (#731, #715, #716; [log](../mock
 
 Variants, by who the player is:
 - **Always private:** the picture (real, tap for the full photo) and banner, the masked name, a **Private profile** chip and one boxed section **Private**: **“This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and the Queue Master.”** No level, status, About or Stats. The player themselves sees their full card.
-- **Guest or unclaimed (no ROTRA account):** a **Not on ROTRA yet** chip and a boxed section **Guest**: **“This player is playing as a guest and hasn't registered with ROTRA yet, so there's no profile to show. The club keeps their games for when they do.”**
+- **Unclaimed** ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)): the full public card showing the club's version of the player, with the muted line **“Saved by the club. Not registered with ROTRA yet.”** and no **Share profile** or **Open ROTRA profile**.
+- **Guest (name only):** a **Not on ROTRA yet** chip and a boxed section **Guest**: **“This player is playing as a guest and hasn't registered with ROTRA yet, so there's no profile to show.”**
 
-The **Queue Master's player profile** (opened from court faces, queue faces, the Players tab avatar button, Saved players and the suggestion cards) uses the same banner card with the Queue Master's own content: banner, overlapping photo, name and nickname, the identity chip and a level badge (**Intermediate High tonight** when on the roster, **Intermediate High · suggestion** otherwise, **No level yet**), the identity line, the **Tonight ·** line, then boxed sections **About** (Registered in, RTR ID, Joined) and **In your club** (Added to club, Sessions here, Phone). The guest invite section and the levels note stay below; the footer is unchanged (Back / Close, Delete player, Link to saved player…, Invite).
+The **Queue Master's player profile** (opened from court faces, queue faces, the Players tab avatar button, Saved players and the suggestion cards) uses the same banner card with the Queue Master's own content: banner, overlapping photo, name and nickname, the identity chip and a level badge (**Intermediate High tonight** when on the roster, **Intermediate High · suggestion** otherwise, **No level yet**), the identity line, the **Tonight ·** line, then boxed sections **About** (Registered in, RTR ID, Joined) and **In your club** (Added to club, Sessions here, Phone, and Email for guests and unclaimed players). The guest invite section and the levels note stay below; the footer is Back / Close, Delete player, Edit details and Invite (**Link to saved player…** was removed on November 16, 2026, [D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)).
 
 ## D-CLUB-PROFILE — Club profile card
 

@@ -2,6 +2,8 @@
 
 `rotra-admin.html` is the single-file design reference for the v1 Admin app, used by the platform owner. It covers sign-in and access denial, the club directory, adding a club, the club detail (in tabs: Overview, License, Public pages, Activity), each club's own monthly and yearly price, manual license activation and renewal after an outside payment, public-page retention, club name-change approval, the player directory and player detail, contact-change review and application, ranking settings, and feature flags. Open it in any browser. Nothing is installed and nothing is sent anywhere.
 
+**November 16, 2026:** Players follow [D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04): unclaimed players have an email and an RTR ID, older phone-only records show **Details required**, an unclaimed player saved by more than one club lists each club, and Edit profile lets Admin change the email and the RTR ID (registration place and date, with a confirmation). [Log](../../../docs/mockup-changes/2026-11-16-admin-unclaimed-rtr-id-edit.md).
+
 **Saved version:** October 27, 2026. It matches version 8 of the published artifact (sharing is set from its Share menu): https://claude.ai/artifact/A5aS4yN8Exa7XBpjxPgWtL
 
 It shares its tokens, type and base components with the [Queue prototype](../queue-app/README.md) and the [Player Information prototype](../player-app/README.md). Clubs, players, RTR IDs and license payments reuse their fixtures where they overlap.

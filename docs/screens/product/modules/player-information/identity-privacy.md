@@ -6,7 +6,7 @@
 
 ## P-ID-QR — Identify yourself to a club
 
-Display the permanent ID in readable text with a QR representation. Example format: `RTR-PH-CEB-102926-0001`. Offer Copy ID and an accessible full-text value; the QR must have a textual alternative.
+Display the RTR ID in readable text with a QR representation. Example format: `RTR-PH-CEB-102926-0001`. Offer Copy ID and an accessible full-text value; the QR must have a textual alternative.
 
 This identity can be shown to an operator without exposing phone number. Do not encode hidden contacts, a reusable registration token, or login credentials in the public QR. Scanning identifies the player; it does not claim/edit the account or reserve a slot.
 
@@ -40,7 +40,7 @@ Save requires server confirmation; pending/error states must not falsely claim a
 
 A change cannot erase information a human already saw or instantly revoke a disconnected cached value. The implementation should minimize cached private contacts and refresh/redact them on reconnection; avoid promising retroactive forgetting.
 
-This switch does not change the login phone or invalidate the permanent ID. Who sees the profile is the separate [Profile visibility](#p-profile-privacy--profile-visibility-and-player-information) choice, and being found by clubs is **Hide me from Player Information**.
+This switch does not change the login phone or change the RTR ID. Who sees the profile is the separate [Profile visibility](#p-profile-privacy--profile-visibility-and-player-information) choice, and being found by clubs is **Hide me from Player Information**.
 
 ## P-CONTACT-REQUEST — Ask to change phone or email
 
@@ -84,4 +84,4 @@ Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mv
 - A hidden-phone player can be identified by ID without revealing the phone.
 - Submitting a change request does not immediately alter login credentials.
 - Approval alone is not shown as Applied if provider synchronization failed.
-- Contact changes preserve the player's permanent RTR ID/history.
+- Contact changes preserve the player's RTR ID/history. Only Admin can change an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)); what happens to a QR code already shared with the old ID is open.

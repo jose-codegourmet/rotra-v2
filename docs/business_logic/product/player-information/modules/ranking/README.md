@@ -65,6 +65,8 @@ A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08
 
 ## Overall leaderboard
 
+**Decided November 16, 2026, mockup only ([D-2026-11-16-05](../../../../../mvp/decisions.md#d-2026-11-16-05)):** there are three leaderboards, **Top annual**, **Top monthly** and **Top weekly**. Each is ordered by wins in standard matches in that period, with win rate as the tie-break, and each place carries a mark for the move since the previous period (up, down, or New). Top annual replaces the single overall list, so a profile's position is its annual place. Each list shows the top 50 only, and a row shows the number of wins, not the skill level. Who qualifies for the monthly and weekly lists, calendar or rolling periods, and what the rating still orders are open. The rules below describe the one overall list that the code and rank calculation still follow.
+
 A newcomer can have a public profile and provisional rank before qualifying for a leaderboard position.
 
 - Public, overall ROTRA only; no city/club filters in v1.

@@ -1,6 +1,6 @@
-# Identity, contacts, accounts, and permanent RTR IDs
+# Identity, contacts, accounts, and RTR IDs
 
-**Last verified:** 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migrations `20261112000100_round2_profiles_banners_invites`, P08.1, and `20261112000200_club_player_claim_links`, P08.9); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for the proposed shape of unclaimed players with an email and an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04); not built); 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migrations `20261112000100_round2_profiles_banners_invites`, P08.1, and `20261112000200_club_player_claim_links`, P08.9); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed logical schema. Player account mapping and claim-link rules are decided (2026-11-07, #244); email verification, password policy and contact-change enforcement remain unresolved.
 
@@ -48,7 +48,7 @@ delete policies. Screens resolve `character:<id>` from the loaded list, else fro
 the stored URL or serves a seeded data: image, for hidden and deleted rows too.
 Existing PNG URLs continue working. Club logo processing is unchanged.
 
-**Club-set pictures (owner request, November 9, 2026):** a club can set the picture of its own guests and unclaimed profiles; it follows the same current-and-previous rule (`avatar_ref` + `avatar_previous_ref`, [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)). Where a guest's picture is stored (guests have no `players` row) is not yet designed.
+**Club-set pictures (owner request, November 9, 2026):** a club can set the picture of its own guests and unclaimed profiles; it follows the same current-and-previous rule (`avatar_ref` + `avatar_previous_ref`, [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10)). Where a guest's picture is stored (guests have no `players` row) is not yet designed. Since [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04) each club keeps its own picture for an unclaimed player too, so the picture belongs with the club record.
 
 **Updated by #567, owner-approved 2026-11-08:** selecting any picture creates a local draft only.
 Photo files, draggable crop and zoom stay in memory; object URLs
@@ -93,7 +93,27 @@ removes only its new upload; ambiguous failures retain it. Bucket configuration 
 not application DDL. The existing club-logo pattern is documented in
 [clubs and licenses](../../admin/modules/clubs-licenses.md#club-logo-persistence-374).
 
+## Unclaimed players with an email and an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)) — proposal, not built
+
+Decided behaviour (owner, November 16, 2026), superseding in part the club-only rules in the next section: an unclaimed player is a person a club saved with a **required email**; they get an RTR ID when saved; one email is one person and one RTR ID across clubs; each club keeps its own name, nickname, picture, level and optional phone; a guest is a name only. **Nothing below is built.** The schema, the P08.1 migration and the P08.9 services still follow the November 11 rules described in the next section.
+
+Proposed shape:
+
+- **A thin shared entry per unclaimed person:** the normalized email (unique) and the RTR ID allocation, and nothing a club typed (no name, picture, level or phone). A second club that enters the same email resolves to the same entry and the same RTR ID. Whether this is an unclaimed `players` row with a private email (the shape before November 11) or a new table is open; it must not expose one club's details to another.
+- **Club records point to it.** Each club's `club_players` row for the person references the shared entry and keeps that club's own `display_name`, `nickname`, picture, level and optional private phone. An unclaimed club record must have an email; a record with no email and no linked player is a guest. A club can set the email once and never update it; only Admin can.
+- **Guest → unclaimed:** adding an email to a guest's `club_players` row resolves or creates the shared entry and allocates the RTR ID then. When the email already belongs to another `club_players` row of the same club, the guest row moves into that row after the Queue Master confirms (the existing `linked_to_club_player_id` redirect in [sessions and roster](../../queue/modules/sessions-roster.md)).
+- **RTR ID allocation** happens when the shared entry is created, from the first club's founding location and that day, and is kept on registration. A club deleting a record with a mistyped email retires the allocation; the ID is never reused and counters are not rewound.
+- **Lookup:** exact RTR ID or exact normalized email only, over registered and unclaimed people; no name search projection for other clubs. A hit on an unclaimed person returns the RTR ID and status only.
+- **Registration:** the person keeps the allocation; the shared entry becomes (or is replaced by) the claimed player, and every `club_players` row that points to it links to the account with its games (one history attribution per record is still open). When several club records exist, the person's pick of one club's version seeds the profile fields. Which email is matched (ROTRA email, Google email, or both) and whether a phone still links a record are open.
+- **Admin edits:** Admin can change the email on the shared entry, and can change the registration place and date, which reissues the RTR ID. The new value must replace the old one on every record that stores or snapshots the RTR ID string (see [RTR ID allocation](#rtr-id-allocation)); whether the old ID is kept as an alias for QR codes and links already shared is open.
+- **Public and ranked:** an unclaimed person has no visibility setting and reads as public. The leaderboard lists them only while exactly one club record points to the shared entry. Public club member lists stay registered members only.
+- **Existing data:** a `club_players` row with a private phone and no email (today's unclaimed record) stays as it is and reads as **Details required** until the Queue Master adds an email or deletes it. No automatic deletion yet.
+
+Open questions are in [database open decisions](../../open-decisions.md).
+
 ## Club-only unclaimed profiles ([D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)) — storage and services built
+
+*Superseded in part on November 16, 2026 by [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04) (section above). This section still describes what the schema, migration and services do today.*
 
 Decided behaviour: an unclaimed profile lives only in its club, has no RTR ID, and is never found by another club; two clubs with the same phone keep separate records; on registration every club's record with that phone links automatically. Storage (migration `20261112000100_round2_profiles_banners_invites`, P08.1; no new columns were needed, `club_players` already carried `display_name`, `nickname` and the private-intake phone):
 
@@ -149,7 +169,7 @@ Fictional data only. Decided 2026-11-07 unless marked open.
 | Wrong-identity claim (collision) | Link for player A; the email entered already belongs to player B's account | Claim blocked; link not consumed; no merge; contact-support route shown |
 | Expired link, then reissue | Link issued Nov 1 at 19:00, opened Nov 3 | Expired state shown. The Queue Master reissues: the old link is revoked, the new one is valid 24 hours and single use; after a successful claim it shows the used state |
 | RTR ID or name only | Someone has the public RTR ID or the name | Cannot claim; only a valid link plus completed provisioning claims |
-| Guest invite (name-only guest) | Guest with no phone and no global profile | Registration leaves the club guest record unlinked; a separate invitation is required to link it (owner, November 8, 2026, #490). Matching phone/email prompts whether the existing account is theirs. Yes requires sign-in/Admin-reviewed recovery; No requires contact correction or contacting ROTRA. Existing contact uniqueness stays in place; answering Yes never authorizes a link |
+| Guest invite (name-only guest) | Guest with no phone and no global profile | Registration leaves the club guest record unlinked; a separate invitation is required to link it (owner, November 8, 2026, #490; *since November 16, 2026 there is no linking invitation: the club adds the guest's email first, [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)*). Matching phone/email prompts whether the existing account is theirs. Yes requires sign-in/Admin-reviewed recovery; No requires contact correction or contacting ROTRA. Existing contact uniqueness stays in place; answering Yes never authorizes a link |
 | Simultaneous allocation | Two clubs sync the same new phone at once | **Open** beyond the existing unique-phone retry rule |
 | Failed provider application | Provider account step fails or the response is lost mid-claim | **Open**; the staged, idempotent recovery above is still the rule |
 
@@ -178,7 +198,7 @@ confirmation prompt before a new profile is staged. Phone/email uniqueness remai
 
 `player_id_counters`: PK `(location_code_id, sync_date)` and positive `last_sequence`. Date grouping must use an agreed server timezone. The location identity includes country so identically spelled city codes in different countries do not collide.
 
-`player_id_allocations`: PK/FK `player_id`; unique immutable `rtr_id`; creating club FK; founding-location FK; frozen country/city strings; `sync_date`; sequence; allocation timestamp. Unique `(location_code_id, sync_date, sequence)`.
+`player_id_allocations`: PK/FK `player_id`; unique `rtr_id` (immutable as built; Admin-changeable under [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04), see below); creating club FK; founding-location FK; frozen country/city strings; `sync_date`; sequence; allocation timestamp. Unique `(location_code_id, sync_date, sequence)`.
 
 Allocation transaction:
 
@@ -188,11 +208,11 @@ Allocation transaction:
 4. Format `RTR-PH-CEB-102926-0001` using the **sync day** and club founding city. Internal UUIDs never use this string.
 5. On a uniqueness race, retry from identity resolution; do not publish a losing allocation or use `MAX(sequence)+1`.
 
-IDs stay permanent. Later contact/address changes do not rerun allocation. Do not assume gap-free sequences or truncate values over four digits; overflow presentation is open.
+IDs stay the same through contact/address changes; those do not rerun allocation. *Proposed for [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04):* an Admin change of the registration place or date writes a new `rtr_id` (same sequence number, unique check: “Another player already has this RTR ID.”) and cascades it to every record holding the old string; allocation also runs when a club first saves an unclaimed person's email, not only on registration; retired IDs are never reused. As built, `rtr_id` is immutable and allocated on registration. Do not assume gap-free sequences or truncate values over four digits; overflow presentation is open.
 
-**Owner decision, October 28, 2026** (*superseded in part on November 11, 2026: the RTR ID is allocated on registration, not on entry sync; [D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03)*)**:** resolve/create the profile and allocate its permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done. Keep unresolved or conflicting input pending; never claim a permanent ID was allocated offline. Identity creation does not grant match-performance credit before valid finalization.
+**Owner decision, October 28, 2026** (*superseded in part on November 11, 2026: the RTR ID is allocated on registration, not on entry sync; [D-2026-11-11-03](../../../../mvp/decisions.md#d-2026-11-11-03); and again on November 16, 2026: allocated when a club first saves the person's email, [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04), not built*)**:** resolve/create the profile and allocate its permanent RTR ID as soon as the entry successfully syncs, without waiting for Session done. Keep unresolved or conflicting input pending; never claim a permanent ID was allocated offline. Identity creation does not grant match-performance credit before valid finalization.
 
-After a historical guest identity is confirmed, attribute earlier valid games to that profile for personal history and ranking under the existing eligibility/window rules. Keep original entry/finalization identity snapshots and permanent outcomes intact; the auditable linkage/projection mechanism, confirmation evidence, and mistaken-link handling must be designed before implementation. Use original played dates and deduplicate contributions.
+After a club record joins a profile (since November 16, 2026: an unclaimed record under the person's email; a guest's record only after the club adds an email), attribute its earlier valid games to that profile for personal history and ranking under the existing eligibility/window rules. Keep original entry/finalization identity snapshots and permanent outcomes intact; the auditable linkage/projection mechanism, confirmation evidence, and mistaken-link handling must be designed before implementation. Use original played dates and deduplicate contributions.
 
 Indexes: unique phone, non-null email proposal, auth subject, RTR ID, allocation city/date/sequence; name lookup can use a safe public search projection. No public phone index/query API is implied.
 

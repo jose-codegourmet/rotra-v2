@@ -1,10 +1,18 @@
 # Player sign-in, registration claim, and password recovery
 
-**Surfaces:** `P-LOGIN`, `P-CLAIM`, `P-CLAIM-STATUS`, `P-FORGOT`, `P-RESET`.
+**Surfaces:** `P-LOGIN`, `P-INVITE`, `P-JOIN-CLUB`, `P-JOIN-SESSION`, `P-GOOGLE-LINK`, `P-GOOGLE-REQUIRED`, `P-CLAIM`, `P-CLAIM-STATUS`, `P-FORGOT`, `P-RESET`.
+
+> **Changed November 16, 2026 ([D-2026-11-16-01](../../../../mvp/decisions.md#d-2026-11-16-01)):** Google sign-in is mandatory. The Google sections below replace the email + password registration and claim forms for new players; the email + password sign-in stays for existing password players until the deadline. Mockup log: [2026-11-16-player-google-sign-in](../../../../mockup-changes/2026-11-16-player-google-sign-in.md).
 
 **Source:** [identity rules](../../../../business_logic/product/player-information/modules/identity/README.md).
 
-## P-LOGIN — Email plus password
+## P-LOGIN — Google, then email plus password
+
+Order: logo and "Your player profile.", "Sign in", a context notice when the player came from an invite ("Sign in to join <club>." / "Sign in to request a spot in <session>."), **Continue with Google** (pending: "Waiting for Google…"), a divider "Signed up with a password?", "Sign in with your email and password once, then connect Google. Google sign-in is required from <deadline>.", then the Email, Password (with **Forgot password?** beside its label) and **Sign in** controls described below. Footer: "New to ROTRA? Create your account from your club's invite link or a session invite. You don't need an account to view profiles or the leaderboard."
+
+A Google account with no ROTRA account (not connected, no matching email) shows a warn notice: "This Google account isn't connected to ROTRA. No ROTRA account uses or is connected to <email>. Already a ROTRA player? Sign in below with your email and password, then connect this Google account. We'll ask you right after you sign in. New to ROTRA? Open your club's invite link or a session invite to create your account." After that password sign-in the announcement offers **Connect <that email>**. A Google email equal to a password account's email opens P-GOOGLE-LINK. Offline: "You're offline. Signing in needs an internet connection."
+
+### Email plus password (existing password players)
 
 Public profiles/leaderboard do not require login. Sign-in is needed for own-profile editing/privacy and account requests.
 
@@ -20,7 +28,43 @@ No Facebook/social sign-in and no club username login on this form. Existing unc
 
 Loading disables duplicate submission. Network failure preserves input and offers retry. Offline cannot establish a new authenticated session; cached public content is a separate read state. Success returns to the intended permitted destination or own profile; final routing is implementation work.
 
+## P-INVITE — Club, session and Admin invite landings
+
+`/register/[clubId]`, `/register/[clubId]?session=<slug>&invite=<code>`, `/register`. An invite card, then a card "New to ROTRA?" with **Continue with Google**, **I don't have a Google account** (the No Google account sheet), "ROTRA accounts sign in with Google. You don't need a password, and you add your mobile number next.", a divider "Already on ROTRA?" and **Sign in to join** / **Sign in to continue** / **Sign in to your account** (P-LOGIN with the context notice, then P-JOIN-CLUB or P-JOIN-SESSION).
+
+| Link | Invite card |
+|---|---|
+| Club | Label "Club invite", club avatar, "Join <club>", chips city and "<n> members", "You're added to <club>'s saved players. The club can put you in its sessions and record your games. You can leave any time from the club page." |
+| Session | Label "Session invite", the inviter's avatar (or the club's), "<inviter> invites you to play" (or "You're invited to play"), a date block, session title, club, "<day> · <time>", chips "Join requests open" and "Invited by <name>", "The Queue Master confirms who plays. Signing up doesn't reserve a spot." |
+| Admin | Label "ROTRA registration", "Create your ROTRA account", "Your player profile, player ID and game history in one place." |
+
+After Google: the registration form in Google mode. "Finish registering", "Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.", **← Other ways to sign up**. Contact section: "Signs in with" and the Google row (name, email, **Email confirmed** chip, "This becomes your ROTRA email. Never shown publicly."), then Phone number (hint "Your mobile number. It identifies your ROTRA profile and is never shown publicly."), the Admin link's City or province, and About you. No email or password fields. CTA **Create account** ("Creating…"). Success is the existing Registration complete page, plus "You sign in with Google (<email>)." and the Verified chip. A Google email that a club already used for a club-created profile: "A club already made a ROTRA profile with this email. Ask the club for your registration link so your games carry over." A Google email already on an account: P-GOOGLE-LINK (or straight to the join step when Google is already connected).
+
+## P-JOIN-CLUB — Signed-in player on a club invite
+
+The club invite card, then a card "Signed in as <name>" with **Join <club>** (toast "You joined <club>") and **Not now**. Already a member: notice "You're already in <club>." and **Go to my profile**.
+
+## P-JOIN-SESSION — Signed-in player on a session invite
+
+The session invite card, then "Signed in as <name>", "Your request to join is ready to send on the session page. The Queue Master sees that <inviter> invited you.", **Continue to request to join** (opens the Queue session page `/s/<slug>?join=1&invite=<code>`) and **Not now**. Own invite: "This is your own invite. Share it with the person you want to bring." Already confirmed: "You're already in <session>."; waitlisted: "You're already on the waitlist for <session>."; both with **Go to my profile**.
+
+## P-GOOGLE-LINK — Connect Google to a password account
+
+Shown when a Google account with the same email as a password account is picked (sign-in or invite). "Connect Google to your account?", "You already have a ROTRA account with this email. You signed up with a password.", the player row (avatar, name, RTR ID), the Google row with **Same email**, "After this you can sign in with Google or with your password. Nothing else on your account changes. You can disconnect Google in Privacy and contact.", **Connect Google and sign in** (toast "Google connected. You're signed in.") and **Use my password instead** (P-LOGIN with the email filled).
+
+## P-GOOGLE-REQUIRED — After the deadline
+
+`/connect-google`. A signed-in player without Google after the deadline sees only this page (and the leaderboard): "Connect Google to continue", "Since <deadline>, every ROTRA player signs in with Google. Connect yours once and you're done. Your profile, games and rank stay the same.", the player row, **Connect <tried email>** when they had tried one, **Connect Google** / **Use another Google account**, **I don't have a Google account**, **Sign out**.
+
+## ROTRA announcement band and the No Google account sheet
+
+A yellow band under the top bar on every page while the signed-in player isn't verified ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)): label "ROTRA announcement", "Verify your ROTRA account by <deadline>. Connect Google, have your phone on file, and use your Google email as your ROTRA email. n of 3 done. Your profile, games and rank stay the same.", the next step's button (**Connect Google**, **Connect <tried email>** + **Use another Google account**, or **Finish verification**), **I don't have a Google account** or **See what's left**, and **Remind me later** (hides it until the next sign-in; not offered after the deadline, when the bottom border is thicker). Colours: `--ann-bg`, `--ann-border`, `--ann-tag`.
+
+The **No Google account?** sheet: "You don't need Gmail. Google lets you make a free account with the email you already use." Steps: open accounts.google.com/signup; choose **Use my current email address instead**; enter the code Google sends and set a Google password; come back and tap **Continue with Google**. "Still stuck? Ask your club or contact ROTRA. Nothing on your profile is lost while you sort it out." **Got it**.
+
 ## P-CLAIM — Complete a club-created profile
+
+**Google (November 16, 2026):** after **Is this you?**, the step "Connect your Google account" ("ROTRA players sign in with Google. Connect yours to finish registering.") with **Continue with Google** and **I don't have a Google account**. The form then shows the Google row in place of Email, Password and Confirm password, with **← Use another Google account**; success says "Sign in from now on with Google (<email>)." A Google email already on another account: "<email> is already on another ROTRA account. Pick another Google account or set a password." The table below still describes the other fields.
 
 Entry: operator-issued registration link tied to a specific existing identity. Show enough of that identity for the recipient to confirm it is their profile before creating credentials. A name/ID is not by itself a reusable claim credential.
 
@@ -60,6 +104,9 @@ No SMS step or Facebook authorization is part of the agreed flow. Link lifetime 
 The club (Queue Master) can reissue the link, which invalidates the previous one (decided 2026-11-07, #244). Every field the club entered is prefilled and stays editable. Experience is Years + months and Playing since (month, year), linked. Exact wording and the replacement-link delivery method are still open. Operator role remains initial entry; normal forgotten-password recovery is reviewed by ROTRA Admin (#491).
 
 ## P-FORGOT — Admin-reviewed recovery request (#491)
+
+For an account that signs in with Google, the acknowledgement is instead: "<email> signs in with Google and has no password. Go back and choose Continue with Google." (November 16, 2026).
+
 
 Enter the email on the ROTRA account and choose **Request password reset**. The server creates a
 private Admin review request, without emailing or generating a link. Pending duplicate addresses

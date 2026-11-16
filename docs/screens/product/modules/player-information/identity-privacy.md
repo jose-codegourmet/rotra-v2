@@ -62,6 +62,23 @@ Validate contact format through the approved account rules. A conflict with anot
 
 Lost access to both phone and email requires a separate owner-assisted verification policy. Do not invent recovery access via a public QR code.
 
+## Sign-in methods (in Privacy and contact, [D-2026-11-16-01](../../../../mvp/decisions.md#d-2026-11-16-01))
+
+A card above Contact details. **Google:** "Connected · <google email>" (plus "(different from your ROTRA email)" when it differs) with a **Required** chip and **Change**, or "Not connected" with **Connect Google**. **Email and password:** "Password set · <email>", "Backup only until <deadline>" once Google is connected, or "Not used". Footer: "Google sign-in is required for every ROTRA player. Any Google account you own works, even with a different email. Your ROTRA email stays <email>." and a row "Account verification is in its own page." with the status chip as a button to P-VERIFICATION. A Google email already used by another account is refused with a toast.
+
+## P-VERIFICATION — Account verification
+
+Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)); signed-out visitors sign in first and come back. Opened from the own profile (status chip next to "This is you", **Verification** button after My player ID, **Verification** in the Your account panel), the yellow announcement, and the pinned notification.
+
+- Header: back to **My profile**, "Verification", "Show that this ROTRA account is really yours. Only you and ROTRA Admin see these details."
+- **Your status** card: chip "Not verified · n of 3" (warn) / "Verified" / "Verified by Admin" (ok); "Finish these by <deadline>. n of 3 done." with a progress bar.
+- Steps, each a numbered circle that turns into a check:
+  1. **Connect your Google account** — "Connected · <google email>" or "You sign in with it from now on." + **Connect Google**.
+  2. **Add your mobile number** — "On your account · <masked phone>" or "Clubs use it to find you. Hide it from clubs any time." + **Add phone number** (P-CONTACT-REQUEST on Phone).
+  3. **Use your Google email as your ROTRA email** — "Both are <email>"; "Connect Google first."; or "Your ROTRA email is X, but your Google account is Y." + **Change my ROTRA email to Y** (P-CONTACT-REQUEST prefilled) and **Connect the Google account for X**. While that request waits: chip "Change sent for Admin review".
+- Verified by Admin: steps hidden; notice "ROTRA Admin verified your account. You don't need to do anything else."
+- Footer: "Can't finish a step? Contact ROTRA. Admin can verify your account by hand." Then a **Why verify?** card.
+
 ## Acceptance examples
 
 - A hidden-phone player can be identified by ID without revealing the phone.

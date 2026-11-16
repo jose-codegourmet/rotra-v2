@@ -95,7 +95,12 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Guest | Name-only entrant with no linked Player Information profile |
 | Lookup pending | New player entered with a phone; matched to a registered player when the session syncs, or kept as the club's unclaimed profile ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
 | Unclaimed profile | A club's saved player with a phone who hasn't registered. Lives only in that club: no RTR ID, never found by another club ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)) |
-| Registered player | Claimed profile with required phone, email, and password |
+| Registered player | Claimed profile with required phone and email that signs in with Google (password accounts from before November 16, 2026 connect Google by the deadline, [D-2026-11-16-01](mvp/decisions.md#d-2026-11-16-01)) |
+| Verified | A registered player with Google connected, a phone on the account and the ROTRA email equal to the Google email. Shown on the **Verification** page and the own profile; never typed in except by Admin ([D-2026-11-16-02](mvp/decisions.md#d-2026-11-16-02)) |
+| Verified by Admin | The Admin override that marks a player verified without the three checks ([D-2026-11-16-02](mvp/decisions.md#d-2026-11-16-02)) |
+| Sign-in methods | Google (required) and, for older accounts, email and password; shown in Privacy and contact |
+| Notification | A private, in-app message to one signed-in player about something that happened (session, invite, club, rank, account) ([D-2026-11-16-03](mvp/decisions.md#d-2026-11-16-03)) |
+| ROTRA announcement | A message from the platform owner shown as the yellow band under the Player top bar and pinned in Notifications |
 | Always private | The strictest **Profile visibility** level (Public · Private · Always private; default Private). Nobody but the player sees their name, level and games; the picture and banner stay public ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
 | Hide from Player Information | The player's switch **Hide me from Player Information**: clubs can't find them in Queue's Add player › Player Information search or by RTR ID, and they're left out of public club page member lists; Saved players, Admin and the public session page are unaffected ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
 | Profile banner | The strip across the top of a player's profile card, public like the picture. A player picks one of the predefined banners the platform owner manages in Admin › Settings › Profile banners; no uploads ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |

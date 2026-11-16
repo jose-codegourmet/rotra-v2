@@ -4,9 +4,10 @@
 
 | Module | Surfaces |
 |---|---|
-| [Access and registration](access-registration.md) | Email login, operator-issued profile claim, email password recovery |
+| [Access and registration](access-registration.md) | Google sign-in (mandatory), email login for password accounts, club and session invite landings, operator-issued profile claim, email password recovery |
 | [Profile](profile.md) | Public identity, own profile, permitted personal editing |
-| [Identity and privacy](identity-privacy.md) | Permanent ID/QR, profile visibility (Public · Private · Always private), Hide from Player Information, hidden phone, approved contact-change request |
+| [Identity and privacy](identity-privacy.md) | Permanent ID/QR, profile visibility (Public · Private · Always private), Hide from Player Information, hidden phone, approved contact-change request, sign-in methods, account verification (P-VERIFICATION) |
+| [Notifications](notifications.md) | Bell and notifications page (P-NOTIFICATIONS), ROTRA announcements |
 | [Ranking and history](ranking-history.md) | Overall leaderboard, rank explanation, eligibility/reassessment, match history |
 | [Public club page](club-page.md) | A club's public page and its full Members page (epic P07, #737) |
 
@@ -22,7 +23,7 @@ Layout and copy choices it makes, recorded here as **proposals** (the business r
 
 | Surface | Prototype choice |
 |---|---|
-| Navigation | One top bar: **Leaderboard** and **Sign in** / **My profile**. The leaderboard is the public home. |
+| Navigation | One top bar: **Leaderboard** and **Sign in** / **My profile**, and when signed in a notifications bell with the unread count. The leaderboard is the public home. A yellow ROTRA announcement band can sit under the bar (November 16, 2026). |
 | P-LEADERBOARD | Columns #, player, rank label. Positions 1–3 stand on a "Top three" podium above the list: a stage lit in the brand green with pixel-notched steps (2nd, 1st, 3rd, brightest for 1st), pixel-font numbers and an animated pixel fire behind #1. Motion stops for reduced motion. The list continues from #4. In search results, 1–3 keep medal styling on their rows. Tapping a podium spot or a row opens the player's **profile card** dialog first ([profile card](profile.md)); its **Open full profile** goes to the profile page (artifact comment, November 13, 2026). Search filters the ranked list by name or nickname; a full RTR ID opens that profile even if it isn't on the list, otherwise a neutral "Profile not found". 25 rows at a time with **Show 25 more**. A signed-in player sees their own position (with **Show my row**) or why they aren't listed. A "Who appears here" card states the current match requirement. |
 | P-PUBLIC-PROFILE / P-OWN-PROFILE | Identity card (a public banner across the top, circular picture or initials overlapping it, name, nickname, RTR ID with **Copy** and a note that it isn't the player's city or club) beside a shared-rank card: label, status chip, overall position or **No position**, and a nine-segment ladder. Then eligibility, recent games and About (playing style, experience, links). The owner also gets **Edit profile**, **My player ID**, **Share profile** (card with QR, level, position and this year's wins, plus a copyable link) and a dashed "Your account · only you see this" panel with phone, email, phone-privacy state, **Privacy and contact** and **Sign out**. An optional, non-blocking "Add details" prompt appears when playing style or experience is empty. |
 | P-RANK-DETAIL | A split bar for the configured weights, one paragraph each on club assessments and match performance, the nine levels with the player's marked, "Clubs set their own levels" and "When it changes". It says it doesn't list each club's assessment. |

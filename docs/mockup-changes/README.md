@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 3 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -362,4 +362,7 @@ IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-14-player-game-row-games-badge](2026-11-14-player-game-row-games-badge.md) | Player app: games badge on every face of a game court | match-court (Player variant), game-row | IN MOCK APP — PR #859 |
 | [2026-11-15-queue-record-courts](2026-11-15-queue-record-courts.md) | Queue session record: How the night ran matches as courts | match-court (Queue variant), record-court-columns | IN MOCK APP — PR #862 |
 | [2026-11-15-share-save-to-photos](2026-11-15-share-save-to-photos.md) | Share dialogs: Save to Photos on iPhone and iPad | share-image-picker, share-image-viewer, share-card (helpers: isAppleMobile) | IN MOCK APP — PR #868 |
+| [2026-11-16-player-account-verification](2026-11-16-player-account-verification.md) | Player app: account verification page (Google, phone, matching email) with an Admin override | verification-card, verification-step, status chip, announcement-band, page-head | NEW |
+| [2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md) | Player app: Google sign-in (mandatory), invite landings and connecting Google to existing accounts | auth-card, google-button, invite-card, google-identity-row, announcement-band, sign-in-methods-card, sheet | NEW |
+| [2026-11-16-player-notifications](2026-11-16-player-notifications.md) | Player app: notifications page and bell | notification-bell, notification-item, notification-list, segmented filter | NEW |
 <!-- status-index:end -->

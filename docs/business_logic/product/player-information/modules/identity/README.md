@@ -1,6 +1,6 @@
 # Player identity and accounts
 
-**Last verified:** 2026-11-12 for club-only unclaimed profiles in the services (P08.9: registered-only search, link-only sync, automatic linking at registration, club-record invites); 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for mandatory Google sign-in, account verification ([D-2026-11-16-01](../../../../../mvp/decisions.md#d-2026-11-16-01), [D-2026-11-16-02](../../../../../mvp/decisions.md#d-2026-11-16-02)); 2026-11-12 for club-only unclaimed profiles in the services (P08.9: registered-only search, link-only sync, automatic linking at registration, club-record invites); 2026-11-11 for profile visibility, Hide from Player Information, banners and avatars ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-08 for guest registration (#490); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules.
 
@@ -55,12 +55,25 @@ Experience can inform the initial operator assessment but is not automatic ranki
 
 ## Login and recovery
 
+**Google sign-in is mandatory (owner, November 16, 2026, [D-2026-11-16-01](../../../../../mvp/decisions.md#d-2026-11-16-01)).** This changes the email + password rules below:
+
+- **New players register with Google only**, from a club invite, a session invite or the Admin link. The Google email becomes the ROTRA email and is confirmed at once. Phone stays required. A club-created profile connects Google at claim instead of setting a password.
+- **Existing password players** still sign in with their password and are asked to connect Google by a deadline (placeholder December 31, 2026) through a yellow ROTRA announcement on every page. After the deadline a password sign-in without Google must connect Google before going on.
+- **Linking an existing account.** Google already connected: signs in. Google email equals a password account's email: the player is asked once to connect it ("Connect Google to your account?"); never linked silently. A different email: not signed in; the player signs in with the password and connects it then. A Google email already used by another ROTRA account is refused.
+- **Connecting while signed in:** any Google account the player owns, even with a different email. Connecting never changes the ROTRA email. Google can be changed, not disconnected.
+- **No Google account:** the player is told how to make a free Google account with the email they already use. Clubs and ROTRA can help; nothing on the profile is lost meanwhile.
+- **Google sign-in on `/login` never creates an account** (placeholder, open): new accounts come only from the registration sources above.
+- **Recovery:** Admin-reviewed password reset applies to password accounts only; an account that signs in with Google is told to use Google.
+- Still open: the deadline date; whether the password stops working after the deadline; Supabase's automatic linking of same-email identities must not skip the "ask first" step.
+
+Earlier rules, still true for password accounts until the deadline:
+
 - Sign in with **email + password**. Phone is not a sign-in identifier.
 - **Owner decisions, November 7, 2026 (#244):** the auth account is keyed by **email + password**; email is required for every player account. No phone provider and no SMS.
 - **Changed November 8, 2026 (owner):** the phone-lookup sign-in decided on November 7 is withdrawn. Email is the only login; phone stays a contact and the profile-matching key for clubs.
 - A failed sign-in never reveals whether an email exists or whether the profile is registered.
 - The player profile links to the auth user; the auth user is not the player identity.
-- No Facebook/social login.
+- No Facebook or other social login. *Changed November 16, 2026:* Google is required (above); it is the only social provider.
 - Forgotten passwords: submit the account email for ROTRA Admin review; no automatic email. Admin verifies ownership and provides a single-use expiring reset link (#491, owner request November 8, 2026).
 - The club operator's role is initial player entry/registration-link delivery, not routine password recovery.
 - Claim links are valid **24 hours** and **single use** (changed from 7 days on November 11, 2026, [D-2026-11-11-08](../../../../../mvp/decisions.md#d-2026-11-11-08)); the club (Queue Master) can reissue, and reissuing invalidates the previous link (decided 2026-11-07, #244). If the phone or email at claim already belongs to another account, the claim is blocked with a contact-support route; never merge silently. An RTR ID or name alone never claims an account.
@@ -71,6 +84,20 @@ Experience can inform the initial operator assessment but is not automatic ranki
   - **Name-only guests** can be invited once the club adds a phone or email to the record.
   - **RTR ID sequence:** the database hands out the next number first come, first served. The RTR ID is display only; every record keys on the player UUID. Founding cities are added by the platform owner from Admin ([D-2026-11-11-07](../../../../../mvp/decisions.md#d-2026-11-11-07)).
 - Still open: contact-change approval evidence beyond the owner's manual review, and failed provider application recovery beyond "Application failed".
+
+## Account verification
+
+**Owner, November 16, 2026 ([D-2026-11-16-02](../../../../../mvp/decisions.md#d-2026-11-16-02)).** A player is **Verified** when all three hold:
+
+1. A Google account is connected.
+2. A phone number is on the account.
+3. The ROTRA email is the Google account's email.
+
+The status is worked out from those facts. The one exception is **Verified by Admin**: ROTRA Admin sets it on the player, and the checks are skipped. A mismatched email is fixed by a normal contact-change request to the Google email (Admin approval, as for any email change) or by connecting the Google account that uses the ROTRA email. New Google registrations are verified at once.
+
+The player sees it on its own profile setting, **Verification**, and as a chip on the own profile; it is not part of Privacy and contact. The yellow ROTRA announcement asks unverified players to finish by the Google deadline.
+
+Still open: what an unverified player can't do (nothing for now); whether the phone must be confirmed (no SMS exists); whether others see the badge; whether Admin can set Not verified and must give a reason.
 
 ## Personal editing and privacy
 

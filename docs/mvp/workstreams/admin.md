@@ -77,6 +77,7 @@ duplicate issues merely because a related epic is open.
 
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — Admin issues the manual reset link.
 - [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) — profile character library; Admin edits everything.
+- [D-2026-11-16-04](../decisions.md#d-2026-11-16-04) — unclaimed players have an email and an RTR ID; Admin can edit the email and change the RTR ID (registration place and date), which cascades; mockup only, not built.
 - [D-2026-11-11-11](../decisions.md#d-2026-11-11-11) — profile banners, 15 per page, upload progress, avatar photo viewer.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 

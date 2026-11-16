@@ -17,7 +17,7 @@ This product stores player identity and shared rank across clubs. Profiles and t
 ## Scope
 
 - A club can run sessions with guests who have no Player Information account.
-- Phone-linked profiles and permanent RTR IDs are created as soon as the entry successfully syncs, without waiting for Session done (owner decision, October 28, 2026). Existing profiles are reused; claiming a profile is a separate step.
+- A club can save a person with their email as an **unclaimed** player. They get an RTR ID as soon as the entry successfully syncs, without waiting for Session done; one email is one person and one RTR ID across clubs, and each club keeps its own version of them ([D-2026-11-16-04](../../../mvp/decisions.md#d-2026-11-16-04), replacing the phone-linked rule of October 28, 2026). Claiming the profile is a separate step. Unclaimed players are public, and on the leaderboard only while exactly one club has saved them.
 - One shared rank supports both singles and doubles.
 - One overall ROTRA leaderboard, with no city or club filtering in v1.
 - A player can have a label such as **Intermediate High** and a position such as **#128**.

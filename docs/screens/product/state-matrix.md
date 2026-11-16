@@ -64,12 +64,13 @@
 
 | State | Session participation | Global profile/account | Allowed identification |
 |---|---|---|---|
-| Name-only guest | Operator confirms slot and full level | No automatic profile/account | Saved club entry; no invented RTR ID |
-| Phone supplied, pending resolution | Can participate; link pending when offline | Eligible creation/linking on allowed sync | Confirm phone in person; resolve conflicts online |
-| Unclaimed linked profile | Can participate | Public identity may exist; login not yet established | Phone when permitted, existing RTR ID |
+| Name-only guest | Operator confirms slot and full level | No profile, account or RTR ID; games join an account only after the club adds an email | Saved club entry; no invented RTR ID |
+| Email supplied offline, Lookup pending | Can participate | Linked to the player with that email, or saved as unclaimed with a new RTR ID, on sync | Resolve online; no RTR ID offline |
+| Unclaimed ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | Can participate | Email required; RTR ID from the day the club saved them; public; login not yet established | Exact RTR ID or exact email |
+| Unclaimed, Details required | Can participate | Older record with a phone and no email; the Queue Master adds an email or deletes the record | The club's own Saved players |
 | Registered, phone visible to club | Can participate | Email + password login | Confirm phone or ID/QR |
 | Registered, phone hidden | Can participate | Same account; contacts absent publicly | ID/QR, no forced reveal |
-| Contact-change requested | Participation unchanged | Existing contact remains until applied | Same permanent RTR ID |
+| Contact-change requested | Participation unchanged | Existing contact remains until applied | Same RTR ID |
 
 ## Match and participant counting
 

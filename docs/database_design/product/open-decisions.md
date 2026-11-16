@@ -3,7 +3,7 @@
 > **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
 
 
-**Last verified:** 2026-11-12 for the round-2 columns (D-2026-11-12-01); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-16 for the open points of [D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04); 2026-11-12 for the round-2 columns (D-2026-11-12-01); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -57,6 +57,13 @@ Source: [D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01), built in migr
 
 - **Settled:** `players.profile_visibility` enum (`public` · `private` · `always_private`) plus `players.hidden_from_directory`; existing Private maps to `private`, others to `public`, new registrations default `private`. `clubs.invite_code` (one column, every club backfilled). `profile_banners` table and `profile-banners` Storage bucket modelled on characters, `players.banner_id`; the default banner is the first shown one (changed November 13, 2026: Admin picks it, `profile_banners.is_default` built in `20261114000100_profile_banner_default`, [D-2026-11-13-03](../../mvp/decisions.md#d-2026-11-13-03)). Unclaimed `players` rows were moved onto `club_players` and their RTR IDs released.
 - **Still open:** a stored marker that distinguishes a club-only record whose phone lookup found nobody (“Lookup pending”) from “Unclaimed”; whether Admin › Add player may still create an unclaimed `players` row with an RTR ID; the invite code shown to anyone who opens the public club page (Join sends it); the banner picker for a banner Admin later hid; closing drop-out notices at Start; an attribution history per linked club record.
+
+## Owner decision recorded November 16, 2026
+
+Source: [D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04). Prose rules only; no DDL or migration is approved by this, and the built schema (P08.1, P08.9) still follows the November 11 rules. Proposed shape: [identity](player-information/modules/identity.md#unclaimed-players-with-an-email-and-an-rtr-id-d-2026-11-16-04--proposal-not-built).
+
+- **Settled:** an unclaimed player needs an email and gets an RTR ID when a club saves them; one email is one person and one RTR ID across clubs, with each club keeping its own name, nickname, picture, level and optional phone; a guest is a name only; lookup by exact RTR ID or exact email; clubs never update an email, Admin can; Admin can change the registration place and date, which changes the RTR ID and cascades to every record holding it; retired RTR IDs are never reused; guest linking (**Link**, **Link to saved player…**) is removed; the guest join form stores no phone; older phone-only unclaimed records are kept and shown as **Details required**.
+- **Still open:** whether the shared entry is an unclaimed `players` row or a new table; whether lookup by phone and by QR code stay; whether an old RTR ID stays resolvable (an alias) for QR codes and links already shared; whether the Confirm player step applies to another club's unclaimed player; whether a phone still links a record on registration; which email is matched on registration (the ROTRA email, the Google email, or both); a returning guest's new join request creates a second guest `club_players` row because nothing links them; which tables snapshot the RTR ID string and must take part in the cascade; whether Admin › Add player must require an email; a history attribution per joined club record (already open below).
 
 ## Owner decisions recorded November 11, 2026
 

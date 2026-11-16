@@ -49,6 +49,7 @@ Superseded by: none
   - Edit details, phone hint: "Kept private. Only your club sees it."
   - Same person: title "Same person as NAME?"; "That email is already **NAME** in your saved players."; "GUEST's slots, games and payments here move to that record, and GUEST is removed from your saved players."; buttons "Back" · "Move to NAME"; toast "Moved to NAME"
   - Join request row: "Says LEVEL · requested TIME" (the phone is gone)
+  - Join requests intro: "Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first."
   - Participant card, unclaimed: "Saved by the club. Not registered with ROTRA yet."; guest: "This player is playing as a guest and hasn't registered with ROTRA yet, so there's no profile to show."
   - Prototype tip under the search: "Prototype: try RTR-PH-MNL-020326-0112 or ivan.delarosa@example.com."
 - Tokens: none.

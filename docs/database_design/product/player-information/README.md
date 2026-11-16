@@ -7,6 +7,6 @@
 | [Identity and RTR allocation](modules/identity.md) | Profiles independent of auth, private contacts, claiming, fixed IDs |
 | [Assessments and rank](modules/ranking.md) | The nine skill levels, source evidence, rolling rank/eligibility |
 
-Public profiles are projections, not direct reads of contact/account tables. A phone-linked unclaimed player is a real identity without a login. Name-only guests remain in the Queue product's club-player records.
+Public profiles are projections, not direct reads of contact/account tables. An unclaimed player is a real identity without a login: saved by a club with a required email, with an RTR ID ([D-2026-11-16-04](../../../mvp/decisions.md#d-2026-11-16-04); proposed, the built schema still keeps unclaimed records club-only with a phone). Name-only guests remain in the Queue product's club-player records.
 
 November 11, 2026 ([D-2026-11-11-11](../../../mvp/decisions.md#d-2026-11-11-11)): `players` gains a visibility level (replacing the private flag), a hidden-from-directory flag and a banner reference; the public club page and Share profile add no tables. See [identity](modules/identity.md).

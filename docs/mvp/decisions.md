@@ -540,7 +540,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Ticket:** [#749](https://github.com/jose-codegourmet/rotra-v2/issues/749), [#757](https://github.com/jose-codegourmet/rotra-v2/issues/757) (epic #748)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Supersedes:** in part the October 28, 2026 owner decision that a phone-linked profile and its permanent RTR ID are created on the first entry sync, and the rule "the same phone number identifies the same profile across clubs" for unclaimed profiles.
-- **Superseded in part by:** [D-2026-11-16-04](#d-2026-11-16-04) (an unclaimed player needs an email, gets an RTR ID when the club saves them, and is found by other clubs). The rules below stay in force in the docs, mockups and code until that decision is built.
+- **Superseded in part by:** [D-2026-11-16-04](#d-2026-11-16-04) (an unclaimed player needs an email, gets an RTR ID when the club saves them, and is found by other clubs). The mockups and docs follow the new decision; the mock app and real mode still follow the rules below until it is built.
 - **Decision:**
   - **In the owner's words:** "guest should stay in the club's saved players and registered players live in rotra's saved players", and "Unclaimed profiles should never be found in other clubs. they should only live in club".
   - **Player Information search** (Queue › Add player and Saved players › Add player) shows **registered (claimed) players only**. Guests and unclaimed profiles are never found by another club, by name, nickname or RTR ID.

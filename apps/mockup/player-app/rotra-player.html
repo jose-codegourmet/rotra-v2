@@ -268,9 +268,15 @@ textarea.input { min-height: 80px; resize: vertical; }
 .gpick .main { display: flex; flex-direction: column; min-width: 0; }
 .gpick .main span { overflow-wrap: anywhere; }
 /* Identity picker (D-2026-11-16-04): one card per club that saved the person's email. */
-.idpick { display: flex; flex-direction: column; gap: 12px; }
-.idpick button { display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 14px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: inherit; text-align: left; cursor: pointer; font: inherit; }
+/* Owner artifact comment, November 16, 2026: the identity cards sit in the share dialog's carousel (drag or swipe, a fade mask on a side with more cards). */
+/* Owner artifact comment, same day: the card in view is always centred, also after a swipe; the next one peeks in at the side. */
+.sh-dlg .sh-tiles.idpick { --idw: min(300px, 72vw); align-items: stretch; padding-inline: calc(50% - var(--idw) / 2); scroll-padding-inline: 0; }
+.idpick button { display: flex; flex-direction: column; align-items: stretch; gap: 10px; flex: none; width: var(--idw); scroll-snap-stop: always; padding: 14px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: inherit; text-align: left; cursor: pointer; font: inherit; }
 .idpick button:hover { background: var(--elev); border-color: var(--accent); }
+/* Owner artifact comment, same day: the club's logo and name on top, then everything the club saved. */
+.idpick .club { display: flex; gap: 8px; align-items: center; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+.idpick .facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 0; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; }
+.idpick .facts dt { color: var(--fg2); } .idpick .facts dd { margin: 0; overflow-wrap: anywhere; }
 .idpick .who { display: flex; gap: 12px; align-items: center; min-width: 0; }
 .idpick .main { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .method { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
@@ -359,7 +365,19 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 /* Leaderboard */
 .lb { display: flex; flex-direction: column; }
-.lb-head, .lb-row { display: grid; grid-template-columns: 56px 36px minmax(0, 1fr) minmax(0, auto); gap: 12px; align-items: center; padding: 8px 12px; }
+.lb-head, .lb-row { display: grid; grid-template-columns: 56px 30px 36px minmax(0, 1fr) minmax(0, auto); gap: 12px; align-items: center; padding: 8px 12px; }
+/* Owner, November 16, 2026: three leaderboards (annual, monthly, weekly), ordered by wins in the period. A mark beside the
+   place shows a move since the previous period: up, down, or New. Hover or focus shows where the player was before. */
+.lb-move { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-width: 30px; height: 24px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--fg2); }
+.lb-move svg { width: 10px; height: 10px; flex: none; }
+.lb-move.up { color: var(--accent); } .lb-move.down { color: var(--error); }
+.lb-move.new { font-family: inherit; font-size: 10px; letter-spacing: .4px; text-transform: uppercase; color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); border-radius: 999px; padding: 0 6px; height: 20px; }
+.lb-move[data-tip]::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-30%); z-index: 5; width: max-content; max-width: 240px; padding: 6px 10px; border-radius: var(--r-sm); background: var(--fg); color: var(--bg); font: 600 12px/1.35 var(--font); letter-spacing: 0; text-transform: none; white-space: normal; opacity: 0; pointer-events: none; transition: opacity .12s; }
+.lb-row:hover .lb-move[data-tip]::after, .lb-row:focus-visible .lb-move[data-tip]::after, .lb-move[data-tip]:hover::after { opacity: 1; }
+.lb-wins { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; text-align: right; }
+.lb-wins b { font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lb-wins span { font-size: 12px; color: var(--fg2); }
+.lb-tabs { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
 .lb-head { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); border-bottom: 1px solid var(--border); padding-block: 6px; }
 .lb-head span:first-child { text-align: right; }
 .lb-head span:last-child { text-align: right; }
@@ -450,10 +468,13 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .lb-lv { font-size: 13px; font-weight: 600; color: var(--fg2); text-align: right; }
 @media (max-width: 560px) {
   .lb-head { display: none; }
-  .lb-row { grid-template-columns: 44px 36px minmax(0, 1fr); row-gap: 0; padding-inline: 8px; }
-  .lb-lv { grid-column: 3; text-align: left; font-size: 12px; }
+  .lb-row { grid-template-columns: 34px 30px 36px minmax(0, 1fr); column-gap: 8px; row-gap: 0; padding-inline: 8px; }
+  .lb-lv { grid-column: 4; text-align: left; font-size: 12px; }
+  .lb-wins { grid-column: 4; flex-direction: row; align-items: baseline; gap: 6px; text-align: left; }
+  .lb-wins b { font-size: 13px; white-space: nowrap; }
   .lb-row .avatar { grid-row: span 2; }
-  .lb-pos { grid-row: span 2; }
+  .lb-pos, .lb-move { grid-row: span 2; }
+  .lb-move[data-tip]::after { transform: translateX(-12%); }
 }
 .skel { display: block; background: var(--elev); border-radius: 6px; height: 14px; animation: pulse 1.2s infinite; }
 @media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
@@ -933,6 +954,8 @@ a.urow:hover .main b, a.urow:focus-visible .main b { color: var(--accent); }
 .sheet .pp-card .pp-banner { background-size: 100% 200%; background-position: center top; }
 .pp-card .pp-avatar { position: relative; top: auto; left: auto; width: max-content; margin: -32px 0 0 20px; z-index: 1; }
 .pp-card .pp-body { padding-top: 12px; }
+/* The same blocks inside the profile page's own card (an unclaimed player): no extra inset. */
+.pp-card.hero-facts .pp-body { padding: 0; }
 .pp-card .pp-avatar:has(.pp-pill) + .pp-body { padding-top: 20px; }
 .pp-card .pp-name { flex-direction: column; align-items: flex-start; gap: 2px; }
 .pp-full { font-size: 14px; color: var(--fg2); }
@@ -1136,8 +1159,8 @@ const UNCLAIMED_SEED = { 17: 'c1', 22: 'c3' };
 // One email is one person and one RTR ID, so both records share the ID. Not on the leaderboard until they register.
 const UNCLAIMED_BY_EMAIL = {
   'paolo.mendoza@example.com': { rtr: 'RTR-PH-CEB-090226-0412', records: [
-    { club: 'c1', name: 'Paolo Mendoza', nick: 'Pao', level: 4, photo: true },
-    { club: 'c2', name: 'Paulo Mendoza', nick: '', level: 3, photo: false },
+    { club: 'c1', name: 'Paolo Mendoza', nick: 'Pao', level: 4, photo: true, phone: '+639175550142', since: 'March 2023', style: 'Fast drives. Likes the front court.', links: ['Facebook', 'Instagram'], sessions: 6, games: 14, saved: 'Sep 2, 2026' },
+    { club: 'c2', name: 'Paulo Mendoza', nick: '', level: 3, photo: false, phone: '', since: '', style: '', links: [], sessions: 2, games: 5, saved: 'Oct 19, 2026' },
   ] },
 };
 
@@ -1265,10 +1288,10 @@ const PLACES = [['CEB', 'Cebu City'], ['LAP', 'Lapu-Lapu'], ['MDE', 'Mandaue'], 
 const seedClubs = () => [{ id: 'c1', via: 'club_link' }, { id: 'c2', via: 'added_by_club' }];
 function seedAccounts() {
   return {
-    u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+63 917 555 0142', email: 'migs.santos@example.com', phoneHidden: true, profilePrivate: false, claimed: true, photo: true, emailConfirmed: true, clubs: seedClubs(),
+    u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+639175550142', email: 'migs.santos@example.com', phoneHidden: true, profilePrivate: false, claimed: true, photo: true, emailConfirmed: true, clubs: seedClubs(),
       style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', expY: '4', expM: '6',
       social: { facebook: 'https://facebook.com/migs.santos.badminton', instagram: 'https://instagram.com/migs.smash', youtube: '', linkedin: '' }, level: 5 },
-    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+63 918 555 0377', email: 'jomar.dc@example.com', phoneHidden: false, profilePrivate: false, claimed: false, photo: false,
+    u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+639185550377', email: 'jomar.dc@example.com', phoneHidden: false, profilePrivate: false, claimed: false, photo: false,
       style: '', expY: '', expM: '', social: { facebook: 'https://facebook.com/jomar.dc', instagram: '', youtube: '', linkedin: '' }, level: 3 },
   };
 }
@@ -1607,56 +1630,108 @@ function emailBanner() {
 }
 
 // ---------- P-LEADERBOARD ----------
+// Owner, November 16, 2026: Top annual, Top monthly and Top weekly. Each list is ordered by standard-match wins in that
+// period (win rate breaks a tie), and compares each place with the previous period. The annual list takes the place of the
+// old overall list, so a profile's position is its annual place. The prototype makes the monthly and weekly numbers up.
+const LB_PERIODS = [['year', 'Top annual'], ['month', 'Top monthly'], ['week', 'Top weekly']];
+const lbP = () => (LB_PERIODS.some(([k]) => k === S.ui.lbP) ? S.ui.lbP : 'year');
+const LB_WORDS = { year: ['this year', 'last year', 'annual'], month: ['this month', 'last month', 'monthly'], week: ['this week', 'last week', 'weekly'] };
+const lbWhen = (k) => { const d = new Date(); if (k === 'year') return String(d.getFullYear()); if (k === 'month') return d.toLocaleDateString('en', { month: 'long', year: 'numeric' }); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const e = new Date(m); e.setDate(m.getDate() + 6); const f = (x) => x.toLocaleDateString('en', { month: 'short', day: 'numeric' }); return `${f(m)} to ${f(e)}`; };
+// Owner, same day: each leaderboard lists the top 50 only, and a row shows the number of wins, not the skill level.
+const LB_TOP = 50;
+let lbCache = { key: '', list: [], full: [] };
+function periodList(k = lbP()) {
+  const base = boardList(), key = `${k}|${base.length}|${S.me}|${S.board}|${S.ui.lbMe || 'auto'}`;
+  if (lbCache.key === key) return lbCache.list;
+  const rows = base.map((e, i) => {
+    const h = hashStr(`lb-${k}-${e.id}`);
+    let w, l;
+    if (k === 'year') { w = Math.max(3, i < 60 ? 118 - Math.floor(i * 0.75) : 73 - Math.floor((i - 60) * 0.057)); l = Math.floor(w * 0.4) + (i % 4); }
+    else { const month = k === 'month', top = month ? 14 : 5, skill = 1 - i / Math.max(1, base.length), r = (h % 1000) / 1000; w = Math.min(top, Math.round(top * (0.3 + 0.7 * skill) * (0.3 + 0.72 * r))); l = (w >= (month ? 8 : 4) ? 1 : 0) + ((h >>> 12) % (month ? 6 : 3)); if (!w && (h >>> 8) % 3) l = 0; }
+    return { e, w, l, h, i };
+  }).filter((r) => r.w + r.l > 0);
+  if (k !== 'year') rows.sort((a, b) => b.w - a.w || b.w / (b.w + b.l) - a.w / (a.w + a.l) || a.i - b.i);
+  const list = rows.map((r, n) => {
+    const pos = n + 1, roll = (r.h >>> 4) % 100, step = 1 + ((r.h >>> 16) % (pos < 10 ? 3 : 9));
+    // prev: the place in the previous period; null = not on that list then (New); the same number = no move.
+    const prev = roll < 12 ? null : roll < 34 ? pos : roll < 68 ? pos + step : Math.max(1, pos - step);
+    return { ...r.e, lbW: r.w, lbL: r.l, lbPrev: prev };
+  });
+  // Prototype control "My place on the leaderboard": put Migs inside or just outside the top 50 on every list.
+  const at = { in: 16, out: LB_TOP + 23 }[S.ui.lbMe], mi = list.findIndex((e) => e.id === 'u1');
+  if (at != null && mi >= 0 && list.length > at) { const [me] = list.splice(mi, 1); list.splice(at, 0, { ...me, lbW: list[at].lbW, lbL: list[at].lbL + 1, lbPrev: at + 1 + (S.ui.lbMe === 'in' ? 5 : 0) }); }
+  lbCache = { key, list: list.slice(0, LB_TOP), full: list };
+  return lbCache.list;
+}
+// A player's own place and wins in the period, also below the top 50 (their own "Your position" card only).
+const periodPlace = (id, k = lbP()) => { periodList(k); const i = lbCache.full.findIndex((e) => e.id === id); return i < 0 ? null : { pos: i + 1, e: lbCache.full[i] }; };
+const LB_ARROW = { up: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1 9.5 8.5H.5z" fill="currentColor"/></svg>', down: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 9 .5 1.5h9z" fill="currentColor"/></svg>' };
+// [class, mark, words]. The words are the tooltip and are read out with the row.
+function lbMove(e, pos) {
+  const [, last, name] = LB_WORDS[lbP()];
+  if (e.lbPrev === undefined) return ['', '', ''];
+  if (e.lbPrev === null) return ['new', 'New', `New on the ${name} list. Not on it ${last}.`];
+  const d = e.lbPrev - pos;
+  if (!d) return ['same', '–', `Same place as ${last}: #${num(pos)}.`];
+  return d > 0 ? ['up', `${LB_ARROW.up}${d}`, `Up ${d} ${d === 1 ? 'place' : 'places'}. Was #${num(e.lbPrev)} ${last}.`] : ['down', `${LB_ARROW.down}${-d}`, `Down ${-d} ${d === -1 ? 'place' : 'places'}. Was #${num(e.lbPrev)} ${last}.`];
+}
+const lbMoveEl = (e, pos) => { const [cls, mark, words] = lbMove(e, pos); return cls ? `<span class="lb-move ${cls}" data-tip="${esc(words)}" title="${esc(words)}">${mark}</span>` : '<span class="lb-move"></span>'; };
+const lbWinsEl = (e) => (e.lbW === undefined ? '<span></span>' : `<span class="lb-wins"><b>${num(e.lbW)} ${e.lbW === 1 ? 'win' : 'wins'}</b></span>`);
 function lbRow(e, pos) {
   const me = e.id === S.me;
   const medal = ['', 'first', 'second', 'third'][pos] || '';
   if (hiddenFromViewer(e)) {
     const m = maskedView(e);
-    return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${avatar(m)}
-    <span class="lb-name"><b>${esc(m.name)}</b></span><span class="lb-lv">${lvLabel(e.level)}</span></div>`;
+    return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${lbMoveEl(e, pos)}${avatar(m)}
+    <span class="lb-name"><b>${esc(m.name)}</b></span>${lbWinsEl(e)}</div>`;
   }
-  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}${e.unclaimed ? ', not registered yet' : ''}, ${lvLabel(e.level)}">
-    <span class="lb-pos">${num(pos)}</span>${avatar(e)}
+  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}${e.unclaimed ? ', not registered yet' : ''}, ${e.lbW === undefined ? '' : `${e.lbW} ${e.lbW === 1 ? 'win' : 'wins'}`}${lbMove(e, pos)[2] ? `. ${esc(lbMove(e, pos)[2])}` : ''}">
+    <span class="lb-pos">${num(pos)}</span>${lbMoveEl(e, pos)}${avatar(e)}
     <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}${e.unclaimed ? unclaimedChip() : ''}</span>
-    <span class="lb-lv">${lvLabel(e.level)}</span></button>`;
+    ${lbWinsEl(e)}</button>`;
 }
 function meCard(list) {
   if (!S.me) return '';
   const p = profileOf(S.me);
   const pos = list.findIndex((e) => e.id === S.me) + 1;
-  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><p class="small muted">Your position</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${lvLabel(p.level)}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
+  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><p class="small muted">Your position ${LB_WORDS[lbP()][0]}</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${num(list[pos - 1].lbW)} ${list[pos - 1].lbW === 1 ? 'win' : 'wins'}</p><p class="small muted">${esc(lbMove(list[pos - 1], pos)[2])}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
+  // Below the top 50: the player still sees their own wins, not a place on the list.
+  const mine = periodPlace(S.me);
+  if (mine) return `<section class="card stack tight"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><h3>You're not in the top ${LB_TOP} ${LB_WORDS[lbP()][0]}</h3><p class="small muted">${num(mine.e.lbW)} ${mine.e.lbW === 1 ? 'win' : 'wins'} ${LB_WORDS[lbP()][0]}. The player in place ${LB_TOP} has ${num(list[list.length - 1].lbW)}${list[list.length - 1].lbW === mine.e.lbW ? ' and a better win rate' : ''}.</p></div></div></section>`;
   const st = rankStatus(p, null);
   return `<section class="card stack tight"><div class="between"><h3>You're not on the leaderboard${p.state === 'reassess' ? ' right now' : ' yet'}</h3>${st.chips}</div><p class="small muted">${st.text}</p>
     <div class="row"><button class="btn xs" data-act="openProfile" data-id="${p.id}">Open my profile</button></div></section>`;
 }
 function viewBoard() {
-  const list = boardList();
+  const per = lbP(), [now, last, lname] = LB_WORDS[per];
+  const list = periodList(per);
   const q = S.q.trim();
   const isId = /^rtr-/i.test(q);
   const ql = q.toLowerCase();
   let body;
   if (S.board === 'loading') {
-    body = `<div class="lb" aria-busy="true" aria-label="Loading the leaderboard">${Array.from({ length: 8 }, (_, i) => `<div class="lb-row" style="cursor:default"><span class="skel" style="width:28px;justify-self:end"></span><span class="avatar"></span><span class="skel" style="width:${50 + ((i * 37) % 40)}%"></span><span class="skel" style="width:110px"></span></div>`).join('')}</div>`;
+    body = `<div class="lb" aria-busy="true" aria-label="Loading the leaderboard">${Array.from({ length: 8 }, (_, i) => `<div class="lb-row" style="cursor:default"><span class="skel" style="width:28px;justify-self:end"></span><span></span><span class="avatar"></span><span class="skel" style="width:${50 + ((i * 37) % 40)}%"></span><span class="skel" style="width:110px"></span></div>`).join('')}</div>`;
   } else if (S.board === 'error') {
     body = `${notice('bad', '<b>Couldn\'t load the leaderboard.</b> Check your connection, then try again.')}<div class="row"><button class="btn sm" data-act="retryBoard">Try again</button></div>`;
   } else if (!list.length) {
-    body = `<div class="empty">No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.</div>`;
+    body = `<div class="empty">${boardList().length ? `No one on the leaderboard has played a standard match ${now} yet.` : `No players qualify for the leaderboard yet. Players appear after ${T()} standard matches in the last three months.`}</div>`;
   } else if (q && !isId) {
     const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromViewer(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
     body = hits.length
       ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map(({ e, pos }) => lbRow(e, pos)).join('')}</div>`
-      : `<div class="empty" aria-live="polite">No one on the leaderboard matches “${esc(q)}”. Players below the match requirement aren't listed here.</div>`;
+      : `<div class="empty" aria-live="polite">No one in the top ${LB_TOP} matches “${esc(q)}”.</div>`;
   } else {
     // The podium above holds 1–3, so the list carries on from 4.
     const shown = Math.min(S.shown, list.length);
     const from = list.length >= 3 ? 3 : 0;
     body = `<div class="lb">${lbHead()}${list.slice(from, shown).map((e, i) => lbRow(e, from + i + 1)).join('')}</div>
-      <div class="between"><span class="small muted">Showing 1–${num(shown)} of ${num(list.length)} players</span>${shown < list.length ? '<button class="btn sm" data-act="showMore">Show 25 more</button>' : ''}</div>`;
+      <div class="between"><span class="small muted">Showing 1–${num(shown)} of the top ${num(list.length)}</span>${shown < list.length ? '<button class="btn sm" data-act="showMore">Show 25 more</button>' : ''}</div>`;
   }
   const showPodium = S.board === 'ok' && list.length >= 3 && !(q && !isId);
   return `<main class="wrap mid">
-    <section class="page-head"><span class="label">Overall ROTRA ranking</span><h1>Leaderboard</h1>
-      <p class="muted">One list across every club. Singles and doubles share one rank.</p></section>
+    <section class="page-head"><span class="label">ROTRA leaderboards</span><h1>Leaderboard</h1>
+      <p class="muted">The top ${LB_TOP} across every club. Most wins ${now} comes first. Singles and doubles count together.</p>
+      <div class="lb-tabs"><div class="seg" role="group" aria-label="Leaderboard period">${LB_PERIODS.map(([k, l]) => `<button type="button" aria-pressed="${per === k}" data-act="lbPeriod" data-v="${k}">${l}</button>`).join('')}</div><span class="small muted">${esc(lbWhen(per))} · compared with ${last}</span></div></section>
     ${showPodium ? podium(list) : ''}
     ${meCard(list)}
     <section class="card stack">
@@ -1671,27 +1746,29 @@ function viewBoard() {
         <li>Players with <b style="color:var(--fg)">${T()} completed singles or doubles matches</b> in the last three months. It's a rolling count, not a lifetime total.</li>
         <li>Fun games, partial games after a substitution, and invalid games or sessions don't count.</li>
         <li>After three months without playing, a player leaves the list until a club reassesses them.</li>
+        <li><b style="color:var(--fg)">Top annual, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">top ${LB_TOP}</b> of those players by wins in standard matches in that year, month or week. Win rate breaks a tie.</li>
+        <li>The mark beside a place shows the move since the period before: up, down, or <b style="color:var(--fg)">New</b> when the player wasn't on that list then. Point at it to see their earlier place.</li>
         <li>Players marked <b style="color:var(--fg)">Not registered yet</b> were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register.</li>
         <li>Positions come from club assessments and match results. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
       </ul></section>
   </main>`;
 }
-const lbHead = () => '<div class="lb-head" aria-hidden="true"><span>#</span><span></span><span>Player</span><span>Rank</span></div>';
+const lbHead = () => '<div class="lb-head" aria-hidden="true"><span>#</span><span></span><span></span><span>Player</span><span>Wins</span></div>';
 // Podium: 1st in the middle on the tallest step with pixel fire behind the picture, 2nd left, 3rd right.
 // The DOM stays in 1–2–3 order for screen readers; CSS order places the steps.
 function podium(list) {
   const place = ['First', 'Second', 'Third'], short = ['1st', '2nd', '3rd'];
   const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
   return `<section class="podium" aria-labelledby="pod-title"><span class="embers" aria-hidden="true">${embers}</span>
-    <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">Overall ROTRA leaderboard · ${num(list.length)} players</span></div>
+    <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">${LB_PERIODS.find(([k]) => k === lbP())[1]} · ${esc(lbWhen(lbP()))} · top ${LB_TOP}</span></div>
     <div class="pod-stage">${list.slice(0, 3).map((e, i) => hiddenFromViewer(e) ? `
     <div class="pod p${i + 1}" aria-disabled="true">
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(maskedView(e), 'pod-av')}
-        <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${lvLabel(e.level)}</span></span>
+        <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${e.lbW === undefined ? '' : `${num(e.lbW)} wins`}</span></span>
       <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></div>` : `
-    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfileCard" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfileCard" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}${e.lbW === undefined ? '' : `, ${e.lbW} wins`}">
       <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(e, 'pod-av')}
-        <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${lvLabel(e.level)}</span></span>
+        <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${e.lbW === undefined ? '' : `${num(e.lbW)} wins`}</span></span>
       <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></button>`).join('')}</div></section>`;
 }
 
@@ -1784,6 +1861,7 @@ function viewProfile() {
       <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
         <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : isUnclaimed(p) ? `<div class="row">${unclaimedChip()}</div>` : ''}</div></div>
+        ${isUnclaimed(p) && !own ? heroFacts(p, pos) : ''}
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
@@ -1842,7 +1920,7 @@ function privatePanel(p) {
   const req = S.requests[p.id];
   const open = req && ['submitted', 'applying', 'failed'].includes(req.status);
   return `<section class="card private stack"><div class="between"><h3>Your account</h3><span class="small muted">${I.lock} Only you see this</span></div>
-    <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
+    <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(maskPhone(p.phone))}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
     ${open ? `<p class="small">${chip(REQ[req.status].chip, REQ[req.status].k)} ${REQ_FIELD[req.field]} change</p>` : ''}
     <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm" data-act="go" data-to="verify">Verification</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
 }
@@ -1861,8 +1939,20 @@ function mySessionsCard() {
 // Clubs card (#766, November 12, 2026): on every readable profile. "Your clubs" on the own profile, "Clubs" on another player's.
 // Each club is one row that opens the club page: logo, then name; the joined-via line shows on the own profile only.
 // Leave club lives on the club page; Report a problem is gone.
+// Owner artifact comment, November 16, 2026: an unclaimed player's card shows the complete information: who saved them,
+// their level and standing when they have one, and this year's stats (the same block as the profile dialog).
+function heroFacts(p, pos) {
+  const gs = p.sessions.filter((x) => x.ago <= YEAR_DAYS()).flatMap((x) => x.games.filter((g) => g.kind === 'counted'));
+  const w = gs.filter((g) => g.res === 'W').length;
+  return `<div class="pp-card hero-facts"><div class="pp-body">
+      <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : chip('Not on the leaderboard yet')}</div>
+      <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Saved by</dt><dd>${esc(savedByName(p))}</dd><dt>Standing</dt><dd>${pos ? `#${num(pos)} of ${num(boardList().length)} overall` : `No overall position yet. ${p.recent} of ${T()} standard matches in the last three months`}</dd></dl></div>
+      ${ppStatsBlock(gs.length, w)}
+    </div></div>`;
+}
 function clubsOf(p) {
-  if (S.accounts[p.id]) return (S.accounts[p.id].clubs || []);
+  // An unclaimed account (Jomar) belongs to the club that saved it.
+  if (S.accounts[p.id]) { const cl = S.accounts[p.id].clubs || []; return cl.length || S.accounts[p.id].claimed !== false ? cl : [{ id: p.savedBy || 'c1' }]; }
   if (p.savedBy) return [{ id: p.savedBy }]; // unclaimed: the one club that saved them
   return [{ id: CLUB_IDS[hashStr(`club-${p.id}`) % CLUB_IDS.length] }];
 }
@@ -2275,12 +2365,13 @@ function requestCard(p) {
   const r = S.requests[p.id];
   if (!r) return '';
   const f = REQ_FIELD[r.field].toLowerCase();
+  const rv = (x) => esc(r.field === 'phone' ? maskPhone(x) : x);
   const text = {
-    submitted: `You asked to change your ${f} to <b>${esc(r.to)}</b>. Changes take effect only after Admin approval. Until then, keep signing in with <span class="mono">${esc(r.from)}</span>.`,
-    applying: `Approved. Your new ${f} is being set up. Keep signing in with <span class="mono">${esc(r.from)}</span> until this says Applied.`,
-    applied: `Your ${f} is now <b>${esc(r.to)}</b>. Your player ID and game history stay the same.`,
-    failed: `The change was approved but couldn't be applied yet. You still sign in with <span class="mono">${esc(r.from)}</span>. ROTRA will retry or contact you.`,
-    rejected: `The platform owner didn't approve changing your ${f} to ${esc(r.to)}. Your current ${f} stays. You can send a new request.`,
+    submitted: `You asked to change your ${f} to <b>${rv(r.to)}</b>. Changes take effect only after Admin approval. Until then, keep signing in with <span class="mono">${rv(r.from)}</span>.`,
+    applying: `Approved. Your new ${f} is being set up. Keep signing in with <span class="mono">${rv(r.from)}</span> until this says Applied.`,
+    applied: `Your ${f} is now <b>${rv(r.to)}</b>. Your player ID and game history stay the same.`,
+    failed: `The change was approved but couldn't be applied yet. You still sign in with <span class="mono">${rv(r.from)}</span>. ROTRA will retry or contact you.`,
+    rejected: `The platform owner didn't approve changing your ${f} to ${rv(r.to)}. Your current ${f} stays. You can send a new request.`,
   }[r.status];
   return `<div class="notice ${r.status === 'applied' ? 'ok' : r.status === 'failed' ? 'bad' : r.status === 'rejected' ? '' : 'warn'}">${r.status === 'applied' ? I.check : I.info}<div class="stack tight"><div class="row">${chip(REQ[r.status].chip, REQ[r.status].k)}<span class="small muted">${REQ_FIELD[r.field]} change · sent ${fmtTime(r.at)}</span></div><p>${text}</p></div></div>`;
 }
@@ -2338,7 +2429,7 @@ function viewAccount() {
       <div class="between" style="padding-top:12px;border-top:1px solid var(--border)"><span class="small">Account verification is in its own page.</span><button class="btn sm" data-act="go" data-to="verify">${verifyChip(S.accounts[S.me])}</button></div>
     </section>
     <section class="card stack"><h2>Contact details</h2>
-      <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd></dl>
+      <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(maskPhone(p.phone))}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd></dl>
       <p class="small muted">You sign in with your email. To change them, ask the ROTRA platform owner. Changes take effect only after Admin approval.</p>
       ${requestCard(p)}
       <div class="row">${open ? '' : '<button class="btn sm" data-act="openRequest">Request a change</button>'}</div>
@@ -2391,7 +2482,7 @@ function viewEdit() {
   const errs = (t) => t.keys.filter((k) => e[k]).length;
   const dirty = (t) => t.keys.some((k) => String(d[k]) !== String(o[k]));
   const body = tab.id === 'account'
-    ? `<dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.rtr)}</dd></dl>
+    ? `<dl class="kv"><dt>Phone</dt><dd class="mono">${esc(maskPhone(p.phone))}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.rtr)}</dd></dl>
       <p class="small muted">You can't edit these here. Phone and email changes go to the ROTRA platform owner for approval; your player ID never changes.</p>
       <div class="row"><button type="button" class="btn sm" data-act="openRequest">Request a phone or email change</button><button type="button" class="btn sm ghost" data-act="go" data-to="account">Phone privacy</button></div>
       <p class="hint">Rank, club levels and game results come from clubs and can't be changed by players.</p>`
@@ -2659,7 +2750,6 @@ function viewNotifs() {
 
 // ---------- P-CLAIM / P-CLAIM-STATUS ----------
 const maskEmail = (em) => em.replace(/^(.)[^@]*(@.*)$/, '$1•••••$2'); // the record is found by its email (D-2026-11-16-04)
-const maskPhone = (ph) => ph.replace(/(\+63 \d{3}) (\d{3}) (\d{2})(\d{2})/, '$1 ••• ••$4');
 function claimStatus() {
   if (S.ui.claimWrong) return 'wrong';
   if (S.claim === 'valid' && S.accounts.u2.claimed) return 'claimed';
@@ -3142,9 +3232,9 @@ const SHEETS = {
   identity: (sh) => {
     const u = UNCLAIMED_BY_EMAIL[sh.email];
     return sheetWrap('Which identity is correct?', `<p class="muted" style="margin:0 0 12px">${u.records.length === 2 ? 'Two' : u.records.length} clubs saved a profile with <b style="color:var(--fg)">${esc(sh.email)}</b>. Pick the one that's right. It becomes your starting profile, and you can change it after.</p>
-      <div class="idpick">${u.records.map((r, i) => `<button type="button" data-act="idPick" data-i="${i}" aria-label="${esc(CLUB_DIR[r.club].name)}: ${esc(r.name)}${r.nick ? `, ${esc(r.nick)}` : ''}, ${lvLabel(r.level)}. Use this identity"><span class="label">${esc(CLUB_DIR[r.club].name)}</span>
+      <div class="sh-dlg"><div class="sh-tiles idpick">${u.records.map((r, i) => `<button type="button" class="sh-pick" data-act="idPick" data-i="${i}" aria-label="${esc(CLUB_DIR[r.club].name)}: ${esc(r.name)}${r.nick ? `, ${esc(r.nick)}` : ''}, ${lvLabel(r.level)}. Use this identity"><span class="club">${avatar({ name: CLUB_DIR[r.club].name })}<span>${esc(CLUB_DIR[r.club].name)}</span></span>
         <span class="who">${avatar({ id: `id-${i}`, name: r.name, photo: r.photo }, 'lg')}<span class="main"><b>${esc(r.name)}</b>${r.nick ? `<span class="small muted">“${esc(r.nick)}”</span>` : '<span class="small muted">No nickname</span>'}</span></span>
-        <span class="row" style="gap:8px">${chip(lvLabel(r.level), 'ok')}</span></button>`).join('')}</div>
+        <dl class="facts">${[['Level', lvLabel(r.level)], ['Picture', r.photo ? 'A photo' : 'Initials'], ['Phone', r.phone ? maskPhone(r.phone) : ''], ['Playing since', r.since], ['Playing style', r.style], ['Links', r.links.join(', ')], ['Saved', r.saved], ['Played here', `${r.games} game${r.games === 1 ? '' : 's'} in ${r.sessions} session${r.sessions === 1 ? '' : 's'}`]].map(([k, v]) => `<dt>${k}</dt><dd>${v ? esc(v) : '<span class="muted">Not added</span>'}</dd>`).join('')}</dl></button>`).join('')}</div></div>
       <p class="small muted" style="margin:12px 0 0">Your player ID stays <span class="mono">${esc(u.rtr)}</span>. Every club's record with this email joins your account with its games, whichever you pick.</p>`,
     '<button class="btn" data-act="gCancel">Cancel</button>');
   },
@@ -3162,7 +3252,7 @@ const SHEETS = {
     const p = profileOf(S.me), R = S.ui.req;
     const cur = R.field === 'phone' ? p.phone : p.email;
     return sheetWrap('Request a contact change', `<div class="seg" role="group" aria-label="Detail to change">${['phone', 'email'].map((f) => `<button type="button" data-act="reqField" data-v="${f}" aria-pressed="${R.field === f}">${REQ_FIELD[f]}</button>`).join('')}</div>
-      <dl class="kv"><dt>Current</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(cur)}</dd></dl>
+      <dl class="kv"><dt>Current</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(R.field === 'phone' ? maskPhone(cur) : cur)}</dd></dl>
       <form data-form="request" novalidate class="stack">${field('req-to', `New ${REQ_FIELD[R.field].toLowerCase()}`, 'ui.req.to', R.to, S.ui.reqErr, { type: R.field === 'email' ? 'email' : 'tel', inputmode: R.field === 'email' ? 'email' : 'tel', ac: R.field === 'email' ? 'email' : 'tel', hint: R.field === 'phone' ? 'A Philippine mobile number, like 0917 555 0142.' : '' })}</form>
       ${notice('warn', `<b>Changes take effect only after Admin approval.</b> Until then you keep signing in with your current ${REQ_FIELD[R.field].toLowerCase()}. Your player ID and history don't change.`)}`,
     `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="submitRequest" ${S.ui.reqPending ? 'disabled' : ''}>${S.ui.reqPending ? 'Sending…' : 'Send request'}</button>`);
@@ -3190,7 +3280,8 @@ const SHEETS = {
       <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me ? `<span class="small">Signed in as <b>${esc(S.accounts[S.me].name)}</b></span><button class="btn xs" data-act="signOut">Sign out</button>` : '<span class="small muted">Not signed in</span><button class="btn xs" data-act="demoSignIn">Sign in as Migs</button>'}</div></div>
       <div class="demo-sec"><span class="label">Migs's rank</span>${seg('setRank', S.rank, [['eligible', 'On the leaderboard'], ['below', 'Below threshold'], ['reassess', 'Needs reassessment'], ['processing', 'Updating'], ['new', 'No rank yet']])}</div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Offline</b><p class="small muted">Shows saved copies; sign-in and saving fail.</p></div>${sw(!S.online, 'toggleOnline', 'Offline')}</div></div>
-      <div class="demo-sec"><span class="label">Leaderboard</span>${seg('setBoard', S.board, [['ok', 'Normal'], ['loading', 'Loading'], ['error', 'Can\'t load'], ['empty', 'No one qualifies']])}</div>
+      <div class="demo-sec"><span class="label">Leaderboard</span>${seg('setBoard', S.board, [['ok', 'Normal'], ['loading', 'Loading'], ['error', 'Can\'t load'], ['empty', 'No one qualifies']])}
+        <span class="label">My place on the leaderboard (signs in as Migs)</span>${seg('setLbMe', S.ui.lbMe || 'auto', [['auto', 'As played'], ['in', 'In the top 50'], ['out', 'Not in the top 50']])}</div>
       <div class="demo-sec"><span class="label">Admin settings</span><div class="fgrid">
         <label class="field" for="cfg-w"><span>Club assessment weight (%)</span><input class="input" id="cfg-w" type="number" min="0" max="100" step="5" value="${S.config.weight}" data-cfg="weight"></label>
         <label class="field" for="cfg-t"><span>Leaderboard match requirement</span><input class="input" id="cfg-t" type="number" min="1" max="40" value="${S.config.threshold}" data-cfg="threshold"></label></div>
@@ -3226,7 +3317,10 @@ function signIn(uid) {
 }
 const digits = (v) => String(v).replace(/\D/g, '');
 const normPhone = (v) => { const d = digits(v); if (/^09\d{9}$/.test(d)) return `63${d.slice(1)}`; if (/^639\d{9}$/.test(d)) return d; return null; };
-const fmtPhone = (n) => `+63 ${n.slice(2, 5)} ${n.slice(5, 8)} ${n.slice(8)}`;
+// Owner, November 16, 2026: a phone is kept the way the database holds it, E.164 with no spaces ('+639175550142').
+// Every phone typed is converted to that; every phone shown is grouped the same way and masked.
+const toE164 = (v) => { const n = normPhone(v || ''); return n ? `+${n}` : ''; };
+const maskPhone = (v) => { const d = digits(toE164(v)); return d ? `+${d.slice(0, 2)} ${d.slice(2, 5)} ••• ••${d.slice(-2)}` : v; };
 const validEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 function accountFor(email) {
   const v = email.trim().toLowerCase();
@@ -3291,7 +3385,7 @@ const ACT = {
     const link = `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/clubs/${el.dataset.club}`;
     try { navigator.clipboard.writeText(link).then(() => toast('Club page link copied'), () => toast(`Couldn't copy. The club page link is ${link}`)); } catch (e) { toast(`Couldn't copy. The club page link is ${link}`); }
   },
-  seeOnBoard: (el) => { const id = el.dataset.id, pos = positionOf(id) || 1; go('board'); S.q = ''; S.shown = Math.max(S.shown, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
+  seeOnBoard: (el) => { const id = el.dataset.id, pos = positionOf(id) || 1; S.ui.lbP = 'year'; go('board'); S.q = ''; S.shown = Math.max(S.shown, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
   openHistory: (el) => { S.ui.hist = 'counted'; S.ui.wpf = null; S.ui.histPage = 0; go('history', el.dataset.id); },
   openSessions: (el) => go('sessions', el.dataset.id),
   histTab: (el) => { S.ui.hist = el.dataset.v; S.ui.wpf = null; S.ui.histPage = 0; render(); },
@@ -3307,6 +3401,7 @@ const ACT = {
   openDemo: () => { S.ui.resetArmed = false; S.ui.sheet = { type: 'demo' }; render(); },
   closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; bannerDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
   showMore: () => { S.shown += 25; render(); },
+  lbPeriod: (el) => { S.ui.lbP = el.dataset.v; S.shown = 25; render(); },
   jumpMe: (el) => {
     S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
     const row = document.getElementById(`row-${S.me}`);
@@ -3430,10 +3525,10 @@ const ACT = {
     if (a.emailConfirmed === false) S.ui.reqErr = 'Confirm your email first.';
     else if (!v) S.ui.reqErr = `Enter the new ${REQ_FIELD[R.field].toLowerCase()}.`;
     else if (R.field === 'email' && !validEmail(v)) S.ui.reqErr = 'Enter an email address, like name@example.com.';
-    else if (R.field === 'phone') { const n = normPhone(v); if (!n) S.ui.reqErr = 'Enter a Philippine mobile number, like 0917 555 0142.'; else to = fmtPhone(n); }
+    else if (R.field === 'phone') { const n = normPhone(v); if (!n) S.ui.reqErr = 'Enter a Philippine mobile number, like 0917 555 0142.'; else to = `+${n}`; }
     if (!S.ui.reqErr) {
-      if (to.toLowerCase() === (R.field === 'phone' ? a.phone : a.email).toLowerCase()) S.ui.reqErr = `That's already your ${REQ_FIELD[R.field].toLowerCase()}.`;
-      else if (Object.values(S.accounts).some((o) => o.id !== a.id && (R.field === 'phone' ? o.phone === to : o.email && o.email.toLowerCase() === to.toLowerCase()))) S.ui.reqErr = `That ${REQ_FIELD[R.field].toLowerCase()} belongs to another ROTRA profile. Contact ROTRA for help.`;
+      if (to.toLowerCase() === (R.field === 'phone' ? toE164(a.phone) || a.phone : a.email).toLowerCase()) S.ui.reqErr = `That's already your ${REQ_FIELD[R.field].toLowerCase()}.`;
+      else if (Object.values(S.accounts).some((o) => o.id !== a.id && (R.field === 'phone' ? !!o.phone && toE164(o.phone) === to : o.email && o.email.toLowerCase() === to.toLowerCase()))) S.ui.reqErr = `That ${REQ_FIELD[R.field].toLowerCase()} belongs to another ROTRA profile. Contact ROTRA for help.`;
     }
     if (S.ui.reqErr) { render(); return; }
     S.ui.reqPending = true; render();
@@ -3453,6 +3548,7 @@ const ACT = {
   },
   setRank: (el) => { S.rank = el.dataset.v; render(); },
   setBoard: (el) => { S.board = el.dataset.v; render(); },
+  setLbMe: (el) => { S.ui.lbMe = el.dataset.v; if (el.dataset.v !== 'auto') { S.me = 'u1'; S.board = 'ok'; S.q = ''; S.ui.sheet = null; go('board'); } render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
   toggleFail: () => { S.failNext = !S.failNext; render(); },
   demoIdentity: () => { ACT.openRegister(null); googleDone('register', G_ACCOUNTS.find((y) => y.email === 'paolo.mendoza@example.com')); render(); },
@@ -3496,7 +3592,7 @@ const ACT = {
     S.ui.req = { field: 'email', to: a.google }; S.ui.reqErr = ''; S.ui.sheet = { type: 'request' }; render();
   },
   demoAdminStatus: (el) => { const a = S.accounts.u1; a.adminStatus = el.dataset.v === 'verified' ? 'verified' : null; S.ui.adminNoteGone = false; S.ui.adminNoteRead = false; S.ui.sheet = null; render(); toast(el.dataset.v === 'verified' ? 'Admin set Migs to Verified by Admin' : 'Admin set Migs back to automatic checks'); },
-  demoNoPhone: () => { const a = S.accounts.u1; a.phone = a.phone ? '' : '+63 917 555 0142'; S.ui.sheet = null; render(); toast(a.phone ? 'Migs has a phone again' : 'Migs has no phone on file'); },
+  demoNoPhone: () => { const a = S.accounts.u1; a.phone = a.phone ? '' : '+639175550142'; S.ui.sheet = null; render(); toast(a.phone ? 'Migs has a phone again' : 'Migs has no phone on file'); },
   annLater: () => { S.ui.annLater = true; render(); toast(`We'll remind you next time. Connect by ${G_DEADLINE}.`); },
   openNoGoogle: () => { S.ui.sheet = { type: 'noGoogle' }; render(); },
   nFilter: (el) => { S.ui.nFilter = el.dataset.v; render(); },
@@ -3607,7 +3703,7 @@ function finishClaim(C) {
   applyPersonal(a, C);
   if (S.ui.claimMethod === 'google' && S.ui.gClaim) { a.google = S.ui.gClaim.email; a.hasPassword = false; a.emailConfirmed = true; }
   a.email = C.email.trim(); a.claimed = true;
-  if (!a.phone) a.phone = fmtPhone(normPhone(C.phone));
+  if (!a.phone) a.phone = toE164(C.phone);
   S.claim = 'valid'; S.ui.claim = null; S.ui.claimConfirmed = false; S.me = 'u2';
   go('claimDone');
 }
@@ -3729,7 +3825,7 @@ const FORM = {
       const n = Object.keys(S.accounts).length + 1, id = `u${n + 1}`;
       const code = ctx.club ? CLUB_DIR[ctx.club].code : C.city, t = new Date();
       const date = `${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(2, '0')}${String(t.getFullYear()).slice(2)}`;
-      const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: true, claimed: true, photo: false, fresh: true,
+      const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: toE164(C.phone), email: C.email.trim(), phoneHidden: false, profilePrivate: true, claimed: true, photo: false, fresh: true,
         emailConfirmed: !!gr, google: gr ? gr.email : null, hasPassword: !gr, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
       // Claiming an unclaimed email: the RTR ID stays, the picked club's picture and level start the profile, every club's record
       // joins with its games, and the profile stays public as it was (privacy settings are theirs to change now).

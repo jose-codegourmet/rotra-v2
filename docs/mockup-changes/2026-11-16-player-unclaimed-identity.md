@@ -7,7 +7,7 @@ Mockup: apps/mockup/player-app/rotra-player.html › viewClaim, viewRegisterDone
 Route: /player/register (pick Paolo in the Google account picker), /player/claim/<token>, /player (leaderboard, #18 and #23)
 Screen ID: P-CLAIM, P-LEADERBOARD, P-PUBLIC-PROFILE (registration from a link has no screen ID)
 Artifact: https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN
-Components: profile-card, leaderboard-row, claim-form, chip, sheet
+Components: profile-card, leaderboard-row, claim-form, chip, sheet, share-image-picker (carousel)
 Supersedes: none
 Superseded by: none
 
@@ -30,11 +30,21 @@ Superseded by: none
 - **Leaderboard rule copy.** "Who appears here" gains one line about unclaimed players.
 - Ranking numbers and math are unchanged: two existing sample rows were marked, none added.
 
+- **Owner artifact comment, same day:** the identity cards sit in the share dialog's carousel, not a stacked list: one horizontal strip, drag or swipe, scroll-snapping, a fade mask on a side when more cards are hidden that way, and dots under the strip. A card is still picked with one tap; a drag never counts as a tap. Reuses `.sh-dlg .sh-tiles`, `.sh-pick`, `.sh-car-nav` and the SHCAR handlers.
+- **Owner artifact comments, same day (two more):** the card in view is always centred, also after a swipe, with the next card peeking in at the side (one card per swipe). Each card shows the club's logo and name on top, the club's picture, name and nickname for the person, then everything the club saved: Level, Picture, Phone (masked), Playing since, Playing style, Links, Saved (date) and Played here ("14 games in 6 sessions"). An empty value reads "Not added".
+
+- **Owner artifact comment, same day (profile page of an unclaimed player):** the profile card on the left now shows the complete information under the name: the level chip and the standing chip ("#18 overall", or "Not on the leaderboard yet"), an **About** block (Saved by CLUB; Standing "#18 of 1,284 overall", or "No overall position yet. 7 of 10 standard matches in the last three months"), and the **Latest stats** block of the profile dialog (win rate, games, wins, losses for the year). The Clubs card lists the club that saved them instead of "No clubs yet." (`heroFacts`, `clubsOf`).
+
 ## Why
 - Owner decision [D-2026-11-16-04](../mvp/decisions.md#d-2026-11-16-04), November 16, 2026. On claiming: "they get
   prompted to a dialog asking. which of the following identities are correct and is presented to them in a form of
   cards and they just pick which one". On being public: "thats the point of unclaimed. they get to be public. making
   sure that the real person must be eager enough to register so they can make it private".
+
+- Owner artifact comment, November 16, 2026 (on "Which identity is correct?"): "please use the layout style with embla carousel and both sides will be masked similar to sharing share posts".
+- Owner artifact comments, November 16, 2026: "the card should also show the logo and name of the club and put full information details"; "cards should always be centered even when they get swiped kinda like a tinder swipe card behavior".
+
+- Owner artifact comment, November 16, 2026 (on Jomar dela Cruz's profile card): "show complete information with standings if applicable and stats too".
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

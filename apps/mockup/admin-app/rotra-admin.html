@@ -717,7 +717,13 @@ function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h
 const plain = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 // Players who also appear in the Queue and Player prototypes keep their names, IDs and contacts.
-const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, phoneHidden: false, level, recent, registered: null, ...o, claimed: !!o.registered });
+// Owner, November 16, 2026: a phone is kept the way the database holds it, E.164 with no spaces ('+639175550142').
+// A phone typed in any accepted form is converted to that; a phone shown is grouped as +63 917 555 0142.
+const toE164 = (v) => { const d = String(v || '').replace(/\D/g, ''); return /^09\d{9}$/.test(d) ? `+63${d.slice(1)}` : /^639\d{9}$/.test(d) ? `+${d}` : ''; };
+const showPhone = (v) => { const d = toE164(v).slice(1); return d ? `+${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5, 8)} ${d.slice(8)}` : String(v || ''); };
+// A contact change is a phone or an email; only the phone is regrouped.
+const reqVal = (r, v) => (r.field === 'phone' ? showPhone(v) : v || '');
+const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone: toE164(phone) || phone, email, phoneHidden: false, level, recent, registered: null, ...o, claimed: !!o.registered });
 // D-2026-11-16-04: an unclaimed player has an email and an RTR ID. Older unclaimed records with a phone and no email are tagged Details required.
 const needsDetails = (p) => !p.claimed && !p.email;
 // One email is one person and one RTR ID. When more than one club saved an unclaimed player, each club keeps its own name for them.
@@ -767,7 +773,7 @@ function seedPlayers() {
   return out;
 }
 
-const R = (id, pid, field, from, to, at, status, o = {}) => ({ id, pid, field, from, to, at, status, source: 'app', ...o });
+const R = (id, pid, field, from, to, at, status, o = {}) => ({ id, pid, field, from: field === 'phone' ? toE164(from) || from : from, to: field === 'phone' ? toE164(to) || to : to, at, status, source: 'app', ...o });
 function seedRequests() {
   const now = Date.now();
   return [
@@ -876,6 +882,9 @@ const KEY = 'rotra-admin-prototype-v1';
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
 if (!S || S.v !== 1) S = freshState();
+// A save from before phones were kept as E.164: convert what is stored.
+(S.players || []).forEach((p) => { p.phone = toE164(p.phone) || p.phone; });
+(S.requests || []).forEach((r) => { if (r.field === 'phone') { r.from = toE164(r.from) || r.from; r.to = toE164(r.to) || r.to; } });
 // Saves from before per-club prices get the sample prices.
 // Saves from before the character library get the built-in characters.
 if (!Array.isArray(S.chars)) S.chars = seedChars();
@@ -1088,7 +1097,7 @@ function checks(r) {
   return [
     other ? { ok: false, html: `This ${f} is already linked to <button class="link acc" data-act="openPlayer" data-id="${other.id}">${esc(other.name)}</button> (<span class="mono">${esc(other.rtr)}</span>). Approving would put two players on one ${f}, and Admin never merges players.` } : { ok: true, html: `Not linked to any other player` },
     newer ? { ok: false, html: `A newer request for this ${f} was sent ${ago(newer.at)}. <button class="link acc" data-act="openReview" data-id="${newer.id}">Review that one instead</button>.` } : { ok: true, html: `No newer request for this ${f}` },
-    norm(cur) === norm(r.from) ? { ok: true, html: `Their current ${f} still matches the request` } : { ok: false, html: `Their ${f} has changed since this was sent. It's now <span class="mono">${esc(cur || 'not set')}</span>.` },
+    norm(cur) === norm(r.from) ? { ok: true, html: `Their current ${f} still matches the request` } : { ok: false, html: `Their ${f} has changed since this was sent. It's now <span class="mono">${esc(reqVal(r, cur) || 'not set')}</span>.` },
     busy ? { ok: false, html: 'Another contact change for this player is still being applied.' } : { ok: true, html: 'No other change is being applied for this player' },
   ];
 }
@@ -1538,7 +1547,7 @@ function playerManagementSheet(action,id) {
       <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}${needsDetails(p) ? chip('Details required', 'warn') : ''}</div></div></div>
       ${needsDetails(p) ? DETAILS_NOTE(p) : ''}
       ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
-      <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}<br><span class="small muted">${NO_BOARD}</span></dd>` : ''}</dl>
+      <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(showPhone(p.phone) || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}<br><span class="small muted">${NO_BOARD}</span></dd>` : ''}</dl>
       ${(() => { /* Owner, November 13, 2026: stats count the calendar year and reset on January 1. */ const yr = todayYmd().slice(0, 4), h = historyOf(p, 60).filter((x) => x.ymd.startsWith(yr)), games = h.reduce((n, x) => n + x.games, 0), wins = h.reduce((n, x) => n + x.won, 0);
         return ppStatsBlock(games, wins); })()}
       <section class="qv-sec"><h3>History</h3><div class="list">${historyOf(p, 2).map(histRow).join('')}</div></section>
@@ -1562,7 +1571,7 @@ function playerManagementSheet(action,id) {
         ${tog('private', 'Private profile', "Guests don't see this player's ROTRA profile. Signed-in players still do.", !!p.profilePrivate)}
         ${tog('phoneHidden', 'Hide phone number from clubs', 'Clubs find the player by RTR ID or QR code instead.', !!p.phoneHidden)}</div>
       <div class="pic-sec"><span class="label">Account</span>
-        <div class="fgrid">${ef('phone', 'Phone', p.phone || '', { type: 'tel', im: 'tel', mono: true, ph: '+63 9XX XXX XXXX' })}${ef('email', 'Email', p.email || '', { type: 'email', im: 'email', mono: true })}</div>
+        <div class="fgrid">${ef('phone', 'Phone', showPhone(p.phone), { type: 'tel', im: 'tel', mono: true, ph: '+63 9XX XXX XXXX' })}${ef('email', 'Email', p.email || '', { type: 'email', im: 'email', mono: true })}</div>
         <p class="hint">${p.claimed ? 'The player signs in with these. Changing them here applies straight away, without a contact-change request.' : needsDetails(p) ? "Details required: this older record has no email. The club must add one or delete the record. You can add it here." : "The club entered these and can't change the email. You can. The player hasn't registered yet."}</p>
         <div class="field"><label for="pe-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password *(for MVP or beta only)*</label>
           <div class="pass"><input class="input" id="pe-pass" type="password" autocomplete="new-password" ${p.claimed ? 'placeholder="Leave empty to keep the current password"' : 'disabled placeholder="Not registered yet"'}><button type="button" class="btn xs ghost" data-act="pePassShow" aria-pressed="false" aria-label="Show password" ${p.claimed ? '' : 'disabled'}>Show</button></div>
@@ -1623,12 +1632,12 @@ function viewPlayer() {
     </div></div>`,
     contact: `<div class="detail"><div>
       <section class="card stack"><div class="sec-head"><div><h2>Private contact</h2><p class="small muted">Only Admin sees these. Players can't change them themselves; they send a request.</p></div></div>
-        <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
+        <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(showPhone(p.phone) || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd>
         <dt>Sign in with</dt><dd>${p.claimed ? 'Email' : 'Nothing yet. The player hasn\'t registered.'}</dd>
         <dt>Phone shown to clubs</dt><dd>${p.claimed ? (p.phoneHidden ? 'No, hidden by the player' : 'Yes') : 'Entered by the club'}</dd></dl></section>
     </div><div>
       <section class="card stack"><h2>Contact-change requests</h2>
-        ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(r.to)}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`
+        ${reqs.length ? `<div class="list">${reqs.map((r) => `<div class="between" style="padding:10px 0;border-bottom:1px solid var(--border)"><div class="stack tight" style="min-width:0"><div class="row">${reqChip(r)}<span class="small muted">${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)} · sent ${ago(r.at)}</span></div><span class="mono small wrapw">${esc(r.from || '—')} → ${esc(reqVal(r, r.to))}</span></div><button class="btn sm" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></div>`).join('')}</div>`
           : '<p class="small muted">No requests.</p>'}</section>
     </div></div>`,
     history: `<section class="card stack" id="player-history"><h2>Game history</h2><div class="list">${historyOf(p, 16).map(histRow).join('')}</div><p class="small muted">Wins–losses in each session, newest first. Read-only: Admin can't change winners or scores.</p></section>`,
@@ -1652,7 +1661,7 @@ function viewContacts() {
     <section class="card">${list.length ? `<div class="tbl-wrap"><table class="tbl cards"><thead><tr><th>Player</th><th>Change</th><th>Sent</th><th>Status</th><th></th></tr></thead><tbody>
       ${list.map((r) => { const p = playerOf(r.pid), b = blocked(r); return `<tr class="click" data-act="openReview" data-id="${r.id}">
         <td class="lead" data-label="Player"><div class="who">${avatar(p)}<div class="main"><b class="wrapw">${esc(p.name)}</b><span class="mono small muted">${esc(p.rtr)}</span></div></div></td>
-        <td data-label="Change"><span class="stack tight" style="align-items:inherit"><span>${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)}</span><span class="mono small muted wrapw">→ ${esc(r.to)}</span></span></td>
+        <td data-label="Change"><span class="stack tight" style="align-items:inherit"><span>${FIELD[r.field][0].toUpperCase() + FIELD[r.field].slice(1)}</span><span class="mono small muted wrapw">→ ${esc(reqVal(r, r.to))}</span></span></td>
         <td data-label="Sent" class="nw small">${ago(r.at)}</td>
         <td data-label="Status"><span class="row" style="justify-content:inherit">${reqChip(r)}${b ? chip('Conflict', 'bad') : ''}</span></td>
         <td data-label="" class="n"><button class="btn xs" data-act="openReview" data-id="${r.id}">${nextAction(r)}</button></td></tr>`; }).join('')}
@@ -1667,10 +1676,10 @@ function viewReview() {
   const ch = r.status === 'submitted' ? checks(r) : null, isBlocked = ch && ch.some((c) => !c.ok);
   const status = {
     submitted: '',
-    applying: notice('warn', `<div class="row"><span class="spin" aria-hidden="true"></span><b>Approved${r.approvedAt ? ` ${ago(r.approvedAt)}` : ''}. Applying the change.</b></div><p>${esc(firstName(p))} keeps signing in with <span class="mono">${esc(r.from)}</span> until this finishes.</p>`),
-    applied: notice('ok', `<b>Applied${r.appliedAt ? ` ${ago(r.appliedAt)}` : ''}.</b> ${esc(firstName(p))} now signs in with <span class="mono">${esc(r.to)}</span>. RTR ID and match history are unchanged.`),
-    failed: notice('bad', `<b>Approved, but not applied.</b> ${esc(r.error || 'The change could not be applied.')} ${esc(firstName(p))} still signs in with <span class="mono">${esc(r.from)}</span>. Retrying applies this same approved change; it doesn't create anything new.`),
-    rejected: notice('', `<b>Not approved${r.decidedAt ? ` · ${ago(r.decidedAt)}` : ''}.</b> ${esc(firstName(p))} keeps <span class="mono">${esc(r.from)}</span>. They can send a new request.`),
+    applying: notice('warn', `<div class="row"><span class="spin" aria-hidden="true"></span><b>Approved${r.approvedAt ? ` ${ago(r.approvedAt)}` : ''}. Applying the change.</b></div><p>${esc(firstName(p))} keeps signing in with <span class="mono">${esc(reqVal(r, r.from))}</span> until this finishes.</p>`),
+    applied: notice('ok', `<b>Applied${r.appliedAt ? ` ${ago(r.appliedAt)}` : ''}.</b> ${esc(firstName(p))} now signs in with <span class="mono">${esc(reqVal(r, r.to))}</span>. RTR ID and match history are unchanged.`),
+    failed: notice('bad', `<b>Approved, but not applied.</b> ${esc(r.error || 'The change could not be applied.')} ${esc(firstName(p))} still signs in with <span class="mono">${esc(reqVal(r, r.from))}</span>. Retrying applies this same approved change; it doesn't create anything new.`),
+    rejected: notice('', `<b>Not approved${r.decidedAt ? ` · ${ago(r.decidedAt)}` : ''}.</b> ${esc(firstName(p))} keeps <span class="mono">${esc(reqVal(r, r.from))}</span>. They can send a new request.`),
   }[r.status];
   const actions = {
     submitted: `<button class="btn" data-act="go" data-to="contacts">Back without deciding</button><button class="btn danger" data-act="openDecline" data-id="${r.id}">Decline</button><button class="btn primary" data-act="openApprove" data-id="${r.id}" ${isBlocked ? 'disabled' : ''}>Approve</button>`,
@@ -1683,7 +1692,7 @@ function viewReview() {
     ${status}
     <div class="detail"><div>
       <section class="card stack"><h2>Requested change</h2>
-        <div class="change"><div><span class="label">Current</span><span class="mono">${esc(r.from || 'Not set')}</span></div>${I.arrow}<div class="to"><span class="label">Requested</span><span class="mono">${esc(r.to)}</span></div></div>
+        <div class="change"><div><span class="label">Current</span><span class="mono">${esc(reqVal(r, r.from) || 'Not set')}</span></div>${I.arrow}<div class="to"><span class="label">Requested</span><span class="mono">${esc(reqVal(r, r.to))}</span></div></div>
         <dl class="kv"><dt>Sent</dt><dd>${fmtAt(r.at)} · ${ago(r.at)}</dd><dt>Came from</dt><dd>${r.source === 'app' ? `${esc(firstName(p))}'s signed-in Player Information account` : `${esc(firstName(p))} contacted you; you entered it`}</dd></dl></section>
       ${ch ? `<section class="card stack"><h2>Checks before approving</h2><ul class="checks">${ch.map((c) => `<li class="${c.ok ? 'ok' : 'bad'}">${c.ok ? I.check : I.xs}<span>${c.html}</span></li>`).join('')}</ul>
         ${isBlocked ? `<p class="small muted">Approve stays off until every check passes. You can still decline.</p>` : ''}</section>
@@ -1691,7 +1700,7 @@ function viewReview() {
       ${actions ? `<div class="row end">${actions}</div>` : ''}
     </div><div>
       <section class="card stack"><div class="who">${avatar(p, '', true)}<div class="main"><button class="link" data-act="openPlayer" data-id="${p.id}">${esc(p.name)}</button><span class="mono small muted">${esc(p.rtr)}</span></div></div>
-        <dl class="kv"><dt>Account</dt><dd>${p.claimed ? 'Registered' : 'Unclaimed'}</dd><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd></dl>
+        <dl class="kv"><dt>Account</dt><dd>${p.claimed ? 'Registered' : 'Unclaimed'}</dd><dt>Phone</dt><dd class="mono">${esc(showPhone(p.phone) || 'Not given')}</dd><dt>Email</dt><dd class="mono">${esc(p.email || 'Not given')}</dd></dl>
         <p class="small muted">These are the contacts in use right now. An approved change shows here only once it's applied.</p></section>
       <section class="card stack"><h2>What approval changes</h2><ul class="bul"><li>Only the ${f} ${esc(firstName(p))} signs in with.</li><li>Not the RTR ID, match history, results or rank.</li><li>Never another player's profile.</li></ul></section>
     </div></div>`);
@@ -1955,14 +1964,14 @@ const SHEETS = {
   },
   approve: (sh) => {
     const r = reqOf(sh.id), p = playerOf(r.pid), f = FIELD[r.field];
-    return sheetWrap(`Approve ${f} change?`, `<dl class="kv"><dt>Player</dt><dd><b>${esc(p.name)}</b></dd><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>From</dt><dd class="mono">${esc(r.from)}</dd><dt>To</dt><dd class="mono">${esc(r.to)}</dd></dl>
+    return sheetWrap(`Approve ${f} change?`, `<dl class="kv"><dt>Player</dt><dd><b>${esc(p.name)}</b></dd><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>From</dt><dd class="mono">${esc(reqVal(r, r.from))}</dd><dt>To</dt><dd class="mono">${esc(reqVal(r, r.to))}</dd></dl>
       <p>After you approve, ROTRA applies the change to the account. ${esc(firstName(p))} signs in with the new ${f} once it shows as Applied.</p>
       <p class="small muted">The RTR ID and match history stay the same. This isn't a correction to any game result.</p>${errLine(sh.err)}`,
     `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="doApprove" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Approving…' : `Approve ${f} change`}</button>`, !sh.pending);
   },
   decline: (sh) => {
     const r = reqOf(sh.id), p = playerOf(r.pid), f = FIELD[r.field];
-    return sheetWrap('Decline this request?', `<p>${esc(p.name)} keeps <span class="mono">${esc(r.from)}</span> as their ${f}. They see the request as not approved and can send a new one.</p>
+    return sheetWrap('Decline this request?', `<p>${esc(p.name)} keeps <span class="mono">${esc(reqVal(r, r.from))}</span> as their ${f}. They see the request as not approved and can send a new one.</p>
       <p class="small muted">How players are told, and whether you can ask them for more details first, hasn't been decided.</p>${errLine(sh.err)}`,
     `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn danger" data-act="doDecline" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Declining…' : 'Decline request'}</button>`, !sh.pending);
   },
@@ -2031,7 +2040,7 @@ function runApply(id, ms = 1800) {
     } else {
       p[r.field] = r.to; r.status = 'applied'; r.appliedAt = Date.now(); r.error = '';
       log('req', r.id, `Applied ${FIELD[r.field]} change for ${p.name}.`);
-      toast(`Applied. ${firstName(p)} now signs in with ${r.to}.`);
+      toast(`Applied. ${firstName(p)} now signs in with ${reqVal(r, r.to)}.`);
     }
   });
 }
@@ -2497,6 +2506,7 @@ const ACT = {
     const p = playerOf(el.dataset.id);
     if (!p || !PIC || PIC.pid !== p.id) return;
     const d = { name: pv('name'), nick: pv('nick'), style: pv('style'), expY: pv('expY'), expM: pv('expM'), sinceM: pv('sinceM'), sinceY: pv('sinceY'), private: pv('private'), phoneHidden: pv('phoneHidden'), phone: pv('phone'), email: pv('email'), pass: (document.getElementById('pe-pass')?.value || ''), reason: pv('reason'), regDate: pv('regDate') };
+    d.phone = toE164(d.phone) || d.phone.trim(); // typed in any accepted form, kept as E.164
     d.rtr = rtrWith(p.rtr, pv('place'), d.regDate);
     const so = socialOf(p);
     SOCIAL_KEYS.forEach(([k]) => { d[k] = pv(k); });

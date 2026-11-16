@@ -117,6 +117,12 @@ Claiming is not permission to edit contact identity directly. Initial email comp
 
 `player_social_links`: player FK, provider (Facebook/Instagram/YouTube/LinkedIn), URL, timestamps; unique `(player_id, provider)`. Do not treat these URLs as proof of identity or auth subjects. Public visibility remains subject to the profile-field decision.
 
+**Google sign-in ([D-2026-11-16-01](../../../../mvp/decisions.md#d-2026-11-16-01), proposal).** The Google identity lives in Supabase Auth (`auth.identities`, provider `google`) on the same auth user as any password identity; `player_accounts` still maps one auth subject to one player. ROTRA keeps no Google tokens. Proposed columns on `player_accounts`: `google_email` (normalized, nullable, unique when set: one Google account per ROTRA account) and `google_linked_at`; `has_password` is read from the auth user. Supabase's automatic linking of a new Google identity to an existing user with the same verified email must not run before the player answers **Connect Google to your account?**; the callback creates or links only after that answer. A Google sign-in with no matching identity never creates a player outside the registration sources. The deadline is configuration (an Admin setting or an environment value; open), not a column per player.
+
+## Account verification ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02))
+
+Derived, not stored: verified = `google_email` is set **and** `player_private_contacts` has a phone **and** `google_email` equals the normalized account email. The Admin override is stored: `players.verification_override` enum (`verified`; `not_verified` if that is approved) nullable, with `verification_override_by` (admin account) and `verification_override_at`, and an Admin audit entry (reason column if a reason is required; open). Clearing the override returns to the derived status.
+
 ## Registration links
 
 `player_claim_links`: UUID PK; player FK; issuing club/account; unique opaque token digest; issued/expiry/consumed/revoked times; claim-state/version metadata. Store a digest rather than a reusable plaintext secret.

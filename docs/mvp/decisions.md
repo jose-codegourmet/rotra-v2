@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-16 (D-2026-11-16-01 to 03 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -52,6 +52,9 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -943,3 +946,59 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Before Start.** Not possible: only while the session is live (`active`). Remove from roster covers a prepared session.
   - **Storage.** A nullable `session_players.no_show_at` with a CHECK that an entry is never both released and a no show. The live roster everywhere is "not released and not a no show".
 - **References:** [Players module](../business_logic/product/queue/modules/players/README.md), [sessions-roster design](../database_design/product/queue/modules/sessions-roster.md), `packages/db/src/queue/session-roster.ts` (`markNoShow`, `undoNoShow`), `apps/queue/src/app/api/sessions/[sessionId]/roster/[rosterId]/no-show/route.ts`.
+
+### D-2026-11-16-01 — Google sign-in is mandatory for players
+- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:**
+  - **Google is the sign-in for every player.** New players register with **Continue with Google** only, from a club invite, a session invite or the Admin link; the email + password sign-up is removed. The Google email becomes the ROTRA email and is confirmed at once (no "Confirm your email" banner). The phone is still required at registration. A club-created profile (claim) connects Google instead of setting a password.
+  - **Existing password players keep their password as a way in** and connect Google. Until they do, a yellow **ROTRA announcement** band shows on every page. After the deadline, a password sign-in without Google stops at **Connect Google to continue** (P-GOOGLE-REQUIRED).
+  - **Linking.** Google already connected: sign in. Same email as a password account: ask once, **Connect Google to your account?** (never linked silently). A different email: not signed in; the player signs in with the password, then connects that Google account. A Google email already used by another ROTRA account is refused.
+  - **Connecting later.** Any Google account the player owns can be connected, even with a different email; the ROTRA email does not change by connecting. Google can be changed but not disconnected.
+  - **No Google account.** "I don't have a Google account" explains making a free Google account with the email they already use.
+  - **Invites.** Club and session invites open an invite card first (P-INVITE). A signed-in player on a session invite gets P-JOIN-SESSION, which hands over to the Queue session page to send the request. An existing player who picks Google on an invite goes through the same link step, then on to the join step.
+  - **Announcements are yellow** (`--ann-bg`, `--ann-border`, `--ann-tag`), distinct from the amber warnings.
+- **Open (placeholders in the mockup):**
+  - The deadline date (the mockup says December 31, 2026).
+  - Whether the password stops working after the deadline once Google is connected (the mockup keeps it as a backup until then).
+  - Whether Google sign-in on `/login` with no ROTRA account may ever create one (the mockup: no, invites only).
+  - Whether a signed-in player confirmed for a session at a club they aren't in joins that club's saved players.
+  - Supabase links identities with the same verified email automatically; the "ask first" step needs that turned off or handled in the callback (backend).
+- **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) (password recovery applies only to password accounts; Google accounts are told to use Google), [D-2026-11-09-06](#d-2026-11-09-06) (registration sources unchanged; the form becomes Google), identity rule "No Facebook/social login" (Google is now required; no other social login).
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [access and registration screens](../screens/product/modules/player-information/access-registration.md), [identity database design](../database_design/product/player-information/modules/identity.md#private-contacts-and-account-mapping), artifact https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN.
+
+### D-2026-11-16-02 — Player account verification with an Admin override
+- **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
+- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-account-verification.md)); the Admin control is not designed yet.
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - A player is **Verified** when all three hold: a Google account is connected, a phone number is on the account, and the ROTRA email equals the Google account's email.
+  - The status is derived from those facts, not typed in, except **Verified by Admin**: ROTRA Admin sets it on the player and the checks are skipped.
+  - A mismatched email is fixed either by a normal contact-change request to the Google email (Admin approval as today) or by connecting the Google account that uses the ROTRA email.
+  - The steps live on their own profile setting, **Verification** (`/profile/verification`, P-VERIFICATION), not in Privacy and contact. The own profile shows the status chip.
+  - The yellow announcement and the pinned notification ask unverified players to finish by the Google deadline.
+- **Open:**
+  - What an unverified player can't do (the mockup blocks nothing).
+  - Whether the phone must be confirmed (no SMS exists; "on file" means present).
+  - Whether other players and clubs see the badge (the mockup shows it only to the player).
+  - Whether Admin can also set **Not verified**, and whether a reason is required and kept in the audit log.
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#account-verification), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md#p-verification--account-verification), [identity database design](../database_design/product/player-information/modules/identity.md#account-verification-d-2026-11-16-02).
+
+### D-2026-11-16-03 — Player notifications page
+- **Decision status:** approved (owner, November 16, 2026); delivery and the event list are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-notifications.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:**
+  - The Player app gets a **Notifications** module: a bell with an unread count in the top bar (signed in only) and a page at `/notifications` with All / Unread, Mark all as read, New and Earlier.
+  - ROTRA announcements are pinned at the top until done and use the yellow announcement colours.
+  - The mockup's events are ones ROTRA already has: spot confirmed, waitlist place, session invite, results published, rank updated, added to a club's saved players, contact change approved, Admin verified the account.
+- **Open:**
+  - Delivery outside the app (push or email would need a backend decision and likely a new dependency).
+  - The final event list.
+  - How long notifications are kept (the mockup says 90 days).
+  - Who writes ROTRA announcements (likely a new Admin screen).
+- **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).

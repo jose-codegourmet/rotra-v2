@@ -10,8 +10,9 @@ This product stores player identity and shared rank across clubs. Profiles and t
 
 | Module | Owns |
 |---|---|
-| [Identity](modules/identity/README.md) | Profile creation/claim, login, contact privacy, player ID |
+| [Identity](modules/identity/README.md) | Profile creation/claim, Google sign-in, account verification, contact privacy, player ID |
 | [Ranking](modules/ranking/README.md) | Club assessments, performance, rank labels, rolling eligibility |
+| [Notifications](modules/notifications/README.md) | The player's notifications and ROTRA announcements (proposal, [D-2026-11-16-03](../../../mvp/decisions.md#d-2026-11-16-03)) |
 
 ## Scope
 

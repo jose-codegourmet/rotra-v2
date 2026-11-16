@@ -11,7 +11,7 @@
   --bg: #0b0b0c; --surface: #1a1a1d; --elev: #2a2a2e; --overlay: #3a3a3f;
   --fg: #f0f0f2; --fg2: #9090a0; --fg3: #5a5a66;
   --accent: #00ff88; --accent-dim: #00cc6a; --accent-subtle: rgba(0, 255, 136, 0.13); --on-accent: #0b0b0c;
-  --error: #ff4d4d; --error-subtle: rgba(255, 77, 77, 0.12); --warn: #ffb800; --warn-subtle: rgba(255, 184, 0, 0.12);
+  --error: #ff4d4d; --error-subtle: rgba(255, 77, 77, 0.12); --warn: #ffb800; --warn-subtle: rgba(255, 184, 0, 0.12); --ann-bg: #3a3000; --ann-border: #ffd400; --ann-tag: #ffd400;
   --border: #2a2a2e; --border-strong: #404048; --scrim: rgba(0, 0, 0, 0.6);
   --font: "Satoshi", "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
   --r: 10px; --r-sm: 6px;
@@ -24,7 +24,7 @@
   --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
   --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
   --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
-  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
@@ -35,7 +35,7 @@
   --bg: #f4f5f2; --surface: #ffffff; --elev: #eef0ec; --overlay: #dfe3dc;
   --fg: #121513; --fg2: #535a54; --fg3: #7a817b;
   --accent: #0a7d44; --accent-dim: #086a39; --accent-subtle: rgba(10, 125, 68, 0.09); --on-accent: #ffffff;
-  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09);
+  --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
@@ -245,6 +245,71 @@ textarea.input { min-height: 80px; resize: vertical; }
 /* Toast */
 .toasts { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; width: min(440px, calc(100vw - 32px)); pointer-events: none; }
 .toast { background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: var(--r); font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+
+/* Google sign-in design (November 16, 2026 proposal) */
+:root { --g-blue: #4285f4; --g-red: #ea4335; --g-yellow: #fbbc05; --g-green: #34a853; }
+.btn.google { background: var(--surface); border-color: var(--border-strong); color: var(--fg); gap: 10px; }
+.btn.google:hover:not(:disabled) { background: var(--elev); }
+.g-mark { width: 18px; height: 18px; flex: none; display: block; }
+.or { display: flex; align-items: center; gap: 12px; color: var(--fg3); font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+.or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.invite-card { padding: 0; overflow: hidden; }
+.invite-card .ic-top { padding: 20px; background: var(--accent-subtle); border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: center; min-width: 0; }
+.invite-card .ic-top h1 { font-size: 22px; overflow-wrap: anywhere; }
+.invite-card .ic-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.ic-when { display: flex; gap: 12px; align-items: center; }
+.gid { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--elev); min-width: 0; }
+.gid .main { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.gid .main span { overflow-wrap: anywhere; }
+.gpick { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.gpick button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 12px 14px; border: 0; border-top: 1px solid var(--border); background: none; color: inherit; text-align: left; cursor: pointer; min-height: 60px; font: inherit; }
+.gpick button:first-child { border-top: 0; }
+.gpick button:hover { background: var(--elev); }
+.gpick .main { display: flex; flex-direction: column; min-width: 0; }
+.gpick .main span { overflow-wrap: anywhere; }
+.method { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.method:first-of-type { border-top: 0; padding-top: 0; }
+.method .who2 { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.method .ico { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--elev); flex: none; color: var(--fg2); }
+.choose-card { display: flex; flex-direction: column; gap: 12px; }
+.login-foot { padding-top: 14px; border-top: 1px solid var(--border); }
+
+.band-ann { background: var(--ann-bg); border-bottom: 1px solid var(--ann-border); color: var(--fg); font-size: 13px; }
+.band-ann.hard { border-bottom-width: 2px; }
+.band-ann .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-start; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+.band-ann .in > div { min-width: 0; }
+.band-ann .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.band-ann .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--ann-tag); margin-right: 6px; }
+.nitem.ann { background: var(--ann-bg); }
+.nitem.ann .nic { background: var(--surface); color: var(--ann-tag); }
+.nitem.ann .dot { background: var(--ann-border); }
+.bell { position: relative; }
+.bell .cnt { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--error); color: var(--on-accent); font-size: 11px; font-weight: 700; display: grid; place-items: center; line-height: 1; border: 2px solid var(--bg); box-sizing: content-box; }
+.nlist { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.nitem { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 14px 16px; border: 0; border-top: 1px solid var(--border); background: none; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+.nitem:first-child { border-top: 0; }
+.nitem:hover { background: var(--elev); }
+.nitem.unread { background: var(--accent-subtle); }
+.nitem .nic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--elev); color: var(--fg2); flex: none; }
+.nitem.unread .nic { background: var(--surface); color: var(--accent-dim); }
+.nitem .nmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nitem .nmain b { overflow-wrap: anywhere; }
+.nitem .ntime { font-size: 12px; color: var(--fg3); white-space: nowrap; }
+.nitem .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 6px; }
+.ngroup { padding: 4px 0; }
+.nfilters { display: flex; gap: 6px; flex-wrap: wrap; }
+.req-steps { display: flex; flex-direction: column; gap: 10px; margin: 0; padding-left: 20px; }
+
+.vsteps { display: flex; flex-direction: column; gap: 0; }
+.vstep { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--border); }
+.vstep:first-child { border-top: 0; padding-top: 0; }
+.vstep .vic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; border: 2px solid var(--border-strong); color: var(--fg3); font-size: 13px; font-weight: 700; }
+.vstep.done .vic { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.vstep .vmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.vstep .vmain span { overflow-wrap: anywhere; }
+.vstep .row { margin-top: 4px; }
+.vbar { height: 6px; border-radius: 999px; background: var(--elev); overflow: hidden; }
+.vbar > i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
 
 /* Login */
 .login { min-height: calc(100dvh - 80px); display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
@@ -1136,7 +1201,39 @@ const CLUB_DIR = {
 const SESSION_DIR = {
   's-tonight': { title: 'Sunday Night Queue', club: 'c1' }, 's-thu-open': { title: 'Thursday Open Play', club: 'c1' },
   's-fri-smash': { title: 'Friday Night Smash', club: 'c2' },
+  's-sat-doubles': { title: 'Saturday Doubles Night', club: 'c3' },
 };
+// Google sign-in design (proposal, November 16, 2026). Fictional data for the invite and Google screens only.
+// Session invites carry a short invite code, one per player and session (D-2026-11-09-08). Invites only work before the session starts (D-2026-11-09-11).
+const INVITES = { k7m2: { by: 'u1', session: 's-thu-open' }, p4x9: { byName: 'Kat Lim', session: 's-sat-doubles' } };
+const INVITE_TIMES = { 's-sat-doubles': { day: 6, time: '2:00–5:00 PM' } };
+// Stand-ins for the accounts Google's own window would list.
+const G_ACCOUNTS = [
+  { email: 'ana.reyes@gmail.com', name: 'Ana Reyes', hint: 'New to ROTRA' },
+  { email: 'migs.santos@example.com', name: 'Miguel Santos', hint: 'Same email as Migs\'s ROTRA account' },
+  { email: 'migs.plays@gmail.com', name: 'Miguel Santos', hint: 'Migs\'s personal Gmail, not his ROTRA email' },
+  { email: 'jomar.delacruz@example.com', name: 'Jomar Dela Cruz', hint: 'Use for the club-created profile' },
+];
+// Owner, November 16, 2026: Google sign-in is mandatory. Existing password players are asked to connect Google before a deadline.
+// The date is a placeholder until it is decided.
+const G_DEADLINE = 'December 31, 2026';
+// Player notifications (proposal). In-app only in this prototype: no push or email.
+const NOTIF_KIND = { announce: ['mega', 'ROTRA'], session: ['court', 'Sessions'], invite: ['mail', 'Invites'], club: ['club', 'Clubs'], rank: ['trophy', 'Rank'], account: ['shield', 'Account'] };
+function seedNotifs() {
+  const m = 60000, h = 60 * m, d = 24 * h, now = Date.now();
+  return {
+    u1: [
+      { id: 'n1', kind: 'session', at: now - 25 * m, title: 'You\'re in Thursday Open Play', body: 'Lahug Smash Club confirmed your spot. Thu · 7:00–10:00 PM.', to: 'sessions', read: false },
+      { id: 'n2', kind: 'invite', at: now - 3 * h, title: 'Kat invited you to play', body: 'Saturday Doubles Night at Mandaue Shuttle Society.', to: 'invite', read: false },
+      { id: 'n3', kind: 'session', at: now - 20 * h, title: 'Results are up for Sunday Night Queue', body: 'You played 6 games. See how they counted.', to: 'history', read: false },
+      { id: 'n4', kind: 'session', at: now - 2 * d, title: 'You\'re on the waitlist for Friday Night Smash', body: 'You\'re number 2. We\'ll tell you if a spot opens.', to: 'sessions', read: true },
+      { id: 'n5', kind: 'rank', at: now - 4 * d, title: 'Your rank was updated', body: 'Your new games are in your rank. Tap to see what changed.', to: 'rank', read: true },
+      { id: 'n6', kind: 'club', at: now - 9 * d, title: 'IT Park Badminton Club added you', body: 'You\'re in the club\'s saved players. You can leave from the club page.', to: 'club:c2', read: true },
+      { id: 'n7', kind: 'account', at: now - 15 * d, title: 'Your email change was approved', body: 'ROTRA Admin approved the change. Sign in with your new email from now on.', to: 'account', read: true },
+    ],
+  };
+}
+const G_MARK = '<svg class="g-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="var(--g-red)" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="var(--g-blue)" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="var(--g-yellow)" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="var(--g-green)" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
 const MY_SESSIONS = [
   { slug: 's-tonight', day: 0, time: '6:00–9:00 PM', status: 'live' },
   { slug: 's-thu-open', day: 3, time: '7:00–10:00 PM', status: 'confirmed' },
@@ -1162,7 +1259,7 @@ function freshState() {
     rank: 'eligible', board: 'ok', shown: 25, q: '', boardAt: Date.now(),
     config: { weight: 70, threshold: 10 },
     accounts: seedAccounts(), requests: {},
-    claim: 'valid', resetLink: 'valid', failNext: false,
+    claim: 'valid', resetLink: 'valid', failNext: false, gDeadline: 'before', notifs: seedNotifs(),
     ui: freshUi(),
   };
 }
@@ -1171,7 +1268,7 @@ function freshUi() {
     login: { id: '', pass: '', show: false, err: '', pending: false, note: '' },
     forgot: { email: '', err: '', pending: false, sent: '' },
     reset: { a: '', b: '', show: false, err: '', pending: false },
-    claim: null, regCtx: { club: null, session: null }, regDone: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
+    claim: null, regCtx: { club: null, session: null, invite: null }, regStep: 'choose', gReg: null, gClaim: null, claimMethod: null, regErr: '', gPending: false, regDone: null, claimErr: {}, claimPending: false, claimChecks: 0, claimConfirmed: false, claimWrong: false,
     edit: null, editOrig: null, editErr: {}, editPending: false, editFail: '',
     req: null, reqErr: '', reqPending: false,
     privacyPending: false, privacyErr: '', profilePending: false, profileErr: '', dirPending: false, dirErr: '',
@@ -1187,7 +1284,8 @@ if (!S || S.v !== 2) S = freshState();
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false });
 ['login', 'forgot', 'reset'].forEach((k) => { S.ui[k].pending = false; });
 if (S.accounts?.u1 && !S.accounts.u1.clubs) { S.accounts.u1.clubs = seedClubs(); S.accounts.u1.emailConfirmed = true; }
-S.ui.regCtx = S.ui.regCtx || { club: null, session: null };
+S.ui.regCtx = S.ui.regCtx || { club: null, session: null, invite: null };
+S.ui.regStep = S.ui.regStep || 'choose'; S.ui.gPending = false; S.gDeadline = S.gDeadline || 'before'; S.notifs = S.notifs || seedNotifs();
 S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false; S.ui.profilePending = false; S.ui.dirPending = false;
 if (S.board === 'loading') S.board = 'ok';
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
@@ -1283,6 +1381,15 @@ const I = {
   share: svg('<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
   ext: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', 14),
+};
+const NI = {
+  bell: svg('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>', 18),
+  mega: svg('<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>', 18),
+  court: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 12h18M12 4v16"/>', 18),
+  mail: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>', 18),
+  club: svg('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>', 18),
+  trophy: svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>', 18),
+  shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 18),
 };
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
 const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
@@ -1454,7 +1561,7 @@ function eligibility(p, own, st) {
 // ---------- Top bar ----------
 function topBar() {
   const me = S.me && S.accounts[S.me];
-  const mine = me && ((['profile', 'rank', 'history', 'sessions'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account'].includes(S.screen));
+  const mine = me && ((['profile', 'rank', 'history', 'sessions'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account', 'verify'].includes(S.screen));
   return `<header class="top"><div class="top-in">
     <button class="brand" data-act="go" data-to="board" aria-label="ROTRA Players, open the leaderboard">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
     <nav class="nav" aria-label="Main">
@@ -1462,9 +1569,10 @@ function topBar() {
       ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
     </nav>
     <div class="grow"></div>
+    ${me ? (() => { const n = unreadCount(); return `<button class="btn xs ghost icon-btn bell" data-act="go" data-to="notifs" aria-label="Notifications${n ? `, ${n} unread` : ''}" ${S.screen === 'notifs' ? 'aria-current="page"' : ''}>${NI.bell}${n ? `<span class="cnt" aria-hidden="true">${n > 9 ? '9+' : n}</span>` : ''}</button>`; })() : ''}
     <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
     <button class="btn xs" data-act="openDemo">Prototype</button>
-  </div></header>${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+  </div></header>${gRequiredBand()}${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
 }
 
 // Shown at the top of every page while the signed-in account has not confirmed its email (D-2026-11-09-06).
@@ -1651,11 +1759,11 @@ function viewProfile() {
     <aside class="side stack">
       <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
-        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button><button class="btn sm" data-act="openShare" data-kind="profile" data-pid="${p.id}">${I.share} Share profile</button></div>`}
+        ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="go" data-to="verify">${NI.shield} Verification</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button><button class="btn sm" data-act="openShare" data-kind="profile" data-pid="${p.id}">${I.share} Share profile</button></div>`}
       </section>
       ${own ? privatePanel(p) : ''}${clubsPanel(p, own)}
     </aside>
@@ -1711,7 +1819,7 @@ function privatePanel(p) {
   return `<section class="card private stack"><div class="between"><h3>Your account</h3><span class="small muted">${I.lock} Only you see this</span></div>
     <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
     ${open ? `<p class="small">${chip(REQ[req.status].chip, REQ[req.status].k)} ${REQ_FIELD[req.field]} change</p>` : ''}
-    <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
+    <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm" data-act="go" data-to="verify">Verification</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
 }
 
 // My sessions: the player's upcoming and live sessions (requested, confirmed or waitlisted). Loads once when the profile opens; no live updates.
@@ -2196,9 +2304,16 @@ function viewAccount() {
       ${S.ui.privacyErr ? notice('bad', esc(S.ui.privacyErr)) : ''}
       <p class="small muted">Hiding your number applies from now on. It can't erase what a club has already seen, and a club device that's offline updates when it reconnects. It doesn't change how you sign in.</p>
     </section>
+    <section class="card stack"><h2>Sign-in methods</h2>
+      <div class="method"><div class="who2"><span class="ico">${G_MARK}</span><div class="stack tight" style="min-width:0"><b>Google</b><span class="small muted" style="overflow-wrap:anywhere">${p.google ? `Connected · ${esc(p.google)}${p.google.toLowerCase() !== p.email.toLowerCase() ? ' (different from your ROTRA email)' : ''}` : 'Not connected'}</span></div></div>
+        ${p.google ? `<span class="row">${chip('Required')}<button class="btn sm" data-act="google" data-ctx="connect">Change</button></span>` : `<button class="btn sm primary" data-act="google" data-ctx="connect">Connect Google</button>`}</div>
+      <div class="method"><div class="who2"><span class="ico">${I.lock}</span><div class="stack tight" style="min-width:0"><b>Email and password</b><span class="small muted" style="overflow-wrap:anywhere">${p.hasPassword === false ? 'Not used' : p.google ? `Backup only until ${G_DEADLINE}` : `Password set · ${esc(p.email)}`}</span></div></div></div>
+      <p class="small muted" style="margin:0">Google sign-in is required for every ROTRA player. Any Google account you own works, even with a different email. Your ROTRA email stays ${esc(p.email)}.</p>
+      <div class="between" style="padding-top:12px;border-top:1px solid var(--border)"><span class="small">Account verification is in its own page.</span><button class="btn sm" data-act="go" data-to="verify">${verifyChip(S.accounts[S.me])}</button></div>
+    </section>
     <section class="card stack"><h2>Contact details</h2>
       <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(p.phone)}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd></dl>
-      <p class="small muted">You sign in with either one. To change them, ask the ROTRA platform owner. Changes take effect only after Admin approval.</p>
+      <p class="small muted">You sign in with your email. To change them, ask the ROTRA platform owner. Changes take effect only after Admin approval.</p>
       ${requestCard(p)}
       <div class="row">${open ? '' : '<button class="btn sm" data-act="openRequest">Request a change</button>'}</div>
     </section>
@@ -2279,25 +2394,31 @@ function viewEdit() {
 
 // ---------- P-LOGIN / P-FORGOT / P-RESET ----------
 function viewLogin() {
-  const L = S.ui.login;
+  const L = S.ui.login, aft = S.ui.after, x = S.ui.regCtx || {};
+  const why = aft && aft.to === 'joinClub' && CLUB_DIR[x.club] ? `Sign in to join ${esc(CLUB_DIR[x.club].name)}.`
+    : aft && aft.to === 'joinSession' && SESSION_DIR[x.session] ? `Sign in to request a spot in ${esc(SESSION_DIR[x.session].title)}.` : '';
   return `<main class="login"><form class="card" data-form="login" novalidate>
     <div class="stack tight"><div class="mark">${rotraLogo('full', 'mark-logo')}</div><p class="muted">Your player profile.</p></div>
     <h1 style="font-size:22px">Sign in</h1>
+    ${why ? notice('', why) : ''}
     ${L.note ? notice('ok', esc(L.note)) : ''}
+    ${L.gMiss ? notice('warn', `<b>This Google account isn't connected to ROTRA.</b><p>No ROTRA account uses or is connected to ${esc(L.gMiss)}.</p><p><b>Already a ROTRA player?</b> Sign in below with your email and password, then connect this Google account. We'll ask you right after you sign in.</p><p><b>New to ROTRA?</b> Open your club's invite link or a session invite to create your account.</p>`) : ''}
+    <button type="button" class="btn google block" data-act="google" data-ctx="login" ${L.pending || S.ui.gPending ? 'disabled' : ''}>${G_MARK}${S.ui.gPending ? 'Waiting for Google…' : 'Continue with Google'}</button>
+    <div class="or">Signed up with a password?</div>
+    <p class="small muted" style="margin:0">Sign in with your email and password once, then connect Google. Google sign-in is required from ${G_DEADLINE}.</p>
     ${L.err ? notice('bad', esc(L.err)) : ''}
     ${field('login-id', 'Email', 'ui.login.id', L.id, '', { type: 'email', inputmode: 'email', ac: 'email', hint: 'The email you registered with. Prototype: try migs.santos@example.com' })}
-    <div class="field"><label for="login-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password</label>
+    <div class="field"><div class="between"><label for="login-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password</label><button type="button" class="btn xs ghost" data-act="go" data-to="forgot">Forgot password?</button></div>
       <div class="row nowrap"><input class="input" id="login-pass" type="${L.show ? 'text' : 'password'}" autocomplete="current-password" data-bind="ui.login.pass" value="${esc(L.pass)}" placeholder="Any password works in this prototype">
       <button type="button" class="btn sm" data-act="toggleShow" data-k="login" aria-pressed="${!!L.show}" aria-label="${L.show ? 'Hide password' : 'Show password'}">${L.show ? 'Hide' : 'Show'}</button></div></div>
     <button class="btn primary block" type="submit" ${L.pending ? 'disabled' : ''}>${L.pending ? 'Signing in…' : 'Sign in'}</button>
-    <button type="button" class="btn ghost block" data-act="go" data-to="forgot">Forgot password?</button>
-    <p class="small muted">New to ROTRA? New to ROTRA? Register from your club's invite link or a session link. You don't need an account to view profiles or the leaderboard.</p>
+    <p class="small muted login-foot">New to ROTRA? Create your account from your club's invite link or a session invite. You don't need an account to view profiles or the leaderboard.</p>
   </form></main>`;
 }
 function viewForgot() {
   const F = S.ui.forgot;
   if (F.sent) return `<main class="login"><div class="card"><h1 style="font-size:22px">Request received</h1>
-    ${notice('ok', `If an account uses <b>${esc(F.sent)}</b>, ROTRA Admin can review your request after verifying ownership.`)}
+    ${F.google ? notice('', `<b>${esc(F.sent)}</b> signs in with Google and has no password. Go back and choose <b>Continue with Google</b>.`) : notice('ok', `If an account uses <b>${esc(F.sent)}</b>, ROTRA Admin can review your request after verifying ownership.`)}
     <p class="small muted">Contact ROTRA support through your usual channel to verify ownership. An Admin will provide your reset link. No automatic email is sent.</p>
     <button class="btn ghost block" data-act="go" data-to="login">Back to sign in</button></div></main>`;
   return `<main class="login"><form class="card" data-form="forgot" novalidate>
@@ -2319,6 +2440,195 @@ function viewReset() {
       <button type="button" class="btn sm" data-act="toggleShow" data-k="reset" aria-pressed="${!!R.show}" aria-label="${R.show ? 'Hide passwords' : 'Show passwords'}">${R.show ? 'Hide' : 'Show'}</button></div></div>
     <label class="field" for="reset-b"><span>Confirm new password</span><input class="input" id="reset-b" type="${R.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.reset.b" value="${esc(R.b)}"></label>
     <button class="btn primary block" type="submit" ${R.pending ? 'disabled' : ''}>${R.pending ? 'Saving…' : 'Save password'}</button></form></main>`;
+}
+
+// ---------- Invite landing (Google sign-in design, proposal) ----------
+function sesWhen(slug) {
+  const m = MY_SESSIONS.find((y) => y.slug === slug) || INVITE_TIMES[slug];
+  return m ? { ago: -m.day, text: `${fmtDay(-m.day)} · ${m.time}` } : null;
+}
+function inviter() {
+  const inv = S.ui.regCtx.invite && INVITES[S.ui.regCtx.invite];
+  if (!inv) return null;
+  if (inv.by) { const p = profileOf(inv.by); return { name: p.name, short: p.nick || firstName(p), p }; }
+  return { name: inv.byName, short: inv.byName.split(' ')[0], p: { name: inv.byName } };
+}
+function inviteHero() {
+  const x = S.ui.regCtx, club = x.club && CLUB_DIR[x.club], ses = x.session && SESSION_DIR[x.session];
+  if (ses) {
+    const by = inviter(), w = sesWhen(x.session), d = w && dayOf(w.ago);
+    return `<section class="card invite-card" aria-label="Session invite">
+      <div class="ic-top">${avatar(by ? by.p : { name: club.name }, 'lg')}<div class="stack tight" style="min-width:0"><span class="label">Session invite</span>
+        <h1>${by ? `${esc(by.short)} invites you to play` : 'You\'re invited to play'}</h1></div></div>
+      <div class="ic-body">
+        <div class="ic-when">${d ? `<span class="dblk" aria-hidden="true"><b>${d.getDate()}</b><span>${d.toLocaleDateString([], { month: 'short' })}</span></span>` : ''}
+          <div class="stack tight" style="min-width:0"><b style="font-size:18px">${esc(ses.title)}</b><span class="muted">${esc(club.name)}</span>${w ? `<span class="small muted">${esc(w.text)}</span>` : ''}</div></div>
+        <div class="row">${chip('Join requests open', 'ok')}${by ? chip(`Invited by ${esc(by.name)}`) : ''}</div>
+        <p class="small muted" style="margin:0">The Queue Master confirms who plays. Signing up doesn't reserve a spot.</p></div></section>`;
+  }
+  if (club) {
+    const city = (PLACES.find(([c]) => c === club.code) || [0, club.code])[1], n = clubMembers(x.club).length;
+    return `<section class="card invite-card" aria-label="Club invite">
+      <div class="ic-top">${avatar({ name: club.name }, 'xl')}<div class="stack tight" style="min-width:0"><span class="label">Club invite</span><h1>Join ${esc(club.name)}</h1>
+        <div class="row">${chip(esc(city))}${chip(`${num(n)} member${n === 1 ? '' : 's'}`)}</div></div></div>
+      <div class="ic-body"><p class="muted" style="margin:0">You're added to ${esc(club.name)}'s saved players. The club can put you in its sessions and record your games. You can leave any time from the club page.</p></div></section>`;
+  }
+  return `<section class="card invite-card" aria-label="ROTRA registration">
+    <div class="ic-top"><div class="stack tight"><span class="label">ROTRA registration</span><h1>Create your ROTRA account</h1></div></div>
+    <div class="ic-body"><p class="muted" style="margin:0">Your player profile, player ID and game history in one place.</p></div></section>`;
+}
+function viewInvite() {
+  return `<main class="wrap slim stack" style="gap:16px">${inviteHero()}
+    <section class="card choose-card"><h2>New to ROTRA?</h2>
+      ${S.ui.regErr ? notice('bad', esc(S.ui.regErr)) : ''}
+      <button class="btn google block" data-act="google" data-ctx="register" ${S.ui.gPending ? 'disabled' : ''}>${G_MARK}${S.ui.gPending ? 'Waiting for Google…' : 'Continue with Google'}</button>
+      <button class="btn ghost block" data-act="openNoGoogle">I don't have a Google account</button>
+      <p class="small muted" style="margin:0">ROTRA accounts sign in with Google. You don't need a password, and you add your mobile number next.</p>
+      <div class="or">Already on ROTRA?</div>
+      <button class="btn ghost block" data-act="inviteLogin">Sign in to ${S.ui.regCtx.session ? 'continue' : S.ui.regCtx.club ? 'join' : 'your account'}</button>
+    </section></main>`;
+}
+const gChip = (g) => `<div class="gid">${G_MARK}<div class="main"><b>${esc(g.name)}</b><span class="small muted">${esc(g.email)}</span></div>${chip(`${I.check} Email confirmed`, 'ok')}</div>`;
+// A signed-in player who opens a session invite (/register/[clubId]?session=<slug>&invite=<code>).
+function viewJoinSession() {
+  const x = S.ui.regCtx, ses = SESSION_DIR[x.session], a = S.accounts[S.me];
+  if (!ses || !a) return viewNotFound();
+  const by = inviter(), own = by && by.p && by.p.id === a.id;
+  const mine = MY_SESSIONS.find((m) => m.slug === x.session);
+  return `<main class="wrap slim stack" style="gap:16px">${inviteHero()}
+    <section class="card stack">
+      <div class="row nowrap" style="gap:12px">${avatar(profileOf(a.id), 'md')}<div class="stack tight" style="min-width:0"><span class="small muted">Signed in as</span><b>${esc(a.name)}</b></div></div>
+      ${own ? notice('', 'This is your own invite. Share it with the person you want to bring.')
+        : mine ? notice('ok', mine.status === 'waitlist' ? `You're already on the waitlist for ${esc(ses.title)}.` : `You're already in ${esc(ses.title)}.`)
+        : `<p class="muted" style="margin:0">Your request to join is ready to send on the session page. ${by ? `The Queue Master sees that ${esc(by.short)} invited you.` : ''}</p>`}
+      <div class="row">${own || mine ? '' : `<button class="btn primary" data-act="toSession" data-slug="${esc(x.session)}">Continue to request to join</button>`}<button class="btn${own || mine ? ' primary' : ''}" data-act="openProfile" data-id="${a.id}">${own || mine ? 'Go to my profile' : 'Not now'}</button></div>
+    </section></main>`;
+}
+
+// A player who signed up with email and password picks a Google account with the same email (P-GOOGLE-LINK).
+function viewGoogleLink() {
+  const L = S.ui.gLink, a = L && S.accounts[L.id];
+  if (!a) return viewLogin();
+  const p = profileOf(a.id);
+  return `<main class="login"><div class="card">
+    <div class="stack tight"><div class="mark">${rotraLogo('full', 'mark-logo')}</div></div>
+    <h1 style="font-size:22px">Connect Google to your account?</h1>
+    <p class="muted" style="margin:0">You already have a ROTRA account with this email. You signed up with a password.</p>
+    <div class="gid">${avatar(p, 'lg')}<div class="main"><b>${esc(p.name)}</b><span class="small muted mono">${esc(p.rtr)}</span></div></div>
+    <div class="gid">${G_MARK}<div class="main"><b>${esc(L.name)}</b><span class="small muted">${esc(L.email)}</span></div>${chip(`${I.check} Same email`, 'ok')}</div>
+    <p class="small muted" style="margin:0">After this you can sign in with Google or with your password. Nothing else on your account changes. You can disconnect Google in Privacy and contact.</p>
+    <button class="btn primary block" data-act="gLinkYes">Connect Google and sign in</button>
+    <button class="btn block" data-act="gLinkNo">Use my password instead</button>
+  </div></main>`;
+}
+// Mandatory Google: every signed-in player without Google sees this announcement at the top of every page.
+// Before the deadline it can be put off for this visit; after it, a password sign-in stops at P-GOOGLE-REQUIRED.
+const needsGoogle = () => { const a = S.me && S.accounts[S.me]; return !!a && !a.google; };
+function gRequiredBand() {
+  const a = S.me && S.accounts[S.me];
+  if (!a || verifyOf(a).ok || S.screen === 'gRequired' || S.ui.annLater) return '';
+  const v = verifyOf(a), n = S.ui.gNudge || {}, passed = S.gDeadline === 'passed';
+  const next = !a.google ? (n.email ? `<button class="btn xs primary" data-act="gNudgeConnect" data-email="${esc(n.email)}">Connect ${esc(n.email)}</button><button class="btn xs" data-act="google" data-ctx="connect">Use another Google account</button>` : '<button class="btn xs primary" data-act="google" data-ctx="connect">Connect Google</button>')
+    : '<button class="btn xs primary" data-act="goVerify">Finish verification</button>';
+  return `<div class="band-ann${passed ? ' hard' : ''}" role="region" aria-label="Announcement from ROTRA"><div class="in">${G_MARK}<div>
+    <span><span class="tag">ROTRA announcement</span><b>Verify your ROTRA account by ${G_DEADLINE}.</b> Connect Google, have your phone on file, and use your Google email as your ROTRA email. <b>${v.n} of 3 done.</b> Your profile, games and rank stay the same.</span>
+    <div class="btns">${next}${!a.google ? '<button class="btn xs ghost" data-act="openNoGoogle">I don\'t have a Google account</button>' : '<button class="btn xs ghost" data-act="goVerify">See what\'s left</button>'}${passed ? '' : '<button class="btn xs ghost" data-act="annLater">Remind me later</button>'}</div></div></div></div>`;
+}
+// After the deadline, a player without Google can still sign in with the password once, but has to connect Google to go on.
+function viewGoogleRequired() {
+  const a = S.accounts[S.me], n = S.ui.gNudge || {};
+  return `<main class="login"><div class="card">
+    <div class="stack tight"><div class="mark">${rotraLogo('full', 'mark-logo')}</div></div>
+    <h1 style="font-size:22px">Connect Google to continue</h1>
+    <p class="muted" style="margin:0">Since ${G_DEADLINE}, every ROTRA player signs in with Google. Connect yours once and you're done. Your profile, games and rank stay the same.</p>
+    <div class="gid">${avatar(profileOf(a.id), 'lg')}<div class="main"><b>${esc(a.name)}</b><span class="small muted">${esc(a.email)}</span></div></div>
+    ${n.email ? `<button class="btn primary block" data-act="gNudgeConnect" data-email="${esc(n.email)}">${G_MARK}Connect ${esc(n.email)}</button>` : ''}
+    <button class="btn google block" data-act="google" data-ctx="connect">${G_MARK}${n.email ? 'Use another Google account' : 'Connect Google'}</button>
+    <button class="btn ghost block" data-act="openNoGoogle">I don't have a Google account</button>
+    <button class="btn ghost block" data-act="signOut">Sign out</button>
+  </div></main>`;
+}
+
+// ---------- Account verification (proposal, owner November 16, 2026) ----------
+// A player is verified when all three are true: a Google account is connected, a phone number is on the account,
+// and the ROTRA email is the Google account's email. ROTRA Admin can set the status by hand (Verified by Admin), which skips the checks.
+function verifyOf(a) {
+  const steps = [
+    { k: 'google', done: !!a.google },
+    { k: 'phone', done: !!a.phone },
+    { k: 'email', done: !!a.google && !!a.email && a.google.toLowerCase() === a.email.toLowerCase() },
+  ];
+  const n = steps.filter((x) => x.done).length;
+  const admin = a.adminStatus === 'verified';
+  return { steps, n, admin, ok: admin || n === 3 };
+}
+const verifyChip = (a) => { const v = verifyOf(a); return v.admin ? chip(`${I.check} Verified by Admin`, 'ok') : v.ok ? chip(`${I.check} Verified`, 'ok') : chip(`Not verified · ${v.n} of 3`, 'warn'); };
+function verifyCard(a) {
+  const v = verifyOf(a), r = S.requests[a.id];
+  const pendingEmail = r && r.field === 'email' && ['submitted', 'applying'].includes(r.status) && a.google && r.to.toLowerCase() === a.google.toLowerCase();
+  const step = (x, i) => {
+    const t = {
+      google: ['Connect your Google account', x.done ? `Connected · ${esc(a.google)}` : 'You sign in with it from now on.',
+        x.done ? '' : '<button class="btn sm primary" data-act="google" data-ctx="connect">Connect Google</button>'],
+      phone: ['Add your mobile number', x.done ? `On your account · ${esc(maskPhone(a.phone))}` : 'Clubs use it to find you. Hide it from clubs any time.',
+        x.done ? '' : '<button class="btn sm" data-act="openRequestPhone">Add phone number</button>'],
+      email: ['Use your Google email as your ROTRA email', x.done ? `Both are ${esc(a.email)}` : !a.google ? 'Connect Google first.'
+        : `Your ROTRA email is ${esc(a.email)}, but your Google account is ${esc(a.google)}.`,
+        x.done || !a.google ? '' : pendingEmail ? chip('Change sent for Admin review', 'warn')
+          : `<button class="btn sm" data-act="reqGoogleEmail">Change my ROTRA email to ${esc(a.google)}</button><button class="btn sm ghost" data-act="google" data-ctx="connect">Connect the Google account for ${esc(a.email)}</button>`],
+    }[x.k];
+    return `<div class="vstep${x.done ? ' done' : ''}"><span class="vic">${x.done ? I.check : i + 1}</span><div class="vmain"><b>${t[0]}</b><span class="small muted">${t[1]}</span>${t[2] ? `<div class="row">${t[2]}</div>` : ''}</div></div>`;
+  };
+  return `<section class="card stack" id="verify"><div class="between"><h2>Your status</h2>${verifyChip(a)}</div>
+    ${v.admin ? notice('ok', 'ROTRA Admin verified your account. You don\'t need to do anything else.')
+      : v.ok ? '<p class="small muted" style="margin:0">Your account is verified: Google is connected, your phone is on file and your email matches Google.</p>'
+      : `<p class="small muted" style="margin:0">Finish these by <b>${G_DEADLINE}</b>. ${v.n} of 3 done.</p><div class="vbar" aria-hidden="true"><i style="width:${Math.round(v.n / 3 * 100)}%"></i></div>`}
+    ${v.admin ? '' : `<div class="vsteps">${v.steps.map(step).join('')}</div>`}
+    <p class="small muted" style="margin:0">Can't finish a step? Contact ROTRA. Admin can verify your account by hand.</p></section>`;
+}
+// P-VERIFICATION: its own settings page in the profile (owner, November 16, 2026), apart from Privacy and contact.
+function viewVerify() {
+  if (!S.me) return viewLogin();
+  const a = S.accounts[S.me];
+  return `<main class="wrap slim stack" style="gap:16px">
+    <div class="page-head">${backBtn('openProfile', 'My profile', a.id)}<h1>Verification</h1>
+      <p class="muted">Show that this ROTRA account is really yours. Only you and ROTRA Admin see these details.</p></div>
+    ${verifyCard(a)}
+    <section class="card stack"><h2>Why verify?</h2>
+      <p class="small muted" style="margin:0">Verification ties your account to a Google account, a mobile number and an email you control, so no one else can take over your profile, games or rank. What changes for players who aren't verified is still being decided.</p></section>
+  </main>`;
+}
+const needsVerify = () => { const a = S.me && S.accounts[S.me]; return !!a && !verifyOf(a).ok; };
+
+// ---------- P-NOTIFICATIONS (proposal) ----------
+const myNotifs = () => (S.me && S.notifs[S.me]) || [];
+function allNotifs() {
+  const list = [...myNotifs()];
+  if (needsVerify()) list.unshift({ id: 'ann-google', kind: 'announce', at: Date.now() - 60000, pinned: true, title: 'Verify your ROTRA account', body: `Connect Google, have your phone on file and use your Google email, by ${G_DEADLINE}. ${verifyOf(S.accounts[S.me]).n} of 3 done.`, to: 'account', read: !!S.ui.annRead });
+  const a = S.me && S.accounts[S.me];
+  if (a && a.adminStatus === 'verified' && !S.ui.adminNoteGone) list.unshift({ id: 'ann-admin', kind: 'account', at: Date.now() - 120000, title: 'ROTRA Admin verified your account', body: 'You don\'t need to finish the verification steps.', to: 'account', read: !!S.ui.adminNoteRead });
+  return list;
+}
+const unreadCount = () => allNotifs().filter((x) => !x.read).length;
+const agoText = (t) => { const m = Math.round((Date.now() - t) / 60000); if (m < 1) return 'Just now'; if (m < 60) return `${m} min ago`; const h = Math.round(m / 60); if (h < 24) return `${h} h ago`; const d = Math.round(h / 24); return d === 1 ? 'Yesterday' : `${d} days ago`; };
+function viewNotifs() {
+  if (!S.me) return viewLogin();
+  const f = S.ui.nFilter || 'all', all = allNotifs();
+  const list = f === 'unread' ? all.filter((x) => !x.read) : all;
+  const today = list.filter((x) => x.pinned || Date.now() - x.at < 864e5), earlier = list.filter((x) => !x.pinned && Date.now() - x.at >= 864e5);
+  const item = (x) => `<button type="button" class="nitem${x.kind === 'announce' ? ' ann' : x.read ? '' : ' unread'}" data-act="openNotif" data-id="${x.id}">
+    <span class="nic">${NI[NOTIF_KIND[x.kind][0]]}</span>
+    <span class="nmain"><span class="small muted">${NOTIF_KIND[x.kind][1]}${x.pinned ? ' · Pinned' : ''}</span><b>${esc(x.title)}</b><span class="small muted">${esc(x.body)}</span></span>
+    <span class="stack tight" style="align-items:flex-end"><span class="ntime">${x.pinned ? 'Until done' : agoText(x.at)}</span>${x.read ? '' : '<span class="dot" aria-label="Unread"></span>'}</span></button>`;
+  const group = (label, xs) => xs.length ? `<div class="stack tight"><span class="label">${label}</span><section class="card nlist">${xs.map(item).join('')}</section></div>` : '';
+  const n = all.filter((x) => !x.read).length;
+  return `<main class="wrap slim stack" style="gap:16px">
+    <div class="page-head"><h1>Notifications</h1><p class="muted">${n ? `${n} unread` : 'You\'re all caught up.'}</p></div>
+    <div class="between"><div class="seg nfilters" role="group" aria-label="Show">${[['all', 'All'], ['unread', 'Unread']].map(([k, l]) => `<button type="button" data-act="nFilter" data-v="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>
+      <button class="btn xs ghost" data-act="nReadAll" ${n ? '' : 'disabled'}>Mark all as read</button></div>
+    ${list.length ? `${group('New', today)}${group('Earlier', earlier)}` : `<section class="card stack" style="align-items:center;text-align:center;padding:32px 16px"><span class="nic" style="width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--elev);color:var(--fg2)">${NI.bell}</span><b>${f === 'unread' ? 'No unread notifications' : 'No notifications yet'}</b><p class="small muted" style="margin:0">Session updates, invites, club changes and messages from ROTRA show up here.</p></section>`}
+    <p class="small muted">Notifications stay for 90 days. Prototype: in the app only, no phone or email alerts yet.</p>
+  </main>`;
 }
 
 // ---------- P-CLAIM / P-CLAIM-STATUS ----------
@@ -2344,28 +2654,40 @@ function viewClaim(standalone = false) {
   const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false, city: '' });
   const adminLink = standalone && !S.ui.regCtx.club;
   const e = S.ui.claimErr;
+  if (standalone && S.ui.regStep === 'choose') return viewInvite();
+  const gMode = standalone ? S.ui.regStep === 'google' && S.ui.gReg : S.ui.claimMethod === 'google' && S.ui.gClaim;
+  const gId = standalone ? S.ui.gReg : S.ui.gClaim;
   if (!standalone && !S.ui.claimConfirmed) {
     return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
       <section class="card stack"><div class="row" style="gap:14px">${avatar(a, 'xl')}<div class="stack tight"><h2>${esc(a.name)}</h2>${a.nick ? `<p class="muted">“${esc(a.nick)}”</p>` : ''}</div></div>
         <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
         <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
   }
+  if (!standalone && !S.ui.claimMethod) {
+    return wrap(`<h1>Connect your Google account</h1><p class="muted">ROTRA players sign in with Google. Connect yours to finish registering.</p>
+      <section class="card choose-card">${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
+        <button class="btn google block" data-act="google" data-ctx="claim" ${S.ui.gPending ? 'disabled' : ''}>${G_MARK}${S.ui.gPending ? 'Waiting for Google…' : 'Continue with Google'}</button>
+        <button class="btn ghost block" data-act="openNoGoogle">I don't have a Google account</button>
+        <p class="small muted" style="margin:0">Your Google email becomes your ROTRA email and is already confirmed.</p></section>`);
+  }
   return `<main class="wrap slim"><div class="page-head"><span class="label">${standalone ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Finish registering</h1>
-    <p class="muted">${standalone ? 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.' : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p></div>
+    <p class="muted">${standalone ? (gMode ? 'Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.' : 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.') : gMode ? "Your club filled in what it knows. Check it and change anything that's wrong." : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p>
+    <div class="row">${standalone ? '<button type="button" class="btn xs ghost" data-act="regBack">← Other ways to sign up</button>' : '<button type="button" class="btn xs ghost" data-act="claimMethodBack">← Use another Google account</button>'}</div></div>
     <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
       ${standalone && S.ui.registerMatch ? notice('warn', `A ROTRA account or profile already uses this phone number or email. Is it yours?<div class="row"><button type="button" class="btn primary" data-act="go" data-to="login">Yes, sign in</button><button type="button" class="btn" data-act="go" data-to="forgot">Recover account</button><button type="button" class="btn" data-act="registerNo">No, edit my details</button></div><p>If you have not registered yet, ask your club for your profile's registration link. Otherwise contact ROTRA for help.</p>`) : ''}
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
       <div class="stack tight"><span class="label">Contact · private</span>
+        ${gMode ? `<div class="field"><span>Signs in with</span>${gChip(gId)}<span class="hint">This becomes your ROTRA email. Never shown publicly.</span></div>` : ''}
         ${a.phone ? `<div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>`
-          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.' })}
-        ${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
+          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: standalone ? 'Your mobile number. It identifies your ROTRA profile and is never shown publicly.' : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.' })}
+        ${gMode ? '' : `${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
         <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span style="color:var(--error)" aria-hidden="true">*</span></label>
           <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
           <button type="button" class="btn sm" data-act="toggleShow" data-k="claim" aria-pressed="${!!C.show}" aria-label="${C.show ? 'Hide passwords' : 'Show passwords'}">${C.show ? 'Hide' : 'Show'}</button></div>${e.pass ? `<span class="err">${esc(e.pass)}</span>` : ''}</div>
-        <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label></div>
+        <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label>`}</div>
       ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span style="color:var(--error)" aria-hidden="true">*</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
       <div class="stack" style="padding-top:12px;border-top:1px solid var(--border)"><span class="label">About you</span>${personalFields('ui.claim', C, e, 'cl')}</div>
-      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? 'Completing…' : 'Complete registration'}</button></div>
+      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : standalone ? 'Create account' : 'Complete registration'}</button></div>
     </form></main>`;
 }
 function regLabel() {
@@ -2381,22 +2703,25 @@ function viewRegisterDone() {
     ${club ? notice('ok', `You're now in ${esc(club.name)}'s saved players.`) : notice('ok', 'Your ROTRA account is ready.')}
     ${ses ? notice('', `Your request to join ${esc(ses.title)} is ready to send.`) : ''}
     <section class="card stack tight"><p>Your player ID is <span class="mono">${esc(a.rtr)}</span>.</p>
-      <div class="row">${ses ? `<a class="btn primary" href="/queue/s/${encodeURIComponent(d.session)}">Back to the session</a>` : ''}<button class="btn${ses ? '' : ' primary'}" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></section></main>`;
+      ${a.google ? `<p class="small muted">You sign in with Google (${esc(a.google)}).</p>` : ''}${verifyOf(a).ok ? `<div class="row">${verifyChip(a)}<span class="small muted">Google, phone and email are all set.</span></div>` : ''}
+      <div class="row">${ses ? `<button class="btn primary" data-act="toSession" data-slug="${esc(d.session)}">Back to the session</button>` : ''}<button class="btn${ses ? '' : ' primary'}" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></section></main>`;
 }
 // A signed-in player who opens a club invite link (/register/[clubId]).
 function viewJoinClub() {
   const club = CLUB_DIR[S.ui.regCtx.club], a = S.accounts[S.me];
   if (!club || !a) return viewNotFound();
-  if ((a.clubs || []).some((c) => c.id === S.ui.regCtx.club)) return `<main class="wrap slim"><div class="page-head"><h1>${esc(club.name)}</h1></div>
-    ${notice('', `You're already in ${esc(club.name)}.`)}<div class="row"><button class="btn primary" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></main>`;
-  return `<main class="wrap slim"><div class="page-head"><h1>Join ${esc(club.name)}?</h1>
-    <p class="muted">You're added to ${esc(club.name)}'s saved players. The club can put you in its sessions and record your games. You can leave any time from your profile.</p></div>
-    <div class="row"><button class="btn primary" data-act="joinClub">Join ${esc(club.name)}</button><button class="btn" data-act="openProfile" data-id="${a.id}">Not now</button></div></main>`;
+  const already = (a.clubs || []).some((c) => c.id === S.ui.regCtx.club);
+  return `<main class="wrap slim stack" style="gap:16px">${inviteHero()}
+    <section class="card stack">
+      <div class="row nowrap" style="gap:12px">${avatar(profileOf(a.id), 'md')}<div class="stack tight" style="min-width:0"><span class="small muted">Signed in as</span><b>${esc(a.name)}</b></div></div>
+      ${already ? notice('', `You're already in ${esc(club.name)}.`) : ''}
+      <div class="row">${already ? `<button class="btn primary" data-act="openProfile" data-id="${a.id}">Go to my profile</button>` : `<button class="btn primary" data-act="joinClub">Join ${esc(club.name)}</button><button class="btn" data-act="openProfile" data-id="${a.id}">Not now</button>`}</div>
+    </section></main>`;
 }
 function viewClaimDone() {
   const p = profileOf('u2');
   return `<main class="wrap slim"><div class="page-head"><span class="label">Registration complete</span><h1>Welcome, ${esc(firstName(p))}</h1></div>
-    ${notice('ok', 'Your profile is registered. Sign in from now on with your email and your password.')}
+    ${notice('ok', S.accounts.u2.google ? `Your profile is registered. Sign in from now on with Google (${esc(S.accounts.u2.google)}).` : 'Your profile is registered. Sign in from now on with your email and your password.')}
     <section class="card stack tight"><p>Your player ID stays <span class="mono">${esc(p.rtr)}</span>. Your games and rank carry over.</p>
       <div class="row"><button class="btn primary" data-act="openProfile" data-id="u2">Go to my profile</button></div></section></main>`;
 }
@@ -2773,6 +3098,15 @@ const SHEETS = {
       <button type="button" class="viewer-x" data-act="closeSheet" aria-label="Close photo">${I.x}</button>
       <div class="viewer-img">${p.photoUrl ? `<img src="${p.photoUrl}" alt="Photo of ${esc(p.name)}">` : faceSVG(p)}</div></div>`;
   },
+  noGoogle: () => sheetWrap('No Google account?', `<p class="muted" style="margin:0 0 12px">You don't need Gmail. Google lets you make a free account with the email you already use.</p>
+    <ol class="req-steps"><li>Open <span class="mono">accounts.google.com/signup</span> on any device.</li><li>Choose <b>Use my current email address instead</b> and enter your email.</li><li>Google sends a code to that email. Enter it and set a Google password.</li><li>Come back here and tap <b>Continue with Google</b>.</li></ol>
+    <p class="small muted" style="margin:12px 0 0">Still stuck? Ask your club or contact ROTRA. Nothing on your profile is lost while you sort it out.</p>`,
+    '<button class="btn primary" data-act="closeSheet">Got it</button>'),
+  gpick: (sh) => sheetWrap(`${G_MARK.replace('class="g-mark"', 'class="g-mark" style="display:inline-block;vertical-align:-3px;margin-right:8px"')}Sign in with Google`,
+    `<p class="muted" style="margin:0 0 12px">Choose an account to continue to ROTRA.</p>
+     <div class="gpick">${G_ACCOUNTS.map((g) => `<button type="button" data-act="gPick" data-email="${esc(g.email)}">${avatar({ name: g.name }, 'md')}<span class="main"><b>${esc(g.name)}</b><span class="small muted">${esc(g.email)}</span><span class="small" style="color:var(--fg3)">Prototype: ${esc(g.hint)}</span></span></button>`).join('')}</div>
+     <p class="small muted" style="margin:12px 0 0">Prototype only: this stands in for Google's own sign-in window. ROTRA gets your name and email from Google, nothing else.</p>`,
+    '<button class="btn" data-act="gCancel">Cancel</button>'),
   leaveClub: (sh) => {
     const c = CLUB_DIR[sh.id];
     return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games stay.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
@@ -2795,6 +3129,17 @@ const SHEETS = {
         ${r.status === 'applying' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Finish applying</button><button class="btn xs" data-act="reqAdvance" data-v="failed">Applying fails</button>' : ''}
         ${r.status === 'failed' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Retry succeeds</button>' : ''}</div>`;
     return sheetWrap('Prototype', `<p class="small muted">Try the states the Player Information app has to handle. None of these controls are part of the real app.</p>
+      <div class="demo-sec"><span class="label">New design: Google sign-in and invites</span>
+        <div class="row"><button class="btn xs" data-act="demoLogin">Sign-in page</button><button class="btn xs" data-act="openRegister" data-club="c1">Club invite</button><button class="btn xs" data-act="openRegister" data-club="c1" data-session="s-thu-open" data-invite="k7m2">Session invite (from Migs)</button><button class="btn xs" data-act="openRegister">Admin link</button></div>
+        <span class="label">Signed in as Migs</span><div class="row"><button class="btn xs" data-act="openJoin" data-club="c3">Club invite</button><button class="btn xs" data-act="openJoin" data-club="c3" data-session="s-sat-doubles" data-invite="p4x9">Session invite (from Kat)</button><button class="btn xs" data-act="openJoin" data-club="c2" data-session="s-fri-smash">Session he's waitlisted for</button></div>
+        <span class="label">Club-created profile (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Registration link</button></div>
+        <span class="label">Existing player, no Google yet</span><div class="row"><button class="btn xs" data-act="demoNoGoogle">Migs: password only, signed out</button></div>
+        <span class="label">Google deadline (${G_DEADLINE}, placeholder)</span>${seg('demoDeadline', S.gDeadline, [['before', 'Before the deadline'], ['passed', 'Deadline passed']])}
+        <span class="label">Verification (Migs)</span>${seg('demoAdminStatus', S.accounts.u1.adminStatus === 'verified' ? 'verified' : 'auto', [['auto', 'Automatic checks'], ['verified', 'Admin: Verified by Admin']])}
+        <div class="row"><button class="btn xs" data-act="demoNoPhone">${S.accounts.u1.phone ? 'Remove his phone' : 'Give him his phone back'}</button></div>
+        <p class="small muted">The real override lives in the Admin app (Players › player › Status). The approve button under Contact-change request (Admin) applies an email change.</p>
+        <span class="label">Notifications</span><div class="row"><button class="btn xs" data-act="demoNotifs">Open as Migs</button><button class="btn xs" data-act="demoNotifsReset">Reset notifications</button></div>
+        <p class="small muted">In Google's window: Ana is new; Migs's example.com email matches his ROTRA account; his Gmail doesn't; Jomar is for the club-created profile.</p></div>
       <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me ? `<span class="small">Signed in as <b>${esc(S.accounts[S.me].name)}</b></span><button class="btn xs" data-act="signOut">Sign out</button>` : '<span class="small muted">Not signed in</span><button class="btn xs" data-act="demoSignIn">Sign in as Migs</button>'}</div></div>
       <div class="demo-sec"><span class="label">Migs's rank</span>${seg('setRank', S.rank, [['eligible', 'On the leaderboard'], ['below', 'Below threshold'], ['reassess', 'Needs reassessment'], ['processing', 'Updating'], ['new', 'No rank yet']])}</div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Offline</b><p class="small muted">Shows saved copies; sign-in and saving fail.</p></div>${sw(!S.online, 'toggleOnline', 'Offline')}</div></div>
@@ -3063,14 +3408,68 @@ const ACT = {
   setBoard: (el) => { S.board = el.dataset.v; render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
   toggleFail: () => { S.failNext = !S.failNext; render(); },
-  openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.sheet = null; go('claim'); },
+  openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.claimMethod = null; S.ui.gClaim = null; S.ui.sheet = null; S.me = null; go('claim'); },
   registerNo: () => { S.ui.registerMatch = false; S.ui.claimFail = 'Correct your phone or email, or contact ROTRA for help. No accounts were linked.'; render(); },
   openRegister: (el) => {
     S.ui.sheet = null; if (S.me) { S.me = null; }
-    S.ui.claim = null; setRegCtx(el?.dataset?.club || null, el?.dataset?.session || null);
+    S.ui.claim = null; setRegCtx(el?.dataset?.club || null, el?.dataset?.session || null, el?.dataset?.invite || null);
+    S.ui.regStep = 'choose'; S.ui.gReg = null; S.ui.regErr = '';
     S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; go('register');
   },
-  openJoin: (el) => { S.ui.sheet = null; S.me = 'u1'; setRegCtx(el.dataset.club, null); go('joinClub'); },
+  openJoin: (el) => { S.ui.sheet = null; S.me = 'u1'; setRegCtx(el.dataset.club, el.dataset.session || null, el.dataset.invite || null); go(el.dataset.session ? 'joinSession' : 'joinClub'); },
+  demoLogin: () => { S.ui.sheet = null; S.me = null; S.ui.after = null; S.ui.login = { id: '', pass: '', show: false, err: '', pending: false, note: '' }; go('login'); },
+  regEmail: () => { S.ui.regStep = 'email'; S.ui.gReg = null; S.ui.claim = null; S.ui.claimErr = {}; S.ui.claimFail = ''; render(); window.scrollTo(0, 0); },
+  regBack: () => { S.ui.regStep = 'choose'; S.ui.gReg = null; S.ui.claim = null; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; render(); window.scrollTo(0, 0); },
+  inviteLogin: () => { const x = S.ui.regCtx; S.ui.after = { to: x.session ? 'joinSession' : x.club ? 'joinClub' : 'profile' }; S.ui.login.gMiss = ''; go('login'); },
+  claimPassword: () => { S.ui.claimMethod = 'password'; S.ui.gClaim = null; S.ui.claimFail = ''; render(); window.scrollTo(0, 0); },
+  claimMethodBack: () => { S.ui.claimMethod = null; S.ui.gClaim = null; S.ui.claimErr = {}; S.ui.claimFail = ''; render(); window.scrollTo(0, 0); },
+  toSession: (el) => { const x = S.ui.regCtx; toast(`Opens /s/${el.dataset.slug}?join=1${x.invite ? `&invite=${x.invite}` : ''} in Queue, where the request is sent`); },
+  google: (el) => {
+    const ctx = el.dataset.ctx;
+    if (!S.online) { if (ctx === 'login') { S.ui.login.err = 'You\'re offline. Signing in needs an internet connection.'; render(); } else toast('You\'re offline. Google sign-in needs an internet connection.'); return; }
+    S.ui.login.gMiss = ''; S.ui.regErr = ''; S.ui.sheet = { type: 'gpick', ctx }; render();
+  },
+  gCancel: () => { S.ui.sheet = null; render(); },
+  gLinkYes: () => { const L = S.ui.gLink, a = S.accounts[L.id]; a.google = L.email; S.ui.after = L.next; S.ui.gLink = null; S.ui.gNudge = null; signIn(a.id); toast('Google connected. You\'re signed in.'); },
+  gLinkNo: () => { const L = S.ui.gLink; S.ui.after = L.next; S.ui.gLink = null; S.ui.login.id = S.accounts[L.id].email; go('login'); },
+  gNudgeConnect: (el) => { const a = S.accounts[S.me]; googleDone('connect', { email: el.dataset.email, name: a.name }); render(); },
+  gNudgeLater: () => { S.ui.gNudge = null; render(); },
+  goVerify: () => { S.ui.annLater = false; go('verify'); },
+  openRequestPhone: () => { S.ui.req = { field: 'phone', to: '' }; S.ui.reqErr = ''; S.ui.sheet = { type: 'request' }; render(); },
+  reqGoogleEmail: () => {
+    const a = S.accounts[S.me], r = S.requests[a.id];
+    if (r && ['submitted', 'applying', 'failed'].includes(r.status)) { toast('You already have a request in progress'); return; }
+    S.ui.req = { field: 'email', to: a.google }; S.ui.reqErr = ''; S.ui.sheet = { type: 'request' }; render();
+  },
+  demoAdminStatus: (el) => { const a = S.accounts.u1; a.adminStatus = el.dataset.v === 'verified' ? 'verified' : null; S.ui.adminNoteGone = false; S.ui.adminNoteRead = false; S.ui.sheet = null; render(); toast(el.dataset.v === 'verified' ? 'Admin set Migs to Verified by Admin' : 'Admin set Migs back to automatic checks'); },
+  demoNoPhone: () => { const a = S.accounts.u1; a.phone = a.phone ? '' : '+63 917 555 0142'; S.ui.sheet = null; render(); toast(a.phone ? 'Migs has a phone again' : 'Migs has no phone on file'); },
+  annLater: () => { S.ui.annLater = true; render(); toast(`We'll remind you next time. Connect by ${G_DEADLINE}.`); },
+  openNoGoogle: () => { S.ui.sheet = { type: 'noGoogle' }; render(); },
+  nFilter: (el) => { S.ui.nFilter = el.dataset.v; render(); },
+  nReadAll: () => { myNotifs().forEach((x) => { x.read = true; }); S.ui.annRead = true; S.ui.adminNoteRead = true; render(); toast('All marked as read'); },
+  openNotif: (el) => {
+    const id = el.dataset.id;
+    if (id === 'ann-google') { S.ui.annRead = true; S.ui.annLater = false; go('verify'); return; }
+    if (id === 'ann-admin') { S.ui.adminNoteRead = true; go('verify'); return; }
+    const x = myNotifs().find((y) => y.id === id); if (!x) return;
+    x.read = true;
+    if (x.to === 'invite') { setRegCtx('c3', 's-sat-doubles', 'p4x9'); go('joinSession'); }
+    else if (x.to.startsWith('club:')) go('club', x.to.slice(5));
+    else if (['sessions', 'history', 'rank'].includes(x.to)) go(x.to, S.me);
+    else go(x.to);
+  },
+  demoDeadline: (el) => { S.gDeadline = el.dataset.v; S.ui.annLater = false; S.ui.sheet = null; render(); },
+  gNudgeNever: () => { const a = S.accounts[S.me]; a.gNudgeOff = true; S.ui.gNudge = null; render(); toast('You can connect Google any time in Privacy and contact'); },
+  demoNotifs: () => { S.ui.sheet = null; if (!S.me) S.me = 'u1'; go('notifs'); },
+  demoNotifsReset: () => { S.notifs = seedNotifs(); S.ui.annRead = false; S.ui.sheet = null; render(); toast('Notifications reset'); },
+  demoNoGoogle: () => { const a = S.accounts.u1; a.google = null; a.gNudgeOff = false; S.ui.sheet = null; S.me = null; S.ui.gNudge = null; S.ui.after = null; S.ui.login = { id: '', pass: '', show: false, err: '', pending: false, note: '' }; go('login'); toast('Migs has a password only now'); },
+  gPick: (el) => {
+    const ctx = S.ui.sheet.ctx, g = G_ACCOUNTS.find((y) => y.email === el.dataset.email);
+    S.ui.sheet = null; S.ui.gPending = true; render();
+    later(700, () => { S.ui.gPending = false; googleDone(ctx, g); });
+  },
+  gDisconnect: () => { const a = S.accounts[S.me]; a.google = null; toast('Google disconnected'); },
+  setPassword: () => { const a = S.accounts[S.me]; a.hasPassword = true; toast('Prototype: a password form opens here'); render(); },
   joinClub: () => {
     const a = S.accounts[S.me], id = S.ui.regCtx.club;
     a.clubs = [...(a.clubs || []), { id, via: 'club_link' }];
@@ -3102,14 +3501,50 @@ const ACT = {
   },
 };
 // The link a person opened decides the context of the registration form: a club, a session of that club, or neither (Admin link).
-function setRegCtx(club, session) {
+function setRegCtx(club, session, invite = null) {
   const x = S.ui.regCtx || {};
   if (x.club !== club || x.session !== session) S.ui.claim = null;
-  S.ui.regCtx = { club, session };
+  S.ui.regCtx = { club, session, invite: invite && INVITES[invite] && INVITES[invite].session === session ? invite : null };
+}
+// What happens after the person picks an account in Google's window.
+// Existing players keep email and password. Google is an extra way in, never a replacement.
+// 1. Google already connected: sign in.
+// 2. Not connected, but the Google email is the player's ROTRA email: ask once before connecting (P-GOOGLE-LINK).
+// 3. Not connected and a different email: we can't tell whose account it is, so they sign in with their password first and connect it then.
+function googleDone(ctx, g) {
+  const linked = Object.values(S.accounts).find((a) => a.claimed && a.google && a.google.toLowerCase() === g.email);
+  const owner = linked || Object.values(S.accounts).find((a) => a.claimed && a.email && a.email.toLowerCase() === g.email);
+  if (ctx === 'connect') {
+    const a = S.accounts[S.me];
+    if (owner && owner.id !== a.id) { toast(`${g.email} is already used by another ROTRA account.`); return; }
+    a.google = g.email; S.ui.gNudge = null; toast('Google connected'); return;
+  }
+  if (ctx === 'login' || ctx === 'register') {
+    const x = S.ui.regCtx;
+    const next = ctx === 'register' ? (x.session ? { to: 'joinSession' } : x.club ? { to: 'joinClub' } : null) : S.ui.after;
+    if (linked) {
+      S.ui.after = next; signIn(linked.id); toast(`Signed in with Google`); return;
+    }
+    if (owner) { S.ui.gLink = { id: owner.id, email: g.email, name: g.name, next }; go('gLink'); return; }
+    if (ctx === 'login') { S.ui.login.gMiss = g.email; return; }
+  }
+  if (ctx === 'register') {
+    if (g.email === 'jomar.delacruz@example.com') { S.ui.regErr = 'A club already made a ROTRA profile with this email. Ask the club for your registration link so your games carry over.'; return; }
+    S.ui.gReg = { email: g.email, name: g.name }; S.ui.regStep = 'google';
+    S.ui.claim = { name: g.name, nick: '', style: '', expY: '', expM: '', sinceM: '', sinceY: '', facebook: '', instagram: '', youtube: '', linkedin: '', email: g.email, phone: '', pass: '', pass2: '', show: false, city: '' };
+    S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; window.scrollTo(0, 0); return;
+  }
+  if (ctx === 'claim') {
+    if (owner && owner.id !== 'u2') { S.ui.claimFail = `${g.email} is already on another ROTRA account. Pick another Google account or set a password.`; return; }
+    S.ui.gClaim = { email: g.email, name: g.name }; S.ui.claimMethod = 'google'; S.ui.claimFail = '';
+    if (S.ui.claim) S.ui.claim.email = g.email;
+    window.scrollTo(0, 0);
+  }
 }
 function finishClaim(C) {
   const a = S.accounts.u2;
   applyPersonal(a, C);
+  if (S.ui.claimMethod === 'google' && S.ui.gClaim) { a.google = S.ui.gClaim.email; a.hasPassword = false; a.emailConfirmed = true; }
   a.email = C.email.trim(); a.claimed = true;
   if (!a.phone) a.phone = fmtPhone(normPhone(C.phone));
   S.claim = 'valid'; S.ui.claim = null; S.ui.claimConfirmed = false; S.me = 'u2';
@@ -3138,7 +3573,7 @@ const FORM = {
       if (!S.online) { L.err = 'You\'re offline. Signing in needs an internet connection.'; return; }
       const a = accountFor(L.id);
       if (!a) { L.err = 'That email and password don\'t match. Check them and try again.'; return; }
-      signIn(a.id);
+      const tried = L.gMiss; S.ui.gNudge = tried ? { email: tried } : null; S.ui.annLater = false; S.ui.annRead = false; signIn(a.id);
     });
   },
   forgot: () => {
@@ -3149,7 +3584,8 @@ const FORM = {
     later(800, () => {
       F.pending = false;
       if (!S.online) { F.err = 'Couldn\'t send because you\'re offline. Try again when you\'re connected.'; return; }
-      F.sent = F.email.trim();
+      const g = Object.values(S.accounts).find((a) => (a.hasPassword === false || a.google) && a.email.toLowerCase() === F.email.trim().toLowerCase());
+      F.sent = F.email.trim(); F.google = !!g;
     });
   },
   reset: () => {
@@ -3195,8 +3631,11 @@ const FORM = {
     if (!C.email.trim()) e.email = 'Enter your email.';
     else if (!validEmail(C.email.trim())) e.email = 'Enter an email address, like name@example.com.';
     else if (Object.values(S.accounts).some((a) => a.id !== 'u2' && a.email.toLowerCase() === C.email.trim().toLowerCase())) e.email = 'This email belongs to another ROTRA account. Use a different email, or ask ROTRA for help.';
-    if (!C.pass) e.pass = 'Choose a password.';
-    if (C.pass && C.pass !== C.pass2) e.pass2 = 'The two passwords don\'t match.';
+    if (S.ui.claimMethod === 'google' && S.ui.gClaim) { C.email = S.ui.gClaim.email; delete e.email; }
+    else {
+      if (!C.pass) e.pass = 'Choose a password.';
+      if (C.pass && C.pass !== C.pass2) e.pass2 = 'The two passwords don\'t match.';
+    }
     S.ui.claimErr = e; S.ui.claimFail = '';
     if (Object.keys(e).length) { render(); const bad = document.querySelector('.input.bad'); if (bad) bad.focus(); return; }
     S.ui.claimPending = true; render();
@@ -3211,8 +3650,12 @@ const FORM = {
     if (!normPhone(C.phone || '')) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     if (!validEmail(C.email || '')) e.email = 'Enter an email address, like name@example.com.';
     if (!ctx.club && !PLACES.some(([c]) => c === C.city)) e.city = 'Pick your city or province.';
-    if (!C.pass) e.pass = 'Choose a password.';
-    if (C.pass !== C.pass2) e.pass2 = 'The two passwords do not match.';
+    const gr = S.ui.regStep === 'google' && S.ui.gReg;
+    if (gr) { C.email = gr.email; delete e.email; }
+    else {
+      if (!C.pass) e.pass = 'Choose a password.';
+      if (C.pass !== C.pass2) e.pass2 = 'The two passwords do not match.';
+    }
     S.ui.claimErr = e;
     if (Object.keys(e).length) { render(); const bad = document.querySelector('.input.bad'); if (bad) bad.focus(); return; }
     if (!S.online) { S.ui.claimFail = 'You are offline. Your details are still here; try again when connected.'; render(); return; }
@@ -3225,9 +3668,9 @@ const FORM = {
       const code = ctx.club ? CLUB_DIR[ctx.club].code : C.city, t = new Date();
       const date = `${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(2, '0')}${String(t.getFullYear()).slice(2)}`;
       const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: true, claimed: true, photo: false, fresh: true,
-        emailConfirmed: false, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
+        emailConfirmed: !!gr, google: gr ? gr.email : null, hasPassword: !gr, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
       applyPersonal(acct, C);
-      S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: ctx.club, session: ctx.session }; S.ui.claim = null;
+      S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: ctx.club, session: ctx.session }; S.ui.claim = null; S.ui.regStep = 'choose'; S.ui.gReg = null;
       S.screen = 'registerDone'; window.scrollTo(0, 0);
     });
   },
@@ -3242,6 +3685,10 @@ document.addEventListener('click', (ev) => {
   const fn = ACT[el.dataset.act];
   if (fn) { ev.preventDefault(); fn(el); }
 });
+document.addEventListener('click', (ev) => {
+  const a = ev.target.closest('a[href^="/queue/"]');
+  if (a && !window.mountPrototypeRouter) { ev.preventDefault(); toast(`Opens ${a.getAttribute('href')} in the Queue prototype`); }
+}, true);
 document.addEventListener('submit', (ev) => {
   const f = ev.target.closest('[data-form]');
   if (!f) return;
@@ -3343,7 +3790,7 @@ document.addEventListener('keydown', (ev) => {
 // ---------- Prototype routes (same paths as apps/player, under /player) ----------
 let prototypeRouter;
 let prototypeToken = 'demo';
-const playerPaths = { board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact' };
+const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact' };
 function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
@@ -3351,10 +3798,10 @@ function prototypePath() {
   if (S.screen === 'clubMembers') path = `/clubs/${encodeURIComponent(S.viewId)}/members`;
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
   if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
-  if (['register', 'registerDone', 'joinClub'].includes(S.screen)) {
+  if (['register', 'registerDone', 'joinClub', 'joinSession'].includes(S.screen)) {
     const x = S.ui.regCtx || {};
     path = `/register${x.club ? `/${encodeURIComponent(x.club)}` : ''}`;
-    const q = [x.session && S.screen !== 'joinClub' ? `session=${encodeURIComponent(x.session)}` : '', S.screen === 'registerDone' ? 'complete=1' : ''].filter(Boolean).join('&');
+    const q = [x.session && S.screen !== 'joinClub' ? `session=${encodeURIComponent(x.session)}` : '', x.invite && S.screen !== 'joinClub' ? `invite=${encodeURIComponent(x.invite)}` : '', S.screen === 'registerDone' ? 'complete=1' : ''].filter(Boolean).join('&');
     if (q) path += `?${q}`;
   }
   if (S.screen === 'history' && S.ui.hist === 'other') path += '?tab=other';
@@ -3385,21 +3832,21 @@ function applyPrototypeRoute(url) {
   if (reg) {
     const club = reg[1] ? decodeURIComponent(reg[1]) : null, ses = url.searchParams.get('session');
     if (club && !CLUB_DIR[club]) return false;
-    setRegCtx(club, club && ses && SESSION_DIR[ses] && SESSION_DIR[ses].club === club ? ses : null);
+    setRegCtx(club, club && ses && SESSION_DIR[ses] && SESSION_DIR[ses].club === club ? ses : null, url.searchParams.get('invite'));
     if (url.searchParams.get('complete') === '1' && S.ui.regDone && S.me === S.ui.regDone.id) screen = 'registerDone';
-    else if (S.me && club) screen = 'joinClub';
+    else if (S.me && club) screen = S.ui.regCtx.session ? 'joinSession' : 'joinClub';
     else if (S.me) { screen = 'profile'; id = S.me; }
     else screen = 'register';
   }
   if (!screen) return false;
   if (screen === 'login') {
     const next = url.searchParams.get('next');
-    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account'].includes(key) && next === '/player' + value);
+    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account', 'verify'].includes(key) && next === '/player' + value);
     S.ui.after = target ? { to: target[0] } : null;
   }
   S.ui.hist = url.searchParams.get('tab') === 'other' ? 'other' : 'counted';
   S.ui.editTab = EDIT_TABS.some((t) => t.id === url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'basics';
-  if (['edit', 'id', 'account'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
+  if (['edit', 'id', 'account', 'verify'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
   S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.pendingGo = null;
   if (screen !== 'edit') { S.ui.edit = null; S.ui.editOrig = null; }
   return true;
@@ -3413,7 +3860,9 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
+  if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board'].includes(S.screen)) S.screen = 'gRequired';
+  if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';

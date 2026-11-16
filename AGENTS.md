@@ -37,6 +37,10 @@
     `CANCELLED` / `MOCKUP ONLY`. Only `NEW` logs are ticketed, grouped by component (reuse first), and
     the real app must match the mockup like for like. Artifacts shown to the owner are published from
     the mockup file itself.
+16. **Shared queue rules are written in Go** (`apps/api/internal/rules`, planned). A change edits the
+    Go rule and its `@rotra/rule-cases` cases, then rebuilds and commits the `.wasm` and generated types
+    in `packages/rules-wasm` in the same PR; `make check` fails on a stale build. Until the swap, see
+    [architecture §3](docs/architecture.md#shared-queue-rules-go-and-webassembly).
 
 ---
 
@@ -113,6 +117,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | A confirmation dialog (`D-…`) | [dialogs.md](docs/screens/product/dialogs.md) |
 | **Product behavior** (what a rule is) | [business_logic/product/README.md](docs/business_logic/product/README.md) → that product's `modules/<module>/README.md` |
 | Is something still undecided? | [business open decisions](docs/business_logic/product/open-decisions.md) · [screen open decisions](docs/screens/product/open-decisions.md) · [database open decisions](docs/database_design/product/open-decisions.md) |
+| Changing a **shared queue rule** (court fill, match checks, courts and time, game counts, roster) | [architecture.md](docs/architecture.md#shared-queue-rules-go-and-webassembly) §3 → [D-2026-11-14-01](docs/mvp/decisions.md#d-2026-11-14-01) |
 | **Domain math** (cost, minimum games, queue generation, rank, awards) | The business module → [coding-conventions.md](docs/coding-conventions.md) §14 → ask |
 | **Prisma / tables** (database epic) | [database_design/product/README.md](docs/database_design/product/README.md) → [conventions](docs/database_design/product/conventions.md) → [coding-conventions.md](docs/coding-conventions.md) §13 |
 | **Offline** (Queue) | [architecture.md](docs/architecture.md) §9 → [offline module](docs/business_logic/product/queue/modules/offline/README.md) |

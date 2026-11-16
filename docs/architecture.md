@@ -109,6 +109,27 @@ apps/*  ──►  @rotra/ui  ──►  @rotra/schema
 `@rotra/ui/match-card`, `@rotra/data/queue-session`, `@rotra/schema/phone`. There are no `index.ts`
 barrels anywhere.
 
+### Shared queue rules: Go and WebAssembly
+
+**Decided, not built** ([D-2026-11-14-01](mvp/decisions.md#d-2026-11-14-01),
+[D-2026-11-13-08](mvp/decisions.md#d-2026-11-13-08)). The rules both the device (offline) and the
+server run (court fill, match checks, courts and time, game counts, roster and waitlist) have **one
+copy, in Go**, under `apps/api/internal/rules`. The server calls it directly; the device runs the same
+code built to WebAssembly (`apps/api/cmd/ruleswasm` → `packages/rules-wasm`, a `.wasm` file plus a
+typed wrapper that `@rotra/data` imports). Every other rule lives only in Go.
+
+**Changing a shared rule** means changing the Go rule; there is no other copy to edit. In the same PR:
+
+1. Edit the Go rule and its JSON cases in `@rotra/rule-cases`.
+2. Rebuild the `.wasm` and regenerate the TypeScript types (`tygo`), and commit both.
+3. A change in what the rule returns adds a new rules version, not an edit of the live one, so a
+   running Queue Session keeps the rules it started with.
+
+`make check` compares a fingerprint of the Go rule files with the committed build and fails when the
+`.wasm` is stale. Until the swap to the wrapper, today's TypeScript copies in `@rotra/data` still run:
+a PR changing one updates its cases in the same PR, and the Go copy follows before the next Go merge.
+Details: [rule-cases track](../conductor/tracks/rule-cases_20261113/spec.md#shipping-a-rule-change-g13g16).
+
 ---
 
 ## 4. Inside an app (Next.js 16 App Router)

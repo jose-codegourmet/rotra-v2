@@ -1,16 +1,16 @@
 # Flow: create, claim, and recover a player account
 
-**Last verified:** 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for club entry by email ([D-2026-11-16-04](../../../../../../mvp/decisions.md#d-2026-11-16-04)); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 ## Club entry to profile
 
 1. The operator adds/confirms a player and verifies their identity in person.
-2. Without a phone, retain a saved club guest; bypass profile creation.
-3. With a phone, keep the entry as the club's own unclaimed profile.
-4. When the entry syncs, a phone that matches a **registered** player links to that player. Otherwise it stays an unclaimed profile in this club only: no RTR ID, never found by another club ([D-2026-11-11-03](../../../../../../mvp/decisions.md#d-2026-11-11-03)).
-5. When the person registers, they get their permanent RTR ID, and every club's unclaimed record with the same phone links to the account automatically.
+2. Without an email, retain a saved club guest (a name only); bypass profile creation.
+3. With an email, the entry is an unclaimed player ([D-2026-11-16-04](../../../../../../mvp/decisions.md#d-2026-11-16-04), replacing the phone rule of [D-2026-11-11-03](../../../../../../mvp/decisions.md#d-2026-11-11-03)).
+4. When the entry syncs, an email that already belongs to a ROTRA player (registered or unclaimed) links the entry to that person and their RTR ID. Otherwise the person gets a new RTR ID. Each club keeps its own name, nickname, picture and level for an unclaimed player.
+5. When the person registers, they keep that RTR ID, and every club's record under the email joins the account automatically. If more than one club saved the email, they pick one club's version as their starting profile.
 
-Profile creation does not bypass the valid-session performance gate. After a returning guest's identity is confirmed, include earlier valid guest games in personal history and ranking under the existing eligibility/window rules, without duplicating games or changing permanent outcomes. The evidence and process for confirming a historical guest link remain to be specified.
+Profile creation does not bypass the valid-session performance gate. Games on a record that joins an account count in personal history and ranking under the existing eligibility/window rules, without duplicating games or changing permanent outcomes. A guest's games join only after the club adds the guest's email.
 
 ## Claim
 

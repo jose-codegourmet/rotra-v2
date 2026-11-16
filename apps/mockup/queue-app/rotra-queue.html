@@ -1683,24 +1683,25 @@ function seedPlayers() {
   return [
     mk('p1', 'Miguel Santos', 'Migs', 'registered', 'RTR-PH-CEB-031526-0001', 23, 6, 0.62, true),
     mk('p2', 'Bea Castillo', '', 'registered', 'RTR-PH-CEB-031526-0002', 19, 7, 0.55),
-    mk('p3', 'Jomar dela Cruz', 'Jom', 'unclaimed', null, 18, 5, 0.48),
+    { ...mk('p3', 'Jomar dela Cruz', 'Jom', 'unclaimed', 'RTR-PH-CEB-052026-0017', 18, 5, 0.48), email: 'jomar.delacruz@example.com' },
     mk('p4', 'Kat Lim', '', 'registered', 'RTR-PH-CEB-040226-0011', 15, 8, 0.51, true),
     mk('p5', 'Enzo Navarro', '', 'registered', 'RTR-PH-MNL-050726-0014', 24, 6, 0.66),
     mk('p6', 'Joanna Tan', 'Jo', 'unclaimed', null, 14, 2, null),
     mk('p7', 'Rafa Aquino', '', 'registered', 'RTR-PH-CEB-061126-0021', 20, 5, 0.58),
     mk('p8', 'Lia Bautista', '', 'guest', null, null, 1, null),
     mk('p9', 'Carlo Medina', '', 'registered', 'RTR-PH-CEB-061126-0025', 16, 6, 0.33),
-    mk('p10', 'Nina Ocampo', '', 'unclaimed', null, 13, 5, 0.45),
+    { ...mk('p10', 'Nina Ocampo', '', 'unclaimed', 'RTR-PH-CEB-080526-0036', 13, 5, 0.45), email: 'nina.ocampo@example.com' },
     mk('p11', 'Paulo Garcia', 'Pau', 'registered', 'RTR-PH-DVO-070926-0031', 21, 9, 0.6),
     mk('p12', 'Sam Villareal', '', 'guest', null, null, 3, null),
     mk('p13', 'Dani Rivera', '', 'registered', 'RTR-PH-CEB-081326-0040', 17, 5, 0.5),
     mk('p14', 'Theo Ramos', '', 'registered', 'RTR-PH-MNL-081326-0042', 25, 4, null),
     mk('p15', 'Ysa Fernandez', '', 'guest', null, null, 0, null),
     mk('p16', 'Marco Lopez', '', 'registered', 'RTR-PH-ILO-090226-0047', 15, 6, 0.72),
-    mk('p17', 'Gab Torres', '', 'unclaimed', null, 19, 1, null),
-    // D-2026-11-09-06: how a saved player joined the club (joinedVia), and a guest's phone kept for linking by the QM.
+    // D-2026-11-16-04: Joanna and Mika are older records with a phone and no email. They show Details required.
+    { ...mk('p17', 'Gab Torres', '', 'unclaimed', 'RTR-PH-CEB-093026-0058', 19, 1, null), email: 'gab.torres@example.com' },
+    // D-2026-11-09-06: how a saved player joined the club (joinedVia). A guest is a name only (D-2026-11-16-04).
     { ...mk('p18', 'Iya Mercado', '', 'registered', 'RTR-PH-CEB-091626-0055', 14, 5, 0.4), joinedVia: 'club' },
-    { ...mk('p19', 'Kiko Salazar', '', 'guest', null, null, 6, 0.5), phone: '0917 555 0188' },
+    mk('p19', 'Kiko Salazar', '', 'guest', null, null, 6, 0.5),
     { ...mk('p20', 'Andi Cruz', '', 'registered', 'RTR-PH-CEB-100726-0061', 11, 0, null), joinedVia: 'session' },
     // Regulars who fill the example sessions (full house, over budget, waitlists).
     mk('p21', 'Rhea Villanueva', '', 'registered', 'RTR-PH-CEB-101426-0064', 16, 4, 0.52),
@@ -1711,16 +1712,18 @@ function seedPlayers() {
     mk('p26', 'Nico Abella', '', 'registered', 'RTR-PH-MNL-102826-0077', 20, 5, 0.56),
     mk('p27', 'Tin Gonzaga', '', 'guest', null, null, 1, null),
     mk('p28', 'Arvin Uy', '', 'registered', 'RTR-PH-CEB-102826-0080', 24, 8, 0.64),
-    { ...mk('p29', 'Faye Dimaculangan', '', 'unclaimed', null, 13, 2, null), noPhone: true },
+    { ...mk('p29', 'Faye Dimaculangan', '', 'unclaimed', 'RTR-PH-CEB-110226-0083', 13, 2, null), noPhone: true, email: 'faye.dimaculangan@example.com' },
     { ...mk('p30', 'Lance Ybañez', '', 'registered', 'RTR-PH-CEB-110426-0085', 17, 4, 0.5), joinedVia: 'session' },
   ];
 }
-// Player Information search shows registered players only. Guests and unclaimed profiles stay in the club
-// that saved them and are never found by another club (owner, Nov 11 2026).
+// D-2026-11-16-04: player lookup is by exact RTR ID or exact email only, for registered and unclaimed players. Names are
+// searched in the club's own saved players. Another club's unclaimed player comes back with no name, picture or level:
+// each club keeps its own version of the person. Guests are never found.
 const DIRECTORY = [
-  { id: 'g1', name: 'Paolo Reyes', identity: 'registered', rtr: 'RTR-PH-MNL-020326-0112', sugg: 6, rank: 'Rank 214' },
-  { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', sugg: 5, rank: 'Rank 388' },
-  { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', sugg: 4, rank: 'Rank 1,042' },
+  { id: 'g1', name: 'Paolo Reyes', identity: 'registered', rtr: 'RTR-PH-MNL-020326-0112', email: 'paolo.reyes@example.com', sugg: 6, rank: 'Rank 214' },
+  { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', email: 'trish.mendoza@example.com', sugg: 5, rank: 'Rank 388' },
+  { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', email: 'marco.lim@example.com', sugg: 4, rank: 'Rank 1,042' },
+  { id: 'g5', name: '', identity: 'unclaimed', rtr: 'RTR-PH-MNL-090126-0203', email: 'ivan.delarosa@example.com', sugg: null, rank: '' },
 ];
 
 function todayAt(h, m) { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
@@ -1741,7 +1744,7 @@ function seedSessions() {
       requests: [
         { id: 'q-seed-rhea', pid: 'p21', account: 'RTR-PH-CEB-101426-0064', name: 'Rhea Villanueva', nick: '', phone: '', band: 'Intermediate', level: 16, at: Date.now() - 25 * 60000, status: 'pending', inviteCode: 'k7m2p9qw' },
         { id: 'q-seed-paolo', account: 'RTR-PH-MNL-020326-0112', name: 'Paolo Reyes', nick: '', phone: '', band: 'Beginner', level: 6, at: Date.now() - 18 * 60000, status: 'pending' },
-        { id: 'q-seed-kiko', name: 'Kiko Salazar', nick: '', phone: '0917 555 0188', band: 'Intermediate', at: Date.now() - 9 * 60000, status: 'pending' },
+        { id: 'q-seed-kiko', name: 'Kiko Salazar', nick: '', phone: '', band: 'Intermediate', at: Date.now() - 9 * 60000, status: 'pending' },
       ],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
@@ -1770,17 +1773,17 @@ function seedVenues() {
 }
 function freshState() {
   return {
-    v: 3, screen: 'login', online: true, syncing: false, pending: 0, lastSync: Date.now(), licenseExpired: false,
+    v: 4, screen: 'login', online: true, syncing: false, pending: 0, lastSync: Date.now(), licenseExpired: false,
     club: { name: 'Lahug Smash Club', initials: 'LS', founding: 'Founded at Salinas Dr, Lahug, Cebu City', license: 'Yearly license · active until Mar 31, 2027', description: 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.' },
     players: seedPlayers(), sessions: seedSessions(), inventory: seedInventory(), venues: seedVenues(), currentId: 's-tonight',
     ui: { sheet: null, pane: 'courts', slide: 0, pubTab: 'details', search: '', login: { user: 'lahug.smash', pass: '', show: false, err: '' }, draft: null, errors: {} },
   };
 }
 
-const KEY = 'rotra-queue-prototype-v3';
+const KEY = 'rotra-queue-prototype-v4';
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
-if (!S || S.v !== 3) S = freshState();
+if (!S || S.v !== 4) S = freshState();
 S.ui.sheet = null; S.ui.courtMenu = null; S.syncing = false; S.ui.login.pending = false;
 if (S.screen === 'finalizing') S.screen = 'console';
 migrateLevels();
@@ -1814,6 +1817,8 @@ const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w)
 
 // Sample profile pictures: illustrated faces for players with a ROTRA profile. Guests and a few profiles
 // without an uploaded picture fall back to initials, as the public-page spec requires.
+// The face for another club's unclaimed player before this club names them.
+const NO_NAME = { id: 'no-name', name: 'Not registered', identity: 'guest' };
 const NO_PHOTO = new Set(['p10', 'p17', 'p20']);
 // Club-set pictures (owner request, Nov 9 2026): for a guest or unclaimed profile the club can set p.pic,
 // null (initials) | { kind: 'char', seed } | { kind: 'photo', src }. p.picPrev keeps the previous photo only
@@ -2238,8 +2243,30 @@ const monthStart = (t) => { const d = new Date(t); return new Date(d.getFullYear
 // ---------- Shared fragments ----------
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
 // The second line under a saved player's name: their RTR ID, or why they have none yet.
-const idLine = (p) => (p.rtr ? esc(p.rtr) : p.identity === 'unclaimed' ? 'Not registered yet' : 'Guest');
-const identChip = (p) => chip(IDENT[p.identity] || esc(p.identity), p.identity === 'registered' ? 'ok' : p.identity === 'pending' ? 'warn' : '');
+const idLine = (p) => (p.rtr ? esc(p.rtr) : p.identity === 'unclaimed' ? 'Details required' : 'Guest');
+// D-2026-11-16-04: an unclaimed player needs an email. An older record with a phone and no email shows Details required
+// until the Queue Master adds the email or deletes the player.
+const needsEmail = (p) => !!p && p.identity === 'unclaimed' && !p.email;
+// Registered and unclaimed players are ROTRA players with an RTR ID; a guest is a name in this club only.
+const onRotra = (p) => !!p && (p.identity === 'registered' || (p.identity === 'unclaimed' && !!p.email));
+const identChip = (p) => (needsEmail(p) ? chip('Details required', 'warn') : chip(IDENT[p.identity] || esc(p.identity), p.identity === 'registered' ? 'ok' : p.identity === 'pending' ? 'warn' : ''));
+const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+// One email is one person: a saved player in this club, or a ROTRA player elsewhere (registered or unclaimed).
+const dirByEmail = (v) => DIRECTORY.find((g) => g.email === v.trim().toLowerCase()) || null;
+const savedByEmail = (v, notId) => { const e = v.trim().toLowerCase(), g = dirByEmail(e); return saved().find((p) => p.id !== notId && ((p.email || '').toLowerCase() === e || (g && p.rtr === g.rtr))) || null; };
+// An unclaimed player gets an RTR ID when the club saves their email: the club's city code, today's date, the next number.
+const newRtr = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `RTR-PH-CEB-${z(d.getMonth() + 1)}${z(d.getDate())}${String(d.getFullYear()).slice(2)}-${String(86 + S.players.filter((p) => p.rtrNew).length).padStart(4, '0')}`; };
+// Saving an email makes a guest (or an older record) an unclaimed player, or links them when the email is already on ROTRA.
+// Offline the lookup waits for the next sync. Returns the words for the saved message.
+function applyEmail(p, email) {
+  const e = email.trim().toLowerCase(), g = dirByEmail(e);
+  if (p.identity === 'guest') p.noPhone = true;
+  p.email = e;
+  if (!S.online) { p.identity = 'pending'; return 'profile lookup after sync'; }
+  if (g) { p.identity = g.identity; p.rtr = g.rtr; return g.identity === 'registered' ? 'linked to their ROTRA account' : `already on ROTRA · ${g.rtr}`; }
+  p.identity = 'unclaimed'; p.rtr = newRtr(); p.rtrNew = true;
+  return `unclaimed · ${p.rtr}`;
+}
 const sw = (on, act, attrs, label) => `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${esc(label)}" data-act="${act}" ${attrs}></button>`;
 const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
 const pname = (s, pid) => { const r = R(s, pid); return `<span class="pn"><b>${esc(nm(pid))}</b>${r ? `<span class="lv">${esc(lvLabel(r.level))}</span>` : ''}</span>`; };
@@ -3326,7 +3353,7 @@ const SP_FILTERS = {
   band: ['Skill level', [['all', 'All levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level yet']]],
   city: ['Registered in', null],
   added: ['Added', [['any', 'Any time'], ['7', 'Last 7 days'], ['30', 'Last 30 days'], ['90', 'Last 3 months'], ['older', 'More than 3 months ago']]],
-  status: ['Account', [['all', 'Everyone'], ['registered', 'Registered'], ['unclaimed', 'Unclaimed profile'], ['guest', 'Guest']]],
+  status: ['Account', [['all', 'Everyone'], ['registered', 'Registered'], ['unclaimed', 'Unclaimed'], ['details', 'Details required'], ['guest', 'Guest']]],
   live: ['Right now', [['all', 'Anyone'], ['playing', 'Playing now'], ['waiting', 'At the session, not playing'], ['session', 'In the live session']]],
 };
 // Where a saved player is in the live session right now: on a court (with its label), present and waiting, or not there.
@@ -3401,7 +3428,7 @@ function viewPlayers() {
     && (f.band === 'all' || bandOf(p) === f.band)
     && (f.city === 'all' || (regCity(p) || 'none') === f.city)
     && addedOk[f.added](p)
-    && (f.status === 'all' || regStatus(p) === f.status)
+    && (f.status === 'all' || (f.status === 'details' ? needsEmail(p) : regStatus(p) === f.status))
     && liveOk(p)).sort((a, b) => a.name.localeCompare(b.name));
   // Contacts-style grouping: one section per first letter, and an A–Z index that jumps to it.
   const letterOf = (p) => { const c = p.name.trim().charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : '#'; };
@@ -3684,9 +3711,6 @@ const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
 const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
-const digitsOf = (v) => String(v || '').replace(/\D/g, '');
-// D-2026-11-09-06: a guest request whose phone matches a saved player is offered for linking; nothing merges until the QM taps Link.
-const savedPhoneMatch = (r) => (r.pid || r.account || !r.phone || r.noLink ? null : saved().find((p) => p.identity !== 'registered' && p.phone && digitsOf(p.phone) === digitsOf(r.phone)) || null);
 // D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
 const inviterOf = (s, r) => { if (!r.inviteCode) return null; const row = [...s.roster, ...(s.waitlist || [])].find((x) => x.inviteCode === r.inviteCode); return row ? P(row.pid) : null; };
 const JOINED_VIA = { club: 'Joined via club link', session: 'Joined via session link' };
@@ -3749,8 +3773,8 @@ function joinReqCard(s, r, full) {
   // otherwise their account's own picture); a guest request keeps initials.
   const face = acct ? avatar(P(r.pid) || saved().find((p) => p.rtr === r.account) || { id: r.account, name: r.name, identity: 'registered' }) : `<span class="avatar" aria-hidden="true">${esc(initials(r.name))}</span>`;
   const tag = acct ? chip(`ROTRA player · ${member ? 'already in your club' : 'new to your club'}`, member ? 'ok' : 'warn') : chip('Guest request', 'warn');
-  const inv = inviterOf(s, r), match = savedPhoneMatch(r);
-  const meta = acct ? `Requested ${fmtWhen(r.at, { lower: true })}` : `${r.phone ? esc(r.phone) : 'No phone given'} · says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}`;
+  const inv = inviterOf(s, r);
+  const meta = acct ? `Requested ${fmtWhen(r.at, { lower: true })}` : `Says ${r.band === 'unsure' ? 'not sure of level' : esc(r.band)} · requested ${fmtWhen(r.at, { lower: true })}`;
   // #706: the choice the player made. A waitlisted player's slot request names their place; the button follows the choice.
   const want = wantOf(r), wlPos = want === 'fromWaitlist' ? waitOf(s).findIndex((w) => w.pid === r.pid) + 1 : 0;
   const wantLine = want === 'fromWaitlist' ? `Waitlist #${wlPos || '?'} · asks for a slot` : WANT_TEXT[want];
@@ -3758,7 +3782,6 @@ function joinReqCard(s, r, full) {
   return `<div class="req-row">
       <div class="li" style="padding:0">${face}<div class="main"><b>${esc(r.name)}${r.nick ? ` <span class="muted">“${esc(r.nick)}”</span>` : ''}</b>
         <p class="small muted">${meta}</p><p class="small"><b>${wantLine}</b></p>${acct ? `<p class="small muted">Shared rank: ${r.level != null ? esc(lvLabel(r.level)) : 'none yet'}</p>` : ''}${inv ? `<p class="small muted">Invited by ${esc(inv.name)}</p>` : ''}</div>${tag}</div>
-      ${r.linked ? notice('ok', `Linked to <b>${esc(nm(r.linked))}</b> from your saved players.`) : match ? notice('', `Is this <b>${esc(match.name)}</b> from your saved players?<div class="row" style="margin-top:8px"><button class="btn xs primary" data-act="linkReq" data-id="${r.id}" data-pid="${match.id}">Link</button><button class="btn xs" data-act="notThemReq" data-id="${r.id}">Not them</button></div>`) : ''}
       <div class="req-actions">${selectLevel(`req-lv-${r.id}`, lv, `data-act-change="reqLevel" data-id="${r.id}" aria-label="Level for ${esc(r.name)}"`, r.err && lv == null)}
         <div class="row"><button class="btn sm" data-act="declineReq" data-id="${r.id}">Decline</button><button class="btn sm primary" data-act="confirmReq" data-id="${r.id}">${confirmLabel}</button></div></div>
       ${r.err ? `<span class="err">${esc(r.err)}</span>` : ''}</div>`;
@@ -4642,12 +4665,13 @@ const pubViewer = () => { const a = pubAs(); return a.kind === 'player' ? P(a.pi
 // #715 (proposed flag, used by #731): an always-private player is masked for everyone, with initials instead of the photo.
 const ALWAYS_PRIVATE = new Set(['p9', 'p14']);
 const alwaysPrivate = (p) => !!p && ALWAYS_PRIVATE.has(p.id);
-const showsFull = (p) => pubSignedIn() && !!p && p.identity === 'registered' && !alwaysPrivate(p);
+// D-2026-11-16-04: an unclaimed player is public, like a registered player who chose Public. A guest stays masked.
+const showsFull = (p) => pubSignedIn() && onRotra(p) && !alwaysPrivate(p);
 const pubNameText = (p) => (showsFull(p) ? p.name : maskName(p.name));
 const pubNameHtml = (p) => (showsFull(p) ? `<b>${esc(p.name)}</b>${p.nick ? `<br><span class="small muted">${esc(p.nick)}</span>` : ''}` : `<b>${esc(maskName(p.name))}</b>`);
 // Owner comment, November 11, 2026: an always-private player's face and banner are public; only the name and details are hidden.
 const pubAvatarOf = (p) => (showsFull(p) || (pubSignedIn() && alwaysPrivate(p)) ? avatar(p) : pubAvatar(p));
-// Signed-in Players can open a registered participant's ROTRA profile; guests and unclaimed profiles stay plain tiles.
+// Signed-in Players can open a participant's profile card. A guest's card says there is no profile yet.
 // The viewer's own tile carries a “You” label (owner request, November 9, 2026).
 const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
 // Owner, November 13, 2026: "in the public view of the Queue session, clicking on player avatars should open the profile dialog".
@@ -4734,7 +4758,7 @@ function setPubAs(k) {
   if (k === 'visitor') S.ui.pubAs = { kind: 'visitor', key: k, sid: s.id };
   else if (k === 'guest') {
     if (!(S.ui.guestReq && S.ui.guestReq.sid === s.id && (s.requests || []).some((r) => r.id === S.ui.guestReq.id))) {
-      const r = { id: `q${Date.now()}`, name: 'Rico Santos', nick: 'Rics', phone: '0917 555 0142', band: 'Intermediate', at: Date.now(), status: 'pending', want: slotsFullFor(s) ? 'waitlist' : 'slot' };
+      const r = { id: `q${Date.now()}`, name: 'Rico Santos', nick: 'Rics', phone: '', band: 'Intermediate', at: Date.now(), status: 'pending', want: slotsFullFor(s) ? 'waitlist' : 'slot' };
       s.requests = [...(s.requests || []), r]; S.ui.guestReq = { sid: s.id, id: r.id };
     }
     S.ui.pubAs = { kind: 'guest', key: k, sid: s.id };
@@ -5116,7 +5140,6 @@ const SHEETS = {
       ${ways}
       <label class="field"><span>Your name</span><input class="input${e.name ? ' bad' : ''}" id="join-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" autocomplete="name" data-autofocus>${e.name ? `<span class="err">${e.name}</span>` : ''}</label>
       <label class="field"><span>Nickname (optional)</span><input class="input" id="join-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
-      <label class="field"><span>Phone (optional)</span><input class="input${e.phone ? ' bad' : ''}" id="join-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" autocomplete="tel">${e.phone ? `<span class="err">${e.phone}</span>` : '<span class="hint">Helps the club recognise you and link your ROTRA profile. Only the club sees it.</span>'}</label>
       <div class="field"><span>Your level</span><div class="seg" role="group" aria-label="Your level">${BAND_CHOICES.map(([v, l]) => `<button aria-pressed="${sh.band === v}" data-act="sheetSet" data-k="band" data-v="${v}">${l}</button>`).join('')}</div>${e.band ? `<span class="err">${e.band}</span>` : '<span class="hint">Your best guess. The Queue Master sets your level for the night.</span>'}</div>
       ${wantField(s, slotsFullFor(s) ? 'waitlist' : sh.want || 'slot', 'data-act="sheetSet" data-k="want"', e.want)}
       ${notice('', 'This is a request, not a booking. The Queue Master confirms each guest before giving a slot or a waitlist place.')}`,
@@ -5288,7 +5311,7 @@ const SHEETS = {
   profile(sh) {
     const p = P(sh.id);
     const city = regCity(p);
-    const status = { registered: 'Registered ROTRA player', unclaimed: 'Saved by your club with a phone. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
+    const status = { registered: 'Registered ROTRA player', unclaimed: needsEmail(p) ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet' : 'Saved by your club with their email. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
     // Owner comment, November 11, 2026: the same banner profile card as the participant profile, with the club-private rows below.
     const s = cur(), r = s ? R(s, p.id) : null;
     const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;
@@ -5302,6 +5325,7 @@ const SHEETS = {
           ${ppName(p)}
           <div class="row" style="gap:8px">${identChip(p)}<span class="chip pp-level">${r && r.level != null ? `${esc(lvLabel(r.level))} tonight` : p.sugg != null ? `${esc(lvLabel(p.sugg))} · suggestion` : 'No level yet'}</span></div>
           <span class="small muted">${status}</span>
+          ${needsEmail(p) ? notice('warn', '<b>Details required.</b> An unclaimed player needs an email. Add their email in Edit details, or delete the player.') : ''}
           <div class="pp-sec"><span class="label">About</span>
             <dl class="kv">
               <dt>Registered in</dt><dd>${city ? esc(city) : 'Not registered yet'}</dd>
@@ -5312,13 +5336,14 @@ const SHEETS = {
             <dl class="kv">
               <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
               <dt>Sessions here</dt><dd>${p.prior}</dd>
-              <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' && !p.phone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
+              <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' || p.noPhone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
+              ${p.identity === 'registered' ? '' : `<dt>Email</dt><dd>${p.email ? 'On file and kept private' : 'None on file'}</dd>`}
             </dl></div>
-      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Their guest record stays unlinked until they accept a separate linking invitation.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
+      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted" style="margin:0">Levels are set per session while preparing a roster, not here.</p>
         </div>
       </div>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'guest' && !sh.back ? `<button class="btn" data-act="openLinkPlayer" data-id="${p.id}">Link to saved player…</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
@@ -5424,8 +5449,8 @@ const SHEETS = {
   pubProfile(sh) {
     const p = P(sh.id), r = R(cur(), p.id);
     // Owner comments, November 11, 2026: every tile opens a dialog. A private player's card shows their picture and banner and says the
-    // rest is private; a guest or unclaimed player (no ROTRA account) gets a card saying there is no profile yet.
-    const limited = pubViewer()?.id !== p.id && (alwaysPrivate(p) || p.identity !== 'registered');
+    // rest is private; a guest (no ROTRA profile) gets a card saying there is no profile yet. An unclaimed player's card is public (D-2026-11-16-04).
+    const limited = pubViewer()?.id !== p.id && (alwaysPrivate(p) || !onRotra(p));
     if (limited) { const priv = alwaysPrivate(p); return sheetShell(esc(maskName(p.name)), `
       <div class="pp-card">
         <div class="pp-banner bn-${bannerOf(p)}" aria-hidden="true"></div>
@@ -5433,7 +5458,7 @@ const SHEETS = {
         <div class="pp-body">
           <div class="pp-name"><b>${esc(maskName(p.name))}</b></div>
           <div class="row" style="gap:8px">${chip(priv ? 'Private profile' : 'Not on ROTRA yet')}</div>
-          <div class="pp-sec"><span class="label">${priv ? 'Private' : 'Guest'}</span><p class="muted" style="margin:0">${priv ? 'This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and the Queue Master.' : 'This player is playing as a guest and hasn\'t registered with ROTRA yet, so there\'s no profile to show. The club keeps their games for when they do.'}</p></div>
+          <div class="pp-sec"><span class="label">${priv ? 'Private' : 'Guest'}</span><p class="muted" style="margin:0">${priv ? 'This player has chosen to keep their ROTRA profile private. You can see their picture and banner; their name, level and games stay between them and the Queue Master.' : 'This player is playing as a guest and hasn\'t registered with ROTRA yet, so there\'s no profile to show.'}</p></div>
         </div>
       </div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'pp-sheet'); }
     const st = pubStats(p), city = regCity(p), s = cur();
@@ -5448,6 +5473,7 @@ const SHEETS = {
         <div class="pp-body">
           ${ppName(p)}
           <div class="row" style="gap:8px">${identChip(p)}<span class="chip pp-level">${esc(lvLabel(r && r.level != null ? r.level : p.sugg))}</span></div>
+          ${p.identity === 'unclaimed' ? '<span class="small muted">Saved by the club. Not registered with ROTRA yet.</span>' : ''}
           <div class="pp-sec"><span class="label">About</span>
             <dl class="kv">
               <dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd>
@@ -5456,21 +5482,20 @@ const SHEETS = {
         </div>
       </div>`,
       // Owner, November 13, 2026: Share profile in the card; Open ROTRA profile opens a new tab and shows the new-tab icon.
-      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.rtr ? `<button class="btn" data-act="shareProfile" data-id="${esc(p.id)}">${I.share} Share profile</button><a class="btn primary" href="${rotraProfileUrl(p)}" target="_blank" rel="noopener" aria-label="Open ROTRA profile in a new tab">Open ROTRA profile ${I.ext}</a>` : ''}`, false, 'pp-sheet');
+      `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.rtr && p.identity === 'registered' ? `<button class="btn" data-act="shareProfile" data-id="${esc(p.id)}">${I.share} Share profile</button><a class="btn primary" href="${rotraProfileUrl(p)}" target="_blank" rel="noopener" aria-label="Open ROTRA profile in a new tab">Open ROTRA profile ${I.ext}</a>` : ''}`, false, 'pp-sheet');
   },
   // #716 (proposed): the full photo on a black overlay. Closes on the overlay, the × or Esc, back to what was open.
   photo(sh) {
     const p = P(sh.id);
     return `<div class="photo-view" data-act="closeSheet" role="dialog" aria-modal="true" aria-label="Photo of ${esc(showsFull(p) || !S.ui.guest ? p.name : maskName(p.name))}"><button class="btn icon-btn photo-x" data-act="closeSheet" aria-label="Close" data-autofocus>${I.x}</button><div class="photo-big" data-photo-stop>${picInner(p)}</div></div>`;
   },
-  // D-2026-11-09-06: the QM links a guest record to a saved player by hand when no phone matched. Nothing merges by itself.
-  linkPlayer(sh) {
-    const g = P(sh.id), q = (sh.q || '').trim().toLowerCase();
-    const list = saved().filter((p) => p.id !== g.id && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
-    return sheetShell(`Link ${esc(g.name)} to a saved player`, `<p class="small muted">Choose the saved player who is the same person. ${esc(g.name)}'s slots, games and payments here move to that record. Nothing merges until you pick one.</p>
-      <label class="field"><span>Search saved players</span><input class="input" id="link-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
-      <div class="sel-list">${list.map((p) => `<button class="opt" data-act="linkPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || '<div class="empty">No saved player matches.</div>'}</div>`,
-      `<button class="btn" data-act="openProfile" data-id="${g.id}">Back</button>`);
+  // D-2026-11-16-04: one email is one person. When the email typed for a guest already belongs to a saved player,
+  // the Queue Master confirms and the guest's record moves into that player's. This replaces Link to saved player….
+  sameEmail(sh) {
+    const g = P(sh.id), to = P(sh.to);
+    return sheetShell(`Same person as ${esc(to.name)}?`, `<p>That email is already <b>${esc(to.name)}</b> in your saved players.</p>
+      <p class="small muted">${esc(g.name)}'s slots, games and payments here move to that record, and ${esc(g.name)} is removed from your saved players.</p>`,
+      `<button class="btn" data-act="openEditPlayer" data-id="${g.id}" data-autofocus>Back</button><button class="btn primary" data-act="confirmSameEmail">Move to ${esc(to.name)}</button>`);
   },
   deletePlayer(sh) {
     // Only reached when the player is in the Active Session (D-DELETE-PLAYER). Elsewhere Delete player acts at once.
@@ -5485,7 +5510,8 @@ const SHEETS = {
       `<button class="btn" data-act="closeSheet" data-autofocus>Keep player</button><button class="btn danger" data-act="confirmDeletePlayer" data-id="${p.id}">Delete player</button>`);
   },
   editPlayer(sh) {
-    // Saved players › player › Edit details. Guests and unclaimed profiles only: a registered player owns their details.
+    // Saved players › player › Edit details. Guests and unclaimed players only: a registered player owns their details.
+    // D-2026-11-16-04: adding an email makes a guest an unclaimed player. A club can't change an email once it is saved.
     const p = P(sh.id), d = sh.d, e = sh.err || {};
     const claim = p.identity === 'unclaimed', phoneOnFile = claim && !p.noPhone;
     const SOC = [['facebook', 'Facebook', 'https://facebook.com/yourname'], ['instagram', 'Instagram', 'https://instagram.com/yourname'], ['youtube', 'YouTube', 'https://youtube.com/@yourname'], ['linkedin', 'LinkedIn', 'https://linkedin.com/in/yourname']];
@@ -5500,13 +5526,14 @@ const SHEETS = {
         <span class="small muted" id="pic-chars-l">Choose a character</span>
         <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
         <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>
-      ${claim ? notice('', 'What you fill in here is filled in for them when they open their invite link. They can still change it and only need to choose a password.') : ''}
+      ${needsEmail(p) ? notice('warn', '<b>Details required.</b> An unclaimed player needs an email. Add their email here, or delete the player.') : claim ? notice('', 'What you fill in here is filled in for them when they open their invite link. They can still change it and only need to choose a password.') : ''}
       <div class="fgrid">${input('ep-name', 'Full or display name', 'name')}${input('ep-nick', 'Nickname (optional)', 'nick')}</div>
       <label class="field"><span>Level for this club (optional)</span>${selectLevel('ep-level', d.level, 'data-bind="ui.sheet.d.level" data-num')}</label>
-      ${phoneOnFile ? `<div class="field"><span>Phone</span><p class="small">On file and kept private. Not their number? Ask ROTRA to change it.</p></div>`
-        : input('ep-phone', 'Phone (optional)', 'phone', { type: 'tel', im: 'tel', ph: '0917 555 0142', hint: claim ? 'This profile has no phone yet. They need one to register.' : "With a phone, ROTRA can link them to their account if they're registered, when it syncs." })}
-      ${claim ? `${input('ep-email', 'Email (optional)', 'email', { type: 'email', im: 'email', ph: 'name@example.com', hint: 'Fills in their registration. Never shown publicly.' })}
-        <div class="field"><span>Playing style (optional)</span><textarea class="input" id="ep-style" data-bind="ui.sheet.d.style" maxlength="280">${esc(d.style)}</textarea></div>
+      ${p.email ? `<div class="field"><span>Email</span><p class="small">On file and kept private. It can't be changed here. Wrong email? Delete this player and add them again.</p></div>`
+        : input('ep-email', claim ? 'Email' : 'Email (optional)', 'email', { type: 'email', im: 'email', ph: 'name@example.com', hint: claim ? "Check it with the player. It can't be changed after you save. Never shown publicly." : "Add an email to save them as an unclaimed player. They get an RTR ID, and their games here follow them when they register. It can't be changed after you save. Never shown publicly." })}
+      ${!claim ? '' : phoneOnFile ? `<div class="field"><span>Phone</span><p class="small">On file and kept private. Not their number? Ask ROTRA to change it.</p></div>`
+        : input('ep-phone', 'Phone (optional)', 'phone', { type: 'tel', im: 'tel', ph: '0917 555 0142', hint: 'Kept private. Only your club sees it.' })}
+      ${claim ? `<div class="field"><span>Playing style (optional)</span><textarea class="input" id="ep-style" data-bind="ui.sheet.d.style" maxlength="280">${esc(d.style)}</textarea></div>
         ${expFields('ep', 'ui.sheet.d', d, e.exp)}
         <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="small muted" style="margin-bottom:6px">Links (optional)</legend><div class="fgrid">${SOC.map(([k, l, ph]) => input(`ep-${k}`, l, k, { type: 'url', im: 'url', ph })).join('')}</div></fieldset>` : ''}`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditPlayer">Save details</button>`);
@@ -5517,10 +5544,10 @@ const SHEETS = {
     const code = (hashStr(`${p.id}${p.name}`) >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7);
     const link = claim ? `https://player.rotra.club/claim/${code}` : 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
-      <p>${claim ? 'Your club saved them with a phone. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
+      <p>${claim ? 'Your club saved them with their email. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
       ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one.' : ''} Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
-      <p class="small muted">${claim ? '' : 'Their guest record stays unlinked until they accept a separate linking invitation. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
+      <p class="small muted">${claim ? '' : "Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first. "}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
       `<button class="btn" data-act="closeSheet">Done</button>`);
   },
   sync() {
@@ -5606,7 +5633,10 @@ const SHEETS = {
     let body = `${club ? notice('', "Adding to your saved players. They won't be added to a session.") : notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
     if (sh.pick) {
       const p = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : P(sh.pick.id);
-      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : idLine(p)}</p></div>${identChip(p)}</div>
+      // Another club's unclaimed player has no name here: this club types its own (D-2026-11-16-04).
+      const own = sh.pick.dir && !p.name;
+      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(own ? NO_NAME : p)}<div class="main"><b>${own ? 'Not registered yet' : esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : idLine(p)}</p></div>${identChip(p)}</div>
+        ${own ? `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-pname" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus><span class="hint">Your club's own name for them. Other clubs keep theirs until the player registers.</span></label>` : ''}
         ${p.phoneHidden ? '<p class="small muted">Phone hidden by player. Use their RTR ID or QR code instead.</p>' : ''}
         <div class="field"><span>Player Information suggestion</span><span class="small">${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</span></div>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}</label></div>`;
@@ -5621,15 +5651,20 @@ const SHEETS = {
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
         <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
-      const list = DIRECTORY.filter((p) => !S.players.some((x) => x.rtr === p.rtr) && (!q || p.name.toLowerCase().includes(q) || p.rtr.toLowerCase().includes(q)));
-      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player now; their profile can be linked after you reconnect.')
-        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name or RTR ID" data-autofocus></label>
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span> · ${esc(p.rank)}</div></div>${identChip(p)}</button>`).join('') || '<div class="empty">No match in Player Information.</div>'}</div>
-        <p class="small muted">Results only suggest people. Confirm with the player before linking.</p>`;
+      // D-2026-11-16-04: exact RTR ID or exact email only. No name search here.
+      const key = (sh.q || '').trim().toLowerCase();
+      const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key;
+      const mine = key ? saved().find((x) => hit(x) || DIRECTORY.some((g) => hit(g) && g.rtr === x.rtr)) : null;
+      const list = key && !mine ? DIRECTORY.filter(hit) : [];
+      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email now; ROTRA looks them up after you reconnect.')
+        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID or email" data-autofocus><span class="hint">Enter the full RTR ID or email. Names are searched in your saved players only.</span></label>
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID or email.' : 'Enter an RTR ID or email to find a ROTRA player.'}</div>`}</div>
+        <p class="small muted">Confirm with the player before adding them.</p>
+        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112 or ivan.delarosa@example.com.</p>`;
     } else {
       body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
-        <label class="field"><span>Phone (optional)</span><input class="input" id="add-phone" type="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}"><span class="hint">Without a phone they're saved as a guest. With one, ROTRA can link them to their account if they're registered, when the session syncs. Only your club sees them otherwise.</span></label>
+        <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly.</span></label>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
       return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
@@ -6314,20 +6349,19 @@ const ACT = {
   sendJoin: () => {
     const sh = S.ui.sheet, s = cur(), err = {};
     if (!(sh.name || '').trim()) err.name = 'Enter your name.';
-    if ((sh.phone || '').trim() && (sh.phone.replace(/\D/g, '').length < 10)) err.phone = 'Enter a full mobile number, or leave it empty.';
     if (!sh.band) err.band = 'Pick your level, or Not sure.';
     // #706: the player's choice; Join a slot is refused while every slot is taken.
     const want = slotsFullFor(s) ? 'waitlist' : sh.want || 'slot';
     if (!WANT_CHOICES.some(([v]) => v === want)) err.want = 'Pick Join a slot or Be waitlisted.';
     else if (want === 'slot' && slotsFullFor(s)) err.want = 'All slots are taken. Join the waitlist instead.';
     sh.err = err;
-    if (Object.keys(err).length) { render(); const f = document.getElementById(err.name ? 'join-name' : err.phone ? 'join-phone' : 'join-name'); if (f) f.focus(); return; }
-    const r = { id: `q${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), phone: (sh.phone || '').trim(), band: sh.band, at: Date.now(), status: 'pending', want };
+    if (Object.keys(err).length) { render(); const f = document.getElementById('join-name'); if (f) f.focus(); return; }
+    const r = { id: `q${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), phone: '', band: sh.band, at: Date.now(), status: 'pending', want };
     s.requests = [...(s.requests || []), r];
     S.ui.guestReq = { sid: s.id, id: r.id }; S.ui.pubAs = { kind: 'guest', key: 'guest', sid: s.id }; S.ui.sheet = null; save(); render(); toast('Request sent');
   },
   fakeReq: (d) => {
-    const s = S.sessions.find((x) => x.id === d.id); const names = [['Rico Santos', 'Rics', '0917 555 0142', 'Intermediate'], ['Mae Lagman', '', '', 'Beginner'], ['JP Uy', 'JP', '0928 555 0199', 'Advanced'], ['Tessa Ramos', '', '0905 555 0110', 'unsure']];
+    const s = S.sessions.find((x) => x.id === d.id); const names = [['Rico Santos', 'Rics', '', 'Intermediate'], ['Mae Lagman', '', '', 'Beginner'], ['JP Uy', 'JP', '', 'Advanced'], ['Tessa Ramos', '', '', 'unsure']];
     const [name, nick, phone, band] = names[(s.requests || []).length % names.length];
     s.requests = [...(s.requests || []), { id: `q${Date.now()}`, name, nick, phone, band, at: Date.now(), status: 'pending' }];
     save(); render(); toast(`${name} sent a join request to ${s.title}`);
@@ -6346,9 +6380,6 @@ const ACT = {
   },
   openRequests: () => openSheet({ type: 'requests' }),
   reqTab: (d) => { S.ui.reqTab = d.k; render(); },
-  // D-2026-11-09-06: Link merges the guest request into the saved player's record; Not them hides the prompt.
-  linkReq: (d) => { const s = cur(), r = (s.requests || []).find((x) => x.id === d.id), p = P(d.pid); if (!r || !p) return; r.pid = p.id; r.linked = p.id; if (!r.nick && p.nick) r.nick = p.nick; save(); render(); toast(`Linked to ${p.name}`); },
-  notThemReq: (d) => { const r = (cur().requests || []).find((x) => x.id === d.id); if (r) r.noLink = true; save(); render(); },
   // D-2026-11-09-03: drop-out notices. The slot never frees by itself.
   keepDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'kept'; x.closedAt = Date.now(); commit(`${nm(x.pid)} stays on the roster`); render(); },
   removeDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'removed'; x.closedAt = Date.now(); s.roster = s.roster.filter((r) => r.pid !== x.pid); commit(`${nm(x.pid)} removed from the roster`); render(); },
@@ -6369,9 +6400,8 @@ const ACT = {
   declineMatchReq: (d) => { const mr = (cur().matchRequests || []).find((x) => x.id === d.id); if (!mr || mr.status !== 'open') return; mr.status = 'declined'; mr.decidedAt = Date.now(); commit(`${short(mr.pid)}'s match request declined`); render(); },
   // D-2026-11-09-03: club setting. Off hides the player-side I'm here button.
   toggleSelfCheckIn: () => { S.club.selfCheckIn = S.club.selfCheckIn === false; save(); render(); toast(S.club.selfCheckIn !== false ? 'Players can check themselves in' : 'Only you mark presence now'); },
-  // D-2026-11-09-06: Link to saved player… from a guest's record.
-  openLinkPlayer: (d) => openSheet({ type: 'linkPlayer', id: d.id, q: '' }),
-  linkPlayer: (d) => { const sh = S.ui.sheet, to = P(d.id); if (!sh || sh.type !== 'linkPlayer' || !to) return; mergePlayer(sh.id, to.id); S.ui.sheet = null; save(); render(); toast(`Linked to ${to.name}`); },
+  // D-2026-11-16-04: the email typed for a guest already belongs to a saved player; the guest's record moves into it.
+  confirmSameEmail: () => { const sh = S.ui.sheet, to = sh && P(sh.to); if (!sh || sh.type !== 'sameEmail' || !to) return; mergePlayer(sh.id, to.id); S.ui.sheet = { type: 'profile', id: to.id }; save(); render(); toast(`Moved to ${to.name}`); },
   openDeleteSession: () => { if (cur()?.status === 'prepared') openSheet({ type: 'deleteSession' }); },
   deleteOpenRoster: () => { S.ui.sheet = null; S.ui.prepTab = 'roster'; render(); const b = document.getElementById('ptb-roster'); if (b) b.focus(); },
   confirmDeleteSession: () => {
@@ -6407,7 +6437,7 @@ const ACT = {
       s.roster.push({ pid, level: +lv, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
       commit(`${r.name} got a slot from the waitlist · ${lvLabel(+lv)}`); render(); return;
     }
-    if (!r.pid) S.players.push(r.account ? { id: pid, name: r.name, nick: r.nick, identity: 'registered', rtr: r.account, sugg: r.level ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' } : { id: pid, name: r.name, nick: r.nick, identity: r.phone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
+    if (!r.pid) S.players.push(r.account ? { id: pid, name: r.name, nick: r.nick, identity: 'registered', rtr: r.account, sugg: r.level ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' } : { id: pid, name: r.name, nick: r.nick, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
     r.status = 'confirmed'; r.pid = pid; r.err = '';
     // #706: Be waitlisted always lands on the waitlist, even during play; Join a slot keeps the earlier rules.
     if (want === 'waitlist' || (s.status !== 'active' && !openSlots(s))) { s.waitlist = [...(s.waitlist || []), { pid, level: +lv, at: r.at }]; commit(`${r.name} confirmed from a join request · waitlist #${waitOf(s).findIndex((w) => w.pid === pid) + 1}`); }
@@ -6528,14 +6558,19 @@ const ACT = {
     if (!d.name.trim()) err.name = 'Enter a name.';
     const digits = d.phone.replace(/\D/g, '');
     if (d.phone.trim() && !/^(09\d{9}|639\d{9})$/.test(digits)) err.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
-    if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim())) err.email = 'Enter an email address, like name@example.com.';
+    const email = p.email ? '' : d.email.trim();
+    if (email && !emailOk(email)) err.email = 'Enter an email address, like name@example.com.';
     const exp = expError(d); if (exp) err.exp = exp;
     sh.err = err;
     if (Object.keys(err).length) { render(); return; }
-    Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), sugg: d.level, email: d.email.trim(), style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
-    if (d.phone.trim()) { if (p.identity === 'guest') p.identity = 'pending'; p.noPhone = false; }
+    Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), sugg: d.level, style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+    if (d.phone.trim()) p.noPhone = false;
+    // One email is one person: an email that is already a saved player asks before the two records become one.
+    const same = email ? savedByEmail(email, p.id) : null;
+    if (same) { S.ui.sheet = { type: 'sameEmail', id: p.id, to: same.id }; commit(`Details saved · ${p.name}`); render(); return; }
+    const how = email ? ` · ${applyEmail(p, email)}` : '';
     S.ui.sheet = { type: 'profile', id: p.id };
-    commit(`Details saved · ${p.name}`);
+    commit(`Details saved · ${p.name}${how}`);
     render();
   },
   copyInvite: (d) => {
@@ -6830,9 +6865,9 @@ const ACT = {
   },
   pickPlayer: (d) => {
     const sh = S.ui.sheet; const p = d.dir ? DIRECTORY.find((x) => x.id === d.id) : P(d.id);
-    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.err = '';
+    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.err = ''; sh.name = '';
     // Anyone with a level is added in one tap at that level, which can still be changed in the roster before
-    // the session starts. Unclaimed profiles are this club's own records, so they need no identity check.
+    // the session starts. A saved unclaimed player needs no identity check.
     if (p.sugg != null) { curAct = 'confirmAdd'; ACT.confirmAdd(); return; }
     render();
   },
@@ -6840,41 +6875,48 @@ const ACT = {
     const sh = S.ui.sheet;
     if (sh.club) {
       // Saved players › Add player: a Player Information profile joins the saved players; the level is optional.
-      const g = DIRECTORY.find((x) => x.id === sh.pick.id);
-      if (S.players.some((x) => x.rtr === g.rtr)) { sh.pick = null; sh.err = `${g.name} is already in your saved players.`; render(); return; }
+      const g = DIRECTORY.find((x) => x.id === sh.pick.id), name = g.name || (sh.name || '').trim();
+      if (!name) { sh.err = 'Enter a name.'; render(); return; }
+      if (S.players.some((x) => x.rtr === g.rtr)) { sh.pick = null; sh.err = `${name} is already in your saved players.`; render(); return; }
       const level = sh.level == null || sh.level === '' ? null : +sh.level;
-      S.players.push({ id: `p${Date.now()}`, name: g.name, nick: '', identity: g.identity, rtr: g.rtr, sugg: level, prior: 0, base: null, added: Date.now() });
-      afterAdd(sh, `${g.name.split(' ')[0]} saved${level != null ? ` · ${lvLabel(level)}` : ''}`);
+      S.players.push({ id: `p${Date.now()}`, name, nick: '', identity: g.identity, rtr: g.rtr, ...(g.identity === 'unclaimed' ? { email: g.email } : {}), sugg: level, prior: 0, base: null, added: Date.now() });
+      afterAdd(sh, `${name.split(' ')[0]} saved${level != null ? ` · ${lvLabel(level)}` : ''}`);
       return;
     }
     const s = cur();
+    const dir = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : null, dirName = dir ? dir.name || (sh.name || '').trim() : '';
+    if (dir && !dirName) { sh.err = 'Enter a name.'; render(); return; }
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club before adding.'; render(); return; }
-    if (!sh.toWait && needsOverfill(s, sh.pick.dir ? (DIRECTORY.find((x) => x.id === sh.pick.id) || {}).name || 'this player' : nm(sh.pick.id), 'confirmAdd', undefined, true)) return;
+    if (!sh.toWait && needsOverfill(s, dir ? dirName : nm(sh.pick.id), 'confirmAdd', undefined, true)) return;
     let pid = sh.pick.id;
-    if (sh.pick.dir) { const g = DIRECTORY.find((x) => x.id === pid); pid = `p${Date.now()}`; S.players.push({ id: pid, name: g.name, nick: '', identity: g.identity, rtr: g.rtr, sugg: g.sugg, prior: 0, base: null, added: Date.now() }); }
+    if (dir) { pid = `p${Date.now()}`; S.players.push({ id: pid, name: dirName, nick: '', identity: dir.identity, rtr: dir.rtr, ...(dir.identity === 'unclaimed' ? { email: dir.email } : {}), sugg: dir.sugg, prior: 0, base: null, added: Date.now() }); }
     if (sh.toWait) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${nm(pid)} added to the waitlist as #${s.waitlist.length} · ${lvLabel(+sh.level)}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
     afterAdd(sh, `${nm(pid)} added · ${lvLabel(+sh.level)}${s.status === 'active' ? ' · level locked' : ''}`);
   },
   confirmNew: () => {
-    const sh = S.ui.sheet;
-    if (!(sh.name || '').trim()) { sh.err = 'Enter a name.'; render(); return; }
+    const sh = S.ui.sheet, name = (sh.name || '').trim(), email = (sh.email || '').trim();
+    if (!name) { sh.err = 'Enter a name.'; render(); return; }
+    // D-2026-11-16-04: no email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player.
+    if (email && !emailOk(email)) { sh.err = 'Enter an email address, like name@example.com, or leave it empty.'; render(); return; }
+    const same = email ? savedByEmail(email) : null;
+    if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
+    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
     if (sh.club) {
-      // Saved players › Add player: a guest (no phone) or pending player (phone), with a level only if one was chosen.
-      const hasPhone = !!(sh.phone || '').trim(), level = sh.level == null || sh.level === '' ? null : +sh.level;
-      S.players.push({ id: `p${Date.now()}`, name: sh.name.trim(), nick: (sh.nick || '').trim(), identity: hasPhone ? 'pending' : 'guest', rtr: null, sugg: level, prior: 0, base: null, added: Date.now() });
-      afterAdd(sh, `${sh.name.trim()} saved${hasPhone ? ' · profile lookup after sync' : ' as a guest'}`);
+      // Saved players › Add player: a level only if one was chosen.
+      np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;
+      S.players.push(np);
+      afterAdd(sh, `${name} saved${email ? ` · ${applyEmail(np, email)}` : ' as a guest'}`);
       return;
     }
     const s = cur();
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club.'; render(); return; }
-    if (!sh.toWait && needsOverfill(s, sh.name.trim(), 'confirmNew', undefined, true)) return;
-    const pid = `p${Date.now()}`;
-    const hasPhone = !!(sh.phone || '').trim();
-    S.players.push({ id: pid, name: sh.name.trim(), nick: (sh.nick || '').trim(), identity: hasPhone ? 'pending' : 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() });
-    if (sh.toWait) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${sh.name.trim()} added to the waitlist as #${s.waitlist.length}`); return; }
+    if (!sh.toWait && needsOverfill(s, name, 'confirmNew', undefined, true)) return;
+    const pid = np.id, how = email ? ` · ${applyEmail(np, email)}` : ' as a guest';
+    S.players.push(np);
+    if (sh.toWait) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${name} added to the waitlist as #${s.waitlist.length}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
-    afterAdd(sh, `${sh.name.trim()} added${hasPhone ? ' · profile lookup after sync' : ' as a guest'}`);
+    afterAdd(sh, `${name} added${how}`);
   },
   // Late or on another day: the new end is pre-filled with now plus the planned length, rounded up to the next 15 minutes.
   openStart: () => { const s = cur(); openSheet({ type: 'start', endAt: startNeedsEnd(s) ? ceil15(Date.now() + (s.end - s.start)) : null }); },

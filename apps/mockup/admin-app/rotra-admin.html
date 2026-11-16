@@ -717,24 +717,37 @@ function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h
 const plain = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 // Players who also appear in the Queue and Player prototypes keep their names, IDs and contacts.
-const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, claimed: !!email, phoneHidden: false, level, recent, registered: null, ...o });
+const P = (id, name, nick, rtr, club, phone, email, level, recent, o = {}) => ({ id, name, nick, rtr, club, phone, email, phoneHidden: false, level, recent, registered: null, ...o, claimed: !!o.registered });
+// D-2026-11-16-04: an unclaimed player has an email and an RTR ID. Older unclaimed records with a phone and no email are tagged Details required.
+const needsDetails = (p) => !p.claimed && !p.email;
+// One email is one person and one RTR ID. When more than one club saved an unclaimed player, each club keeps its own name for them.
+const savedBy = (p) => (!p.claimed && Array.isArray(p.clubs) && p.clubs.length > 1 ? p.clubs : null);
+const clubLine = (p) => { const m = savedBy(p); return m ? `${p.club} and ${m.length - 1} more club${m.length === 2 ? '' : 's'}` : p.club; };
+const savedByHtml = (p) => savedBy(p).map((c) => `<span>${esc(c.club)} · saved as <b>${esc(c.name)}</b></span>`).join('<br>');
+const NO_BOARD = 'Saved by more than one club. Not on the leaderboard until they register.';
+const DETAILS_NOTE = (p) => notice('warn', `<b>Details required.</b> This older record has a phone and no email. ${esc(p.club || 'The club')} must add an email or delete the record.`);
+// RTR-<city code>-<MMDDYY>-<sequence>. Admin changes the place and the date; the RTR ID follows them and keeps its sequence number.
+const rtrParts = (rtr) => { const m = /^RTR-(.+)-(\d{6})-(\d+)$/.exec(rtr || ''); return m ? { code: m[1], date: m[2], seq: m[3] } : null; };
+const rtrYmd = (rtr) => { const x = rtrParts(rtr); return x ? `20${x.date.slice(4)}-${x.date.slice(0, 2)}-${x.date.slice(2, 4)}` : ''; };
+const rtrWith = (rtr, code, ymd) => { const x = rtrParts(rtr); return x && code && /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? `RTR-${code}-${ymd.slice(5, 7)}${ymd.slice(8, 10)}${ymd.slice(2, 4)}-${x.seq}` : rtr; };
 function seedPlayers() {
   const out = [
     P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18', pic: { kind: 'char', charId: 'ch1', seed: 'base' } }),
     P('p2', 'Bea Castillo', '', 'RTR-PH-CEB-031526-0002', 'Lahug Smash Club', '+63 917 555 0213', 'bea.castillo.cebu@example.com', 6, 14, { registered: '2026-03-21', pic: { kind: 'char', charId: 'ch4', seed: 'c' } }),
-    P('p3', 'Jomar dela Cruz', 'Jom', 'RTR-PH-CEB-040226-0007', 'Lahug Smash Club', '+63 918 555 0377', '', 3, 9),
+    P('p3', 'Jomar dela Cruz', 'Jom', 'RTR-PH-CEB-040226-0007', 'Lahug Smash Club', '+63 918 555 0377', 'jomar.delacruz@example.com', 3, 9),
     P('p4', 'Kat Lim', '', 'RTR-PH-CEB-040226-0011', 'Lahug Smash Club', '+63 920 555 0458', 'kat.lim@example.com', 5, 11, { registered: '2026-04-05', pic: { kind: 'char', charId: 'ch3', seed: 'b' } }),
     P('p5', 'Enzo Navarro', '', 'RTR-PH-MNL-050726-0014', 'Sampaloc Shuttle Club', '+63 917 555 0631', 'enzo.navarro@example.com', 7, 15, { registered: '2026-05-09' }),
+    // An older record: a phone and no email, so it shows Details required.
     P('p6', 'Joanna Tan', 'Jo', 'RTR-PH-CEB-050726-0019', 'Lahug Smash Club', '+63 919 555 0702', '', null, 2),
     P('p7', 'Rafa Aquino', '', 'RTR-PH-CEB-061126-0021', 'IT Park Badminton Club', '+63 915 555 0814', 'rafa.aquino@example.com', 6, 10, { registered: '2026-06-14' }),
     P('p9', 'Carlo Medina', '', 'RTR-PH-CEB-061126-0025', 'IT Park Badminton Club', '+63 916 555 0920', 'carlo.medina@example.com', 4, 8, { registered: '2026-06-20' }),
     P('p9b', 'Carlo Medina', '', 'RTR-PH-MNL-090226-0102', 'Sampaloc Shuttle Club', '+63 908 555 0175', 'carlo.m.manila@example.com', 2, 3, { registered: '2026-09-04' }),
-    P('p10', 'Nina Ocampo', '', 'RTR-PH-CEB-070926-0030', 'Talamban Racket Club', '+63 917 555 0388', '', 3, 7),
+    P('p10', 'Nina Ocampo', '', 'RTR-PH-CEB-070926-0030', 'Talamban Racket Club', '+63 917 555 0388', 'nina.ocampo@example.com', 3, 7, { clubs: [{ club: 'Talamban Racket Club', name: 'Nina Ocampo' }, { club: 'IT Park Badminton Club', name: 'Nina O.' }] }),
     P('p11', 'Paulo Garcia', 'Pau', 'RTR-PH-DVO-070926-0031', 'Matina Smash Club', '+63 926 555 0149', 'paulo.garcia@example.com', 6, 13, { registered: '2026-07-12' }),
     P('p13', 'Dani Rivera', '', 'RTR-PH-CEB-081326-0040', 'Lahug Smash Club', '+63 917 555 0566', 'dani.rivera@example.com', 4, 10, { registered: '2026-08-15' }),
     P('p14', 'Theo Ramos', '', 'RTR-PH-MNL-081326-0042', 'Sampaloc Shuttle Club', '+63 905 555 0297', 'theo.ramos@example.com', 8, 18, { registered: '2026-08-16' }),
     P('p16', 'Marco Lopez', '', 'RTR-PH-ILO-090226-0047', 'Molo Shuttle Club', '+63 933 555 0611', 'marco.lopez@example.com', 7, 11, { registered: '2026-09-03' }),
-    P('p17', 'Gab Torres', '', 'RTR-PH-CEB-090226-0050', 'Talamban Racket Club', '', '', 2, 4),
+    P('p17', 'Gab Torres', '', 'RTR-PH-CEB-090226-0050', 'Talamban Racket Club', '', 'gab.torres@example.com', 2, 4),
     P('p18', 'Iya Mercado', '', 'RTR-PH-CEB-091626-0055', 'IT Park Badminton Club', '+63 917 555 0904', 'iya.mercado@example.com', 4, 6, { registered: '2026-09-18' }),
     P('p20', 'Andi Cruz', '', 'RTR-PH-CEB-100726-0061', 'Lahug Smash Club', '+63 921 555 0730', 'andi.cruz@example.com', null, 0, { registered: '2026-10-09' }),
   ];
@@ -743,12 +756,12 @@ function seedPlayers() {
     const first = FIRST[h % FIRST.length], last = LAST[(h >>> 8) % LAST.length];
     const code = CODES[(h >>> 12) % CODES.length], date = DATES[(h >>> 6) % DATES.length];
     const clubs = CITY_CLUB[code];
-    const claimed = (h >>> 4) % 4 !== 0;
+    const claimed = (h >>> 4) % 4 !== 0; // unclaimed players have an email too, except one older record (i === 11) with a phone only
     const lv = (h >>> 20) % 11;
     const mm = date.slice(0, 2), dd = date.slice(2, 4);
     out.push(P(`g${i}`, `${first} ${last}`, (h >>> 16) % 6 === 0 ? NICKS[(h >>> 22) % NICKS.length] : '', `RTR-PH-${code}-${date}-${String(200 + i).padStart(4, '0')}`, clubs[(h >>> 14) % clubs.length],
       claimed || (h >>> 18) % 2 ? `+63 9${10 + ((h >>> 9) % 30)} 555 ${String(1000 + i * 37).slice(-4)}` : '',
-      claimed ? `${plain(first)}.${plain(last)}${i}@example.com` : '', lv > 8 ? null : lv, (h >>> 24) % 19,
+      claimed || i !== 11 ? `${plain(first)}.${plain(last)}${i}@example.com` : '', lv > 8 ? null : lv, (h >>> 24) % 19,
       { phoneHidden: claimed && (h >>> 11) % 3 === 0, registered: claimed ? `2026-${mm}-${pad(Math.min(28, +dd + 3))}` : null }));
   }
   return out;
@@ -868,6 +881,8 @@ if (!S || S.v !== 1) S = freshState();
 if (!Array.isArray(S.chars)) S.chars = seedChars();
 if (!Array.isArray(S.banners)) S.banners = seedBanners();
 if (!S.defaultBanner) S.defaultBanner = 'bn1';
+// Saves from before unclaimed players had an email get the sample players again.
+if (!S.players.some((p) => !p.registered && p.email)) S.players = seedPlayers();
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false, upload: null });
 S.ui.login.pending = false;
@@ -1050,6 +1065,7 @@ function retention(c) {
 function rankOf(p) {
   if (p.level == null) return { k: 'none', text: 'No rank yet', chip: chip('No rank yet') };
   const T = eff().threshold;
+  if (savedBy(p)) return { k: 'clubs', text: `${LEVELS[p.level]} · not on the leaderboard until they register`, chip: chip('Not on leaderboard') };
   if (p.recent < T) return { k: 'below', text: `${LEVELS[p.level]} · ${p.recent} of ${T} recent matches`, chip: chip('Below requirement') };
   return { k: 'board', text: `${LEVELS[p.level]} · on the overall leaderboard`, chip: chip('On leaderboard', 'ok') };
 }
@@ -1381,7 +1397,7 @@ const fmtAdded = (p) => { const d = p.rtr.split('-')[3] || ''; return /^\d{6}$/.
 function playerMatches() {
   const q = S.ui.playersQ.trim(), F = S.ui.playersF;
   const qp = plain(q), qd = q.replace(/\D/g, '');
-  return S.players.filter((p) => (F === 'all' || (F === 'registered' ? p.claimed : !p.claimed))
+  return S.players.filter((p) => (F === 'all' || (F === 'registered' ? p.claimed : F === 'details' ? needsDetails(p) : !p.claimed))
     && (!q || plain(`${p.name} ${p.nick} ${p.rtr} ${p.email}`).includes(qp) || (qd.length >= 4 && (p.phone.replace(/\D/g, '').includes(qd) || p.phone.replace(/\D/g, '').includes(qd.replace(/^0/, '63'))))));
 }
 function viewPlayers() {
@@ -1392,9 +1408,9 @@ function viewPlayers() {
   const adv = !!S.ui.playerAdv;
   const ic = (d) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   const cell = (label, i) => `<button type="button" class="card pl-card ${i<4?'pl-level':'pl-account'}" data-act="playersF" data-v="${i===4?'registered':i===5?'unclaimed':'all'}" aria-label="${label}: ${counts[i]}. ${i>=4?'Show only these players':''}"><span>${label}</span><b class="tnum">${counts[i]}</b></button>`;
-  return shell(`<div class="page-head"><div class="row between"><div><h1>Players</h1><p class="muted">${all.length} player${all.length===1?'':'s'} · permanent RTR IDs</p></div><button class="btn primary pl-add" data-act="pmSheet" data-v="Add player"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add player</button></div></div>
+  return shell(`<div class="page-head"><div class="row between"><div><h1>Players</h1><p class="muted">${all.length} player${all.length===1?'':'s'}</p></div><button class="btn primary pl-add" data-act="pmSheet" data-v="Add player"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add player</button></div></div>
     <div class="pl-cards" role="group" aria-label="Player counts">${[0,1,2,3,4,5].map((i)=>cell(labels[i],i)).join('')}</div>
-    <div class="toolbar pl-tools"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed']],'Filter by account')}
+    <div class="toolbar pl-tools"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed'],['details','Details required']],'Filter by account')}
       <button class="btn" aria-expanded="${adv}" aria-controls="pl-adv" data-act="plAdv">${ic('<path d="M4 6h16M7 12h10M10 18h4"/>')} Filters</button>
       <div class="seg" role="group" aria-label="Layout"><button type="button" aria-pressed="${!S.ui.playerGrid}" aria-label="List view" title="List" data-act="plGrid" data-v="">${ic('<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>')}</button><button type="button" aria-pressed="${!!S.ui.playerGrid}" aria-label="Grid view" title="Grid" data-act="plGrid" data-v="1">${ic('<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>')}</button></div></div>
     ${adv ? `<section class="card stack pl-adv" id="pl-adv" aria-label="More filters">
@@ -1407,7 +1423,7 @@ function viewPlayers() {
       <label class="pl-dup"><span class="stack tight"><b>Duplicates only</b><span class="small muted">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</span></span><input type="checkbox" role="switch" class="pl-switch" aria-label="Duplicates only"></label>
       <div class="pl-adv-foot"><button class="btn" data-act="clearPlayers">Clear filters</button><button class="btn primary" data-act="plAdv">Done</button></div></section>` : ''}
     <div class="pl-bulk"><label class="pl-all"><input type="checkbox" data-change="plSelectAll"> Select all on this page</label><button class="btn xs" type="button">Select all ${all.length} matching</button></div>
-    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${rankOf(p).chip}</div><p class="small muted">${esc(p.club || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${needsDetails(p)?chip('Details required','warn'):''}${rankOf(p).chip}</div><p class="small muted">${esc(clubLine(p) || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
     ${(() => {
       const pages = Math.max(1, Math.ceil(all.length / size));
       // 1 … 4 5 6 … 12: always the first and last page, and the pages next to the current one.
@@ -1519,9 +1535,10 @@ function playerManagementSheet(action,id) {
   const qv = () => {
     const rk = rankOf(p), soc = socialsOf(p);
     return `<div class="stack qv">
-      <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}</div></div></div>
+      <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}${needsDetails(p) ? chip('Details required', 'warn') : ''}</div></div></div>
+      ${needsDetails(p) ? DETAILS_NOTE(p) : ''}
       ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
-      <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd></dl>
+      <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(p.phone || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}<br><span class="small muted">${NO_BOARD}</span></dd>` : ''}</dl>
       ${(() => { /* Owner, November 13, 2026: stats count the calendar year and reset on January 1. */ const yr = todayYmd().slice(0, 4), h = historyOf(p, 60).filter((x) => x.ymd.startsWith(yr)), games = h.reduce((n, x) => n + x.games, 0), wins = h.reduce((n, x) => n + x.won, 0);
         return ppStatsBlock(games, wins); })()}
       <section class="qv-sec"><h3>History</h3><div class="list">${historyOf(p, 2).map(histRow).join('')}</div></section>
@@ -1546,12 +1563,15 @@ function playerManagementSheet(action,id) {
         ${tog('phoneHidden', 'Hide phone number from clubs', 'Clubs find the player by RTR ID or QR code instead.', !!p.phoneHidden)}</div>
       <div class="pic-sec"><span class="label">Account</span>
         <div class="fgrid">${ef('phone', 'Phone', p.phone || '', { type: 'tel', im: 'tel', mono: true, ph: '+63 9XX XXX XXXX' })}${ef('email', 'Email', p.email || '', { type: 'email', im: 'email', mono: true })}</div>
-        <p class="hint">${p.claimed ? 'The player signs in with these. Changing them here applies straight away, without a contact-change request.' : "The club entered these. The player hasn't registered yet."}</p>
+        <p class="hint">${p.claimed ? 'The player signs in with these. Changing them here applies straight away, without a contact-change request.' : needsDetails(p) ? "Details required: this older record has no email. The club must add one or delete the record. You can add it here." : "The club entered these and can't change the email. You can. The player hasn't registered yet."}</p>
         <div class="field"><label for="pe-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password *(for MVP or beta only)*</label>
           <div class="pass"><input class="input" id="pe-pass" type="password" autocomplete="new-password" ${p.claimed ? 'placeholder="Leave empty to keep the current password"' : 'disabled placeholder="Not registered yet"'}><button type="button" class="btn xs ghost" data-act="pePassShow" aria-pressed="false" aria-label="Show password" ${p.claimed ? '' : 'disabled'}>Show</button></div>
           <span class="hint">${p.claimed ? "Replaces the player's password. For manual recovery until players can reset it themselves. Leave empty to keep it. Give the new password to the player yourself; it isn't shown again." : "This player hasn't registered, so there's no password to replace."}</span><span class="err" id="pe-pass-err" hidden></span></div>
-        <dl class="kv small"><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>Created by</dt><dd>${esc(p.club || 'Admin')}</dd><dt>Account</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed'}</dd><dt>Rank</dt><dd>${esc(rk.text)}</dd><dt>Recent matches</dt><dd>${p.recent} in the last three months</dd>${p.pwSetAt ? `<dt>Password</dt><dd>Last set by Admin ${fmtAt(p.pwSetAt)}</dd>` : ''}</dl>
-        <p class="small muted">These stay read-only. The RTR ID never changes. Rank, level and match counts come from finished club sessions, and Admin can't change ranks, winners or scores. A profile becomes registered only when the player claims it.</p></div>
+        ${rtrParts(p.rtr) ? `<div class="fgrid"><label class="field" for="pe-place"><span>Registration place</span><select class="input" id="pe-place" data-change="peRtr" data-id="${p.id}">${CITY_LIST.map(([k, n]) => `<option value="${k}" ${rtrParts(p.rtr).code === k ? 'selected' : ''}>${n} · ${k}</option>`).join('')}</select></label><label class="field" for="pe-regDate"><span>Registration date</span><input class="input" id="pe-regDate" type="date" value="${rtrYmd(p.rtr)}" max="${todayYmd()}" data-change="peRtr" data-id="${p.id}"><span class="err" id="pe-regDate-err" hidden></span></label></div>
+        <dl class="kv small"><dt>RTR ID</dt><dd class="mono" id="pe-rtr" aria-live="polite">${esc(p.rtr)}</dd></dl>
+        <p class="hint" id="pe-rtr-hint">The RTR ID follows the registration place and date, and keeps its number at the end. It isn't typed by hand.</p>` : ''}
+        <dl class="kv small"><dt>Created by</dt><dd>${savedBy(p) ? `${savedByHtml(p)}<br><span class="muted">${NO_BOARD}</span>` : esc(p.club || 'Admin')}</dd><dt>Account</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed'}</dd><dt>Rank</dt><dd>${esc(rk.text)}</dd><dt>Recent matches</dt><dd>${p.recent} in the last three months</dd>${p.pwSetAt ? `<dt>Password</dt><dd>Last set by Admin ${fmtAt(p.pwSetAt)}</dd>` : ''}</dl>
+        <p class="small muted">These stay read-only. Rank, level and match history come from finished club sessions, and Admin can't change ranks, winners or scores. A profile becomes registered only when the player claims it.</p></div>
       <div class="pic-sec">${ef('reason', 'Reason for the change', '', { area: true, max: 300, ph: 'Required. Saved in the record of actions.' })}</div>
     </div>`;
   };
@@ -1565,7 +1585,7 @@ function playerManagementSheet(action,id) {
   const inviteFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="copyInvite" data-id="${id}">Copy link</button>`;
   const editFoot = `<button class="btn" data-act="pmSheet" data-v="Quick view" data-id="${id}">Back</button><button class="btn primary" data-act="pmSave" data-id="${id}">Save changes</button>`;
   if (action === 'Edit profile' && p) PIC = { pid: p.id, draft: p.pic ? { ...p.pic } : null, page: 1, err: '' };
-  const body= action==='Quick view' ? qv() : action==='Invite to ROTRA' && p ? inviteBody() : action==='Edit profile' && p ? editBody() : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" data-act="pmSheet" data-v="${x}" data-id="${id}">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Contacts, rank and RTR ID cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
+  const body= action==='Quick view' ? qv() : action==='Invite to ROTRA' && p ? inviteBody() : action==='Edit profile' && p ? editBody() : action==='Games' ? '<p>Read-only. Admin cannot change ranks, winners or scores.</p><div class="toolbar"><button class="btn">Counted</button><button class="btn">Fun and partial</button><button class="btn">All</button></div><p>Date · Club · Session · Partner · Opponents · Score · Result · Counted for rank</p>' : action==='Actions' ? ['Quick view','View full profile','View full history','Copy RTR ID','Copy registration link','Edit profile','Archive','Restore','Remove'].map(x=>`<button class="btn" data-act="pmSheet" data-v="${x}" data-id="${id}">${x}</button>`).join('') : action==='Add player' || action==='Edit profile' ? `<div class="stack"><label>Full name<input class="input" value="${p?esc(p.name):''}"></label><label>Nickname<input class="input" value="${p?esc(p.nick||''):''}"></label>${action==='Add player'?'<label>Phone (optional)<input class="input"></label><label>Email (optional)<input class="input"></label><label>Place<select class="input"><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label><label>Club (optional)<select class="input"><option>Created by Admin</option></select></label>':`${!p?.claimed?'<label>Profile photo<input class="input" type="url"></label>':''}<label>Reason<textarea class="input"></textarea></label><p>Review before and after values before saving. Rank cannot be edited.</p>`}<button class="btn primary">${action==='Add player'?'Add player':'Review changes'}</button></div>` : `<p>${action} ${name}. ${action==='Remove'?'Permanent. Only records with no games and no claimed account.':'History is kept.'}</p><label>Reason<textarea class="input"></textarea></label>${action==='Remove'?'<label>Type the RTR ID<input class="input"></label>':''}<button class="btn primary">Confirm ${action}</button>`;
   document.querySelectorAll('.scrim,.sheet').forEach(x=>x.remove());
   document.body.insertAdjacentHTML('beforeend',sheetWrap(action==='Edit profile'&&p?'Edit profile':action,body,action==='Quick view'?qvFoot:action==='Edit profile'&&p?editFoot:action==='Invite to ROTRA'&&p?inviteFoot:''));
   if(action==='Quick view'||((action==='Edit profile'||action==='Invite to ROTRA')&&p)) document.querySelector('.sheet').classList.add('player-side-panel');
@@ -1589,10 +1609,11 @@ function viewPlayer() {
       <section class="card stack"><h2>Identity</h2><dl class="kv">
         <dt>Name</dt><dd>${esc(p.name)}</dd><dt>Nickname</dt><dd>${esc(p.nick || '—')}</dd>
         <dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd>
-        <dt>Created</dt><dd>${fmtYmd(`20${yy}-${mm}-${dd}`)} by ${esc(p.club)}</dd></dl>
-        <p class="small muted">The RTR ID never changes, including after a contact change.</p></section>
+        <dt>Created</dt><dd>${fmtYmd(`20${yy}-${mm}-${dd}`)} by ${esc(p.club)}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}</dd>` : ''}</dl>
+        ${savedBy(p) ? `<p class="small muted">${NO_BOARD}</p>` : ''}
+        <p class="small muted">A contact change doesn't change the RTR ID. Admin can change it from Edit profile, by changing the registration place or date.</p></section>
       <section class="card stack"><h2>Account</h2><dl class="kv">
-        <dt>Status</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed. The club created this profile; the player hasn\'t finished registering.'}</dd></dl></section>
+        <dt>Status</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed. The club created this profile; the player hasn\'t finished registering.'}</dd></dl>${needsDetails(p) ? DETAILS_NOTE(p) : ''}</section>
     </div><div>
       <section class="card stack"><h2>Rank and games</h2><dl class="kv">
         <dt>Rank</dt><dd>${esc(rk.text)}</dd>
@@ -1615,7 +1636,7 @@ function viewPlayer() {
       <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>`,
   };
   return shell(`${backBtn('players', 'Players')}
-    <div class="hero">${avatar(p, 'lg', true)}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
+    <div class="hero">${avatar(p, 'lg', true)}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${needsDetails(p) ? chip('Details required', 'warn') : ''}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
     ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
     <div class="tabs" role="tablist" aria-label="Player sections">${PT.map(([k, l, badge]) => `<button role="tab" id="ptab-${k}" aria-selected="${k === ptab}" aria-controls="player-panel" data-act="playerTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
     <div id="player-panel" role="tabpanel" aria-labelledby="ptab-${ptab}" class="stack" style="gap:20px">${panels[ptab]}</div>`);
@@ -2062,8 +2083,11 @@ function peErrors(p, d) {
   if (d.phone && d.phone.replace(/\D/g, '').length < 10) e.phone = 'Enter the full phone number, like +63 917 555 0142.';
   else if (d.phone && S.players.some((x) => x.id !== p.id && norm(x.phone) === norm(d.phone))) e.phone = 'This phone number is already linked to another player.';
   if (!d.email && p.claimed) e.email = 'A registered player signs in with email. Enter one.';
+  else if (!d.email && p.email) e.email = 'An unclaimed player needs an email. Enter one.';
   else if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = 'Enter an email like name@example.com.';
   else if (d.email && S.players.some((x) => x.id !== p.id && norm(x.email) === norm(d.email))) e.email = 'This email is already linked to another player.';
+  if (rtrParts(p.rtr) && !/^\d{4}-\d{2}-\d{2}$/.test(d.regDate)) e.regDate = 'Enter the registration date.';
+  else if (d.rtr !== p.rtr && S.players.some((x) => x.id !== p.id && x.rtr === d.rtr)) e.regDate = 'Another player already has this RTR ID. Choose another place or date.';
   if (d.pass && d.pass.length < 8) e.pass = 'Use at least 8 characters, or leave it empty to keep the current password.';
   return e;
 }
@@ -2468,10 +2492,12 @@ const ACT = {
   picPrev: () => { if (!PIC) return; const p = playerOf(PIC.pid); PIC.draft = p.prevPic ? { ...p.prevPic } : null; PIC.err = ''; picRefresh('.pic-up input'); },
   picPage: (el) => { if (!PIC) return; PIC.page = +el.dataset.v; picRefresh('[data-act="picPage"]:not(:disabled)'); },
   pePassShow: (el) => { const i = document.getElementById('pe-pass'); if (!i) return; const show = i.type === 'password'; i.type = show ? 'text' : 'password'; el.textContent = show ? 'Hide' : 'Show'; el.setAttribute('aria-pressed', String(show)); el.setAttribute('aria-label', `${show ? 'Hide' : 'Show'} password`); },
+  peRtrBack: () => { document.querySelectorAll('body > .pe-confirm').forEach((x) => x.remove()); const s = document.querySelector('body > .sheet'); if (s) { s.style.display = ''; document.getElementById('pe-regDate')?.focus(); } },
   pmSave: (el) => {
     const p = playerOf(el.dataset.id);
     if (!p || !PIC || PIC.pid !== p.id) return;
-    const d = { name: pv('name'), nick: pv('nick'), style: pv('style'), expY: pv('expY'), expM: pv('expM'), sinceM: pv('sinceM'), sinceY: pv('sinceY'), private: pv('private'), phoneHidden: pv('phoneHidden'), phone: pv('phone'), email: pv('email'), pass: (document.getElementById('pe-pass')?.value || ''), reason: pv('reason') };
+    const d = { name: pv('name'), nick: pv('nick'), style: pv('style'), expY: pv('expY'), expM: pv('expM'), sinceM: pv('sinceM'), sinceY: pv('sinceY'), private: pv('private'), phoneHidden: pv('phoneHidden'), phone: pv('phone'), email: pv('email'), pass: (document.getElementById('pe-pass')?.value || ''), reason: pv('reason'), regDate: pv('regDate') };
+    d.rtr = rtrWith(p.rtr, pv('place'), d.regDate);
     const so = socialOf(p);
     SOCIAL_KEYS.forEach(([k]) => { d[k] = pv(k); });
     const before = { name: p.name, nick: p.nick || '', style: p.style || '', expY: String(p.expY ?? ''), expM: String(p.expM ?? ''), sinceM: String(p.sinceM ?? ''), sinceY: String(p.sinceY ?? ''), private: !!p.profilePrivate, phoneHidden: !!p.phoneHidden, phone: p.phone || '', email: p.email || '' };
@@ -2480,6 +2506,8 @@ const ACT = {
     const changed = [...new Set(Object.keys(before).filter((k) => String(before[k]) !== String(d[k])).map((k) => LABEL[k]))];
     const picChanged = picKey(PIC.draft) !== picKey(p.pic);
     if (picChanged) changed.unshift('profile picture');
+    const rtrChanged = d.rtr !== p.rtr;
+    if (rtrChanged) changed.push('RTR ID');
     if (d.pass) changed.push('password');
     const e = peErrors(p, d);
     if (changed.length && !d.reason) e.reason = 'Say why you are making this change.';
@@ -2493,11 +2521,24 @@ const ACT = {
     }
     if (!changed.length) { PIC = null; document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove()); render(); toast('Nothing changed.'); return; }
     if (!S.online) { toast(OFFLINE_ERR); return; }
+    // A changed RTR ID is confirmed first. The edit sheet stays underneath with what was typed, so Back loses nothing.
+    if (rtrChanged && !el.dataset.ok) {
+      const edit = document.querySelector('body > .sheet');
+      edit.style.display = 'none';
+      document.body.insertAdjacentHTML('beforeend', sheetWrap('Change RTR ID?', `<div class="change"><div><span class="label">Current</span><span class="mono">${esc(p.rtr)}</span></div>${I.arrow}<div class="to"><span class="label">New</span><span class="mono">${esc(d.rtr)}</span></div></div>
+        <p>The old RTR ID is replaced with the new one on every record that holds it, in every club that saved ${esc(p.name)}.</p>
+        <p class="small muted">QR codes and links the player already shared with the old RTR ID may stop working.</p>`,
+        `<button class="btn" data-act="peRtrBack">Back</button><button class="btn primary" data-act="pmSave" data-id="${p.id}" data-ok="1">Change RTR ID</button>`, false).replace('class="scrim" data-act="closeSheet"', 'class="scrim pe-confirm"').replace('class="sheet"', 'class="sheet pe-confirm"').replace(/sheet-title/g, 'pe-confirm-title'));
+      document.getElementById('pe-confirm-title').focus();
+      return;
+    }
+    const rtrFrom = p.rtr;
+    if (rtrChanged) p.rtr = d.rtr; // the prototype holds the RTR ID in one place; the real change cascades to every record
     if (picChanged) { p.prevPic = p.pic || null; p.pic = PIC.draft; }
     Object.assign(p, { name: d.name, nick: d.nick, style: d.style, expY: d.expY === '' ? null : +d.expY, expM: d.expM === '' ? null : +d.expM, sinceM: d.sinceM === '' ? null : +d.sinceM, sinceY: d.sinceY === '' ? null : +d.sinceY, profilePrivate: d.private, phoneHidden: d.phoneHidden, phone: d.phone, email: d.email });
     p.social = Object.fromEntries(SOCIAL_KEYS.map(([k]) => [k, d[k]]));
     if (d.pass) p.pwSetAt = Date.now(); // the prototype never stores the password itself
-    log('player', p.id, `Edited ${p.name}: ${changed.join(', ')}. Reason: ${d.reason}`);
+    log('player', p.id, `Edited ${p.name}: ${changed.join(', ')}.${rtrChanged ? ` RTR ID ${rtrFrom} replaced with ${p.rtr} on every record.` : ''} Reason: ${d.reason}`);
     PIC = null;
     document.querySelectorAll('body > .scrim, body > .sheet').forEach((x) => x.remove());
     render();
@@ -2612,6 +2653,8 @@ const CHANGE = {
   charFiles: (el) => { addCharFiles(el.files); el.value = ''; },
   bannerFiles: (el) => { addBannerFiles(el.files); el.value = ''; },
   plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
+  // Edit profile: the RTR ID preview follows the registration place and date.
+  peRtr: (el) => { const p = playerOf(el.dataset.id), box = document.getElementById('pe-rtr'); if (p && box) box.textContent = rtrWith(p.rtr, pv('place'), pv('regDate')); },
 };
 document.addEventListener('change', (ev) => { const el = ev.target.closest('[data-change]'); if (el && CHANGE[el.dataset.change]) CHANGE[el.dataset.change](el); });
 document.addEventListener('submit', (ev) => {

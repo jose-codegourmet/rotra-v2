@@ -55,7 +55,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -1007,7 +1007,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID
 - **Decision status:** approved (owner discussion, November 16, 2026); lookup by phone and already-shared QR codes with an old RTR ID are not decided.
-- **Implementation status:** not started. No mockup, business, screen or database doc is changed yet; they still describe [D-2026-11-11-03](#d-2026-11-11-03).
+- **Implementation status:** mockup only: [Queue](../mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md), [Player](../mockup-changes/2026-11-16-player-unclaimed-identity.md) and [Admin](../mockup-changes/2026-11-16-admin-unclaimed-rtr-id-edit.md) logs. The mock app and real mode still follow [D-2026-11-11-03](#d-2026-11-11-03).
 - **Ticket:** needed
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
@@ -1040,4 +1040,6 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the **Confirm player** step applies when a club adds another club's unclaimed player.
   - Whether a phone still links a record on registration (the email is the key now).
   - Which email is matched on registration (the ROTRA email, the Google email, or both).
+  - A returning guest who sends a new join request gets a second guest record, because nothing links the two any more.
+  - The **Same person as NAME?** confirmation in the Queue mockup (the email typed for a guest already belongs to a saved player) is new and not yet confirmed by the owner.
 - **References:** [product terms](../product-terms.md) (Guest, Unclaimed profile, Player ID / RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [identity database design](../database_design/product/player-information/modules/identity.md).

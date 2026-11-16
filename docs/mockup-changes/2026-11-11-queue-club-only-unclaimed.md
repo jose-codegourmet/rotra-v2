@@ -9,7 +9,7 @@ Screen ID: Q-ROSTER, Q-IDENTIFY, Q-SAVED-PLAYERS
 Artifact: none
 Components: add-player-sheet, saved-player-card, player-profile-sheet, invite-sheet, identity-chip
 Supersedes: none
-Superseded by: none
+Superseded by: 2026-11-16-queue-unclaimed-email-lookup.md (in part)
 
 ## What changed
 - Player Information search: the unclaimed directory result (Leo Pascual) is gone. Search shows registered players only.

@@ -267,6 +267,12 @@ textarea.input { min-height: 80px; resize: vertical; }
 .gpick button:hover { background: var(--elev); }
 .gpick .main { display: flex; flex-direction: column; min-width: 0; }
 .gpick .main span { overflow-wrap: anywhere; }
+/* Identity picker (D-2026-11-16-04): one card per club that saved the person's email. */
+.idpick { display: flex; flex-direction: column; gap: 12px; }
+.idpick button { display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 14px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.idpick button:hover { background: var(--elev); border-color: var(--accent); }
+.idpick .who { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.idpick .main { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .method { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
 .method:first-of-type { border-top: 0; padding-top: 0; }
 .method .who2 { display: flex; gap: 12px; align-items: center; min-width: 0; }
@@ -1116,13 +1122,24 @@ const CLUBS = [
   ['Talamban Racket Club', ['Wednesday Ladder Night']],
 ];
 // Players who also appear in the Queue prototype keep their names here (index = order before Migs is placed).
-const FIXED = { 2: ['Theo Ramos'], 40: ['Marco Lopez'], 62: ['Enzo Navarro'], 96: ['Paulo Garcia', 'Pau'], 155: ['Bea Castillo'], 200: ['Rafa Aquino'], 339: ['Kat Lim'], 511: ['Dani Rivera'], 702: ['Carlo Medina'], 860: ['Iya Mercado'] };
+const FIXED = { 2: ['Theo Ramos'], 17: ['Nina Ocampo', 'Nins'], 40: ['Marco Lopez'], 62: ['Enzo Navarro'], 96: ['Paulo Garcia', 'Pau'], 155: ['Bea Castillo'], 200: ['Rafa Aquino'], 339: ['Kat Lim'], 511: ['Dani Rivera'], 702: ['Carlo Medina'], 860: ['Iya Mercado'] };
 // Two sample players with a private profile (leaderboard positions 6 and 10), so visitors see the masking and the gate.
 const PRIVATE_SEED = new Set([5, 9]);
 // Proposed (#715): one sample player is always private (leaderboard position 12) and three are hidden from Player Information.
 const ALWAYS_SEED = new Set([11]);
 const HIDDEN_SEED = new Set([3, 20, 41]);
 const MIGS_SLOT = 127; // Migs is #128 while he qualifies
+// D-2026-11-16-04: two sample unclaimed players (leaderboard positions 18 and 23), each saved by one club (index: club id).
+// An unclaimed player is public and on the leaderboard only while exactly one club has saved them.
+const UNCLAIMED_SEED = { 17: 'c1', 22: 'c3' };
+// An email two clubs saved, each with its own version of the person. Registering with it opens the identity picker.
+// One email is one person and one RTR ID, so both records share the ID. Not on the leaderboard until they register.
+const UNCLAIMED_BY_EMAIL = {
+  'paolo.mendoza@example.com': { rtr: 'RTR-PH-CEB-090226-0412', records: [
+    { club: 'c1', name: 'Paolo Mendoza', nick: 'Pao', level: 4, photo: true },
+    { club: 'c2', name: 'Paulo Mendoza', nick: '', level: 3, photo: false },
+  ] },
+};
 
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 const BASE = [];
@@ -1136,6 +1153,7 @@ for (let i = 0; i < 1283; i++) {
     id: `b${i}`, name, nick, photo: (h >>> 24) % 6 !== 0, level: levelAt(origPos), recent: 10 + ((h >>> 4) % 16),
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
     profilePrivate: PRIVATE_SEED.has(i) || ALWAYS_SEED.has(i), alwaysPrivate: ALWAYS_SEED.has(i), hiddenDir: HIDDEN_SEED.has(i),
+    unclaimed: i in UNCLAIMED_SEED, savedBy: UNCLAIMED_SEED[i] || null,
   });
 }
 
@@ -1213,6 +1231,7 @@ const G_ACCOUNTS = [
   { email: 'migs.santos@example.com', name: 'Miguel Santos', hint: 'Same email as Migs\'s ROTRA account' },
   { email: 'migs.plays@gmail.com', name: 'Miguel Santos', hint: 'Migs\'s personal Gmail, not his ROTRA email' },
   { email: 'jomar.delacruz@example.com', name: 'Jomar Dela Cruz', hint: 'Use for the club-created profile' },
+  { email: 'paolo.mendoza@example.com', name: 'Paolo Mendoza', hint: 'Two clubs saved this email (unclaimed)' },
 ];
 // Owner, November 16, 2026: Google sign-in is mandatory. Existing password players are asked to connect Google before a deadline.
 // The date is a placeholder until it is decided.
@@ -1419,11 +1438,15 @@ function profileOf(pid) {
   if (!e) return null;
   if (!genCache.has(pid)) genCache.set(pid, genSessions(pid, e.recent));
   const sessions = genCache.get(pid);
-  return { ...e, claimed: true, state: 'eligible', style: '', expY: '', expM: '', social: {}, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
+  return { ...e, claimed: !e.unclaimed, state: 'eligible', style: '', expY: '', expM: '', social: {}, sessions, recent: countedIn(sessions, WINDOW_DAYS) };
 }
 // Visitors (not signed in) never see a private player or a guest: masked and not opened (D-2026-11-09-07).
 // Proposed (#715): an always-private player stays masked for signed-in players too; the player sees their own profile.
 const hiddenFromViewer = (p) => !!p && p.id !== S.me && (!!p.alwaysPrivate || (!S.me && !!(p.profilePrivate || p.guest)));
+// D-2026-11-16-04: an unclaimed player (saved by a club with an email, not registered yet) is public and carries this mark.
+const isUnclaimed = (p) => !!p && p.claimed === false;
+const savedByName = (p) => (CLUB_DIR[p.savedBy] || CLUB_DIR.c1).name; // Jomar was saved by Lahug Smash Club
+const unclaimedChip = () => chip('Not registered yet', 'warn');
 const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
 const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: e.photo, face: e.face, photoUrl: e.photoUrl, level: e.level }); // picture stays visible: D-2026-11-11-11
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
@@ -1592,9 +1615,9 @@ function lbRow(e, pos) {
     return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${avatar(m)}
     <span class="lb-name"><b>${esc(m.name)}</b></span><span class="lb-lv">${lvLabel(e.level)}</span></div>`;
   }
-  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}, ${lvLabel(e.level)}">
+  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}${e.unclaimed ? ', not registered yet' : ''}, ${lvLabel(e.level)}">
     <span class="lb-pos">${num(pos)}</span>${avatar(e)}
-    <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}</span>
+    <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}${e.unclaimed ? unclaimedChip() : ''}</span>
     <span class="lb-lv">${lvLabel(e.level)}</span></button>`;
 }
 function meCard(list) {
@@ -1648,6 +1671,7 @@ function viewBoard() {
         <li>Players with <b style="color:var(--fg)">${T()} completed singles or doubles matches</b> in the last three months. It's a rolling count, not a lifetime total.</li>
         <li>Fun games, partial games after a substitution, and invalid games or sessions don't count.</li>
         <li>After three months without playing, a player leaves the list until a club reassesses them.</li>
+        <li>Players marked <b style="color:var(--fg)">Not registered yet</b> were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register.</li>
         <li>Positions come from club assessments and match results. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
       </ul></section>
   </main>`;
@@ -1759,7 +1783,7 @@ function viewProfile() {
     <aside class="side stack">
       <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : isUnclaimed(p) ? `<div class="row">${unclaimedChip()}</div>` : ''}</div></div>
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
@@ -1770,6 +1794,7 @@ function viewProfile() {
     <div class="stack" style="gap:20px">
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
       ${p.state === 'processing' ? notice('warn', `<b>Updating from Sunday Night Queue.</b> Lahug Smash Club finished the session last night. This is ${own ? 'your' : 'the'} last calculated rank until the update is ready.`) : ''}
+      ${isUnclaimed(p) && !own ? notice('', `<b>Not registered yet.</b> ${esc(savedByName(p))} saved this player, so this is the club's version of them. The profile is public until they register with ROTRA.`) : ''}
       ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
       ${eligibility(p, own, st)}
       ${weeklyPerf(p, true)}
@@ -1838,6 +1863,7 @@ function mySessionsCard() {
 // Leave club lives on the club page; Report a problem is gone.
 function clubsOf(p) {
   if (S.accounts[p.id]) return (S.accounts[p.id].clubs || []);
+  if (p.savedBy) return [{ id: p.savedBy }]; // unclaimed: the one club that saved them
   return [{ id: CLUB_IDS[hashStr(`club-${p.id}`) % CLUB_IDS.length] }];
 }
 function clubsPanel(p, own) {
@@ -2632,6 +2658,7 @@ function viewNotifs() {
 }
 
 // ---------- P-CLAIM / P-CLAIM-STATUS ----------
+const maskEmail = (em) => em.replace(/^(.)[^@]*(@.*)$/, '$1•••••$2'); // the record is found by its email (D-2026-11-16-04)
 const maskPhone = (ph) => ph.replace(/(\+63 \d{3}) (\d{3}) (\d{2})(\d{2})/, '$1 ••• ••$4');
 function claimStatus() {
   if (S.ui.claimWrong) return 'wrong';
@@ -2652,15 +2679,18 @@ function viewClaim(standalone = false) {
     <div class="row"><button class="btn primary" data-act="claimCheck">Check again</button></div>`);
   // Everything the club filled in (Queue › Saved players › Edit details) starts the form; the player can change it.
   const C = S.ui.claim || (S.ui.claim = { ...editFields(a), email: a.email || '', phone: '', pass: '', pass2: '', show: false, city: '' });
-  const adminLink = standalone && !S.ui.regCtx.club;
   const e = S.ui.claimErr;
   if (standalone && S.ui.regStep === 'choose') return viewInvite();
   const gMode = standalone ? S.ui.regStep === 'google' && S.ui.gReg : S.ui.claimMethod === 'google' && S.ui.gClaim;
   const gId = standalone ? S.ui.gReg : S.ui.gClaim;
+  // D-2026-11-16-04: registering with an email clubs already saved keeps that record's RTR ID, so no city is asked.
+  const un = standalone && gMode && gId.unclaimed ? UNCLAIMED_BY_EMAIL[gId.unclaimed] : null;
+  const adminLink = standalone && !S.ui.regCtx.club && !un;
+  const viaEmail = !standalone && S.ui.claimEmail;
   if (!standalone && !S.ui.claimConfirmed) {
     return wrap(`<h1>Is this you?</h1><p class="muted">Lahug Smash Club added this profile for you. Check it's yours before you set a password.</p>
       <section class="card stack"><div class="row" style="gap:14px">${avatar(a, 'xl')}<div class="stack tight"><h2>${esc(a.name)}</h2>${a.nick ? `<p class="muted">“${esc(a.nick)}”</p>` : ''}</div></div>
-        <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
+        <dl class="kv"><dt>Player ID</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(a.rtr)}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(maskEmail(a.email))}</dd></dl>
         <div class="row"><button class="btn primary" data-act="claimYes">Yes, this is me</button><button class="btn" data-act="claimNo">This isn't me</button></div></section>`);
   }
   if (!standalone && !S.ui.claimMethod) {
@@ -2670,16 +2700,18 @@ function viewClaim(standalone = false) {
         <button class="btn ghost block" data-act="openNoGoogle">I don't have a Google account</button>
         <p class="small muted" style="margin:0">Your Google email becomes your ROTRA email and is already confirmed.</p></section>`);
   }
-  return `<main class="wrap slim"><div class="page-head"><span class="label">${standalone ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Finish registering</h1>
+  return `<main class="wrap slim"><div class="page-head"><span class="label">${standalone || viaEmail ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Finish registering</h1>
     <p class="muted">${standalone ? (gMode ? 'Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.' : 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.') : gMode ? "Your club filled in what it knows. Check it and change anything that's wrong." : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p>
     <div class="row">${standalone ? '<button type="button" class="btn xs ghost" data-act="regBack">← Other ways to sign up</button>' : '<button type="button" class="btn xs ghost" data-act="claimMethodBack">← Use another Google account</button>'}</div></div>
     <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
       ${standalone && S.ui.registerMatch ? notice('warn', `A ROTRA account or profile already uses this phone number or email. Is it yours?<div class="row"><button type="button" class="btn primary" data-act="go" data-to="login">Yes, sign in</button><button type="button" class="btn" data-act="go" data-to="forgot">Recover account</button><button type="button" class="btn" data-act="registerNo">No, edit my details</button></div><p>If you have not registered yet, ask your club for your profile's registration link. Otherwise contact ROTRA for help.</p>`) : ''}
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
+      ${un ? notice('', `You picked <b>${esc(CLUB_DIR[un.records[gId.pick].club].name)}</b>'s version of you as your starting profile. Change anything that's wrong. Your player ID stays <span class="mono">${esc(un.rtr)}</span>.`) : ''}
+      ${viaEmail ? notice('', `<b>Lahug Smash Club already saved a profile with this email.</b> Its details are filled in below. Your player ID stays <span class="mono">${esc(a.rtr)}</span> and your games carry over.`) : ''}
       <div class="stack tight"><span class="label">Contact · private</span>
         ${gMode ? `<div class="field"><span>Signs in with</span>${gChip(gId)}<span class="hint">This becomes your ROTRA email. Never shown publicly.</span></div>` : ''}
         ${a.phone ? `<div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>`
-          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: standalone ? 'Your mobile number. It identifies your ROTRA profile and is never shown publicly.' : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.' })}
+          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: standalone ? 'Your mobile number. It is never shown publicly.' : 'This profile has no phone yet. Add your mobile number.' })}
         ${gMode ? '' : `${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
         <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span style="color:var(--error)" aria-hidden="true">*</span></label>
           <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
@@ -2700,9 +2732,10 @@ function viewRegisterDone() {
   if (!a) return viewClaim(true);
   const club = d.club && CLUB_DIR[d.club], ses = d.session && SESSION_DIR[d.session];
   return `<main class="wrap slim"><div class="page-head"><span class="label">Registration complete</span><h1>Welcome, ${esc(firstName(a))}</h1></div>
-    ${club ? notice('ok', `You're now in ${esc(club.name)}'s saved players.`) : notice('ok', 'Your ROTRA account is ready.')}
+    ${d.joined ? notice('ok', `Your records from ${listNames(d.joined.map((c) => esc(CLUB_DIR[c].name)))} are now on your account, with their games.`) : ''}
+    ${club ? notice('ok', `You're now in ${esc(club.name)}'s saved players.`) : d.joined ? '' : notice('ok', 'Your ROTRA account is ready.')}
     ${ses ? notice('', `Your request to join ${esc(ses.title)} is ready to send.`) : ''}
-    <section class="card stack tight"><p>Your player ID is <span class="mono">${esc(a.rtr)}</span>.</p>
+    <section class="card stack tight"><p>Your player ID ${d.joined ? 'stays' : 'is'} <span class="mono">${esc(a.rtr)}</span>.</p>
       ${a.google ? `<p class="small muted">You sign in with Google (${esc(a.google)}).</p>` : ''}${verifyOf(a).ok ? `<div class="row">${verifyChip(a)}<span class="small muted">Google, phone and email are all set.</span></div>` : ''}
       <div class="row">${ses ? `<button class="btn primary" data-act="toSession" data-slug="${esc(d.session)}">Back to the session</button>` : ''}<button class="btn${ses ? '' : ' primary'}" data-act="openProfile" data-id="${a.id}">Go to my profile</button></div></section></main>`;
 }
@@ -3025,7 +3058,8 @@ const SHEETS = {
   // Owner comment, November 11, 2026: clicking a member opens a profile dialog (the same banner card as the Queue app) instead of leaving the page.
   profileCard: (sh) => {
     const p = sh.id ? profileOf(sh.id) : null;
-    // A game opponent with no ROTRA profile in this prototype (guest or unclaimed): a limited card, like the Queue guest card.
+    // A game opponent with no ROTRA profile in this prototype is a guest (a name only): a limited card, like the Queue guest card.
+    // An unclaimed player (D-2026-11-16-04) has a public profile and gets the full card below with the "Not registered yet" mark.
     if (!p && sh.name) { const q = { id: `x-${sh.name}`, name: sh.name, photo: hashStr(sh.name) % 4 !== 0 }; return sheetWrap(esc(sh.name), `<div class="pp-card"><div class="pp-banner bn-${esc(DEFAULT_BANNER)}" aria-hidden="true"></div><div class="pp-avatar">${avatar(q, 'xl')}</div><div class="pp-body"><div class="pp-name"><b>${esc(sh.name)}</b></div><div class="row" style="gap:8px">${chip('Not on ROTRA yet')}</div>
         <div class="pp-sec"><span class="label">Guest</span><p class="muted" style="margin:0">This player played as a guest and hasn't registered with ROTRA yet, so there's no profile to show.</p></div></div></div>`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>'); }
     if (!p) return sheetWrap('Profile', '<div class="empty">This player could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
@@ -3041,8 +3075,9 @@ const SHEETS = {
     // Owner comment, November 13, 2026: named by the nickname, else the full name.
     return sheetWrap(esc(p.nick || p.name), `<div class="pp-card">${head}<div class="pp-body">
         <div class="pp-name"><span class="pp-nm"><b>${esc(p.nick || p.name)}</b><a class="pp-ext" href="${esc(profileLink(p.id))}" data-act="openProfile" data-id="${esc(p.id)}" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile" title="Open ROTRA profile">${I.fwd}</a></span>${p.nick ? `<span class="pp-full">${esc(p.name)}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy player ID ${esc(p.rtr)}" title="Copy player ID">${esc(p.rtr)}${I.copy}</button>` : ''}</div>
-        <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : ''}${p.id === S.me ? chip('You', 'ok') : ''}</div>
-        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd></dl></div>
+        <div class="row" style="gap:8px">${chip(p.level == null ? 'Not ranked yet' : lvLabel(p.level), p.level == null ? '' : 'ok')}${pos ? chip(`#${num(pos)} overall`) : ''}${p.id === S.me ? chip('You', 'ok') : ''}${isUnclaimed(p) ? unclaimedChip() : ''}</div>
+        ${isUnclaimed(p) ? `<div class="pp-sec"><span class="label">Unclaimed</span><p class="muted" style="margin:0">${esc(savedByName(p))} saved this player. This is the club's version of them, public until they register with ROTRA.</p></div>
+        <div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Saved by</dt><dd>${esc(savedByName(p))}</dd></dl></div>` : `<div class="pp-sec"><span class="label">About</span><dl class="kv"><dt>Registered in</dt><dd>${city ? esc(city) : '—'}</dd></dl></div>`}
         ${p.hideStats && p.id !== S.me ? '' : ppStatsBlock(gs.length, w)}
       </div></div>`,
       // Owner, November 13, 2026: Share profile in the card. Inside ROTRA Player the profile opens in the same tab (only Queue,
@@ -3102,6 +3137,17 @@ const SHEETS = {
     <ol class="req-steps"><li>Open <span class="mono">accounts.google.com/signup</span> on any device.</li><li>Choose <b>Use my current email address instead</b> and enter your email.</li><li>Google sends a code to that email. Enter it and set a Google password.</li><li>Come back here and tap <b>Continue with Google</b>.</li></ol>
     <p class="small muted" style="margin:12px 0 0">Still stuck? Ask your club or contact ROTRA. Nothing on your profile is lost while you sort it out.</p>`,
     '<button class="btn primary" data-act="closeSheet">Got it</button>'),
+  // D-2026-11-16-04, owner: "they get prompted to a dialog asking. which of the following identities are correct and is
+  // presented to them in a form of cards and they just pick which one". Shown only when more than one club saved the email.
+  identity: (sh) => {
+    const u = UNCLAIMED_BY_EMAIL[sh.email];
+    return sheetWrap('Which identity is correct?', `<p class="muted" style="margin:0 0 12px">${u.records.length === 2 ? 'Two' : u.records.length} clubs saved a profile with <b style="color:var(--fg)">${esc(sh.email)}</b>. Pick the one that's right. It becomes your starting profile, and you can change it after.</p>
+      <div class="idpick">${u.records.map((r, i) => `<button type="button" data-act="idPick" data-i="${i}" aria-label="${esc(CLUB_DIR[r.club].name)}: ${esc(r.name)}${r.nick ? `, ${esc(r.nick)}` : ''}, ${lvLabel(r.level)}. Use this identity"><span class="label">${esc(CLUB_DIR[r.club].name)}</span>
+        <span class="who">${avatar({ id: `id-${i}`, name: r.name, photo: r.photo }, 'lg')}<span class="main"><b>${esc(r.name)}</b>${r.nick ? `<span class="small muted">“${esc(r.nick)}”</span>` : '<span class="small muted">No nickname</span>'}</span></span>
+        <span class="row" style="gap:8px">${chip(lvLabel(r.level), 'ok')}</span></button>`).join('')}</div>
+      <p class="small muted" style="margin:12px 0 0">Your player ID stays <span class="mono">${esc(u.rtr)}</span>. Every club's record with this email joins your account with its games, whichever you pick.</p>`,
+    '<button class="btn" data-act="gCancel">Cancel</button>');
+  },
   gpick: (sh) => sheetWrap(`${G_MARK.replace('class="g-mark"', 'class="g-mark" style="display:inline-block;vertical-align:-3px;margin-right:8px"')}Sign in with Google`,
     `<p class="muted" style="margin:0 0 12px">Choose an account to continue to ROTRA.</p>
      <div class="gpick">${G_ACCOUNTS.map((g) => `<button type="button" data-act="gPick" data-email="${esc(g.email)}">${avatar({ name: g.name }, 'md')}<span class="main"><b>${esc(g.name)}</b><span class="small muted">${esc(g.email)}</span><span class="small" style="color:var(--fg3)">Prototype: ${esc(g.hint)}</span></span></button>`).join('')}</div>
@@ -3133,13 +3179,14 @@ const SHEETS = {
         <div class="row"><button class="btn xs" data-act="demoLogin">Sign-in page</button><button class="btn xs" data-act="openRegister" data-club="c1">Club invite</button><button class="btn xs" data-act="openRegister" data-club="c1" data-session="s-thu-open" data-invite="k7m2">Session invite (from Migs)</button><button class="btn xs" data-act="openRegister">Admin link</button></div>
         <span class="label">Signed in as Migs</span><div class="row"><button class="btn xs" data-act="openJoin" data-club="c3">Club invite</button><button class="btn xs" data-act="openJoin" data-club="c3" data-session="s-sat-doubles" data-invite="p4x9">Session invite (from Kat)</button><button class="btn xs" data-act="openJoin" data-club="c2" data-session="s-fri-smash">Session he's waitlisted for</button></div>
         <span class="label">Club-created profile (Jomar)</span><div class="row"><button class="btn xs" data-act="openClaim" data-v="valid">Registration link</button></div>
+        <span class="label">Unclaimed: email saved by two clubs (Paolo)</span><div class="row"><button class="btn xs" data-act="demoIdentity">Register with Google: pick an identity</button></div>
         <span class="label">Existing player, no Google yet</span><div class="row"><button class="btn xs" data-act="demoNoGoogle">Migs: password only, signed out</button></div>
         <span class="label">Google deadline (${G_DEADLINE}, placeholder)</span>${seg('demoDeadline', S.gDeadline, [['before', 'Before the deadline'], ['passed', 'Deadline passed']])}
         <span class="label">Verification (Migs)</span>${seg('demoAdminStatus', S.accounts.u1.adminStatus === 'verified' ? 'verified' : 'auto', [['auto', 'Automatic checks'], ['verified', 'Admin: Verified by Admin']])}
         <div class="row"><button class="btn xs" data-act="demoNoPhone">${S.accounts.u1.phone ? 'Remove his phone' : 'Give him his phone back'}</button></div>
         <p class="small muted">The real override lives in the Admin app (Players › player › Status). The approve button under Contact-change request (Admin) applies an email change.</p>
         <span class="label">Notifications</span><div class="row"><button class="btn xs" data-act="demoNotifs">Open as Migs</button><button class="btn xs" data-act="demoNotifsReset">Reset notifications</button></div>
-        <p class="small muted">In Google's window: Ana is new; Migs's example.com email matches his ROTRA account; his Gmail doesn't; Jomar is for the club-created profile.</p></div>
+        <p class="small muted">In Google's window: Ana is new; Migs's example.com email matches his ROTRA account; his Gmail doesn't; Jomar is for the club-created profile (one club saved his email, so its details prefill); two clubs saved Paolo's email, so he picks an identity. On the leaderboard, #18 and #23 are unclaimed players.</p></div>
       <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me ? `<span class="small">Signed in as <b>${esc(S.accounts[S.me].name)}</b></span><button class="btn xs" data-act="signOut">Sign out</button>` : '<span class="small muted">Not signed in</span><button class="btn xs" data-act="demoSignIn">Sign in as Migs</button>'}</div></div>
       <div class="demo-sec"><span class="label">Migs's rank</span>${seg('setRank', S.rank, [['eligible', 'On the leaderboard'], ['below', 'Below threshold'], ['reassess', 'Needs reassessment'], ['processing', 'Updating'], ['new', 'No rank yet']])}</div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Offline</b><p class="small muted">Shows saved copies; sign-in and saving fail.</p></div>${sw(!S.online, 'toggleOnline', 'Offline')}</div></div>
@@ -3408,7 +3455,14 @@ const ACT = {
   setBoard: (el) => { S.board = el.dataset.v; render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
   toggleFail: () => { S.failNext = !S.failNext; render(); },
-  openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.claimMethod = null; S.ui.gClaim = null; S.ui.sheet = null; S.me = null; go('claim'); },
+  demoIdentity: () => { ACT.openRegister(null); googleDone('register', G_ACCOUNTS.find((y) => y.email === 'paolo.mendoza@example.com')); render(); },
+  idPick: (el) => {
+    const sh = S.ui.sheet, i = +el.dataset.i, r = UNCLAIMED_BY_EMAIL[sh.email].records[i];
+    S.ui.gReg = { email: sh.email, name: sh.name, unclaimed: sh.email, pick: i }; S.ui.regStep = 'google'; S.ui.sheet = null;
+    S.ui.claim = { name: r.name, nick: r.nick, style: '', expY: '', expM: '', sinceM: '', sinceY: '', facebook: '', instagram: '', youtube: '', linkedin: '', email: sh.email, phone: '', pass: '', pass2: '', show: false, city: '' };
+    S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; render(); window.scrollTo(0, 0);
+  },
+  openClaim: (el) => { S.claim = el.dataset.v; S.ui.claimEmail = false; S.ui.claimConfirmed = false; S.ui.claimWrong = false; S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.claimChecks = 0; S.ui.claimMethod = null; S.ui.gClaim = null; S.ui.sheet = null; S.me = null; go('claim'); },
   registerNo: () => { S.ui.registerMatch = false; S.ui.claimFail = 'Correct your phone or email, or contact ROTRA for help. No accounts were linked.'; render(); },
   openRegister: (el) => {
     S.ui.sheet = null; if (S.me) { S.me = null; }
@@ -3529,7 +3583,14 @@ function googleDone(ctx, g) {
     if (ctx === 'login') { S.ui.login.gMiss = g.email; return; }
   }
   if (ctx === 'register') {
-    if (g.email === 'jomar.delacruz@example.com') { S.ui.regErr = 'A club already made a ROTRA profile with this email. Ask the club for your registration link so your games carry over.'; return; }
+    // D-2026-11-16-04: the email is the key. Clubs already saved this email as an unclaimed player, so registering claims it:
+    // the person keeps the record's RTR ID and every club's record joins the account. One club: its details prefill, no picker.
+    if (g.email === 'jomar.delacruz@example.com' && !S.accounts.u2.claimed) {
+      S.claim = 'valid'; S.ui.claimEmail = true; S.ui.claimConfirmed = true; S.ui.claimWrong = false; S.ui.claim = null; S.ui.claimErr = {}; S.ui.claimFail = '';
+      S.ui.gClaim = { email: g.email, name: g.name }; S.ui.claimMethod = 'google'; go('claim'); return;
+    }
+    // More than one club: the person picks which club's version is right.
+    if (UNCLAIMED_BY_EMAIL[g.email] && UNCLAIMED_BY_EMAIL[g.email].records.length > 1) { S.ui.sheet = { type: 'identity', email: g.email, name: g.name }; return; }
     S.ui.gReg = { email: g.email, name: g.name }; S.ui.regStep = 'google';
     S.ui.claim = { name: g.name, nick: '', style: '', expY: '', expM: '', sinceM: '', sinceY: '', facebook: '', instagram: '', youtube: '', linkedin: '', email: g.email, phone: '', pass: '', pass2: '', show: false, city: '' };
     S.ui.claimErr = {}; S.ui.claimFail = ''; S.ui.registerMatch = false; window.scrollTo(0, 0); return;
@@ -3649,8 +3710,9 @@ const FORM = {
     const C = S.ui.claim, e = validatePersonal(C), ctx = S.ui.regCtx;
     if (!normPhone(C.phone || '')) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     if (!validEmail(C.email || '')) e.email = 'Enter an email address, like name@example.com.';
-    if (!ctx.club && !PLACES.some(([c]) => c === C.city)) e.city = 'Pick your city or province.';
     const gr = S.ui.regStep === 'google' && S.ui.gReg;
+    const un = gr && gr.unclaimed ? UNCLAIMED_BY_EMAIL[gr.unclaimed] : null, pick = un && un.records[gr.pick];
+    if (!ctx.club && !un && !PLACES.some(([c]) => c === C.city)) e.city = 'Pick your city or province.';
     if (gr) { C.email = gr.email; delete e.email; }
     else {
       if (!C.pass) e.pass = 'Choose a password.';
@@ -3669,8 +3731,14 @@ const FORM = {
       const date = `${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(2, '0')}${String(t.getFullYear()).slice(2)}`;
       const acct = { id, name: '', nick: '', rtr: `RTR-PH-${code}-${date}-${String(100 + n).padStart(4, '0')}`, phone: fmtPhone(normPhone(C.phone)), email: C.email.trim(), phoneHidden: false, profilePrivate: true, claimed: true, photo: false, fresh: true,
         emailConfirmed: !!gr, google: gr ? gr.email : null, hasPassword: !gr, clubs: ctx.club ? [{ id: ctx.club, via: ctx.session ? 'session_link' : 'club_link' }] : [], style: '', expY: '', expM: '', social: {}, level: null };
+      // Claiming an unclaimed email: the RTR ID stays, the picked club's picture and level start the profile, every club's record
+      // joins with its games, and the profile stays public as it was (privacy settings are theirs to change now).
+      if (un) {
+        Object.assign(acct, { rtr: un.rtr, photo: pick.photo, level: pick.level, fresh: false, profilePrivate: false });
+        acct.clubs = [...un.records.map((r) => ({ id: r.club, via: 'added_by_club' })), ...acct.clubs.filter((c) => !un.records.some((r) => r.club === c.id))];
+      }
       applyPersonal(acct, C);
-      S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: ctx.club, session: ctx.session }; S.ui.claim = null; S.ui.regStep = 'choose'; S.ui.gReg = null;
+      S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: un && un.records.some((r) => r.club === ctx.club) ? null : ctx.club, session: ctx.session, joined: un ? un.records.map((r) => r.club) : null }; S.ui.claim = null; S.ui.regStep = 'choose'; S.ui.gReg = null;
       S.screen = 'registerDone'; window.scrollTo(0, 0);
     });
   },

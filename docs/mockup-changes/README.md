@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 3 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 6 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -301,7 +301,7 @@ NEW: 3 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-11-player-share-profile](2026-11-11-player-share-profile.md) | Player: Share profile card with QR, photo, level, stats and a copyable link (#738, proposed) | share-card (the share sheet and card used by Share rank, Share result and Share games), avatar | IN MOCK APP — #738 |
 | [2026-11-11-queue-avatar-photo-viewer](2026-11-11-queue-avatar-photo-viewer.md) | Avatar photo viewer: tap a picture to see the full photo (#716, proposed; Queue part) | avatar, photo-viewer (new) | IN MOCK APP — #758 |
 | [2026-11-11-queue-bagging-mode](2026-11-11-queue-bagging-mode.md) | Generate matches: bagging mode with a bagging pairs list (#739, proposed) | generate-matches-workspace, switch, segmented-control, bagging-pairs-card (new), bagging-pair-sheet (new), player-select | IN MOCK APP — #739 |
-| [2026-11-11-queue-club-only-unclaimed](2026-11-11-queue-club-only-unclaimed.md) | Guests and unclaimed profiles stay in their club; Player Information search shows registered players only | add-player-sheet, saved-player-card, player-profile-sheet, invite-sheet, identity-chip | IN MOCK APP — #757 |
+| [2026-11-11-queue-club-only-unclaimed](2026-11-11-queue-club-only-unclaimed.md) | Guests and unclaimed profiles stay in their club; Player Information search shows registered players only | add-player-sheet, saved-player-card, player-profile-sheet, invite-sheet, identity-chip | IN MOCK APP — #757 (superseded by 2026-11-16-queue-unclaimed-email-lookup.md (in part)) |
 | [2026-11-11-queue-courts-and-time-sheet](2026-11-11-queue-courts-and-time-sheet.md) | Courts and time sheet: lists each court with its status and time; a court's time can change during a match | courts-time-sheet, court-row, court-menu | IN MOCK APP — #756 |
 | [2026-11-11-queue-device-play-history-file](2026-11-11-queue-device-play-history-file.md) | Club settings › This device: Export play history and Import play history… | device-downloads-card, button, toaster | IN MOCK APP — #722 |
 | [2026-11-11-queue-facebook-post-court-times-join-link](2026-11-11-queue-facebook-post-court-times-join-link.md) | Facebook post: court times on each court line and a join link (#730, proposed) | facebook-post-dialog, post-template-keys | IN MOCK APP — #730 |
@@ -362,7 +362,10 @@ NEW: 3 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-14-player-game-row-games-badge](2026-11-14-player-game-row-games-badge.md) | Player app: games badge on every face of a game court | match-court (Player variant), game-row | IN MOCK APP — PR #859 |
 | [2026-11-15-queue-record-courts](2026-11-15-queue-record-courts.md) | Queue session record: How the night ran matches as courts | match-court (Queue variant), record-court-columns | IN MOCK APP — PR #862 |
 | [2026-11-15-share-save-to-photos](2026-11-15-share-save-to-photos.md) | Share dialogs: Save to Photos on iPhone and iPad | share-image-picker, share-image-viewer, share-card (helpers: isAppleMobile) | IN MOCK APP — PR #868 |
+| [2026-11-16-admin-unclaimed-rtr-id-edit](2026-11-16-admin-unclaimed-rtr-id-edit.md) | Admin › Players: unclaimed players have an email and an RTR ID; Admin can change the email and the RTR ID | admin-player-card, admin-player-filters, admin-player-quick-view, admin-player-clubs, admin-player-identity-card, admin-edit-player-form, player-account-chip, rank-status-chip, confirm-sheet, change-compare | NEW |
 | [2026-11-16-player-account-verification](2026-11-16-player-account-verification.md) | Player app: account verification page (Google, phone, matching email) with an Admin override | verification-card, verification-step, status chip, announcement-band, page-head | NEW |
 | [2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md) | Player app: Google sign-in (mandatory), invite landings and connecting Google to existing accounts | auth-card, google-button, invite-card, google-identity-row, announcement-band, sign-in-methods-card, sheet | NEW |
 | [2026-11-16-player-notifications](2026-11-16-player-notifications.md) | Player app: notifications page and bell | notification-bell, notification-item, notification-list, segmented filter | NEW |
+| [2026-11-16-player-unclaimed-identity](2026-11-16-player-unclaimed-identity.md) | Player app: unclaimed players are public, found by email, and pick an identity on registration | profile-card, leaderboard-row, claim-form, chip, sheet | NEW |
+| [2026-11-16-queue-unclaimed-email-lookup](2026-11-16-queue-unclaimed-email-lookup.md) | Queue app: unclaimed players need an email and get an RTR ID; lookup by RTR ID or email only; guest linking removed | add-player-sheet, saved-player-card, player-profile-sheet, edit-player-form, invite-sheet, join-request-row, join-request-form, participant-profile-card, chip | NEW |
 <!-- status-index:end -->

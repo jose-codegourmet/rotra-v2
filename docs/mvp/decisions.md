@@ -55,7 +55,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID | approved 2026-11-16 (search result and changed RTR ID open) | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -1006,7 +1006,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID
-- **Decision status:** approved (owner discussion, November 16, 2026); what another club's search result shows and what happens to a changed RTR ID are not decided.
+- **Decision status:** approved (owner discussion, November 16, 2026); lookup by phone and already-shared QR codes with an old RTR ID are not decided.
 - **Implementation status:** not started. No mockup, business, screen or database doc is changed yet; they still describe [D-2026-11-11-03](#d-2026-11-11-03).
 - **Ticket:** needed
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
@@ -1017,10 +1017,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Unclaimed:** a person the Queue Master saves for the club because they expect them back. The **email is required**. In the owner's words: "unclaimed can mean the QM registers on behalf of them. uploads there pics and basic info."
   - **An unclaimed player gets an RTR ID** when the club saves them. One email is one person and one RTR ID, so ROTRA keeps a shared entry for the person and a second club that enters the same email gets the same RTR ID.
   - **A guest becomes unclaimed** when the Queue Master adds an email, and gets the RTR ID then.
-  - **Other clubs can find an unclaimed player** by name, email or RTR ID (owner choice; the proposal was exact email or RTR ID only).
+  - **Player lookup is by exact RTR ID or exact email only** (owner, later the same day; this replaces the earlier choice to keep name search). It applies to every ROTRA player, registered or unclaimed. Name search stays for the club's own Saved players only. In the owner's words: "no more name search in player lookup. have player look up ONLY for saved players".
+  - **Another club finds an unclaimed player** only by entering their email or RTR ID. The club then keeps its own version of the person, so no club is shown another club's name, picture or level.
   - **Location in the RTR ID** comes from the first club that entered the email and never changes, also when the person later registers through another club's link.
   - **The email is never edited by a club.** To fix a mistyped email the Queue Master deletes the record and makes it again; the mistaken RTR ID is retired and never reused.
   - **Admin can edit the email and the RTR ID.** When Admin changes the registration place or date, the RTR ID is updated to match. This changes the read-only RTR ID of [D-2026-11-09-14](#d-2026-11-09-14) and the "permanent" RTR ID in [product terms](../product-terms.md).
+  - **A changed RTR ID cascades.** Every record that holds the old RTR ID is updated to the new one.
   - **On registration** the person keeps the same RTR ID, and every club's record under that email joins the account.
   - **Each club keeps its own version of the person.** Club 1 and Club 2 can each set a different name, picture and level, and each edits only its own.
   - **Claiming: the person picks their identity.** On registration a dialog shows each club's version as a card ("which of the following identities are correct") and the person picks one.
@@ -1033,8 +1035,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Unclaimed players can rank** (owner choice; the proposal was to wait until they register).
 - **Risk, accepted by the owner:** a person who never signed up gets a public, ranked profile that other clubs can find. Their email and phone stay private as everywhere else.
 - **Open:**
-  - Which name, picture and level another club's search result shows while two clubs name the person differently.
-  - What happens to an old RTR ID after Admin changes it: QR codes and links already shared, and whether the old ID is retired.
+  - Whether lookup by phone and by QR code stay (the QR code holds the RTR ID; the phone is not on the owner's list).
+  - QR codes and links a player already shared or printed with an old RTR ID: they can't be updated, so whether the old ID still leads to the player.
   - Whether the **Confirm player** step applies when a club adds another club's unclaimed player.
   - Whether a phone still links a record on registration (the email is the key now).
   - Which email is matched on registration (the ROTRA email, the Google email, or both).

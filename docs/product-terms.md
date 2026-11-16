@@ -123,6 +123,8 @@ Phones and emails are **never public**, never in search results, participant car
 
 **Updated November 11, 2026 ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)):** an unclaimed profile stays in its club and gets no RTR ID; the RTR ID is given on registration. On registration, every club's record with the same phone links to the account automatically, and the history rules above apply.
 
+**Decided November 16, 2026, not built yet ([D-2026-11-16-04](mvp/decisions.md#d-2026-11-16-04)):** an unclaimed player will need an email, get an RTR ID when the club saves them, and be found by other clubs; a guest stays name-only. The rows above keep the November 11 meaning until the mockups and docs are updated.
+
 ---
 
 ## 5. Levels and ranking

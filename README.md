@@ -51,7 +51,8 @@ Staging deploys the same way through **Deploy staging**
 ([`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml)): run it on
 **go-stack**, the only branch it deploys. It uses the GitHub **staging** environment
 (`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` variables, `VERCEL_TOKEN` secret) linked to the staging
-Vercel Services project. The file lives on `main` so GitHub lists it under Actions.
+Vercel Services project, whose domains are `staging.queue.rotra.club`, `staging.player.rotra.club`
+and `staging.admin.rotra.club`. The file lives on `main` so GitHub lists it under Actions.
 
 The GitHub **production** environment allows only the `main` branch. It needs:
 
@@ -75,9 +76,9 @@ configure the exact DNS records Vercel gives you at your DNS provider:
 | Service root | Production domain |
 | --- | --- |
 | `apps/mockup` | `mockup.rotra.club` |
-| `apps/queue` | `queue.rotra.club` |
-| `apps/player` | `player.rotra.club` |
-| `apps/admin` | `admin.rotra.club` |
+| `apps/queue` | `staging.queue.rotra.club` |
+| `apps/player` | `staging.player.rotra.club` |
+| `apps/admin` | `staging.admin.rotra.club` |
 
 `vercel.json` selects services by request host; it does not attach domains or create DNS records.
 The generated `*.vercel.app` deployment URL opens the mockup launcher. The actual Queue, Player

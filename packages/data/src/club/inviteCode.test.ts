@@ -40,9 +40,9 @@ describe('club invite code (#712)', () => {
 
   it('prints ?k=<code> on the club invite link, and never an empty ?k=', () => {
     expect(clubInviteUrl(CLUB, 'ROTRA2XK9')).toBe(
-      `https://player.rotra.club/register/${CLUB}?k=ROTRA2XK9`,
+      `https://staging.player.rotra.club/register/${CLUB}?k=ROTRA2XK9`,
     )
-    expect(clubInviteUrl(CLUB, null)).toBe(`https://player.rotra.club/register/${CLUB}`)
+    expect(clubInviteUrl(CLUB, null)).toBe(`https://staging.player.rotra.club/register/${CLUB}`)
     expect(clubInviteUrl(CLUB, '')).not.toContain('?k=')
   })
 })

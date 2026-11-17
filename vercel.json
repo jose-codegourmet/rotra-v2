@@ -41,17 +41,17 @@
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "queue.rotra.club" }],
+      "has": [{ "type": "host", "value": "staging.queue.rotra.club" }],
       "destination": { "service": "queue" }
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "player.rotra.club" }],
+      "has": [{ "type": "host", "value": "staging.player.rotra.club" }],
       "destination": { "service": "player" }
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "admin.rotra.club" }],
+      "has": [{ "type": "host", "value": "staging.admin.rotra.club" }],
       "destination": { "service": "admin" }
     },
     {

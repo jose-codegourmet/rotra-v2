@@ -10,7 +10,10 @@ for (const name of names) {
   await access(new URL(`apps/${name}/package.json`, root))
   const route = config.rewrites.find((rule) =>
     rule.has?.some(
-      (condition) => condition.type === 'host' && condition.value === `${name}.rotra.club`,
+      (condition) =>
+        condition.type === 'host' &&
+        condition.value ===
+          (name === 'mockup' ? 'mockup.rotra.club' : `staging.${name}.rotra.club`),
     ),
   )
   assert.equal(route?.source, '/(.*)')
@@ -34,4 +37,4 @@ if (process.argv.includes('--linked')) {
     'Set the Vercel project Root Directory to the repository root (./).',
   )
 }
-console.log('Verified four Vercel services and their production host routes.')
+console.log('Verified four Vercel services and their staging host routes.')

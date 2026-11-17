@@ -1,7 +1,8 @@
 /**
- * The three ROTRA app origins. Production is the canonical same-site deployment; local work runs on
- * localhost 9000/9001/9002. A run that serves the apps elsewhere (the e2e suite on 127.0.0.1
- * 9100-9102) sets NEXT_PUBLIC_ROTRA_QUEUE_URL / _PLAYER_URL / _ADMIN_URL; unset, nothing changes.
+ * The three ROTRA app origins. On the go-stack branch the deployed default is staging
+ * (staging.<app>.rotra.club); local work runs on localhost 9000/9001/9002. A run that serves the
+ * apps elsewhere (the e2e suite on 127.0.0.1 9100-9102) sets NEXT_PUBLIC_ROTRA_QUEUE_URL /
+ * _PLAYER_URL / _ADMIN_URL; unset, nothing changes.
  * Each `process.env.NEXT_PUBLIC_*` is written out in full so Next.js inlines it in client code.
  */
 // @rotra/data ships without Node types; Next inlines NEXT_PUBLIC_* values at build time.
@@ -14,9 +15,9 @@ declare const process: {
 }
 
 const PRODUCTION = {
-  queue: 'https://queue.rotra.club',
-  player: 'https://player.rotra.club',
-  admin: 'https://admin.rotra.club',
+  queue: 'https://staging.queue.rotra.club',
+  player: 'https://staging.player.rotra.club',
+  admin: 'https://staging.admin.rotra.club',
 } as const
 const LOCAL = {
   queue: 'http://localhost:9000',

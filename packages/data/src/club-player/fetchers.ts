@@ -1,3 +1,4 @@
+import { appOrigin } from '../app-origins'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { clubPlayers as fixturePlayers } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
@@ -202,7 +203,7 @@ export async function createPlayerInvite(clubPlayerId: string) {
   }
   const code = (hash >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7)
   return {
-    url: `https://player.rotra.club/claim/${code}`,
+    url: `${appOrigin('player')}/claim/${code}`,
     message: 'Invite link ready',
   }
 }

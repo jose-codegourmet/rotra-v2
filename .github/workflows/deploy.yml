@@ -87,6 +87,7 @@ jobs:
             for app in mockup queue player admin; do
               echo "| apps/$app | https://$app.rotra.club |"
             done
+            echo "| apps/landingpage | https://rotra.club |"
             echo ''
             echo 'Custom hosts require domain attachment and valid DNS on the same Vercel project.'
           } >> "$GITHUB_STEP_SUMMARY"

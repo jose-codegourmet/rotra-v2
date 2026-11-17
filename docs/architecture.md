@@ -66,7 +66,7 @@ apps or provide operational persistence/auth. See its [route map](../apps/mockup
 Production uses one Vercel Services project rooted at `./`. Host rewrites map `mockup.rotra.club`,
 `queue.rotra.club`, `player.rotra.club` and `admin.rotra.club` to their matching `apps/` directories.
 The mockup service publishes `dist/public` as static files; the other services use Next.js. The manual
-Deploy production workflow builds and publishes all four services together. Domain attachment/DNS
+Deploy production workflow builds and publishes all five services together. Domain attachment/DNS
 is configured outside the repository; see the [deployment setup](../README.md#production-deployments).
 
 The Queue, Player and Admin services export OpenTelemetry traces to Grafana Cloud when

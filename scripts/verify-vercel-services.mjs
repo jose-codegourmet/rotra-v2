@@ -4,7 +4,7 @@ import { access, readFile } from 'node:fs/promises'
 const root = new URL('../', import.meta.url)
 const config = JSON.parse(await readFile(new URL('vercel.json', root), 'utf8'))
 const names = ['mockup', 'queue', 'player', 'admin']
-assert.deepEqual(Object.keys(config.services).sort(), [...names].sort())
+assert.deepEqual(Object.keys(config.services).sort(), [...names, 'landingpage'].sort())
 for (const name of names) {
   assert.equal(config.services[name].root, `apps/${name}`)
   await access(new URL(`apps/${name}/package.json`, root))
@@ -15,6 +15,16 @@ for (const name of names) {
   )
   assert.equal(route?.source, '/(.*)')
   assert.equal(route?.destination.service, name)
+}
+// The marketing site answers on the bare domain and www, not on a subdomain.
+assert.equal(config.services.landingpage.root, 'apps/landingpage')
+await access(new URL('apps/landingpage/package.json', root))
+for (const host of ['rotra.club', 'www.rotra.club']) {
+  const route = config.rewrites.find((rule) =>
+    rule.has?.some((condition) => condition.type === 'host' && condition.value === host),
+  )
+  assert.equal(route?.source, '/(.*)')
+  assert.equal(route?.destination.service, 'landingpage')
 }
 assert.equal(config.services.mockup.outputDirectory, 'dist/public')
 assert.equal(config.git.deploymentEnabled, false)
@@ -34,4 +44,4 @@ if (process.argv.includes('--linked')) {
     'Set the Vercel project Root Directory to the repository root (./).',
   )
 }
-console.log('Verified four Vercel services and their production host routes.')
+console.log('Verified five Vercel services and their production host routes.')

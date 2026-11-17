@@ -1,0 +1,48 @@
+{
+  "name": "request",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/building.webp",
+      "x": 0,
+      "y": 914,
+      "depth": 0.5,
+      "brightness": 0.55,
+      "motion": "none"
+    },
+    {
+      "file": "el/gate.webp",
+      "x": 107,
+      "y": 272,
+      "depth": 0.5,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/ground.webp",
+      "x": 108,
+      "y": 1385,
+      "depth": 0.85,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/gear.webp",
+      "x": 1823,
+      "y": 67,
+      "depth": 0.85,
+      "brightness": 0.6,
+      "motion": "none"
+    }
+  ]
+}

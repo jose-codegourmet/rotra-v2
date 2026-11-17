@@ -1,0 +1,85 @@
+{
+  "name": "ladder",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/structure.webp",
+      "x": 0,
+      "y": 34,
+      "depth": 0.55,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/panels.webp",
+      "x": 92,
+      "y": 194,
+      "depth": 0.55,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/floor.webp",
+      "x": 0,
+      "y": 1453,
+      "depth": 0.8,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/confetti.webp",
+      "x": 130,
+      "y": 0,
+      "depth": 0.85,
+      "brightness": 0.6,
+      "motion": "drift",
+      "amp": 10,
+      "period": 7,
+      "phase": 0.3,
+      "pivot": [
+        1363,
+        810
+      ]
+    },
+    {
+      "file": "el/feather-2.webp",
+      "x": 2213,
+      "y": 455,
+      "depth": 0.9,
+      "brightness": 0.6,
+      "motion": "drift",
+      "amp": 12,
+      "period": 6,
+      "phase": 0.6,
+      "pivot": [
+        240,
+        272
+      ]
+    },
+    {
+      "file": "el/feather-1.webp",
+      "x": 62,
+      "y": 915,
+      "depth": 1,
+      "brightness": 0.6,
+      "motion": "drift",
+      "amp": 16,
+      "period": 8,
+      "phase": 0,
+      "pivot": [
+        415,
+        352
+      ]
+    }
+  ]
+}

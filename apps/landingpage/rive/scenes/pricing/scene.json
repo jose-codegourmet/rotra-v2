@@ -1,0 +1,78 @@
+{
+  "name": "pricing",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/lights-left.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.2,
+      "brightness": 0.55,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.0,
+      "pivot": [
+        316,
+        94
+      ]
+    },
+    {
+      "file": "el/lights-right.webp",
+      "x": 1777,
+      "y": 0,
+      "depth": 0.2,
+      "brightness": 0.55,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.5,
+      "pivot": [
+        785,
+        94
+      ]
+    },
+    {
+      "file": "el/shelves.webp",
+      "x": 0,
+      "y": 56,
+      "depth": 0.55,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/sign.webp",
+      "x": 1118,
+      "y": 377,
+      "depth": 0.55,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/desk.webp",
+      "x": 389,
+      "y": 875,
+      "depth": 0.7,
+      "brightness": 0.65,
+      "motion": "none"
+    },
+    {
+      "file": "el/tubes.webp",
+      "x": 0,
+      "y": 691,
+      "depth": 0.95,
+      "brightness": 0.55,
+      "motion": "none"
+    }
+  ]
+}

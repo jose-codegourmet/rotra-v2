@@ -1,0 +1,280 @@
+{
+ "reset": [
+  "UPDATE session_publications SET state = 'details', deleted_at = NULL, published_snapshot_id = NULL, published_slides = ARRAY[]::result_slide[], include_off_day = false, public_results = NULL, published_at = NULL WHERE id = 'e7000000-0000-4000-8000-000000000008'",
+  "UPDATE session_publications SET state = 'published', deleted_at = NULL, published_snapshot_id = 'ec000000-0000-4000-8000-000000000001', published_slides = ARRAY['standings','awards']::result_slide[], include_off_day = true, public_results = '{\"standings\":[{\"position\":1,\"name\":\"Alice Reyes\",\"wins\":5,\"losses\":1,\"games\":6},{\"position\":2,\"name\":\"Mika\",\"wins\":4,\"losses\":2,\"games\":6},{\"position\":3,\"name\":\"Twin Name\",\"wins\":3,\"losses\":3,\"games\":6},{\"position\":4,\"name\":\"Jose Adrian\",\"wins\":2.0,\"losses\":4,\"games\":6},{\"position\":5,\"name\":\"Not On Roster\",\"wins\":1,\"losses\":5,\"games\":6},{\"position\":6,\"name\":\"alice reyes\",\"wins\":0,\"losses\":6,\"games\":6}],\"awards\":{\"mvp\":{\"name\":\"Alice Reyes\"},\"mostImproved\":{\"name\":\"Mika\",\"priorSessions\":3}},\"offDay\":[{\"name\":\"Solo Sam\",\"priorSessions\":2},{\"name\":\"Twin Name\",\"priorSessions\":0}]}'::jsonb, published_at = TIMESTAMPTZ '2026-11-14 17:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000001'",
+  "UPDATE session_publications SET state = 'details', deleted_at = NULL WHERE id = 'e7000000-0000-4000-8000-000000000002'",
+  "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-02 00:00:00+00', release_reason = 'demoted' WHERE id = 'e5000000-0000-4000-8000-00000000000f'",
+  "UPDATE session_players SET released_at = NULL, release_reason = NULL, no_show_at = NULL WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002')",
+  "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, updated_at) VALUES ('e6000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000012', 1, TIMESTAMPTZ '2026-11-02 10:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00') ON CONFLICT DO NOTHING",
+  "UPDATE queue_sessions SET updated_at = TIMESTAMPTZ '2026-11-10 08:00:00.123456+00', title = 'Open Night' WHERE id = 'e4000000-0000-4000-8000-000000000001'",
+  "UPDATE queue_sessions SET state = 'active', finalized_at = NULL WHERE id = 'e4000000-0000-4000-8000-00000000000c'",
+  "UPDATE clubs SET name = 'Rally Club', logo_ref = 'https://example.test/club1.png' WHERE id = 'e1000000-0000-4000-8000-000000000001'"
+ ],
+ "scenarios": {
+  "base": [],
+  "publish_later": [
+   "UPDATE session_publications SET state = 'published', published_snapshot_id = 'ec000000-0000-4000-8000-000000000008', published_slides = ARRAY['standings']::result_slide[], public_results = '{\"standings\":[{\"position\":1,\"name\":\"Alice Reyes\",\"wins\":2,\"losses\":0,\"games\":2}]}'::jsonb, published_at = TIMESTAMPTZ '2026-11-08 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000008'"
+  ],
+  "unpublish": [
+   "UPDATE session_publications SET state = 'deleted', deleted_at = TIMESTAMPTZ '2026-11-15 00:00:00+00', published_snapshot_id = NULL, published_at = NULL, published_slides = ARRAY[]::result_slide[], include_off_day = false, public_results = NULL WHERE id = 'e7000000-0000-4000-8000-000000000001'"
+  ],
+  "delete_details_row": [
+   "UPDATE session_publications SET state = 'deleted', deleted_at = TIMESTAMPTZ '2026-11-15 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "roster_changes": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE id = 'e5000000-0000-4000-8000-000000000001'",
+   "UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-03 00:00:00+00' WHERE id = 'e5000000-0000-4000-8000-000000000002'",
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE id = 'e5000000-0000-4000-8000-00000000000f'",
+   "DELETE FROM session_waitlist WHERE id = 'e6000000-0000-4000-8000-000000000001'",
+   "UPDATE queue_sessions SET updated_at = TIMESTAMPTZ '2026-11-11 08:00:00+00', title = 'Open Night (renamed)' WHERE id = 'e4000000-0000-4000-8000-000000000001'"
+  ],
+  "active_becomes_completed": [
+   "UPDATE queue_sessions SET state = 'completed', finalized_at = TIMESTAMPTZ '2026-11-17 16:00:00+00' WHERE id = 'e4000000-0000-4000-8000-00000000000c'"
+  ],
+  "club_renamed": [
+   "UPDATE clubs SET name = 'Rally  Renamed  Club', logo_ref = NULL WHERE id = 'e1000000-0000-4000-8000-000000000001'"
+  ]
+ },
+ "cases": [
+  {
+   "name": "session_1_open_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "session_2_active_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/active-night"
+  },
+  {
+   "name": "session_3_finishing_up",
+   "scenario": "base",
+   "path": "/api/public-sessions/finishing-up"
+  },
+  {
+   "name": "session_4_done_published",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-published"
+  },
+  {
+   "name": "session_5_done_unpublished",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-unpublished"
+  },
+  {
+   "name": "session_6_done_no_row",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-no-row"
+  },
+  {
+   "name": "session_7_done_deleted_page",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-deleted-page"
+  },
+  {
+   "name": "session_8_ahead_deleted_page",
+   "scenario": "base",
+   "path": "/api/public-sessions/ahead-deleted-page"
+  },
+  {
+   "name": "session_9_cancelled_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/cancelled-night"
+  },
+  {
+   "name": "session_10_invalid_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/invalid-night"
+  },
+  {
+   "name": "session_11_empty_session",
+   "scenario": "base",
+   "path": "/api/public-sessions/empty-session"
+  },
+  {
+   "name": "session_12_active_published_row",
+   "scenario": "base",
+   "path": "/api/public-sessions/active-published-row"
+  },
+  {
+   "name": "session_13_abcd",
+   "scenario": "base",
+   "path": "/api/public-sessions/abcd"
+  },
+  {
+   "name": "session_14_xxxxxxxxxxxxxxxxxxxxxxxx",
+   "scenario": "base",
+   "path": "/api/public-sessions/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+   "name": "session_15_emoji_club_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/emoji-club-night"
+  },
+  {
+   "name": "session_16_done_minimal_results",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-minimal-results"
+  },
+  {
+   "name": "session_17_done_awards_only",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-awards-only"
+  },
+  {
+   "name": "session_18_later_published_night",
+   "scenario": "base",
+   "path": "/api/public-sessions/later-published-night"
+  },
+  {
+   "name": "session_19_done_odd_rows",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-odd-rows"
+  },
+  {
+   "name": "session_20_done_odd_awards_array",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-odd-awards-array"
+  },
+  {
+   "name": "session_21_done_awards_string",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-awards-string"
+  },
+  {
+   "name": "session_22_done_awards_null",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-awards-null"
+  },
+  {
+   "name": "slug_with_query",
+   "scenario": "base",
+   "path": "/api/public-sessions/open-night?viewer=signed_in&x=1"
+  },
+  {
+   "name": "slug_percent_encoded_hyphen",
+   "scenario": "base",
+   "path": "/api/public-sessions/open%2Dnight"
+  },
+  {
+   "name": "unknown_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/no-such-session"
+  },
+  {
+   "name": "uppercase_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/OPEN-NIGHT"
+  },
+  {
+   "name": "mixed_case_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/Open-Night"
+  },
+  {
+   "name": "too_short_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/abc"
+  },
+  {
+   "name": "too_long_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+   "name": "very_long_slug",
+   "scenario": "base",
+   "path": "/api/public-sessions/yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+  },
+  {
+   "name": "slug_with_space",
+   "scenario": "base",
+   "path": "/api/public-sessions/open%20night"
+  },
+  {
+   "name": "slug_trailing_space",
+   "scenario": "base",
+   "path": "/api/public-sessions/open-night%20"
+  },
+  {
+   "name": "slug_with_dot_dot",
+   "scenario": "base",
+   "path": "/api/public-sessions/.."
+  },
+  {
+   "name": "slug_unicode",
+   "scenario": "base",
+   "path": "/api/public-sessions/abc%E2%82%AC"
+  },
+  {
+   "name": "slug_nul",
+   "scenario": "base",
+   "path": "/api/public-sessions/%00"
+  },
+  {
+   "name": "slug_nul_inside",
+   "scenario": "base",
+   "path": "/api/public-sessions/open%00night"
+  },
+  {
+   "name": "slug_underscore",
+   "scenario": "base",
+   "path": "/api/public-sessions/open_night"
+  },
+  {
+   "name": "slug_sql_quote",
+   "scenario": "base",
+   "path": "/api/public-sessions/x%27%3B%20DROP%20TABLE%20queue_sessions%3B--"
+  },
+  {
+   "name": "slug_like_wildcard",
+   "scenario": "base",
+   "path": "/api/public-sessions/open%25"
+  },
+  {
+   "name": "slug_a_session_id",
+   "scenario": "base",
+   "path": "/api/public-sessions/e4000000-0000-4000-8000-000000000001"
+  },
+  {
+   "name": "later_published_before",
+   "scenario": "base",
+   "path": "/api/public-sessions/later-published-night"
+  },
+  {
+   "name": "later_published_after",
+   "scenario": "publish_later",
+   "path": "/api/public-sessions/later-published-night"
+  },
+  {
+   "name": "published_then_unpublished_before",
+   "scenario": "base",
+   "path": "/api/public-sessions/done-published"
+  },
+  {
+   "name": "published_then_unpublished_after",
+   "scenario": "unpublish",
+   "path": "/api/public-sessions/done-published"
+  },
+  {
+   "name": "details_row_then_deleted",
+   "scenario": "delete_details_row",
+   "path": "/api/public-sessions/done-unpublished"
+  },
+  {
+   "name": "roster_changes_after",
+   "scenario": "roster_changes",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "state_flip_to_completed_with_row",
+   "scenario": "active_becomes_completed",
+   "path": "/api/public-sessions/active-published-row"
+  },
+  {
+   "name": "club_renamed_after",
+   "scenario": "club_renamed",
+   "path": "/api/public-sessions/open-night"
+  }
+ ]
+}

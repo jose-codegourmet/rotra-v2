@@ -92,12 +92,12 @@ func TestTicketIsSingleUse(t *testing.T) {
 	defer srv.Close()
 	tk := issueOver(t, srv.URL)
 	first := openStream(t, srv.URL, tk)
-	defer first.Body.Close()
+	defer func() { _ = first.Body.Close() }()
 	if first.StatusCode != 200 || !strings.HasPrefix(first.Header.Get("Content-Type"), "text/event-stream") {
 		t.Fatalf("first use: %d %s", first.StatusCode, first.Header.Get("Content-Type"))
 	}
 	second := openStream(t, srv.URL, tk)
-	defer second.Body.Close()
+	defer func() { _ = second.Body.Close() }()
 	if second.StatusCode != 401 {
 		t.Fatalf("second use = %d", second.StatusCode)
 	}
@@ -109,7 +109,7 @@ func issueOver(t *testing.T, base string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	var body struct{ Ticket string }
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		t.Fatal(err)
@@ -130,13 +130,13 @@ func TestStreamStaysOpenAndHeartbeats(t *testing.T) {
 	srv := httptest.NewServer(NewHandler(streamDeps(nil)))
 	defer srv.Close()
 	resp := openStream(t, srv.URL, issueOver(t, srv.URL))
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.Header.Get("Cache-Control") != "no-store" {
 		t.Errorf("cache-control %q", resp.Header.Get("Cache-Control"))
 	}
 	sc := bufio.NewScanner(resp.Body)
 	beats := 0
-	deadline := time.AfterFunc(5*time.Second, func() { resp.Body.Close() })
+	deadline := time.AfterFunc(5*time.Second, func() { _ = resp.Body.Close() })
 	defer deadline.Stop()
 	for sc.Scan() && beats < 3 {
 		if strings.HasPrefix(sc.Text(), ": ") {
@@ -161,7 +161,7 @@ func TestStreamEndsWhenClientDisconnects(t *testing.T) {
 		t.Fatal(err)
 	}
 	cancel()
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	select {
 	case <-done:
 	case <-time.After(3 * time.Second):
@@ -177,7 +177,7 @@ func TestStreamEndsOnServerDraining(t *testing.T) {
 	srv := httptest.NewServer(NewHandler(d))
 	defer srv.Close()
 	resp := openStream(t, srv.URL, issueOver(t, srv.URL))
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	d.Readiness.SetDraining()
 	select {
 	case <-done:

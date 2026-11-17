@@ -4,16 +4,16 @@
   "type": "refactor",
   "priority": "high",
   "order": 5,
-  "status": "pending",
+  "status": "in_progress",
   "created": "2026-11-13",
-  "updated": "2026-11-13",
+  "updated": "2026-11-17",
   "depends_on": "beta-stack",
   "phases": {
     "total": 3,
-    "completed": 0
+    "completed": 2
   },
   "tasks": {
     "total": 7,
-    "completed": 0
+    "completed": 6
   }
 }

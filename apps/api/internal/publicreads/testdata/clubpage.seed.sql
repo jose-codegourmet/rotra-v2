@@ -1,0 +1,110 @@
+-- Fictional clubs, members, sessions, banners and ranking settings for the club page, shown banners,
+-- shown characters, character image and ranking settings characterization (P-CLUB-PAGE with no viewer,
+-- the Player pickers, the public ranking numbers). Applied on top of the Prisma migrations, which already
+-- seed the PH locations, the six profile banners, the 24 profile characters and ranking settings version 1.
+-- Hand-written; rerun apps/api/testdata/tools/capture-clubpage.test.mjs after any change.
+-- Foreign key checks are off for this load (the routes never read the tables only needed to satisfy them),
+-- and the same switch lets the append-only ranking settings be replaced.
+BEGIN;
+SET LOCAL session_replication_role = replica;
+
+-- ---- clubs: A (members and banner scenarios), B (a deliberate tie, never mutated), C (empty), D (sessions) ----
+INSERT INTO clubs (id, name, name_key, logo_ref, invite_code, founding_location_code_id, founding_address, license_pricing, source_command_id, updated_at) VALUES
+  ('a1000000-0000-4000-8000-000000000001', 'Smash Club', 'smash-club', 'https://example.test/smash.png', 'SMASH2026A', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'Somewhere', 'free', 'a3000000-0000-4000-8000-000000000001', now()),
+  ('a1000000-0000-4000-8000-000000000002', 'Net Ninjas', 'net-ninjas', NULL, NULL, (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'MNL'), 'Somewhere', 'free', 'a3000000-0000-4000-8000-000000000002', now()),
+  ('a1000000-0000-4000-8000-000000000003', 'solo', 'solo', NULL, 'SOLO0001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'Somewhere', 'free', 'a3000000-0000-4000-8000-000000000003', now()),
+  ('a1000000-0000-4000-8000-000000000004', '  😀 Birdie   Club', 'birdie-club', 'https://example.test/birdie.png', 'BIRDIE2026', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'DVO'), 'Somewhere', 'free', 'a3000000-0000-4000-8000-000000000004', now());
+
+-- ---- one uploaded banner and one deleted banner on top of the six seeded ones (millisecond-and-finer upload times) ----
+INSERT INTO profile_banners (id, image, shown, uploaded_at, number, deleted_at) VALUES
+  ('b0000000-0000-4000-8000-000000000001', 'https://example.test/banner-one.png', false, TIMESTAMPTZ '2026-11-12 00:00:00+00', 7, TIMESTAMPTZ '2026-11-13 00:00:00+00'),
+  ('b0000000-0000-4000-8000-000000000002', 'https://example.test/banner-two.png', true, TIMESTAMPTZ '2026-11-12 00:00:00.123456+00', 8, NULL),
+  ('b0000000-0000-4000-8000-000000000003', 'https://example.test/banner-three.png', true, TIMESTAMPTZ '2026-11-12 00:00:00.999999+00', 9, NULL);
+
+-- ---- players: claimed profiles appear on a club page; the others are the exclusions ----
+INSERT INTO players (id, full_name, nickname, avatar_ref, profile_state, profile_visibility, hidden_from_directory, banner_id, updated_at) VALUES
+  ('d2000000-0000-4000-8000-000000000001', 'Alice Reyes', 'Ace', 'https://example.test/alice.png', 'claimed', 'public', false, 'night', now()),
+  ('d2000000-0000-4000-8000-000000000002', 'Bob Santos', 'Bobby', 'character:a', 'claimed', 'private', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000003', 'Carla Dizon', 'CD', NULL, 'claimed', 'always_private', false, 'ember', now()),
+  ('d2000000-0000-4000-8000-000000000004', '  😀 Smile   Lee ', 'Smiley', 'character:', 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000005', 'Hal Hidden', NULL, NULL, 'claimed', 'public', true, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000006', 'Ursula Unclaimed', NULL, NULL, 'unclaimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000007', 'Rita Removed', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000008', chr(160), NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000009', 'Ünï Çödé', 'Uni', NULL, 'claimed', 'public', false, 'b0000000-0000-4000-8000-000000000001', now()),
+  ('d2000000-0000-4000-8000-00000000000a', 'élan Vital', NULL, NULL, 'claimed', 'public', false, 'b0000000-0000-4000-8000-000000000002', now()),
+  ('d2000000-0000-4000-8000-00000000000b', 'Zed Zulu', NULL, NULL, 'claimed', 'public', false, 'no-such-banner', now()),
+  ('d2000000-0000-4000-8000-00000000000c', '日本 太郎', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-00000000000d', 'a lower', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-00000000000e', 'Gina Default', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-00000000000f', 'Advanced Ada', NULL, NULL, 'claimed', 'public', false, 'sun', now()),
+  ('d2000000-0000-4000-8000-000000000010', 'Jon Doe', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000011', 'Jane Doe', NULL, NULL, 'claimed', 'private', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000012', 'Joe Dee', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000013', 'John D', NULL, NULL, 'claimed', 'public', false, NULL, now()),
+  ('d2000000-0000-4000-8000-000000000014', 'jon doe', NULL, NULL, 'claimed', 'public', false, NULL, now());
+
+-- ---- club members, in id order = added order ----
+INSERT INTO club_players (id, club_id, player_id, display_name, added_at, removed_at, updated_at) VALUES
+  ('a2000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000001', 'Alice R.', TIMESTAMPTZ '2026-01-01 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000002', 'Bob', TIMESTAMPTZ '2026-01-02 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000003', 'Carla', TIMESTAMPTZ '2026-01-03 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000004', 'Smile', TIMESTAMPTZ '2026-01-04 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000005', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000005', 'Hal', TIMESTAMPTZ '2026-01-05 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000006', 'Ursula', TIMESTAMPTZ '2026-01-06 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000007', 'a1000000-0000-4000-8000-000000000001', NULL, 'Guest Gary', TIMESTAMPTZ '2026-01-07 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000008', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000007', 'Rita', TIMESTAMPTZ '2026-01-08 00:00:00+00', TIMESTAMPTZ '2026-02-01 00:00:00+00', now()),
+  ('a2000000-0000-4000-8000-000000000009', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000008', 'Display Only', TIMESTAMPTZ '2026-01-09 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000a', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000009', 'Uni', TIMESTAMPTZ '2026-01-10 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000b', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000a', 'Elan', TIMESTAMPTZ '2026-01-11 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000c', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000b', 'Zed', TIMESTAMPTZ '2026-01-12 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000d', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000c', 'Taro', TIMESTAMPTZ '2026-01-13 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000e', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000d', 'lower', TIMESTAMPTZ '2026-01-14 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-00000000000f', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000e', 'Gina', TIMESTAMPTZ '2026-01-15 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000010', 'a1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-00000000000f', 'Ada', TIMESTAMPTZ '2026-01-16 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000011', 'a1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000010', 'Jon', TIMESTAMPTZ '2026-02-01 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000012', 'a1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000011', 'Jane', TIMESTAMPTZ '2026-02-02 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000013', 'a1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000012', 'Joe', TIMESTAMPTZ '2026-02-03 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000014', 'a1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000013', 'John', TIMESTAMPTZ '2026-02-04 00:00:00+00', NULL, now()),
+  ('a2000000-0000-4000-8000-000000000015', 'a1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000014', 'jon', TIMESTAMPTZ '2026-02-05 00:00:00+00', NULL, now());
+
+-- ---- assessments: the latest per club player wins; level 0 is a level, not "no level" ----
+INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, player_id_at_assessment, skill_level_id, source_operation_id, assessed_at, accepted_revision, actor_club_id) VALUES
+  ('a4000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000001', 3, 'a7000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-03-01 00:00:00+00', 1, 'a1000000-0000-4000-8000-000000000001'),
+  ('a4000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000001', 5, 'a7000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-04-01 00:00:00+00', 2, 'a1000000-0000-4000-8000-000000000001'),
+  ('a4000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000001', 7, 'a7000000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-02-01 00:00:00+00', 3, 'a1000000-0000-4000-8000-000000000001'),
+  ('a4000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000003', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000003', 'd2000000-0000-4000-8000-000000000003', 0, 'a7000000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-03-01 00:00:00+00', 1, 'a1000000-0000-4000-8000-000000000001'),
+  ('a4000000-0000-4000-8000-000000000005', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000010', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000010', 'd2000000-0000-4000-8000-00000000000f', 8, 'a7000000-0000-4000-8000-000000000005', TIMESTAMPTZ '2026-03-01 00:00:00+00', 1, 'a1000000-0000-4000-8000-000000000001'),
+  ('a4000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000002', 'a5000000-0000-4000-8000-000000000001', 'a6000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000002', 4, 'a7000000-0000-4000-8000-000000000006', TIMESTAMPTZ '2026-03-01 00:00:00+00', 1, 'a1000000-0000-4000-8000-000000000001');
+
+-- ---- sessions (no two non-invalid sessions of a club overlap; one running session per club) ----
+-- Club A: one live, one scheduled. Club D: every other state, around the three-month page retention line
+-- (the fixed clock is 2026-11-17T12:00:00Z, so the line is 2026-08-19T12:00:00Z).
+INSERT INTO queue_sessions (id, club_id, title, state, invalid_reason, cancelled_at, started_at, finalized_at, scheduled_start_at, scheduled_end_at, players_per_court, public_slug, source_command_id, updated_at) VALUES
+  ('a8000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000001', 'Next Friday', 'prepared', NULL, NULL, NULL, NULL, TIMESTAMPTZ '2026-11-20 09:00:00+00', TIMESTAMPTZ '2026-11-20 15:00:00+00', 8, 'next-friday', 'a9000000-0000-4000-8000-000000000002', now()),
+  ('a8000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', 'Tonight', 'active', NULL, NULL, TIMESTAMPTZ '2026-11-17 09:05:00+00', NULL, TIMESTAMPTZ '2026-11-17 09:00:00+00', TIMESTAMPTZ '2026-11-17 15:00:00+00', 8, 'tonight', 'a9000000-0000-4000-8000-000000000001', now()),
+  ('a8000000-0000-4000-8000-000000000014', 'a1000000-0000-4000-8000-000000000004', 'Cancelled Sunday', 'cancelled', NULL, TIMESTAMPTZ '2026-11-20 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-29 09:00:00+00', TIMESTAMPTZ '2026-11-29 15:00:00+00', 8, 'cancelled-sunday', 'a9000000-0000-4000-8000-000000000014', now()),
+  ('a8000000-0000-4000-8000-000000000015', 'a1000000-0000-4000-8000-000000000004', 'Thrown Out', 'invalid', 'Fixture: thrown out', NULL, TIMESTAMPTZ '2026-11-29 09:00:00+00', NULL, TIMESTAMPTZ '2026-11-29 09:00:00+00', TIMESTAMPTZ '2026-11-29 15:00:00+00', 8, 'thrown-out', 'a9000000-0000-4000-8000-000000000015', now()),
+  ('a8000000-0000-4000-8000-000000000013', 'a1000000-0000-4000-8000-000000000004', 'Micro Start', 'prepared', NULL, NULL, NULL, NULL, TIMESTAMPTZ '2026-11-25 09:00:00.123456+00', TIMESTAMPTZ '2026-11-25 15:00:00.999999+00', 8, 'micro-start', 'a9000000-0000-4000-8000-000000000013', now()),
+  ('a8000000-0000-4000-8000-000000000012', 'a1000000-0000-4000-8000-000000000004', 'Deleted Page Ahead', 'prepared', NULL, NULL, NULL, NULL, TIMESTAMPTZ '2026-11-22 09:00:00+00', TIMESTAMPTZ '2026-11-22 15:00:00+00', 8, 'deleted-page-ahead', 'a9000000-0000-4000-8000-000000000012', now()),
+  ('a8000000-0000-4000-8000-000000000011', 'a1000000-0000-4000-8000-000000000004', 'Just Finishing', 'finalizing', NULL, NULL, TIMESTAMPTZ '2026-11-16 09:00:00+00', NULL, TIMESTAMPTZ '2026-11-16 09:00:00+00', TIMESTAMPTZ '2026-11-16 15:00:00+00', 8, 'just-finishing', 'a9000000-0000-4000-8000-000000000011', now()),
+  ('a8000000-0000-4000-8000-000000000010', 'a1000000-0000-4000-8000-000000000004', 'Kept Page', 'completed', NULL, NULL, TIMESTAMPTZ '2026-11-13 09:00:00+00', TIMESTAMPTZ '2026-11-13 16:00:00+00', TIMESTAMPTZ '2026-11-13 09:00:00+00', TIMESTAMPTZ '2026-11-13 15:00:00+00', 8, 'kept-page', 'a9000000-0000-4000-8000-000000000010', now()),
+  ('a8000000-0000-4000-8000-000000000009', 'a1000000-0000-4000-8000-000000000004', 'Deleted Page Done', 'completed', NULL, NULL, TIMESTAMPTZ '2026-11-10 09:00:00+00', TIMESTAMPTZ '2026-11-10 16:00:00+00', TIMESTAMPTZ '2026-11-10 09:00:00+00', TIMESTAMPTZ '2026-11-10 15:00:00+00', 8, 'deleted-page-done', 'a9000000-0000-4000-8000-000000000009', now()),
+  ('a8000000-0000-4000-8000-000000000008', 'a1000000-0000-4000-8000-000000000004', 'Exactly Ninety Days', 'completed', NULL, NULL, TIMESTAMPTZ '2026-08-19 11:59:59.999+00', TIMESTAMPTZ '2026-08-19 13:00:00+00', TIMESTAMPTZ '2026-08-19 11:59:59.999+00', TIMESTAMPTZ '2026-08-19 12:00:00+00', 8, 'exactly-ninety-days', 'a9000000-0000-4000-8000-000000000008', now()),
+  ('a8000000-0000-4000-8000-000000000007', 'a1000000-0000-4000-8000-000000000004', 'One Millisecond Over', 'completed', NULL, NULL, TIMESTAMPTZ '2026-08-19 11:59:59.998+00', TIMESTAMPTZ '2026-08-19 13:00:00+00', TIMESTAMPTZ '2026-08-19 11:59:59.998+00', TIMESTAMPTZ '2026-08-19 11:59:59.999+00', 8, 'one-millisecond-over', 'a9000000-0000-4000-8000-000000000007', now()),
+  ('a8000000-0000-4000-8000-000000000006', 'a1000000-0000-4000-8000-000000000004', 'Long Ago With Page Row', 'completed', NULL, NULL, TIMESTAMPTZ '2026-01-10 09:00:00+00', TIMESTAMPTZ '2026-01-10 16:00:00+00', TIMESTAMPTZ '2026-01-10 09:00:00+00', TIMESTAMPTZ '2026-01-10 15:00:00+00', 8, 'long-ago-with-page-row', 'a9000000-0000-4000-8000-000000000006', now());
+
+INSERT INTO session_publications (id, club_id, session_id, public_key, state, deleted_at, details_projection, participants_projection, last_synced_at, updated_at) VALUES
+  ('aa000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'a8000000-0000-4000-8000-000000000009', 'public-key-deleted-done', 'deleted', TIMESTAMPTZ '2026-11-12 00:00:00+00', '{}', '[]', now(), now()),
+  ('aa000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000004', 'a8000000-0000-4000-8000-000000000012', 'public-key-deleted-ahead', 'deleted', TIMESTAMPTZ '2026-11-12 00:00:00+00', '{}', '[]', now(), now()),
+  ('aa000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000004', 'a8000000-0000-4000-8000-000000000010', 'public-key-kept-page', 'details', NULL, '{}', '[]', now(), now()),
+  ('aa000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000004', 'a8000000-0000-4000-8000-000000000006', 'public-key-long-ago', 'details', NULL, '{}', '[]', now(), now());
+
+-- ---- ranking settings: three saved versions, out of order, one with microseconds and an Admin note ----
+DELETE FROM ranking_policy_versions;
+INSERT INTO ranking_policy_versions (id, version, effective_at, assessment_weight_bp, performance_weight_bp, recent_standard_match_threshold, algorithm_version, change_note, created_at) VALUES
+  ('ab000000-0000-4000-8000-000000000003', 3, TIMESTAMPTZ '2026-11-10 00:00:00.999999+00', 5000, 5000, 12, 'unapproved', 'Admin only: third note', TIMESTAMPTZ '2026-11-09 00:00:00+00'),
+  ('ab000000-0000-4000-8000-000000000001', 1, TIMESTAMPTZ '2026-10-01 00:00:00+00', 7000, 3000, 10, 'unapproved', 'Initial settings', TIMESTAMPTZ '2026-10-01 00:00:00+00'),
+  ('ab000000-0000-4000-8000-000000000002', 2, TIMESTAMPTZ '2026-11-01 08:30:15.123456+00', 6000, 4000, 8, 'v2-draft', NULL, TIMESTAMPTZ '2026-10-31 00:00:00+00');
+
+COMMIT;

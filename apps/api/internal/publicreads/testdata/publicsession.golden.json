@@ -1,0 +1,2915 @@
+{
+ "session_1_open_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "waitlist": [
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_2_active_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "active-night",
+   "status": "active",
+   "title": "Active Night",
+   "start": 1794906000000,
+   "end": 1794927600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000002",
+    "name": "Net Ninjas",
+    "initials": "NN",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "A",
+    "B"
+   ],
+   "formats": {
+    "singles": false,
+    "doubles": true
+   },
+   "mode": "hard",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 3,
+   "participants": [
+    {
+     "name": "L*** L***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "O*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "P*** P***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 1,
+    "unrated": 1
+   },
+   "waitlist": [
+    {
+     "name": "L***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "openSlots": 13,
+   "slotBudget": 16,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": true,
+   "lastSyncedAt": 1794904200000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_3_finishing_up": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "finishing-up",
+   "status": "active",
+   "title": "Finishing Up",
+   "start": 1794906000000,
+   "end": 1794927600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000003",
+    "name": "Birdie Squad",
+    "initials": "BS",
+    "logoUrl": "https://example.test/club3.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Only"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 3,
+   "participants": [
+    {
+     "name": "F*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "F*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "F*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 3,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 1,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794924000000,
+   "hasPendingChanges": true,
+   "results": null
+  }
+ },
+ "session_4_done_published": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-published",
+   "status": "completed",
+   "title": "Done and Published",
+   "start": 1794646800000,
+   "end": 1794668400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 6,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "S*** S***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 2,
+    "intermediate": 2,
+    "advanced": 2,
+    "unrated": 0
+   },
+   "waitlist": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "openSlots": 2,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794679200000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": {
+      "name": "Alice Reyes",
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     "mostImproved": {
+      "name": "Mika",
+      "priorSessions": 3,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     }
+    },
+    "offDay": [
+     {
+      "name": "Solo Sam",
+      "priorSessions": 2,
+      "pictureUrl": null,
+      "participant": 5
+     },
+     {
+      "name": "Twin Name",
+      "priorSessions": 0,
+      "pictureUrl": null
+     }
+    ],
+    "standings": [
+     {
+      "name": "Alice Reyes",
+      "wins": 5,
+      "games": 6,
+      "losses": 1,
+      "position": 1,
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     {
+      "name": "Mika",
+      "wins": 4,
+      "games": 6,
+      "losses": 2,
+      "position": 2,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     },
+     {
+      "name": "Twin Name",
+      "wins": 3,
+      "games": 6,
+      "losses": 3,
+      "position": 3,
+      "pictureUrl": null
+     },
+     {
+      "name": "Jose Adrian",
+      "wins": 2,
+      "games": 6,
+      "losses": 4,
+      "position": 4,
+      "pictureUrl": "https://example.test/jose.png",
+      "participant": 4
+     },
+     {
+      "name": "Not On Roster",
+      "wins": 1,
+      "games": 6,
+      "losses": 5,
+      "position": 5,
+      "pictureUrl": null
+     },
+     {
+      "name": "alice reyes",
+      "wins": 0,
+      "games": 6,
+      "losses": 6,
+      "position": 6,
+      "pictureUrl": null
+     }
+    ]
+   }
+  }
+ },
+ "session_5_done_unpublished": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-unpublished",
+   "status": "completed",
+   "title": "Done, Details Only",
+   "start": 1794560400000,
+   "end": 1794582000000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794592800000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_6_done_no_row": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-no-row",
+   "status": "completed",
+   "title": "Done, No Publication",
+   "start": 1794474000000,
+   "end": 1794495600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 1,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 7,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794506400000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_7_done_deleted_page": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "session_8_ahead_deleted_page": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "session_9_cancelled_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "cancelled-night",
+   "status": "cancelled",
+   "title": "Cancelled Night",
+   "start": 1795683600000,
+   "end": 1795705200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000b",
+    "name": "Cancelled Cats",
+    "initials": "CC",
+    "logoUrl": "https://example.test/club11.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 0,
+   "slotBudget": 0,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_10_invalid_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "invalid-night",
+   "status": "invalid",
+   "title": "Invalid Night",
+   "start": 1795770000000,
+   "end": 1795791600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000c",
+    "name": "Invalid Inc",
+    "initials": "II",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 0,
+   "slotBudget": 0,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_11_empty_session": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "empty-session",
+   "status": "prepared",
+   "title": "Empty Session",
+   "start": 1795856400000,
+   "end": 1795878000000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000d",
+    "name": "Empty Courts",
+    "initials": "EC",
+    "logoUrl": "https://example.test/club13.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 0,
+   "slotBudget": 0,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_12_active_published_row": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "active-published-row",
+   "status": "active",
+   "title": "Active With a Published Row",
+   "start": 1794906000000,
+   "end": 1794927600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000f",
+    "name": "Quiet Club",
+    "initials": "QC",
+    "logoUrl": "https://example.test/club15.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "C1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 1,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 3,
+   "slotBudget": 4,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794902400000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_13_abcd": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "abcd",
+   "status": "prepared",
+   "title": "Shortest Slug",
+   "start": 1795942800000,
+   "end": 1795964400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000010",
+    "name": "Late Bloomers",
+    "initials": "LB",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 0,
+   "slotBudget": 0,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_14_xxxxxxxxxxxxxxxxxxxxxxxx": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "status": "prepared",
+   "title": "Longest Slug",
+   "start": 1796029200000,
+   "end": 1796050800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000005",
+    "name": "ßeta Club",
+    "initials": "SSC",
+    "logoUrl": "https://example.test/club5.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 0,
+   "slotBudget": 0,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_15_emoji_club_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "emoji-club-night",
+   "status": "prepared",
+   "title": "Emoji Club Night",
+   "start": 1796115600000,
+   "end": 1796137200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000004",
+    "name": "  😀 Smash   Club",
+    "initials": "\ud83dS",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Birdie Court"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 1,
+   "participants": [
+    {
+     "name": "M*** M***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 3,
+   "slotBudget": 4,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794333600000,
+   "hasPendingChanges": false,
+   "results": null
+  },
+  "rawContains": [
+   "\\ud83dS"
+  ]
+ },
+ "session_16_done_minimal_results": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-minimal-results",
+   "status": "completed",
+   "title": "Done, Minimal Results",
+   "start": 1794214800000,
+   "end": 1794236400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000007",
+    "name": "Clear Kings",
+    "initials": "CK",
+    "logoUrl": "https://example.test/club7.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 1
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794247200000,
+   "hasPendingChanges": false,
+   "results": {
+    "standings": [
+     {
+      "name": "Alice Reyes",
+      "wins": 1,
+      "games": 1,
+      "losses": 0,
+      "position": 1,
+      "pictureUrl": null,
+      "participant": 0
+     }
+    ]
+   }
+  }
+ },
+ "session_17_done_awards_only": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-awards-only",
+   "status": "completed",
+   "title": "Done, Awards Only",
+   "start": 1794128400000,
+   "end": 1794150000000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000008",
+    "name": "Lift Lords",
+    "initials": "LL",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 1
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794160800000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": null,
+     "mostImproved": null
+    }
+   }
+  }
+ },
+ "session_18_later_published_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "later-published-night",
+   "status": "completed",
+   "title": "Done, Published Later",
+   "start": 1794042000000,
+   "end": 1794063600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000009",
+    "name": "Smash Mid",
+    "initials": "SM",
+    "logoUrl": "https://example.test/club9.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 1
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794074400000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "session_19_done_odd_rows": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-odd-rows",
+   "status": "completed",
+   "title": "Odd done-odd-rows",
+   "start": 1793955600000,
+   "end": 1793977200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000011",
+    "name": "Odd One",
+    "initials": "OO",
+    "logoUrl": "https://example.test/club17.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 2,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1793988000000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": "Alice Reyes",
+     "other": {
+      "x": [
+       1,
+       2
+      ]
+     },
+     "mostImproved": {
+      "name": "Mika",
+      "pictureUrl": null,
+      "participant": 1
+     }
+    },
+    "offDay": [],
+    "standings": [
+     {
+      "name": 5,
+      "wins": 1,
+      "pictureUrl": null
+     },
+     {
+      "position": 3
+     },
+     "str",
+     null,
+     [
+      1
+     ],
+     {
+      "name": "Alice Reyes",
+      "pictureUrl": null,
+      "participant": 0
+     },
+     1.5,
+     100,
+     {
+      "name": "Mika",
+      "extra": {
+       "deep": [
+        1,
+        {
+         "k": null
+        }
+       ]
+      },
+      "pictureUrl": null,
+      "participant": 1
+     }
+    ]
+   }
+  }
+ },
+ "session_20_done_odd_awards_array": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-odd-awards-array",
+   "status": "completed",
+   "title": "Odd done-odd-awards-array",
+   "start": 1793955600000,
+   "end": 1793977200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000012",
+    "name": "Odd Two",
+    "initials": "OT",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 2,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1793988000000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "0": {
+      "name": "Alice Reyes"
+     },
+     "1": 2
+    },
+    "offDay": [],
+    "standings": []
+   }
+  }
+ },
+ "session_21_done_awards_string": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-awards-string",
+   "status": "completed",
+   "title": "Odd done-awards-string",
+   "start": 1793955600000,
+   "end": 1793977200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000013",
+    "name": "Odd Three",
+    "initials": "OT",
+    "logoUrl": "https://example.test/club19.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 2,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1793988000000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": "x"
+   }
+  }
+ },
+ "session_22_done_awards_null": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-awards-null",
+   "status": "completed",
+   "title": "Odd done-awards-null",
+   "start": 1793955600000,
+   "end": 1793977200000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000014",
+    "name": "Odd Four",
+    "initials": "OF",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 2,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1793988000000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": null
+   }
+  }
+ },
+ "slug_with_query": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "waitlist": [
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "slug_percent_encoded_hyphen": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "waitlist": [
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "unknown_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "uppercase_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "mixed_case_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "too_short_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "too_long_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "very_long_slug": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_with_space": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_trailing_space": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_with_dot_dot": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_unicode": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_nul": {
+  "status": 500,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "internal",
+    "message": "Something went wrong."
+   }
+  }
+ },
+ "slug_nul_inside": {
+  "status": 500,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "internal",
+    "message": "Something went wrong."
+   }
+  }
+ },
+ "slug_underscore": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_sql_quote": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_like_wildcard": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_a_session_id": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "later_published_before": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "later-published-night",
+   "status": "completed",
+   "title": "Done, Published Later",
+   "start": 1794042000000,
+   "end": 1794063600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000009",
+    "name": "Smash Mid",
+    "initials": "SM",
+    "logoUrl": "https://example.test/club9.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 1
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794074400000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "later_published_after": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "later-published-night",
+   "status": "completed",
+   "title": "Done, Published Later",
+   "start": 1794042000000,
+   "end": 1794063600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000009",
+    "name": "Smash Mid",
+    "initials": "SM",
+    "logoUrl": "https://example.test/club9.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 2,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 1,
+    "advanced": 0,
+    "unrated": 1
+   },
+   "waitlist": [],
+   "openSlots": 6,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794074400000,
+   "hasPendingChanges": false,
+   "results": {
+    "standings": [
+     {
+      "name": "Alice Reyes",
+      "wins": 2,
+      "games": 2,
+      "losses": 0,
+      "position": 1,
+      "pictureUrl": null,
+      "participant": 0
+     }
+    ]
+   }
+  }
+ },
+ "published_then_unpublished_before": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-published",
+   "status": "completed",
+   "title": "Done and Published",
+   "start": 1794646800000,
+   "end": 1794668400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 6,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "S*** S***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 2,
+    "intermediate": 2,
+    "advanced": 2,
+    "unrated": 0
+   },
+   "waitlist": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "openSlots": 2,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794679200000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": {
+      "name": "Alice Reyes",
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     "mostImproved": {
+      "name": "Mika",
+      "priorSessions": 3,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     }
+    },
+    "offDay": [
+     {
+      "name": "Solo Sam",
+      "priorSessions": 2,
+      "pictureUrl": null,
+      "participant": 5
+     },
+     {
+      "name": "Twin Name",
+      "priorSessions": 0,
+      "pictureUrl": null
+     }
+    ],
+    "standings": [
+     {
+      "name": "Alice Reyes",
+      "wins": 5,
+      "games": 6,
+      "losses": 1,
+      "position": 1,
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     {
+      "name": "Mika",
+      "wins": 4,
+      "games": 6,
+      "losses": 2,
+      "position": 2,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     },
+     {
+      "name": "Twin Name",
+      "wins": 3,
+      "games": 6,
+      "losses": 3,
+      "position": 3,
+      "pictureUrl": null
+     },
+     {
+      "name": "Jose Adrian",
+      "wins": 2,
+      "games": 6,
+      "losses": 4,
+      "position": 4,
+      "pictureUrl": "https://example.test/jose.png",
+      "participant": 4
+     },
+     {
+      "name": "Not On Roster",
+      "wins": 1,
+      "games": 6,
+      "losses": 5,
+      "position": 5,
+      "pictureUrl": null
+     },
+     {
+      "name": "alice reyes",
+      "wins": 0,
+      "games": 6,
+      "losses": 6,
+      "position": 6,
+      "pictureUrl": null
+     }
+    ]
+   }
+  }
+ },
+ "published_then_unpublished_after": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "details_row_then_deleted": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "roster_changes_after": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night (renamed)",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 13,
+   "participants": [
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Z*** Z***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "A*** L***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 3,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "waitlist": [
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794384000000,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "state_flip_to_completed_with_row": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "active-published-row",
+   "status": "completed",
+   "title": "Active With a Published Row",
+   "start": 1794906000000,
+   "end": 1794927600000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000f",
+    "name": "Quiet Club",
+    "initials": "QC",
+    "logoUrl": "https://example.test/club15.png"
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "C1"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 1,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 1,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "waitlist": [],
+   "openSlots": 3,
+   "slotBudget": 4,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794902400000,
+   "hasPendingChanges": false,
+   "results": {
+    "standings": [
+     {
+      "name": "Alice Reyes",
+      "wins": 1,
+      "games": 1,
+      "losses": 0,
+      "position": 1,
+      "pictureUrl": null,
+      "participant": 0
+     }
+    ]
+   }
+  }
+ },
+ "club_renamed_after": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally  Renamed  Club",
+    "initials": "RR",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "waitlist": [
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ }
+}

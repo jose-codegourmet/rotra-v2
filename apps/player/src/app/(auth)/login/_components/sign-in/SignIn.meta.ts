@@ -6,6 +6,7 @@ export const signInMeta = {
   usage: [
     'Retains a validated Queue public session destination for a same-tab registration invitation, then returns to it after sign-in without granting club authority.',
     'Real mode uses the existing Player Supabase sign-in; no email delivery.',
+    'Passes the public /terms and /privacy paths so the card shows the Terms of Service and Privacy Policy line (D-2026-11-17-01).',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

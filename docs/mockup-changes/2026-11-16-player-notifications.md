@@ -1,6 +1,6 @@
 # Player app: notifications page and bell
 
-Status: NEW
+Status: TICKETED — #890
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › topBar (bell), viewNotifs, allNotifs, seedNotifs, NOTIF_KIND

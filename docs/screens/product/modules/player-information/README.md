@@ -10,6 +10,7 @@
 | [Notifications](notifications.md) | Bell and notifications page (P-NOTIFICATIONS), ROTRA announcements |
 | [Ranking and history](ranking-history.md) | Overall leaderboard, rank explanation, eligibility/reassessment, match history |
 | [Public club page](club-page.md) | A club's public page and its full Members page (epic P07, #737) |
+| [Legal pages](legal.md) | Privacy Policy (P-PRIVACY) and Terms of Service (P-TERMS), public static pages ([D-2026-11-17-01](../../../../mvp/decisions.md#d-2026-11-17-01)) |
 
 Screen IDs begin with `P-`. The public club page (`P-CLUB-PAGE`, `P-CLUB-MEMBERS`, November 11, 2026) are Player Information screens, not World. No World, social feed, game editor, peer-review, EXP, or separate MMR screens are specified.
 

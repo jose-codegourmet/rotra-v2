@@ -70,6 +70,7 @@ flowchart TD
 | [Public and own player profile](modules/player-information/profile.md) | `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE` |
 | [Public club page and club members](modules/player-information/club-page.md) | `P-CLUB-PAGE`, `P-CLUB-MEMBERS` |
 | [Global leaderboard, rank explanation, and game history](modules/player-information/ranking-history.md) | `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY` |
+| [Legal pages](modules/player-information/legal.md) | `P-PRIVACY`, `P-TERMS` |
 
 ### Admin
 
@@ -108,3 +109,7 @@ sign-in required. The club is RTR allocation context only; existing profiles sti
 ### Player club routes (epic P07)
 
 Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.
+
+### Player legal routes
+
+Decided November 17, 2026 ([D-2026-11-17-01](../../mvp/decisions.md#d-2026-11-17-01)): `/privacy` (`P-PRIVACY`) and `/terms` (`P-TERMS`) in Player Information. Both are public (no sign-in) in mock and real mode, and static. The Google sign-in consent screen and P-LOGIN link to them. The prototype serves them under `/player/privacy` and `/player/terms`.

@@ -1,6 +1,6 @@
 # Admin › Players: unclaimed players have an email and an RTR ID; Admin can change the email and the RTR ID
 
-Status: NEW
+Status: TICKETED — #900
 Date: 2026-11-16
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players (list, quick view, Edit profile) and the player page (Overview)

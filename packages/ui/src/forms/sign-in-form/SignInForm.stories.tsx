@@ -29,3 +29,10 @@ export const SuccessNote: Story = { args: { successNote: playerAccessScenarios.s
 export const Pending: Story = { args: { isPending: true } }
 export const Offline: Story = { args: { offline: true } }
 export const PhoneViewport: Story = { globals: { viewport: { value: 'phone' } } }
+const legalLinks = { termsHref: '/terms', privacyHref: '/privacy' }
+export const LegalLinks: Story = { args: { legalLinks } }
+export const LegalLinksLight: Story = { args: { legalLinks }, globals: { theme: 'light' } }
+export const LegalLinksPhone: Story = {
+  args: { legalLinks },
+  globals: { viewport: { value: 'phone' } },
+}

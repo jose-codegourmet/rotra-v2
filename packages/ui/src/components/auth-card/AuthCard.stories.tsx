@@ -58,6 +58,25 @@ export const Admin: Story = {
   },
 }
 
+export const PlayerWithLegalNote: Story = {
+  args: {
+    ...Player.args,
+    below: (
+      <p className="m-0">
+        By continuing you agree to the{' '}
+        <a href="/terms" className="text-accent underline underline-offset-[3px]">
+          Terms of Service
+        </a>{' '}
+        and{' '}
+        <a href="/privacy" className="text-accent underline underline-offset-[3px]">
+          Privacy Policy
+        </a>
+        .
+      </p>
+    ),
+  },
+}
+
 export const Offline: Story = { args: { offline: true, children: <QueueForm disabled /> } }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

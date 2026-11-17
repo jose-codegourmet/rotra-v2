@@ -121,6 +121,7 @@
     "./leaderboard-row": "./src/components/leaderboard-row/LeaderboardRow.tsx",
     "./leaderboard-rules-card": "./src/components/leaderboard-rules-card/LeaderboardRulesCard.tsx",
     "./leaderboard-search": "./src/components/leaderboard-search/LeaderboardSearch.tsx",
+    "./legal-document": "./src/components/legal-document/LegalDocument.tsx",
     "./letter-group": "./src/components/letter-group/LetterGroup.tsx",
     "./level-diff-indicator": "./src/components/level-diff-indicator/LevelDiffIndicator.tsx",
     "./level-pill": "./src/components/level-pill/LevelPill.tsx",

@@ -142,6 +142,14 @@ Players cannot change phone or email themselves. They must contact the platform 
 
 Whether club operators can continue editing non-ranking personal details after a profile is claimed was not answered and remains open.
 
+## Privacy Policy and Terms of Service pages
+
+**Owner, November 17, 2026 ([D-2026-11-17-01](../../../../../mvp/decisions.md#d-2026-11-17-01)).** The Player app has two public, static pages that the Google sign-in consent screen links to: **Privacy Policy** at `/privacy` and **Terms of Service** at `/terms` ([screens](../../../../../screens/product/modules/player-information/legal.md)). Both name the operator as ROTRA, give `support@rotra.club` for questions and privacy requests, are written for the Philippines (the Data Privacy Act of 2012, Republic Act No. 10173; Philippine law governs the terms) and take effect November 17, 2026. P-LOGIN says "By continuing you agree to the Terms of Service and Privacy Policy."
+
+- **Privacy Policy** describes what this module and the profile rules already say: what ROTRA collects (account details, the Google email, name and picture only, play data, what a club saves, sign-in cookies and basic logs), unclaimed profiles being public until the person registers, the three visibility levels, email and phone never public and the phone masked, who sees what (clubs, the hosting, database and sign-in providers, the law), storage and protection, keeping data while the account or profile exists and what is needed afterwards, the Data Privacy Act rights and how to use them by email.
+- **Terms of Service** describe how ROTRA is used: Google sign-in and one account per person, clubs running their own Queue Sessions, fees and payments between the player and the club (ROTRA never collects money), results recorded by the club (permanent once confirmed; invalid matches and sessions don't count), acceptable use, the player's content, suspension, the service as it is, and Philippine law.
+- They add no rules. A page that contradicts this module is wrong and is fixed in the mockup and `apps/player` together.
+
 ## RTR ID
 
 *Updated November 16, 2026 ([D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)):* the RTR ID is no longer strictly permanent. No club or player can change it, but Admin can.

@@ -9,6 +9,7 @@ export const authCardMeta = {
     "Put the product's sign-in form in children; errors from a failed sign-in go in a Notice inside the form.",
     'Pass offline to show "Signing in needs an internet connection." and disable submit in the form.',
     'No Facebook or social sign-in buttons, ever.',
+    "Use below for a small centred line under the card, outside it: Player's Terms of Service and Privacy Policy note.",
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -19,6 +20,6 @@ export const authCardMeta = {
     'docs/screens/product/modules/player-information/access-registration.md',
     'docs/screens/product/modules/admin/access-navigation.md',
   ],
-  variants: ['tagline', 'product', 'recovery-without-brand'],
+  variants: ['tagline', 'product', 'recovery-without-brand', 'below'],
   related: ['Card', 'Notice', 'Field'],
 } satisfies ComponentMeta

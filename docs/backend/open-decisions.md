@@ -1,13 +1,13 @@
 # Backend open decisions
 
-**Last verified:** 2026-11-17 · **Status:** B-38 and B-40 open (B-40 parked as BL-9); **B-53 to B-61 opened November 17, 2026** from the go-public-reads port. B-01 to B-20 decided November 13, 2026
+**Last verified:** 2026-11-17 · **Status:** B-38 and B-40 open (B-40 parked as BL-9); **B-53 to B-61 opened November 17, 2026** from the go-public-reads port; **B-62** from the go-sign-in plan. B-01 to B-20 decided November 13, 2026
 ([D-2026-11-13-01](../mvp/decisions.md#d-2026-11-13-01)); B-21 to B-23 decided November 14, 2026 ([D-2026-11-14-01](../mvp/decisions.md#d-2026-11-14-01)). **B-24 to B-37 opened November 14, 2026** from an architecture review of the plan on `main`; B-24 to B-33 settled the same day, B-34 to B-37 on November 15; **B-40 to B-47 opened November 15, 2026** from a second review; B-41 to B-47 settled the same day; B-38 and B-39 raised by the owner, B-39 settled; **B-48 to B-50 opened November 15, 2026** from a review of the live-update event design; B-48 and B-49 settled the same day and amended after a table review (transaction-order cursor); B-50 settled the same day. Never fill a question in by guessing.
 
 ## Open
 
 Raised by the architecture reviews on November 14 and 15, 2026. Each row names the track it blocks; a track
 doesn't start the blocked requirement until its row is answered. The recommendation is the
-reviewer's, not a decision. New backend questions take the next B-id (B-62).
+reviewer's, not a decision. New backend questions take the next B-id (B-63).
 
 ### Blocks a track
 
@@ -42,6 +42,12 @@ Found while porting the public reads to Go. The Go routes copy the current TypeS
 | B-59 | **Approve `golang.org/x/text` as a direct Go dependency.** The club page lists members in the order of JavaScript's `localeCompare`; Go uses `golang.org/x/text/collate`. It was already an indirect dependency (same module and version, no `go.sum` change), now listed as a direct requirement | AGENTS rule 11: no new dependencies without a decision. It matched Node's ordering on a 400 name test set, but depends on the Unicode data version of both (ICU 78.3 in Node) | Approve it. The alternative is a hand-written comparator that will drift from `localeCompare` on non-Latin names | Next Go ticket (already merged in #931; confirm or replace) |
 | B-60 | **How do we list the routes that share a prefix with signed-in or cookie routes?** `ROTRA_GO_MOVED_AREAS` matches whole-segment prefixes only, with no method or wildcard. `/api/leaderboard` also catches `/me`, `/api/players` catches `/compare`, `/api/rtr-ids` catches `/stats`, `/api/public-sessions` catches `/my-request` and `/join-request`. Only `/api/clubs`, `/api/profile-banners`, `/api/profile-characters` and `/api/ranking-settings` could be switched | The Go reads for the leaderboard, player pages and the public session page exist but are not reachable from the apps. [staging-verification R1](../../conductor/tracks/staging-verification_20261117/spec.md) needs the full list (or `/api`) | Either move the signed-in siblings first (track 7 for reads, tracks 8 and 9 for writes) and then list whole prefixes, or add method and wildcard matching to `go-forward` (changes B-32, three apps, whole-segment tests) | go-signed-in-reads (track 7) |
 | B-61 | **Minor: `offset=9007199254740992` on `/api/leaderboard`.** TypeScript returns page 1 (Prisma turns the huge skip into 0); Go returns an empty page with the real total | Edge case nobody hits; pinned in `knownDeviations` in the Go test | Leave Go as is and fix TypeScript when the route moves, or make Go match; either is one line | Whenever the TypeScript route is next touched |
+
+### Raised by go-sign-in (track 6), November 17, 2026
+
+| ID | Question | Why it matters | Recommendation | Pick up before |
+|---|---|---|---|---|
+| B-62 | **Review the proposed Go sign-in contract.** [sign-in › Proposed: Go sign-in contract](../database_design/product/sign-in.md#proposed-go-sign-in-contract-b-62): EdDSA passes with a `kid`, key set behind the proxy secret, per-audience host-only cookies (`rotra-<aud>-access` / `-refresh`), endpoint set, one shared refresh per tab, argon2id at the OWASP baseline with a hash semaphore and a dummy hash, fixed-window limits keyed by an HMAC, rate-limit upsert committed before the sign-in transaction, 5 second revocation cache, Go per-request auth built in this track | The existing design fixes the tables but not the wire details (pass format, algorithm, key endpoint, cookie names, endpoint paths, hashing parameters). Changing them after passes and cookies exist costs a forced sign-out | Approve or amend the section. Nothing in it is migration SQL; the migration PR (`packages/db` only, owner sign-off) is reviewed separately | The Go sign-in PR merges (go-sign-in, track 6) |
 
 Owner questions raised by the same review, not defects: live updates are the reason for the Go API but
 land at track 10 of 12; one Hobby instance with no Railway uptime SLA is a single point of failure for

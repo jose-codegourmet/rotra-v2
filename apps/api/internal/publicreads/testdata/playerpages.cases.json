@@ -1,0 +1,532 @@
+{
+  "now": "2026-11-17T12:00:00.000Z",
+  "reset": [
+    "DELETE FROM projection_jobs WHERE id::text LIKE 'b1000000-%'",
+    "UPDATE profile_banners SET shown = true, is_default = false, deleted_at = NULL WHERE id <> 'b0000000-0000-4000-8000-000000000001'",
+    "UPDATE profile_banners SET is_default = true WHERE id = 'court'",
+    "UPDATE players SET profile_visibility = v.vis::profile_visibility, hidden_from_directory = false FROM (VALUES ('d1000000-0000-4000-8000-000000000001', 'public'), ('d1000000-0000-4000-8000-000000000003', 'always_private'), ('d1000000-0000-4000-8000-000000000004', 'always_private')) AS v(pid, vis) WHERE id = v.pid::uuid",
+    "UPDATE club_players SET removed_at = NULL WHERE player_id = 'd1000000-0000-4000-8000-000000000001' AND id <> 'e2000000-0000-4000-8000-000000000013'"
+  ],
+  "scenarios": {
+    "base": [],
+    "dusk_default": [
+      "UPDATE profile_banners SET is_default = false WHERE id = 'court'",
+      "UPDATE profile_banners SET is_default = true WHERE id = 'dusk'"
+    ],
+    "court_hidden_no_default": [
+      "UPDATE profile_banners SET is_default = false WHERE id = 'court'",
+      "UPDATE profile_banners SET shown = false WHERE id = 'court'"
+    ],
+    "no_default_court_shown": [
+      "UPDATE profile_banners SET is_default = false WHERE id = 'court'"
+    ],
+    "none_shown": [
+      "UPDATE profile_banners SET is_default = false, shown = false"
+    ],
+    "court_deleted_default": [
+      "UPDATE profile_banners SET deleted_at = TIMESTAMPTZ '2026-11-14 00:00:00+00' WHERE id = 'court'"
+    ],
+    "night_hidden": [
+      "UPDATE profile_banners SET shown = false WHERE id = 'night'"
+    ],
+    "night_deleted": [
+      "UPDATE profile_banners SET shown = false, deleted_at = TIMESTAMPTZ '2026-11-14 00:00:00+00' WHERE id = 'night'"
+    ],
+    "alice_always_private": [
+      "UPDATE players SET profile_visibility = 'always_private' WHERE id = 'd1000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_private": [
+      "UPDATE players SET profile_visibility = 'private' WHERE id = 'd1000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_hidden_from_directory": [
+      "UPDATE players SET hidden_from_directory = true WHERE id = 'd1000000-0000-4000-8000-000000000001'"
+    ],
+    "carla_public": [
+      "UPDATE players SET profile_visibility = 'public' WHERE id = 'd1000000-0000-4000-8000-000000000003'"
+    ],
+    "dan_public": [
+      "UPDATE players SET profile_visibility = 'public' WHERE id = 'd1000000-0000-4000-8000-000000000004'"
+    ],
+    "alice_c1_removed": [
+      "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e2000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_all_clubs_removed": [
+      "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE player_id = 'd1000000-0000-4000-8000-000000000001'"
+    ],
+    "job_pending": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'pending', NULL, now()); COMMIT"
+    ],
+    "job_running_and_failed": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'running', NULL, now()); INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000002', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000003', 'failed', NULL, now()); COMMIT"
+    ],
+    "job_done": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'done', now(), now()); COMMIT"
+    ],
+    "job_other_kind": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_history', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'pending', NULL, now()); COMMIT"
+    ],
+    "job_other_session": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000006', 'pending', NULL, now()); COMMIT"
+    ],
+    "job_unfinalized_session": [
+      "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'pending', NULL, now()); INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000002', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000004', 'running', NULL, now()); COMMIT"
+    ]
+  },
+  "cases": [
+    {
+      "name": "profile_alice",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_alice_with_query",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001?x=1&playerId=other"
+    },
+    {
+      "name": "profile_alice_uppercase_id",
+      "scenario": "base",
+      "path": "/api/players/D1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_bob_private",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002"
+    },
+    {
+      "name": "profile_carla_always_private",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003"
+    },
+    {
+      "name": "profile_dan_always_private_odd_name",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000004"
+    },
+    {
+      "name": "profile_eve_no_rtr_id",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000005"
+    },
+    {
+      "name": "profile_frank_deleted_banner_future_experience",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000006"
+    },
+    {
+      "name": "profile_gina_default_banner",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_hal_style_not_a_string",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000008"
+    },
+    {
+      "name": "profile_ida_no_details",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000009"
+    },
+    {
+      "name": "profile_jon_unicode_one_link",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-00000000000a"
+    },
+    {
+      "name": "profile_unknown_player",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-0000000000ff"
+    },
+    {
+      "name": "profile_malformed_id",
+      "scenario": "base",
+      "path": "/api/players/not-a-uuid"
+    },
+    {
+      "name": "profile_id_without_dashes",
+      "scenario": "base",
+      "path": "/api/players/d1000000000040008000000000000001"
+    },
+    {
+      "name": "profile_id_with_padding",
+      "scenario": "base",
+      "path": "/api/players/%20d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_id_too_long",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-0000000000010"
+    },
+    {
+      "name": "profile_id_nul_byte",
+      "scenario": "base",
+      "path": "/api/players/%00"
+    },
+    {
+      "name": "profile_alice_always_private",
+      "scenario": "alice_always_private",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_alice_private",
+      "scenario": "alice_private",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_alice_hidden_from_directory",
+      "scenario": "alice_hidden_from_directory",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_carla_made_public",
+      "scenario": "carla_public",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003"
+    },
+    {
+      "name": "profile_alice_banner_hidden_kept",
+      "scenario": "night_hidden",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_alice_banner_deleted_kept",
+      "scenario": "night_deleted",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_gina_banner_dusk_default",
+      "scenario": "dusk_default",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_gina_banner_court_hidden_no_default",
+      "scenario": "court_hidden_no_default",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_gina_banner_no_default_court_shown",
+      "scenario": "no_default_court_shown",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_gina_banner_none_shown",
+      "scenario": "none_shown",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_gina_banner_court_deleted_default",
+      "scenario": "court_deleted_default",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "rtr_alice",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001"
+    },
+    {
+      "name": "rtr_lowercase",
+      "scenario": "base",
+      "path": "/api/rtr-ids/rtr-ph-ceb-102926-0001"
+    },
+    {
+      "name": "rtr_mixed_case",
+      "scenario": "base",
+      "path": "/api/rtr-ids/rtr-PH-ceb-102926-0001"
+    },
+    {
+      "name": "rtr_padded",
+      "scenario": "base",
+      "path": "/api/rtr-ids/%20RTR-PH-CEB-102926-0001%20"
+    },
+    {
+      "name": "rtr_padded_with_unicode_space",
+      "scenario": "base",
+      "path": "/api/rtr-ids/%C2%A0RTR-PH-CEB-102926-0001%E3%80%80"
+    },
+    {
+      "name": "rtr_with_query",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001?x=1"
+    },
+    {
+      "name": "rtr_bob_private_is_found",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002"
+    },
+    {
+      "name": "rtr_carla_always_private_is_found",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003"
+    },
+    {
+      "name": "rtr_alice_hidden_from_directory_is_found",
+      "scenario": "alice_hidden_from_directory",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001"
+    },
+    {
+      "name": "rtr_unknown",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0099"
+    },
+    {
+      "name": "rtr_malformed",
+      "scenario": "base",
+      "path": "/api/rtr-ids/abc"
+    },
+    {
+      "name": "rtr_fullwidth_letters",
+      "scenario": "base",
+      "path": "/api/rtr-ids/%EF%BD%92%EF%BD%94%EF%BD%92-PH-CEB-102926-0001"
+    },
+    {
+      "name": "rtr_sharp_s_does_not_fold",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-000%C3%9F"
+    },
+    {
+      "name": "rtr_encoded_slash",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR%2FPH"
+    },
+    {
+      "name": "rtr_nul_byte",
+      "scenario": "base",
+      "path": "/api/rtr-ids/%00"
+    },
+    {
+      "name": "rtr_very_long",
+      "scenario": "base",
+      "path": "/api/rtr-ids/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    {
+      "name": "rtr_with_percent_sign",
+      "scenario": "base",
+      "path": "/api/rtr-ids/100%25"
+    },
+    {
+      "name": "clubs_alice",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/clubs"
+    },
+    {
+      "name": "clubs_alice_with_query",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/clubs?x=1"
+    },
+    {
+      "name": "clubs_bob_three_clubs",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/clubs"
+    },
+    {
+      "name": "clubs_frank_no_clubs",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000006/clubs"
+    },
+    {
+      "name": "clubs_carla_always_private",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/clubs"
+    },
+    {
+      "name": "clubs_dan_always_private",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000004/clubs"
+    },
+    {
+      "name": "clubs_eve_no_rtr_id",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000005/clubs"
+    },
+    {
+      "name": "clubs_jon_two_clubs",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-00000000000a/clubs"
+    },
+    {
+      "name": "clubs_unknown_player",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-0000000000ff/clubs"
+    },
+    {
+      "name": "clubs_malformed_id",
+      "scenario": "base",
+      "path": "/api/players/nope/clubs"
+    },
+    {
+      "name": "clubs_alice_one_club_removed",
+      "scenario": "alice_c1_removed",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/clubs"
+    },
+    {
+      "name": "clubs_alice_all_removed",
+      "scenario": "alice_all_clubs_removed",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/clubs"
+    },
+    {
+      "name": "clubs_alice_always_private",
+      "scenario": "alice_always_private",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/clubs"
+    },
+    {
+      "name": "clubs_carla_made_public",
+      "scenario": "carla_public",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/clubs"
+    },
+    {
+      "name": "rank_alice",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_with_query",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank?x=1"
+    },
+    {
+      "name": "rank_bob_no_level",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/rank"
+    },
+    {
+      "name": "rank_carla_always_private_name_not_masked",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/rank"
+    },
+    {
+      "name": "rank_dan_no_rank_row_always_private_name_not_masked",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000004/rank"
+    },
+    {
+      "name": "rank_eve_rank_row_but_no_rtr_id",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000005/rank"
+    },
+    {
+      "name": "rank_frank_level_zero",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000006/rank"
+    },
+    {
+      "name": "rank_gina_no_rank_row",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007/rank"
+    },
+    {
+      "name": "rank_unknown_player",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-0000000000ff/rank"
+    },
+    {
+      "name": "rank_malformed_id",
+      "scenario": "base",
+      "path": "/api/players/nope/rank"
+    },
+    {
+      "name": "rank_alice_always_private_name_not_masked",
+      "scenario": "alice_always_private",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_pending",
+      "scenario": "job_pending",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_running_and_failed",
+      "scenario": "job_running_and_failed",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_done",
+      "scenario": "job_done",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_other_kind",
+      "scenario": "job_other_kind",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_other_session",
+      "scenario": "job_other_session",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_alice_job_unfinalized_session",
+      "scenario": "job_unfinalized_session",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_bob_job_pending_through_attribution",
+      "scenario": "job_pending",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/rank"
+    },
+    {
+      "name": "games_alice",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games"
+    },
+    {
+      "name": "games_alice_with_query",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?maskAlwaysPrivate=false"
+    },
+    {
+      "name": "games_bob_with_attributed_guest",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/games"
+    },
+    {
+      "name": "games_carla_always_private_own_history",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/games"
+    },
+    {
+      "name": "games_dan_revoked_attribution",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000004/games"
+    },
+    {
+      "name": "games_eve_no_rtr_id",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000005/games"
+    },
+    {
+      "name": "games_gina_one_session",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007/games"
+    },
+    {
+      "name": "games_ida_no_history",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000009/games"
+    },
+    {
+      "name": "games_unknown_player",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-0000000000ff/games"
+    },
+    {
+      "name": "games_malformed_id",
+      "scenario": "base",
+      "path": "/api/players/nope/games"
+    },
+    {
+      "name": "games_alice_carla_made_public",
+      "scenario": "carla_public",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games"
+    },
+    {
+      "name": "games_alice_dan_made_public",
+      "scenario": "dan_public",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games"
+    },
+    {
+      "name": "games_alice_always_private",
+      "scenario": "alice_always_private",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games"
+    }
+  ]
+}

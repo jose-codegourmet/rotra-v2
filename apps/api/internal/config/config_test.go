@@ -1,11 +1,14 @@
 package config
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"log/slog"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 )
 
 func lookup(env map[string]string) func(string) (string, bool) {
@@ -174,6 +177,87 @@ func TestLoadRejectsBadOrigins(t *testing.T) {
 		_, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_ALLOWED_ORIGINS": v}))
 		if err == nil || !strings.Contains(err.Error(), "ROTRA_ALLOWED_ORIGINS") {
 			t.Errorf("%q: want an ROTRA_ALLOWED_ORIGINS error, got %v", v, err)
+		}
+	}
+}
+
+func TestLoadAuthHashConcurrency(t *testing.T) {
+	base := map[string]string{"DATABASE_URL": "postgres://x"}
+	cfg, err := Load(lookup(base))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.AuthHashConcurrency != 4 {
+		t.Fatalf("default AuthHashConcurrency = %d, want 4", cfg.AuthHashConcurrency)
+	}
+	for v, want := range map[string]int{"1": 1, "8": 8, "64": 64, " 2 ": 2} {
+		cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_AUTH_HASH_CONCURRENCY": v}))
+		if err != nil || cfg.AuthHashConcurrency != want {
+			t.Errorf("%q: got %d, %v; want %d", v, cfg.AuthHashConcurrency, err, want)
+		}
+	}
+	for _, v := range []string{"0", "-1", "65", "abc", "2.5"} {
+		_, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_AUTH_HASH_CONCURRENCY": v}))
+		if err == nil || !strings.Contains(err.Error(), "ROTRA_AUTH_HASH_CONCURRENCY") {
+			t.Errorf("%q: want an error naming the variable, got %v", v, err)
+		}
+	}
+}
+
+func authEnv(extra map[string]string) map[string]string {
+	env := map[string]string{"DATABASE_URL": "postgres://x"}
+	for k, v := range extra {
+		env[k] = v
+	}
+	return env
+}
+
+func TestAuthKeysUnsetByDefault(t *testing.T) {
+	cfg, err := Load(lookup(authEnv(nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.AuthSigningKey != nil || len(cfg.AuthExtraPublicKeys) != 0 {
+		t.Fatalf("keys must be unset: %+v", cfg)
+	}
+}
+
+func TestAuthKeysParsed(t *testing.T) {
+	seed := "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8" // 0x00..0x1f
+	other := pass.EncodePublicKey(ed25519.NewKeyFromSeed(make([]byte, 32)).Public().(ed25519.PublicKey))
+	cfg, err := Load(lookup(authEnv(map[string]string{
+		"ROTRA_AUTH_SIGNING_KEY": " " + seed + " ", "ROTRA_AUTH_EXTRA_PUBLIC_KEYS": other + ", " + other,
+	})))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := pass.EncodeSigningKey(cfg.AuthSigningKey); got != seed {
+		t.Errorf("signing key = %q", got)
+	}
+	if len(cfg.AuthExtraPublicKeys) != 2 || pass.EncodePublicKey(cfg.AuthExtraPublicKeys[0]) != other {
+		t.Errorf("extra keys = %v", cfg.AuthExtraPublicKeys)
+	}
+}
+
+func TestAuthKeysInvalidFailFastWithoutLeakingValues(t *testing.T) {
+	for name, env := range map[string]map[string]string{
+		"signing key not base64": {"ROTRA_AUTH_SIGNING_KEY": "not-a-key-!!"},
+		"signing key too short":  {"ROTRA_AUTH_SIGNING_KEY": "AAECAw"},
+		"extra key bad":          {"ROTRA_AUTH_EXTRA_PUBLIC_KEYS": "secret-looking-garbage!!"},
+		"extra key short":        {"ROTRA_AUTH_EXTRA_PUBLIC_KEYS": "AAECAw"},
+	} {
+		_, err := Load(lookup(authEnv(env)))
+		if err == nil {
+			t.Errorf("%s: want an error", name)
+			continue
+		}
+		for _, v := range env {
+			if strings.Contains(err.Error(), v) {
+				t.Errorf("%s: error repeats the value: %v", name, err)
+			}
+		}
+		if !strings.Contains(err.Error(), "ROTRA_AUTH") {
+			t.Errorf("%s: error must name the variable: %v", name, err)
 		}
 	}
 }

@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"crypto/ed25519"
 	"fmt"
 	"log/slog"
 	"net"
@@ -12,6 +13,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/claim"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/recovery"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/signin"
+	authstore "github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
@@ -58,10 +66,61 @@ func run() error {
 	ready := httpapi.NewReadiness()
 	// One budget per trusted client IP for every public-read route (B-43); later tracks pass the same limiter.
 	publicLimiter := httpapi.NewRateLimiter(httpapi.PublicReadsPerMinute, nil)
+	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log})}
+	if cfg.AuthSigningKey == nil {
+		log.Warn("ROTRA_AUTH_SIGNING_KEY is not set: no auth routes are served")
+	} else {
+		current := cfg.AuthSigningKey.Public().(ed25519.PublicKey)
+		keys, err := pass.NewKeySet(current, cfg.AuthExtraPublicKeys...)
+		if err != nil {
+			return err
+		}
+		routes = append(routes, pass.Register(pass.Deps{Keys: keys, Limiter: publicLimiter}))
+		signer, err := pass.NewSigner(cfg.AuthSigningKey, cfg.AuthTuning.AccessLifetime)
+		if err != nil {
+			return err
+		}
+		// No leeway: the verifier runs in the same process, on the same clock, as the signer.
+		verifier, err := pass.NewVerifier(keys, 0)
+		if err != nil {
+			return err
+		}
+		hasher, err := password.NewHasher(password.DefaultParams(), cfg.AuthHashConcurrency)
+		if err != nil {
+			return err
+		}
+		authStore := authstore.New(pool.Raw())
+		svc, err := session.New(session.Deps{
+			Store: authStore, Signer: signer, Verifier: verifier, Hasher: hasher,
+			Tuning: cfg.AuthTuning, SigningKey: cfg.AuthSigningKey, Logger: log,
+		})
+		if err != nil {
+			return err
+		}
+		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, signInRoutes)
+		// The registration link shares the public-read budget for its read and the sign-in limits for its submit.
+		claimRoutes, err := claim.Register(claim.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, ReadLimiter: publicLimiter, Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, claimRoutes)
+		// Admin-reviewed password recovery: the two public Player routes. The Admin list and review routes belong to
+		// go-writes-admin-player (track 8), which calls the same service.
+		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, recoveryService.Routes())
+		log.Info("auth signing key loaded", slog.String("kid", pass.KeyID(current)), slog.Int("published_keys", len(keys.JWKS())))
+	}
 	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{
 		Logger: log, Pinger: pool, Readiness: ready,
 		ProxySecret: cfg.ProxySecret, AllowedOrigins: cfg.AllowedOrigins,
-	}, publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log})))
+	}, routes...))
 	srv := &http.Server{
 		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,
@@ -79,6 +138,9 @@ func run() error {
 	// Housekeeping shares the signal context, so it stops when draining starts (B-44). Tracks that add a
 	// growing table register its cleanup here, using cfg.Housekeeping retention (go-sign-in, go-writes-queue).
 	hk := housekeeping.New(pool.Raw(), log, housekeeping.Options{Interval: cfg.Housekeeping.Interval, BatchSize: cfg.Housekeeping.BatchSize})
+	// Events first, then the sessions they reference (B-34).
+	hk.Register(authstore.AuthEventsCleanup(cfg.Housekeeping.AuthEventsDays))
+	hk.Register(authstore.AuthSessionsCleanup(cfg.Housekeeping.AuthSessionsDays))
 	hkDone := make(chan struct{})
 	go func() {
 		defer close(hkDone)

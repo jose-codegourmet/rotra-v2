@@ -7,6 +7,7 @@ package sqlcgen
 import (
 	"database/sql/driver"
 	"fmt"
+	"net/netip"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -2061,6 +2062,57 @@ type AdminSetting struct {
 	UpdatedByAdminID    pgtype.UUID
 	UpdatedAt           pgtype.Timestamptz
 	Revision            int64
+}
+
+type AuthEvent struct {
+	ID         int64
+	IdentityID pgtype.UUID
+	SessionID  pgtype.UUID
+	Audience   string
+	Event      string
+	Ip         *netip.Addr
+	DeviceID   pgtype.UUID
+	OccurredAt pgtype.Timestamptz
+}
+
+type AuthIdentity struct {
+	ID                pgtype.UUID
+	Audience          string
+	LoginKey          string
+	PasswordHash      string
+	PasswordScheme    string
+	PasswordChangedAt pgtype.Timestamptz
+	DisabledAt        pgtype.Timestamptz
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+	Revision          int64
+}
+
+type AuthRateLimit struct {
+	Scope       string
+	Subject     string
+	Action      string
+	WindowStart pgtype.Timestamptz
+	Attempts    int32
+}
+
+type AuthSession struct {
+	ID                    pgtype.UUID
+	IdentityID            pgtype.UUID
+	Audience              string
+	ClubID                pgtype.UUID
+	DeviceID              pgtype.UUID
+	DeviceLabel           string
+	RefreshDigest         []byte
+	PreviousRefreshDigest []byte
+	RefreshedAt           pgtype.Timestamptz
+	CreatedIp             *netip.Addr
+	LastIp                *netip.Addr
+	LastSeenAt            pgtype.Timestamptz
+	ExpiresAt             pgtype.Timestamptz
+	RevokedAt             pgtype.Timestamptz
+	RevokeReason          pgtype.Text
+	CreatedAt             pgtype.Timestamptz
 }
 
 type Club struct {

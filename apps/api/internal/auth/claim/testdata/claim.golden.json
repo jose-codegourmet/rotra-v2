@@ -1,0 +1,1043 @@
+{
+  "get_rec_valid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": null,
+          "fullName": "Ana Reyes",
+          "nickname": "Nana",
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": "+63 918 ••• ••77"
+        },
+        "preset": {
+          "fullName": "Ana Reyes",
+          "nickname": "Nana",
+          "email": "ana@club.test",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_nophone": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": null,
+          "fullName": "Bea Santos",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": ""
+        },
+        "preset": {
+          "fullName": "Bea Santos",
+          "nickname": "",
+          "email": "bea@club.test",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_noinput": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": null,
+          "fullName": "Cy Dela Cruz",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": ""
+        },
+        "preset": {
+          "fullName": "Cy Dela Cruz",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_expired": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "expired",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": null,
+          "fullName": "Dee Expired",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": "+63 918 ••• ••04"
+        },
+        "preset": {
+          "fullName": "Dee Expired",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_removed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "get_rec_consumed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "claimed",
+        "clubName": "Other Club",
+        "preview": {
+          "playerId": null,
+          "fullName": "Flo Used",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": "+63 918 ••• ••06"
+        },
+        "preset": {
+          "fullName": "Flo Used",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_linked_active": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "claimed",
+        "clubName": "Other Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000009",
+          "fullName": "Ivy Linked",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": "+63 918 ••• ••07"
+        },
+        "preset": {
+          "fullName": "Ivy Linked",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_linked_consumed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "claimed",
+        "clubName": "Other Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Fay Used",
+          "nickname": null,
+          "rtrId": null,
+          "picture": null,
+          "maskedPhone": ""
+        },
+        "preset": {
+          "fullName": "Fay Used",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_rec_revoked": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "get_unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "get_ply_valid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Ben Cruz",
+          "nickname": "Benny",
+          "rtrId": "RTR-PH-CEB-111426-0002",
+          "picture": "https://example.test/ben.png",
+          "maskedPhone": "+63 917 ••• ••42"
+        },
+        "preset": {
+          "fullName": "Ben Cruz",
+          "nickname": "Benny",
+          "email": "ben@club.test",
+          "playingStyle": "baseline defender",
+          "experienceYears": "2",
+          "experienceMonths": "6",
+          "facebook": "https://facebook.com/ben",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": "https://linkedin.com/in/ben"
+        }
+      }
+    }
+  },
+  "get_ply_noalloc": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "get_ply_nocontact_email": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "Dan Uy",
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-111426-0004",
+          "picture": null,
+          "maskedPhone": "+63 917 ••• ••04"
+        },
+        "preset": {
+          "fullName": "Dan Uy",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_ply_nocontact": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "valid",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-00000000000a",
+          "fullName": "Jay Yu",
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-111426-0010",
+          "picture": null,
+          "maskedPhone": ""
+        },
+        "preset": {
+          "fullName": "Jay Yu",
+          "nickname": "",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_ply_expired": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "expired",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "Eve Tan",
+          "nickname": "Evie",
+          "rtrId": "RTR-PH-CEB-111426-0005",
+          "picture": null,
+          "maskedPhone": "+63 917 ••• ••05"
+        },
+        "preset": {
+          "fullName": "Eve Tan",
+          "nickname": "Evie",
+          "email": "",
+          "playingStyle": "",
+          "experienceYears": "0",
+          "experienceMonths": "0",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_ply_consumed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "claimed",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Fay Go",
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-111426-0006",
+          "picture": null,
+          "maskedPhone": "+63 917 ••• ••06"
+        },
+        "preset": {
+          "fullName": "Fay Go",
+          "nickname": "",
+          "email": "fay@example.com",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_ply_claimed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "link": {
+        "status": "claimed",
+        "clubName": "Lahug Smash Club",
+        "preview": {
+          "playerId": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Gus Ong",
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-111426-0007",
+          "picture": null,
+          "maskedPhone": "+63 917 ••• ••07"
+        },
+        "preset": {
+          "fullName": "Gus Ong",
+          "nickname": "",
+          "email": "gus@example.com",
+          "playingStyle": "",
+          "experienceYears": "",
+          "experienceMonths": "",
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  },
+  "get_ply_revoked": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "post_body_text": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "post_body_array": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "post_body_null": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "post_body_empty": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "post_body_number": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "post_phone_bad": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Enter a Philippine mobile number, like 0917 555 0142."
+        }
+      }
+    }
+  },
+  "post_phone_bad_other_country": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Enter a Philippine mobile number, like 0917 555 0142."
+        }
+      }
+    }
+  },
+  "post_email_no_at": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "post_email_missing": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "post_password_empty": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "password": "Enter a password."
+        }
+      }
+    }
+  },
+  "post_order_phone_before_email": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Enter a Philippine mobile number, like 0917 555 0142."
+        }
+      }
+    }
+  },
+  "post_order_email_before_password": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "post_unknown_link": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_revoked_rec": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_revoked_ply": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_expired_rec": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_removed_rec": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_consumed_rec_unlinked": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_linked_active_rec": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This profile is already registered."
+        }
+      }
+    }
+  },
+  "post_nophone_rec": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Add your mobile number to finish registering."
+        }
+      }
+    }
+  },
+  "post_noinput_rec": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Add your mobile number to finish registering."
+        }
+      }
+    }
+  },
+  "post_noinput_rec_typed_phone_taken": {
+    "status": 409,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "conflict",
+        "message": "This changed since you loaded it. Refresh and try again.",
+        "fields": {
+          "phone": "This number belongs to another ROTRA profile. Ask the club or ROTRA for help."
+        }
+      }
+    }
+  },
+  "post_phone_taken_rec": {
+    "status": 409,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "conflict",
+        "message": "This changed since you loaded it. Refresh and try again.",
+        "fields": {
+          "phone": "This number belongs to another ROTRA profile. Ask the club or ROTRA for help."
+        }
+      }
+    }
+  },
+  "post_email_taken_rec": {
+    "status": 409,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "conflict",
+        "message": "This changed since you loaded it. Refresh and try again.",
+        "fields": {
+          "email": "This email is already used by another player."
+        }
+      }
+    }
+  },
+  "post_expired_ply": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_claimed_ply": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This profile is already registered."
+        }
+      }
+    }
+  },
+  "post_noalloc_ply": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_nophone_ply": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "phone": "Add your mobile number to finish registering."
+        }
+      }
+    }
+  },
+  "post_typed_phone_taken_ply": {
+    "status": 409,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "conflict",
+        "message": "This changed since you loaded it. Refresh and try again.",
+        "fields": {
+          "phone": "This number belongs to another ROTRA profile. Ask the club or ROTRA for help."
+        }
+      }
+    }
+  },
+  "post_email_taken_ply": {
+    "status": 409,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "conflict",
+        "message": "This changed since you loaded it. Refresh and try again.",
+        "fields": {
+          "email": "This email is already used by another player."
+        }
+      }
+    }
+  },
+  "post_unknown_link_bad_details": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  },
+  "post_expired_link_bad_details": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "The registration link has expired or was replaced."
+        }
+      }
+    }
+  }
+}

@@ -254,7 +254,7 @@ Decided November 14, 2026 ([B-27](../../backend/open-decisions.md#settled)).
   | `admin` | 15 min | 12 hours, not extended |
 
 - **Cookies.** Host-only per app, `HttpOnly`, `Secure`, `SameSite=Lax`; the refresh cookie is
-  limited to the refresh path.
+  limited to the auth endpoints (`/api/auth`), so sign-out receives it too (B-62 amendment).
 
 ## Proposed: Go sign-in contract (B-62)
 
@@ -264,7 +264,7 @@ Decided November 14, 2026 ([B-27](../../backend/open-decisions.md#settled)).
 
 **Keys.** `ROTRA_AUTH_SIGNING_KEY` (current) and a second variable for the next key, both Railway only. The public key set is served by Go behind the proxy secret, so B-30 (404 without the secret except `/healthz` and the ticket route) is unchanged; the apps hold the secret. Apps cache the set for 10 minutes; an unknown `kid` triggers one refetch, at most once a minute. Tests generate keys per run; no key material is committed.
 
-**Cookies.** Names per audience, so Queue, Player and Admin on `localhost` never collide: `rotra-<aud>-access` (`Path=/`) and `rotra-<aud>-refresh` (`Path` = the refresh endpoint). Both host-only (no `Domain`), `HttpOnly`, `Secure` (relaxed on localhost), `SameSite=Lax`. The refresh cookie lives as long as the refresh lifetime; the access cookie as long as the access pass. Go sends the two as separate `Set-Cookie` lines (`go-forward` keeps them separate). "Across the beta subdomains" in staging-verification means each app works on its own host.
+**Cookies.** Names per audience, so Queue, Player and Admin on `localhost` never collide: `rotra-<aud>-access` (`Path=/`) and `rotra-<aud>-refresh` (`Path=/api/auth`: refresh and sign-out receive it, nothing else does). Both host-only (no `Domain`), `HttpOnly`, `Secure` (relaxed on localhost), `SameSite=Lax`. Both cookies live as long as the refresh lifetime of their app (30 days club and player, 12 hours Admin), on a refresh response too, even when the refresh cookie is left alone in the grace window. The access pass inside the access cookie still expires after 15 minutes (`ROTRA_AUTH_ACCESS_SECONDS`, 30 to 900) and Go enforces `exp`, so an idle browser still sends the expired pass and gets `401 expired`, never a silent signed-out. `GET /api/auth/session` with no usable pass but a refresh cookie also answers `401 expired`; with neither cookie it answers the signed-out 200. Go sends the two as separate `Set-Cookie` lines (`go-forward` keeps them separate). "Across the beta subdomains" in staging-verification means each app works on its own host.
 
 **Endpoints.** Existing paths stay: `GET /api/auth/session` (still 200 with null or `signed-out` when signed out; Admin `denied` still a 200 body), `POST /api/auth/sign-in`, `POST /api/auth/sign-out`, `POST /api/auth/password-reset`, `POST /api/auth/reset-password`, claim. New: `POST /api/auth/refresh`, `GET /api/auth/devices`, `POST /api/auth/devices/{id}/sign-out`, `POST /api/auth/sign-out-all`. Queue sign-in gains `deviceId` and `deviceLabel` in its body. Errors keep the existing envelope and the generic credential messages; an expired access pass is a 401 with a distinct code so clients can tell it from "not signed in".
 

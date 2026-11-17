@@ -131,7 +131,7 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: "Your information is stored on our providers' servers. Today the app and the database run in Singapore, so your information is kept outside the Philippines.",
+          text: "Your information is stored on our providers' servers. Today the app runs in Singapore, so your information is kept outside the Philippines.",
         },
         {
           kind: 'paragraph',

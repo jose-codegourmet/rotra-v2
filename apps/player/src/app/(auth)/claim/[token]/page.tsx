@@ -1,5 +1,5 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import { claimLinks } from '@rotra/data/fixtures/player-accounts'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import { readClaimLink } from '@rotra/db/player/claim'
 import type { Metadata } from 'next'
 import { Claim } from './_components/claim/Claim'

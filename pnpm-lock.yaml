@@ -35,6 +35,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.0.0
         version: 2.13.0(react-redux@9.3.0(@types/react@19.2.14)(react@19.2.9)(redux@5.0.1))(react@19.2.9)
+      '@rotra/api-proxy':
+        specifier: workspace:*
+        version: link:../../packages/api-proxy
       '@rotra/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -119,6 +122,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.0.0
         version: 2.13.0(react-redux@9.3.0(@types/react@19.2.14)(react@19.2.9)(redux@5.0.1))(react@19.2.9)
+      '@rotra/api-proxy':
+        specifier: workspace:*
+        version: link:../../packages/api-proxy
       '@rotra/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -186,6 +192,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.0.0
         version: 2.13.0(react-redux@9.3.0(@types/react@19.2.14)(react@19.2.9)(redux@5.0.1))(react@19.2.9)
+      '@rotra/api-proxy':
+        specifier: workspace:*
+        version: link:../../packages/api-proxy
       '@rotra/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -245,6 +254,22 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/api-proxy:
+    dependencies:
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
+    devDependencies:
+      '@rotra/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^24
+        version: 24.12.3
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/config: {}
 
   packages/data:
@@ -286,6 +311,9 @@ importers:
       '@prisma/client':
         specifier: 7.10.1
         version: 7.10.1(prisma@7.10.1(@types/node@24.12.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3))(typescript@5.9.3)
+      '@rotra/api-proxy':
+        specifier: workspace:*
+        version: link:../api-proxy
       '@rotra/data':
         specifier: workspace:*
         version: link:../data

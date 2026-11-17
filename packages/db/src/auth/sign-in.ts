@@ -1,8 +1,8 @@
 import 'server-only'
+import { dataMode, MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import { clubLoginEmail } from '../admin/club-identity'
 import { prisma } from '../client/prisma'
 import { loadAccountContext } from './account-context'
-import { dataMode, MOCK_COOKIE_PREFIX } from './data-mode'
 import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from './supabase'
 
 /** The apps with a password sign-in: Queue (club), Player Information (player, email only) and Admin. */

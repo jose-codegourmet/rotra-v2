@@ -1,4 +1,5 @@
 import 'server-only'
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import {
   PROFILE_CHARACTER_DELETE_REFUSAL,
   PROFILE_CHARACTER_HIDE_REFUSAL,
@@ -8,7 +9,6 @@ import {
 } from '@rotra/data/profile-character/rules'
 import { createClient } from '@supabase/supabase-js'
 import type { AdminContext } from '../auth/account-context'
-import { dataMode } from '../auth/data-mode'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileCharacter } from '../generated/prisma/client'
 import { requireAdmin } from '../service/authorize'

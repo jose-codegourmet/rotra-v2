@@ -1,6 +1,6 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
 import { mockPlayerSessionAccess } from '@rotra/data/public-session/fetchers'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import { readPlayerSessionAccess } from '@rotra/db/queue/public-session'
 import { handleAccountRequest } from '@rotra/db/service/handler'
 import { routeCookieAdapter } from '@rotra/db/service/route-cookies'

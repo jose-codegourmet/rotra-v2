@@ -1,6 +1,6 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
 import { publicSlugFor } from '@rotra/data/queue-session/queueSession.rules'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import { readPreviewAudience } from '@rotra/db/queue/public-session'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'

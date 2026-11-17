@@ -79,6 +79,7 @@ packages/
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
   schema/                 shared Zod fields (email, phone, date, money, password)
   config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
+  api-proxy/              server-only proxy code the apps share (Go forwarding, data mode check)
   db/                     Prisma schema + server services (real mode)
 docs/
   architecture.md         apps, packages, dependency rules, data flow, offline, auth, database

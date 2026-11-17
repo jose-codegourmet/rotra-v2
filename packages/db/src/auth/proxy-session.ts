@@ -1,6 +1,6 @@
 import 'server-only'
+import { MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import type { AccountAudience } from './account-context'
-import { MOCK_COOKIE_PREFIX } from './data-mode'
 import { type CookieToSet, verifySubject } from './supabase'
 
 type ProxyRequest = {

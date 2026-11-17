@@ -1,0 +1,22 @@
+{
+  "name": "@rotra/api-proxy",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./go-forward": "./src/go-forward.ts",
+    "./data-mode": "./src/data-mode.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/node": "^24",
+    "typescript": "^5.9.3"
+  }
+}

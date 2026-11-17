@@ -22,7 +22,7 @@ real-mode switch; scheduled jobs; decision gates #243–#248 under [F07 #241](ht
 
 | Capability | Status | Evidence | Tickets |
 |---|---|---|---|
-| Real-mode switch | implemented (opt-in) | Client `NEXT_PUBLIC_ROTRA_DATA_MODE=real` (`packages/data/src/real/mode.ts:9`), server `ROTRA_DATA_MODE=real` (`packages/db/src/auth/data-mode.ts:10`); default `mock` (`packages/db/.env.example:10`) | — |
+| Real-mode switch | implemented (opt-in) | Client `NEXT_PUBLIC_ROTRA_DATA_MODE=real` (`packages/data/src/real/mode.ts:9`), server `ROTRA_DATA_MODE=real` (`packages/api-proxy/src/data-mode.ts:10`); default `mock` (`packages/db/.env.example:10`) | — |
 | Production deployment | implemented (manual) | `.github/workflows/deploy.yml`: Actions → Deploy production → `main` only; env pulled from Vercel | #389 closed (hosted signed-in verification) |
 | Production data mode | unknown | Whether production sets `real` is not in the repo | Ticket: needed (or owner confirms) |
 | Mock fallback in real mode | implemented | Unwired fetchers throw `NotConnectedError` (`packages/data/src/mock/store.ts:207,229`, `mock/latency.ts:18`) | #386 (tracking) |

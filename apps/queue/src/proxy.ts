@@ -1,7 +1,7 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
+import { forwardToGo, goApiEnabled } from '@rotra/api-proxy/go-forward'
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
-import { forwardToGo, goApiEnabled } from '@rotra/db/proxy/go-forward'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_PAGE_PREVIEW = /^\/sessions\/[^/]+\/public-page\/?$/

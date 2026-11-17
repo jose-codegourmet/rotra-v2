@@ -49,6 +49,7 @@ rotra/
 │   ├── data/         @rotra/data     Domain types, fixtures, mock store, fetchers, query keys, hooks
 │   ├── schema/       @rotra/schema   Shared Zod field schemas (email, phone, date, money, …)
 │   ├── config/       @rotra/config   tsconfig bases + Tailwind 4 theme tokens (CSS)
+│   ├── api-proxy/    @rotra/api-proxy Server-only proxy code the apps share: Go forwarding, data mode check
 │   └── db/           @rotra/db       Prisma schema + server services (real mode)
 ├── docs/                             Product, screen, database, and engineering docs
 └── email-templates/                  Supabase auth email HTML (copy-paste artifacts)
@@ -104,6 +105,7 @@ apps/*  ──►  @rotra/ui  ──►  @rotra/schema
 | Apps never import each other | Each app builds independently; the Services deployment releases them together |
 | A package never imports from an app | No cycles |
 | `@rotra/db` is imported only by server code (route handlers) | Prisma never reaches a client bundle |
+| `@rotra/api-proxy` is server-only (`proxy.ts`, server pages, route handlers, `@rotra/db`); it imports no other workspace package | The proxy secret and data mode never reach a client bundle, and it outlives `@rotra/db` (B-51) |
 
 **Imports go through `package.json` `exports` subpaths**, one per component or module, e.g.
 `@rotra/ui/match-card`, `@rotra/data/queue-session`, `@rotra/schema/phone`. There are no `index.ts`
@@ -283,7 +285,7 @@ to `real` in each app's own `.env.local` (Next reads env files from the app fold
 | Layer | Real mode |
 |---|---|
 | `proxy.ts` | `@rotra/db/auth/proxy-session` verifies the Supabase JWT (`getClaims`), refreshes session cookies, deletes `rotra-mock-*` cookies, and redirects. Navigation only; it never loads Prisma |
-| Beta forwarding | `@rotra/db/proxy/go-forward` (called first in every `proxy.ts`; moves with `data-mode` to `@rotra/api-proxy`, B-51). Only with `ROTRA_GO_API_URL` set: `/api/*` paths under `ROTRA_GO_MOVED_AREAS` (comma-separated prefixes, whole-segment match, empty = none) are forwarded to Go with `X-Rotra-Proxy-Secret: $ROTRA_PROXY_SECRET` and the client IP (`X-Forwarded-For`, `X-Real-IP`), 10 s timeout, no retry; timeout or network failure answers `503 { error: { code: 'unavailable', message } }`. In that mode `proxy.ts` never calls Supabase: everyone is signed out (protected pages redirect to `/login`, other paths pass through). Unset: nothing changes (B-30, B-32, B-46). Prefixes are added per move track; when all have moved the value is `/api`, and ship-and-retire deletes the variable so every `/api/*` goes to Go ([lifecycle](backend/infrastructure.md#side-by-side-with-the-current-apps-b-10)) |
+| Beta forwarding | `@rotra/api-proxy/go-forward` (called first in every `proxy.ts`; lives in `packages/api-proxy` with `@rotra/api-proxy/data-mode`, B-51). Only with `ROTRA_GO_API_URL` set: `/api/*` paths under `ROTRA_GO_MOVED_AREAS` (comma-separated prefixes, whole-segment match, empty = none) are forwarded to Go with `X-Rotra-Proxy-Secret: $ROTRA_PROXY_SECRET` and the client IP (`X-Forwarded-For`, `X-Real-IP`), 10 s timeout, no retry; timeout or network failure answers `503 { error: { code: 'unavailable', message } }`. In that mode `proxy.ts` never calls Supabase: everyone is signed out (protected pages redirect to `/login`, other paths pass through). Unset: nothing changes (B-30, B-32, B-46). Prefixes are added per move track; when all have moved the value is `/api`, and ship-and-retire deletes the variable so every `/api/*` goes to Go ([lifecycle](backend/infrastructure.md#side-by-side-with-the-current-apps-b-10)) |
 | Route Handler | `handleAccountRequest(audience, routeCookieAdapter(await cookies()), run)` from `@rotra/db/service/handler`: verifies the session again, maps the subject to the app's account type from current server state (provisioned/not disabled club account, not disabled player account, active admin), then `run` checks scope with `@rotra/db/service/authorize` (`requireOwnClub`, `requireOwnPlayer`, `requireAdmin`, `requireClubEntitlement`, `requireRevision`) |
 | Sign-in | `@rotra/db/auth/sign-in` (`handleSignIn`, `handleSessionRead`, `handleSignOut`) behind `/api/auth/{sign-in,session,sign-out}` in Queue and Admin (and Player since #483). Bodies are the shapes the existing hooks read (`MockSession`, `AdminSession`) |
 | Session cookie | One per app: `sb-rotra-{club,player,admin}-auth` (`authCookieName(audience)` in `@rotra/db/auth/supabase`), never Supabase's default shared name. Cookies ignore the port and are shared across a parent domain, so a shared name would make the apps one session: a club sign-in on `localhost:9000` would replace the Admin sign-in on `localhost:9002`. Every Supabase client, the proxy included, passes the app's audience |

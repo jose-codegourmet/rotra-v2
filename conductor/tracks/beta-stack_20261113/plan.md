@@ -8,7 +8,7 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 
 - [x] **1.1** Env-gated forwarding in each app's `proxy.ts` (B-30; shared helper `@rotra/db/proxy/go-forward`)
 - [x] **1.2** `make check`; verify the current project is unchanged
-- [ ] **1.3** Move `go-forward` and `data-mode` from `packages/db` to the new `packages/api-proxy` (B-51), no behavior change; update the three `proxy.ts` and the pages' imports. Before go-sign-in 4.1
+- [x] **1.3** Move `go-forward` and `data-mode` from `packages/db` to the new `packages/api-proxy` (B-51), no behavior change; update the three `proxy.ts` and the pages' imports. Before go-sign-in 4.1
 
 ## Phase 2: Local check (replaces the beta project and beta data phases, moved to staging-verification on 2026-11-17)
 
@@ -47,3 +47,4 @@ Queue app (`pnpm dev`, port 9000, mock data mode) with `ROTRA_GO_API_URL=http://
 | SIGTERM with a stream open | stream closed cleanly, process exited at once |
 
 Not covered locally (staging-verification): the client IP Vercel sets (locally a client can send its own `X-Forwarded-For`, which Vercel overwrites); the stream reconnect hint and spread on deploy (B-44, built in live-updates; the minimal stream sends none yet); `/readyz` failing during the draining time; Vercel function limits and logs; cookies across the beta subdomains.
+| 2026-11-17 | 1.3 | `go-forward` and `data-mode` moved to `packages/api-proxy`; `packages/db` and the three apps depend on it | B-51: `packages/db` is deleted at retire, the apps still need this code | Done, no behavior change; `make check` passed |

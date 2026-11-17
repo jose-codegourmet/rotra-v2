@@ -13,7 +13,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 1 | [~] | [rule-cases_20261113](./tracks/rule-cases_20261113/) — Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | chore | critical | — (phases 4–6: go-api-foundation) | 7 / 30 |
 | 2 | [~] | [go-api-foundation_20261113](./tracks/go-api-foundation_20261113/) — Go API foundation | feature | critical | rule-cases phases 1–3 (spike, case runner) | 5 / 15 |
 | 3 | [ ] | [monitoring_20261113](./tracks/monitoring_20261113/) — Monitoring: Grafana for API, Postgres and pictures | chore | high | go-api-foundation | 3 / 6 |
-| 4 | [ ] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 3 / 6 |
+| 4 | [x] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 3 / 6 |
 | 5 | [ ] | [go-public-reads_20261113](./tracks/go-public-reads_20261113/) — Public reads in Go | refactor | high | beta-stack | 3 / 7 |
 | 6 | [ ] | [go-sign-in_20261113](./tracks/go-sign-in_20261113/) — Sign-in owned by Go | feature | critical | beta-stack | 5 / 15 |
 | 7 | [ ] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 4 / 6 |

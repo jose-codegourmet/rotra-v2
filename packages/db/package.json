@@ -8,8 +8,6 @@
     "./client": "./src/client/prisma.ts",
     "./admin/club-identity": "./src/admin/club-identity.ts",
     "./player/rtr-id": "./src/player/rtr-id.ts",
-    "./auth/data-mode": "./src/auth/data-mode.ts",
-    "./proxy/go-forward": "./src/proxy/go-forward.ts",
     "./auth/supabase": "./src/auth/supabase.ts",
     "./auth/proxy-session": "./src/auth/proxy-session.ts",
     "./auth/account-context": "./src/auth/account-context.ts",
@@ -80,6 +78,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "@rotra/api-proxy": "workspace:*",
     "@rotra/data": "workspace:*",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",

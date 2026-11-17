@@ -1,6 +1,6 @@
 import 'server-only'
+import { dataMode, MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import { type AccountAudience, type ContextFor, loadAccountContext } from '../auth/account-context'
-import { dataMode, MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { errorBody, ServiceError } from './errors'
 import { toJson } from './serialize'

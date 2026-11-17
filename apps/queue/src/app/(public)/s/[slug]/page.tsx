@@ -1,5 +1,5 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import { readPublicSession } from '@rotra/db/queue/public-session'
 import type { Metadata } from 'next'
 import { PublicSession } from './_components/public-session/PublicSession'

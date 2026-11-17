@@ -1,7 +1,7 @@
 import 'server-only'
+import { MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import { consumeReviewedResetToken } from '../admin/password-resets'
 import { loadAccountContext, type PlayerContext } from '../auth/account-context'
-import { MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from '../auth/supabase'
 import { supabaseProviderAdmin } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'

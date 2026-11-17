@@ -18,7 +18,7 @@ Ticket: #874 (one issue for the whole track, under epic #869).
 
 ## Phase 3: Switch
 
-- [ ] **3.1** The pages that read these services directly (club page and members, register, Queue public session page and its preview) read through Go instead (B-51); add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo, the Route Handler stays until ship); manual check locally; record what was verified
+- [x] **3.1** The pages that read these services directly (club page and members, register, Queue public session page and its preview) read through Go instead (B-51); add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo, the Route Handler stays until ship); manual check locally; record what was verified
 
 ## Deviations log
 
@@ -48,3 +48,17 @@ Ticket: #874 (one issue for the whole track, under epic #869).
 | 2026-11-17 | 2.3 | The page exposes device-sync state (`lastSyncedAt`, `hasPendingChanges`); cancelled and invalid sessions still serve the masked roster with a 200 | Characterized | Ported as is |
 | 2026-11-17 | 3.1 | `/api/public-sessions` cannot be listed for Queue: it also catches `/my-request` and `/join-request`, which Go answers 404 | Prefix-only matching | Not switched (owner decision 2026-11-17); the Queue public session page can still read through Go server-side |
 | 2026-11-17 | 2.3 | Go answers the 404 envelope for a NUL-byte slug (TS: 500) and for invalid percent-encoding (Next: 400) | `validSlug` runs before the cache and database | Pinned in tests |
+
+## Local check, 2026-11-17 (3.1)
+
+Throwaway `postgres:16-alpine` with the Prisma migrations, the Go API (built from `main` after #931), the Queue app (9000) and the Player app (9001) in real data mode with `ROTRA_GO_API_URL` and a test proxy secret. Queue `ROTRA_GO_MOVED_AREAS=/api/clubs,/api/profile-banners,/api/profile-characters`; Player `/api/profile-banners,/api/profile-characters,/api/ranking-settings`.
+
+| Check | Result |
+|---|---|
+| Queue `/api/clubs/{id}`, `/api/profile-banners/shown`, `/api/profile-characters/{id}/image` | Reached Go (1 request each; 404 for an unknown id) |
+| Player `/api/ranking-settings`, `/api/profile-banners/shown` | Reached Go; ranking settings returned the seeded policy version |
+| Queue `/api/ranking-settings`, `/api/public-sessions/{slug}` (not listed) | Not forwarded; the Route Handler answered |
+| Player `/api/clubs/{id}`, `/api/leaderboard`, `/api/players/{id}` (not listed) | Not forwarded; the Route Handler answered |
+| Queue `/s/{slug}` page | Read the title through Go (1 request to `/api/public-sessions/{slug}`); an unknown slug got the generic title |
+
+Not switched, by owner decision: the operator preview page (needs the signed-in session), Player club page and members (need the viewer), register (read not ported). Not covered locally: a published session title read through Go (no session seeded; the Go read is covered by the Go golden tests), Vercel and Railway behavior (staging-verification).

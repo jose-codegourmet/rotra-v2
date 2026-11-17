@@ -47,6 +47,12 @@ Deployments run through the **Deploy production** GitHub Action
 Run workflow**, select **main**, and run it. There are no deployment triggers for pushes or pull requests;
 the job also refuses to deploy any branch other than `main`.
 
+Staging deploys the same way through **Deploy staging**
+([`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml)): run it on
+**go-stack**, the only branch it deploys. It uses the GitHub **staging** environment
+(`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` variables, `VERCEL_TOKEN` secret) linked to the staging
+Vercel Services project. The file lives on `main` so GitHub lists it under Actions.
+
 The GitHub **production** environment allows only the `main` branch. It needs:
 
 - Environment variables `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`, targeting the existing Services

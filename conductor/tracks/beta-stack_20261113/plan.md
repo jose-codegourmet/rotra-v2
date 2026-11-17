@@ -10,21 +10,14 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 - [x] **1.2** `make check`; verify the current project is unchanged
 - [ ] **1.3** Move `go-forward` and `data-mode` from `packages/db` to the new `packages/api-proxy` (B-51), no behavior change; update the three `proxy.ts` and the pages' imports. Before go-sign-in 4.1
 
-## Phase 2: Beta project
+## Phase 2: Local check (replaces the beta project and beta data phases, moved to staging-verification on 2026-11-17)
 
-- [ ] **2.1** Create the Vercel project, env vars and domains (stop and ask: infrastructure)
-- [ ] **2.2** Real mode loads on the three beta domains
-
-## Phase 3: Beta data
-
-- [ ] **3.1** Dump/restore Supabase → Railway staging; compare counts (stop and ask: data copy)
-- [ ] **3.2** Point beta Route Handlers at Railway Postgres
-- [ ] **3.3** Check the beta Vercel project has no Supabase variables (B-24); confirm a Supabase-backed action fails on beta and changes nothing in Supabase
+- [x] **2.1** Local Queue app → local Go API → local Postgres; results below (2026-11-17)
 
 ## Phase 4: Stream test
 
 - [x] **4.1** Stream ticket route (through `proxy.ts`) and a minimal Go stream endpoint on the API domain (B-41)
-- [ ] **4.2** CORS for the app domains on the stream route (done in Go, tested); an hour-long stream test on staging (owner-gated, open)
+- [x] **4.2** CORS for the app domains on the stream route (done in Go, tested; checked locally 2026-11-17). The hour-long run on staging moved to staging-verification R3
 
 ## Deviations log
 
@@ -34,3 +27,23 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 | 2026-11-16 | 2.1, 2.2, 3.1, 3.3, 4.2 (hour test) | Left open | Infrastructure and data copy are stop-and-ask; no Vercel tool, Supabase MCP unauthenticated | Owner decision needed |
 | 2026-11-16 | 4.1 | Go ticket route `POST /api/stream/ticket`, stream `GET /stream`; tickets in memory | One instance (B-43), 60s lifetime | Add the ticket path to `ROTRA_GO_MOVED_AREAS` on beta |
 | 2026-11-16 | 4.1 | Unset `ROTRA_PROXY_SECRET` also 404s `/readyz` | B-30 allows only `/healthz` and the ticket route | Health tests send the secret |
+| 2026-11-17 | 2.x, 3.x, 4.2 (hour test) | Vercel project, data copy and live stream test moved to staging-verification | B-52: test locally during the move; live once, after every area is in Go | Done |
+
+## Local check, 2026-11-17
+
+Queue app (`pnpm dev`, port 9000, mock data mode) with `ROTRA_GO_API_URL=http://127.0.0.1:8080`, `ROTRA_GO_MOVED_AREAS=/api/stream/ticket` and a test `ROTRA_PROXY_SECRET`; Go API built from `main` on 8080 with `ROTRA_ALLOWED_ORIGINS=http://localhost:9000`; throwaway `postgres:16-alpine` on 5433.
+
+| Check | Result |
+|---|---|
+| Ticket through `proxy.ts` (`POST /api/stream/ticket`) | 200, 60 s ticket |
+| Stream on Go with the ticket and `Origin: http://localhost:9000` | 200 `text/event-stream`, `Access-Control-Allow-Origin` echoed |
+| Same ticket again / forged ticket | 401 / 401 |
+| Unlisted origin | no CORS header |
+| Go `/readyz` without / with the secret | 404 / 200 |
+| `/api/stream/ticket-x` (whole-segment match) | not forwarded (Go never saw it) |
+| Protected page in Go mode | 307 to `/login` |
+| Go stopped | 503 `unavailable` at once |
+| Go accepting but never answering | 503 `unavailable` after 10.0 s |
+| SIGTERM with a stream open | stream closed cleanly, process exited at once |
+
+Not covered locally (staging-verification): the client IP Vercel sets (locally a client can send its own `X-Forwarded-For`, which Vercel overwrites); the stream reconnect hint and spread on deploy (B-44, built in live-updates; the minimal stream sends none yet); `/readyz` failing during the draining time; Vercel function limits and logs; cookies across the beta subdomains.

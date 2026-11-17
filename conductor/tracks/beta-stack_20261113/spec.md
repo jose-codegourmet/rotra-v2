@@ -1,15 +1,17 @@
 # Track specification: Side-by-side beta stack
 
-**Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 12) · **Created:** 2026-11-13
+**Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 13) · **Created:** 2026-11-13
 **Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-18, B-20, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
 The Go API is built and tested next to the current apps, with real-mode screens, before anything ships. The current Vercel project and Supabase stay untouched.
 
+**Testing during the move ([B-52](../../../docs/backend/open-decisions.md#settled)).** Until every area is in Go, checks run **locally**: the apps (`pnpm dev`) with `ROTRA_GO_API_URL` pointing at a local Go API, both on one local Postgres. No live environment, no database URL outside Railway. Live checks on Railway and Vercel run once, in [staging-verification](../staging-verification_20261117/spec.md), and what they find is logged as bugs. R1, R3 and the live parts of R4 moved there on 2026-11-17.
+
 ## Requirements
 
-### R1: Second Vercel project
+### R1: Second Vercel project (moved to staging-verification R1)
 
 Same repo and apps, built from the long-lived `go-stack` branch (created off `main` in this track, B-20), real data mode, domains `queue-beta`, `player-beta`, `admin-beta`.rotra.club, cross-app URLs pointing at the beta domains.
 
@@ -32,7 +34,7 @@ Each app's `proxy.ts` forwards the `/api/*` paths of **moved areas** to the Go A
 - [ ] With Go stopped or hanging, a forwarded call fails within 10 seconds and the screen shows the existing offline / network error; Queue keeps working on a downloaded session
 - [ ] Go sees the real client IP through the forwarding; a direct call with a faked `X-Forwarded-For` and no secret is not trusted, and gets 404 except `/healthz` and the stream-ticket route
 
-### R3: Beta data
+### R3: Beta data (moved to staging-verification R1)
 
 Railway Postgres in staging starts from a copy of the Supabase database. Route Handlers in the beta project use that database too, so moved and unmoved areas see the same data.
 
@@ -56,16 +58,16 @@ Per [B-41](../../../docs/backend/open-decisions.md#settled) (replaces B-12): the
 
 **Accepted when:**
 
-- [ ] A beta app opens a stream on the Go API domain with a ticket; it stays open for an hour on staging
+- [ ] A local app gets a ticket through `proxy.ts` and opens the stream on the Go API (the hour-long run on staging is in staging-verification R3)
 - [ ] A used, expired or forged ticket is refused
 - [ ] CORS allows only the app domains, on the stream route only
-- [ ] No stream request shows up in Vercel's function logs
+- [ ] No stream request goes through `proxy.ts` (the Vercel log check is in staging-verification R3)
 
 ## Scope
 
-**In:** Vercel project, the `go-stack` branch, forwarding, data copy, the stream test. The env-gated forwarding (R2) merges into `main`; they are inert without `ROTRA_GO_API_URL`.
+**In:** Forwarding, the stream ticket route and stream, local checks. The env-gated forwarding (R2) merges into `main`; they are inert without `ROTRA_GO_API_URL`.
 
-**Out:** Moving any area; Shipping to production.
+**Out:** Moving any area; Shipping to production; the Vercel project, `go-stack` branch and data copy (staging-verification R1).
 
 ## Testing
 

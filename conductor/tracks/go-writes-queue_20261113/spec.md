@@ -1,6 +1,6 @@
 # Track specification: Queue writes and offline contract in Go
 
-**Track ID:** go-writes-queue_20261113 · **Type:** refactor · **Priority:** critical (order 9 of 12) · **Created:** 2026-11-13
+**Track ID:** go-writes-queue_20261113 · **Type:** refactor · **Priority:** critical (order 9 of 13) · **Created:** 2026-11-13
 **Depends on:** go-writes-admin-player · **Decisions:** B-01, B-02, B-04, D-2026-11-11-04 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

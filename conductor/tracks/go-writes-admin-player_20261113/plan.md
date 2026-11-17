@@ -15,7 +15,7 @@ Ticket: #877 (one issue for the whole track, under epic #869).
 
 ## Phase 3: Switch
 
-- [ ] **3.1** Add this track's `/api/*` prefixes to `ROTRA_GO_MOVED_AREAS` on beta (remove it again to undo; the Route Handler stays until ship); manual check
+- [ ] **3.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check locally
 
 ## Deviations log
 

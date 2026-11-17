@@ -156,7 +156,7 @@ Rules this sets:
 - **Proxy secret (B-30).** `proxy.ts` adds a secret header (`ROTRA_PROXY_SECRET`, set in the beta
   Vercel project and Railway) and the client IP. Go trusts the forwarded IP only with the secret,
   and without it answers only `/healthz` and the stream-ticket route.
-- **Moved areas (`ROTRA_GO_MOVED_AREAS`).** Beta Vercel project only, unset everywhere else. A
+- **Moved areas (`ROTRA_GO_MOVED_AREAS`).** Set only in a local test run (B-52) and, from staging-verification on, the beta Vercel project; unset everywhere else. A
   comma-separated list of `/api/*` prefixes Go owns; everything else still reaches its Route Handler.
   - **Start:** `/api/stream/ticket` (B-41).
   - **Each move track** adds its prefixes in its Switch step; removing a prefix undoes the move, since

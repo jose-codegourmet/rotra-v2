@@ -26,7 +26,7 @@ Ticket: #875 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Apps
 
-- [ ] **4.1** `proxy.ts` session check behind `ROTRA_GO_API_URL` (frontend PR, `make check`); written in `@rotra/api-proxy` (B-51); add the sign-in `/api/*` prefixes to `ROTRA_GO_MOVED_AREAS` on beta; the claim page reads its link through Go instead of `@rotra/db/player/claim`
+- [ ] **4.1** `proxy.ts` session check behind `ROTRA_GO_API_URL` (frontend PR, `make check`); written in `@rotra/api-proxy` (B-51); add the sign-in `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now); the claim page reads its link through Go instead of `@rotra/db/player/claim`
 - [ ] **4.2** Device list screen data for owner/Admin (contract only; screens follow mockup process)
 
 ## Phase 5: Import

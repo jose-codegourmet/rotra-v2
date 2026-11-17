@@ -13,7 +13,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 1 | [~] | [rule-cases_20261113](./tracks/rule-cases_20261113/) — Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | chore | critical | — (phases 4–6: go-api-foundation) | 7 / 30 |
 | 2 | [~] | [go-api-foundation_20261113](./tracks/go-api-foundation_20261113/) — Go API foundation | feature | critical | rule-cases phases 1–3 (spike, case runner) | 5 / 15 |
 | 3 | [ ] | [monitoring_20261113](./tracks/monitoring_20261113/) — Monitoring: Grafana for API, Postgres and pictures | chore | high | go-api-foundation | 3 / 6 |
-| 4 | [ ] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 4 / 8 |
+| 4 | [ ] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 3 / 6 |
 | 5 | [ ] | [go-public-reads_20261113](./tracks/go-public-reads_20261113/) — Public reads in Go | refactor | high | beta-stack | 3 / 7 |
 | 6 | [ ] | [go-sign-in_20261113](./tracks/go-sign-in_20261113/) — Sign-in owned by Go | feature | critical | beta-stack | 5 / 15 |
 | 7 | [ ] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 4 / 6 |
@@ -21,7 +21,8 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 9 | [ ] | [go-writes-queue_20261113](./tracks/go-writes-queue_20261113/) — Queue writes and offline contract in Go | refactor | critical | go-writes-admin-player | 5 / 9 |
 | 10 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
 | 11 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
-| 12 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | all earlier tracks | 3 / 7 |
+| 12 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–11) | 5 / 10 |
+| 13 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
 
 ## Backlog
 
@@ -33,11 +34,13 @@ Open items set aside on 2026-11-13. Not scheduled; each says when it must be pic
 | BL-2 | Grace period and exact schedule checks for offline device time (owner OK) | [rule-cases Q2](./tracks/rule-cases_20261113/spec.md#owner-answers-2026-11-13), go-writes-queue R1a | go-writes-queue R1a |
 | BL-3 | Ticket for the lineup contract change (device sends lineups instead of `n`) | rule-cases Q3, go-writes-queue R1a | go-writes-queue R1a |
 | BL-4 | Mockup change: offline payments show the last synced amount due | rule-cases payments, go-writes-queue R3 | go-writes-queue R3 |
-| BL-5 | Create the `go-stack` branch off `main` (B-20) | beta-stack R1 | beta-stack R1 |
+| BL-5 | Create the `go-stack` branch off `main` (B-20) | beta-stack R1 | staging-verification R1 |
 | BL-6 | Service worker for the Queue app, so it and the rules `.wasm` load after an offline reload | [D-2026-11-14-01](../docs/mvp/decisions.md#d-2026-11-14-01), rule-cases G12 | real clubs relying on offline reloads |
 | BL-7 | Mockup change: "Sign in to sync N waiting changes", the revoked-device message, the sign-out warning with waiting changes, and the revoke dialog's offline-copy warning | [B-28](../docs/backend/open-decisions.md#settled) | go-sign-in R3 |
 | BL-8 | Mockup change + ticket: read-only switch for the cutover (one setting; writes refused with a "ROTRA is updating" message) | [B-35](../docs/backend/open-decisions.md#settled) | ship-and-retire R2 |
 | BL-9 | Backups and a restore drill: confirm what Railway Hobby includes, production schedule (suggested daily + weekly; point-in-time recovery after pricing), a timed restore drill on staging, a manual off-Railway `pg_dump` before ship and risky migrations | [B-40](../docs/backend/open-decisions.md#will-hurt-later) | ship-and-retire R1 |
+
+**Testing (B-52).** Tracks 3–11 check their work locally (apps → local Go API → local Postgres); live checks on Railway and Vercel run once in `staging-verification`, and what they find is logged as bugs.
 
 `monitoring` and `beta-stack` can run in parallel after the foundation; `go-public-reads` and `go-sign-in` can run in parallel after `beta-stack`.
 

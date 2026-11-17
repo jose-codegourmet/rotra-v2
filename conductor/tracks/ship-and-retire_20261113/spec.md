@@ -1,6 +1,6 @@
 # Track specification: Ship the Go stack and retire Supabase
 
-**Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 12 of 12) · **Created:** 2026-11-13
+**Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 13 of 13) · **Created:** 2026-11-13
 **Depends on:** all earlier tracks · **Decisions:** B-10, B-20, B-35, B-36, B-42, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -11,11 +11,11 @@ Moves production to the beta stack once the Go API is ready, then removes what i
 
 ### R1: Readiness
 
-Every area moved; regression suite passes against the beta stack; monitoring and alerts live; one load test passed ([B-42](../../../docs/backend/open-decisions.md#settled)).
+Every area moved; [staging-verification](../staging-verification_20261117/spec.md) done (live checks, load test [B-42](../../../docs/backend/open-decisions.md#settled)) with no open blocker bug; regression suite passes against the beta stack.
 
 **Accepted when:**
 
-- [ ] Load test (Go, `apps/api/cmd/loadtest`): one hour on staging, 50 clubs × 3–5 screens, about 20 viewers per public session page, writes every few seconds, a deploy in the middle; p95 under 1 s, errors under 2%, memory well below the instance limit; results recorded in the plan
+- [ ] staging-verification done; every bug it logged is fixed or the owner has marked it not blocking
 - [ ] Owner signs off readiness
 
 ### R2: Ship

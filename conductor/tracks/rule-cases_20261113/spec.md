@@ -1,6 +1,6 @@
 # Track specification: Shared queue rules (one Go copy, run on the device as WebAssembly)
 
-**Track ID:** rule-cases_20261113 · **Type:** chore · **Priority:** critical (order 1 of 12) · **Created:** 2026-11-13 · **Refined:** 2026-11-14
+**Track ID:** rule-cases_20261113 · **Type:** chore · **Priority:** critical (order 1 of 13) · **Created:** 2026-11-13 · **Refined:** 2026-11-14
 **Depends on:** phases 1–3 nothing; phases 4–6 go-api-foundation (the Go module) · **Decisions:** D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-02, B-20, B-21, B-22, B-23, B-37 ([register](../../../docs/mvp/decisions.md#d-2026-11-14-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

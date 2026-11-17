@@ -1,6 +1,6 @@
 # Track specification: Live updates
 
-**Track ID:** live-updates_20261113 · **Type:** feature · **Priority:** high (order 10 of 12) · **Created:** 2026-11-13
+**Track ID:** live-updates_20261113 · **Type:** feature · **Priority:** high (order 10 of 13) · **Created:** 2026-11-13
 **Depends on:** go-writes-queue (events), beta-stack (ticket route, B-41) · **Decisions:** B-08, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -28,7 +28,7 @@ One stream per signed-in screen (and visitors on public session pages), opened s
 
 **Accepted when:**
 
-- [ ] Event reaches a connected screen in under a second on staging
+- [ ] Event reaches a connected screen in under a second (locally; on staging in staging-verification R3)
 - [ ] Reconnect resumes from the last event id
 - [ ] Write R takes its transaction id first and inserts its event last; write E inserts first and commits last. Both reach a connected screen, and a reconnect with `Last-Event-ID` gets both (B-48)
 - [ ] A write left idle in a transaction is ended by `idle_in_transaction_session_timeout`, and publisher lag shows in Grafana
@@ -37,7 +37,7 @@ One stream per signed-in screen (and visitors on public session pages), opened s
 - [ ] A reconnect with an id older than the kept events (B-34, 7 days) gets "changed" for every topic and the screen re-reads
 - [ ] The listener uses a direct connection; with the listener cut (or the database restarted), events committed meanwhile still reach connected screens after it reconnects
 - [ ] An API restart mid-session: phones reconnect and catch up with no manual refresh
-- [ ] A write through a beta Route Handler reaches a connected screen
+- [ ] A write through a Route Handler (area not moved yet) reaches a connected screen, locally
 - [ ] A re-read right after a live message returns the new snapshot, never the cached older one
 - [ ] Many screens re-reading the same new version cause one snapshot build
 - [ ] The cache holds at most one copy per session and view and stays under its size cap; API memory is on the Grafana dashboard

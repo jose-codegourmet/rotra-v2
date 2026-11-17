@@ -1,6 +1,6 @@
 # Track specification: Signed-in reads in Go
 
-**Track ID:** go-signed-in-reads_20261113 · **Type:** refactor · **Priority:** high (order 7 of 12) · **Created:** 2026-11-13
+**Track ID:** go-signed-in-reads_20261113 · **Type:** refactor · **Priority:** high (order 7 of 13) · **Created:** 2026-11-13
 **Depends on:** go-sign-in, go-public-reads · **Decisions:** B-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

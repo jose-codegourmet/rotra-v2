@@ -1,6 +1,6 @@
 # Track specification: Go API foundation
 
-**Track ID:** go-api-foundation_20261113 · **Type:** feature · **Priority:** critical (order 2 of 12) · **Created:** 2026-11-13
+**Track ID:** go-api-foundation_20261113 · **Type:** feature · **Priority:** critical (order 2 of 13) · **Created:** 2026-11-13
 **Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, B-34, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -60,7 +60,7 @@ OpenTelemetry traces to Grafana Cloud, service name `rotra-api`, trace context j
 
 - [ ] `railway config plan` shows only intended resources
 - [ ] Staging `/readyz` green on `api-beta.rotra.club`
-- [ ] Railway default domain test ([B-30](../../../docs/backend/open-decisions.md#settled)): with `api-beta.rotra.club` as `ROTRA_GO_API_URL`, the beta apps on their subdomains reach Go; then the `*.up.railway.app` domain is removed and the same check repeated. Result recorded in backend open decisions (removed, or kept behind the proxy-secret rule)
+- [ ] Railway default domain test (B-30): moved to staging-verification R1, since it needs the beta apps
 - [ ] Watch paths and Wait for CI turned on for `api`
 - [ ] `pg_stat_statements` enabled
 

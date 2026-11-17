@@ -1,6 +1,6 @@
 # Track specification: Sign-in owned by Go
 
-**Track ID:** go-sign-in_20261113 · **Type:** feature · **Priority:** critical (order 6 of 12) · **Created:** 2026-11-13
+**Track ID:** go-sign-in_20261113 · **Type:** feature · **Priority:** critical (order 6 of 13) · **Created:** 2026-11-13
 **Depends on:** beta-stack · **Decisions:** B-04, B-11, D-2026-11-07-01, D-2026-11-09-14 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -26,7 +26,7 @@ Club username, player email, Admin; argon2id; bcrypt import rehash; host-only co
 
 - [ ] Key rotation ([B-47](../../../docs/backend/open-decisions.md#settled)): passes carry a key id; with two keys published, passes from both are accepted; after the old key is removed, an old access pass refreshes silently and nobody is signed out
 - [ ] "Revoke all sessions" signs every device out on its next refresh
-- [ ] Each audience signs in on beta
+- [ ] Each audience signs in locally (on beta: staging-verification R2)
 - [ ] Refresh rotation and reuse detection tested
 - [ ] Grace window ([B-29](../../../docs/backend/open-decisions.md#settled)): the previous refresh pass within 30 s gets an access pass only and the session stays; after 30 s it revokes the session; two tabs and a page load refreshing together never sign the device out
 - [ ] Within a tab, concurrent refreshes share one request
@@ -66,7 +66,7 @@ Idempotent import of Supabase accounts (same account rows, new identity ids, bcr
 
 **Accepted when:**
 
-- [ ] Rehearsed on staging with a report
+- [ ] Tested locally on made-up accounts (bcrypt hashes, rerun changes nothing); the rehearsal on a copy of real accounts is staging-verification R1
 
 ### R7: Session check in the apps
 

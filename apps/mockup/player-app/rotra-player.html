@@ -326,6 +326,9 @@ textarea.input { min-height: 80px; resize: vertical; }
 /* Login */
 .login { min-height: calc(100dvh - 80px); display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
 .login .card { width: min(420px, 100%); padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+.login-stack { width: min(420px, 100%); display: flex; flex-direction: column; gap: 12px; }
+.legal-note { text-align: center; }
+.legal-note a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .mark { font-size: 40px; font-weight: 800; letter-spacing: 6px; line-height: 1; }
 .mark b { color: var(--accent); }
 
@@ -362,6 +365,10 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .nowrap { flex-wrap: nowrap; }
 .wrap.mid { max-width: 920px; }
 .wrap.slim { max-width: 640px; }
+/* P-PRIVACY / P-TERMS (D-2026-11-17-01): a readable column of headings, paragraphs and lists */
+.wrap.legal { max-width: 720px; }
+.legal-sec { display: flex; flex-direction: column; gap: 10px; }
+.legal-sec ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 
 /* Leaderboard */
 .lb { display: flex; flex-direction: column; }
@@ -2520,7 +2527,7 @@ function viewLogin() {
   const L = S.ui.login, aft = S.ui.after, x = S.ui.regCtx || {};
   const why = aft && aft.to === 'joinClub' && CLUB_DIR[x.club] ? `Sign in to join ${esc(CLUB_DIR[x.club].name)}.`
     : aft && aft.to === 'joinSession' && SESSION_DIR[x.session] ? `Sign in to request a spot in ${esc(SESSION_DIR[x.session].title)}.` : '';
-  return `<main class="login"><form class="card" data-form="login" novalidate>
+  return `<main class="login"><div class="login-stack"><form class="card" data-form="login" novalidate>
     <div class="stack tight"><div class="mark">${rotraLogo('full', 'mark-logo')}</div><p class="muted">Your player profile.</p></div>
     <h1 style="font-size:22px">Sign in</h1>
     ${why ? notice('', why) : ''}
@@ -2536,7 +2543,8 @@ function viewLogin() {
       <button type="button" class="btn sm" data-act="toggleShow" data-k="login" aria-pressed="${!!L.show}" aria-label="${L.show ? 'Hide password' : 'Show password'}">${L.show ? 'Hide' : 'Show'}</button></div></div>
     <button class="btn primary block" type="submit" ${L.pending ? 'disabled' : ''}>${L.pending ? 'Signing in…' : 'Sign in'}</button>
     <p class="small muted login-foot">New to ROTRA? Create your account from your club's invite link or a session invite. You don't need an account to view profiles or the leaderboard.</p>
-  </form></main>`;
+  </form>
+  <p class="small muted legal-note">By continuing you agree to the <a href="/player/terms" data-act="go" data-to="terms">Terms of Service</a> and <a href="/player/privacy" data-act="go" data-to="privacy">Privacy Policy</a>.</p></div></main>`;
 }
 function viewForgot() {
   const F = S.ui.forgot;
@@ -2865,6 +2873,184 @@ function viewNotFound() {
   return `<main class="wrap slim"><div class="page-head">${backBtn('goBoard', 'Leaderboard')}<h1>Profile not found</h1></div>
     ${notice('', `No ROTRA profile has the ID <span class="mono">${esc(S.ui.findId || S.viewId || '')}</span>. Check the ID and try again.`)}</main>`;
 }
+
+// ---------- P-PRIVACY / P-TERMS (D-2026-11-17-01) ----------
+// Public, static pages the Google sign-in consent screen links to. apps/player keeps the same words in (public)/privacy/content.ts and (public)/terms/content.ts.
+const LEGAL_EFFECTIVE = 'Effective November 17, 2026';
+const LEGAL = {
+  privacy: { title: 'Privacy Policy', sections: [
+    { heading: 'Who we are', blocks: [
+      { kind: 'paragraph', text: 'ROTRA is a badminton session app. Clubs use it to run their club nights: the Queue, the courts, the games and the results. Players use it to see their profile, their games and their rank.' },
+      { kind: 'paragraph', text: 'This policy explains what information ROTRA keeps about you, why we keep it, and what you can do about it. It is written for players and clubs in the Philippines and follows the Data Privacy Act of 2012 (Republic Act No. 10173).' },
+      { kind: 'paragraph', text: 'In this policy, "ROTRA", "we" and "us" mean the people who run ROTRA. For questions and privacy requests, email support@rotra.club.' },
+    ] },
+    { heading: 'What we collect', blocks: [
+      { kind: 'paragraph', text: 'We collect only what the app needs to work:' },
+      { kind: 'list', items: [
+        'Your account: your full name, nickname, email address, mobile number and profile picture. Also the details you choose to add, such as your playing style, when you started playing and links to your social profiles, the city or province you give when you register without a club, and the requests you send us, such as a change to your phone or email.',
+        'From Google sign-in: your Google email address, your name and your profile picture. Nothing else. ROTRA can\'t read your Gmail, your contacts, your Google Drive or anything else in your Google account.',
+        'Your play: the Queue Sessions you join, the games you play, their scores and results, and the level, rank and statistics worked out from them.',
+        'What a club saves about you: your name, nickname, picture, level and email address, and your mobile number if the club adds it.',
+        'Technical information: the cookies that keep you signed in, a setting on your device that remembers light or dark mode, basic server logs (such as when a page was requested and any errors), and page-visit counts that don\'t identify you.',
+      ] },
+      { kind: 'paragraph', text: 'We don\'t ask for your government ID or payment card details, and we don\'t track your location.' },
+    ] },
+    { heading: 'People saved by a club before they register', blocks: [
+      { kind: 'paragraph', text: 'A club\'s Queue Master can save a player who hasn\'t joined ROTRA yet, so the club can put them in its Queue Sessions and record their games. There are two kinds:' },
+      { kind: 'list', items: [
+        'A guest is a name only. A guest has no email, no phone and no ROTRA profile of their own.',
+        'An unclaimed profile is a person the club saved with their email address. It gets an RTR ID, the ROTRA player ID, and can appear on the leaderboards.',
+      ] },
+      { kind: 'paragraph', text: 'An unclaimed profile is public: anyone can see its name, picture, level, games and rank. Its email address and phone number are never shown publicly. Another club can find an unclaimed profile only by typing its exact email address or RTR ID.' },
+      { kind: 'paragraph', text: 'If a club saved you, register with the same email address to take over your profile. Your RTR ID and your games come with you, and you can then choose who sees your profile.' },
+      { kind: 'paragraph', text: 'If you don\'t want to register and want your unclaimed profile removed, ask the club that saved you to delete it, or email support@rotra.club.' },
+    ] },
+    { heading: 'How we use your information', blocks: [
+      { kind: 'list', items: [
+        'To run club nights: to put you in a Queue Session, in the Queue and on a court, and to record your games and results.',
+        'To show your profile, games, rank and leaderboard places in the app.',
+        'To sign you in and keep your account safe.',
+        'To check your account. A player is verified when a Google account is connected, a mobile number is on the account and the ROTRA email matches the Google email.',
+        'To let clubs find you and add you to their Queue Sessions.',
+        'To handle your requests, such as a password reset or a change to your phone or email. ROTRA Admin reviews these by hand.',
+        'To show you notifications in the app, fix problems and keep the app working.',
+      ] },
+      { kind: 'paragraph', text: 'We don\'t use your information for advertising, and we don\'t sell it.' },
+    ] },
+    { heading: 'What is public and what is private', blocks: [
+      { kind: 'list', items: [
+        'Your email address and mobile number are never shown publicly. Where the app shows your number to you, it is masked, like +63 917 ••• ••42. ROTRA Admin sees the full number. You can also hide your phone number from clubs.',
+        'Your profile has three visibility settings. Public: anyone can see your name, level, games and profile. Private, the default: visitors who aren\'t signed in see a masked name, and signed-in ROTRA players see your profile. Always private: only you, and the Queue Master of a session you join, see your name, level and games.',
+        'Your picture and profile banner are always public, even when your profile is Always private.',
+        'Hide me from Player Information stops clubs from finding you by your RTR ID or email, and leaves you out of public club member lists.',
+        'A club\'s public session page lists who is playing with masked names, and never shows contact details.',
+      ] },
+    ] },
+    { heading: 'Who we share it with', blocks: [
+      { kind: 'list', items: [
+        'Clubs you play at. A club that saved you, or whose Queue Session you join, sees what it needs to run its sessions, such as your name, picture, level and your games there. It sees your phone number unless you hide it from clubs.',
+        'Service providers that run ROTRA for us: hosting, the database, picture storage and sign-in. Today Vercel hosts the app, and Supabase runs our database, file storage and sign-in. Google handles Google sign-in. They handle your information to provide these services to us.',
+        'The authorities, when the law requires it, for example a valid order from a court or a government agency.',
+      ] },
+      { kind: 'paragraph', text: 'We never sell your information.' },
+    ] },
+    { heading: 'Where it is stored and how we protect it', blocks: [
+      { kind: 'paragraph', text: 'Your information is stored on our providers\' servers. Today the app and the database run in Singapore, so your information is kept outside the Philippines.' },
+      { kind: 'paragraph', text: 'We protect it with sign-in, encrypted connections and access checks: the app shows each person only what they are allowed to see, and only ROTRA Admin can use the admin tools.' },
+      { kind: 'paragraph', text: 'No system is perfectly safe. If a breach puts your information at risk, we will tell you and the National Privacy Commission as the Data Privacy Act requires.' },
+    ] },
+    { heading: 'How long we keep it', blocks: [
+      { kind: 'paragraph', text: 'We keep your information while your account or your profile exists.' },
+      { kind: 'paragraph', text: 'Some records stay after that when they are still needed: a club\'s game results and history, which other players\' games and ranks depend on, and records the law asks us to keep.' },
+      { kind: 'paragraph', text: 'For pictures, we keep only your current and your previous uploaded picture. Older ones are deleted.' },
+    ] },
+    { heading: 'Your rights', blocks: [
+      { kind: 'paragraph', text: 'Under the Data Privacy Act of 2012 you have the right to:' },
+      { kind: 'list', items: [
+        'Be informed about how your information is collected and used. This policy is part of that.',
+        'Access the information we hold about you.',
+        'Correct information that is wrong. You can edit most of your profile yourself. A change to your phone or email goes through a request that ROTRA Admin reviews.',
+        'Object to how we use your information, and withdraw your consent.',
+        'Ask us to erase or block your information.',
+        'Get a copy of your information in a common electronic format (data portability).',
+        'Claim damages if you were harmed by wrong or unlawful use of your information.',
+        'Complain to the National Privacy Commission if you think your rights were not respected.',
+      ] },
+      { kind: 'paragraph', text: 'To use any of these rights, email support@rotra.club from the email address on your account, or tell us which account it is. We may ask you to show that the account is yours before we act. We answer every request by email.' },
+    ] },
+    { heading: 'Children', blocks: [
+      { kind: 'paragraph', text: 'Clubs may include players under 18 in their Queue Sessions and save them in the app. A parent or guardian who wants to see, correct or remove a child\'s information can email support@rotra.club.' },
+    ] },
+    { heading: 'Changes to this policy', blocks: [
+      { kind: 'paragraph', text: 'We may change this policy when ROTRA changes. The date at the top shows when it last changed. If a change matters to you, we will tell you in the app.' },
+    ] },
+    { heading: 'Contact', blocks: [
+      { kind: 'paragraph', text: 'Questions about this policy or your information: support@rotra.club.' },
+    ] },
+  ] },
+  terms: { title: 'Terms of Service', sections: [
+    { heading: 'What ROTRA is', blocks: [
+      { kind: 'paragraph', text: 'ROTRA is a badminton session app. Clubs use it to run their club nights: the Queue, the courts, the games and the results. Players use it to see their profile, their games, their rank and the leaderboards.' },
+      { kind: 'paragraph', text: 'These terms apply when you use ROTRA. By continuing with Google, signing in or using the app, you agree to them. If you don\'t agree, please don\'t use ROTRA.' },
+      { kind: 'paragraph', text: 'You don\'t need an account to view public profiles, club pages or the leaderboards.' },
+    ] },
+    { heading: 'Your account', blocks: [
+      { kind: 'list', items: [
+        'You sign in with Google. Some older accounts also have a password until they connect Google.',
+        'Use your real name and correct details, and keep them up to date. A change to your phone or email goes through a request that ROTRA Admin reviews.',
+        'One account per person. Don\'t make an account for someone else, and don\'t share yours.',
+        'Keep your Google account and your password safe. Email support@rotra.club if you think someone else got into your account.',
+        'Your RTR ID is your ROTRA player ID. Only ROTRA Admin can change it.',
+      ] },
+    ] },
+    { heading: 'Clubs and Queue Sessions', blocks: [
+      { kind: 'list', items: [
+        'Clubs run their own Queue Sessions. Each club sets its own schedule, fees, levels and house rules, and its Queue Master decides who plays and when.',
+        'ROTRA is the tool the club uses. ROTRA doesn\'t organise the sessions and isn\'t responsible for the venue, the games or what happens at them.',
+        'Payments are between you and the club. ROTRA doesn\'t collect or hold money. A club may record in ROTRA whether you paid, but refunds and disputes are for you and the club to settle.',
+        'A club can save you in its players and put you in its Queue Sessions. If it saves you with your email address, you have an unclaimed profile until you register, as the Privacy Policy explains.',
+      ] },
+    ] },
+    { heading: 'Results, rank and leaderboards', blocks: [
+      { kind: 'list', items: [
+        'The club records games and results. ROTRA works out levels, ranks and leaderboard places from them.',
+        'Once the Queue Master confirms a result, it is permanent. A match that can\'t be finished can be marked invalid, and a whole Queue Session can be marked invalid when its records can\'t be trusted. Invalid matches and sessions don\'t count toward rank.',
+        'Ranks and leaderboard places change as new games are played. ROTRA doesn\'t promise any rank or place.',
+        'If you think a result is wrong, talk to the club first. You can also email support@rotra.club.',
+      ] },
+    ] },
+    { heading: 'Acceptable use', blocks: [
+      { kind: 'paragraph', text: 'Don\'t:' },
+      { kind: 'list', items: [
+        'Make fake accounts or more than one account.',
+        'Pretend to be another person, a club or ROTRA.',
+        'Enter false results or try to change a rank unfairly.',
+        'Harass, threaten or abuse other players, clubs or the people who run ROTRA.',
+        'Copy data from ROTRA in bulk, by scraping or with automated tools, or try to see information you aren\'t allowed to see.',
+        'Break, overload or attack the app, or get around its security.',
+        'Use ROTRA to break the law.',
+      ] },
+    ] },
+    { heading: 'Your content', blocks: [
+      { kind: 'list', items: [
+        'Your content is what you add to your profile: your picture, nickname, playing style, links and other details.',
+        'It stays yours. You give ROTRA permission to store it and show it in the app, on share images and in links you share, as your settings allow. This permission ends when you remove the content or your account, except for copies already shared.',
+        'Only add content you have the right to use. Don\'t add pictures of other people without their permission, or anything offensive or illegal.',
+        'We may remove content that breaks these terms.',
+      ] },
+    ] },
+    { heading: 'Suspension and ending an account', blocks: [
+      { kind: 'list', items: [
+        'We may suspend or close an account that is fake, breaks these terms or puts other people at risk. Where we can, we tell you why.',
+        'You can ask us to close your account at any time by emailing support@rotra.club.',
+        'When an account ends, some records stay, such as a club\'s game results and history, as the Privacy Policy explains.',
+      ] },
+    ] },
+    { heading: 'The service as it is', blocks: [
+      { kind: 'list', items: [
+        'We work to keep ROTRA running and correct, but we provide it as it is. We don\'t promise that it will always be available, free of mistakes or right for your needs.',
+        'We may change, add or remove features.',
+        'As far as Philippine law allows, ROTRA isn\'t liable for indirect losses, or for losses caused by clubs, venues, other players or events outside our control. Nothing in these terms takes away rights that the law doesn\'t allow us to limit.',
+      ] },
+    ] },
+    { heading: 'Changes to these terms', blocks: [
+      { kind: 'paragraph', text: 'We may update these terms. The date at the top shows when they last changed. If a change matters to you, we will tell you in the app. If you keep using ROTRA after a change, the new terms apply.' },
+    ] },
+    { heading: 'Governing law', blocks: [
+      { kind: 'paragraph', text: 'These terms are governed by the laws of the Republic of the Philippines. If there is a problem, please email us first so we can try to settle it together.' },
+    ] },
+    { heading: 'Contact', blocks: [
+      { kind: 'paragraph', text: 'Questions about these terms: support@rotra.club.' },
+    ] },
+  ] },
+};
+function viewLegal(doc) {
+  const block = (b) => b.kind === 'list' ? `<ul>${b.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(b.text)}</p>`;
+  return `<main class="wrap legal"><div class="page-head"><h1>${esc(doc.title)}</h1><p class="muted">${LEGAL_EFFECTIVE}</p></div>
+    ${doc.sections.map((s) => `<section class="legal-sec"><h2>${esc(s.heading)}</h2>${s.blocks.map(block).join('')}</section>`).join('')}</main>`;
+}
+const viewPrivacy = () => viewLegal(LEGAL.privacy);
+const viewTerms = () => viewLegal(LEGAL.terms);
 
 // ---------- Share cards (D-2026-11-09-08) ----------
 // Rank card, My session result and Session games share one sheet. The image is drawn on the device (canvas), like the Queue Session QR card.
@@ -3961,7 +4147,7 @@ document.addEventListener('keydown', (ev) => {
 // ---------- Prototype routes (same paths as apps/player, under /player) ----------
 let prototypeRouter;
 let prototypeToken = 'demo';
-const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact' };
+const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact', privacy: '/privacy', terms: '/terms' };
 function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
@@ -4031,8 +4217,8 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound };
-  if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board'].includes(S.screen)) S.screen = 'gRequired';
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;
   document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');

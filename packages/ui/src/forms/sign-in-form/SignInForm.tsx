@@ -20,8 +20,14 @@ export type SignInFormProps = {
   defaultValues?: Partial<SignInValues>
   /** Mock data only: the sample-account hint and "Any password works" placeholder. */
   prototypeHints?: boolean
+  /** Shows "By continuing you agree to the Terms of Service and Privacy Policy." under the card. */
+  legalLinks?: { termsHref: string; privacyHref: string }
 }
-/** P-LOGIN: email + password. The sample hint and password placeholder show only with `prototypeHints`. */
+const legalLinkClass = 'text-accent underline underline-offset-[3px]'
+/**
+ * P-LOGIN: email + password. The sample hint and password placeholder show only with `prototypeHints`;
+ * `legalLinks` adds the Terms of Service and Privacy Policy line under the card (D-2026-11-17-01).
+ */
 export function SignInForm({
   onSubmit,
   onForgotPassword,
@@ -31,6 +37,7 @@ export function SignInForm({
   successNote,
   defaultValues,
   prototypeHints = false,
+  legalLinks,
 }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const form = useForm<SignInValues>({
@@ -44,6 +51,21 @@ export function SignInForm({
       title="Sign in"
       tagline="Your player profile."
       footer="New to ROTRA? A club adds you first, then sends you a link to finish registering. You don't need an account to view profiles or the leaderboard."
+      below={
+        legalLinks ? (
+          <p className="m-0">
+            By continuing you agree to the{' '}
+            <a href={legalLinks.termsHref} className={legalLinkClass}>
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href={legalLinks.privacyHref} className={legalLinkClass}>
+              Privacy Policy
+            </a>
+            .
+          </p>
+        ) : undefined
+      }
     >
       <FormProvider {...form}>
         <form

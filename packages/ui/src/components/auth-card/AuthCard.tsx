@@ -23,6 +23,8 @@ export type AuthCardProps = {
   children: ReactNode
   /** Muted note under the form */
   footer?: ReactNode
+  /** Small line under the card, outside it, such as P-LOGIN's Terms of Service and Privacy Policy note */
+  below?: ReactNode
 }
 
 /**
@@ -40,37 +42,48 @@ export function AuthCard({
   offline,
   children,
   footer,
+  below,
 }: AuthCardProps) {
+  const card = (
+    <Card className="flex w-[min(420px,100%)] flex-col gap-[18px] p-7">
+      {back}
+      {showBrand ? (
+        product ? (
+          <div className="flex items-center gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
+            <RotraLogo className="h-[52px]" />
+            <span className="text-[15px] font-bold tracking-[0.5px] text-fg2 uppercase">
+              {product}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2.5">
+              <RotraLogo className="h-[52px]" />
+            </div>
+            {tagline ? <p className="m-0 text-fg2">{tagline}</p> : null}
+          </div>
+        )
+      ) : null}
+      {badge ? <div>{badge}</div> : null}
+      <div className="flex flex-col gap-1.5">
+        <h1 className={product ? undefined : 'text-[22px]'}>{title}</h1>
+        {description ? <p className="m-0 text-fg2">{description}</p> : null}
+      </div>
+      {offline ? <Notice tone="offline">Signing in needs an internet connection.</Notice> : null}
+      {children}
+      {footer ? <p className="m-0 text-[13px] text-fg2">{footer}</p> : null}
+    </Card>
+  )
   return (
     <main className="grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
-      <Card className="flex w-[min(420px,100%)] flex-col gap-[18px] p-7">
-        {back}
-        {showBrand ? (
-          product ? (
-            <div className="flex items-center gap-2.5" role="img" aria-label={`ROTRA ${product}`}>
-              <RotraLogo className="h-[52px]" />
-              <span className="text-[15px] font-bold tracking-[0.5px] text-fg2 uppercase">
-                {product}
-              </span>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2.5">
-                <RotraLogo className="h-[52px]" />
-              </div>
-              {tagline ? <p className="m-0 text-fg2">{tagline}</p> : null}
-            </div>
-          )
-        ) : null}
-        {badge ? <div>{badge}</div> : null}
-        <div className="flex flex-col gap-1.5">
-          <h1 className={product ? undefined : 'text-[22px]'}>{title}</h1>
-          {description ? <p className="m-0 text-fg2">{description}</p> : null}
+      {below ? (
+        <div className="flex w-[min(420px,100%)] flex-col gap-3">
+          {card}
+          <div className="text-center text-[13px] text-fg2">{below}</div>
         </div>
-        {offline ? <Notice tone="offline">Signing in needs an internet connection.</Notice> : null}
-        {children}
-        {footer ? <p className="m-0 text-[13px] text-fg2">{footer}</p> : null}
-      </Card>
+      ) : (
+        card
+      )}
     </main>
   )
 }

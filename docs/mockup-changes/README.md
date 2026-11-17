@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 9 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
+TICKETED: 9 · IN MOCK APP: 178 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -371,4 +371,5 @@ TICKETED: 9 · IN MOCK APP: 177 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-16-player-phone-mask-format](2026-11-16-player-phone-mask-format.md) | Player app: every phone shown is masked and grouped; phones are kept as the database holds them | contact-details-card, private-contact-card, contact-change-request-form, claim-form | TICKETED — #893 |
 | [2026-11-16-player-unclaimed-identity](2026-11-16-player-unclaimed-identity.md) | Player app: unclaimed players are public, found by email, and pick an identity on registration | profile-card, leaderboard-row, claim-form, chip, sheet, share-image-picker (carousel) | TICKETED — #900 |
 | [2026-11-16-queue-unclaimed-email-lookup](2026-11-16-queue-unclaimed-email-lookup.md) | Queue app: unclaimed players need an email and get an RTR ID; lookup by RTR ID or email only; guest linking removed | add-player-sheet, saved-player-card, player-profile-sheet, edit-player-form, invite-sheet, join-request-row, join-request-form, participant-profile-card, chip | TICKETED — #900 |
+| [2026-11-17-player-legal-pages](2026-11-17-player-legal-pages.md) | Player app: Privacy Policy and Terms of Service pages | legal-document, auth-card, sign-in-form, page-header | IN MOCK APP — PR #928 |
 <!-- status-index:end -->

@@ -10,6 +10,8 @@
 
 Order: logo and "Your player profile.", "Sign in", a context notice when the player came from an invite ("Sign in to join <club>." / "Sign in to request a spot in <session>."), **Continue with Google** (pending: "Waiting for Google…"), a divider "Signed up with a password?", "Sign in with your email and password once, then connect Google. Google sign-in is required from <deadline>.", then the Email, Password (with **Forgot password?** beside its label) and **Sign in** controls described below. Footer: "New to ROTRA? Create your account from your club's invite link or a session invite. You don't need an account to view profiles or the leaderboard."
 
+Under the card, outside it, one small centred muted line: "By continuing you agree to the Terms of Service and Privacy Policy." The two names link to `/terms` and `/privacy` ([legal pages](legal.md), [D-2026-11-17-01](../../../../mvp/decisions.md#d-2026-11-17-01)).
+
 A Google account with no ROTRA account (not connected, no matching email) shows a warn notice: "This Google account isn't connected to ROTRA. No ROTRA account uses or is connected to <email>. Already a ROTRA player? Sign in below with your email and password, then connect this Google account. We'll ask you right after you sign in. New to ROTRA? Open your club's invite link or a session invite to create your account." After that password sign-in the announcement offers **Connect <that email>**. A Google email equal to a password account's email opens P-GOOGLE-LINK. Offline: "You're offline. Signing in needs an internet connection."
 
 ### Email plus password (existing password players)

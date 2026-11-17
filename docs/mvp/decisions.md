@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -58,6 +58,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -1089,3 +1090,24 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open:**
   - Whether a player may reveal their own full number anywhere.
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/data/src/player-account/playerAccount.rules.ts`.
+
+<a id="d-2026-11-17-01"></a>
+### D-2026-11-17-01 — Privacy Policy and Terms of Service pages on the Player app
+- **Decision status:** approved (owner, November 17, 2026); the open items below are not decided.
+- **Implementation status:** in progress: mockup and apps/player built in one change ([log](../mockup-changes/2026-11-17-player-legal-pages.md)); update to implemented once it is on `main`.
+- **Ticket:** none (built without a ticket; see the log)
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:**
+  - The Player app gets two public pages so the Google sign-in consent screen can link to them: **Privacy Policy** at `https://player.rotra.club/privacy` (P-PRIVACY) and **Terms of Service** at `https://player.rotra.club/terms` (P-TERMS). Both are reachable signed out, in mock and real mode, and are static text. P-LOGIN says "By continuing you agree to the Terms of Service and Privacy Policy." with links to both.
+  - **Operator:** the pages name the operator simply as "ROTRA" (no company or personal name yet).
+  - **Contact:** privacy requests and questions go to `support@rotra.club`.
+  - **Law:** written for the Philippines: the Data Privacy Act of 2012 (Republic Act No. 10173); Philippine law governs the terms.
+  - **Effective date** on both: November 17, 2026.
+- **Open:**
+  - The pages are a plain-language draft that a lawyer has not reviewed.
+  - The operator's legal name and address.
+  - Registering with the National Privacy Commission, if required.
+  - The `support@rotra.club` mailbox must exist before launch.
+  - Retention periods are not decided. The pages say data is kept while the account or profile exists, and what is still needed afterwards (a club's results and history, records the law requires).
+  - Whether the Queue and Admin apps link to the same pages.
+- **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/`, `apps/player/src/app/(public)/terms/`, `packages/ui/src/components/legal-document/`.

@@ -43,6 +43,7 @@ export function SignIn({
       serverError={mutation.error?.message}
       offline={offline}
       prototypeHints={!isRealDataMode()}
+      legalLinks={{ termsHref: '/terms', privacyHref: '/privacy' }}
       successNote={passwordSaved ? 'Password saved. Sign in with your new password.' : undefined}
       onForgotPassword={() => router.push('/forgot-password')}
       onSubmit={(values) =>

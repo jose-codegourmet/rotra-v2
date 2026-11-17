@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./go-forward": "./src/go-forward.ts",
+    "./go-read": "./src/go-read.ts",
     "./data-mode": "./src/data-mode.ts"
   },
   "scripts": {

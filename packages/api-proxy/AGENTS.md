@@ -9,4 +9,5 @@ subpath per file, no barrels, no dependency beyond `server-only`.
 | Import | Exports |
 |---|---|
 | `@rotra/api-proxy/go-forward` | `forwardToGo`, `goApiEnabled`: forward moved `/api/*` paths to Go |
+| `@rotra/api-proxy/go-read` | `readFromGo`: server-side read of a Go GET endpoint (null on 404, throws otherwise) for pages that read a service directly |
 | `@rotra/api-proxy/data-mode` | `dataMode`, `MOCK_COOKIE_PREFIX`: the `ROTRA_DATA_MODE` check |

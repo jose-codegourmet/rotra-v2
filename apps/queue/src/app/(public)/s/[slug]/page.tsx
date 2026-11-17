@@ -1,4 +1,6 @@
 import { dataMode } from '@rotra/api-proxy/data-mode'
+import { goApiEnabled } from '@rotra/api-proxy/go-forward'
+import { readFromGo } from '@rotra/api-proxy/go-read'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { readPublicSession } from '@rotra/db/queue/public-session'
 import type { Metadata } from 'next'
@@ -30,7 +32,17 @@ export async function generateMetadata(props: PageProps<'/s/[slug]'>): Promise<M
 
 async function publicSessionTitle(slug: string) {
   try {
-    if (dataMode() === 'real') return (await readPublicSession(slug)).title || null
+    if (dataMode() === 'real') {
+      // Gated on the Go URL, not on ROTRA_GO_MOVED_AREAS: the `/api/public-sessions` prefix also
+      // catches cookie-based routes that Go answers 404, so it cannot be listed as a moved area.
+      if (goApiEnabled()) {
+        const session = await readFromGo<{ title?: string }>(
+          `/api/public-sessions/${encodeURIComponent(slug)}`,
+        )
+        return session?.title || null
+      }
+      return (await readPublicSession(slug)).title || null
+    }
     // Mock mode: the store lives in the browser; the seeded sessions are the ones a link can point to.
     return queueSessionFixtures.sessions.find((s) => s.publicSlug === slug)?.title || null
   } catch {

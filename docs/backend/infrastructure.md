@@ -156,6 +156,16 @@ Rules this sets:
 - **Proxy secret (B-30).** `proxy.ts` adds a secret header (`ROTRA_PROXY_SECRET`, set in the beta
   Vercel project and Railway) and the client IP. Go trusts the forwarded IP only with the secret,
   and without it answers only `/healthz` and the stream-ticket route.
+- **Moved areas (`ROTRA_GO_MOVED_AREAS`).** Beta Vercel project only, unset everywhere else. A
+  comma-separated list of `/api/*` prefixes Go owns; everything else still reaches its Route Handler.
+  - **Start:** `/api/stream/ticket` (B-41).
+  - **Each move track** adds its prefixes in its Switch step; removing a prefix undoes the move, since
+    the Route Handler stays until ship.
+  - **All moved:** the value becomes `/api` (variable change only, still undoable).
+  - **Retire (ship-and-retire R3):** the Route Handlers are deleted, then the variable and its check go;
+    `proxy.ts` forwards every `/api/*` to Go. `ROTRA_GO_API_URL` stays as the API address (required,
+    the apps fail at start without it); the proxy secret, client IP and 10-second timeout stay
+    (B-30, B-46); the "everyone is signed out" rule goes, since Go owns sign-in.
 - **Railway's default domain (B-30).** Removing `*.up.railway.app` is optional until tested in
   go-api-foundation R6; if it stays, the proxy-secret rule protects it.
 - The two stacks have **separate data**: the new one starts from a copy of the Supabase database,

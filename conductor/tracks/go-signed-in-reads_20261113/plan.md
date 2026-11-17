@@ -20,7 +20,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Switch
 
-- [ ] **4.1** Extend the beta rewrite list; manual check per app
+- [ ] **4.1** Add this track's `/api/*` prefixes to `ROTRA_GO_MOVED_AREAS` on beta (remove it again to undo; the Route Handler stays until ship); manual check per app
 
 ## Deviations log
 

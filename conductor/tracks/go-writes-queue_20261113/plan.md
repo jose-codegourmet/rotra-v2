@@ -26,7 +26,7 @@ Ticket: #878 (one issue for the whole track, under epic #869).
 
 ## Phase 5: Switch
 
-- [ ] **5.1** Extend the beta rewrite list; replay a recorded offline session on beta
+- [ ] **5.1** Add this track's `/api/*` prefixes to `ROTRA_GO_MOVED_AREAS` on beta (remove it again to undo; the Route Handler stays until ship); replay a recorded offline session on beta
 
 ## Deviations log
 

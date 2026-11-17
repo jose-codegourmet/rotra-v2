@@ -73,6 +73,7 @@ Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 apps/mockup/             canonical editable HTML prototypes and notes
 apps/e2e/                Playwright regression suite (real mode, local Supabase only)
+apps/landingpage/        rotra.club marketing site: static scroll-story wireframe + Higgsfield art (no build)
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks

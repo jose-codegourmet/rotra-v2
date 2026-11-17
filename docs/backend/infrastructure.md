@@ -165,7 +165,7 @@ Rules this sets:
   - **Retire (ship-and-retire R3):** the Route Handlers are deleted, then the variable and its check go;
     `proxy.ts` forwards every `/api/*` to Go. `ROTRA_GO_API_URL` stays as the API address (required,
     the apps fail at start without it); the proxy secret, client IP and 10-second timeout stay
-    (B-30, B-46); the "everyone is signed out" rule goes, since Go owns sign-in.
+    (B-30, B-46); the "everyone is signed out" rule goes, since Go owns sign-in. The code lives in `@rotra/api-proxy` (B-51), not `packages/db`.
 - **Railway's default domain (B-30).** Removing `*.up.railway.app` is optional until tested in
   go-api-foundation R6; if it stays, the proxy-secret rule protects it.
 - The two stacks have **separate data**: the new one starts from a copy of the Supabase database,

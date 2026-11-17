@@ -43,14 +43,14 @@ Merge `main` into `go-stack` one last time, then `go-stack` into `main` in one o
 
 Remove moved Route Handlers and `packages/db` services; move the regression suite to local Postgres + Go; Supabase removed after sign-off. **Schema moves to the Go API ([B-36](../../../docs/backend/open-decisions.md#settled)):** pick the Go migration tool (dependency decision, owner approves), carry the existing migration history over as its baseline, then retire Prisma migrations and `packages/db`.
 
-**Forwarding after retire.** Before shipping, `ROTRA_GO_MOVED_AREAS` on beta is `/api`. After the Route Handlers are deleted: the variable and its check are removed and `proxy.ts` forwards every `/api/*` to Go; `ROTRA_GO_API_URL` becomes required (the apps fail at start without it); the proxy secret, client IP and 10-second timeout stay (B-30, B-46); the "everyone is signed out" rule goes. The forwarding helper lives in `packages/db` today (`@rotra/db/proxy/go-forward`), so it moves out **before** `packages/db` is deleted. Where it goes (a small new package or a copy in each app) is a decision (stop and ask: new package).
+**Forwarding after retire.** Before shipping, `ROTRA_GO_MOVED_AREAS` on beta is `/api`. After the Route Handlers are deleted: the variable and its check are removed and `proxy.ts` forwards every `/api/*` to Go; `ROTRA_GO_API_URL` becomes required (the apps fail at start without it); the proxy secret, client IP and 10-second timeout stay (B-30, B-46); the "everyone is signed out" rule goes. The forwarding helper already lives in `@rotra/api-proxy` (B-51, moved in beta-stack 1.3); here only the moved-areas check is deleted from it. `proxy.ts` stays, doing two things: forward every `/api/*` to Go, and send signed-out visitors on protected pages to `/login` using Go's pass.
 
 **Accepted when:**
 
 - [ ] TypeScript copies of Go-only rules deleted on `go-stack` and gone from `main` after the merge ([D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2026-11-13-08); [rule map](../rule-cases_20261113/spec.md#where-the-rules-live)); the shared queue and matchmaking rules run from the Go WebAssembly build (rule-cases R7, [D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01)), with no TypeScript copy left
 - [ ] UI updated on `go-stack` where a screen ran a deleted rule: setup form previews, `@rotra/schema` form checks, offline payments amount, mock mode per area. Each through the mockup first (mockup change on `main`)
 - [ ] `ROTRA_GO_MOVED_AREAS` is gone from code, `.env.example` and every Vercel project; every `/api/*` reaches Go and an app without `ROTRA_GO_API_URL` fails at start
-- [ ] The forwarding helper no longer lives in `packages/db`, and `packages/db` can be deleted without breaking any `proxy.ts`
+- [ ] No app file imports `@rotra/db`; deleting `packages/db` breaks no `proxy.ts` or page (B-51)
 - [ ] Go migrations own the schema; a new migration from `apps/api` applies cleanly to a copy of production; Prisma no longer runs migrations
 - [ ] Docs updated: architecture, AGENTS, coding conventions, observability (including AGENTS rule 6 on `@rotra/schema`)
 

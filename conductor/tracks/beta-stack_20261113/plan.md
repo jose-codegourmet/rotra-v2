@@ -8,6 +8,7 @@ Ticket: #873 (one issue for the whole track, under epic #869).
 
 - [x] **1.1** Env-gated forwarding in each app's `proxy.ts` (B-30; shared helper `@rotra/db/proxy/go-forward`)
 - [x] **1.2** `make check`; verify the current project is unchanged
+- [ ] **1.3** Move `go-forward` and `data-mode` from `packages/db` to the new `packages/api-proxy` (B-51), no behavior change; update the three `proxy.ts` and the pages' imports. Before go-sign-in 4.1
 
 ## Phase 2: Beta project
 

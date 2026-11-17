@@ -1,0 +1,88 @@
+{
+  "name": "moves",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/crowd.webp",
+      "x": 0,
+      "y": 781,
+      "depth": 0.45,
+      "brightness": 0.6,
+      "motion": "bob",
+      "amp": 4,
+      "period": 3,
+      "phase": 0
+    },
+    {
+      "file": "el/net.webp",
+      "x": 272,
+      "y": 581,
+      "depth": 0.6,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/floor.webp",
+      "x": 0,
+      "y": 1438,
+      "depth": 0.8,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/shuttle-1.webp",
+      "x": 640,
+      "y": 0,
+      "depth": 0.85,
+      "brightness": 0.8,
+      "motion": "drift",
+      "amp": 10,
+      "period": 5,
+      "phase": 0,
+      "pivot": [
+        723,
+        244
+      ]
+    },
+    {
+      "file": "el/shuttle-2.webp",
+      "x": 0,
+      "y": 299,
+      "depth": 0.9,
+      "brightness": 0.8,
+      "motion": "drift",
+      "amp": 13,
+      "period": 6,
+      "phase": 0.35,
+      "pivot": [
+        515,
+        306
+      ]
+    },
+    {
+      "file": "el/shuttle-3.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 1,
+      "brightness": 0.8,
+      "motion": "drift",
+      "amp": 16,
+      "period": 7,
+      "phase": 0.7,
+      "pivot": [
+        1334,
+        801
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "name": "queue",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/lights-left.webp",
+      "x": 0,
+      "y": 3,
+      "depth": 0.25,
+      "brightness": 0.45,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.0,
+      "pivot": [
+        275,
+        0
+      ]
+    },
+    {
+      "file": "el/lights-right.webp",
+      "x": 1718,
+      "y": 3,
+      "depth": 0.25,
+      "brightness": 0.45,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.5,
+      "pivot": [
+        888,
+        0
+      ]
+    },
+    {
+      "file": "el/arena.webp",
+      "x": 0,
+      "y": 350,
+      "depth": 0.35,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/crowd.webp",
+      "x": 11,
+      "y": 1463,
+      "depth": 0.45,
+      "brightness": 0.45,
+      "motion": "bob",
+      "amp": 2,
+      "period": 3,
+      "phase": 0.0
+    },
+    {
+      "file": "el/scoreboard.webp",
+      "x": 212,
+      "y": 298,
+      "depth": 0.6,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/bench.webp",
+      "x": 38,
+      "y": 731,
+      "depth": 0.9,
+      "brightness": 0.4,
+      "motion": "none"
+    }
+  ]
+}

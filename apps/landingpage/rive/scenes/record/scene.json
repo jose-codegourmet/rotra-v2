@@ -1,0 +1,71 @@
+{
+  "name": "record",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/structure.webp",
+      "x": 17,
+      "y": 173,
+      "depth": 0.55,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/banners.webp",
+      "x": 131,
+      "y": 229,
+      "depth": 0.55,
+      "brightness": 0.45,
+      "motion": "sway",
+      "amp": 0.003,
+      "period": 7,
+      "phase": 0,
+      "pivot": [
+        1312,
+        0
+      ]
+    },
+    {
+      "file": "el/floor.webp",
+      "x": 0,
+      "y": 1408,
+      "depth": 0.8,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/sparks.webp",
+      "x": 42,
+      "y": 1300,
+      "depth": 0.8,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/shuttle-2.webp",
+      "x": 2594,
+      "y": 1284,
+      "depth": 0.8,
+      "brightness": 0.6,
+      "motion": "none"
+    },
+    {
+      "file": "el/shuttle-1.webp",
+      "x": 74,
+      "y": 1176,
+      "depth": 0.8,
+      "brightness": 0.6,
+      "motion": "none"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+build/
+build-el/
+_rigtest/
+__pycache__/

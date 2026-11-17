@@ -52,12 +52,12 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
-| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | needed | [Player](workstreams/player.md) |
-| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | needed | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | #892 | [Player](workstreams/player.md) |
+| [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
+| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | #891 | [Player](workstreams/player.md) |
+| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 
 ## Status conventions
 
@@ -954,7 +954,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-01 — Google sign-in is mandatory for players
 - **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the open items below are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
-- **Ticket:** needed
+- **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Decision:**
   - **Google is the sign-in for every player.** New players register with **Continue with Google** only, from a club invite, a session invite or the Admin link; the email + password sign-up is removed. The Google email becomes the ROTRA email and is confirmed at once (no "Confirm your email" banner). The phone is still required at registration. A club-created profile (claim) connects Google instead of setting a password.
@@ -976,7 +976,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-02 — Player account verification with an Admin override
 - **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
 - **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-account-verification.md)); the Admin control is not designed yet.
-- **Ticket:** needed
+- **Ticket:** [#889](https://github.com/jose-codegourmet/rotra-v2/issues/889) (Epic P13)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
   - A player is **Verified** when all three hold: a Google account is connected, a phone number is on the account, and the ROTRA email equals the Google account's email.
@@ -994,7 +994,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-03 — Player notifications page
 - **Decision status:** approved (owner, November 16, 2026); delivery and the event list are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-notifications.md)).
-- **Ticket:** needed
+- **Ticket:** [#890](https://github.com/jose-codegourmet/rotra-v2/issues/890) (Epic P14)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Decision:**
   - The Player app gets a **Notifications** module: a bell with an unread count in the top bar (signed in only) and a page at `/notifications` with All / Unread, Mark all as read, New and Earlier.
@@ -1010,7 +1010,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID
 - **Decision status:** approved (owner discussion, November 16, 2026); lookup by phone and already-shared QR codes with an old RTR ID are not decided.
 - **Implementation status:** mockup only: [Queue](../mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md), [Player](../mockup-changes/2026-11-16-player-unclaimed-identity.md) and [Admin](../mockup-changes/2026-11-16-admin-unclaimed-rtr-id-edit.md) logs. The mock app and real mode still follow [D-2026-11-11-03](#d-2026-11-11-03).
-- **Ticket:** needed
+- **Ticket:** [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900) (Epic P15)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
 - **Decision:**
@@ -1053,7 +1053,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-05 — Three leaderboards: Top annual, Top monthly, Top weekly
 - **Decision status:** approved (owner, November 16, 2026); the meaning of "calendars roll" is to be confirmed.
 - **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-leaderboard-periods.md)). The mock app, real mode and rank calculation still have one overall list ordered by rating.
-- **Ticket:** needed
+- **Ticket:** [#891](https://github.com/jose-codegourmet/rotra-v2/issues/891) (Epic P16)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Supersedes:** in part the November 11, 2026 rule that the one overall leaderboard is ordered by rating ([ranking module](../business_logic/product/player-information/modules/ranking/README.md#overall-leaderboard)).
 - **Decision:**
@@ -1078,7 +1078,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
 - **Implementation status:** mockup only: [Player](../mockup-changes/2026-11-16-player-phone-mask-format.md) and [Admin](../mockup-changes/2026-11-16-admin-phone-format.md) logs. The real app already stores E.164 (`phoneField` in `packages/schema`) and has `maskPhone` and `formatPhoneForDisplay`; where it still shows a player their full phone is to be checked when ticketed.
-- **Ticket:** needed
+- **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
   - In the owner's words: "all phone numbers must be masked and formated correctly but it should still match how the data is. if the db data has no space all of the inputs should convert it".

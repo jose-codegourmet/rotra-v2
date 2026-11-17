@@ -1,6 +1,6 @@
 # Player app: unclaimed players are public, found by email, and pick an identity on registration
 
-Status: NEW
+Status: TICKETED — #900
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewClaim, viewRegisterDone, googleDone, SHEETS.identity, SHEETS.profileCard, lbRow, viewBoard, viewProfile, Prototype panel

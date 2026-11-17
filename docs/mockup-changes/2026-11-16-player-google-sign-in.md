@@ -1,6 +1,6 @@
 # Player app: Google sign-in (mandatory), invite landings and connecting Google to existing accounts
 
-Status: NEW
+Status: TICKETED — #892
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewLogin, viewInvite, inviteHero, viewJoinClub, viewJoinSession, viewGoogleLink, viewGoogleRequired, gRequiredBand, viewClaim (Google mode), viewAccount (Sign-in methods), SHEETS.gpick, SHEETS.noGoogle

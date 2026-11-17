@@ -1,6 +1,6 @@
 # Player app: every phone shown is masked and grouped; phones are kept as the database holds them
 
-Status: NEW
+Status: TICKETED — #893
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `toE164`, `maskPhone`; account fixtures; viewAccount, viewEdit (Privacy and contact), the contact-change sheet and `requestCard`, viewClaim, the identity cards

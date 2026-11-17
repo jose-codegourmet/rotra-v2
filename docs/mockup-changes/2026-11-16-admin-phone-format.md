@@ -1,6 +1,6 @@
 # Admin app: phones are kept as the database holds them and shown in one grouped format
 
-Status: NEW
+Status: TICKETED — #893
 Date: 2026-11-16
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › `toE164`, `showPhone`, `reqVal`; `P` and `R` (sample data); Players quick view, player page, Edit profile; Contact changes (list, detail, approve and decline sheets, toast)

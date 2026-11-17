@@ -1,0 +1,2942 @@
+{
+  "page_default_closed_gate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 0
+    }
+  },
+  "page_closed_gate_bad_params": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "search_closed_gate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "page_default": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_limit_3": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_3_limit_3": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_6_limit_3": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_8_end": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_100": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_limit_1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_limit_50": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_empty_string": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_exponent_offset": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_hex_limit": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_decimal_zero_fraction_limit": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_spaced_limit": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_plus_sign_limit": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_first_of_duplicate_params": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_unknown_param_ignored": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_negative_zero_offset": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_negative": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_offset_fraction": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_offset_word": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_offset_infinity": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_limit_zero": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_limit_empty": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_limit_51": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_limit_negative": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_limit_word": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "page_offset_int32_max": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_offset_over_int32": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_offset_safe_integer_max": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_offset_huge": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "page_banner_dusk_default": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_banner_court_hidden": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_banner_no_default_court_shown": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_banner_none_shown": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 4,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 5,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 9
+    }
+  },
+  "search_name_lowercase": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_name_uppercase": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_nickname": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_shared_nickname_two_hits_in_rank_order": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        }
+      ],
+      "total": 2
+    }
+  },
+  "search_substring": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_trims_query": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_plus_is_a_space": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_inner_space": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_tie_players_both_hit": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        }
+      ],
+      "total": 6
+    }
+  },
+  "search_no_hits": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_always_private_real_name_never_matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_always_private_nickname_never_matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_always_private_masked_name_does_not_match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_unlisted_player_never_matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_empty_q": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_missing_q": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_blank_q": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_percent_is_a_wildcard_or_literal": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 7
+    }
+  },
+  "search_percent_literal_text": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_underscore_is_a_wildcard_or_literal": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        }
+      ],
+      "total": 2
+    }
+  },
+  "search_underscore_alone": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 2
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 3
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 6
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 7
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 8
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 7
+    }
+  },
+  "search_backslash": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_accented_name": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_malformed_percent_escape": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_banner_dusk_default": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "dusk",
+          "bannerImageUrl": null,
+          "position": 2
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_query_cut_at_100_characters_before_trim": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 1
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_query_99_spaces_then_text_not_cut": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "page_offset_2_pow_53": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "fullName": "Alice Reyes",
+          "nickname": "Ace",
+          "playingLevel": "advanced_high",
+          "pictureUrl": "https://example.test/alice.png",
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "position": 9007199254740992
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "fullName": "Bob Santos",
+          "nickname": null,
+          "playingLevel": "advanced_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9007199254740992
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000003",
+          "fullName": "Carla Dizon",
+          "nickname": "CD",
+          "playingLevel": "advanced_low",
+          "pictureUrl": null,
+          "bannerKey": "sun",
+          "bannerImageUrl": null,
+          "position": 9007199254740996
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000004",
+          "fullName": "É*** Ñ***",
+          "nickname": null,
+          "playingLevel": "intermediate_high",
+          "pictureUrl": "https://example.test/elodie.png",
+          "bannerKey": "ember",
+          "bannerImageUrl": null,
+          "position": 9007199254740996,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000005",
+          "fullName": "😀*** S*** L***",
+          "nickname": null,
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9007199254740996,
+          "masked": true,
+          "levelHidden": true
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000006",
+          "fullName": "Eve Alcala",
+          "nickname": "Ali",
+          "playingLevel": "intermediate_low",
+          "pictureUrl": null,
+          "bannerKey": "b0000000-0000-4000-8000-000000000001",
+          "bannerImageUrl": "https://example.test/banner-one.png",
+          "position": 9007199254740996
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000000007",
+          "fullName": "Frank Uy",
+          "nickname": "Ace",
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9007199254741000
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000c",
+          "fullName": "Percent 100% Real",
+          "nickname": "a_c",
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9007199254741000
+        },
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9007199254741000
+        }
+      ],
+      "total": 9
+    }
+  },
+  "page_offset_1e15": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_offset_1e18": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [],
+      "total": 9
+    }
+  },
+  "page_offset_int64_max_as_double": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "page_offset_1e19": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "search_accent_exact": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_accent_uppercase_non_ascii": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_accent_stripped": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [],
+      "total": 0
+    }
+  },
+  "search_ascii_in_accented_name": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_uppercase_non_ascii_inner": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "a0000000-0000-4000-8000-00000000000d",
+          "fullName": "Zoë Ångström",
+          "nickname": null,
+          "playingLevel": "beginner_low",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 9
+        }
+      ],
+      "total": 1
+    }
+  },
+  "search_more_than_50_hits_capped": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "hits": [
+        {
+          "id": "c0000000-0000-4000-8000-000000000060",
+          "fullName": "Bulk Player 60",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 10
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000059",
+          "fullName": "Bulk Player 59",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 11
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000058",
+          "fullName": "Bulk Player 58",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 12
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000057",
+          "fullName": "Bulk Player 57",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 13
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000056",
+          "fullName": "Bulk Player 56",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 14
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000055",
+          "fullName": "Bulk Player 55",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 15
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000054",
+          "fullName": "Bulk Player 54",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 16
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000053",
+          "fullName": "Bulk Player 53",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 17
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000052",
+          "fullName": "Bulk Player 52",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 18
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000051",
+          "fullName": "Bulk Player 51",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 19
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000050",
+          "fullName": "Bulk Player 50",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 20
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000049",
+          "fullName": "Bulk Player 49",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 21
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000048",
+          "fullName": "Bulk Player 48",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 22
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000047",
+          "fullName": "Bulk Player 47",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 23
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000046",
+          "fullName": "Bulk Player 46",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 24
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000045",
+          "fullName": "Bulk Player 45",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 25
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000044",
+          "fullName": "Bulk Player 44",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 26
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000043",
+          "fullName": "Bulk Player 43",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 27
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000042",
+          "fullName": "Bulk Player 42",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 28
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000041",
+          "fullName": "Bulk Player 41",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 29
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000040",
+          "fullName": "Bulk Player 40",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 30
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000039",
+          "fullName": "Bulk Player 39",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 31
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000038",
+          "fullName": "Bulk Player 38",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 32
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000037",
+          "fullName": "Bulk Player 37",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 33
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000036",
+          "fullName": "Bulk Player 36",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 34
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000035",
+          "fullName": "Bulk Player 35",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 35
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000034",
+          "fullName": "Bulk Player 34",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 36
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000033",
+          "fullName": "Bulk Player 33",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 37
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000032",
+          "fullName": "Bulk Player 32",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 38
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000031",
+          "fullName": "Bulk Player 31",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 39
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000030",
+          "fullName": "Bulk Player 30",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 40
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000029",
+          "fullName": "Bulk Player 29",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 41
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000028",
+          "fullName": "Bulk Player 28",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 42
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000027",
+          "fullName": "Bulk Player 27",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 43
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000026",
+          "fullName": "Bulk Player 26",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 44
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000025",
+          "fullName": "Bulk Player 25",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 45
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000024",
+          "fullName": "Bulk Player 24",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 46
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000023",
+          "fullName": "Bulk Player 23",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 47
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000022",
+          "fullName": "Bulk Player 22",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 48
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000021",
+          "fullName": "Bulk Player 21",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 49
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000020",
+          "fullName": "Bulk Player 20",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 50
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000019",
+          "fullName": "Bulk Player 19",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 51
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000018",
+          "fullName": "Bulk Player 18",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 52
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000017",
+          "fullName": "Bulk Player 17",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 53
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000016",
+          "fullName": "Bulk Player 16",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 54
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000015",
+          "fullName": "Bulk Player 15",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 55
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000014",
+          "fullName": "Bulk Player 14",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 56
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000013",
+          "fullName": "Bulk Player 13",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 57
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000012",
+          "fullName": "Bulk Player 12",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 58
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000011",
+          "fullName": "Bulk Player 11",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 59
+        }
+      ],
+      "total": 60
+    }
+  },
+  "page_bulk_offset_55_limit_10": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "c0000000-0000-4000-8000-000000000014",
+          "fullName": "Bulk Player 14",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 56
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000013",
+          "fullName": "Bulk Player 13",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 57
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000012",
+          "fullName": "Bulk Player 12",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 58
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000011",
+          "fullName": "Bulk Player 11",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 59
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000010",
+          "fullName": "Bulk Player 10",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 60
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000009",
+          "fullName": "Bulk Player 9",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 61
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000008",
+          "fullName": "Bulk Player 8",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 62
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000007",
+          "fullName": "Bulk Player 7",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 63
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000006",
+          "fullName": "Bulk Player 6",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 64
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000005",
+          "fullName": "Bulk Player 5",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 65
+        }
+      ],
+      "total": 69
+    }
+  },
+  "page_bulk_last_page": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "entries": [
+        {
+          "id": "c0000000-0000-4000-8000-000000000009",
+          "fullName": "Bulk Player 9",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 61
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000008",
+          "fullName": "Bulk Player 8",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 62
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000007",
+          "fullName": "Bulk Player 7",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 63
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000006",
+          "fullName": "Bulk Player 6",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 64
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000005",
+          "fullName": "Bulk Player 5",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 65
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000004",
+          "fullName": "Bulk Player 4",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 66
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000003",
+          "fullName": "Bulk Player 3",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 67
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000002",
+          "fullName": "Bulk Player 2",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 68
+        },
+        {
+          "id": "c0000000-0000-4000-8000-000000000001",
+          "fullName": "Bulk Player 1",
+          "nickname": null,
+          "playingLevel": "beginner_mid",
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "position": 69
+        }
+      ],
+      "total": 69
+    }
+  }
+}

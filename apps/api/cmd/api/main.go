@@ -16,6 +16,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
 
@@ -55,10 +56,12 @@ func run() error {
 	log.Info("tracing", slog.Bool("enabled", tracing.Enabled()))
 
 	ready := httpapi.NewReadiness()
+	// One budget per trusted client IP for every public-read route (B-43); later tracks pass the same limiter.
+	publicLimiter := httpapi.NewRateLimiter(httpapi.PublicReadsPerMinute, nil)
 	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{
 		Logger: log, Pinger: pool, Readiness: ready,
 		ProxySecret: cfg.ProxySecret, AllowedOrigins: cfg.AllowedOrigins,
-	}))
+	}, publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log})))
 	srv := &http.Server{
 		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,

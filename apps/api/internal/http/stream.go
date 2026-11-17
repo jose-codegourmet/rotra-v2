@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"net/http"
 	"slices"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -42,21 +41,16 @@ func (o StreamOptions) withDefaults() StreamOptions {
 }
 
 // ticketStore keeps random, unguessable tickets in memory until used or expired (one API instance,
-// B-43). Redeeming deletes the ticket, so it works once. It also holds the per-IP issue counters.
+// B-43). Redeeming deletes the ticket, so it works once. Issuing is limited per IP by a RateLimiter.
 type ticketStore struct {
 	opts    StreamOptions
+	limiter *RateLimiter
 	mu      sync.Mutex
 	tickets map[string]time.Time // ticket -> expiry
-	windows map[string]*window
-}
-
-type window struct {
-	start time.Time
-	count int
 }
 
 func newTicketStore(o StreamOptions) *ticketStore {
-	return &ticketStore{opts: o, tickets: map[string]time.Time{}, windows: map[string]*window{}}
+	return &ticketStore{opts: o, limiter: NewRateLimiter(o.TicketsPerMinute, o.Now), tickets: map[string]time.Time{}}
 }
 
 func (s *ticketStore) size() int {
@@ -67,21 +61,13 @@ func (s *ticketStore) size() int {
 
 // issue returns a new ticket, or ok=false with the seconds to wait when ip is over its per-minute limit.
 func (s *ticketStore) issue(ip string) (ticket string, retryAfter int, ok bool) {
+	if retry, ok := s.limiter.Allow(ip); !ok {
+		return "", retry, false
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	now := s.opts.Now()
 	s.pruneLocked(now)
-
-	w := s.windows[ip]
-	if w == nil || now.Sub(w.start) >= time.Minute {
-		w = &window{start: now}
-		s.windows[ip] = w
-	}
-	if w.count >= s.opts.TicketsPerMinute {
-		wait := int((time.Minute - now.Sub(w.start)).Seconds()) + 1
-		return "", max(wait, 1), false
-	}
-	w.count++
 
 	var b [32]byte
 	if _, err := rand.Read(b[:]); err != nil {
@@ -111,11 +97,6 @@ func (s *ticketStore) pruneLocked(now time.Time) {
 	for t, exp := range s.tickets {
 		if !now.Before(exp) {
 			delete(s.tickets, t)
-		}
-	}
-	for ip, w := range s.windows {
-		if now.Sub(w.start) >= time.Minute {
-			delete(s.windows, ip)
 		}
 	}
 }
@@ -149,9 +130,7 @@ func registerStream(mux *http.ServeMux, d Deps, store *ticketStore) {
 	issueTicket := func(w http.ResponseWriter, r *http.Request) {
 		ticket, retry, ok := store.issue(ClientIPFrom(r.Context()))
 		if !ok {
-			w.Header().Set("Retry-After", strconv.Itoa(retry))
-			WriteJSON(w, http.StatusTooManyRequests,
-				errorBody{Error: errorDetail{Code: "rate_limited", Message: "Too many requests. Try again shortly."}}, Private)
+			WriteRateLimited(w, retry, "Too many requests. Try again shortly.")
 			return
 		}
 		WriteJSON(w, http.StatusOK, map[string]any{

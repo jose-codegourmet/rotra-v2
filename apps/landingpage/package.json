@@ -1,0 +1,27 @@
+{
+  "name": "@rotra/landingpage",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 9004",
+    "build": "next build",
+    "lint": "biome check .",
+    "check:fix": "biome check --write .",
+    "type-check": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@rive-app/canvas": "2.50.0",
+    "lenis": "1.1.13",
+    "next": "16.4.3",
+    "react": "~19.2.9",
+    "react-dom": "~19.2.9"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/node": "^24",
+    "@types/react": "~19.2.0",
+    "@types/react-dom": "~19.2.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,7 +1,7 @@
 """Builds rive/tara/scene.rml: the Higgsfield Tara image on a skinned mesh, with an idle loop.
 
 Run:  python3 rive/rig_tara.py <alpha.raw>   (alpha.raw = tara.webp alpha, 300x452 gray; see README)
-Then: rive rive/tara --publish  and copy build/tara.riv to art/tara-idle.riv
+Then: rive rive/tara --publish  and copy build/tara.riv to public/art/tara-idle.riv
 """
 import base64, math, sys
 W, H = 900, 1356

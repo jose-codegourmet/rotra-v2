@@ -1,7 +1,7 @@
 """Builds rive/rion/scene.rml: the Higgsfield Rion image on a skinned mesh, with an idle loop.
 
 Run:  python3 rive/rig_rion.py <alpha.raw>   (alpha.raw = rion.webp alpha, 300x452 gray; see README)
-Then: rive rive/rion --publish  and copy build/rion.riv to art/rion-idle.riv
+Then: rive rive/rion --publish  and copy build/rion.riv to public/art/rion-idle.riv
 """
 import base64, math, sys
 W, H = 900, 1356

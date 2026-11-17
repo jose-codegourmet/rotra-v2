@@ -43,6 +43,7 @@ rotra/
 │   ├── player/       @rotra/player   Player Information: profiles, leaderboard :9001
 │   ├── admin/        @rotra/admin    Platform owner tools                      :9002
 │   ├── mockup/       @rotra/mockups  Canonical routed HTML prototypes          :9003
+│   ├── landingpage/  @rotra/landingpage rotra.club marketing site (static export) :9004
 │   └── e2e/          @rotra/e2e      Playwright regression suite, local Supabase :9100-9102
 ├── packages/
 │   ├── ui/           @rotra/ui       Every visual component and form + the one Storybook

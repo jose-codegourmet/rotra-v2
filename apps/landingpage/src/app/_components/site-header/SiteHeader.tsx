@@ -1,0 +1,62 @@
+/** Background fx layer, the top bar with the main nav, and the chapter rail. */
+export function SiteHeader() {
+  return (
+    <>
+      <div className="bgfx" id="bgfx" aria-hidden="true" />
+      <header className="top gut">
+        <div className="wrap">
+          {/* biome-ignore lint/a11y/useAnchorContent: the aria-label names the logo link */}
+          <a className="rlogo" href="#home" aria-label="ROTRA home">
+            <svg aria-hidden="true">
+              <use href="#logo-full" />
+            </svg>
+          </a>
+          <nav aria-label="Main">
+            <a href="#ranking" data-nav="ranking">
+              How ranking works
+            </a>
+            <a href="#clubs" data-nav="clubs">
+              For clubs
+            </a>
+            <a href="#s-record">Find your profile</a>
+            <a className="btn pri" href="https://player.rotra.club/login" data-app="player">
+              Sign in
+            </a>
+          </nav>
+        </div>
+      </header>
+      <nav className="rail" aria-label="Chapters">
+        <a href="#top" aria-label="00 Play or run the game">
+          00
+          <span className="rl" aria-hidden="true">
+            Play or run the game
+          </span>
+        </a>
+        <a href="#s-real" aria-label="01 The real Tara">
+          01
+          <span className="rl" aria-hidden="true">
+            The real Tara
+          </span>
+        </a>
+        <a href="#s-ranking" aria-label="02 How a rank moves">
+          02
+          <span className="rl" aria-hidden="true">
+            How a rank moves
+          </span>
+        </a>
+        <a href="#s-ladder" aria-label="03 The leaderboards">
+          03
+          <span className="rl" aria-hidden="true">
+            The leaderboards
+          </span>
+        </a>
+        <a href="#s-record" aria-label="04 One record">
+          04
+          <span className="rl" aria-hidden="true">
+            One record
+          </span>
+        </a>
+      </nav>
+    </>
+  )
+}

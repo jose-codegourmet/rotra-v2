@@ -5,7 +5,7 @@ Usage:  python3 rive/scene.py rive/scenes/<scene>
 Then:   rive rive/scenes/<scene> --verify
         rive inspect rive/scenes/<scene> --summary          ("problems": [])
         rive rive/scenes/<scene> --publish                  (needs `rive login`)
-        cp rive/scenes/<scene>/build/scene-<scene>.riv art/scenes/<scene>.riv
+        cp rive/scenes/<scene>/build/scene-<scene>.riv public/art/scenes/<scene>.riv
 
 Python 3 standard library only. Shells out to dwebp and cwebp (libwebp tools) and ffmpeg.
 
@@ -36,7 +36,7 @@ Writes into the scene folder:
               state machine Main with the idle loops. No scripts, so --publish needs no signing.
   rive.yaml   (name scene-<name>) and .gitignore (build/, build-el/), if missing
 
-Parallax, artboard px (the page writes px, py and scroll every frame; see the scene loader in index.html):
+Parallax, artboard px (the page writes px, py and scroll every frame; see the scene loader in src/scripts/rive.js):
   pointer  x = -MAX_X * depth * px,  y = -MAX_Y * depth * py
   scroll   y = SCROLL * height * (SCROLL_D0 - depth) * (scroll - 0.5)
            far elements drift down and near ones up as the section passes; depth 0 and 1 travel

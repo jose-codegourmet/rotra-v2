@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Split the hero art (hero-a/far, mid, near .webp, 2880x1620) into element layers for Rive.
+"""Split the hero art (public/hero-a/far, mid, near .webp, 2880x1620) into element layers for Rive.
 
 Writes, under rive/hero/:
   el/*.webp        one image per element, cropped to its bounding box, with overdraw
   elements.json    every element's file, position (artboard px), size, depth and group
   scene.rml        the Rive scene: one artboard, one image per element, one group per depth,
                    view model Hero {px, py, scroll} bound to the group positions, state machine Main
-and hero-a/still.webp, the flattened scene the page shows until (or if) Rive draws.
+and public/hero-a/still.webp, the flattened scene the page shows until (or if) Rive draws.
 
 Requirements: Python 3 with Pillow and numpy (a virtualenv outside the repo), e.g.
   python3 -m venv /tmp/herovenv && /tmp/herovenv/bin/pip install pillow numpy
   /tmp/herovenv/bin/python apps/landingpage/rive/hero_split.py
-Then: rive apps/landingpage/rive/hero --publish, and copy rive/hero/build/hero.riv to art/hero.riv.
+Then: rive apps/landingpage/rive/hero --publish, and copy rive/hero/build/hero.riv to public/art/hero.riv.
 
 The art is flat colour, so elements are split by colour and position. Antialiased edges are
 unblended against the colour behind them (no fringes), the holes an element leaves in the one
@@ -19,7 +19,7 @@ behind it are filled with the surrounding colour, and every element gets overdra
 offsets below never open a gap. The light cones are redrawn from their fitted edges so they can
 extend under the lamp housings and the floor.
 
-Parallax (artboard px; the page must use the same numbers, see the hero script in index.html):
+Parallax (artboard px; the page must use the same numbers, see the hero part of src/scripts/rive.js):
   pointer  x = -MAX_X * depth * px,  y = -MAX_Y * depth * py      (px, py in -1..1)
   scroll   y = SCROLL * (SCROLL_D0 - depth) * scroll              (scroll in 0..1)
 """
@@ -33,7 +33,7 @@ from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-SRC = ROOT / 'hero-a'
+SRC = ROOT / 'public' / 'hero-a'
 OUT = HERE / 'hero'
 EL = OUT / 'el'
 W, H = 2880, 1620

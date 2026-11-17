@@ -53,6 +53,22 @@
       "!packages/rules-wasm/src/generated"
     ]
   },
+  "overrides": [
+    {
+      "includes": [
+        "apps/landingpage/src/scripts/**",
+        "apps/landingpage/src/app/globals.css",
+        "apps/landingpage/rive/**"
+      ],
+      "linter": { "enabled": false },
+      "formatter": { "enabled": false },
+      "assist": { "enabled": false }
+    },
+    {
+      "includes": ["apps/landingpage/src/app/_components/**"],
+      "linter": { "rules": { "performance": { "noImgElement": "off" } } }
+    }
+  ],
   "vcs": {
     "enabled": true,
     "clientKind": "git",

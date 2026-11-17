@@ -1,12 +1,30 @@
 # ROTRA landing page (rotra.club)
 
-Static marketing site for rotra.club: a scroll story for players plus a separate landing for club owners and
-Queue Masters. One self-contained `index.html`; open it through any static server
-(`python3 -m http.server --directory apps/landingpage`). No build step, no package, no dependencies in the
-workspace; Lenis (smooth scroll) and the Rive web runtime load from jsDelivr.
+Marketing site for rotra.club: a scroll story for players plus a separate landing for club owners and Queue
+Masters. Workspace package `@rotra/landingpage`, a Next.js 16 app exported as static files.
 
-**Status: wireframe.** It was designed as a claude.ai artifact on November 17, 2026 and copied here as is. It is
-not wired to the apps or to real data.
+```bash
+nvm use && pnpm --filter @rotra/landingpage dev     # http://localhost:9004
+nvm use && pnpm --filter @rotra/landingpage build   # static export to apps/landingpage/out/
+python3 -m http.server 9022 --directory apps/landingpage/out   # serve the export
+```
+
+- `src/app/page.tsx`: the one page, composed of server components in `src/app/_components/<section>/` (logo symbol,
+  header and chapter rail, each landing section, the detail pages, footer).
+- `src/app/globals.css`: the site's own stylesheet (no Tailwind, no `@rotra/ui`). Fonts come from `next/font`
+  (`src/app/fonts.ts`) as `--nf-*` variables used in its `--font`, `--mono` and `--pixel` stacks.
+- `src/scripts/`: the behaviour, plain JavaScript: `site.js` (routes, pinned chapters, parallax, sign-in links,
+  forms; Lenis smooth scroll), `rive.js` (the Rive hero, scenes and characters; `@rive-app/canvas`) and
+  `vignettes.js` (the `#c-get` Queue stories). `SiteScripts` runs them once, in that order, after hydration; they
+  change the server-rendered DOM directly, so the markup components never re-render.
+- `public/art/`, `public/hero-a/`: every asset the page loads, served from the site root (`/art/...`).
+- `rive/`: Rive projects and build scripts (Python), the sources of the `.riv` files. Not shipped.
+
+Biome skips `src/scripts/`, `globals.css` and `rive/` (moved as is from the old single-file page); see the
+`overrides` in the root `biome.json`.
+
+**Status: wireframe.** It was designed as a claude.ai artifact on November 17, 2026, copied here as one
+`index.html`, then split into this app like for like. It is not wired to the apps or to real data.
 
 ## Pages (hash routes)
 
@@ -19,7 +37,7 @@ not wired to the apps or to real data.
 
 `#pricing` no longer has a page: the router redirects it to `#request`.
 
-Sign-in links (header “Sign in”, footer Player and Club account) are `a[data-app="player|queue"]`; the main script
+Sign-in links (header “Sign in”, footer Player and Club account) are `a[data-app="player|queue"]`; `src/scripts/site.js`
 sets their hrefs to `<origin>/login` from the `PLAYER_APP_URL` and `QUEUE_APP_URL` constants at its top
 (`https://player.rotra.club`, `https://queue.rotra.club`, per `docs/architecture.md`).
 
@@ -28,11 +46,11 @@ sets their hrefs to `<origin>/login` from the `PLAYER_APP_URL` and `QUEUE_APP_UR
 Generated with Higgsfield in the chosen “Samurai Jack” flat-vector direction (no outlines, near-black, dark
 greens, one mint `#00FF88`).
 
-- `hero-a/far.webp`, `mid.webp`, `near.webp`: the hero art, 2880×1620, flat-colour vector style, one aligned scene (far is
+- `public/hero-a/far.webp`, `mid.webp`, `near.webp`: the hero art, 2880×1620, flat-colour vector style, one aligned scene (far is
   opaque, mid and near transparent). They are the source for the Rive hall below and are not loaded by the page.
-  `hero-a/still.webp` is the three stacked: the page shows it under the canvas until Rive has drawn, and keeps it if
-  Rive fails. The old `.jpg` layers are still in the folder, unused.
-- `rive/hero/`: Rive project for the hero hall, `art/hero.riv` once published. `rive/hero_split.py` splits the three
+  `public/hero-a/still.webp` is the three stacked: the page shows it under the canvas until Rive has drawn, and keeps it if
+  Rive fails.
+- `rive/hero/`: Rive project for the hero hall, `public/art/hero.riv` once published. `rive/hero_split.py` splits the three
   layers by colour and position into 26 element images (`rive/hero/el/`, positions in `rive/hero/elements.json`):
   truss with lamp housings, four light cones (redrawn from their fitted edges), back floor, each stand in four tier
   slices, three crowd rows per stand, court floor with lines, ring plate. Holes are filled with the surrounding
@@ -40,22 +58,21 @@ greens, one mint `#00FF88`).
   group per depth (truss .15, cones .25, back floor .3, stands .5, crowd .55 between the stand slices, court and plate
   .85), view model `Hero` with `px`, `py` and `scroll` bound to the group positions through range-mapper
   converters, and state machine `Main` with the idle loops (cones sway 6 s, crowd rows bob 3 s, plate breathes 4 s).
-  The page writes the view model every frame (see the hero part of the last script in `index.html`), and moves
+  The page writes the view model every frame (see the hero part of `src/scripts/rive.js`), and moves
   Tara's spot and Rion's side by the court's offset. To rebuild: in a virtualenv outside the repo with Pillow and
   numpy (`python3 -m venv /tmp/herovenv && /tmp/herovenv/bin/pip install pillow numpy`), run
   `/tmp/herovenv/bin/python rive/hero_split.py`, then `rive rive/hero --verify`, `rive inspect rive/hero --summary`,
-  `rive rive/hero --publish`, copy `rive/hero/build/hero.riv` to `art/hero.riv` and bump the `?v=` on its `data-riv`.
-  The parallax numbers live in both `hero_split.py` and `index.html`; change them together.
-- `art/<set>-{far,mid,near}.webp` (sets lineup, moves, ladder, record on `#home`; clubs, assess, queue, pricing,
+  `rive rive/hero --publish`, copy `rive/hero/build/hero.riv` to `public/art/hero.riv` and bump the `?v=` on its `data-riv` (`HomeHero.tsx`).
+  The parallax numbers live in both `hero_split.py` and `src/scripts/rive.js`; change them together.
+- `public/art/<set>-{far,mid,near}.webp` (sets lineup, moves, ladder, record on `#home`; clubs, assess, queue, pricing,
   request on `#clubs`), 2880 px wide: three parallax layers per section in `<div class="bgl">`. Far is opaque; mid and
   near carry real transparency and stack on top of it at opacity 1, with no blend mode. Loudness is set with
   `filter: brightness()` only (defaults far .45, mid .6, near .8 through `--b-far`, `--b-mid`, `--b-near`), dimmed per
   section where copy sits over bright shapes, and `.bgl::after` adds a dark centre veil (`--veil`, default .55). The
-  footer's dark arena uses `art/footer-sky.webp` (opaque, cover, anchored bottom, brightness .5) behind Tara
-  (`tara-outro`) and Rion (`rion-wave`) standing on the mint band; `art/footer-far-pair.webp` is no longer used (it
-  cluttered the closing line). The old `.jpg` layers are still in the folder, unused. The three layers carry
+  footer's dark arena uses `public/art/footer-sky.webp` (opaque, cover, anchored bottom, brightness .5) behind Tara
+  (`tara-outro`) and Rion (`rion-wave`) standing on the mint band. The three layers carry
   `loading="lazy"`, so phones (where they are `display:none`) never download them.
-- `art/mobile/<scene>.webp` (the same nine scenes), 1080 px wide, 9:16: one tall still per section for phones, made
+- `public/art/mobile/<scene>.webp` (the same nine scenes), 1080 px wide, 9:16: one tall still per section for phones, made
   with Higgsfield (`gpt_image_2_6`, reference = the scene's three layers flattened) and recomposed for portrait:
   structures and lights in the top third, a calm dark middle third for the copy, floor and foreground at the bottom.
   At 700 px and below it is the section's only background (`<img class="ly m">` in the `.bgl`, `loading="lazy"`,
@@ -71,11 +88,11 @@ greens, one mint `#00FF88`).
   sway about their top, crowds bob 2 px. Each element's `brightness` follows its section's `--b-far/--b-mid/--b-near`.
   At rest (scroll 0.5) a scene shows its art unshifted, while the still layers drift by `--pp` and sit up to 15vh
   higher at mid-section, so the foreground of a scene sits lower than on the still page. On desktop (not touch, wider than 700 px, no reduced
-  motion), while the `.bgl` is within one screen of the viewport, the page plays `art/scenes/<scene>.riv` over the
+  motion), while the `.bgl` is within one screen of the viewport, the page plays `public/art/scenes/<scene>.riv` over the
   three layers: Fit Cover in the layers' box (top -8%, 116% high), so the crop is the same; pointer x/y (eased) and
   the section's scroll progress (0 when its top reaches the bottom of the screen, 1 when its bottom leaves the top)
-  go into the file's view model every frame through the same `depthParallax` the hero uses (the scene part of the
-  last script in `index.html`). The three layers hide once the canvas has drawn; the `--veil` stays on top. The
+  go into the file's view model every frame through the same `depthParallax` the hero uses (the scene part of
+  `src/scripts/rive.js`). The three layers hide once the canvas has drawn; the `--veil` stays on top. The
   instance pauses off screen and is destroyed beyond two screens. On phones, touch, reduced motion, or if the file is
   missing or fails, the three layers stay as they are. `--b-far/--b-mid/--b-near` do not apply to the canvas: the
   brightness is baked into the file.
@@ -104,8 +121,8 @@ greens, one mint `#00FF88`).
     `python3 rive/scene.py rive/scenes/<scene>`, `rive rive/scenes/<scene> --verify`,
     `rive inspect rive/scenes/<scene> --summary` (`"problems": []`),
     `rive rive/scenes/<scene> --screenshot=/tmp/<scene>.png` (the rest pose), `rive rive/scenes/<scene> --publish`
-    (Rive CLI, after `rive login`), `mkdir -p art/scenes && cp rive/scenes/<scene>/build/scene-<scene>.riv
-    art/scenes/<scene>.riv`, add `data-bg-scene="<scene>"` to the section's `.bgl`, and bump `SCN.v` in `index.html`
+    (Rive CLI, after `rive login`), `mkdir -p public/art/scenes && cp rive/scenes/<scene>/build/scene-<scene>.riv
+    public/art/scenes/<scene>.riv`, add `data-bg-scene="<scene>"` to the section's `.bgl`, and bump `SCN.v` in `src/scripts/rive.js`
     when replacing a published file. `rive/scenes/moves/scene.3layer.json` is the first three-layer proof, kept for
     reference; `scene.rich.json` there is the source of today's `scene.json`.
 - `rive/tara/`: Rive project for the hero Tara. `tara.webp` is the Higgsfield redraw of Tara at 900×1356 (GPT Image 2.6,
@@ -113,35 +130,34 @@ greens, one mint `#00FF88`).
   skinned mesh with bones for hips, chest, head, ponytail, both arms and the racket, plus the `Idle` loop. To rebuild:
   `ffmpeg -i rive/tara/tara.webp -vf "alphaextract,scale=300:452:flags=area" -f rawvideo -pix_fmt gray alpha.raw`,
   `python3 rive/rig_tara.py alpha.raw`, `rive rive/tara --publish` (needs the Rive CLI and `rive login`), then copy
-  `rive/tara/build/tara.riv` to `art/tara-idle.riv` and bump the `?v=` in `CHR.riv` in `index.html`.
+  `rive/tara/build/tara.riv` to `public/art/tara-idle.riv` and bump the `?v=` in `CHR.riv` in `src/scripts/site.js`.
 - `rive/rion/`: Rive project for the hero Rion, built the same way. `rion.webp` is the Higgsfield redraw of Rion at 900×1356
   (GPT Image 2.6, transparent background, the old `rion-idle` sprite frame as reference). `rive/rig_rion.py` writes
   `scene.rml`: the image on a skinned mesh with bones for hips, chest, head, the tablet arm (upper, fore, tablet) and the
   hand-in-pocket arm, a static ground bone for the legs, plus the `Idle` loop. To rebuild:
   `ffmpeg -i rive/rion/rion.webp -vf "alphaextract,scale=300:452:flags=area" -f rawvideo -pix_fmt gray alpha.raw`,
   `python3 rive/rig_rion.py alpha.raw`, `rive rive/rion --publish`, then copy `rive/rion/build/rion.riv` to
-  `art/rion-idle.riv` and bump the `?v=` in `CHR.riv` in `index.html`.
-- `art/hero.riv`: the hall, played through the Rive web runtime (`@rive-app/canvas` from jsDelivr) on the element with
+  `public/art/rion-idle.riv` and bump the `?v=` in `CHR.riv` in `src/scripts/site.js`.
+- `public/art/hero.riv`: the hall, played through the Rive web runtime (`@rive-app/canvas`) on the element with
   `data-riv`; `data-riv-fit="fill"` fills the element, `data-riv-parallax` feeds the hall's view model.
 - Characters: every character on the site (hero, the five Taras in 01, the four players in 02, the waist-up `half-*`
   posters on the ranking page, the clubs hero and the assessors, footer, page cut-outs) is an element `class="chr" data-char="<pose>"` that plays one looping Rive file per pose:
-  `art/tara-idle.riv` and `art/rion-idle.riv` (the hero rigs above) and `art/chars/<pose>.riv` for the rest
+  `public/art/tara-idle.riv` and `public/art/rion-idle.riv` (the hero rigs above) and `public/art/chars/<pose>.riv` for the rest
   (900×1356 artboards, state machine `Main`, fit Contain, bottom centre). Under the canvas the element shows
-  `art/chars/<pose>.webp` until Rive has drawn its first frame, and keeps it if Rive fails or the reader prefers
+  `public/art/chars/<pose>.webp` until Rive has drawn its first frame, and keeps it if Rive fails or the reader prefers
   reduced motion. An instance exists only while its element is within one screen of the viewport, plays only
   while it is on screen and not faded out, and draws at most 2× CSS pixels.
-  Each `art/chars/<pose>` comes from `rive/chars/<pose>/`: the Higgsfield still (`<pose>.webp`) and `rig.json`
+  Each `public/art/chars/<pose>` comes from `rive/chars/<pose>/`: the Higgsfield still (`<pose>.webp`) and `rig.json`
   (bones, ground anchors and the idle keys; see the header of `rive/rig.py`). To rebuild one:
   `python3 rive/rig.py rive/chars/<pose>` (writes `scene.rml`), `rive rive/chars/<pose> --publish` (Rive CLI, after
-  `rive login`), then copy `rive/chars/<pose>/build/<pose>.riv` and `rive/chars/<pose>/<pose>.webp` to `art/chars/`
-  and bump the `?v=` in `CHR.riv` in `index.html`. `art/chars/tara-idle.webp` and `rion-idle.webp` are copies of
+  `rive login`), then copy `rive/chars/<pose>/build/<pose>.riv` and `rive/chars/<pose>/<pose>.webp` to `public/art/chars/`
+  and bump the `?v=` in `CHR.riv` in `src/scripts/site.js`. `public/art/chars/tara-idle.webp` and `rion-idle.webp` are copies of
   `rive/tara/tara.webp` and `rive/rion/rion.webp`.
-- `art/chars/lineup-clone-1`, `lineup-clone-2`, `lineup-real`, `lineup-clone-4`, `lineup-clone-5` (`.webp` and `.riv`):
+- `public/art/chars/lineup-clone-1`, `lineup-clone-2`, `lineup-real`, `lineup-clone-4`, `lineup-clone-5` (`.webp` and `.riv`):
   the five waist-up Taras of 01, 1600×2342 artboards whose bodies run off the bottom edge. Each slot's box keeps that
   aspect ratio and sits 3vh below the screen, sized in `vh` (CSS “v18” block); tints, ghost and glitch stay in CSS.
-- `art/sprites/*.png` (old 40-frame strips) and `art/*-cut.png` (old cut-outs): no longer used by the page.
-- `art/shots/`: screenshots of the Queue prototype (`apps/mockup/queue-app`), demo data. No longer used by the page:
-  the four “Run the night” slides in `#c-get` are HTML/CSS vignettes (CSS and script blocks marked `vignettes`),
+- The old 40-frame sprite strips (`art/sprites/`), cut-out PNGs, `.jpg` layers, `footer-far-pair` and Queue
+  prototype screenshots (`art/shots/`) were removed when the site became a Next.js app; they are in git history. The four “Run the night” slides in `#c-get` are HTML/CSS vignettes (CSS and script blocks marked `vignettes`),
   short click-through stories whose labels and numbers come from the prototype and its demo data. Each plays only
   while its slide is the visible one; with reduced motion it shows its end state.
 

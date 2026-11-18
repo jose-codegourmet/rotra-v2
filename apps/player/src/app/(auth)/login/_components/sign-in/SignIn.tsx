@@ -1,5 +1,6 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
+import { GOOGLE_SIGN_IN_DEADLINE } from '@rotra/data/google-sign-in/config'
 import type { GoogleIdentity, InviteLink } from '@rotra/data/google-sign-in/types'
 import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { useGoogleSignIn } from '@rotra/data/google-sign-in/useGoogleSignIn'
@@ -147,7 +148,8 @@ function GoogleSignInBody({
   const picker = useGooglePicker({ key: 'login', intent: 'login' }, continueWith)
   const google: SignInGoogle = {
     pending: googleSignIn.isPending,
-    deadlineLabel: deadline?.label ?? '',
+    // The label is fixed configuration, so the first render has it (no hydration mismatch).
+    deadlineLabel: deadline?.label ?? GOOGLE_SIGN_IN_DEADLINE.label,
     contextMessage,
     notConnectedEmail: result?.outcome === 'not-connected' ? result.triedEmail : undefined,
     onContinue: () => picker.start(continueWith),

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { InviteCard } from './InviteCard'
+import { InviteCard, type InviteCardProps } from './InviteCard'
 
 const meta = {
   title: 'Player/InviteCard',
@@ -12,42 +12,67 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof InviteCard>
+} satisfies Meta
 export default meta
-type Story = StoryObj<typeof meta>
+// InviteCard's props are a union on `variant`, which Storybook's args typing collapses to never, so
+// each story renders the card itself.
+type Story = StoryObj
 
 const startsAt = new Date(2026, 10, 19, 19, 0).getTime()
 
 export const Club: Story = {
-  args: { variant: 'club', clubName: 'Lakeside Smashers', city: 'Cebu City', memberCount: 42 },
+  render: () => (
+    <InviteCard
+      {...({
+        variant: 'club',
+        clubName: 'Lakeside Smashers',
+        city: 'Cebu City',
+        memberCount: 42,
+      } satisfies InviteCardProps)}
+    />
+  ),
 }
 export const SessionWithInviter: Story = {
-  args: {
-    variant: 'session',
-    sessionTitle: 'Thursday open play',
-    clubName: 'Lakeside Smashers',
-    startsAt,
-    when: 'Thu, Nov 19 · 7:00 PM',
-    inviter: { name: 'Migs Santos', shortName: 'Migs' },
-  },
+  render: () => (
+    <InviteCard
+      {...({
+        variant: 'session',
+        sessionTitle: 'Thursday open play',
+        clubName: 'Lakeside Smashers',
+        startsAt,
+        when: 'Thu, Nov 19 · 7:00 PM',
+        inviter: { name: 'Migs Santos', shortName: 'Migs' },
+      } satisfies InviteCardProps)}
+    />
+  ),
 }
 export const SessionWithoutInviter: Story = {
-  args: {
-    variant: 'session',
-    sessionTitle: 'Thursday open play',
-    clubName: 'Lakeside Smashers',
-    startsAt,
-    when: 'Thu, Nov 19 · 7:00 PM',
-  },
+  render: () => (
+    <InviteCard
+      {...({
+        variant: 'session',
+        sessionTitle: 'Thursday open play',
+        clubName: 'Lakeside Smashers',
+        startsAt,
+        when: 'Thu, Nov 19 · 7:00 PM',
+      } satisfies InviteCardProps)}
+    />
+  ),
 }
-export const Admin: Story = { args: { variant: 'admin' } }
+export const Admin: Story = {
+  render: () => <InviteCard {...({ variant: 'admin' } satisfies InviteCardProps)} />,
+}
 export const LongClubName: Story = {
-  args: {
-    variant: 'club',
-    clubName: 'The Very Long Named Badminton Association of Greater Metro Cebu',
-    city: 'Cebu City',
-    memberCount: 1,
-  },
+  render: () => (
+    <InviteCard
+      {...({
+        variant: 'club',
+        clubName: 'The Very Long Named Badminton Association of Greater Metro Cebu',
+        city: 'Cebu City',
+        memberCount: 1,
+      } satisfies InviteCardProps)}
+    />
+  ),
 }
 export const ClubLight: Story = { ...Club, globals: { theme: 'light' } }
 export const SessionWithInviterLight: Story = {

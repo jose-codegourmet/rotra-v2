@@ -310,6 +310,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
+          phoneOnFile={profile.hasPhone}
+          emailOnFile={profile.emailOnFile}
+          detailsRequired={profile.detailsRequired}
           inviteUrl={clubInviteUrl(profile.clubId, club.data?.inviteCode)}
         />
       ) : null}

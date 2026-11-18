@@ -295,6 +295,7 @@ export function SavedPlayers() {
                     )}
                     nickname={p.nickname}
                     identity={p.identity}
+                    detailsRequired={p.detailsRequired}
                     level={p.suggestion}
                     live={liveStates[p.id]}
                     registeredCity={
@@ -347,6 +348,9 @@ export function SavedPlayers() {
           joinedVia={joinedViaProp(profile.joinedVia)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
+          phoneOnFile={profile.hasPhone}
+          emailOnFile={profile.emailOnFile}
+          detailsRequired={profile.detailsRequired}
           onInvite={
             profile.identity === 'guest' || profile.identity === 'unclaimed'
               ? () => openInvite(profile.id)
@@ -387,6 +391,10 @@ export function SavedPlayers() {
           clubPlayerId={editId}
           onClose={() => {
             setProfileId(editId)
+            setEditId(null)
+          }}
+          onMoved={(intoId) => {
+            setProfileId(intoId)
             setEditId(null)
           }}
         />

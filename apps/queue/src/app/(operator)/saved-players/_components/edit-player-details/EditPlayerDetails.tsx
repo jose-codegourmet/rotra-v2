@@ -1,11 +1,13 @@
 'use client'
 import { useClubPlayer } from '@rotra/data/club-player/useClubPlayer'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
+import { useMoveSavedPlayer } from '@rotra/data/club-player/useMoveSavedPlayer'
 import { useRemoveClubPlayerPicture } from '@rotra/data/club-player/useRemoveClubPlayerPicture'
 import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
 import { useUpdateClubPlayerDetails } from '@rotra/data/club-player/useUpdateClubPlayerDetails'
 import { useUseClubPlayerPreviousPicture } from '@rotra/data/club-player/useUseClubPlayerPreviousPicture'
 import { MockError } from '@rotra/data/mock/errors'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { EditPlayerDetailsForm } from '@rotra/ui/edit-player-details-form'
 import { PROFILE_CHARACTER_IDS, profileCharacterUrl } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
@@ -22,13 +24,22 @@ const pictureMessage = (error: unknown) =>
       ? error.message
       : 'Something went wrong. Try again.'
 
-/** Q-SAVED-PLAYERS › Edit details: loads what the club entered, saves, returns to the profile. */
+/**
+ * Q-SAVED-PLAYERS › Edit details: loads what the club entered, saves, returns to the profile. When
+ * the email typed for a guest (or an older record) already belongs to another saved player, the
+ * other details are saved and the Same person as NAME? confirmation takes the sheet's place
+ * (D-2026-11-16-04): Back returns to Edit details, Move to NAME moves the record into that player's
+ * and opens their profile (`onMoved`).
+ */
 export function EditPlayerDetails({
   clubPlayerId,
   onClose,
+  onMoved,
 }: {
   clubPlayerId: string
   onClose: () => void
+  /** The record was moved into this saved player: show their profile */
+  onMoved: (intoClubPlayerId: string) => void
 }) {
   const details = useClubPlayerDetails(clubPlayerId)
   const player = useClubPlayer(clubPlayerId)
@@ -36,6 +47,8 @@ export function EditPlayerDetails({
   const setPicture = useSetClubPlayerPicture()
   const removePicture = useRemoveClubPlayerPicture()
   const previousPicture = useUseClubPlayerPreviousPicture()
+  const move = useMoveSavedPlayer()
+  const [same, setSame] = useState<{ intoId: string; name: string; email: string } | null>(null)
   const [pictureError, setPictureError] = useState<string>()
   const loadError = details.error
   useEffect(() => {
@@ -70,6 +83,38 @@ export function EditPlayerDetails({
     id,
     image: profileCharacterUrl(seedId, seedName, id),
   }))
+  if (same)
+    return (
+      <ConfirmSheet
+        open
+        onOpenChange={(open) => {
+          if (!open && !move.isPending) setSame(null)
+        }}
+        title={`Same person as ${same.name}?`}
+        consequence={
+          <>
+            That email is already <b>{same.name}</b> in your saved players.
+          </>
+        }
+        note={`${name}'s slots, games and payments here move to that record, and ${name} is removed from your saved players.`}
+        backLabel="Back"
+        onBack={() => setSame(null)}
+        confirmLabel={`Move to ${same.name}`}
+        isPending={move.isPending}
+        error={move.error?.message}
+        onConfirm={() =>
+          move.mutate(
+            { clubPlayerId, intoClubPlayerId: same.intoId, email: same.email },
+            {
+              onSuccess: (result) => {
+                toast(result.message ?? `Moved to ${same.name}`)
+                onMoved(same.intoId)
+              },
+            },
+          )
+        }
+      />
+    )
   const pictureCallbacks = (message: string) => ({
     onSuccess: () => toast(`${message} · ${name}`),
     onError: (e: unknown) => setPictureError(pictureMessage(e)),
@@ -108,9 +153,15 @@ export function EditPlayerDetails({
         save.mutate(
           { id: clubPlayerId, values },
           {
-            onSuccess: () => {
-              toast(`Details saved · ${values.fullName.trim()}`)
-              onClose()
+            onSuccess: (result) => {
+              toast(result.message ?? `Details saved · ${values.fullName.trim()}`)
+              if (result.samePerson)
+                setSame({
+                  intoId: result.samePerson.clubPlayerId,
+                  name: result.samePerson.name,
+                  email: values.email.trim(),
+                })
+              else onClose()
             },
           },
         )

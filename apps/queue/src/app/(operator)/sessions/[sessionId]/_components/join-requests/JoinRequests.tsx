@@ -162,8 +162,6 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const isPending =
     confirm.isPending ||
     decline.isPending ||
-    link.isPending ||
-    notThem.isPending ||
     keep.isPending ||
     remove.isPending ||
     addMatch.isPending ||

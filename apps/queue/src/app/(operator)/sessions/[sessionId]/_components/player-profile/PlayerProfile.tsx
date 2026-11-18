@@ -85,6 +85,9 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         addedLabel={longDateLabel(profile.addedAt)}
         sessionsHere={profile.sessionsHere}
         phoneHidden={profile.phoneHidden}
+        phoneOnFile={profile.hasPhone}
+        emailOnFile={profile.emailOnFile}
+        detailsRequired={profile.detailsRequired}
         backLabel={backLabel}
         onBack={onBack}
       />

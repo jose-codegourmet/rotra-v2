@@ -26,8 +26,9 @@ export type ParticipantProfileProps = {
  * D-PARTICIPANT-PROFILE on the session page (#731): the card a signed-in Player's tap opens. A
  * registered participant (and the viewer's own tile) gets ParticipantProfileSheet with Stats · YEAR
  * from useParticipantStats, the new-tab profile icon and Share profile (the share dialog with the
- * Profile link); an always-private player the private card; a guest or an unclaimed player the Not on
- * ROTRA yet card. The big picture opens the full-photo viewer (#716, D-PHOTO-VIEWER) when it is a
+ * Profile link); an unclaimed player (saved by the club with an email) the same card with the
+ * Unclaimed chip and no Share profile or Open ROTRA profile; an always-private player the private
+ * card; a guest the Not on ROTRA yet card. The big picture opens the full-photo viewer (#716, D-PHOTO-VIEWER) when it is a
  * real picture; an always-private player's picture stays public, so it can be enlarged too. Closing
  * the viewer or the share dialog returns to the card.
  */
@@ -38,7 +39,10 @@ export function ParticipantProfile({
 }: ParticipantProfileProps) {
   const photo = usePhotoViewer()
   const [sharing, setSharing] = useState(false)
-  const full = participant?.profile === 'registered'
+  // An unclaimed player (D-2026-11-16-04) gets the full card too, without Share profile or Open
+  // ROTRA profile; their stats read by RTR ID like a registered player's.
+  const unclaimed = participant?.profile === 'unclaimed'
+  const full = participant?.profile === 'registered' || unclaimed
   const stats = useParticipantStats(participant?.rtrId, viewerPlayerId, full)
   if (!participant?.profile) return null
   const onOpenChange = (open: boolean) => {
@@ -93,9 +97,10 @@ export function ParticipantProfile({
         stats={visibleStats(stats.data)}
         showStats={!isStatsHidden(stats.data)}
         statsLoading={!!participant.rtrId && stats.isPending}
-        statsError={stats.isError}
-        profileHref={participant.href}
-        onShare={link ? () => setSharing(true) : undefined}
+        statsError={stats.isError && !unclaimed}
+        profileHref={unclaimed ? null : participant.href}
+        onShare={link && !unclaimed ? () => setSharing(true) : undefined}
+        unclaimed={unclaimed}
       />
       {/* Share profile (2026-11-13-profile-card-open-share): the standard share dialog with Queue's
           win-rate image for this player; closing it returns to the card. */}

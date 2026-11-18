@@ -1,6 +1,6 @@
 # Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks
 
-Status: TICKETED — #891
+Status: IN PROGRESS — #891; #897 components implemented, batch verification pending
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewBoard, `periodList`, `lbMove`, `lbRow`, `lbHead`, `podium`, `meCard`, `.lb-move`, `.lb-wins`, `.lb-tabs`

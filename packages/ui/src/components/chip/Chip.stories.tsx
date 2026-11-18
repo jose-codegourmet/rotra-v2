@@ -31,6 +31,9 @@ export const AllTones: Story = {
   ),
 }
 
+/** The placement chip used on the Player profile dialog and an unclaimed player's card. */
+export const LeaderboardPlace: Story = { args: { children: 'Top annual #39', tone: 'neutral' } }
+
 export const Live: Story = { args: { tone: 'live', children: 'Live' } }
 
 export const LongText: Story = {

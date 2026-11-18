@@ -1,6 +1,8 @@
 import { Avatar, type AvatarProps } from '@rotra/ui/avatar'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { LeaderboardMove, leaderboardMovement } from '@rotra/ui/leaderboard-move'
+import { type LeaderboardPeriod, leaderboardWinsLabel } from '@rotra/ui/leaderboard-period-switch'
 import { type LeaderboardRowVariants, leaderboardRowVariants } from './LeaderboardRow.variants'
 
 export type LeaderboardRowProps = LeaderboardRowVariants & {
@@ -8,23 +10,25 @@ export type LeaderboardRowProps = LeaderboardRowVariants & {
   position: number
   fullName: string
   nickname?: string | null
-  levelLabel: string
+  levelLabel?: string
+  period?: LeaderboardPeriod
+  wins?: number
+  /** Null means the player was absent from the previous list. */
+  previousPosition?: number | null
+  unclaimed?: boolean
   picture?: Pick<AvatarProps, 'src' | 'initials'>
   isMe?: boolean
   masked?: boolean
-  /** Opened from a profile's Overall box: an accent wash that fades out (about 1.6 s) */
+  /** The profile box jumps to this row, which flashes for about 1.6 seconds. */
   flash?: boolean
-  onSelect: () => void
+  /** Omit when privacy prevents opening the player's profile. */
+  onSelect?: () => void
 }
 
-function positionLabel(
-  position: number,
-  variant: LeaderboardRowVariants['variant'],
-  isMe: boolean,
-) {
+function positionLabel(position: number, variant: LeaderboardRowVariants['variant']) {
   const medal = variant?.startsWith('medal-') ? variant.replace('medal-', '') : undefined
   const place = medal === '1' ? 'First place' : medal === '2' ? 'Second place' : 'Third place'
-  return `${medal ? place : `Number ${position.toLocaleString('en-PH')}`},${isMe ? ' (you),' : ''}`
+  return medal ? place : `Number ${position.toLocaleString('en-PH')}`
 }
 
 function medalClasses(variant: LeaderboardRowVariants['variant']) {
@@ -34,13 +38,17 @@ function medalClasses(variant: LeaderboardRowVariants['variant']) {
   return 'text-fg2'
 }
 
-/** One selectable player in the overall ROTRA leaderboard. */
+/** One player in a ROTRA leaderboard. */
 export function LeaderboardRow({
   id,
   position,
   fullName,
   nickname,
   levelLabel,
+  period,
+  wins,
+  previousPosition,
+  unclaimed = false,
   picture,
   isMe = false,
   variant,
@@ -50,19 +58,36 @@ export function LeaderboardRow({
 }: LeaderboardRowProps) {
   const rowVariant = variant ?? (isMe ? 'me' : 'default')
   const medal = rowVariant.startsWith('medal-')
-  const accessibleName = `${positionLabel(position, rowVariant, isMe)} ${fullName}, ${levelLabel}`
+  const winLabel = wins === undefined ? undefined : leaderboardWinsLabel(wins)
+  const hasMovement = period !== undefined && previousPosition !== undefined
+  const movement = hasMovement ? leaderboardMovement(period, position, previousPosition) : undefined
+  const detail = period ? winLabel : levelLabel
+  const identity = [
+    positionLabel(position, rowVariant),
+    `${fullName}${isMe ? ' (you)' : ''}`,
+    unclaimed ? 'not registered yet' : undefined,
+    detail,
+  ]
+    .filter(Boolean)
+    .join(', ')
+  const accessibleName = movement ? `${identity}. ${movement.sentence}` : identity
+  const Row = onSelect ? 'button' : 'div'
 
-  // The prototype's every row is a button, masked or not: opening a masked profile shows the
-  // private card (or the sign-in gate for visitors).
   return (
-    <button
+    <Row
       id={id}
-      type="button"
+      type={onSelect ? 'button' : undefined}
       onClick={onSelect}
-      aria-label={accessibleName}
+      aria-label={onSelect ? accessibleName : undefined}
+      aria-disabled={onSelect ? undefined : true}
       className={cn(
-        leaderboardRowVariants({ variant: masked ? 'masked' : rowVariant }),
+        leaderboardRowVariants({ variant: !period && masked ? 'masked' : rowVariant }),
         'group/leaderboard-row',
+        period &&
+          'grid-cols-[56px_30px_36px_minmax(0,1fr)_auto] max-[560px]:grid-cols-[34px_30px_36px_minmax(0,1fr)] max-[560px]:gap-x-2',
+        onSelect &&
+          'cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent',
+        !onSelect && 'cursor-default hover:bg-transparent',
         rowVariant !== 'me' && 'shadow-[0_-1px_0_var(--border)] first:shadow-none',
         flash && 'animate-row-flash motion-reduce:animate-none',
       )}
@@ -76,6 +101,16 @@ export function LeaderboardRow({
       >
         {position.toLocaleString('en-PH')}
       </span>
+      {hasMovement ? (
+        <LeaderboardMove
+          period={period}
+          position={position}
+          previousPosition={previousPosition}
+          rowIsTrigger={!!onSelect}
+        />
+      ) : period ? (
+        <span aria-hidden className="max-[560px]:row-span-2" />
+      ) : null}
       <Avatar
         name={fullName}
         src={picture?.src}
@@ -87,19 +122,31 @@ export function LeaderboardRow({
           medal && medalClasses(rowVariant),
         )}
       />
-      <span className="col-start-3 flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+      <span
+        className={cn(
+          'flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5',
+          period ? 'col-start-4' : 'col-start-3',
+        )}
+      >
         <b className={cn('min-w-0 [overflow-wrap:anywhere]', medal && 'text-base')}>{fullName}</b>
         {!masked && nickname ? <span className="text-[13px] text-fg2">“{nickname}”</span> : null}
         {isMe ? <Chip tone="accent">You</Chip> : null}
+        {unclaimed ? <Chip tone="warn">Not registered yet</Chip> : null}
       </span>
-      <span
-        className={cn(
-          'justify-self-end text-[13px] font-semibold text-fg2 max-[560px]:col-start-3 max-[560px]:justify-self-start max-[560px]:text-xs',
-          medal && 'text-fg',
-        )}
-      >
-        {levelLabel}
-      </span>
-    </button>
+      {period ? (
+        <b className="justify-self-end font-mono text-[15px] whitespace-nowrap tabular-nums max-[560px]:col-start-4 max-[560px]:justify-self-start max-[560px]:text-[13px]">
+          {winLabel}
+        </b>
+      ) : (
+        <span
+          className={cn(
+            'justify-self-end text-[13px] font-semibold text-fg2 max-[560px]:col-start-3 max-[560px]:justify-self-start max-[560px]:text-xs',
+            medal && 'text-fg',
+          )}
+        >
+          {levelLabel}
+        </span>
+      )}
+    </Row>
   )
 }

@@ -306,3 +306,7 @@
 .rotra-pod[aria-disabled] {
   cursor: default;
 }
+
+.rotra-pod[aria-disabled="true"] {
+  cursor: default;
+}

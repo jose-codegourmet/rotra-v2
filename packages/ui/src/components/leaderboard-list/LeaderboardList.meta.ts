@@ -3,9 +3,9 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const leaderboardListMeta = {
   name: 'LeaderboardList',
   description:
-    'The column frame, loading state and incremental footer for the overall ROTRA leaderboard.',
+    'The Wins heading, loading state and incremental footer for Top annual, Top monthly and Top weekly.',
   usage: [
-    'Pass LeaderboardRow children after leaderboard data loads.',
+    'Pass the current period and its LeaderboardRow children after the list loads.',
     'Use loading while the leaderboard query is pending.',
   ],
   prototype: {

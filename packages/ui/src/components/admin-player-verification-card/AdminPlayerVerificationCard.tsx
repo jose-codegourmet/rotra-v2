@@ -1,6 +1,10 @@
 'use client'
 
-import type { AccountVerification, VerificationEmail } from '@rotra/data/account-verification/types'
+import type {
+  AdminAccountVerification,
+  VerificationEmail,
+} from '@rotra/data/account-verification/types'
+import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
@@ -11,7 +15,8 @@ import { VerificationStep } from '@rotra/ui/verification-step'
 import { useId } from 'react'
 
 export type AdminPlayerVerificationCardProps = {
-  verification?: AccountVerification
+  /** `phone` is the full E.164 number: Admin never sees it masked. */
+  verification?: Omit<AdminAccountVerification, 'revision'>
   onOpenOverride: () => void
   onRetry?: () => void
   retrying?: boolean
@@ -60,9 +65,11 @@ export function AdminPlayerVerificationCard({
               <VerificationStep
                 number={2}
                 title="Mobile number"
-                done={Boolean(verification.maskedPhone)}
+                done={Boolean(verification.phone)}
                 status={
-                  verification.maskedPhone ? `On file · ${verification.maskedPhone}` : 'Not on file'
+                  verification.phone
+                    ? `On file · ${formatPhoneForDisplay(verification.phone)}`
+                    : 'Not on file'
                 }
               />
               <VerificationStep

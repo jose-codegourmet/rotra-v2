@@ -8,7 +8,7 @@ export function useLeaderboard(period: LeaderboardPeriod = 'year', viewerId?: st
     queryKey: leaderboardKeys.pages(period, viewerId),
     initialPageParam: 0,
     queryFn: ({ pageParam, signal }) =>
-      getLeaderboardPage({ offset: pageParam, limit: 25, period }, signal),
+      getLeaderboardPage({ offset: pageParam, limit: 25, period }, signal, viewerId ?? null),
     getNextPageParam: (last, pages) => {
       const shown = pages.reduce((count, page) => count + page.entries.length, 0)
       return shown < last.total ? shown : undefined

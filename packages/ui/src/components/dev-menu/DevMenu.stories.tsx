@@ -1,6 +1,7 @@
 import {
   devMenuFixtures,
   leaderboardOptions,
+  leaderboardPlaceOptions,
   playerRankOptions,
 } from '@rotra/data/fixtures/dev-menu'
 import { players } from '@rotra/data/fixtures/players'
@@ -90,6 +91,7 @@ const playerArgs = {
     leaderboard: 'normal',
     rankOptions: playerRankOptions,
     leaderboardOptions,
+    leaderboardPlaceOptions,
     onRankChange: () => {},
     onLeaderboardChange: () => {},
   },

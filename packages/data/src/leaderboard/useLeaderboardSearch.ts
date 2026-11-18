@@ -10,7 +10,7 @@ export function useLeaderboardSearch(
 ) {
   return useQuery({
     queryKey: leaderboardKeys.search(query, period, viewerId),
-    queryFn: ({ signal }) => searchLeaderboard(query, signal, period),
+    queryFn: ({ signal }) => searchLeaderboard(query, signal, period, viewerId ?? null),
     enabled: Boolean(query.trim()) && !/^RTR-/i.test(query.trim()),
     networkMode: 'always',
     retry: false,

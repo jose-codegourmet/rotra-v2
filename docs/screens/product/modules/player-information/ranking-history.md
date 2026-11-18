@@ -1,4 +1,4 @@
-# Global leaderboard, rank explanation, and game history
+# Leaderboards, rank explanation, and game history
 
 **Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
@@ -6,23 +6,56 @@
 
 **Source:** [ranking rules](../../../../business_logic/product/player-information/modules/ranking/README.md).
 
-## P-LEADERBOARD — One overall ROTRA ranking
+## P-LEADERBOARD — ROTRA leaderboards
 
-**Three leaderboards** ([D-2026-11-16-05](../../../../mvp/decisions.md#d-2026-11-16-05), [log](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md)): under the page head, a switch **Top annual · Top monthly · Top weekly** (Top annual first) with the period beside it ("2026 · compared with last year", "November 2026 · compared with last month", "Nov 16 to Nov 22 · compared with last week"). The podium, the "Your position" card and the list all follow the chosen period. Each row is: place, movement mark, picture, name, then "N wins" only (no skill level or win rate, owner follow-up the same day); the list heading reads # · Player · Wins. Each list shows the top 50 only ("Showing 1–25 of the top 50", Show 25 more); a signed-in player below it sees "You're not in the top 50 this year" with their wins and the wins of place 50. The movement mark is an up arrow with the number of places (accent), a down arrow with the number (error colour), a dash for no move, or a **New** pill; hovering or focusing the row shows a tooltip, for example "Up 3 places. Was #7 last week.", "Down 2 places. Was #5 last month.", "Same place as last year: #4." or "New on the weekly list. Not on it last week." The same words are in the row's accessible name. The "Your position" card reads "Your position this month", "#43 · 12 wins" and the movement sentence. Empty period: "No one on the leaderboard has played a standard match this week yet." On a phone the wins line sits under the name. **Who appears here** now reads: the 50 players with the most wins in standard matches in that year, month or week, nothing else decides who is listed, win rate breaks a tie; each list starts again when a new year, month or week begins; a player's skill rank is separate and isn't shown here. Empty: "No one has won a standard match this month yet. The list fills as clubs finish sessions." The description below is the earlier single list.
+Public without sign-in. **Top annual** is the default. The **Top annual · Top monthly · Top weekly**
+switch sits below the page title with the period and comparison, e.g. “2026 · compared with last
+year”, “November 2026 · compared with last month” or “Nov 16 to Nov 22 · compared with last week”.
+Labels use the calendar in Asia/Manila. [Decision](../../../../mvp/decisions.md#d-2026-11-16-05) ·
+[Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md).
 
-Public without sign-in. Rows show global position, name/nickname, optional avatar, full skill label, and a link to the correct profile. No city, club, national, world-stage, or separate singles/doubles filters in v1.
+The selected period drives the podium, **Your position** card, search and list. Each row shows the
+place, movement mark, picture, name and “N wins”. On a phone, wins sit under the name. The heading
+reads # · Player · Wins. The podium replaces rows 1–3 when there are at least three players and no
+name search. When all 50 places are filled, the footer starts at “Showing 1–25 of the top 50” with
+**Show 25 more**. A shorter list gives its actual number of places. Name search covers all publicly
+readable names and nicknames in the selected top 50 and retains each hit's place. No hits reads `No one
+in the top 50 matches “name”.` Entering a full RTR ID can open a profile outside the top 50.
 
-Visitors who aren't signed in ([D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)): a private player (or guest) keeps their position and level, but the name shows the first letter of each word followed by `***` ("Jose Adrian" → "J*** A***"), the picture shows the initials of that mask, and the row (or podium step) doesn't open: no button, `aria-disabled`. Name search doesn't match them. Entering a private player's full RTR ID gives the same neutral "Profile not found" as an unknown ID. Signed-in players see everyone as usual, except an **Always private** player ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): for everyone but that player, signed in or not, the leaderboard row and podium step show the masked name and the player's picture (their picture and banner stay public); the row opens only to the private card of [profile states](profile.md#profile-states) (**This player keeps their profile private.**, no sign-in button). The player sees their own row in full. *Whether an always-private player's level and position still show on the row is not stated in the decision; the prototype's helper text says initials instead of the photo, which the decision overrides (picture stays public).* Podium and row pictures are circles.
+Movement compares places with the previous calendar period. The mark is an up arrow with the number
+of places, a down arrow with the number, a dash for no move or **New** for a player with no place in
+the prior top 50. Pointing at the mark or focusing the row shows the earlier place where available.
+The same words are included in the row's accessible name.
 
-**Unclaimed players** ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04), [log](../../../../mockup-changes/2026-11-16-player-unclaimed-identity.md)): an unclaimed player (saved by a club with an email, not registered yet) is public and on the leaderboard only while exactly one club has saved them. Their row shows a **Not registered yet** chip after the name and opens the profile dialog like any public player; they are never masked, for visitors too. A person saved by more than one club is not listed until they register. "Who appears here" gains the line: "Players marked **Not registered yet** were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register." Ranking numbers and math are unchanged.
+A signed-in player in the selected top 50 sees “Your position this month”, their place and wins,
+the movement sentence, and **Show my row**. A player with qualifying matches below place 50 sees
+“You're not in the top 50 this year” with their wins and place 50's wins. The card mentions a better
+win rate only if it decided the tie. A player with no qualifying matches sees “You haven't played a
+standard match this week yet” (with the selected period) and **Open my profile**. A profile link can
+select the period and focus and flash the player's row using `/?period=month&player=<id>`, loading
+the second page when needed.
 
-Pagination or progressive loading is a proposed presentation choice for scale, not an excuse to truncate the ranking. Keep ordering stable within a coherent refreshed result. Search, if included, searches this public ranking; it is not a hidden contact search or new discovery product.
+A row or podium place opens the profile dialog. For visitors, a **Private** player's name is masked
+(“Jose Adrian” → “J*** A***”), their picture shows the mask's initials, the place is unavailable as
+a button and the name cannot be found by search. A private RTR ID shows the same “Profile not found”
+as an unknown ID. **Always private** players keep their public picture and banner, with a masked
+name and only the private dialog available to other viewers. Their own row is shown in full.
+[Private visibility](../../../../mvp/decisions.md#d-2026-11-09-07) ·
+[Always private](../../../../mvp/decisions.md#d-2026-11-11-11).
 
-Eligibility help states the configured recent completed standard-match threshold, initially 10, within the last three months. Fun games, invalid games/sessions, and partial games do not count. Threshold text must use the current Admin configuration, not a hardcoded ten after changes.
+An unclaimed player saved by one club is public and has a **Not registered yet** chip on their
+leaderboard row. Their row opens the profile dialog. A person saved by more than one club joins the
+list after registering. [Unclaimed players](../../../../mvp/decisions.md#d-2026-11-16-04).
 
-States: loading, no eligible players, fetch failure, refresh in progress, stale/cached data, and a profile not appearing due to eligibility. Never populate empty standings with demo people or treat ineligible as last place.
+**Who appears here** explains standard matches, the calendar resets, tie-breaking by win rate,
+excluded matches and sessions, movement marks and unclaimed players. **How ranks work** opens the
+separate skill rank explanation.
 
-Refresh in progress is reached by pulling the page down from its top (touch) or by coming back to the tab, once every 10 seconds, with the session page's `pull-to-refresh` pill (**Pull to refresh** → **Release to refresh** → **Refreshing…** → **Updated 7:42 PM**; **Refresh again in a few seconds** inside the lock; **You're offline. Reconnect and try again.** offline). It refetches the list, the signed-in player's own position and the match requirement; no polling ([November 12, 2026 mockup change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md)).
+States include loading, an empty period (“No one on the leaderboard has played a standard match
+this week yet.”), fetch failure with **Try again**, refresh in progress and a cached copy while
+offline. Pull down from the top or return to the tab to refresh the selected list, active search and
+signed-in place at most once every 10 seconds. The refresh pill reports the live state.
+[Pull-to-refresh change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md).
 
 ## P-RANK-DETAIL — Explain the shared rank
 

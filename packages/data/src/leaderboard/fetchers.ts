@@ -12,15 +12,23 @@ import type { LeaderboardPage, LeaderboardPeriod, MyPeriodPosition } from './lea
 import { mockLeaderboard } from './projection'
 import { playerRequest } from './request'
 
+/** Match the cache's audience to the actual session, including during sign-in and sign-out. */
+async function mockViewer(viewerScope?: string | null) {
+  if (viewerScope === null) return null
+  const viewerId = (await getSession('player'))?.account.id ?? null
+  return viewerScope === undefined || viewerId === viewerScope ? viewerId : null
+}
+
 export async function getLeaderboardPage(
   input: { offset: number; limit?: 25; period?: LeaderboardPeriod },
   signal?: AbortSignal,
+  viewerScope?: string | null,
 ): Promise<LeaderboardPage> {
   const { offset, limit = 25, period = 'year' } = input
   if (isRealDataMode()) return realGetLeaderboardPage({ ...input, limit }, signal)
   await playerRequest(signal)
   const board = mockLeaderboard(readMockState())
-  const entries = board.entries(period, (await getSession('player'))?.account.id ?? null)
+  const entries = board.entries(period, await mockViewer(viewerScope))
   return {
     entries: entries.slice(offset, offset + limit),
     total: entries.length,
@@ -33,11 +41,12 @@ export async function searchLeaderboard(
   query: string,
   signal?: AbortSignal,
   period?: LeaderboardPeriod,
+  viewerScope?: string | null,
 ) {
   if (isRealDataMode()) return realSearchLeaderboard(query, signal, period)
   await playerRequest(signal)
   const q = query.trim().toLowerCase()
-  const viewerId = (await getSession('player'))?.account.id ?? null
+  const viewerId = await mockViewer(viewerScope)
   const entries = mockLeaderboard(readMockState()).entries(period ?? 'year', viewerId)
   const hits = entries.filter(
     (e) =>
@@ -51,12 +60,13 @@ export async function searchLeaderboard(
 export async function getMyPeriodPosition(
   period: LeaderboardPeriod,
   signal?: AbortSignal,
+  playerId?: string,
 ): Promise<MyPeriodPosition | null> {
   if (isRealDataMode()) return realGetMyPeriodPosition(period, signal)
   await playerRequest(signal)
-  const session = await getSession('player')
-  if (!session) return null
-  return ownPeriodPosition(mockLeaderboard(readMockState()).standings(period), session.account.id)
+  const viewerId = await mockViewer(playerId)
+  if (!viewerId) return null
+  return ownPeriodPosition(mockLeaderboard(readMockState()).standings(period), viewerId)
 }
 
 /** Existing consumers use the public annual place; only the owner-specific period read includes the cutoff. */

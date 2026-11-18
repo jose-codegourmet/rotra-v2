@@ -7,6 +7,7 @@ export const myPositionCardMeta = {
   usage: [
     'Use on the leaderboard only for a signed-in player.',
     'Pass cutoffWins when the player is below place 50.',
+    'When the player has no qualifying matches, show the empty state for that period.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

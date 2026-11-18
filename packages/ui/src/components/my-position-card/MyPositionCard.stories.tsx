@@ -35,22 +35,4 @@ export const BelowTop50SameWinsAndWinRate: Story = {
   args: { wins: 93, cutoffWins: 93, cutoffHasBetterWinRate: false },
 }
 export const ListedInitials: Story = { args: { ...Listed.args, picture: undefined } }
-export const NoPosition: Story = {
-  args: {
-    status: {
-      label: 'Provisional',
-      tone: 'warn',
-      sentence: 'This rank is still settling: 7 of 10 standard matches in the last three months.',
-    },
-  },
-}
-export const NeedsReassessment: Story = {
-  args: {
-    status: {
-      label: 'Needs reassessment',
-      tone: 'warn',
-      sentence: 'Ask a club to reassess you.',
-      needsReassessment: true,
-    },
-  },
-}
+export const NoGamesThisWeek: Story = { args: { period: 'week', wins: 0 } }

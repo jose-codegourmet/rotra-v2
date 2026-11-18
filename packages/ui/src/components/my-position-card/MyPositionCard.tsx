@@ -96,6 +96,17 @@ export function MyPositionCard({
       </Card>
     )
   }
+  if (when) {
+    return (
+      <Card className="flex flex-col items-start gap-2">
+        <h3>You&apos;re not on the leaderboard {when}</h3>
+        <p className="text-[13px] text-fg2">You haven&apos;t played a standard match {when} yet.</p>
+        <Button size="xs" onClick={onOpenProfile}>
+          Open my profile
+        </Button>
+      </Card>
+    )
+  }
   return (
     <Card className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">

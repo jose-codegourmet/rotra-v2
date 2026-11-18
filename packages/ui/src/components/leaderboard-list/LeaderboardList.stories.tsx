@@ -48,6 +48,10 @@ export const Weekly: Story = {
   args: { period: 'week' },
   render: (args) => <LeaderboardList {...args}>{renderRows('week')}</LeaderboardList>,
 }
+export const SearchResults: Story = {
+  args: { search: { query: rows[0]?.fullName ?? '', total: 1 } },
+  render: (args) => <LeaderboardList {...args}>{renderRows('year').slice(0, 1)}</LeaderboardList>,
+}
 export const Loading: Story = { args: { loading: true } }
 export const FooterWithMore: Story = {
   args: { shown: 25, total: 50, onShowMore: noop },

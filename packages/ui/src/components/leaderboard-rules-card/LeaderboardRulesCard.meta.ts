@@ -1,7 +1,8 @@
 import type { ComponentMeta } from '@rotra/ui/meta'
 export const leaderboardRulesCardMeta = {
   name: 'LeaderboardRulesCard',
-  description: 'Explains overall leaderboard eligibility and rank scope.',
+  description:
+    'Explains the three leaderboard periods, which games count and what a movement mark means.',
   usage: ['Use below the leaderboard.'],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

@@ -4,7 +4,12 @@ import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import type { ContactChangeStatus } from '@rotra/data/contact-change-request/types'
 import { useAdvanceContactChangeRequest } from '@rotra/data/contact-change-request/useAdvanceContactChangeRequest'
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
-import { leaderboardOptions, playerRankOptions } from '@rotra/data/fixtures/dev-menu'
+import {
+  leaderboardOptions,
+  leaderboardPlaceOptions,
+  playerRankOptions,
+} from '@rotra/data/fixtures/dev-menu'
+import { JOSE_PLAYER_ID } from '@rotra/data/fixtures/players'
 import {
   connectMockBridge,
   type LeaderboardScenario,
@@ -15,12 +20,13 @@ import { resetDemoData } from '@rotra/data/mock/reset'
 import { openClaimLinkPreview } from '@rotra/data/player-account/claim-link-preview'
 import { playerAccountKeys } from '@rotra/data/player-account/query-keys'
 import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-settings'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { Button } from '@rotra/ui/button'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
 import { DevMenu } from '@rotra/ui/dev-menu'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector, useAppStore } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
@@ -46,6 +52,35 @@ export function DevTools() {
   const contactRequest = useMyContactChangeRequest(account?.id ?? null),
     advance = useAdvanceContactChangeRequest()
   const request = contactRequest.data
+  const pathname = usePathname()
+  const changeLeaderboard = (scenario: LeaderboardScenario) => {
+    if (isRealDataMode()) return
+    const demoPlace = scenario === 'in-top-50' || scenario === 'below-top-50'
+    const showScenario = () => {
+      dispatch(setLeaderboardScenario(scenario))
+      if (scenario === 'empty-week') {
+        setOpen(false)
+        router.push('/?period=week')
+      } else if (demoPlace) {
+        setOpen(false)
+        if (pathname !== '/') router.push('/')
+      }
+    }
+    if (demoPlace && account?.id !== JOSE_PLAYER_ID) {
+      signIn.mutate(
+        { identifier: 'demo', password: 'demo' },
+        {
+          onSuccess: (session) => {
+            dispatch(setAccount(session.account))
+            showScenario()
+          },
+          onError: (error) => toast.error(error.message),
+        },
+      )
+      return
+    }
+    showScenario()
+  }
   // The prototype's Contact-change request (Admin) buttons for each status.
   const requestActions: Partial<Record<ContactChangeStatus, [ContactChangeStatus, string][]>> = {
     pending: [
@@ -115,10 +150,10 @@ export function DevTools() {
         rank: toggles.playerRankScenario ?? 'on-leaderboard',
         leaderboard: toggles.leaderboardScenario ?? 'normal',
         rankOptions: playerRankOptions,
-        leaderboardOptions,
+        leaderboardOptions: isRealDataMode() ? undefined : leaderboardOptions,
+        leaderboardPlaceOptions: isRealDataMode() ? undefined : leaderboardPlaceOptions,
         onRankChange: (value) => dispatch(setPlayerRankScenario(value as PlayerRankScenario)),
-        onLeaderboardChange: (value) =>
-          dispatch(setLeaderboardScenario(value as LeaderboardScenario)),
+        onLeaderboardChange: (value) => changeLeaderboard(value as LeaderboardScenario),
       }}
       rankingSettings={
         settings.data

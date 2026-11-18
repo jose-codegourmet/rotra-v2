@@ -12,6 +12,7 @@ export type LeaderboardListProps = {
   busy?: boolean
   shown?: number
   total?: number
+  search?: { query: string; total: number }
   onShowMore?: () => void
 }
 
@@ -44,6 +45,7 @@ export function LeaderboardList({
   busy = false,
   shown,
   total,
+  search,
   onShowMore,
 }: LeaderboardListProps) {
   const canShowMore = shown !== undefined && total !== undefined && shown < total && onShowMore
@@ -53,6 +55,11 @@ export function LeaderboardList({
       aria-busy={loading || busy || undefined}
       aria-label={loading ? 'Loading the leaderboard' : undefined}
     >
+      {search ? (
+        <p className="mb-4 text-[13px] text-fg2" aria-live="polite">
+          {search.total} {search.total === 1 ? 'player matches' : 'players match'} “{search.query}”.
+        </p>
+      ) : null}
       {loading && period ? null : (
         <div
           aria-hidden

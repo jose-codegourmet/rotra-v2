@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 and D-2026-11-18-02 added; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-01 to 03 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -60,8 +60,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
+| [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -1160,7 +1160,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the Queue and Admin apps link to the same pages (carried over from D-2026-11-17-01).
 - **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/content.ts`, `apps/player/src/app/(public)/terms/content.ts`, `apps/mockup/player-app/rotra-player.html` › `LEGAL`.
 
-### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
+<a id="d-2026-11-18-03"></a>
+### D-2026-11-18-03 — Club nickname: set by the Queue Master, shown on Queue Master screens only
 - **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
 - **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))

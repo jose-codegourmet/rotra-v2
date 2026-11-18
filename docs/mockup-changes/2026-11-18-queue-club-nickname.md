@@ -63,7 +63,7 @@ Superseded by: none
 - Business logic: docs/business_logic/product/queue/modules/players/README.md — club nickname rule; where each nickname shows
 - Database design: docs/database_design/product/queue/modules/sessions-roster.md — the club's `nickname` on a linked row is the club nickname
 - Screen docs: docs/screens/product/modules/queue/players-roster.md — Club nickname button, row and sheet
-- Also: docs/product-terms.md (Club nickname), docs/mvp/decisions.md (D-2026-11-18-02)
+- Also: docs/product-terms.md (Club nickname), docs/mvp/decisions.md (D-2026-11-18-03)
 
 ## Real app work
 - `@rotra/ui`: the form, the profile sheet row and button, the saved-player card line.

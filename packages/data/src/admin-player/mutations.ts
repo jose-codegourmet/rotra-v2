@@ -4,6 +4,12 @@ import {
   adminPlayerCreateSchema,
   adminPlayerEditSchemaFor,
 } from '@rotra/schema/admin-player'
+import type {
+  AdminAccountVerification,
+  SetAdminVerificationOverrideInput,
+} from '../account-verification/accountVerification.types'
+import { adminAccountVerificationIn } from '../account-verification/mockVerification'
+import { parseAdminSession, readAdminSessionMarker } from '../admin-account/cookie'
 import { getAdminSession } from '../admin-account/fetchers'
 import { adminMutation } from '../admin-account/mutation'
 import { appendAdminAudit } from '../admin-audit/fetchers'
@@ -11,7 +17,7 @@ import { normalizeContact } from '../contact-change-request/contactChangeRequest
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
 import { checkMockSave } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { ConflictError, MockError, NotConnectedError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
@@ -229,6 +235,50 @@ const editResult = (
   passwordSet: changed.includes('password'),
   message: adminPlayerSavedMessage(player.name, changed),
 })
+
+/** Sets or clears Verified by Admin. Both changes need a reason and create one audit event. */
+export async function setAdminVerificationOverride(
+  input: SetAdminVerificationOverrideInput,
+): Promise<AdminAccountVerification> {
+  if (isRealDataMode()) throw new NotConnectedError()
+  await owner()
+  const overrideReason = reason(input.reason)
+  return adminMutation(400, (draft) => {
+    const session = parseAdminSession(readAdminSessionMarker())
+    if (session.kind !== 'owner')
+      throw new MockError('permission', 'Only ROTRA Admin can change player verification.')
+    const current = adminAccountVerificationIn(draft, input.playerId)
+    if (!current)
+      throw new MockError('permission', 'Verification is available only for registered players.')
+    if (current.revision !== input.revision) throw new ConflictError(current, STALE_EDIT)
+    if (current.verifiedByAdmin === input.verifiedByAdmin) return current
+
+    checkMockSave()
+    const { player, record: management } = record(draft, input.playerId)
+    management.verificationOverride = input.verifiedByAdmin
+      ? { status: 'verified', adminId: session.account.id, at: new Date().toISOString() }
+      : null
+    management.revision++
+    const action = input.verifiedByAdmin
+      ? 'player_verification_override_set'
+      : 'player_verification_override_cleared'
+    const description = input.verifiedByAdmin
+      ? `Set ${player.fullName} to Verified by Admin.`
+      : `Cleared Verified by Admin for ${player.fullName}.`
+    appendAdminAudit(draft, {
+      action,
+      targetType: 'player',
+      targetId: player.id,
+      summary: `${description} Reason: ${overrideReason}`,
+    })
+    return {
+      ...current,
+      verified: input.verifiedByAdmin || current.completedSteps === 3,
+      verifiedByAdmin: input.verifiedByAdmin,
+      revision: management.revision,
+    }
+  })
+}
 
 /**
  * Admin › Players › Edit › Save changes (A07.6, D-2026-11-09-14): every field the player can change,

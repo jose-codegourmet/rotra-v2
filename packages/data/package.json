@@ -487,6 +487,13 @@
     "./profile-banner/rules": "./src/profile-banner/profileBanner.rules.ts",
     "./profile-banner/query-keys": "./src/profile-banner/queryKeys.ts",
     "./fixtures/profile-banners": "./src/fixtures/profileBanners.ts",
+    "./account-verification/types": "./src/account-verification/accountVerification.types.ts",
+    "./account-verification/rules": "./src/account-verification/accountVerification.rules.ts",
+    "./account-verification/query-keys": "./src/account-verification/queryKeys.ts",
+    "./account-verification/useMyAccountVerification": "./src/account-verification/useMyAccountVerification.ts",
+    "./account-verification/useAdminAccountVerification": "./src/account-verification/useAdminAccountVerification.ts",
+    "./account-verification/useSetAdminVerificationOverride": "./src/account-verification/useSetAdminVerificationOverride.ts",
+    "./fixtures/account-verification": "./src/fixtures/accountVerification.ts",
     "./real/google": "./src/real/google.ts"
   },
   "scripts": {

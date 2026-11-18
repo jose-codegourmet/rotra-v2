@@ -69,9 +69,7 @@ function readDraft(slug: string): Draft | null {
       Date.now() - saved.at > 30 * 60_000 ||
       typeof saved.requestId !== 'string' ||
       !saved.values ||
-      !['name', 'nickname', 'statedBand'].every(
-        (key) => typeof saved.values[key] === 'string',
-      ) ||
+      !['name', 'nickname', 'statedBand'].every((key) => typeof saved.values[key] === 'string') ||
       // Drafts from before the Join a slot / Be waitlisted choice start that field afresh.
       (saved.values.placement != null && typeof saved.values.placement !== 'string')
     ) {

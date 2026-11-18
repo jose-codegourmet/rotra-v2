@@ -48,7 +48,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 /** An unclaimed player with an email and no phone yet: the email is read-only, Phone (optional) shows. */
 export const UnclaimedWithEmail: Story = {
-  args: { details: { ...unclaimed, profile: { ...unclaimed.profile!, email: 'faye@example.com' } } },
+  args: {
+    details: { ...unclaimed, profile: { ...unclaimed.profile!, email: 'faye@example.com' } },
+  },
 }
 export const UnclaimedWithEmailLight: Story = {
   ...UnclaimedWithEmail,

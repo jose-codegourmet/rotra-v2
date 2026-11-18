@@ -128,7 +128,9 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
           label="Email"
           optional
           hint={errors.email || emailSavedAs ? undefined : EMAIL_HINT}
-          error={errors.email?.message ?? (emailSavedAs ? emailSavedMessage(emailSavedAs) : undefined)}
+          error={
+            errors.email?.message ?? (emailSavedAs ? emailSavedMessage(emailSavedAs) : undefined)
+          }
         >
           <Controller
             control={form.control}

@@ -55,7 +55,11 @@ export const NoEmail: Story = {
 /** A new email: saved as an unclaimed player with an RTR ID. */
 export const NewEmail: Story = {
   args: {
-    defaultValues: { name: guest.fullName, email: 'new.player@example.com', level: 'intermediate_mid' },
+    defaultValues: {
+      name: guest.fullName,
+      email: 'new.player@example.com',
+      level: 'intermediate_mid',
+    },
   },
 }
 

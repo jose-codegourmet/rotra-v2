@@ -92,7 +92,10 @@ export function PlayerConfirmCard({
     <div className={cn('flex flex-col gap-3.5', className)}>
       <Card className="flex flex-col gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar name={nameRequired ? 'Not registered' : name} src={nameRequired ? undefined : photoUrl} />
+          <Avatar
+            name={nameRequired ? 'Not registered' : name}
+            src={nameRequired ? undefined : photoUrl}
+          />
           <span className="flex min-w-0 flex-1 flex-col">
             <b className="[overflow-wrap:anywhere]">{nameRequired ? 'Not registered yet' : name}</b>
             <span className="text-[13px] text-fg2">

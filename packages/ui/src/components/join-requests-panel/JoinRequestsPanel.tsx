@@ -266,11 +266,9 @@ export function JoinRequestsPanel({
                           {r.nickname ? <span className="text-fg2"> “{r.nickname}”</span> : null}
                         </b>
                         <span className="text-[13px] text-fg2">
-                          {details?.account ? (
-                            `Requested ${formatTime(r.requestedAt)}`
-                          ) : (
-                            `Says ${BAND_LABEL[r.statedBand]} · requested ${formatTime(r.requestedAt)}`
-                          )}
+                          {details?.account
+                            ? `Requested ${formatTime(r.requestedAt)}`
+                            : `Says ${BAND_LABEL[r.statedBand]} · requested ${formatTime(r.requestedAt)}`}
                         </span>
                         <span className="text-[13px] font-semibold">
                           {placementLabel(r.placement, details?.waitlistPosition)}

@@ -1,6 +1,6 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
-import { nameField } from '@rotra/schema/name'
 import { emailField } from '@rotra/schema/email'
+import { nameField } from '@rotra/schema/name'
 import { LEVEL_OPTION_GROUPS } from '@rotra/ui/level-select'
 import { z } from 'zod'
 

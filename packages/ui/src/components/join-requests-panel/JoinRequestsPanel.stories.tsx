@@ -186,7 +186,6 @@ export const LiveNoMatchRequestsLight: Story = {
   ...LiveNoMatchRequests,
   globals: { theme: 'light' },
 }
-export const FourGuestsLight: Story = { globals: { theme: 'light' } }
 export const LiveMatchRequestsPhone: Story = {
   ...LiveMatchRequests,
   globals: { viewport: { value: 'phone' } },

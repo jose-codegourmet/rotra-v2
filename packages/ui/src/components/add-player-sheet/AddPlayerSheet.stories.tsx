@@ -30,8 +30,7 @@ const savedCandidates: AddPlayerCandidate[] = clubPlayers.map((p: ClubPlayer, i)
   identity: p.identity,
   suggestion: p.playingLevel,
   phoneHidden: i === 0 || i === 3,
-  detailsRequired:
-    p.identity === 'unclaimed' && !players.find((x) => x.id === p.playerId)?.rtrId,
+  detailsRequired: p.identity === 'unclaimed' && !players.find((x) => x.id === p.playerId)?.rtrId,
 }))
 
 // Directory suggestions: registered players, with their leaderboard level and position.
@@ -77,9 +76,9 @@ function Demo({ club, ...props }: DemoProps) {
     ? []
     : q === OTHER_CLUB_EMAIL
       ? [otherClubUnclaimed]
-      : directoryCandidates.filter((p) => q && p.rtrId?.toLowerCase() === q).concat(
-          q === OTHER_CLUB_RTR ? [otherClubUnclaimed] : [],
-        )
+      : directoryCandidates
+          .filter((p) => q && p.rtrId?.toLowerCase() === q)
+          .concat(q === OTHER_CLUB_RTR ? [otherClubUnclaimed] : [])
   if (club)
     return (
       <AddPlayerSheet
@@ -117,7 +116,10 @@ const searchFor =
   (value: string): Story['play'] =>
   async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body)
-    await userEvent.type(await body.findByRole('searchbox', { name: /Search Player Information/ }), value)
+    await userEvent.type(
+      await body.findByRole('searchbox', { name: /Search Player Information/ }),
+      value,
+    )
   }
 
 const meta = {

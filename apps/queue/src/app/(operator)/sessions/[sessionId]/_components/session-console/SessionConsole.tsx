@@ -4,7 +4,7 @@ import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import {
   activeMatches,
   matchStatus,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
@@ -232,7 +232,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       label: 'Leaderboard',
       shortLabel: 'Board',
       badges: leader
-        ? [{ text: `${leaderPlayer ? shortName(leaderPlayer) : leader.name} leads` }]
+        ? [{ text: `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads` }]
         : [],
     },
     {

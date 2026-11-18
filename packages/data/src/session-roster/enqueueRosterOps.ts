@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { savedPlayerName } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubEmailWords, emailAlreadySaved, planClubEmail } from '../club-player/email'
 import { OWN_NAME_ERROR } from '../club-player/mutations'
@@ -27,7 +28,7 @@ import {
   type RosterRead,
   readRosterView,
 } from './rosterBatch'
-import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
+import { levelLabel, queueMasterName, ROSTER_DUPLICATE_ERROR } from './sessionRoster.rules'
 import type { DirectoryPlayer, PlayerLookup, SessionJoinRequest } from './sessionRoster.types'
 
 /**
@@ -75,9 +76,6 @@ const placementFlags = ({ allowOverfill, toWaitlist }: RosterAddPlacement) => ({
   ...(allowOverfill ? { allowOverfill: true } : {}),
   ...(toWaitlist ? { toWaitlist: true } : {}),
 })
-
-const firstName = (player: { fullName: string; nickname: string | null }) =>
-  player.nickname || player.fullName.split(' ')[0] || player.fullName
 
 function savedPlayer(client: QueryClient, clubPlayerId: string) {
   for (const [, data] of client.getQueriesData<{ players?: ClubPlayer[] }>({
@@ -177,7 +175,7 @@ export function enqueueAddSavedPlayer(
   if (inSession(place.view, input.clubPlayerId))
     throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
   const player = savedPlayer(client, input.clubPlayerId)
-  const name = player ? firstName(player) : 'Player'
+  const name = player ? savedPlayerName(player) : 'Player'
   const shared = getRosterBatch(client, input.sessionId)
   shared.enqueue({
     operation: {
@@ -252,7 +250,9 @@ export function enqueueAddDirectoryPlayer(
       place,
     ),
   })
-  const name = firstName({ fullName, nickname })
+  const name = saved
+    ? savedPlayerName(saved)
+    : queueMasterName({ nameSnapshot: fullName, nicknameSnapshot: nickname })
   return {
     sessionId: input.sessionId,
     outcome: accepted(
@@ -318,7 +318,7 @@ export function enqueueRemoveRosterPlayer(
   })
   return {
     sessionId: input.sessionId,
-    outcome: accepted(null, `${shortName(row)} removed from the roster`),
+    outcome: accepted(null, `${queueMasterName(row)} removed from the roster`),
   }
 }
 

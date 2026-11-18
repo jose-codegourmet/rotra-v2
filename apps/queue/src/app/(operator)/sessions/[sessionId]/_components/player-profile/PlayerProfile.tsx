@@ -72,6 +72,7 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         bannerImageUrl={profile.bannerImageUrl}
         identity={profile.identity}
         nickname={profile.nickname}
+        clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
         level={profile.suggestion}
         tonightLevel={live ? entry?.level : null}
         tonight={tonight}

@@ -1,4 +1,5 @@
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
+import { savedPlayerName, withClubNickname } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPlayerForProfile, createClubPlayer } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
@@ -42,8 +43,8 @@ import {
 import {
   inUnfinishedMatch,
   levelLabel,
+  queueMasterName,
   ROSTER_DUPLICATE_ERROR,
-  shortName,
   stepDownBlockedText,
 } from './sessionRoster.rules'
 import type {
@@ -51,6 +52,7 @@ import type {
   JoinRequestPlacement,
   PlayerLookup,
   SessionJoinRequest,
+  SessionPlayer,
 } from './sessionRoster.types'
 
 function fail(text: string): never {
@@ -148,7 +150,7 @@ export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
       input.toWaitlist,
       input.allowOverfill,
     ),
-    name = p.nickname || p.fullName.split(' ')[0]
+    name = savedPlayerName(p)
   return {
     data,
     text: data.waitlistPosition
@@ -265,7 +267,7 @@ export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayer
   )
   return {
     data,
-    text: `${p.nickname || p.fullName.split(' ')[0]} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
+    text: `${savedPlayerName(p)} added${data.waitlistPosition ? ` to the waitlist as #${data.waitlistPosition}` : ''} · ${levelLabel(input.level)}${!data.waitlistPosition && data.locked ? ' · level locked' : ''}`,
   }
 }
 export async function addDirectoryPlayerToSession(input: AddDirectoryPlayerInput) {
@@ -307,6 +309,10 @@ export async function addNewPlayerToSession(input: AddNewPlayerInput) {
     rosterMutation(input.sessionId, (s) => addNewPlayerChange(s, input)),
   )
 }
+/** The name the Queue Master sees for a roster row, for toasts and messages. */
+function nameIn(s: MockState, p: SessionPlayer) {
+  return queueMasterName(withClubNickname(s, p))
+}
 function row(s: MockState, id: string, sessionId: string) {
   const p = s.roster.find((p) => p.id === id && p.sessionId === sessionId)
   if (!p) fail('Player not available.')
@@ -327,7 +333,7 @@ export async function setRosterLevel(input: {
       fail('Levels are locked after the session starts.')
     levelCheck(input.level)
     p.level = input.level
-    return { data: null, text: `${shortName(p)}: ${levelLabel(input.level)}` }
+    return { data: null, text: `${nameIn(s, p)}: ${levelLabel(input.level)}` }
   })
 }
 export function removeRosterPlayerChange(
@@ -338,7 +344,7 @@ export function removeRosterPlayerChange(
     fail('Only a prepared roster can remove players.')
   const p = row(s, input.rosterId, input.sessionId)
   s.roster = s.roster.filter((r) => r.id !== p.id)
-  return { data: null, text: `${shortName(p)} removed from the roster` }
+  return { data: null, text: `${nameIn(s, p)} removed from the roster` }
 }
 export function removeRosterPlayer(input: { sessionId: string; rosterId: string }) {
   if (isRealDataMode()) return realRemoveRosterPlayer(input)
@@ -362,7 +368,7 @@ export function stepDownChange(s: MockState, input: StepDownInput, blocked?: str
       s.matches.filter((m) => m.sessionId === input.sessionId),
     )
   )
-    throw new MockError('conflict', blocked ?? stepDownBlockedText(shortName(p)))
+    throw new MockError('conflict', blocked ?? stepDownBlockedText(nameIn(s, p)))
   const waiting = s.waitlist.filter((w) => w.sessionId === input.sessionId)
   const front = Math.min(Date.now(), ...waiting.map((w) => w.addedAt)) - 1
   s.roster = s.roster.filter((r) => r.id !== p.id)
@@ -394,9 +400,9 @@ export async function markNoShow(input: { sessionId: string; rosterId: string })
     const p = row(s, input.rosterId, input.sessionId)
     const matches = s.matches.filter((m) => m.sessionId === input.sessionId)
     if (inUnfinishedMatch(p.id, matches))
-      throw new MockError('conflict', `Remove ${shortName(p)} from their match first.`)
+      throw new MockError('conflict', `Remove ${nameIn(s, p)} from their match first.`)
     if (p.present || gamesPlayed(p, matches) > 0)
-      fail(`${shortName(p)} is here or has played tonight.`)
+      fail(`${nameIn(s, p)} is here or has played tonight.`)
     s.roster = s.roster.filter((r) => r.id !== p.id)
     s.noShows = [...(s.noShows ?? []), { ...p, noShowAt: Date.now() }]
     const count = s.roster.filter((r) => r.sessionId === input.sessionId).length
@@ -448,7 +454,7 @@ export async function setPresence(input: {
           ).length
       return {
         data: null,
-        text: `${shortName(p)} is ${input.present ? '' : 'not '}present${n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''}`,
+        text: `${nameIn(s, p)} is ${input.present ? '' : 'not '}present${n ? ` · ${n} waiting match${n === 1 ? ' needs' : 'es need'} attention` : ''}`,
       }
     }),
   )
@@ -531,7 +537,7 @@ export function setGamesPlayed(input: SetGamesPlayedInput) {
         return {
           data: rows.map((p) => ({ rosterId: p.id, games: gamesPlayed(p, matches) })),
           text: one
-            ? `Games played set · ${shortName(one)}`
+            ? `Games played set · ${nameIn(s, one)}`
             : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`,
         }
       },
@@ -567,7 +573,7 @@ export async function giveSlot(input: { sessionId: string; waitlistId: string })
         budget = capacity(s, input.sessionId)
       return {
         data: null,
-        text: `${p.nickname || p.fullName.split(' ')[0]} got a slot${sessionIn(s, input.sessionId).state === 'active' ? ' · level locked' : ''}${n > budget ? ` · now ${n} players for ${budget} slots` : ''}`,
+        text: `${savedPlayerName(p)} got a slot${sessionIn(s, input.sessionId).state === 'active' ? ' · level locked' : ''}${n > budget ? ` · now ${n} players for ${budget} slots` : ''}`,
       }
     }),
   )
@@ -598,7 +604,7 @@ export async function removeFromWaitlist(input: { sessionId: string; waitlistId:
       s.waitlist = s.waitlist.filter((x) => x.id !== w.id)
       return {
         data: null,
-        text: `${p.nickname || p.fullName.split(' ')[0]} removed from the waitlist`,
+        text: `${savedPlayerName(p)} removed from the waitlist`,
       }
     }),
   )

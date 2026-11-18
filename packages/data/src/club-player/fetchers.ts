@@ -63,6 +63,8 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     ...player,
     fullName,
     nickname: own ? own.nickname : player.nickname,
+    /** The club's own nickname for a registered player (D-2026-11-18-02); null when none */
+    clubNickname: registered ? player.clubNickname?.trim() || null : null,
     /** Avatar reference: the club-set picture for a guest or unclaimed player, else their own. */
     picture: clubPictureState(player, own?.picture ?? null).reference,
     joinedVia: joinedViaOf(player),
@@ -100,7 +102,10 @@ function filterAndGroup(
       const now = rightNowOf(p)
       const age = Date.now() - p.addedAt
       return (
-        (!q || [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLocaleLowerCase().includes(q))) &&
+        (!q ||
+          [p.fullName, p.nickname, p.clubNickname, p.rtrId].some((v) =>
+            v?.toLocaleLowerCase().includes(q),
+          )) &&
         (!filters.band ||
           filters.band === 'all' ||
           (p.suggestion?.split('_')[0] ?? 'none') === filters.band) &&

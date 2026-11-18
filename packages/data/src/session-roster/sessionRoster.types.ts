@@ -16,6 +16,13 @@ export type SessionPlayer = {
    */
   hasPlayedAtClubBefore?: boolean
   /**
+   * The club nickname of the linked registered saved player (D-2026-11-18-02). Derived by the
+   * Queue Master roster read and by mutation helpers (`withClubNickname`); never stored on the
+   * roster row and never present in public or player reads. Missing = none (real mode, until
+   * ticket P15.8 reads it).
+   */
+  clubNickname?: string | null
+  /**
    * The linked Player's own **I'm here** (D-2026-11-09-03). The QM's last action wins: the
    * “Checked in themselves” mark shows only while the row is present and no presence change came
    * after it (`selfCheckInMark` in public-session rules). Missing on older rows means never.

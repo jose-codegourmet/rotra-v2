@@ -16,7 +16,7 @@ import {
   matchStatus,
   nextEligibleForCourt,
   openedEarly,
-  shortName,
+  queueMasterName,
   shortOnPlayers,
   swapTarget,
   waitingMatches,
@@ -214,7 +214,7 @@ export function SessionView({
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
       photoUrl: clubPlayer
         ? profilePictureSrc(

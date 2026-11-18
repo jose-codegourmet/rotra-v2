@@ -1,3 +1,4 @@
+import { withClubNickname } from '../club-player/clubNickname.rules'
 import {
   closeStaleMatchRequests,
   notEnoughToFillText,
@@ -9,7 +10,7 @@ import { queueMutation } from '../mock/transaction'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import { realAddMatchRequestToQueue, realDeclineMatchRequest } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
-import { FORMAT_LABELS, shortName } from './match.rules'
+import { FORMAT_LABELS, queueMasterName } from './match.rules'
 import type { MatchFormat } from './match.types'
 import { append, requireLive } from './queue.mutations'
 
@@ -88,7 +89,7 @@ export function declineMatchRequest(input: { sessionId: string; requestId: strin
     const row = rosterRow(s, input.sessionId, r.pid)
     return {
       data: null,
-      text: `${row ? shortName(row) : 'Player'}'s match request declined`,
+      text: `${row ? queueMasterName(withClubNickname(s, row)) : 'Player'}'s match request declined`,
     }
   })
 }

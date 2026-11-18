@@ -1,4 +1,4 @@
-import { shortName } from '../match/match.rules'
+import { queueMasterName } from '../match/match.rules'
 import type { MatchFormat } from '../match/match.types'
 import type {
   MatchRequestView,
@@ -55,7 +55,7 @@ export async function realDeclineMatchRequest(input: { sessionId: string; reques
     `${sessionPath(input.sessionId)}/match-requests/${encodeURIComponent(input.requestId)}/decline`,
     { method: 'POST', body: {} },
   )
-  return accepted(null, `${shortName(done.requester)}'s match request declined`)
+  return accepted(null, `${queueMasterName(done.requester)}'s match request declined`)
 }
 
 // ---------- Signed-in Player on the session page (Q17.14), on the Player origin ----------

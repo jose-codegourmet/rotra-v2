@@ -10,7 +10,7 @@ import {
   gamesPlayed,
   isFunFormat,
   queuedCount,
-  shortName,
+  queueMasterName,
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
@@ -285,7 +285,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   /** Move to waitlist (#735): blocked with a toast while the player is in any unfinished match. */
   const stepDownPlayer = (player: SessionPlayer) => {
     if (inUnfinishedMatch(player.id, all)) {
-      toast(stepDownBlockedText(shortName(player)))
+      toast(stepDownBlockedText(queueMasterName(player)))
       return
     }
     if (steppingDown.current.has(player.id)) return
@@ -492,7 +492,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             return {
               id,
               name: p?.nameSnapshot ?? 'Player',
-              shortName: p ? shortName(p) : 'Player',
+              shortName: p ? queueMasterName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),
@@ -503,7 +503,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             return {
               id,
               name: p?.nameSnapshot ?? 'Player',
-              shortName: p ? shortName(p) : 'Player',
+              shortName: p ? queueMasterName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),

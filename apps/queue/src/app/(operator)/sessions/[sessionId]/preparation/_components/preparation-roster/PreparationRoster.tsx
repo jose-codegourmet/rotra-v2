@@ -297,6 +297,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           bannerImageUrl={profile.bannerImageUrl}
           identity={profile.identity}
           nickname={profile.nickname}
+          clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
           level={profile.suggestion}
           tonightLevel={profileEntry?.level}
           tonight={null}

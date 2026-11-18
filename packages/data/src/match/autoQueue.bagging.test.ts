@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createConsoleFixtures } from '../fixtures/consoleSessions'
 import type { PlayingLevel } from '../player/player.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import {
   baggingPairApplies,
   editBagging,
@@ -81,7 +81,7 @@ describe('Bagging mode in Generate matches (#739)', () => {
     expect(allPlayers(draft)).toEqual(expect.arrayContaining([a, b]))
     expect(sameTeam(draft, a, b)).toBe(true)
     expect(draft.reason).toBe(
-      `Bagging pair: ${shortName(input.ctx.roster[6]!)} and ${shortName(input.ctx.roster[7]!)} are partners`,
+      `Bagging pair: ${queueMasterName(input.ctx.roster[6]!)} and ${queueMasterName(input.ctx.roster[7]!)} are partners`,
     )
   })
   it('swaps a free partner in for the last unpaired pick, keeping the court at four', () => {

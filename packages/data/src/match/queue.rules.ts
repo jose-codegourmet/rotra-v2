@@ -1,6 +1,6 @@
 import { PLAYING_LEVELS } from '../player/player.types'
 import type { QueueSession } from '../queue-session/queueSession.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import {
   activeMatchFor,
@@ -187,7 +187,7 @@ export function suggestionReason(
     below = selected.filter((p) => gamesPlayed(p, matches) < session.minimumGames)
   return below.length
     ? `${below
-        .map((p) => `${shortName(p)} (${gamesPlayed(p, matches)}/${session.minimumGames})`)
+        .map((p) => `${queueMasterName(p)} (${gamesPlayed(p, matches)}/${session.minimumGames})`)
         .join(', ')} are below the minimum.`
     : 'Everyone has met the minimum. These players have the fewest games.'
 }

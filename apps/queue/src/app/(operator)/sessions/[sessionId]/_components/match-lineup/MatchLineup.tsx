@@ -4,6 +4,7 @@ import {
   activeMatchFor,
   countedGames,
   courtNames,
+  queueMasterName,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
 import { pickerOrder } from '@rotra/data/match/queue.rules'
@@ -90,7 +91,8 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
     return {
       id: p.id,
       name: p.nameSnapshot,
-      nickname: p.nicknameSnapshot,
+      // The nickname the Queue Master sees: the club nickname when set, else the account nickname.
+      nickname: p.clubNickname || p.nicknameSnapshot ? queueMasterName(p) : null,
       level: p.level,
       games: countedGames(p.id, all),
       present: p.present,

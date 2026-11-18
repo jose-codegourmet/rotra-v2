@@ -1,6 +1,7 @@
 'use client'
 
 import { rotraProfileUrl } from '@rotra/data/app-origins'
+import { savedPlayerName } from '@rotra/data/club-player/clubNickname-rules'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
 import type { DeleteImpact } from '@rotra/data/club-player/types'
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
@@ -9,6 +10,7 @@ import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYea
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
 import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
+import { useSetClubNickname } from '@rotra/data/club-player/useSetClubNickname'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { statsYear } from '@rotra/data/player/rules'
@@ -21,6 +23,7 @@ import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { DeletePlayerSheet } from '@rotra/ui/delete-player-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { ClubNicknameForm } from '@rotra/ui/forms/club-nickname-form'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
@@ -130,6 +133,8 @@ export function SavedPlayers() {
   const [profileId, setProfileId] = useState<string | null>(null)
   const [inviteId, setInviteId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
+  const [nicknameId, setNicknameId] = useState<string | null>(null)
+  const setClubNickname = useSetClubNickname()
   // D-DELETE-PLAYER, only when the player is in the Active Session
   const [deleting, setDeleting] = useState<{
     id: string
@@ -168,6 +173,7 @@ export function SavedPlayers() {
       )
     : undefined
   const invitee = byId(inviteId)
+  const nicknamePlayer = byId(nicknameId)
   // Load Edit details while the profile is open, so choosing it swaps sheets with no blank gap.
   useClubPlayerDetails(
     profile && (profile.identity === 'guest' || profile.identity === 'unclaimed')
@@ -206,7 +212,7 @@ export function SavedPlayers() {
       },
     })
   /** Delete player: acts at once unless they're in the Active Session, which asks first. */
-  const startDelete = (p: { id: string; fullName: string; nickname: string | null }) =>
+  const startDelete = (p: { id: string } & Parameters<typeof savedPlayerName>[0]) =>
     del.check.mutate(p.id, {
       onSuccess: (impact) => {
         if (!impact.activeSession) {
@@ -218,7 +224,7 @@ export function SavedPlayers() {
         setDeleting({
           id: p.id,
           name: p.fullName,
-          shortName: p.nickname || p.fullName.split(' ')[0] || p.fullName,
+          shortName: savedPlayerName(p),
           impact,
         })
       },
@@ -294,6 +300,7 @@ export function SavedPlayers() {
                       p.pictureName ?? p.fullName,
                     )}
                     nickname={p.nickname}
+                    clubNickname={p.clubNickname}
                     identity={p.identity}
                     detailsRequired={p.detailsRequired}
                     level={p.suggestion}
@@ -336,6 +343,15 @@ export function SavedPlayers() {
           bannerImageUrl={profile.bannerImageUrl}
           identity={profile.identity}
           nickname={profile.nickname}
+          clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
+          onClubNickname={
+            profile.identity === 'registered'
+              ? () => {
+                  setProfileId(null)
+                  setNicknameId(profile.id)
+                }
+              : undefined
+          }
           level={profile.suggestion}
           registeredCity={registeredCity(profile.rtrId)}
           rtrId={profile.rtrId}
@@ -397,6 +413,35 @@ export function SavedPlayers() {
             setProfileId(intoId)
             setEditId(null)
           }}
+        />
+      ) : null}
+      {nicknamePlayer?.identity === 'registered' ? (
+        <ClubNicknameForm
+          key={nicknamePlayer.id}
+          open
+          onOpenChange={(open) => {
+            if (open) return
+            setClubNickname.reset()
+            setProfileId(nicknamePlayer.id)
+            setNicknameId(null)
+          }}
+          name={nicknamePlayer.fullName}
+          currentNickname={nicknamePlayer.clubNickname}
+          accountNickname={nicknamePlayer.nickname}
+          isPending={setClubNickname.isPending}
+          serverError={setClubNickname.error?.message}
+          onSubmit={(values) =>
+            setClubNickname.mutate(
+              { clubPlayerId: nicknamePlayer.id, clubNickname: values.nickname },
+              {
+                onSuccess: (result) => {
+                  toast(result.message)
+                  setProfileId(nicknamePlayer.id)
+                  setNicknameId(null)
+                },
+              },
+            )
+          }
         />
       ) : null}
       {invitee && (invitee.identity === 'guest' || invitee.identity === 'unclaimed') ? (

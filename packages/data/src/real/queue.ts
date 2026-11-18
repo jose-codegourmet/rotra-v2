@@ -28,7 +28,7 @@ import type {
   QueueSessionSummary,
   SessionCourt,
 } from '../queue-session/queueSession.types'
-import { levelLabel, shortName } from '../session-roster/sessionRoster.rules'
+import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
   SessionJoinRequest,
@@ -604,16 +604,18 @@ export async function realSetRosterLevel(input: {
     `/api/sessions/${encodeURIComponent(input.sessionId)}/roster/${encodeURIComponent(input.rosterId)}/level`,
     { method: 'POST', body: { level: input.level, operationId: crypto.randomUUID() } },
   )
-  return accepted(null, `${shortName(entry)}: ${levelLabel(input.level)}`)
+  return accepted(null, `${queueMasterName(entry)}: ${levelLabel(input.level)}`)
 }
 
 // ---------- Saved players and Player Information (Q-SAVED-PLAYERS, Q-ADD-PLAYER) ----------
 
 export type WireClubPlayer = Omit<
   ClubPlayerView,
-  'addedAt' | 'displayName' | 'suggestion' | 'emailOnFile' | 'detailsRequired'
+  'addedAt' | 'displayName' | 'suggestion' | 'emailOnFile' | 'detailsRequired' | 'clubNickname'
 > & {
   addedAt: string
+  /** Not sent until the club nickname is built on the server (P15.8); missing reads as none */
+  clubNickname?: string | null
   /** Not sent until D-2026-11-16-04 is built on the server (P15.8); missing reads as false */
   emailOnFile?: boolean
   detailsRequired?: boolean
@@ -629,6 +631,7 @@ export async function realGetClubPlayers(): Promise<ClubPlayerView[]> {
     addedAt: msOf(p.addedAt),
     emailOnFile: p.emailOnFile ?? false,
     detailsRequired: p.detailsRequired ?? false,
+    clubNickname: p.clubNickname ?? null,
   }))
 }
 
@@ -722,7 +725,7 @@ type RosterAdd = { rosterEntry: WireRosterEntry | null; waitlist: WireWaitlistEn
 function rosterAdded(result: RosterAdd, level: PlayingLevel) {
   const waitlistPosition = result.waitlist?.position ?? null
   const clubPlayerId = result.rosterEntry?.clubPlayerId ?? result.waitlist?.clubPlayerId ?? ''
-  const name = result.rosterEntry ? shortName(result.rosterEntry) : 'Player'
+  const name = result.rosterEntry ? queueMasterName(result.rosterEntry) : 'Player'
   return accepted(
     { waitlistPosition, locked: false, clubPlayerId },
     waitlistPosition

@@ -1,7 +1,7 @@
 import { countedGames, courtNames } from '../match/match.rules'
 import type { Match, MatchFormat } from '../match/match.types'
 import type { SessionCourt } from '../queue-session/queueSession.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'
 import type { MatchLineupPlayerFixture } from './matchLineups'
@@ -42,7 +42,7 @@ export function createMatchResultFixtures(now = Date.now()) {
       return {
         id: p.id,
         name: p.nameSnapshot,
-        shortName: shortName(p),
+        shortName: queueMasterName(p),
         level: p.level,
         games: countedGames(p.id, matches),
       }

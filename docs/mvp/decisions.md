@@ -60,7 +60,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1163,7 +1163,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
 - **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
+- **Implementation status:** in the mock app (#941 components, #942 data and wiring); real mode is #927 ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
 - **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**

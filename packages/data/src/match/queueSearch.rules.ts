@@ -1,7 +1,7 @@
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { Match } from './match.types'
 
-/** Search full names and nicknames without changing the queue. */
+/** Search full names, account nicknames and the club nickname without changing the queue. */
 export function matchesPlayerText(match: Match, roster: SessionPlayer[], text: string) {
   const query = text.trim().toLocaleLowerCase()
   if (!query) return false
@@ -9,7 +9,9 @@ export function matchesPlayerText(match: Match, roster: SessionPlayer[], text: s
   return roster.some(
     (player) =>
       ids.has(player.id) &&
-      `${player.nameSnapshot} ${player.nicknameSnapshot ?? ''}`.toLocaleLowerCase().includes(query),
+      `${player.nameSnapshot} ${player.nicknameSnapshot ?? ''} ${player.clubNickname ?? ''}`
+        .toLocaleLowerCase()
+        .includes(query),
   )
 }
 export function queueSearchHitCount(matches: Match[], roster: SessionPlayer[], text: string) {

@@ -1,7 +1,7 @@
 import { countedGames, courtNames, substitutionCandidates, waitMinutes } from '../match/match.rules'
 import type { Match, MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'
 
@@ -66,7 +66,7 @@ export function createActiveMatchFixtures(now = Date.now()) {
   const card = (p: SessionPlayer): ActiveMatchPlayerFixture => ({
     id: p.id,
     name: p.nameSnapshot,
-    shortName: shortName(p),
+    shortName: queueMasterName(p),
     level: p.level,
     games: countedGames(p.id, matches),
   })

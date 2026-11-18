@@ -6,7 +6,7 @@ import {
   FORMAT_LABELS,
   type MatchContext,
   nextMatchCandidates,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
@@ -80,7 +80,7 @@ export function NextMatch({ sessionId, request, onClose }: NextMatchProps) {
       return {
         id,
         name: p?.nameSnapshot ?? 'Player',
-        shortName: p ? shortName(p) : 'Player',
+        shortName: p ? queueMasterName(p) : 'Player',
         level: p?.level ?? null,
         photoUrl: clubPlayer
           ? profilePictureSrc(

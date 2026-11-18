@@ -8,6 +8,7 @@ import { isUnclaimedPerson, savedDisplayName, savedRecordByEmail } from '../play
 import { isRealDataMode } from '../real/mode'
 import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
+import { savedPlayerName } from './clubNickname.rules'
 import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
 import { applyClubEmail, emailAlreadySaved, planClubEmail } from './email'
 
@@ -157,7 +158,7 @@ export function addDirectoryPlayerToClub(input: {
     const level = input.level === undefined ? undefined : savedLevel(input.level)
     const { player, created } = clubPlayerForProfile(s, input.playerId, level, 'added', input.name)
     if (!created) throw alreadySaved(player.fullName)
-    const name = player.nickname || player.fullName.split(' ')[0]
+    const name = savedPlayerName(player)
     return {
       data: { clubPlayerId: player.id },
       text: `${name} saved${player.playingLevel ? ` · ${levelLabel(player.playingLevel)}` : ''}`,

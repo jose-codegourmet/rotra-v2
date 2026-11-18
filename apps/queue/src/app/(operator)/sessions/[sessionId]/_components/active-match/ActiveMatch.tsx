@@ -385,7 +385,11 @@ function OpenActiveMatch({
           }
     })
   const pickerCandidates = (free: SessionPlayer[]) =>
-    free.map((p) => ({ ...substitutionPlayer(p), shortName: queueMasterName(p), photoUrl: photoOf(p) }))
+    free.map((p) => ({
+      ...substitutionPlayer(p),
+      shortName: queueMasterName(p),
+      photoUrl: photoOf(p),
+    }))
 
   /** Review result passed validation: the confirm step, with what was entered kept for Back to result */
   const onReviewResult = (values: MatchResultFormValues) =>

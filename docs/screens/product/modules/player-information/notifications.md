@@ -15,3 +15,10 @@ Signed in only, in the top bar before the theme button. A red count badge shows 
 - Empty: bell icon, "No notifications yet" (All) or "No unread notifications" (Unread), "Session updates, invites, club changes and messages from ROTRA show up here."
 - Footer: "Notifications stay for 90 days." (placeholder retention).
 - Signed out: P-LOGIN, then back here.
+
+## Owner decisions — November 18, 2026
+
+- Use the standard Player loading and error states for the page.
+- While the bell count loads or fails, keep the bell link available and hide the count.
+- Notifications remain visible for 90 days; automatic database deletion remains deferred.
+- Implementation waits for account verification epic #889 rather than adding a stand-in verification state.

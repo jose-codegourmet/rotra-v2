@@ -24,4 +24,4 @@ Pinned ROTRA announcements that depend on the player's state (verification) are 
 
 ## Retention
 
-Open. The mockup says 90 days; a scheduled delete would need the jobs decision in [backend open decisions](../../../../backend/open-decisions.md).
+Owner decision, November 18, 2026: list visibility is 90 days. Filter reads by creation time; automatic database deletion is deferred and would need the jobs decision in [backend open decisions](../../../../backend/open-decisions.md). This batch waits for account verification epic #889. Free-text announcements remain out of scope; only the derived verification reminder is approved.

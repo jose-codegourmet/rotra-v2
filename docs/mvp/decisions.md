@@ -998,7 +998,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#account-verification), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md#p-verification--account-verification), [identity database design](../database_design/product/player-information/modules/identity.md#account-verification-d-2026-11-16-02).
 
 ### D-2026-11-16-03 — Player notifications page
-- **Decision status:** approved (owner, November 16, 2026); delivery and the event list are not decided.
+- **Decision status:** approved (owner, November 16, 2026; event scope, visibility window and states settled November 18, 2026).
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-notifications.md)).
 - **Ticket:** [#890](https://github.com/jose-codegourmet/rotra-v2/issues/890) (Epic P14)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
@@ -1008,9 +1008,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - The mockup's events are ones ROTRA already has: spot confirmed, waitlist place, session invite, results published, rank updated, added to a club's saved players, contact change approved, Admin verified the account.
 - **Open:**
   - Delivery outside the app (push or email would need a backend decision and likely a new dependency).
-  - The final event list.
-  - How long notifications are kept (the mockup says 90 days).
-  - Who writes ROTRA announcements (likely a new Admin screen).
+  - Per-kind opt-out, automatic deletion, and future free-text announcement publishing.
+- **Owner amendment, November 18, 2026:** all eight documented events are approved (contact-change review includes approved and declined); notifications remain visible for 90 days, with automatic database deletion deferred. Only the derived verification reminder is in scope; free-text publishing is deferred. Use standard Player loading/error states; the bell remains a link with no count while loading or failed. Wait for account verification epic #889 rather than adding a stand-in verification state for #899.
 - **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID

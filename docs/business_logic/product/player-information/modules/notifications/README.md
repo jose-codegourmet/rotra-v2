@@ -1,6 +1,6 @@
 # Player notifications
 
-**Last verified:** 2026-11-16 · **Status:** Proposal, approved by the owner ([D-2026-11-16-03](../../../../../mvp/decisions.md#d-2026-11-16-03)); delivery and the final event list are open.
+**Last verified:** 2026-11-18 · **Status:** Approved scope; implementation pending. See [D-2026-11-16-03](../../../../../mvp/decisions.md#d-2026-11-16-03).
 
 **Reference prototype:** [`rotra-player.html`](../../../../../../apps/mockup/player-app/rotra-player.html) › Notifications ([log](../../../../../mockup-changes/2026-11-16-player-notifications.md)).
 
@@ -24,9 +24,16 @@ A short message to one signed-in player about something that already happened in
 - Notifications describe events; they never change data. Opening one only navigates.
 - A notification that points to something the player can no longer see (a session page that expired, a club they left) opens the nearest page that still exists.
 
+## Owner decisions — November 18, 2026
+
+- Real mode covers all eight documented events: spot confirmed, waitlist place, session invite, results published, rank updated, added to a club's saved players, contact-change review, and Admin verified the account.
+- Notifications remain visible for 90 days. This is a read visibility window, not authorization to delete stored notifications. Automatic deletion is deferred.
+- Only the derived verification reminder is in this epic. Free-text announcement publishing is deferred.
+- Notifications wait for account verification epic #889; do not introduce a stand-in verification state for #899.
+
 ## Open
 
 - Delivery outside the app (phone push, email). In-app only for now.
-- The final event list, and whether players can turn kinds off.
-- Retention (the mockup says 90 days).
-- Who writes ROTRA announcements and to whom (likely a new Admin screen).
+- Whether players can turn kinds off.
+- Automatic deletion and its jobs implementation.
+- Free-text announcement authors and audiences, for a future epic.

@@ -59,20 +59,53 @@ const history = (
   }))
 
 describe('session standings', () => {
-  it('numbers the live leaderboard order with unique positions', () => {
+  it('shares a position between players on the same wins and losses (1, 2, 2, 4)', () => {
     const rows = sessionStandings(roster, [
       game(['Zoe'], ['Amy']),
       game(['Amy'], ['Ben']),
       game(['Dan'], ['Zoe']),
     ])
-    // Dan 1–0, then Zoe and Amy both 1–1 with Zoe ahead on head-to-head, then Ben 0–1.
+    // Dan 1–0, then Amy and Zoe both 1–1: Zoe beat Amy, but head-to-head separates no one and the
+    // name only orders them inside the shared position. Ben 0–1 is numbered after both.
     expect(rows.map((r) => [r.position, r.name])).toEqual([
       [1, 'Dan'],
+      [2, 'Amy'],
       [2, 'Zoe'],
-      [3, 'Amy'],
       [4, 'Ben'],
     ])
-    expect(rows[1]).toMatchObject({ clubPlayerId: 'club-Zoe', wins: 1, losses: 1, games: 2 })
+    expect(rows[2]).toMatchObject({ clubPlayerId: 'club-Zoe', wins: 1, losses: 1, games: 2 })
+  })
+  it('shares one position three ways and numbers the next after all three (1, 2, 2, 2, 5)', () => {
+    const rows = sessionStandings(roster, [
+      game(['Zoe'], ['Amy']),
+      game(['Amy'], ['Ben']),
+      game(['Ben'], ['Zoe']),
+      game(['Dan'], ['Eve']),
+    ])
+    expect(rows.map((r) => [r.position, r.name, r.wins, r.losses])).toEqual([
+      [1, 'Dan', 1, 0],
+      [2, 'Amy', 1, 1],
+      [2, 'Ben', 1, 1],
+      [2, 'Zoe', 1, 1],
+      [5, 'Eve', 0, 1],
+    ])
+  })
+  it('puts two players on 4–2 at position 1 and the next player at 3', () => {
+    const wins = (winner: string, ...losers: string[]) => losers.map((l) => game([winner], [l]))
+    const rows = sessionStandings(roster, [
+      // Ben beat Amy twice, yet they share the position.
+      ...wins('Ben', 'Amy', 'Amy', 'Zoe', 'Dan'),
+      ...wins('Amy', 'Zoe', 'Dan', 'Eve', 'Eve'),
+      ...wins('Zoe', 'Ben'),
+      ...wins('Dan', 'Ben'),
+    ])
+    expect(rows.map((r) => [r.position, r.name, r.wins, r.losses])).toEqual([
+      [1, 'Amy', 4, 2],
+      [1, 'Ben', 4, 2],
+      [3, 'Dan', 1, 2],
+      [3, 'Zoe', 1, 2],
+      [5, 'Eve', 0, 2],
+    ])
   })
   it('leaves out players without a counted game, partials and invalid matches', () => {
     const partial = game(['Zoe', 'Amy'], ['Ben', 'Dan'])
@@ -250,8 +283,8 @@ describe('export frames', () => {
     expect(paginateStandings([], 'feed')).toEqual([{ title: 'Standings', rows: [] }])
   })
   it('adds Awards and only includes Off Day when chosen', () => {
-    const standings: StandingRow[] = names(3).map((name, i) => ({
-      position: i + 1,
+    const standings: StandingRow[] = names(3).map((name) => ({
+      position: 1,
       sessionPlayerId: name,
       clubPlayerId: name,
       name,

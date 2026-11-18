@@ -15,10 +15,13 @@ import type {
   StandingRow,
 } from './sessionResult.types'
 
-/** Standings order is the live leaderboard's (match.rules computeStandings); this only numbers the rows. */
+/**
+ * Standings order and positions are the live leaderboard's (match.rules computeStandings): players on
+ * the same wins and losses share a position (1, 1, 3). This only adds each row's club player.
+ */
 export function sessionStandings(roster: SessionPlayer[], matches: Match[]): StandingRow[] {
-  return computeStandings(roster, matches).map((r, i) => ({
-    position: i + 1,
+  return computeStandings(roster, matches).map((r) => ({
+    position: r.position,
     sessionPlayerId: r.playerId,
     clubPlayerId: roster.find((p) => p.id === r.playerId)?.clubPlayerId ?? r.playerId,
     name: r.name,

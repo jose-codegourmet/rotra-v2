@@ -31,6 +31,23 @@ function verificationReminder(
   }
 }
 
+function resolveClubTarget(
+  notification: PlayerNotification,
+  state: MockState,
+  playerId: string,
+): PlayerNotification {
+  const clubId = notification.kind === 'club' && /^\/clubs\/([^/]+)$/.exec(notification.target)?.[1]
+  if (!clubId) return notification
+  const clubExists = state.clubs.some((club) => club.id === clubId)
+  const memberships = state.clubPlayers.filter(
+    (player) => player.clubId === clubId && player.playerId === playerId,
+  )
+  const leftClub = memberships.length > 0 && memberships.every((player) => player.removedAt)
+  return clubExists && !leftClub
+    ? notification
+    : { ...notification, target: `/players/${encodeURIComponent(playerId)}` }
+}
+
 /** The expected player ID scopes the cache; the Player session authorizes reads. */
 export async function getPlayerNotifications(
   playerId: string,
@@ -43,9 +60,9 @@ export async function getPlayerNotifications(
 
   const state = readMockState()
   const now = Date.now()
-  const rows = (state.playerNotifications[playerId] ?? []).filter((notification) =>
-    isPlayerNotificationVisible(notification, now),
-  )
+  const rows = (state.playerNotifications[playerId] ?? [])
+    .filter((notification) => isPlayerNotificationVisible(notification, now))
+    .map((notification) => resolveClubTarget(notification, state, playerId))
   const reminder = verificationReminder(state, playerId, now)
   if (reminder) rows.unshift(reminder)
   return rows

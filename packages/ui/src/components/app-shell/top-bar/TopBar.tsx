@@ -106,7 +106,7 @@ export function TopBar({
             {brand}
           </div>
         )}
-        {product !== 'Players' ? <div className="flex-1" /> : null}
+        <div className={cn('flex-1', product === 'Players' && 'sm:hidden')} />
         {children}
       </div>
     </header>

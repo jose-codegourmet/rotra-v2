@@ -19,7 +19,9 @@ export async function proxy(request: NextRequest) {
   const goMode = goApiEnabled()
   const protectedPath =
     /^\/players\/[^/]+\/compare\/?$/.test(path) ||
-    ['/me', '/profile'].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+    ['/me', '/profile', '/notifications'].some(
+      (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+    )
   const toLogin = () => {
     const login = new URL('/login', request.url)
     login.searchParams.set('returnTo', `${path}${request.nextUrl.search}`)

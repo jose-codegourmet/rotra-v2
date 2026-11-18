@@ -22,8 +22,14 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   if (!reduce && window.Lenis) {
     try { lenis = new Lenis({ lerp: 0.09, smoothWheel: true }); } catch (e) { lenis = null; }
   }
+  // the loading screen (boot.js) owns the page until everything is in: no scrolling under it
+  if (lenis && document.getElementById('boot')) {
+    lenis.stop();
+    window.addEventListener('rotra:ready', function(){ lenis.start(); }, { once: true });
+  }
   var pins = Array.prototype.slice.call(document.querySelectorAll('[data-pin]'));
   var chapters = Array.prototype.slice.call(document.querySelectorAll('[data-ch]'));
+  var footEl = null;
   var railLinks = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
   var tracks = pins.filter(function(s){ return s.hasAttribute('data-track'); });
 
@@ -43,25 +49,24 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
       var items = s.querySelectorAll('[data-at]');
       for (var i = 0; i < items.length; i++) items[i].classList.toggle('on', p >= parseFloat(items[i].getAttribute('data-at')));
     });
-    // Hero: content holds, then leaves through the rings (x1 = exit progress)
+    // Hero: the title lifts and the camera pushes in with the scroll (--o1), Tara winds up (.sm-wind) and a shuttle
+    // drops to her racket (--sd). At SM_T the smash plays on its own clock (smashPlay) and hands over to chapter 01,
+    // which is already pinned under the hero stage (CSS: hero smash). Same timings on phones (shorter hero, 200vh).
     var ph = parseFloat(heroEl.style.getPropertyValue('--p')) || 0;
     function seg(a0, a1){ return Math.min(1, Math.max(0, (ph - a0) / (a1 - a0))); }
-    // phones (mobile pass): a shorter hero (200vh) over chapter 01, so the drop, the dive and the veil come sooner and
-    // the stage fades out (--hf) to show chapter 01, already pinned underneath
     var ph1 = PHONE.matches;
-    heroEl.style.setProperty('--o1', (ph1 ? seg(.05, .3) : seg(.08, .36)).toFixed(4));  // plate sinks, camera tilts down
-    heroEl.style.setProperty('--d', (Math.round((ph1 ? seg(.22, .5) : seg(.34, .62)) * 10) / 10).toFixed(2));   // Tara drops through
-    heroEl.style.setProperty('--z', (ph1 ? seg(.5, .82) : seg(.6, .9)).toFixed(4));   // dive through the hole
-    heroEl.style.setProperty('--hf', ph1 ? (1 - seg(.88, 1)).toFixed(4) : '1');
-    // Chapter 01: cards fan out (a), hold, then merge into the rank card (m)
+    heroEl.style.setProperty('--o1', (ph1 ? seg(.04, .3) : seg(.06, .34)).toFixed(4));  // title lifts, camera pushes in
+    heroEl.style.setProperty('--sd', seg(SM_WIND, SM_T - .02).toFixed(4));              // the shuttle drops in
+    windSet(ph >= SM_WIND);
+    smashTick(ph);
+    // Chapter 01: the real Tara is already standing there; cards fan out (a), hold, then merge into the rank card (m)
     // p1 = progress through the beats only (the first CH1_END of the span); the 70vh tail after it is the fade-out
     var p1 = Math.min(1, (parseFloat(ch1.style.getPropertyValue('--p')) || 0) / CH1_END);
     function s1(a0, a1){ return Math.min(1, Math.max(0, (p1 - a0) / (a1 - a0))); }
-    // phones (mobile pass): the fall, the clones and the heading come within the first ~60vh, not ~150vh
-    var tf = ph1 ? s1(0, .05) : s1(0, .14); tf = Math.round((1 - Math.pow(1 - tf, 3)) * 9) / 9;                // real Tara falls out of the hole
-    ch1.style.setProperty('--t', tf.toFixed(4));
-    ch1.style.setProperty('--a', (ph1 ? s1(.03, .13) : s1(.12, .36)).toFixed(4));            // clones slide in from the sides
-    ch1.style.setProperty('--h', (ph1 ? s1(.1, .18) : s1(.34, .46)).toFixed(4));            // then the heading shows
+    // phones (mobile pass): the clones and the heading come within the first ~60vh, not ~120vh
+    ch1.style.setProperty('--t', '1');
+    ch1.style.setProperty('--a', (ph1 ? s1(.02, .12) : s1(.04, .28)).toFixed(4));            // clones slide in from the sides
+    ch1.style.setProperty('--h', (ph1 ? s1(.09, .17) : s1(.26, .38)).toFixed(4));            // then the heading shows
     var m1 = Math.min(1, Math.max(0, (p1 - 0.55) / 0.3));
     ch1.style.setProperty('--m', m1.toFixed(4));
     lineupWrap.classList.toggle('revealed', m1 > 0.5);
@@ -80,8 +85,12 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
       needEl.className = 'qnotice ' + (need ? 'warn' : 'ok');
       needEl.textContent = need ? need + ' player' + (need > 1 ? 's need' : ' needs') + ' a level before the session can start.' : 'Everyone has a level. Ready to start the session.';
     }
+    // the top bar leaves as the footer arrives (the footer slides over it), instead of being cut in half
+    var ft = footEl || (footEl = document.getElementById('siteFooter'));
+    if (ft) document.body.classList.toggle('at-foot', ft.getBoundingClientRect().top < 96);
     var cur = 0;
     chapters.forEach(function(c, i){ if (c.getBoundingClientRect().top < vh * 0.5) cur = i; });
+    if (chapters[cur] === ch1 && smash.state !== 'done') cur = Math.max(0, cur - 1);   // still under the hero
     railLinks.forEach(function(a, i){ a.classList.toggle('on', i === cur); });
     curCh = cur;
     if (chapters.length) {
@@ -176,9 +185,96 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
         el.classList.toggle('cur', idx >= a && idx <= b);
         el.classList.toggle('past', idx > b);
       });
-      sec.querySelectorAll('.sdots i').forEach(function(d, i){ d.classList.toggle('on', i === idx); d.classList.toggle('done', i < idx); });
+      sec.querySelectorAll('.sdots i').forEach(function(d, i){ d.classList.toggle('on', i === idx); d.classList.toggle('sd-done', i < idx); });
     });
   }
+  // ---- Hero smash: Tara hits the shuttle at the camera and the page goes through it into chapter 01 ----
+  // Scroll only arms it: once the hero's progress reaches SM_T the sequence runs on its own clock (about 1.1 s),
+  // because a smash scrubbed by the wheel has no weight. Classes on #top drive the CSS (hero smash block):
+  //   .sm-hit   0 ms    follow-through pose, smear, burst and a dark impact frame (hit-stop, SM.stop ms)
+  //   .sm-smash 110 ms  the shuttle (.hx-fly) flies from her racket to the camera, speed lines, the hall pushes back
+  //   .sm-flash 570 ms  the cork fills the screen: the mint flash is on
+  //   .sm-thru  630 ms  everything but the flash is hidden; chapter 01 (.arrived) settles in as the flash fades
+  //   .sm-done  1080 ms the hero stage is hidden; chapter 01 is the page
+  // Scrolling back above SM_BACK brings the hero back (.sm-back: a short fade). A jump past the hero (a rail link, a
+  // reload further down) and reduced motion skip straight to .sm-done.
+  var SM_WIND = .2, SM_T = .46, SM_BACK = .38;
+  var SM = { stop: 110, fly: 460, hold: 60, fade: 450 };
+  var smash = { state: 'idle', last: 0, timers: [], anim: null };
+  var hxFly = heroEl.querySelector('.hx-fly'), hxDrop = heroEl.querySelector('.hx-drop img'), hxFx = heroEl.querySelector('.hx-fx');
+  // The wind-up: crossing SM_WIND plays standing -> crouch -> take-off -> wind-up on a clock (.sm-wup, CSS hx-w0..3),
+  // so every drawing is seen however fast the wheel turns; crossing back plays the short way down (.sm-unw).
+  var wind = { on: false, t: 0 };
+  function windSet(on){
+    if (on === wind.on) return;
+    wind.on = on;
+    heroEl.classList.toggle('sm-wind', on);
+    clearTimeout(wind.t); heroEl.classList.remove('sm-wup', 'sm-unw');
+    if (reduce || smash.state !== 'idle') return;
+    var c = on ? 'sm-wup' : 'sm-unw';
+    heroEl.classList.add(c);
+    wind.t = setTimeout(function(){ heroEl.classList.remove(c); }, on ? 500 : 280);
+  }
+  function smashClear(){
+    smash.timers.forEach(clearTimeout); smash.timers = [];
+    if (smash.anim) { try { smash.anim.cancel(); } catch (e) {} smash.anim = null; }
+    heroEl.classList.remove('sm-hit', 'sm-smash', 'sm-flash', 'sm-thru', 'sm-back');
+  }
+  function smashDone(){
+    smashClear();
+    heroEl.classList.add('sm-done'); ch1.classList.add('arrived');
+    smash.state = 'done';
+  }
+  function smashReset(){
+    smashClear();
+    heroEl.classList.remove('sm-done'); ch1.classList.remove('arrived');
+    smash.state = 'idle';
+    heroEl.classList.add('sm-back');
+    smash.timers.push(setTimeout(function(){ heroEl.classList.remove('sm-back'); }, 400));
+  }
+  function smashPlay(){
+    smashClear();
+    clearTimeout(wind.t); heroEl.classList.remove('sm-wup', 'sm-unw');
+    smash.state = 'playing';
+    var st = hxFx.getBoundingClientRect(), d = hxDrop.getBoundingClientRect();
+    // the hit point (centre of the dropped shuttle) and the stage centre, in stage px
+    var x0 = d.left + d.width / 2 - st.left, y0 = d.top + d.height / 2 - st.top, x1 = st.width / 2, y1 = st.height / 2;
+    heroEl.style.setProperty('--bx', x0.toFixed(1) + 'px'); heroEl.style.setProperty('--by', y0.toFixed(1) + 'px');
+    heroEl.classList.add('sm-hit');
+    function at(ms, fn){ smash.timers.push(setTimeout(fn, ms)); }
+    at(SM.stop, function(){
+      heroEl.classList.add('sm-smash');
+      // .hx-fly turns about its cork (CSS transform-origin = the cork's centre in the image, CORK), so the cork
+      // travels from the hit point to the middle of the screen and ends wider than the screen's diagonal
+      var w = hxFly.offsetWidth, h = hxFly.offsetHeight, CORK = [.209, .813, .40];
+      var cx = w * CORK[0], cy = h * CORK[1];
+      var s0 = Math.max(.01, d.width * .8 / w), s2 = 1.2 * Math.sqrt(st.width * st.width + st.height * st.height) / (w * CORK[2]);
+      function tf(x, y, sc, rot){ return 'translate(' + (x - cx).toFixed(1) + 'px,' + (y - cy).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ') rotate(' + rot + 'deg)'; }
+      if (hxFly.animate) smash.anim = hxFly.animate([
+        { transform: tf(x0, y0, s0, 20), offset: 0 },
+        { transform: tf(x0 + (x1 - x0) * .7, y0 + (y1 - y0) * .7, Math.sqrt(s0 * s2) * .5, 12), offset: .62 },
+        { transform: tf(x1, y1, s2, 6), offset: 1 }
+      ], { duration: SM.fly, easing: 'cubic-bezier(.5,0,.9,.5)', fill: 'forwards' });
+    });
+    at(SM.stop + SM.fly, function(){ heroEl.classList.add('sm-flash'); });
+    at(SM.stop + SM.fly + SM.hold, function(){ heroEl.classList.add('sm-thru'); ch1.classList.add('arrived'); });
+    at(SM.stop + SM.fly + SM.hold + SM.fade, smashDone);
+  }
+  function smashTick(ph){
+    var jump = ph - smash.last > .3;
+    smash.last = ph;
+    if (smash.state === 'idle' && ph >= SM_T) { if (reduce || jump || ph >= .98) smashDone(); else smashPlay(); }
+    else if (smash.state === 'done' && ph < SM_BACK) smashReset();
+  }
+  // The scene dots are buttons: a click glides to the middle of that scene's stretch of the section's scroll
+  document.addEventListener('click', function(e){
+    var d = e.target.closest && e.target.closest('.sdots i');
+    if (!d) return;
+    var sec = d.closest('.story'), n = +sec.getAttribute('data-n') || 1;
+    var i = Array.prototype.indexOf.call(d.parentNode.children, d);
+    var y = sec.getBoundingClientRect().top + window.scrollY + (sec.offsetHeight - window.innerHeight) * storyEnd(sec) * (i + .5) / n;
+    if (lenis) lenis.scrollTo(y, { duration: 1 }); else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  });
   var fadeIn = Array.prototype.slice.call(document.querySelectorAll('.fade-io'));
   var lineupWrap = ch1.querySelector('.lineup-wrap');
   // Line-up figures (CSS v18): the real one is 68vh tall (46vh at 700 px and below) and grows 10% on the reveal.
@@ -248,11 +344,11 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   window.addEventListener('resize', function(){ measureTracks(); update(); });
 
   // ---- Pages: #home (the story), #ranking, #partners, #request (#pricing redirects to #request) ----
-  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, assets: 1 };
+  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, assets: 1, find: 1 };
   var ALIAS = { partners: 'clubs' };
   var REDIRECT = { pricing: 'request' };
-  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', assets: 'Asset list · ROTRA' };
-  var NAV_OF = { clubs: 'clubs', request: 'clubs', ranking: 'ranking' };
+  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', assets: 'Asset list · ROTRA', find: 'Find your profile · ROTRA' };
+  var NAV_OF = { clubs: 'clubs', request: 'clubs', ranking: 'ranking', find: 'find' };
   var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
   var view = 'home';
@@ -271,14 +367,28 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     measureTracks();
     return changed;
   }
+  // Chapter 01 starts under the hero (its top is still the hero's wind-up), and its heading and line-up come in with
+  // the scroll, so a link to it lands where all five figures and the heading are in and the reveal has not begun
+  // (42% of its beats; 22% on phones, where they come in sooner)
+  function landing(el){ return el === ch1 ? Math.round((ch1.offsetHeight - window.innerHeight) * CH1_END * (PHONE.matches ? .22 : .42)) : 0; }
   function route(){
     var h = location.hash.slice(1);
     if (REDIRECT[h]) { h = REDIRECT[h]; try { history.replaceState(null, '', '#' + h); } catch (err) { location.replace('#' + h); return; } }
     var target = !PAGES[h] && h ? document.getElementById(h) : null;
     var next = PAGES[h] ? (ALIAS[h] || h) : ownerView(target);
-    var changed = setView(next);
-    if (target && h !== 'top') { if (lenis) lenis.scrollTo(target, { duration: 1.2 }); else target.scrollIntoView(); }
-    else if (changed || PAGES[h] || h === 'top') toTop();
+    cover(next, function(){
+      var changed = setView(next);
+      if (target && h !== 'top') { if (lenis) lenis.scrollTo(target, { duration: 1.2, offset: landing(target) }); else { target.scrollIntoView(); window.scrollBy(0, landing(target)); } }
+      else if (changed || PAGES[h] || h === 'top') toTop();
+    });
+  }
+  // A change of view happens under the page transition (ROTRA_PT, boot.js): the mark covers the screen, the view
+  // is swapped behind it, the mark flies out. The first route of a load, and a route to the same view, swap at once.
+  var routed = false;
+  function cover(next, swap){
+    var PT = window.ROTRA_PT;
+    if (!routed || next === view || !PT) { routed = true; swap(); return; }
+    PT.run(swap);
   }
   window.addEventListener('hashchange', route);
 
@@ -298,11 +408,13 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     if (!el) return;
     e.preventDefault();
     var owner = ownerView(el), switching = owner !== view;
-    if (switching) { setView(owner); toTop(); try { history.replaceState(null, '', '#' + owner); } catch (err) {} }
-    setTimeout(function(){
-      if (lenis) lenis.scrollTo(id === 'top' ? 0 : el, { duration: 1.4 });
-      else el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
-    }, switching ? 80 : 0);
+    cover(owner, function(){
+      if (switching) { setView(owner); toTop(); try { history.replaceState(null, '', '#' + owner); } catch (err) {} }
+      setTimeout(function(){
+        if (lenis) lenis.scrollTo(id === 'top' ? 0 : el, { duration: 1.4, offset: id === 'top' ? 0 : landing(el) });
+        else { el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); if (landing(el)) window.scrollBy(0, landing(el)); }
+      }, switching ? 80 : 0);
+    });
   });
   route();
 
@@ -368,7 +480,7 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   // which stays visible until Rive has drawn and whenever Rive is off (far away, failed, reduced motion).
   // The character script at the end of the page owns the Rive instances.
   var CHR = window.ROTRA_CHR = {
-    riv: function(name){ return (/-idle$/.test(name) ? '/art/' : '/art/chars/') + name + '.riv?v=3'; },
+    riv: function(name){ return (/-idle$/.test(name) ? '/art/' : '/art/chars/') + name + '.riv?v=4'; },
     still: function(name){ return '/art/chars/' + name + '.webp'; },
     showStill: function(el){
       el.style.backgroundImage = 'url(' + CHR.still(el.getAttribute('data-char')) + ')';
@@ -376,6 +488,21 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     }
   };
   document.querySelectorAll('.chr[data-char]').forEach(CHR.showStill);
+
+  // Sample-player avatars: every initials circle (.vg-av, .qav, .avatar) whose initials have a portrait in
+  // art/avatars/<initials>.webp shows it (.has-av); the initials stay in the markup as the fallback.
+  var AV = window.ROTRA_AV = {
+    list: 'jt ra lb cm ac en no yf bc br dr tr ms kl ml ks sv gt be ta pa ju ma'.split(' '),
+    url: function(k){ return '/art/avatars/' + k + '.webp'; },
+    paint: function(el){
+      var t = '';
+      for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3) t += n.nodeValue;
+      var k = t.trim().toLowerCase(), has = AV.list.indexOf(k) >= 0;
+      el.style.backgroundImage = has ? 'url(' + AV.url(k) + ')' : '';
+      el.classList.toggle('has-av', has);
+    }
+  };
+  document.querySelectorAll('.vg-av, .qav, .avatar').forEach(AV.paint);
 
   // ---- Asset list page: built from every placeholder on the site ----
   (function(){
@@ -422,6 +549,7 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
       document.getElementById('lbSub').textContent = B.sub;
       B.top.forEach(function(e, i){
         lbBoard.querySelector('[data-k="i' + i + '"]').textContent = e[0];
+        if (window.ROTRA_AV) window.ROTRA_AV.paint(lbBoard.querySelector('[data-k="i' + i + '"]'));
         lbBoard.querySelector('[data-k="n' + i + '"]').textContent = e[1];
         lbBoard.querySelector('[data-k="l' + i + '"]').textContent = e[2];
       });

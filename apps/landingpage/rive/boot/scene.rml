@@ -1,0 +1,78 @@
+<Rive version="1" kind="fragment">
+<!-- The ROTRA mark as the site's loading screen. View model: progress (0..1) fills the inner ring; out (0 or 1)
+     plays Out once (the mark flies at the camera); intro = 1
+     before the first frame starts on Intro (the mark lands from the camera), used by the page transition. First child draws in front. -->
+<Artboard defaultStateMachineId="0:7" viewModelId="0:40" viewModelInstanceId="0:44" styleId="0:5" width="1200" height="1200" name="Boot" id="0:2">
+<LayoutComponentStyle name="Artboard Style" id="0:5"/>
+<Node x="600" y="600" name="Mark" id="0:20">
+<Node name="Orbit" id="0:21">
+<Shape x="135" y="0" name="Dot" id="0:22"><Ellipse width="38.5" height="38.5" name="Path"/><Fill name="Fill"><SolidColor colorValue="FF71C173" name="Color"/></Fill></Shape>
+</Node>
+<Shape x="0" y="0" rotation="-1.5707963" opacity="1" name="Progress" id="0:23">
+<Ellipse width="192.6" height="192.6" name="Path"/>
+<Stroke thickness="14.4" cap="round" name="Stroke"><SolidColor colorValue="FF71C173" name="Color"/><TrimPath start="0" end="0" name="Trim"><DataBindContext sourcePathIds="0:40-0:41" propertyKey="115"/></TrimPath></Stroke>
+</Shape>
+<Shape x="0" y="0" rotation="-1.5707963" opacity="0.22" name="Ring3" id="0:24">
+<Ellipse width="192.6" height="192.6" name="Path"/>
+<Stroke thickness="14.4" cap="round" name="Stroke"><SolidColor colorValue="FF71C173" name="Color"/></Stroke>
+</Shape>
+<Shape x="0" y="0" rotation="-1.5707963" opacity="0.4" name="Ring2" id="0:25">
+<Ellipse width="270" height="270" name="Path"/>
+<Stroke thickness="14.4" cap="round" name="Stroke"><SolidColor colorValue="FF71C173" name="Color"/></Stroke>
+</Shape>
+<Shape x="0" y="0" rotation="-1.5707963" opacity="0.2" name="Ring1" id="0:26">
+<Ellipse width="346.8" height="346.8" name="Path"/>
+<Stroke thickness="14.4" cap="round" name="Stroke"><SolidColor colorValue="FF71C173" name="Color"/></Stroke>
+</Shape>
+</Node>
+<StateMachine name="Main" id="0:7">
+<StateMachineLayer name="Layer 1" id="0:8">
+<AnyState x="200" y="-120"/><ExitState x="600" y="-120"/>
+<EntryState>
+<StateTransition stateToId="0:14">
+<TransitionViewModelCondition opValue="greaterThan">
+<TransitionPropertyViewModelComparator><BindablePropertyNumber><DataBindContext sourcePathIds="0:40-0:43" propertyKey="636"/></BindablePropertyNumber></TransitionPropertyViewModelComparator>
+<TransitionValueNumberComparator value="0.5"/>
+</TransitionViewModelCondition>
+</StateTransition>
+<StateTransition stateToId="0:12"/>
+</EntryState>
+<AnimationState x="0" y="120" animationId="0:32" id="0:14"><StateTransition stateToId="0:12" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100"/></AnimationState>
+<AnimationState x="200" y="0" animationId="0:30" id="0:12">
+<StateTransition stateToId="0:13" duration="220">
+<TransitionViewModelCondition opValue="greaterThan">
+<TransitionPropertyViewModelComparator><BindablePropertyNumber><DataBindContext sourcePathIds="0:40-0:42" propertyKey="636"/></BindablePropertyNumber></TransitionPropertyViewModelComparator>
+<TransitionValueNumberComparator value="0.5"/>
+</TransitionViewModelCondition>
+</StateTransition>
+</AnimationState>
+<AnimationState x="400" y="0" animationId="0:31" id="0:13"/>
+</StateMachineLayer>
+</StateMachine>
+<LinearAnimation loopValue="loop" fps="60" duration="120" name="Idle" id="0:30">
+<KeyedObject objectId="0:21"><KeyedProperty property="rotation"><KeyFrameDouble value="0" frame="0" interpolationType="linear"/><KeyFrameDouble value="6.2831853" frame="120" interpolationType="linear"/></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:25"><KeyedProperty property="opacity"><KeyFrameDouble value="0.4" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.8" frame="30" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.4" frame="75" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.4" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleX"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1.035" frame="30" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="75" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleY"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1.035" frame="30" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="75" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:26"><KeyedProperty property="opacity"><KeyFrameDouble value="0.2" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.2" frame="18" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.5" frame="48" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.2" frame="96" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0.2" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleX"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="18" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1.04" frame="48" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="96" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleY"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="18" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1.04" frame="48" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="96" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+</LinearAnimation>
+<LinearAnimation fps="60" duration="48" name="Out" id="0:31">
+<KeyedObject objectId="0:21"><KeyedProperty property="rotation"><KeyFrameDouble value="6.2831853" frame="0" interpolationType="linear"/><KeyFrameDouble value="6.2831853" frame="48" interpolationType="linear"/></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:20"><KeyedProperty property="scaleX"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="0.88" frame="12" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="3.6" frame="48" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleY"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="0.88" frame="12" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="3.6" frame="48" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="opacity"><KeyFrameDouble value="1" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="1" frame="26" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble><KeyFrameDouble value="0" frame="46" interpolationType="cubic"><CubicEaseInterpolator x1="0.6" y1="0" x2="0.9" y2="0.4"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:25"><KeyedProperty property="opacity"><KeyFrameDouble value="0.4" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="12" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:26"><KeyedProperty property="opacity"><KeyFrameDouble value="0.2" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="12" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+</LinearAnimation>
+<LinearAnimation fps="60" duration="22" name="Intro" id="0:32">
+<KeyedObject objectId="0:20"><KeyedProperty property="scaleX"><KeyFrameDouble value="3.2" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="22" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="scaleY"><KeyFrameDouble value="3.2" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="22" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble></KeyedProperty><KeyedProperty property="opacity"><KeyFrameDouble value="0" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="12" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble><KeyFrameDouble value="1" frame="22" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble></KeyedProperty></KeyedObject>
+<KeyedObject objectId="0:21"><KeyedProperty property="rotation"><KeyFrameDouble value="-2.2" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.1" y1="0.7" x2="0.2" y2="1"/></KeyFrameDouble><KeyFrameDouble value="0" frame="22" interpolationType="linear"/></KeyedProperty></KeyedObject>
+</LinearAnimation>
+</Artboard>
+<ViewModel defaultInstanceId="0:44" name="Boot" id="0:40">
+<ViewModelPropertyNumber name="progress" id="0:41"/>
+<ViewModelPropertyNumber name="out" id="0:42"/>
+<ViewModelPropertyNumber name="intro" id="0:43"/>
+<ViewModelInstance exports="true" name="Default" id="0:44">
+<ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:41"/>
+<ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:42"/>
+<ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:43"/>
+</ViewModelInstance>
+</ViewModel>
+</Rive>

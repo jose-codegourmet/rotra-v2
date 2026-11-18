@@ -18,7 +18,9 @@ export function SiteHeader() {
             <a href="#clubs" data-nav="clubs">
               For clubs
             </a>
-            <a href="#s-record">Find your profile</a>
+            <a href="#find" data-nav="find">
+              Find your profile
+            </a>
             <a className="btn pri" href="https://player.rotra.club/login" data-app="player">
               Sign in
             </a>

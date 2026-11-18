@@ -126,8 +126,8 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   request all reach the Queue Master's Requests in real mode.
 - **Update, November 18, 2026 (owner: “full version migration”):** **I'm here** and **I'm leaving** are
   real (`selfCheckIn`, `leaveSessionAsPlayer`; Player app routes `check-in` and `leave`), with the
-  roster marks and the club's switch (migration `20261118000600_self_check_in`, **not applied to the
-  shared database**). Written and type-checked; not run against a database. Still open here: the
+  roster marks and the club's switch (migration `20261118000600_self_check_in`, applied to a local disposable database
+  2026-11-19; **shared database pending, applied right after merge**). Written and type-checked. Still open here: the
   drop-out notice (**I can't make it**) and the Session invite code.
 - **Update, November 19, 2026 (Q24.6, #968; owner approved the migration for the batch):**
   **I can't make it** and the Session invite code are real (`sendDropOutNotice`,
@@ -135,8 +135,8 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   read returns the open drop-out notices; **Keep** and **Remove from roster** are Queue app routes
   under `requests/drop-outs/[noticeId]`; finishing, invalidating or cancelling closes open notices;
   My night reads `cantMakeItSent`, `canInvite` and `inviteCode`. Migration
-  `20261118000700_drop_out_notices_session_invites`, **not applied to the shared database**; not run
-  against a database. Still open: resolving `?invite=` on a join request (“Invited by NAME”).
+  `20261118000700_drop_out_notices_session_invites`, applied to a local disposable database
+  2026-11-19, **shared database pending, applied right after merge**. Still open: resolving `?invite=` on a join request (“Invited by NAME”).
 
 ---
 

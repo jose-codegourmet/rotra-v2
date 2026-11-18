@@ -147,7 +147,12 @@ greens, one mint `#00FF88`).
   `.story` / `.scene` machinery as home): two parts (`assess`, Rion then Tara beside the copy), four ways a rank moves
   (`moves`, the home meters), the rules (`clubs`), the ladder (`ladder`), the rank card (`record`). The copy is the old
   page's, one idea per screen. The chapter rail is hidden on `#ranking` and `#find`; the footer's arena CTA is hidden on `#find`.
-- Find your profile is its own view (`#find`, `find-page/FindPage.tsx`); home 04 ends with a button to it. It is one
+- Find your profile is its own view (`#find`, `find-page/FindPage.tsx`); home 04 ends with a button to it. The search is
+  live: an RTR ID opens that player's profile card over the page, in a frame of the Player Information app's
+  `/card/<ID>` (`openCard()` in `site.js`, `.pcard` in `globals.css`; the app tells the page when the card is ready,
+  closed or has no such profile, and after 9 s without an answer the page goes to `/find/<ID>` instead), a name opens its
+  leaderboard at `/?q=<name>` with the name search filled in (`initialQuery` in the player app's `LeaderboardPage`). On a
+  local dev host the form targets `http://localhost:9001`. It is one
   screen, centred, over its own scene `find` (`rive/scenes/find/`, built like the other section scenes: backdrop, two banner
   groups that sway, two drifting shuttles, the players in front), with `art/find-far/mid/near.webp` as the still layers and
   `art/mobile/find.webp` on phones (`.find-hero` in `globals.css`).

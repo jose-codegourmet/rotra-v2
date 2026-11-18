@@ -1426,3 +1426,11 @@ body[data-view="find"] .h-arena{display:none}
 /* the top bar slides away as the footer reaches it (body.at-foot, main script) */
 .top{transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s}
 body.at-foot .top{transform:translateY(-100%);opacity:0;pointer-events:none}
+/* Find your profile: the Player Information app's profile card in a frame over the page (openCard, main script) */
+.pcard{position:fixed;inset:0;z-index:950;display:grid;place-items:center;background:rgba(5,8,7,.72);animation:pcard-in .2s ease-out}
+.pcard iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color-scheme:dark;opacity:0;transition:opacity .25s}
+.pcard.on iframe{opacity:1}
+.pcard.on{background:transparent;transition:background .25s}
+.pcard.on .pcard-wait{display:none}
+.pcard-wait{margin:0;font:500 13px var(--mono);letter-spacing:.08em;color:#b9b9c2}
+@keyframes pcard-in{from{opacity:0}}

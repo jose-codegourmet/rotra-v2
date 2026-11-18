@@ -1,0 +1,32 @@
+{
+ "image": "tara-hit.webp",
+ "name": "TaraHit",
+ "width": 900,
+ "height": 1356,
+ "cell": 15,
+ "duration": 240,
+ "bones": [
+  {"name": "Hips", "from": [433, 630], "to": [467, 529], "parent": null},
+  {"name": "Chest", "to": [472, 360], "parent": "Hips"},
+  {"name": "Head", "to": [461, 191], "parent": "Chest"},
+  {"name": "Pony1", "to": [304, 79], "parent": "Head"},
+  {"name": "Pony2", "to": [101, 270], "parent": "Pony1"},
+  {"name": "ArmA", "from": [382, 371], "to": [422, 776], "parent": null},
+  {"name": "Racket", "to": [433, 1294], "parent": "ArmA"},
+  {"name": "ArmB", "from": [540, 326], "to": [742, 338], "parent": null}
+ ],
+ "anchors": [
+  {"name": "FootL", "points": [[90, 1271], [169, 1012]]},
+  {"name": "FootR", "points": [[799, 1271], [675, 934]]}
+ ],
+ "keys": {
+  "Hips": {"y": [[0, 0], [120, 5], [240, 0]]},
+  "Chest": {"rotation": [[0, -0.008], [130, 0.012], [240, -0.008]]},
+  "Head": {"rotation": [[0, -0.015], [140, 0.02], [240, -0.015]]},
+  "Pony1": {"rotation": [[0, 0], [80, 0.03], [180, -0.03], [240, 0]]},
+  "Pony2": {"rotation": [[0, 0], [100, 0.05], [200, -0.05], [240, 0]]},
+  "ArmA": {"y": [[0, 0], [120, 5], [240, 0]], "rotation": [[0, 0], [150, 0.012], [240, 0]]},
+  "Racket": {"rotation": [[0, 0], [170, 0.02], [240, 0]]},
+  "ArmB": {"y": [[0, 0], [120, 5], [240, 0]], "rotation": [[0, 0], [150, -0.02], [240, 0]]}
+ }
+}

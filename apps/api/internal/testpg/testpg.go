@@ -22,6 +22,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const image = "postgres:16-alpine"
@@ -178,4 +179,23 @@ func ApplyMigrations(t testing.TB, dsn string) {
 			t.Fatalf("migration %s: %v", filepath.Base(filepath.Dir(f)), err)
 		}
 	}
+}
+
+// NewMigratedPool creates an empty database, applies every migration and opens a pool of up to maxConns
+// connections on it. The pool is closed and the database dropped when the test ends.
+func NewMigratedPool(t testing.TB, maxConns int32) *pgxpool.Pool {
+	t.Helper()
+	dsn := NewDatabase(t)
+	ApplyMigrations(t, dsn)
+	cfg, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		t.Fatalf("parse dsn: %v", err)
+	}
+	cfg.MaxConns = maxConns
+	pool, err := pgxpool.NewWithConfig(context.Background(), cfg)
+	if err != nil {
+		t.Fatalf("open pool: %v", err)
+	}
+	t.Cleanup(pool.Close)
+	return pool
 }

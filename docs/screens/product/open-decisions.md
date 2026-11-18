@@ -121,7 +121,7 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 |---|---|---|
 | Club account provisioning | The platform owner adds clubs directly; no application flow | A-CLUBS, A-ADD-CLUB |
 | License prices and discount | Each club has its own monthly and yearly price (yearly below twelve months), or is free as a tester; the license amount is prefilled from it | A-ADD-CLUB, A-CLUB-PRICE, A-LICENSE |
-| Feature flag catalog | Starts empty; the platform owner adds flags with a name, a fixed key, a description and a starting value | A-FEATURE-FLAGS, A-ADD-FLAG |
+| Feature flag catalog | Starts with the flags ROTRA's own features ship with, all off (`player_google_sign_in`, D-2026-11-18-01); the platform owner adds other flags with a name, a fixed key, a description and a starting value | A-FEATURE-FLAGS, A-ADD-FLAG |
 | Club detail layout | Tabs: Overview, License, Public pages, Activity | A-CLUB-DETAIL |
 
 ## Sources

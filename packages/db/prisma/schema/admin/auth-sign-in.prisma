@@ -1,0 +1,83 @@
+// Sign-in owned by the Go API (B-62): identities, the signed-in device list, rate-limit counters and the
+// sign-in audit trail. Design: docs/database_design/product/sign-in.md. Prisma cannot express the CHECKs,
+// the partial indexes, `fillfactor`, `UNLOGGED` or the append-only trigger; they live in the migration SQL.
+// Go-only tables: the Prisma services never read or write them.
+
+/// One row per account that can sign in. `login_key` is the club username, or the normalized email.
+model AuthIdentity {
+  id                String    @id @db.Uuid
+  audience          String
+  loginKey          String    @map("login_key")
+  /// PHC string, e.g. $argon2id$v=19$...; never plaintext.
+  passwordHash      String    @map("password_hash")
+  passwordScheme    String    @map("password_scheme")
+  passwordChangedAt DateTime  @map("password_changed_at") @db.Timestamptz(6)
+  disabledAt        DateTime? @map("disabled_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  revision          BigInt    @default(1)
+
+  sessions AuthSession[]
+  events   AuthEvent[]
+
+  @@unique([audience, loginKey])
+  @@map("auth_identities")
+}
+
+/// The signed-in device list. Only SHA-256 digests of refresh passes are stored.
+model AuthSession {
+  id                    String    @id @db.Uuid
+  identityId            String    @map("identity_id") @db.Uuid
+  audience              String
+  clubId                String?   @map("club_id") @db.Uuid
+  deviceId              String?   @map("device_id") @db.Uuid
+  deviceLabel           String    @map("device_label")
+  refreshDigest         Bytes     @unique @map("refresh_digest")
+  previousRefreshDigest Bytes?    @unique @map("previous_refresh_digest")
+  refreshedAt           DateTime? @map("refreshed_at") @db.Timestamptz(6)
+  createdIp             String?   @map("created_ip") @db.Inet
+  lastIp                String?   @map("last_ip") @db.Inet
+  lastSeenAt            DateTime  @map("last_seen_at") @db.Timestamptz(6)
+  expiresAt             DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt             DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokeReason          String?   @map("revoke_reason")
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  identity AuthIdentity @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  device   Device?      @relation(fields: [clubId, deviceId], references: [clubId, id], onDelete: Restrict)
+  events   AuthEvent[]
+
+  // Partial indexes (WHERE revoked_at IS NULL / device_id IS NOT NULL) are in the migration SQL.
+  @@map("auth_sessions")
+}
+
+/// Per account, IP and device attempt counters. UNLOGGED in the migration: losing them in a crash only
+/// starts a fresh window.
+model AuthRateLimit {
+  scope       String
+  subject     String
+  action      String
+  windowStart DateTime @map("window_start") @db.Timestamptz(6)
+  attempts    Int
+
+  @@id([scope, subject, action, windowStart])
+  @@map("auth_rate_limits")
+}
+
+/// Append-only sign-in audit trail. Stores no email, username or password.
+model AuthEvent {
+  id         BigInt   @id @default(autoincrement())
+  identityId String?  @map("identity_id") @db.Uuid
+  sessionId  String?  @map("session_id") @db.Uuid
+  audience   String
+  event      String
+  ip         String?  @db.Inet
+  deviceId   String?  @map("device_id") @db.Uuid
+  occurredAt DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  identity AuthIdentity? @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  session  AuthSession?  @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+
+  // Partial indexes (identity_id / session_id IS NOT NULL) are in the migration SQL.
+  @@map("auth_events")
+}

@@ -1,9 +1,13 @@
 import type { LegalDocumentProps } from '@rotra/ui/legal-document'
 
-/** P-PRIVACY copy, word for word from the mockup (rotra-player.html › LEGAL.privacy; D-2026-11-17-01). */
+/**
+ * P-PRIVACY copy, word for word from the mockup (rotra-player.html › LEGAL.privacy; D-2026-11-17-01,
+ * D-2026-11-18-02). rotra.club shows the same text in
+ * apps/landingpage/src/app/_components/legal-page/privacy-content.ts.
+ */
 export const privacyPolicy = {
   title: 'Privacy Policy',
-  effective: 'Effective November 17, 2026',
+  effective: 'Effective November 18, 2026',
   sections: [
     {
       heading: 'Who we are',
@@ -14,11 +18,19 @@ export const privacyPolicy = {
         },
         {
           kind: 'paragraph',
-          text: 'This policy explains what information ROTRA keeps about you, why we keep it, and what you can do about it. It is written for players and clubs in the Philippines and follows the Data Privacy Act of 2012 (Republic Act No. 10173).',
+          text: 'ROTRA is operated by [OPERATOR LEGAL NAME], [OPERATOR ADDRESS]. In this policy, "ROTRA", "we" and "us" mean [OPERATOR LEGAL NAME]. We are responsible for your information under the law. The law calls this the personal information controller.',
         },
         {
           kind: 'paragraph',
-          text: 'In this policy, "ROTRA", "we" and "us" mean the people who run ROTRA. For questions and privacy requests, email support@rotra.club.',
+          text: 'This policy explains what information ROTRA keeps about you, why we keep it, and what you can do about it. It covers the ROTRA apps and the website rotra.club. It is written for players and clubs in the Philippines and follows the Data Privacy Act of 2012 (Republic Act No. 10173).',
+        },
+        {
+          kind: 'paragraph',
+          text: 'Our Data Protection Officer is the person responsible for data protection at ROTRA. For questions and privacy requests, email support@rotra.club.',
+        },
+        {
+          kind: 'paragraph',
+          text: 'Clubs and ROTRA have different jobs. A club decides which players it saves and adds to its Queue Sessions, and it is responsible for having the right to do so. ROTRA is responsible for the platform, for player profiles and for ranks.',
         },
       ],
     },
@@ -27,16 +39,19 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'We collect only what the app needs to work:',
+          text: 'We collect only what ROTRA needs to work:',
         },
         {
           kind: 'list',
           items: [
             'Your account: your full name, nickname, email address, mobile number and profile picture. Also the details you choose to add, such as your playing style, when you started playing and links to your social profiles, the city or province you give when you register without a club, and the requests you send us, such as a change to your phone or email.',
-            "From Google sign-in: your Google email address, your name and your profile picture. Nothing else. ROTRA can't read your Gmail, your contacts, your Google Drive or anything else in your Google account.",
-            'Your play: the Queue Sessions you join, the games you play, their scores and results, and the level, rank and statistics worked out from them.',
+            "If you sign in with Google: your Google email address, your name and your profile picture. Nothing else. ROTRA can't read your Gmail, your contacts, your Google Drive or anything else in your Google account.",
+            'Your play: the Queue Sessions you join, the games you play, their scores and results, and the rank and statistics worked out from them.',
             'What a club saves about you: your name, nickname, picture, level and email address, and your mobile number if the club adds it.',
-            "Technical information: the cookies that keep you signed in, a setting on your device that remembers light or dark mode, basic server logs (such as when a page was requested and any errors), and page-visit counts that don't identify you.",
+            "A club account: the club's name, its founding address and city, its sign-in name, its logo, its license and the license payments recorded in ROTRA, and the Queue Sessions, courts and players it keeps in ROTRA.",
+            "A quotation request on rotra.club: the club's name, city, main venue, courts per night and nights per week, your full name, your role at the club, your email address and mobile number, the plan you're interested in and anything else you write.",
+            'A profile search on rotra.club: the name or RTR ID you type. It goes to the ROTRA Player app to find the profile.',
+            "Technical information: the cookies that keep you signed in, settings on your device such as light or dark mode, basic server logs and sign-in records (such as when a page was requested, the internet (IP) address it came from and any errors), technical traces that help us find and fix problems, and page-visit counts that don't identify you.",
           ],
         },
         {
@@ -61,6 +76,10 @@ export const privacyPolicy = {
         },
         {
           kind: 'paragraph',
+          text: "Under the Terms of Service, a club that saves someone confirms that it has that person's permission, and a parent's or guardian's permission for anyone under 18.",
+        },
+        {
+          kind: 'paragraph',
           text: 'An unclaimed profile is public: anyone can see its name, picture, level, games and rank. Its email address and phone number are never shown publicly. Another club can find an unclaimed profile only by typing its exact email address or RTR ID.',
         },
         {
@@ -69,28 +88,87 @@ export const privacyPolicy = {
         },
         {
           kind: 'paragraph',
-          text: "If you don't want to register and want your unclaimed profile removed, ask the club that saved you to delete it, or email support@rotra.club.",
+          text: "You can object or ask for removal at any time. If you don't want to register and want your unclaimed profile removed, ask the club that saved you to delete it, or email support@rotra.club.",
         },
       ],
     },
     {
-      heading: 'How we use your information',
+      heading: 'Why we use your information',
       blocks: [
+        {
+          kind: 'paragraph',
+          text: 'The Data Privacy Act asks us to have a lawful reason, called a legal basis, for each use of your information. These are ours.',
+        },
+        {
+          kind: 'paragraph',
+          text: 'To provide the service you or your club asked for. This is our agreement with you:',
+        },
         {
           kind: 'list',
           items: [
             'To run club nights: to put you in a Queue Session, in the Queue and on a court, and to record your games and results.',
             'To show your profile, games, rank and leaderboard places in the app.',
             'To sign you in and keep your account safe.',
-            'To check your account. A player is verified when a Google account is connected, a mobile number is on the account and the ROTRA email matches the Google email.',
             'To let clubs find you and add you to their Queue Sessions.',
             'To handle your requests, such as a password reset or a change to your phone or email. ROTRA Admin reviews these by hand.',
-            'To show you notifications in the app, fix problems and keep the app working.',
+            'To show you notifications in the app.',
+            "To run a club's account and license, and to answer a club's quotation request and contact the club about its plan and payment.",
           ],
         },
         {
           kind: 'paragraph',
+          text: 'With your consent:',
+        },
+        {
+          kind: 'list',
+          items: [
+            'When you register, and for the optional details you add to your profile, such as your playing style, when you started playing and your social links.',
+            'If you sign in with Google, for the details Google shares with us.',
+          ],
+        },
+        {
+          kind: 'paragraph',
+          text: 'You can withdraw your consent at any time. Remove an optional detail from your profile, or ask us to close your account. Withdrawing doesn\'t undo what we did before, and some records stay, as "How long we keep it" explains.',
+        },
+        {
+          kind: 'paragraph',
+          text: 'For our legitimate interests, which we weigh against your rights:',
+        },
+        {
+          kind: 'list',
+          items: [
+            "To keep clubs' game records complete, because other players' games and ranks depend on them.",
+            'To work out ranks, statistics and leaderboards from the levels and results clubs record.',
+            'To keep the unclaimed profiles clubs save, so their games count and the person can take the profile over when they register.',
+            'To check accounts. For example, where Google sign-in is offered, a player is verified when a Google account is connected, a mobile number is on the account and the ROTRA email matches the Google email. ROTRA Admin can also verify an account.',
+            'To keep ROTRA secure and to prevent fake accounts, false results and other abuse.',
+            'To fix problems and keep the app working, using logs, traces and page-visit counts.',
+          ],
+        },
+        {
+          kind: 'paragraph',
+          text: 'When the law requires it: to keep the records the law asks us to keep, and to answer a valid order from a court or a government agency.',
+        },
+        {
+          kind: 'paragraph',
           text: "We don't use your information for advertising, and we don't sell it.",
+        },
+      ],
+    },
+    {
+      heading: 'Levels, ranks and automated processing',
+      blocks: [
+        {
+          kind: 'paragraph',
+          text: 'Clubs give each player a playing level. ROTRA works out ranks, statistics and leaderboard places automatically, from those levels and from the results clubs record. No person checks each one.',
+        },
+        {
+          kind: 'paragraph',
+          text: "They are about badminton only. They have no legal effect on you, and we don't use them to make decisions about you outside ROTRA.",
+        },
+        {
+          kind: 'paragraph',
+          text: "If you think a result, level or rank is wrong, talk to the club first, because the club records results and sets levels. If that doesn't settle it, email support@rotra.club and we will look into it.",
         },
       ],
     },
@@ -116,13 +194,26 @@ export const privacyPolicy = {
           kind: 'list',
           items: [
             'Clubs you play at. A club that saved you, or whose Queue Session you join, sees what it needs to run its sessions, such as your name, picture, level and your games there. It sees your phone number unless you hide it from clubs.',
-            'Service providers that run ROTRA for us: hosting, the database, picture storage and sign-in. Today Vercel hosts the app, and Supabase runs our database, file storage and sign-in. Google handles Google sign-in. They handle your information to provide these services to us.',
             'The authorities, when the law requires it, for example a valid order from a court or a government agency.',
+            'A new operator, if ROTRA is ever sold or merged with another business. We will tell you before your information passes to them.',
           ],
         },
         {
           kind: 'paragraph',
-          text: 'We never sell your information.',
+          text: 'Service providers run parts of ROTRA for us. They handle your information only to provide their services to us. Today they are:',
+        },
+        {
+          kind: 'list',
+          items: [
+            'Vercel, which hosts the ROTRA apps and rotra.club, and counts page visits in the apps.',
+            'Supabase, which runs our database, file storage (such as profile pictures) and sign-in, and sends the emails that sign-in needs.',
+            'Google, which handles Google sign-in where it is offered.',
+            'Grafana Labs, which receives technical traces of requests and errors when we turn this monitoring on, so we can find and fix problems.',
+          ],
+        },
+        {
+          kind: 'paragraph',
+          text: 'This list can change. When it does, we update this page. We never sell your information.',
         },
       ],
     },
@@ -131,15 +222,24 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: "Your information is stored on our providers' servers. Today the app runs in Singapore, so your information is kept outside the Philippines.",
+          text: "Your information is stored on our providers' servers outside the Philippines. Today the ROTRA apps run in Singapore. Our providers may also process information in other countries. Wherever it is, we stay responsible for it.",
         },
         {
           kind: 'paragraph',
-          text: 'We protect it with sign-in, encrypted connections and access checks: the app shows each person only what they are allowed to see, and only ROTRA Admin can use the admin tools.',
+          text: 'We protect it with reasonable organisational, physical and technical measures. These include sign-in, encrypted connections and access checks: the app shows each person only what they are allowed to see, and only ROTRA Admin can use the admin tools.',
         },
         {
           kind: 'paragraph',
-          text: 'No system is perfectly safe. If a breach puts your information at risk, we will tell you and the National Privacy Commission as the Data Privacy Act requires.',
+          text: 'No system is perfectly safe.',
+        },
+      ],
+    },
+    {
+      heading: 'If there is a breach',
+      blocks: [
+        {
+          kind: 'paragraph',
+          text: 'If a breach puts your information at risk, we will tell the National Privacy Commission and the people affected within 72 hours of learning of it, when the law requires us to.',
         },
       ],
     },
@@ -156,7 +256,28 @@ export const privacyPolicy = {
         },
         {
           kind: 'paragraph',
+          text: 'We keep a quotation request as long as we need it to answer it and, if the club joins ROTRA, to run its account.',
+        },
+        {
+          kind: 'paragraph',
+          text: 'We keep server logs and traces only as long as we need them to fix problems and keep ROTRA secure.',
+        },
+        {
+          kind: 'paragraph',
           text: 'For pictures, we keep only your current and your previous uploaded picture. Older ones are deleted.',
+        },
+      ],
+    },
+    {
+      heading: 'Cookies and device storage',
+      blocks: [
+        {
+          kind: 'paragraph',
+          text: 'ROTRA uses only the cookies and device storage it needs: to keep you signed in, to remember settings such as light or dark mode, and to finish a sign-in or registration you started.',
+        },
+        {
+          kind: 'paragraph',
+          text: "We don't use advertising or tracking cookies.",
         },
       ],
     },
@@ -177,12 +298,12 @@ export const privacyPolicy = {
             'Ask us to erase or block your information.',
             'Get a copy of your information in a common electronic format (data portability).',
             'Claim damages if you were harmed by wrong or unlawful use of your information.',
-            'Complain to the National Privacy Commission if you think your rights were not respected.',
+            'Complain to the National Privacy Commission (privacy.gov.ph) if you think your rights were not respected.',
           ],
         },
         {
           kind: 'paragraph',
-          text: 'To use any of these rights, email support@rotra.club from the email address on your account, or tell us which account it is. We may ask you to show that the account is yours before we act. We answer every request by email.',
+          text: 'To use any of these rights, email support@rotra.club from the email address on your account, or tell us which account it is. We may ask you to show that the account is yours before we act. We answer every request by email, as soon as we reasonably can.',
         },
       ],
     },
@@ -191,7 +312,24 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: "Clubs may include players under 18 in their Queue Sessions and save them in the app. A parent or guardian who wants to see, correct or remove a child's information can email support@rotra.club.",
+          text: 'You must be 18 or older to register for ROTRA on your own. Anyone under 18 may use ROTRA only with the consent of a parent or guardian.',
+        },
+        {
+          kind: 'paragraph',
+          text: "Clubs may include players under 18 in their Queue Sessions and save them in the app. A club that adds a player under 18 confirms that it has a parent's or guardian's consent.",
+        },
+        {
+          kind: 'paragraph',
+          text: "A parent or guardian who wants to see, correct or remove a child's information can email support@rotra.club. If we learn that a child's information was added without that consent, we remove it.",
+        },
+      ],
+    },
+    {
+      heading: 'Links to other sites',
+      blocks: [
+        {
+          kind: 'paragraph',
+          text: "Profiles can link to social media and other sites, and you can sign in with Google where it is offered. Those sites and services have their own privacy policies. This policy doesn't cover them.",
         },
       ],
     },
@@ -200,7 +338,7 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'We may change this policy when ROTRA changes. The date at the top shows when it last changed. If a change matters to you, we will tell you in the app.',
+          text: 'We may change this policy when ROTRA changes. The date at the top shows when it last changed. If a change matters to you, we will tell you in the app or by email before it applies.',
         },
       ],
     },
@@ -209,7 +347,11 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Questions about this policy or your information: support@rotra.club.',
+          text: '[OPERATOR LEGAL NAME], [OPERATOR ADDRESS].',
+        },
+        {
+          kind: 'paragraph',
+          text: 'Questions about this policy or your information, and requests for our Data Protection Officer: support@rotra.club.',
         },
       ],
     },

@@ -1,0 +1,81 @@
+{
+  "name": "assess",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.45,
+      "motion": "none"
+    },
+    {
+      "file": "el/lights-left.webp",
+      "x": 19,
+      "y": 8,
+      "depth": 0.25,
+      "brightness": 0.6,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.0,
+      "pivot": [
+        259,
+        0
+      ]
+    },
+    {
+      "file": "el/lights-right.webp",
+      "x": 1982,
+      "y": 9,
+      "depth": 0.25,
+      "brightness": 0.6,
+      "motion": "sway",
+      "amp": 0.006,
+      "period": 6,
+      "phase": 0.5,
+      "pivot": [
+        620,
+        0
+      ]
+    },
+    {
+      "file": "el/arena.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.35,
+      "brightness": 0.55,
+      "motion": "none"
+    },
+    {
+      "file": "el/crowd.webp",
+      "x": 59,
+      "y": 886,
+      "depth": 0.5,
+      "brightness": 0.6,
+      "motion": "bob",
+      "amp": 2,
+      "period": 3,
+      "phase": 0.0
+    },
+    {
+      "file": "el/clipboard.webp",
+      "x": 0,
+      "y": 1093,
+      "depth": 0.9,
+      "brightness": 0.8,
+      "motion": "none"
+    },
+    {
+      "file": "el/tablet.webp",
+      "x": 1365,
+      "y": 1216,
+      "depth": 0.9,
+      "brightness": 0.8,
+      "motion": "none"
+    }
+  ]
+}

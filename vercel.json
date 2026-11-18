@@ -31,6 +31,21 @@
     "admin": {
       "root": "apps/admin",
       "framework": "nextjs"
+    },
+    "landingpage": {
+      "root": "apps/landingpage",
+      "framework": "nextjs",
+      "headers": [
+        {
+          "source": "/(art|hero-a)/(.*)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=3600, stale-while-revalidate=2592000"
+            }
+          ]
+        }
+      ]
     }
   },
   "rewrites": [
@@ -53,6 +68,16 @@
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "staging.admin.rotra.club" }],
       "destination": { "service": "admin" }
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "rotra.club" }],
+      "destination": { "service": "landingpage" }
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.rotra.club" }],
+      "destination": { "service": "landingpage" }
     },
     {
       "source": "/(.*)",

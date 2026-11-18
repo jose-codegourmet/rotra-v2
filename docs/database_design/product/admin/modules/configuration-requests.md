@@ -12,7 +12,7 @@ Versions are append-only so results explain which configuration produced them. W
 
 ## `feature_flags`
 
-Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026); the table starts empty. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
+Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026). The table starts with the flags ROTRA's own features ship with, added by a migration with value false: `player_google_sign_in` ([D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01), November 18, 2026; it used to start empty). The created-by admin of such a row is open. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
 
 Downloaded sessions need the relevant approved settings version. How flag changes affect an already-offline session is unresolved; a DB update cannot guarantee immediate remote application.
 

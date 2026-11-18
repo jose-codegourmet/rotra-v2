@@ -24,7 +24,7 @@ Loading/error: preserve the last accepted configuration and unsaved draft separa
 
 ## A-FEATURE-FLAGS — Platform flags
 
-List the flags the platform owner has created: name, key, description, current value (a switch), and last change. **Add flag** in the page header opens `A-ADD-FLAG`. The catalog starts empty; the empty state explains this and offers **Add flag**.
+List the flags the platform owner has created: name, key, description, current value (a switch), and last change. **Add flag** in the page header opens `A-ADD-FLAG`. The catalog starts with the flags ROTRA's own features ship with, all off (today `player_google_sign_in`, [D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01)); the empty state stays for a catalog with no flags and offers **Add flag**.
 
 Targeting and offline behavior are unresolved. Do not ship a sample catalog with invented payments, World launch, winner editing, or “ignore sync” switches.
 

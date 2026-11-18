@@ -3,12 +3,15 @@
 package config
 
 import (
+	"crypto/ed25519"
 	"fmt"
 	"log/slog"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 )
 
 // DrainingSeconds mirrors RAILWAY_DEPLOYMENT_DRAINING_SECONDS (B-44). The process must exit before it.
@@ -26,6 +29,17 @@ type Config struct {
 	ProxySecret string
 	// AllowedOrigins is ROTRA_ALLOWED_ORIGINS: exact app origins allowed by CORS on the stream routes (B-41).
 	AllowedOrigins []string
+	// AuthHashConcurrency is ROTRA_AUTH_HASH_CONCURRENCY: how many password hashes may run at once
+	// (each argon2id hash holds about 19 MiB). 1 to 64, default 4.
+	AuthHashConcurrency int
+	// AuthSigningKey is ROTRA_AUTH_SIGNING_KEY: the current pass signing key (B-27). Nil means unset: the API
+	// serves no auth routes.
+	AuthSigningKey ed25519.PrivateKey
+	// AuthExtraPublicKeys is ROTRA_AUTH_EXTRA_PUBLIC_KEYS: public keys also published and accepted (B-47).
+	AuthExtraPublicKeys []ed25519.PublicKey
+	// AuthTuning is the optional ROTRA_AUTH_* configuration: refresh grace window, revocation cache TTL and
+	// rate limits (B-29, B-30, B-62).
+	AuthTuning AuthTuning
 }
 
 // Housekeeping is the B-34 cleanup loop: how often it runs, rows per delete statement, and how many
@@ -126,6 +140,38 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 			*f.dst = n
 		}
 	}
+
+	cfg.AuthHashConcurrency = 4
+	if v := get("ROTRA_AUTH_HASH_CONCURRENCY"); v != "" {
+		n, err := strconv.Atoi(v)
+		if err != nil || n < 1 || n > 64 {
+			return Config{}, fmt.Errorf("ROTRA_AUTH_HASH_CONCURRENCY must be a number from 1 to 64, got %q", v)
+		}
+		cfg.AuthHashConcurrency = n
+	}
+
+	// The signing key is optional: without it the API starts and serves no auth routes. Errors name the
+	// variable and never repeat its value.
+	if v := get("ROTRA_AUTH_SIGNING_KEY"); v != "" {
+		k, err := pass.ParseSigningKey(v)
+		if err != nil {
+			return Config{}, fmt.Errorf("ROTRA_AUTH_SIGNING_KEY must be the unpadded base64url of a 32 byte Ed25519 seed (go run ./cmd/authkey makes one)")
+		}
+		cfg.AuthSigningKey = k
+	}
+	if v := get("ROTRA_AUTH_EXTRA_PUBLIC_KEYS"); v != "" {
+		ks, err := pass.ParsePublicKeys(v)
+		if err != nil {
+			return Config{}, fmt.Errorf("ROTRA_AUTH_EXTRA_PUBLIC_KEYS must be comma separated unpadded base64url 32 byte Ed25519 public keys")
+		}
+		cfg.AuthExtraPublicKeys = ks
+	}
+
+	tuning, err := loadAuthTuning(get)
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.AuthTuning = tuning
 
 	cfg.ProxySecret = get("ROTRA_PROXY_SECRET")
 	for _, o := range strings.Split(get("ROTRA_ALLOWED_ORIGINS"), ",") {

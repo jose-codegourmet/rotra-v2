@@ -1,0 +1,76 @@
+{
+  "name": "find",
+  "width": 2880,
+  "height": 1620,
+  "background": "#08080b",
+  "elements": [
+    {
+      "file": "el/backdrop.webp",
+      "x": 0,
+      "y": 0,
+      "depth": 0.1,
+      "brightness": 0.5,
+      "motion": "none"
+    },
+    {
+      "file": "el/banners-left.webp",
+      "x": 17,
+      "y": 0,
+      "depth": 0.5,
+      "brightness": 0.5,
+      "motion": "sway",
+      "amp": 0.004,
+      "period": 7,
+      "phase": 0,
+      "pivot": [
+        393,
+        0
+      ]
+    },
+    {
+      "file": "el/banners-right.webp",
+      "x": 2077,
+      "y": 0,
+      "depth": 0.5,
+      "brightness": 0.5,
+      "motion": "sway",
+      "amp": 0.004,
+      "period": 8,
+      "phase": 0.4,
+      "pivot": [
+        393,
+        0
+      ]
+    },
+    {
+      "file": "el/shuttle-1.webp",
+      "x": 300,
+      "y": 700,
+      "depth": 0.7,
+      "brightness": 0.6,
+      "motion": "drift",
+      "amp": 10,
+      "period": 6,
+      "phase": 0.0
+    },
+    {
+      "file": "el/shuttle-2.webp",
+      "x": 2470,
+      "y": 420,
+      "depth": 0.7,
+      "brightness": 0.6,
+      "motion": "drift",
+      "amp": 10,
+      "period": 6,
+      "phase": 0.5
+    },
+    {
+      "file": "el/players.webp",
+      "x": 0,
+      "y": 977,
+      "depth": 0.9,
+      "brightness": 0.75,
+      "motion": "none"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{ "name": "moves", "width": 2880, "height": 1620, "background": "#08080b",
+  "elements": [
+    { "file": "el/moves-far.webp", "x": 0, "y": 0, "depth": 0.15, "brightness": 0.45, "motion": "none" },
+    { "file": "el/moves-mid.webp", "x": 0, "y": 0, "depth": 0.5, "brightness": 0.5, "motion": "none" },
+    { "file": "el/moves-near.webp", "x": 0, "y": 0, "depth": 0.9, "brightness": 0.42,
+      "motion": "drift", "amp": 10, "period": 7, "phase": 0 }
+  ] }

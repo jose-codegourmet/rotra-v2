@@ -1,0 +1,679 @@
+{
+  "now": "2026-11-17T12:00:00.000Z",
+  "cases": [
+    {
+      "name": "get_rec_valid",
+      "method": "GET",
+      "token": "rec-valid"
+    },
+    {
+      "name": "get_rec_nophone",
+      "method": "GET",
+      "token": "rec-nophone"
+    },
+    {
+      "name": "get_rec_noinput",
+      "method": "GET",
+      "token": "rec-noinput"
+    },
+    {
+      "name": "get_rec_expired",
+      "method": "GET",
+      "token": "rec-expired"
+    },
+    {
+      "name": "get_rec_removed",
+      "method": "GET",
+      "token": "rec-removed"
+    },
+    {
+      "name": "get_rec_consumed",
+      "method": "GET",
+      "token": "rec-consumed"
+    },
+    {
+      "name": "get_rec_linked_active",
+      "method": "GET",
+      "token": "rec-linked-active"
+    },
+    {
+      "name": "get_rec_linked_consumed",
+      "method": "GET",
+      "token": "rec-linked-consumed"
+    },
+    {
+      "name": "get_rec_revoked",
+      "method": "GET",
+      "token": "rec-revoked"
+    },
+    {
+      "name": "get_unknown",
+      "method": "GET",
+      "token": "no-such-link"
+    },
+    {
+      "name": "get_ply_valid",
+      "method": "GET",
+      "token": "ply-valid"
+    },
+    {
+      "name": "get_ply_noalloc",
+      "method": "GET",
+      "token": "ply-noalloc"
+    },
+    {
+      "name": "get_ply_nocontact_email",
+      "method": "GET",
+      "token": "ply-nocontact-email"
+    },
+    {
+      "name": "get_ply_nocontact",
+      "method": "GET",
+      "token": "ply-nocontact"
+    },
+    {
+      "name": "get_ply_expired",
+      "method": "GET",
+      "token": "ply-expired"
+    },
+    {
+      "name": "get_ply_consumed",
+      "method": "GET",
+      "token": "ply-consumed"
+    },
+    {
+      "name": "get_ply_claimed",
+      "method": "GET",
+      "token": "ply-claimed"
+    },
+    {
+      "name": "get_ply_revoked",
+      "method": "GET",
+      "token": "ply-revoked"
+    },
+    {
+      "name": "post_body_text",
+      "method": "POST",
+      "token": "rec-valid",
+      "rawBody": "nope"
+    },
+    {
+      "name": "post_body_array",
+      "method": "POST",
+      "token": "rec-valid",
+      "rawBody": "[]"
+    },
+    {
+      "name": "post_body_null",
+      "method": "POST",
+      "token": "rec-valid",
+      "rawBody": "null"
+    },
+    {
+      "name": "post_body_empty",
+      "method": "POST",
+      "token": "rec-valid",
+      "rawBody": ""
+    },
+    {
+      "name": "post_body_number",
+      "method": "POST",
+      "token": "rec-valid",
+      "rawBody": "5"
+    },
+    {
+      "name": "post_phone_bad",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "12345",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_phone_bad_other_country",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "+1 917 555 0142",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_email_no_at",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "email": "no-at",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_email_missing",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "password": "pass-word-1"
+      }
+    },
+    {
+      "name": "post_password_empty",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "email": "new@example.com",
+        "password": "",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_order_phone_before_email",
+      "method": "POST",
+      "token": "no-such-link",
+      "body": {
+        "email": "x",
+        "password": "pass-word-1",
+        "phone": "1",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_order_email_before_password",
+      "method": "POST",
+      "token": "no-such-link",
+      "body": {
+        "email": "x",
+        "password": "",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_unknown_link",
+      "method": "POST",
+      "token": "no-such-link",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_revoked_rec",
+      "method": "POST",
+      "token": "rec-revoked",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_revoked_ply",
+      "method": "POST",
+      "token": "ply-revoked",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_expired_rec",
+      "method": "POST",
+      "token": "rec-expired",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_removed_rec",
+      "method": "POST",
+      "token": "rec-removed",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_consumed_rec_unlinked",
+      "method": "POST",
+      "token": "rec-consumed",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_linked_active_rec",
+      "method": "POST",
+      "token": "rec-linked-active",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_nophone_rec",
+      "method": "POST",
+      "token": "rec-nophone",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_noinput_rec",
+      "method": "POST",
+      "token": "rec-noinput",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_noinput_rec_typed_phone_taken",
+      "method": "POST",
+      "token": "rec-noinput",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "0917 555 0199",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_phone_taken_rec",
+      "method": "POST",
+      "token": "rec-phone-taken",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_email_taken_rec",
+      "method": "POST",
+      "token": "rec-valid",
+      "body": {
+        "email": "Taken@Example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_expired_ply",
+      "method": "POST",
+      "token": "ply-expired",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_claimed_ply",
+      "method": "POST",
+      "token": "ply-claimed",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_noalloc_ply",
+      "method": "POST",
+      "token": "ply-noalloc",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_nophone_ply",
+      "method": "POST",
+      "token": "ply-nocontact",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_typed_phone_taken_ply",
+      "method": "POST",
+      "token": "ply-nocontact",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "09175550199",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_email_taken_ply",
+      "method": "POST",
+      "token": "ply-valid",
+      "body": {
+        "email": "taken@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": "New Name",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_unknown_link_bad_details",
+      "method": "POST",
+      "token": "no-such-link",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": " ",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": -4,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    },
+    {
+      "name": "post_expired_link_bad_details",
+      "method": "POST",
+      "token": "rec-expired",
+      "body": {
+        "email": "new@example.com",
+        "password": "pass-word-1",
+        "phone": "",
+        "fullName": " ",
+        "nickname": "",
+        "playingStyle": "",
+        "experienceYears": -4,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        }
+      }
+    }
+  ]
+}

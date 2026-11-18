@@ -43,6 +43,7 @@ rotra/
 │   ├── player/       @rotra/player   Player Information: profiles, leaderboard :9001
 │   ├── admin/        @rotra/admin    Platform owner tools                      :9002
 │   ├── mockup/       @rotra/mockups  Canonical routed HTML prototypes          :9003
+│   ├── landingpage/  @rotra/landingpage rotra.club marketing site (static export) :9004
 │   └── e2e/          @rotra/e2e      Playwright regression suite, local Supabase :9100-9102
 ├── packages/
 │   ├── ui/           @rotra/ui       Every visual component and form + the one Storybook
@@ -66,7 +67,7 @@ apps or provide operational persistence/auth. See its [route map](../apps/mockup
 Production uses one Vercel Services project rooted at `./`. Host rewrites map `mockup.rotra.club`,
 `queue.rotra.club`, `player.rotra.club` and `admin.rotra.club` to their matching `apps/` directories.
 The mockup service publishes `dist/public` as static files; the other services use Next.js. The manual
-Deploy production workflow builds and publishes all four services together. Domain attachment/DNS
+Deploy production workflow builds and publishes all five services together. Domain attachment/DNS
 is configured outside the repository; see the [deployment setup](../README.md#production-deployments).
 
 The Queue, Player and Admin services export OpenTelemetry traces to Grafana Cloud when

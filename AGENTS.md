@@ -73,7 +73,7 @@ Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 apps/mockup/             canonical editable HTML prototypes and notes
 apps/e2e/                Playwright regression suite (real mode, local Supabase only)
-apps/landingpage/        rotra.club marketing site: static scroll-story wireframe + Higgsfield art (no build)
+apps/landingpage/        rotra.club marketing site: Next.js 16 static export (one page, hash routes) + Higgsfield/Rive art
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
@@ -147,12 +147,12 @@ Behavior: **business docs**. Look and copy: **the prototype**, then the screen d
 ## 5. Commands
 
 The root scripts and `Makefile` run these (every `make` target loads nvm first). Ports: queue 9000,
-player 9001, admin 9002.
+player 9001, admin 9002, landingpage 9004.
 
 ```bash
 nvm use && pnpm install
 nvm use && pnpm dev                          # all apps
-nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin
+nvm use && pnpm --filter @rotra/queue dev    # or @rotra/player, @rotra/admin, @rotra/landingpage
 nvm use && pnpm --filter @rotra/ui storybook   # or: pnpm storybook, make storybook
 nvm use && pnpm mockups                      # routed prototypes on port 9003
 nvm use && pnpm lint                         # Biome

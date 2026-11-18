@@ -1,0 +1,230 @@
+{
+  "now": "2026-11-17T12:00:00.000Z",
+  "cases": [
+    {
+      "name": "submit_eligible",
+      "route": "password-reset",
+      "body": {
+        "email": "ana@club.test"
+      }
+    },
+    {
+      "name": "submit_eligible_again",
+      "route": "password-reset",
+      "body": {
+        "email": "ana@club.test"
+      }
+    },
+    {
+      "name": "submit_eligible_shouting",
+      "route": "password-reset",
+      "body": {
+        "email": "  ANA@Club.TEST "
+      }
+    },
+    {
+      "name": "submit_unknown",
+      "route": "password-reset",
+      "body": {
+        "email": "nobody@club.test"
+      }
+    },
+    {
+      "name": "submit_disabled",
+      "route": "password-reset",
+      "body": {
+        "email": "dan@club.test"
+      }
+    },
+    {
+      "name": "submit_sync_failed",
+      "route": "password-reset",
+      "body": {
+        "email": "eve@club.test"
+      }
+    },
+    {
+      "name": "submit_no_email",
+      "route": "password-reset",
+      "body": {}
+    },
+    {
+      "name": "submit_email_number",
+      "route": "password-reset",
+      "body": {
+        "email": 42
+      }
+    },
+    {
+      "name": "submit_email_empty",
+      "route": "password-reset",
+      "body": {
+        "email": ""
+      }
+    },
+    {
+      "name": "submit_no_at",
+      "route": "password-reset",
+      "body": {
+        "email": "ana.club.test"
+      }
+    },
+    {
+      "name": "submit_two_ats",
+      "route": "password-reset",
+      "body": {
+        "email": "a@b@c.co"
+      }
+    },
+    {
+      "name": "submit_no_dot",
+      "route": "password-reset",
+      "body": {
+        "email": "ana@club"
+      }
+    },
+    {
+      "name": "submit_space_inside",
+      "route": "password-reset",
+      "body": {
+        "email": "an a@club.test"
+      }
+    },
+    {
+      "name": "submit_too_long",
+      "route": "password-reset",
+      "body": {
+        "email": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@b.co"
+      }
+    },
+    {
+      "name": "submit_array_body",
+      "route": "password-reset",
+      "rawBody": "[1]"
+    },
+    {
+      "name": "submit_string_body",
+      "route": "password-reset",
+      "rawBody": "\"x\""
+    },
+    {
+      "name": "submit_null_body",
+      "route": "password-reset",
+      "rawBody": "null"
+    },
+    {
+      "name": "submit_broken_json",
+      "route": "password-reset",
+      "rawBody": "{\"email\":"
+    },
+    {
+      "name": "reset_no_password",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-disabled"
+      }
+    },
+    {
+      "name": "reset_empty_password",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-disabled",
+        "password": ""
+      }
+    },
+    {
+      "name": "reset_password_number",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-disabled",
+        "password": 42
+      }
+    },
+    {
+      "name": "reset_empty_both",
+      "route": "reset-password",
+      "body": {}
+    },
+    {
+      "name": "reset_no_token",
+      "route": "reset-password",
+      "body": {
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_empty_token",
+      "route": "reset-password",
+      "body": {
+        "token": "",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_token_number",
+      "route": "reset-password",
+      "body": {
+        "token": 42,
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_token_too_long",
+      "route": "reset-password",
+      "body": {
+        "token": "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_unknown_token",
+      "route": "reset-password",
+      "body": {
+        "token": "no-such-token",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_account_disabled",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-disabled",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_sync_failed",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-sync",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_email_changed",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-moved",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_subject_mismatch",
+      "route": "reset-password",
+      "body": {
+        "token": "tok-mismatch",
+        "password": "a fine new password"
+      }
+    },
+    {
+      "name": "reset_array_body",
+      "route": "reset-password",
+      "rawBody": "[1]"
+    },
+    {
+      "name": "reset_broken_json",
+      "route": "reset-password",
+      "rawBody": "{\"token\":"
+    }
+  ]
+}

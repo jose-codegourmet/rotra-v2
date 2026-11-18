@@ -2874,24 +2874,30 @@ function viewNotFound() {
     ${notice('', `No ROTRA profile has the ID <span class="mono">${esc(S.ui.findId || S.viewId || '')}</span>. Check the ID and try again.`)}</main>`;
 }
 
-// ---------- P-PRIVACY / P-TERMS (D-2026-11-17-01) ----------
-// Public, static pages the Google sign-in consent screen links to. apps/player keeps the same words in (public)/privacy/content.ts and (public)/terms/content.ts.
-const LEGAL_EFFECTIVE = 'Effective November 17, 2026';
+// ---------- P-PRIVACY / P-TERMS (D-2026-11-17-01, D-2026-11-18-02) ----------
+// Public, static pages the Google sign-in consent screen links to. apps/player keeps the same words in (public)/privacy/content.ts and (public)/terms/content.ts,
+// and rotra.club (#privacy, #terms) in apps/landingpage/src/app/_components/legal-page/privacy-content.ts and terms-content.ts.
+const LEGAL_EFFECTIVE = 'Effective November 18, 2026';
 const LEGAL = {
   privacy: { title: 'Privacy Policy', sections: [
     { heading: 'Who we are', blocks: [
       { kind: 'paragraph', text: 'ROTRA is a badminton session app. Clubs use it to run their club nights: the Queue, the courts, the games and the results. Players use it to see their profile, their games and their rank.' },
-      { kind: 'paragraph', text: 'This policy explains what information ROTRA keeps about you, why we keep it, and what you can do about it. It is written for players and clubs in the Philippines and follows the Data Privacy Act of 2012 (Republic Act No. 10173).' },
-      { kind: 'paragraph', text: 'In this policy, "ROTRA", "we" and "us" mean the people who run ROTRA. For questions and privacy requests, email support@rotra.club.' },
+      { kind: 'paragraph', text: 'ROTRA is operated by [OPERATOR LEGAL NAME], [OPERATOR ADDRESS]. In this policy, "ROTRA", "we" and "us" mean [OPERATOR LEGAL NAME]. We are responsible for your information under the law. The law calls this the personal information controller.' },
+      { kind: 'paragraph', text: 'This policy explains what information ROTRA keeps about you, why we keep it, and what you can do about it. It covers the ROTRA apps and the website rotra.club. It is written for players and clubs in the Philippines and follows the Data Privacy Act of 2012 (Republic Act No. 10173).' },
+      { kind: 'paragraph', text: 'Our Data Protection Officer is the person responsible for data protection at ROTRA. For questions and privacy requests, email support@rotra.club.' },
+      { kind: 'paragraph', text: 'Clubs and ROTRA have different jobs. A club decides which players it saves and adds to its Queue Sessions, and it is responsible for having the right to do so. ROTRA is responsible for the platform, for player profiles and for ranks.' },
     ] },
     { heading: 'What we collect', blocks: [
-      { kind: 'paragraph', text: 'We collect only what the app needs to work:' },
+      { kind: 'paragraph', text: 'We collect only what ROTRA needs to work:' },
       { kind: 'list', items: [
         'Your account: your full name, nickname, email address, mobile number and profile picture. Also the details you choose to add, such as your playing style, when you started playing and links to your social profiles, the city or province you give when you register without a club, and the requests you send us, such as a change to your phone or email.',
-        'From Google sign-in: your Google email address, your name and your profile picture. Nothing else. ROTRA can\'t read your Gmail, your contacts, your Google Drive or anything else in your Google account.',
-        'Your play: the Queue Sessions you join, the games you play, their scores and results, and the level, rank and statistics worked out from them.',
+        'If you sign in with Google: your Google email address, your name and your profile picture. Nothing else. ROTRA can\'t read your Gmail, your contacts, your Google Drive or anything else in your Google account.',
+        'Your play: the Queue Sessions you join, the games you play, their scores and results, and the rank and statistics worked out from them.',
         'What a club saves about you: your name, nickname, picture, level and email address, and your mobile number if the club adds it.',
-        'Technical information: the cookies that keep you signed in, a setting on your device that remembers light or dark mode, basic server logs (such as when a page was requested and any errors), and page-visit counts that don\'t identify you.',
+        'A club account: the club\'s name, its founding address and city, its sign-in name, its logo, its license and the license payments recorded in ROTRA, and the Queue Sessions, courts and players it keeps in ROTRA.',
+        'A quotation request on rotra.club: the club\'s name, city, main venue, courts per night and nights per week, your full name, your role at the club, your email address and mobile number, the plan you\'re interested in and anything else you write.',
+        'A profile search on rotra.club: the name or RTR ID you type. It goes to the ROTRA Player app to find the profile.',
+        'Technical information: the cookies that keep you signed in, settings on your device such as light or dark mode, basic server logs and sign-in records (such as when a page was requested, the internet (IP) address it came from and any errors), technical traces that help us find and fix problems, and page-visit counts that don\'t identify you.',
       ] },
       { kind: 'paragraph', text: 'We don\'t ask for your government ID or payment card details, and we don\'t track your location.' },
     ] },
@@ -2901,21 +2907,45 @@ const LEGAL = {
         'A guest is a name only. A guest has no email, no phone and no ROTRA profile of their own.',
         'An unclaimed profile is a person the club saved with their email address. It gets an RTR ID, the ROTRA player ID, and can appear on the leaderboards.',
       ] },
+      { kind: 'paragraph', text: 'Under the Terms of Service, a club that saves someone confirms that it has that person\'s permission, and a parent\'s or guardian\'s permission for anyone under 18.' },
       { kind: 'paragraph', text: 'An unclaimed profile is public: anyone can see its name, picture, level, games and rank. Its email address and phone number are never shown publicly. Another club can find an unclaimed profile only by typing its exact email address or RTR ID.' },
       { kind: 'paragraph', text: 'If a club saved you, register with the same email address to take over your profile. Your RTR ID and your games come with you, and you can then choose who sees your profile.' },
-      { kind: 'paragraph', text: 'If you don\'t want to register and want your unclaimed profile removed, ask the club that saved you to delete it, or email support@rotra.club.' },
+      { kind: 'paragraph', text: 'You can object or ask for removal at any time. If you don\'t want to register and want your unclaimed profile removed, ask the club that saved you to delete it, or email support@rotra.club.' },
     ] },
-    { heading: 'How we use your information', blocks: [
+    { heading: 'Why we use your information', blocks: [
+      { kind: 'paragraph', text: 'The Data Privacy Act asks us to have a lawful reason, called a legal basis, for each use of your information. These are ours.' },
+      { kind: 'paragraph', text: 'To provide the service you or your club asked for. This is our agreement with you:' },
       { kind: 'list', items: [
         'To run club nights: to put you in a Queue Session, in the Queue and on a court, and to record your games and results.',
         'To show your profile, games, rank and leaderboard places in the app.',
         'To sign you in and keep your account safe.',
-        'To check your account. A player is verified when a Google account is connected, a mobile number is on the account and the ROTRA email matches the Google email.',
         'To let clubs find you and add you to their Queue Sessions.',
         'To handle your requests, such as a password reset or a change to your phone or email. ROTRA Admin reviews these by hand.',
-        'To show you notifications in the app, fix problems and keep the app working.',
+        'To show you notifications in the app.',
+        'To run a club\'s account and license, and to answer a club\'s quotation request and contact the club about its plan and payment.',
       ] },
+      { kind: 'paragraph', text: 'With your consent:' },
+      { kind: 'list', items: [
+        'When you register, and for the optional details you add to your profile, such as your playing style, when you started playing and your social links.',
+        'If you sign in with Google, for the details Google shares with us.',
+      ] },
+      { kind: 'paragraph', text: 'You can withdraw your consent at any time. Remove an optional detail from your profile, or ask us to close your account. Withdrawing doesn\'t undo what we did before, and some records stay, as "How long we keep it" explains.' },
+      { kind: 'paragraph', text: 'For our legitimate interests, which we weigh against your rights:' },
+      { kind: 'list', items: [
+        'To keep clubs\' game records complete, because other players\' games and ranks depend on them.',
+        'To work out ranks, statistics and leaderboards from the levels and results clubs record.',
+        'To keep the unclaimed profiles clubs save, so their games count and the person can take the profile over when they register.',
+        'To check accounts. For example, where Google sign-in is offered, a player is verified when a Google account is connected, a mobile number is on the account and the ROTRA email matches the Google email. ROTRA Admin can also verify an account.',
+        'To keep ROTRA secure and to prevent fake accounts, false results and other abuse.',
+        'To fix problems and keep the app working, using logs, traces and page-visit counts.',
+      ] },
+      { kind: 'paragraph', text: 'When the law requires it: to keep the records the law asks us to keep, and to answer a valid order from a court or a government agency.' },
       { kind: 'paragraph', text: 'We don\'t use your information for advertising, and we don\'t sell it.' },
+    ] },
+    { heading: 'Levels, ranks and automated processing', blocks: [
+      { kind: 'paragraph', text: 'Clubs give each player a playing level. ROTRA works out ranks, statistics and leaderboard places automatically, from those levels and from the results clubs record. No person checks each one.' },
+      { kind: 'paragraph', text: 'They are about badminton only. They have no legal effect on you, and we don\'t use them to make decisions about you outside ROTRA.' },
+      { kind: 'paragraph', text: 'If you think a result, level or rank is wrong, talk to the club first, because the club records results and sets levels. If that doesn\'t settle it, email support@rotra.club and we will look into it.' },
     ] },
     { heading: 'What is public and what is private', blocks: [
       { kind: 'list', items: [
@@ -2929,20 +2959,36 @@ const LEGAL = {
     { heading: 'Who we share it with', blocks: [
       { kind: 'list', items: [
         'Clubs you play at. A club that saved you, or whose Queue Session you join, sees what it needs to run its sessions, such as your name, picture, level and your games there. It sees your phone number unless you hide it from clubs.',
-        'Service providers that run ROTRA for us: hosting, the database, picture storage and sign-in. Today Vercel hosts the app, and Supabase runs our database, file storage and sign-in. Google handles Google sign-in. They handle your information to provide these services to us.',
         'The authorities, when the law requires it, for example a valid order from a court or a government agency.',
+        'A new operator, if ROTRA is ever sold or merged with another business. We will tell you before your information passes to them.',
       ] },
-      { kind: 'paragraph', text: 'We never sell your information.' },
+      { kind: 'paragraph', text: 'Service providers run parts of ROTRA for us. They handle your information only to provide their services to us. Today they are:' },
+      { kind: 'list', items: [
+        'Vercel, which hosts the ROTRA apps and rotra.club, and counts page visits in the apps.',
+        'Supabase, which runs our database, file storage (such as profile pictures) and sign-in, and sends the emails that sign-in needs.',
+        'Google, which handles Google sign-in where it is offered.',
+        'Grafana Labs, which receives technical traces of requests and errors when we turn this monitoring on, so we can find and fix problems.',
+      ] },
+      { kind: 'paragraph', text: 'This list can change. When it does, we update this page. We never sell your information.' },
     ] },
     { heading: 'Where it is stored and how we protect it', blocks: [
-      { kind: 'paragraph', text: 'Your information is stored on our providers\' servers. Today the app runs in Singapore, so your information is kept outside the Philippines.' },
-      { kind: 'paragraph', text: 'We protect it with sign-in, encrypted connections and access checks: the app shows each person only what they are allowed to see, and only ROTRA Admin can use the admin tools.' },
-      { kind: 'paragraph', text: 'No system is perfectly safe. If a breach puts your information at risk, we will tell you and the National Privacy Commission as the Data Privacy Act requires.' },
+      { kind: 'paragraph', text: 'Your information is stored on our providers\' servers outside the Philippines. Today the ROTRA apps run in Singapore. Our providers may also process information in other countries. Wherever it is, we stay responsible for it.' },
+      { kind: 'paragraph', text: 'We protect it with reasonable organisational, physical and technical measures. These include sign-in, encrypted connections and access checks: the app shows each person only what they are allowed to see, and only ROTRA Admin can use the admin tools.' },
+      { kind: 'paragraph', text: 'No system is perfectly safe.' },
+    ] },
+    { heading: 'If there is a breach', blocks: [
+      { kind: 'paragraph', text: 'If a breach puts your information at risk, we will tell the National Privacy Commission and the people affected within 72 hours of learning of it, when the law requires us to.' },
     ] },
     { heading: 'How long we keep it', blocks: [
       { kind: 'paragraph', text: 'We keep your information while your account or your profile exists.' },
       { kind: 'paragraph', text: 'Some records stay after that when they are still needed: a club\'s game results and history, which other players\' games and ranks depend on, and records the law asks us to keep.' },
+      { kind: 'paragraph', text: 'We keep a quotation request as long as we need it to answer it and, if the club joins ROTRA, to run its account.' },
+      { kind: 'paragraph', text: 'We keep server logs and traces only as long as we need them to fix problems and keep ROTRA secure.' },
       { kind: 'paragraph', text: 'For pictures, we keep only your current and your previous uploaded picture. Older ones are deleted.' },
+    ] },
+    { heading: 'Cookies and device storage', blocks: [
+      { kind: 'paragraph', text: 'ROTRA uses only the cookies and device storage it needs: to keep you signed in, to remember settings such as light or dark mode, and to finish a sign-in or registration you started.' },
+      { kind: 'paragraph', text: 'We don\'t use advertising or tracking cookies.' },
     ] },
     { heading: 'Your rights', blocks: [
       { kind: 'paragraph', text: 'Under the Data Privacy Act of 2012 you have the right to:' },
@@ -2954,33 +3000,61 @@ const LEGAL = {
         'Ask us to erase or block your information.',
         'Get a copy of your information in a common electronic format (data portability).',
         'Claim damages if you were harmed by wrong or unlawful use of your information.',
-        'Complain to the National Privacy Commission if you think your rights were not respected.',
+        'Complain to the National Privacy Commission (privacy.gov.ph) if you think your rights were not respected.',
       ] },
-      { kind: 'paragraph', text: 'To use any of these rights, email support@rotra.club from the email address on your account, or tell us which account it is. We may ask you to show that the account is yours before we act. We answer every request by email.' },
+      { kind: 'paragraph', text: 'To use any of these rights, email support@rotra.club from the email address on your account, or tell us which account it is. We may ask you to show that the account is yours before we act. We answer every request by email, as soon as we reasonably can.' },
     ] },
     { heading: 'Children', blocks: [
-      { kind: 'paragraph', text: 'Clubs may include players under 18 in their Queue Sessions and save them in the app. A parent or guardian who wants to see, correct or remove a child\'s information can email support@rotra.club.' },
+      { kind: 'paragraph', text: 'You must be 18 or older to register for ROTRA on your own. Anyone under 18 may use ROTRA only with the consent of a parent or guardian.' },
+      { kind: 'paragraph', text: 'Clubs may include players under 18 in their Queue Sessions and save them in the app. A club that adds a player under 18 confirms that it has a parent\'s or guardian\'s consent.' },
+      { kind: 'paragraph', text: 'A parent or guardian who wants to see, correct or remove a child\'s information can email support@rotra.club. If we learn that a child\'s information was added without that consent, we remove it.' },
+    ] },
+    { heading: 'Links to other sites', blocks: [
+      { kind: 'paragraph', text: 'Profiles can link to social media and other sites, and you can sign in with Google where it is offered. Those sites and services have their own privacy policies. This policy doesn\'t cover them.' },
     ] },
     { heading: 'Changes to this policy', blocks: [
-      { kind: 'paragraph', text: 'We may change this policy when ROTRA changes. The date at the top shows when it last changed. If a change matters to you, we will tell you in the app.' },
+      { kind: 'paragraph', text: 'We may change this policy when ROTRA changes. The date at the top shows when it last changed. If a change matters to you, we will tell you in the app or by email before it applies.' },
     ] },
     { heading: 'Contact', blocks: [
-      { kind: 'paragraph', text: 'Questions about this policy or your information: support@rotra.club.' },
+      { kind: 'paragraph', text: '[OPERATOR LEGAL NAME], [OPERATOR ADDRESS].' },
+      { kind: 'paragraph', text: 'Questions about this policy or your information, and requests for our Data Protection Officer: support@rotra.club.' },
     ] },
   ] },
   terms: { title: 'Terms of Service', sections: [
     { heading: 'What ROTRA is', blocks: [
       { kind: 'paragraph', text: 'ROTRA is a badminton session app. Clubs use it to run their club nights: the Queue, the courts, the games and the results. Players use it to see their profile, their games, their rank and the leaderboards.' },
-      { kind: 'paragraph', text: 'These terms apply when you use ROTRA. By continuing with Google, signing in or using the app, you agree to them. If you don\'t agree, please don\'t use ROTRA.' },
+      { kind: 'paragraph', text: 'ROTRA is operated by [OPERATOR LEGAL NAME], [OPERATOR ADDRESS]. In these terms, "ROTRA", "we" and "us" mean [OPERATOR LEGAL NAME]. These terms cover the ROTRA apps and the website rotra.club.' },
+      { kind: 'paragraph', text: 'These terms apply when you use ROTRA. By registering, signing in or using ROTRA, you agree to them. If you don\'t agree, please don\'t use ROTRA.' },
+      { kind: 'paragraph', text: 'The Privacy Policy is part of these terms. It explains what information we keep and why.' },
+      { kind: 'paragraph', text: 'If you use ROTRA for a club, for example by signing in to a club account or by requesting a quotation, you confirm that you are allowed to act for that club. These terms then apply to the club too.' },
       { kind: 'paragraph', text: 'You don\'t need an account to view public profiles, club pages or the leaderboards.' },
+    ] },
+    { heading: 'Who can use ROTRA', blocks: [
+      { kind: 'paragraph', text: 'You must be 18 or older to register on your own. Anyone under 18 may use ROTRA only with the consent of a parent or guardian.' },
+      { kind: 'paragraph', text: 'A club that adds a player under 18 confirms that it has a parent\'s or guardian\'s consent.' },
     ] },
     { heading: 'Your account', blocks: [
       { kind: 'list', items: [
-        'You sign in with Google. Some older accounts also have a password until they connect Google.',
+        'You sign in with your email and password, or with Google where it is offered.',
         'Use your real name and correct details, and keep them up to date. A change to your phone or email goes through a request that ROTRA Admin reviews.',
         'One account per person. Don\'t make an account for someone else, and don\'t share yours.',
-        'Keep your Google account and your password safe. Email support@rotra.club if you think someone else got into your account.',
+        'Keep your password safe, and your Google account if you sign in with it. Email support@rotra.club if you think someone else got into your account.',
         'Your RTR ID is your ROTRA player ID. Only ROTRA Admin can change it.',
+      ] },
+    ] },
+    { heading: 'Club accounts and licenses', blocks: [
+      { kind: 'list', items: [
+        'A club can ask to use ROTRA by requesting a quotation on rotra.club. A request is not a contract. The agreement starts only when the club accepts a quotation from us.',
+        'ROTRA Admin sets up each club account, with the club\'s name, its founding address and city, and its sign-in name and first password. The club keeps its password safe and can change it in Club settings. Whoever signs in to the club account acts for the club.',
+        'A club uses the Queue app with a monthly or yearly license. The license, its fees, its period, how it is paid and any refunds are as the club\'s accepted quotation says. Nothing in these terms or in the quotation takes away rights the law gives the club.',
+        'The club pays outside ROTRA. ROTRA Admin turns the license on once it is paid, and the club can see its license payments in Club settings.',
+        'When a license ends and isn\'t renewed, the club can\'t use the Queue app, including its saved players and reports. A Queue Session already running may finish. The club\'s public session pages stop being updated, and are deleted later if the license stays ended. Renewing before then brings them back. Players keep their games and ranks.',
+      ] },
+      { kind: 'paragraph', text: 'The club confirms, and is responsible for, the following:' },
+      { kind: 'list', items: [
+        'It has the right, and each player\'s permission, to add that player\'s details to ROTRA, and a parent\'s or guardian\'s permission for a player under 18.',
+        'It records results and levels honestly.',
+        'It alone is responsible for its Queue Sessions, its fees, its venue and the safety of its players, and for following the law, including the Data Privacy Act for the information it keeps.',
       ] },
     ] },
     { heading: 'Clubs and Queue Sessions', blocks: [
@@ -2991,11 +3065,20 @@ const LEGAL = {
         'A club can save you in its players and put you in its Queue Sessions. If it saves you with your email address, you have an unclaimed profile until you register, as the Privacy Policy explains.',
       ] },
     ] },
+    { heading: 'Playing is at your own risk', blocks: [
+      { kind: 'list', items: [
+        'Badminton is a physical sport, and injuries can happen.',
+        'ROTRA doesn\'t run sessions, doesn\'t check venues or courts, and doesn\'t give medical or fitness advice.',
+        'You are responsible for your own health and fitness, and for deciding whether to play.',
+        'As far as the law allows, ROTRA isn\'t liable for any injury, loss or damage that happens at a session or a venue.',
+      ] },
+    ] },
     { heading: 'Results, rank and leaderboards', blocks: [
       { kind: 'list', items: [
-        'The club records games and results. ROTRA works out levels, ranks and leaderboard places from them.',
+        'The club records games and results and gives each player a playing level. ROTRA works out ranks, statistics and leaderboard places from them.',
         'Once the Queue Master confirms a result, it is permanent. A match that can\'t be finished can be marked invalid, and a whole Queue Session can be marked invalid when its records can\'t be trusted. Invalid matches and sessions don\'t count toward rank.',
         'Ranks and leaderboard places change as new games are played. ROTRA doesn\'t promise any rank or place.',
+        'ROTRA levels and ranks are not an official rating from any badminton federation or association, and they don\'t come with any prize or entitlement.',
         'If you think a result is wrong, talk to the club first. You can also email support@rotra.club.',
       ] },
     ] },
@@ -3007,6 +3090,9 @@ const LEGAL = {
         'Enter false results or try to change a rank unfairly.',
         'Harass, threaten or abuse other players, clubs or the people who run ROTRA.',
         'Copy data from ROTRA in bulk, by scraping or with automated tools, or try to see information you aren\'t allowed to see.',
+        'Use bots or other automated tools to get into ROTRA, or take apart or reverse engineer the app, except as far as the law allows.',
+        'Upload or send viruses or other harmful code.',
+        'Use other players\' information for marketing or spam.',
         'Break, overload or attack the app, or get around its security.',
         'Use ROTRA to break the law.',
       ] },
@@ -3019,6 +3105,19 @@ const LEGAL = {
         'We may remove content that breaks these terms.',
       ] },
     ] },
+    { heading: 'ROTRA\'s property', blocks: [
+      { kind: 'list', items: [
+        'The ROTRA name and logo, its characters and artwork, its design and its software belong to ROTRA or to those who license them to us.',
+        'We give you a personal permission to use ROTRA as these terms allow. You can\'t transfer it to anyone else.',
+        'Don\'t copy or reuse any of these without our written permission. Sharing your profile or results with the app\'s share tools is fine.',
+      ] },
+    ] },
+    { heading: 'Other companies\' services', blocks: [
+      { kind: 'list', items: [
+        'Some parts of ROTRA use services from other companies, such as Google sign-in where it is offered. Those services have their own terms, which apply when you use them.',
+        'Profiles can link to other sites. We don\'t control those sites and aren\'t responsible for them.',
+      ] },
+    ] },
     { heading: 'Suspension and ending an account', blocks: [
       { kind: 'list', items: [
         'We may suspend or close an account that is fake, breaks these terms or puts other people at risk. Where we can, we tell you why.',
@@ -3028,18 +3127,52 @@ const LEGAL = {
     ] },
     { heading: 'The service as it is', blocks: [
       { kind: 'list', items: [
+        'ROTRA is a new product that we are still building. Features may change, and mistakes can happen.',
         'We work to keep ROTRA running and correct, but we provide it as it is. We don\'t promise that it will always be available, free of mistakes or right for your needs.',
         'We may change, add or remove features.',
-        'As far as Philippine law allows, ROTRA isn\'t liable for indirect losses, or for losses caused by clubs, venues, other players or events outside our control. Nothing in these terms takes away rights that the law doesn\'t allow us to limit.',
+        'Parts of ROTRA, including some of its artwork and software, are made with the help of AI tools. We review them before they are released.',
+        'We make no promises beyond what these terms say and what the law requires.',
       ] },
     ] },
-    { heading: 'Changes to these terms', blocks: [
-      { kind: 'paragraph', text: 'We may update these terms. The date at the top shows when they last changed. If a change matters to you, we will tell you in the app. If you keep using ROTRA after a change, the new terms apply.' },
+    { heading: 'Limits on our liability', blocks: [
+      { kind: 'paragraph', text: 'As far as Philippine law allows:' },
+      { kind: 'list', items: [
+        'ROTRA isn\'t liable for indirect or consequential losses, lost profits or lost data.',
+        'ROTRA isn\'t liable for losses caused by clubs, venues, other players or events outside our control.',
+        'ROTRA\'s total liability to you is limited to the fees you paid ROTRA in the 12 months before the claim, if any.',
+      ] },
+      { kind: 'paragraph', text: 'Nothing in these terms limits liability for fraud, wilful misconduct or gross negligence, or takes away rights under the Consumer Act of the Philippines, the Data Privacy Act or any other law that can\'t be waived.' },
     ] },
-    { heading: 'Governing law', blocks: [
-      { kind: 'paragraph', text: 'These terms are governed by the laws of the Republic of the Philippines. If there is a problem, please email us first so we can try to settle it together.' },
+    { heading: 'If your actions cause a claim', blocks: [
+      { kind: 'paragraph', text: 'As far as the law allows, you cover ROTRA\'s losses when someone makes a claim against ROTRA because of:' },
+      { kind: 'list', items: [
+        'Your breach of these terms.',
+        'Your content.',
+        'For a club: its Queue Sessions, and the player information it adds.',
+      ] },
+    ] },
+    { heading: 'Events outside our control', blocks: [
+      { kind: 'paragraph', text: 'We aren\'t responsible for delays or failures caused by events we can\'t reasonably control, such as typhoons, earthquakes and other natural disasters, power or internet outages, failures of our providers, or government action.' },
+    ] },
+    { heading: 'Changes to these terms', blocks: [
+      { kind: 'paragraph', text: 'We may update these terms. The date at the top shows when they last changed. We announce important changes in the app or by email before they apply. If you keep using ROTRA after a change applies, the new terms apply.' },
+    ] },
+    { heading: 'Governing law and disputes', blocks: [
+      { kind: 'paragraph', text: 'These terms are governed by the laws of the Republic of the Philippines.' },
+      { kind: 'paragraph', text: 'If there is a problem, please email us first. We and you will both try in good faith to settle it together.' },
+      { kind: 'paragraph', text: 'If we can\'t settle it, it goes to the proper courts of [OPERATOR CITY], Philippines. This doesn\'t take away any right the law gives you to bring a case somewhere else.' },
+    ] },
+    { heading: 'General', blocks: [
+      { kind: 'list', items: [
+        'If one part of these terms can\'t be enforced, the rest still applies.',
+        'If we don\'t enforce a term right away, we haven\'t given it up.',
+        'These terms, the Privacy Policy and, for a club, its accepted quotation are the whole agreement between you and ROTRA. If the quotation and these terms differ on fees or the license period, the quotation wins.',
+        'ROTRA may transfer this agreement to a new operator if ROTRA is sold or merged. We will tell you if that happens.',
+        'These terms are written in English. If they are translated, the English version governs.',
+      ] },
     ] },
     { heading: 'Contact', blocks: [
+      { kind: 'paragraph', text: '[OPERATOR LEGAL NAME], [OPERATOR ADDRESS].' },
       { kind: 'paragraph', text: 'Questions about these terms: support@rotra.club.' },
     ] },
   ] },

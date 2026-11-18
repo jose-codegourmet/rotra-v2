@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-01 and D-2026-11-18-02 added; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -59,6 +59,9 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
+| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -957,6 +960,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
 - **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Amended by:** [D-2026-11-18-01](#d-2026-11-18-01): everything below ships behind the feature flag `player_google_sign_in`, which starts off.
 - **Decision:**
   - **Google is the sign-in for every player.** New players register with **Continue with Google** only, from a club invite, a session invite or the Admin link; the email + password sign-up is removed. The Google email becomes the ROTRA email and is confirmed at once (no "Confirm your email" banner). The phone is still required at registration. A club-created profile (claim) connects Google instead of setting a password.
   - **Existing password players keep their password as a way in** and connect Google. Until they do, a yellow **ROTRA announcement** band shows on every page. After the deadline, a password sign-in without Google stops at **Connect Google to continue** (P-GOOGLE-REQUIRED).
@@ -1097,6 +1101,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Implementation status:** in progress: mockup and apps/player built in one change ([log](../mockup-changes/2026-11-17-player-legal-pages.md)); update to implemented once it is on `main`.
 - **Ticket:** none (built without a ticket; see the log)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Amended by:** [D-2026-11-18-02](#d-2026-11-18-02): the text is rewritten, the operator is named by placeholders, the effective date is November 18, 2026, and rotra.club shows the same text.
 - **Decision:**
   - The Player app gets two public pages so the Google sign-in consent screen can link to them: **Privacy Policy** at `https://player.rotra.club/privacy` (P-PRIVACY) and **Terms of Service** at `https://player.rotra.club/terms` (P-TERMS). Both are reachable signed out, in mock and real mode, and are static text. P-LOGIN says "By continuing you agree to the Terms of Service and Privacy Policy." with links to both.
   - **Operator:** the pages name the operator simply as "ROTRA" (no company or personal name yet).
@@ -1111,3 +1116,66 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Retention periods are not decided. The pages say data is kept while the account or profile exists, and what is still needed afterwards (a club's results and history, records the law requires).
   - Whether the Queue and Admin apps link to the same pages.
 - **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/`, `apps/player/src/app/(public)/terms/`, `packages/ui/src/components/legal-document/`.
+
+### D-2026-11-18-01 — Google sign-in ships behind a feature flag that starts off
+- **Decision status:** approved (owner, November 18, 2026); the open items below are not decided.
+- **Implementation status:** not started.
+- **Ticket:** [#938](https://github.com/jose-codegourmet/rotra-v2/issues/938) (Epic P12, [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892))
+- **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Decision:**
+  - Everything in [D-2026-11-16-01](#d-2026-11-16-01) (Epic P12) is gated by one platform feature flag in Admin › Settings › Feature flags: key **`player_google_sign_in`**, name **Google sign-in for players**.
+  - **The flag starts off.** It ships already in the catalog, in mock mode and in real mode, so the platform owner does not add it by hand. The platform owner turns it on in Admin (D-FLAG confirmation, Record of actions), with no deploy.
+  - **While it is off, the Player app works as it does today:** email + password sign-in and registration, no **Continue with Google**, no Connect Google steps, no ROTRA announcement band, no Sign-in methods card, and the deadline gate never runs.
+  - **While it is on,** D-2026-11-16-01 applies in full.
+  - It is the first flag the apps' code checks, and the first flag that ships with the product. The catalog therefore no longer starts empty: it starts with the flags ROTRA's own features ship with, and the platform owner still adds any other flag with **Add flag**.
+- **Open:**
+  - Whether the invite card (P-INVITE) and the signed-in join steps (P-JOIN-CLUB, P-JOIN-SESSION) also wait for the flag, or show while it is off with the email + password registration behind them. Until answered: they wait for the flag.
+  - Turning the flag off again after players registered with Google only: they have no password. Until answered: a connected Google account keeps working when the flag is off; only new Google registration and the prompts are hidden.
+  - Who a flag that ships with the product is "added by" in Admin (the row shows the Admin who added it).
+  - How the Player app reads the flag in real mode (it is needed signed out, on `/login`): through the Go API or a Player Route Handler, and for how long a value may be cached.
+- **Amends:** [D-2026-11-16-01](#d-2026-11-16-01) (ships behind the flag); the October 27, 2026 rule "the feature flag catalog starts empty" ([configuration module](../business_logic/product/admin/modules/configuration/README.md)).
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [configuration module](../business_logic/product/admin/modules/configuration/README.md), [feature flag screens](../screens/product/modules/admin/configuration.md), [`feature_flags` design](../database_design/product/admin/modules/configuration-requests.md).
+
+<a id="d-2026-11-18-02"></a>
+### D-2026-11-18-02 — Fuller Privacy Policy and Terms of Service, also on rotra.club
+- **Decision status:** approved (owner, November 18, 2026); the open items below are not decided.
+- **Implementation status:** in progress: the mockup and `apps/player` rewritten in one change ([log](../mockup-changes/2026-11-18-player-legal-text-rewrite.md)); rotra.club (`apps/landingpage`) built in the same round. Update to implemented once it is on `main`.
+- **Ticket:** none (built without a ticket; see the log)
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Amends:** [D-2026-11-17-01](#d-2026-11-17-01) (operator naming, effective date, the text, where it is shown).
+- **Decision:**
+  - **Fuller text.** Both pages are rewritten into a more complete version in the same plain-language voice: the Privacy Policy covers the Data Privacy Act of 2012 (legal basis per use, automated ranks, named service providers, storage outside the Philippines, breach notice, cookies, rights, children, links); the Terms add who can use ROTRA, club accounts and licenses, playing at your own risk, ROTRA's property, other companies' services, limits on liability, claims caused by the user, events outside our control, disputes and general terms.
+  - **Operator:** placeholders for now, exactly `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes), so they can be found and filled. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
+  - **Age:** you must be 18 to register on your own. Anyone under 18 may use ROTRA only with a parent's or guardian's consent. A club that adds a minor confirms it has that consent.
+  - **Club licenses and refunds:** the license, fees, period, payment and refunds are the ones in the club's accepted quotation. A quotation request on rotra.club is not a contract until a quotation is accepted. Nothing overrides rights the law gives.
+  - **Google sign-in:** every statement about Google is true whether the `player_google_sign_in` flag ([D-2026-11-18-01](#d-2026-11-18-01)) is on or off ("If you sign in with Google", "or with Google where it is offered").
+  - **rotra.club** gets `#privacy` and `#terms` with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
+  - **Effective date** on both, everywhere: November 18, 2026.
+- **Open:**
+  - The text is still a plain-language draft that a lawyer has not reviewed.
+  - Filling the three placeholders.
+  - Designating a Data Protection Officer, and checking whether ROTRA must register with the National Privacy Commission.
+  - The `support@rotra.club` mailbox must exist before launch.
+  - Retention periods: the pages give none. (The [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md#public-pages-and-retention) already has six months for public pages after expiry and 90 days for join requests, server request logs and exports, not yet enforced by a job.)
+  - A liability cap for players who pay ROTRA nothing: the cap is the fees paid in the 12 months before a claim, if any, which is zero for them.
+  - Whether the Queue and Admin apps link to the same pages (carried over from D-2026-11-17-01).
+- **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/content.ts`, `apps/player/src/app/(public)/terms/content.ts`, `apps/mockup/player-app/rotra-player.html` › `LEGAL`.
+
+### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
+- **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
+- **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - A Queue Master can give a **registered** player a **club nickname**. It is kept by the club and used in every session of that club until changed; it is not set per session.
+  - **Queue Master screens only:** the console (courts, Main Queue, Auto Queue, pickers, toasts), the roster and Saved players show the club nickname in place of the player's own nickname, and search there matches it.
+  - **Everything else uses the account nickname** (the name when there is none): the public session page, the player's live view, Match history and finished-session results, leaderboards, awards and share images.
+  - It never changes the player's ROTRA account, and another club never sees it.
+  - Guests and unclaimed players are unchanged: they have no account, so the nickname in Edit details is already the club's.
+- **Open:**
+  - The length limit of a club nickname (the mockup has none).
+  - Whether the player can see or remove the nickname a club gave them.
+  - Results the Queue Master reads on their own screens after Session done (the mockup: account nickname there too).
+  - Nicknames already copied onto linked saved-player rows before this rule (database).
+- **Amends:** the November 11, 2026 rule (#705) that Saved players always show a registered player's own nickname; “Registered players have no Edit details” still holds, the club nickname is the one exception.
+- **References:** [players module](../business_logic/product/queue/modules/players/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Club nickname](../product-terms.md).

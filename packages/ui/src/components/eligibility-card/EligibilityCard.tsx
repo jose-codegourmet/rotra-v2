@@ -5,7 +5,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { ProgressBar } from '@rotra/ui/progress-bar'
 
-/** The shared rank's status chip (rankStatus): Not calculated, Needs reassessment, On the leaderboard, … */
+/** The shared rank's status chip, such as Provisional, Needs reassessment or Not calculated. */
 export type RankStatusChip = { label: string; tone: 'accent' | 'warn' | 'neutral' }
 
 /**
@@ -15,7 +15,7 @@ export type RankStatusChip = { label: string; tone: 'accent' | 'warn' | 'neutral
 export type ProfileRankHead = {
   /** The level label; null shows “No rank yet” in muted text */
   levelLabel: string | null
-  status: RankStatusChip
+  status?: RankStatusChip
   /** Own profile with a rank: Share (the Share rank sheet) */
   onShare?: () => void
   /** How this rank works: the rank page (ladder and the full explanation) */
@@ -31,7 +31,7 @@ export function RankLabel({ levelLabel, status }: Pick<ProfileRankHead, 'levelLa
         <b className={cn('text-[20px] font-extrabold', !levelLabel && 'text-fg2')}>
           {levelLabel ?? 'No rank yet'}
         </b>
-        <Chip tone={status.tone}>{status.label}</Chip>
+        {status ? <Chip tone={status.tone}>{status.label}</Chip> : null}
       </div>
     </div>
   )

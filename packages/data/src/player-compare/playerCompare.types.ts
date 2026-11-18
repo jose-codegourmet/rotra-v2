@@ -42,7 +42,10 @@ export type PlayerCompareStats = {
 }
 
 export type ComparePlayer = {
-  profile: Pick<PlayerProfile, 'playerId' | 'fullName' | 'nickname' | 'picture'>
+  profile: Pick<
+    PlayerProfile,
+    'playerId' | 'fullName' | 'nickname' | 'picture' | 'leaderboardPlaces'
+  >
   /** The existing rank reader's result, without any compare-specific ranking calculation. */
   rank: PlayerRank | null
   overallWinRate: number | null

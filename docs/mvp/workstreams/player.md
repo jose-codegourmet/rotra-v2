@@ -19,7 +19,7 @@ password recovery through Admin-reviewed requests (#491).
 ## Out of scope / deferred
 
 - Automated recovery emails, a player notification inbox, and club-owner password resets. #491 adds submitted requests in Admin.
-- Meaningful rank and leaderboard values until #247 ([ranking.md](ranking.md)).
+- Skill-rating values until #247 ([ranking.md](ranking.md)).
 
 ## Current state
 
@@ -31,7 +31,7 @@ password recovery through Admin-reviewed requests (#491).
 | Games / history | implemented | `player/fetchers.ts` → `real/player.ts` → `api/players/[playerId]/games` → `db/src/player/projections.ts`. Each game carries the faces on its court (`partnerPlayers` / `opponentPlayers`: name, picture, player ID; a guest has no picture or player ID; an always-private player's name is masked, the picture stays), #830 | #400 closed, #830 |
 | Player Compare | implemented in source; SQL draft | `player-compare/usePlayerCompare` → signed-in `api/players/[playerId]/compare` → `db/src/player/compare.ts` → `rotra_player_compare`; mock fixtures and screen landed, SQL-only migration still needs human sign-off/runtime EXECUTE grant, local and hosted verification pending | #525, #526, #541; D-2026-11-08-02 |
 | Player rank page | partially connected | `api/players/[playerId]/rank` → `projections.ts`; rank always null / `formula_pending` | #247 open |
-| Leaderboard (page, search, my position) | partially connected | `real/leaderboard.ts` → `api/leaderboard/{,search,me}` → `db/src/player/leaderboard.ts`; eligibility always `false` (`projections.ts`) so the list is empty | #247 open |
+| Leaderboard (page, search, my position) | partially connected | `real/leaderboard.ts` → `api/leaderboard/{,search,me}` → `db/src/player/leaderboard.ts`; top 50 and movement computed from valid match facts, with the private cutoff for the signed-in player | #918, batch verification pending |
 | Own profile read/edit, phone privacy, contact-change submit | implemented | `api/me/{account,profile,phone-privacy}`, `api/account/contact-change` → `db/src/player/{profile,contact-change}.ts`; a real player session now exists (#483). Admin approval side: [admin.md](admin.md) | #400 closed; #483 |
 | Clubs card, Join club, Leave club | implemented in source (F07.64, #766); not run against a database | `player-club/fetchers.ts` (`getPlayerClubs`) → `real/player-club.ts` → `api/me/clubs` (GET, POST; the owner's read) and `api/me/clubs/[clubId]` (DELETE) → `db/src/player/my-clubs.ts`; another player's clubs → `api/players/[playerId]/clubs` (public, no joined-via) → `db/src/player/player-clubs.ts`. Leave club is on the club page hero (`viewerIsMember` on the club page read). Leave club sets `club_players.removed_at` and keeps the row (owner decision); Join club creates the row or clears `removed_at`. `club_players.joined_via` is not migrated (D-2026-11-09-06), so a club-link join reads as "Added by the club"; a confirmed join request reads as "Joined via session link" | F07.64 |
 | My sessions, share-card results | implemented in source (F07.65); not run against a database | `player/mySessions.ts` → `real/my-sessions.ts` → `api/me/sessions` → `db/src/player/my-sessions.ts` (open sessions from roster, waitlist and pending requests; finished from saved history). `player/shareData.ts` → `api/me/sessions/[sessionId]/share` (the people on the player's own games, before or after publication, D-2026-11-13-06, #830; position only from the published snapshot once the standings are shared; guests masked with no picture; always-private players masked, picture kept) | F07.65 |
@@ -55,7 +55,7 @@ password recovery through Admin-reviewed requests (#491).
 - [ ] Admin claim-link issuance in real mode. Ticket: needed if Admin issuance is MVP (open question 9).
 - [ ] Admin-reviewed password recovery (#491) is verified with the hosted provider (schema applied after sign-off).
 - [ ] Attach a signed-in player to a join request; player sign-up (D-07). Ticket: needed.
-- [ ] Rank and leaderboard become meaningful after #247. Ticket: #247.
+- [ ] Implement skill-rating constants from #247. Ticket: #247.
 
 ## Related decisions
 
@@ -71,7 +71,7 @@ password recovery through Admin-reviewed requests (#491).
 ## Blocking open decisions
 
 - #244 (email verification on claim, password policy, contact-change enforcement, mistaken guest links); hosted provider handoff verification for #491.
-- #247 ranking math (rank, leaderboard).
+- #247 skill-rating math.
 - [Business open decisions](../../business_logic/product/open-decisions.md) · [database open decisions](../../database_design/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 8, 9, 12, 14.
 
@@ -82,4 +82,4 @@ password recovery through Admin-reviewed requests (#491).
 - [ ] In real mode, a player can claim an account, sign in, sign out, and read and edit their own profile.
 - [ ] Public profile, RTR ID lookup and history work for visitors.
 - [ ] Admin-reviewed password recovery (#491) is verified with the hosted provider (schema applied after sign-off).
-- [ ] Rank and leaderboard behaviour matches the owner's ruling (open question 12).
+- [ ] Verify the three period leaderboards and their profile places against D-2026-11-16-05.

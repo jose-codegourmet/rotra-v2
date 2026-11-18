@@ -6,6 +6,7 @@ export const chipMeta = {
     'A small rounded state label: identity (Registered, Unclaimed), session state (Live, Preparing), warnings and counts.',
   usage: [
     'Always has text; colour only reinforces it.',
+    'Use a neutral chip for a profile’s leaderboard place, such as Top annual #39.',
     'accent for good or done states, warn for needs attention or pending, error for failed or invalid, solid for neutral emphasis, live for a running session (its dot stops under reduced motion).',
     'For a big top-bar sync state use SyncStatus, not a Chip.',
   ],

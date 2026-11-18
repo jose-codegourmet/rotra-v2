@@ -1,3 +1,12 @@
+import type { LeaderboardPlace } from '../leaderboard/leaderboard.types'
+
+/** Example places from the period profile and dialog designs. */
+export const profileLeaderboardStoryPlaces = [
+  { period: 'year', position: 17, wins: 106 },
+  { period: 'month', position: 24, wins: 12 },
+  { period: 'week', position: 39, wins: 1 },
+] as const satisfies readonly LeaderboardPlace[]
+
 /** Prototype menu scenarios for rank-component stories. */
 export const joseRankStates = {
   onLeaderboard: {

@@ -28,7 +28,8 @@ export type DevMenuProps = {
     rank: string
     leaderboard: string
     rankOptions: { value: string; label: string }[]
-    leaderboardOptions: { value: string; label: string }[]
+    leaderboardOptions?: { value: string; label: string }[]
+    leaderboardPlaceOptions?: { value: string; label: string }[]
     onRankChange: (value: string) => void
     onLeaderboardChange: (value: string) => void
   }
@@ -209,21 +210,48 @@ export function DevMenu({
                 />
               </div>
             </section>
-            <section className={SECTION}>
-              <h3 className={LABEL}>Leaderboard</h3>
-              <SegmentedControl
-                aria-label="Leaderboard"
-                value={playerScenarios.leaderboard}
-                options={playerScenarios.leaderboardOptions}
-                onChange={playerScenarios.onLeaderboardChange}
-              />
-            </section>
+            {playerScenarios.leaderboardOptions ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>Leaderboard</h3>
+                <SegmentedControl
+                  aria-label="Leaderboard"
+                  value={
+                    playerScenarios.leaderboardOptions.some(
+                      ({ value }) => value === playerScenarios.leaderboard,
+                    )
+                      ? playerScenarios.leaderboard
+                      : 'normal'
+                  }
+                  options={playerScenarios.leaderboardOptions}
+                  onChange={playerScenarios.onLeaderboardChange}
+                />
+                {playerScenarios.leaderboardPlaceOptions ? (
+                  <>
+                    <p className="text-[13px] font-semibold text-fg2">
+                      My place on the leaderboard (signs in as Jose)
+                    </p>
+                    <SegmentedControl
+                      aria-label="My place on the leaderboard (signs in as Jose)"
+                      value={
+                        playerScenarios.leaderboardPlaceOptions.some(
+                          ({ value }) => value === playerScenarios.leaderboard,
+                        )
+                          ? playerScenarios.leaderboard
+                          : 'normal'
+                      }
+                      options={playerScenarios.leaderboardPlaceOptions}
+                      onChange={playerScenarios.onLeaderboardChange}
+                    />
+                  </>
+                ) : null}
+              </section>
+            ) : null}
             {rankingSettings ? (
               <section className={SECTION}>
                 <h3 className={LABEL}>Admin settings</h3>
                 {settingsFields}
                 <p className="text-xs text-fg2">
-                  Copy on the leaderboard, profiles and rank page follows these.
+                  Copy on profiles and the rank page follows these.
                 </p>
               </section>
             ) : null}

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "profile-three-lists",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "name": "compare",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "name": "profile-three-lists",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "name": "compare",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "name": "profile-three-lists",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "name": "compare",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "name": "profile-three-lists",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "name": "compare",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  }
+]

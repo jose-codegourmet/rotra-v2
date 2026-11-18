@@ -6,7 +6,6 @@ import {
   requestPasswordReset,
   setPhonePrivacy,
 } from '../player-account/fetchers'
-import { NOT_CONNECTED_MESSAGE } from '../real/mode'
 import {
   findPlayerByRtrId,
   getPlayerGames,
@@ -74,9 +73,12 @@ describe('Player Information › real mode', () => {
 
   it('reads a public profile, and a missing one is null', async () => {
     const before = mockStore.getSnapshot()
+    reply(200, null)
     reply(200, { profile: wireProfile })
     expect(await getPlayerProfile(playerId)).toEqual(wireProfile)
-    expect(sent()).toMatchObject({ path: `/api/players/${playerId}`, method: 'GET' })
+    expect(sent()).toMatchObject({ path: '/api/auth/session', method: 'GET' })
+    expect(sent(1)).toMatchObject({ path: `/api/players/${playerId}`, method: 'GET' })
+    reply(200, null)
     reply(404, { error: { code: 'not_found', message: 'Not found.' } })
     expect(await getPlayerProfile('nobody')).toBeNull()
     expect(mockStore.getSnapshot()).toBe(before)
@@ -160,11 +162,17 @@ describe('Player Information › real mode', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('leaves password reset not connected, never falling back to the mock store', async () => {
-    await expect(requestPasswordReset('a@example.invalid')).rejects.toMatchObject({
-      message: NOT_CONNECTED_MESSAGE,
+  it('requests an Admin-reviewed reset without changing the mock store or consuming its token', async () => {
+    const before = mockStore.getSnapshot()
+    reply(200, { acknowledged: true })
+    expect(await requestPasswordReset('a@example.invalid')).toEqual({ acknowledged: true })
+    expect(sent()).toMatchObject({
+      path: '/api/auth/password-reset',
+      method: 'POST',
+      body: { email: 'a@example.invalid' },
     })
-    await expect(getResetLink('token')).rejects.toMatchObject({ message: NOT_CONNECTED_MESSAGE })
-    expect(fetchMock).not.toHaveBeenCalled()
+    expect(await getResetLink('token')).toEqual({ token: 'token', status: 'valid' })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(mockStore.getSnapshot()).toBe(before)
   })
 })

@@ -1,0 +1,1298 @@
+[
+  {
+    "id": "player-leaderboardlist--annual",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--annual",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--annual",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--annual",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--monthly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--monthly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--monthly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--monthly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--weekly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--weekly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--weekly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--weekly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--search-results",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--search-results",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--search-results",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--search-results",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--loading",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--loading",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--loading",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--loading",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-with-more",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-with-more",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-with-more",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-with-more",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-complete",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-complete",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-complete",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--footer-complete",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--refreshing",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--refreshing",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--refreshing",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--refreshing",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--masked-rows",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--masked-rows",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--masked-rows",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardlist--masked-rows",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--up",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--up",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--up",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--up",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--down",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--down",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--down",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--down",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--same",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--same",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--same",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--same",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new-with-tooltip",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new-with-tooltip",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new-with-tooltip",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardmove--new-with-tooltip",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--annual",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--annual",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--annual",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--annual",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--monthly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--monthly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--monthly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--monthly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--weekly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--weekly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--weekly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardperiodswitch--weekly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--up",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--up",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--up",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--up",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--down",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--down",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--down",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--down",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--same",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--same",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--same",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--same",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new-with-tooltip",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new-with-tooltip",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new-with-tooltip",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--new-with-tooltip",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--flash",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--flash",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--flash",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--flash",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--me",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--me",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--me",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--me",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-1",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-1",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-1",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-1",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-2",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-2",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-2",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-2",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-3",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-3",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-3",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--medal-3",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--long-name-and-nickname",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--long-name-and-nickname",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--long-name-and-nickname",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--long-name-and-nickname",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--masked",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--masked",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--masked",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--masked",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--unclaimed",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--unclaimed",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--unclaimed",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-leaderboardrow--unclaimed",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--monthly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--monthly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--monthly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--monthly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--weekly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--weekly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--weekly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--weekly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins-and-win-rate",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins-and-win-rate",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins-and-win-rate",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--below-top-50-same-wins-and-win-rate",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed-initials",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed-initials",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed-initials",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--listed-initials",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--no-games-this-week",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--no-games-this-week",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--no-games-this-week",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-mypositioncard--no-games-this-week",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--three-places",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--three-places",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--three-places",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--three-places",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--one-place",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--one-place",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--one-place",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--one-place",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--no-places",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--no-places",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--no-places",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profileleaderboardchips--no-places",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--three-lists",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--three-lists",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--three-lists",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--three-lists",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--two-lists",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--two-lists",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--two-lists",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--two-lists",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--one-list",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--one-list",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--one-list",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--one-list",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--no-lists",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--no-lists",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--no-lists",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--no-lists",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--provisional",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--provisional",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--provisional",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--provisional",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--needs-reassessment",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--needs-reassessment",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--needs-reassessment",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--needs-reassessment",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone-light",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone-light",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone-light",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-profilerankingcard--phone-light",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--annual",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--annual",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--annual",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--annual",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--monthly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--monthly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--monthly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--monthly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--weekly",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--weekly",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--weekly",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--weekly",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--me-in-first",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--me-in-first",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--me-in-first",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--me-in-first",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--masked",
+    "theme": "dark",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--masked",
+    "theme": "light",
+    "width": 375,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--masked",
+    "theme": "light",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "id": "player-topthreepodium--masked",
+    "theme": "dark",
+    "width": 375,
+    "overflow": false
+  }
+]

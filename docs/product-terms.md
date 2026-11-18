@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-12 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-18 (leaderboard terms) · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -139,9 +139,9 @@ Rules: [Ranking](business_logic/product/player-information/modules/ranking/READM
 | Playing level | One of nine: Beginner, Intermediate, Advanced × Low, Mid, High (e.g. "Intermediate High") |
 | Club assessment | The latest of the nine levels one club assigned to a player |
 | Session playing level | The level the club set for this session; locks at Start session (late entries lock when added) |
-| Shared rank | Cross-club rank shown in Player Information: 70% club assessments, 30% performance, last three months |
-| Overall leaderboard | The one global ROTRA leaderboard. No city or club filters in v1 |
-| Needs reassessment | Rank still visible after three months without play; returning to the leaderboard needs reassessment |
+| Shared rank | Cross-club skill rank, based on wins weighted by opponent strength |
+| Top annual, Top monthly, Top weekly | ROTRA’s three cross-club leaderboards. Each shows the top 50 by wins in standard matches for the calendar period. Top annual replaces the overall list |
+| Needs reassessment | Skill rank remains visible after three months without play and needs a fresh assessment |
 
 ---
 
@@ -333,7 +333,7 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
 | Player | `Player` | `players` | Global identity across clubs |
 | Ranking settings | `RankingPolicyVersion` | `ranking_policy_versions` | One append-only saved version: weights in basis points (sum 10000) and the recent-standard-match threshold (1–40); the newest is in effect. `RankingSettings` {assessmentWeightPercent, matchRequirement} is the effective version's reader shape |
-| Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
+| Leaderboard entry | `LeaderboardEntry` | — | Public identity projection. Leaderboard rows add the period’s wins, losses, place and previous place |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
 | Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` ([D-2026-11-12-01](mvp/decisions.md#d-2026-11-12-01)) |

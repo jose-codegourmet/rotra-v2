@@ -13,6 +13,7 @@ const DECIDED_MATH_TESTS = [
   'src/match/match.rules.test.ts',
   'src/session-result/sessionResult.rules.test.ts',
   'src/player/player.rules.test.ts',
+  'src/leaderboard/leaderboard.rules.test.ts',
   'src/queue-session/queueSession.rules.test.ts',
 ]
 

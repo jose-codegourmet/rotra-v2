@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockStore } from '../mock/store'
-import { getLeaderboardPage, getMyLeaderboardPosition, searchLeaderboard } from './fetchers'
+import {
+  getLeaderboardPage,
+  getMyLeaderboardPosition,
+  getMyPeriodPosition,
+  searchLeaderboard,
+} from './fetchers'
 
 describe('Leaderboard › real mode', () => {
   const fetchMock = vi.fn()
@@ -23,10 +28,14 @@ describe('Leaderboard › real mode', () => {
 
   it('reads a page from the Route Handler and returns the empty state, never fixture entries', async () => {
     const before = mockStore.getSnapshot()
-    reply(200, { entries: [], total: 0 })
-    const page = await getLeaderboardPage({ offset: 25, limit: 25 })
-    expect(sent()).toMatchObject({ path: '/api/leaderboard?offset=25&limit=25', method: 'GET' })
-    expect(page).toEqual({ entries: [], total: 0 })
+    const empty = { entries: [], total: 0, periodStart: '2026-11-15T16:00:00.000Z' }
+    reply(200, empty)
+    const page = await getLeaderboardPage({ offset: 25, limit: 25, period: 'week' })
+    expect(sent()).toMatchObject({
+      path: '/api/leaderboard?offset=25&limit=25&period=week',
+      method: 'GET',
+    })
+    expect(page).toEqual(empty)
     expect(mockStore.getSnapshot()).toBe(before)
   })
 
@@ -38,15 +47,20 @@ describe('Leaderboard › real mode', () => {
       playingLevel: 'intermediate_mid',
       pictureUrl: null,
       position: 1,
+      wins: 3,
+      losses: 1,
+      previousPosition: null,
     }
-    reply(200, { entries: [entry], total: 1 })
-    expect(await getLeaderboardPage({ offset: 0 })).toEqual({ entries: [entry], total: 1 })
+    const page = { entries: [entry], total: 1, periodStart: '2025-12-31T16:00:00.000Z' }
+    reply(200, page)
+    expect(await getLeaderboardPage({ offset: 0 })).toEqual(page)
+    expect(sent().path).toBe('/api/leaderboard?offset=0&limit=25')
   })
 
   it('searches by encoded, trimmed name', async () => {
     reply(200, { hits: [], total: 0 })
-    const result = await searchLeaderboard('  Ana & Co ')
-    expect(sent().path).toBe('/api/leaderboard/search?q=Ana%20%26%20Co')
+    const result = await searchLeaderboard('  Ana & Co ', undefined, 'month')
+    expect(sent().path).toBe('/api/leaderboard/search?q=Ana%20%26%20Co&period=month')
     expect(result).toEqual({ hits: [], total: 0 })
   })
 
@@ -54,6 +68,19 @@ describe('Leaderboard › real mode', () => {
     reply(200, { position: null })
     expect(await getMyLeaderboardPosition()).toBeNull()
     expect(sent().path).toBe('/api/leaderboard/me')
+  })
+
+  it('reads the private cutoff from the signed-in period endpoint', async () => {
+    const standing = {
+      position: 51,
+      wins: 1,
+      losses: 2,
+      cutoffWins: 1,
+      cutoffHasBetterWinRate: true,
+    }
+    reply(200, { standing })
+    expect(await getMyPeriodPosition('week')).toEqual(standing)
+    expect(sent().path).toBe('/api/leaderboard/me?period=week')
   })
 
   it('surfaces a failed read as retryable instead of falling back to mock data', async () => {

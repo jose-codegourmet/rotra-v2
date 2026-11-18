@@ -1,3 +1,4 @@
+import { LEADERBOARD_PERIOD_COPY, LEADERBOARD_PERIODS } from '@rotra/ui/leaderboard-period-switch'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   againstGames,
@@ -24,7 +25,13 @@ const meta = {
 } satisfies Meta<typeof CompareStats>
 export default meta
 type Story = StoryObj<typeof meta>
+const leaderboardLabels: string[] = LEADERBOARD_PERIODS.map(
+  (period) => LEADERBOARD_PERIOD_COPY[period].label,
+)
 export const All: Story = {}
+export const NoLeaderboardPlaces: Story = {
+  args: { rows: comparisonRows('all').filter((row) => !leaderboardLabels.includes(row.label)) },
+}
 export const HeadToHead: Story = {
   args: {
     filter: 'h2h',
@@ -40,7 +47,7 @@ export const Empty: Story = {
     myWins: 0,
     otherWins: 0,
     rows: comparisonRows('all').map((row) =>
-      ['Level', 'Overall position'].includes(row.label)
+      ['Level', ...leaderboardLabels].includes(row.label)
         ? row
         : {
             ...row,
@@ -56,7 +63,7 @@ export const EmptyHeadToHead: Story = {
     ...Empty.args,
     filter: 'h2h',
     rows: comparisonRows('h2h').map((row) =>
-      ['Level', 'Overall position', 'Games counted (3 months)', 'Win rate overall'].includes(
+      ['Level', ...leaderboardLabels, 'Games counted (3 months)', 'Win rate overall'].includes(
         row.label,
       )
         ? row

@@ -18,5 +18,11 @@ export const leaderboardOptions = [
   { value: 'normal', label: 'Normal' },
   { value: 'loading', label: 'Loading' },
   { value: 'error', label: "Can't load" },
-  { value: 'empty', label: 'No one qualifies' },
+  { value: 'empty', label: 'Empty lists' },
+  { value: 'empty-week', label: 'Empty week' },
+]
+export const leaderboardPlaceOptions = [
+  { value: 'normal', label: 'As played' },
+  { value: 'in-top-50', label: 'In the top 50' },
+  { value: 'below-top-50', label: 'Not in the top 50' },
 ]

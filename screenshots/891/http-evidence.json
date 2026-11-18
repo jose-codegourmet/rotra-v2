@@ -1,0 +1,98 @@
+[
+  {
+    "path": "/api/leaderboard?period=year",
+    "status": 200,
+    "cacheControl": "private, no-store",
+    "body": {
+      "entries": [
+        {
+          "id": "91000000-0000-4000-8000-000000000001",
+          "wins": 1,
+          "losses": 0,
+          "position": 1,
+          "previousPosition": null,
+          "fullName": "Juan Dela Cruz",
+          "nickname": "Juan",
+          "playingLevel": "intermediate_mid",
+          "pictureUrl": null,
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "masked": false,
+          "levelHidden": false,
+          "unclaimed": false
+        },
+        {
+          "id": "91000000-0000-4000-8000-000000000003",
+          "wins": 0,
+          "losses": 1,
+          "position": 2,
+          "previousPosition": null,
+          "fullName": "M*** S***",
+          "nickname": null,
+          "playingLevel": null,
+          "pictureUrl": null,
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "masked": true,
+          "levelHidden": false,
+          "unclaimed": false
+        }
+      ],
+      "total": 2,
+      "periodStart": "2025-12-31T16:00:00.000Z"
+    }
+  },
+  {
+    "path": "/api/leaderboard?period=month",
+    "status": 200,
+    "cacheControl": "private, no-store",
+    "body": {
+      "entries": [],
+      "total": 0,
+      "periodStart": "2026-10-31T16:00:00.000Z"
+    }
+  },
+  {
+    "path": "/api/leaderboard?period=week",
+    "status": 200,
+    "cacheControl": "private, no-store",
+    "body": {
+      "entries": [],
+      "total": 0,
+      "periodStart": "2026-11-15T16:00:00.000Z"
+    }
+  },
+  {
+    "path": "/api/leaderboard?period=bad",
+    "status": 422,
+    "cacheControl": "private, no-store",
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  {
+    "path": "/api/leaderboard?limit=51",
+    "status": 422,
+    "cacheControl": "private, no-store",
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  {
+    "path": "/api/leaderboard/me?period=week",
+    "status": 401,
+    "cacheControl": "private, no-store",
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  }
+]

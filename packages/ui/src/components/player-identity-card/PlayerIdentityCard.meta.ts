@@ -5,6 +5,7 @@ export const playerIdentityCardMeta = {
     'Profile identity card: the ProfileHero (5:1 banner strip, the picture on its bottom edge, display name and full name), the permanent RTR ID with Copy, then the actions one full-width button per row: Edit profile, My player ID, Share profile (own), or Compare with me, Share profile (someone else).',
   usage: [
     'Use as the side column of P-PUBLIC-PROFILE and P-OWN-PROFILE; never pass private contact data.',
+    'An unclaimed player saved by one club shows that club, the level, leaderboard place chips and permitted calendar-year stats.',
     'The RTR ID hint never calls the ID a residence or current club.',
     'Other profiles offer Compare with me, or Compare with my results when signed out, and Share profile (onShare) under it.',
     'The owner picture edit button calls onChangePicture; public profiles do not show it.',
@@ -17,6 +18,6 @@ export const playerIdentityCardMeta = {
     screen: 'Profile › identity card (.hero, .rtr-line, .acts)',
   },
   docs: ['docs/screens/product/modules/player-information/profile.md'],
-  variants: ['public', 'own'],
+  variants: ['public', 'own', 'unclaimed'],
   related: ['ProfileHero', 'BannerSheet', 'PlayerIdLine', 'AccountPanel', 'ProfileLayout'],
 } satisfies ComponentMeta

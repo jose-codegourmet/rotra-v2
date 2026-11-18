@@ -65,8 +65,10 @@ export async function listProfileBanners(signal?: AbortSignal): Promise<ProfileB
  * Mock mode: the banner a stored `bannerId` draws, with the default rule (null → Court while shown,
  * else the first shown banner). Real mode gets the same answer from the server's profile projection.
  */
-export function resolveMockProfileBanner(bannerId: string | null | undefined) {
-  const library = readMockState().profileBanners
+export function resolveMockProfileBanner(
+  bannerId: string | null | undefined,
+  library = readMockState().profileBanners,
+) {
   return resolveProfileBanner(
     bannerId,
     (id) => library.find((b) => b.id === id) ?? retainedBanners.get(id),

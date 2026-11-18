@@ -10,8 +10,8 @@ import type {
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
-import { readMyLeaderboardPosition } from './leaderboard'
-import { readPublicProfile } from './profile'
+import { readLeaderboardPlaces } from './leaderboard'
+import { readVisibleProfile } from './profile'
 import { readPlayerMatchHistory, readPlayerRank } from './projections'
 
 const PAGE_SIZE = 3
@@ -42,11 +42,13 @@ function stats(games: number, myWins: number, otherWins: number): PlayerCompareS
   }
 }
 
-async function comparePlayer(playerId: string): Promise<ComparePlayer> {
-  const [profile, rank, position, history] = await Promise.all([
-    readPublicProfile(playerId),
+async function comparePlayer(
+  profile: Awaited<ReturnType<typeof readVisibleProfile>>,
+  places: Awaited<ReturnType<typeof readLeaderboardPlaces>>,
+): Promise<ComparePlayer> {
+  const playerId = profile.playerId
+  const [rank, history] = await Promise.all([
     readPlayerRank(playerId),
-    readMyLeaderboardPosition(playerId),
     readPlayerMatchHistory(playerId),
   ])
   const games = history
@@ -61,8 +63,9 @@ async function comparePlayer(playerId: string): Promise<ComparePlayer> {
       fullName: profile.fullName,
       nickname: profile.nickname,
       picture: profile.picture,
+      leaderboardPlaces: places.get(playerId) ?? [],
     },
-    rank: rank ? { ...rank, position } : null,
+    rank,
     overallWinRate: percentage(games.filter((game) => game.result === 'won').length, games.length),
   }
 }
@@ -88,9 +91,14 @@ export async function readPlayerCompare(
     requested < 0
   )
     throw new ServiceError('invalid')
+  const [viewerProfile, otherProfile] = await Promise.all([
+    readVisibleProfile(context.playerId, context.playerId),
+    readVisibleProfile(otherId, context.playerId),
+  ])
+  const places = await readLeaderboardPlaces([context.playerId, otherId])
   const [viewer, other, rows] = await Promise.all([
-    comparePlayer(context.playerId),
-    comparePlayer(otherId),
+    comparePlayer(viewerProfile, places),
+    comparePlayer(otherProfile, places),
     prisma.$queryRaw<ComparePageRow[]>`
       WITH shared AS MATERIALIZED (
         SELECT * FROM public.rotra_player_compare(${context.playerId}::uuid, ${otherId}::uuid)

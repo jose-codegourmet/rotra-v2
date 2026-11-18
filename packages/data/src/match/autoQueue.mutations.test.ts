@@ -347,7 +347,8 @@ describe('complete flexible Queue Session rules', () => {
       before.waitlist[2]!.id,
     ])
     const page = await getPublicSession(state.sessions.find((s) => s.id === sessionId)!.publicSlug)
-    expect(page.participants).toHaveLength(37)
+    expect(page.participantCount).toBe(37)
+    expect(page.participants).toHaveLength(12)
     const generated = await generateAutoQueueDrafts({ sessionId, mode: 'available', count: 2 })
     expect(generated).toBeDefined()
     // Force the late player into the next explicit batch without excluding them at the plan boundary.

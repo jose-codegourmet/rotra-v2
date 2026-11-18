@@ -159,6 +159,9 @@ Rules this sets:
 - **Moved areas (`ROTRA_GO_MOVED_AREAS`).** Set only in a local test run (B-52) and, from staging-verification on, the beta Vercel project; unset everywhere else. A
   comma-separated list of `/api/*` prefixes Go owns; everything else still reaches its Route Handler.
   - **Start:** `/api/stream/ticket` (B-41).
+  - **Sign-in check (go-sign-in):** add `/api/auth` and `/api/claim`; the apps then guard pages with the Go
+    access pass (`@rotra/api-proxy/pass`, key set from Go's `/api/auth/keys`) and never call Supabase.
+    See `packages/api-proxy/AGENTS.md` for what stays on TypeScript until tracks 7 and 8.
   - **Each move track** adds its prefixes in its Switch step; removing a prefix undoes the move, since
     the Route Handler stays until ship.
   - **All moved:** the value becomes `/api` (variable change only, still undoable).

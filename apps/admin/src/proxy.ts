@@ -1,5 +1,6 @@
 import { dataMode } from '@rotra/api-proxy/data-mode'
 import { forwardToGo, goApiEnabled } from '@rotra/api-proxy/go-forward'
+import { accessCookieName, verifyAccessPass } from '@rotra/api-proxy/pass'
 import { ADMIN_COOKIE_NAME, parseAdminSession } from '@rotra/data/admin-account/cookie'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -12,7 +13,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
   // Beta (B-32): moved paths reach Go first; with Go in front nobody is signed in and Supabase is never called.
-  const moved = await forwardToGo(request)
+  const moved = await forwardToGo(request, 'admin')
   if (moved) return moved
   const goMode = goApiEnabled()
   // Route Handlers authorize themselves at the service boundary and answer in JSON, never a redirect.
@@ -28,7 +29,14 @@ export async function proxy(request: NextRequest) {
           : '/login'
 
   if (goMode) {
-    const destination = route(false)
+    // A pass signed by Go for this app lets a page load, even an expired one (the client refreshes on
+    // 'expired'). On /login only a still-valid pass skips the form, so a dead session cannot loop.
+    const pass = path.startsWith('/api/')
+      ? null
+      : await verifyAccessPass(request.cookies.get(accessCookieName('admin'))?.value, 'admin')
+    const destination = route(
+      path === '/login' ? Boolean(pass?.ok && !pass.expired) : Boolean(pass?.ok),
+    )
     const response = destination
       ? NextResponse.redirect(new URL(destination, request.url))
       : NextResponse.next()

@@ -1,4 +1,6 @@
 import { dataMode } from '@rotra/api-proxy/data-mode'
+import { goApiEnabled } from '@rotra/api-proxy/go-forward'
+import { readFromGo } from '@rotra/api-proxy/go-read'
 import { claimLinks } from '@rotra/data/fixtures/player-accounts'
 import { readClaimLink } from '@rotra/db/player/claim'
 import type { Metadata } from 'next'
@@ -30,6 +32,15 @@ export async function generateMetadata(props: PageProps<'/claim/[token]'>): Prom
 
 async function claimLinkExists(token: string) {
   try {
+    // Beta: Go owns the claim link read (404 = unknown or revoked, same fallback copy; other failures
+    // throw into the catch, same as the TypeScript path).
+    if (goApiEnabled()) {
+      const body = await readFromGo<{ link: { status: string } }>(
+        `/api/claim/${encodeURIComponent(token)}`,
+        { app: 'player' },
+      )
+      return body?.link.status === 'valid'
+    }
     if (dataMode() === 'real') return (await readClaimLink(token)).status === 'valid'
     // Mock mode: the store lives in the browser; only the seeded link is known here.
     return claimLinks[token]?.status === 'valid'

@@ -8,6 +8,9 @@
  * - `ROTRA_PROXY_SECRET`: sent as `X-Rotra-Proxy-Secret` so Go trusts the forwarded client IP.
  */
 export const PROXY_SECRET_HEADER = 'X-Rotra-Proxy-Secret'
+/** Which app the call comes from; Go trusts it only because this helper sets it next to the proxy secret. */
+export const APP_HEADER = 'X-Rotra-App'
+export type GoApp = 'club' | 'player' | 'admin'
 export const GO_FORWARD_TIMEOUT_MS = 10_000
 
 /** True when this deployment runs with the Go API in front of its moved areas (beta only). */
@@ -41,7 +44,12 @@ const HOP_BY_HOP = [
   'content-length',
 ]
 // Never trusted from the client; set only by this helper.
-const CLIENT_SUPPLIED = ['x-forwarded-for', 'x-real-ip', PROXY_SECRET_HEADER.toLowerCase()]
+const CLIENT_SUPPLIED = [
+  'x-forwarded-for',
+  'x-real-ip',
+  PROXY_SECRET_HEADER.toLowerCase(),
+  APP_HEADER.toLowerCase(),
+]
 
 type ForwardableRequest = {
   method: string
@@ -64,9 +72,13 @@ function unreachable() {
 
 /**
  * Returns the Go API's response for a moved `/api/*` path, a 503 JSON error on timeout or network
- * failure, or `null` when the request is not forwarded (call this first in `proxy.ts`).
+ * failure, or `null` when the request is not forwarded (call this first in `proxy.ts`). `app` is the
+ * calling app; any client-sent `X-Rotra-App` is dropped and this value is set instead.
  */
-export async function forwardToGo(request: ForwardableRequest): Promise<Response | null> {
+export async function forwardToGo(
+  request: ForwardableRequest,
+  app: GoApp,
+): Promise<Response | null> {
   const base = process.env.ROTRA_GO_API_URL?.trim()
   const { pathname, search } = request.nextUrl
   if (!base || !pathname.startsWith('/api/') || !isMovedPath(pathname)) return null
@@ -85,6 +97,7 @@ export async function forwardToGo(request: ForwardableRequest): Promise<Response
   }
   const secret = process.env.ROTRA_PROXY_SECRET
   if (secret) headers.set(PROXY_SECRET_HEADER, secret)
+  headers.set(APP_HEADER, app)
 
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD'
   try {

@@ -1,6 +1,6 @@
 # Admin player detail shows verification checks and the Admin override
 
-Status: TICKETED — #912
+Status: IN MOCK APP — #889
 Date: 2026-11-18
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Full profile › Overview › Verification
@@ -63,3 +63,7 @@ Superseded by: none
 - Open **Players**, search for the name, open the result's Quick view, then choose **Full profile**. Use **Overview** and scroll below **Account**.
 - **Miguel Santos** (p1) starts at 1 of 3. Set and clear his override. **Bea Castillo** (p2) starts Verified, so clearing her override restores Verified. **Kat Lim** (p4) has a mismatched Google email and a waiting request. **Enzo Navarro** (p5) has a mismatch without a request. **Marco Lopez** (p16) starts at 0 of 3. **Andi Cruz** (p20) has matching emails and a missing phone. **Jomar dela Cruz** (p3) is unclaimed.
 - For a simulated write failure, enable **Prototype** › **Next verification save fails** before confirming. **Prototype** › **Offline** gives the offline error on confirm. If a locally saved demo predates these fixtures, **Prototype** › **Reset demo data** loads the current fixtures.
+
+## Batch verification — 2026-11-18
+
+Player and Admin screens checked at 375 px and 1280 px in dark and light themes against the canonical mockups. Local real-mode checks cover automatic status, pending email mismatch, required reason, set/clear, persisted reload, Activity audit reason, and failed-save reason retention. Screenshots were delivered in chat only. Google OAuth itself remains separate in #922.

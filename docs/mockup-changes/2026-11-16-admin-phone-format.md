@@ -1,6 +1,6 @@
 # Admin app: phones are kept as the database holds them and shown in one grouped format
 
-Status: TICKETED — #893
+Status: IN MOCK APP — #911
 Date: 2026-11-16
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › `toE164`, `showPhone`, `reqVal`; `P` and `R` (sample data); Players quick view, player page, Edit profile; Contact changes (list, detail, approve and decline sheets, toast)
@@ -36,4 +36,4 @@ Superseded by: none
 - Screen docs: none needed.
 
 ## Real app work
-- Likely none: the real Admin already stores E.164 and formats for display. To confirm when ticketed; then this log becomes `MOCKUP ONLY`.
+- Done in #911 (mock app). Already full and grouped: PrivateContactCard, CurrentContactsCard, and the contact-change list, review and decision sheets (their `fromValue` and `toValue` are built with `formatPhoneForDisplay` and stay full). Fixed: AdminPlayerQuickView printed the phone as stored; AdminEditPlayerForm started from the stored E.164 instead of the grouped number; the Edit player and Add player phone fields did not group while typing (they now use PhoneOrEmailInput in `phone` mode; `phoneField` still converts to E.164 on save).

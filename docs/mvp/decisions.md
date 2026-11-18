@@ -57,7 +57,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
-| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mock app (Player #904, Admin #911) | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
@@ -1082,7 +1082,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
-- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part is mockup only so far ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The real app already stores E.164 (`phoneField`).
+- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part in the mock app (#911): every phone Admin shows as text is full and grouped, and the Edit player and Add player phone fields group while typing and save E.164 ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The Verification card's “On file” row still shows a masked phone, as its own mockup and screen doc say. The real app already stores E.164 (`phoneField`).
 - **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**

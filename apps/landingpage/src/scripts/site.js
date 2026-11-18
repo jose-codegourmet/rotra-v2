@@ -616,10 +616,46 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   })();
 
   var findForm = document.getElementById('findForm');
+  // Find your profile. An RTR ID opens that player's profile card here, in a frame over the page: the Player
+  // Information app serves the card alone at /card/<ID> and tells this page when it is ready, closed or has no such
+  // profile (messages from that origin only). Anything else opens the app's leaderboard with the name search filled
+  // in (/?q=<name>). On a local dev host the app is the local one (port 9001).
+  var findMsg = document.getElementById('findMsg'), FIND_NOTE = findMsg.textContent, card = null;
+  function playerBase(){ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:9001' : PLAYER_APP_URL.replace(/\/$/, ''); }
+  function closeCard(){
+    if (!card) return;
+    clearTimeout(card.t); window.removeEventListener('message', card.onMsg); document.removeEventListener('keydown', card.onKey);
+    card.el.remove(); card = null;
+    if (lenis) lenis.start();
+    document.getElementById('findq').focus();
+  }
+  function openCard(id){
+    closeCard();
+    var base = playerBase(), el = document.createElement('div'), fr = document.createElement('iframe');
+    el.className = 'pcard'; el.innerHTML = '<p class="pcard-wait">Looking up ' + id.replace(/[<>&]/g, '') + '…</p>';
+    fr.title = 'ROTRA profile'; fr.src = base + '/card/' + encodeURIComponent(id);
+    el.appendChild(fr); document.body.appendChild(el);
+    if (lenis) lenis.stop();
+    card = { el: el, t: 0,
+      onMsg: function(e){
+        if (e.origin !== base || !e.data || !card) return;
+        if (e.data.type === 'rotra:card-ready') { clearTimeout(card.t); el.classList.add('on'); fr.focus(); }
+        else if (e.data.type === 'rotra:card-close') closeCard();
+        else if (e.data.type === 'rotra:card-missing') { closeCard(); findMsg.textContent = 'No ROTRA profile has the RTR ID ' + id + '. Check it and try again.'; }
+      },
+      onKey: function(e){ if (e.key === 'Escape') closeCard(); } };
+    window.addEventListener('message', card.onMsg); document.addEventListener('keydown', card.onKey);
+    el.addEventListener('click', function(e){ if (e.target === el) closeCard(); });
+    // the frame never answered (blocked, or the app is down): fall back to the app's own lookup page
+    card.t = setTimeout(function(){ if (card && !el.classList.contains('on')) window.location.assign(base + '/find/' + encodeURIComponent(id)); }, 9000);
+  }
   findForm.addEventListener('submit', function(e){
     e.preventDefault();
     var q = document.getElementById('findq').value.trim();
-    document.getElementById('findMsg').textContent = q ? 'Wireframe: this would open the profile search for “' + q + '” in the Player Information app.' : 'Type a name or an RTR ID first.';
+    if (!q) { findMsg.textContent = 'Type a name or an RTR ID first.'; return; }
+    findMsg.textContent = FIND_NOTE;
+    if (/^RTR-/i.test(q)) openCard(q.toUpperCase());
+    else window.location.assign(playerBase() + '/?q=' + encodeURIComponent(q));
   });
 
   var form = document.getElementById('partnerForm');

@@ -41,13 +41,20 @@ function levelLabel(value: string) {
 /**
  * `focusPlayerId` (`/?player=<id>`, the profile's Overall box; 2026-11-13-player-ranking-card): the
  * list loads pages until that row is there, scrolls it to the middle and flashes it.
+ * `initialQuery` (`/?q=<name>`): the search box starts with that text, so the name search shows at once.
  */
-export function LeaderboardPage({ focusPlayerId }: { focusPlayerId?: string } = {}) {
+export function LeaderboardPage({
+  focusPlayerId,
+  initialQuery,
+}: {
+  focusPlayerId?: string
+  initialQuery?: string
+} = {}) {
   const router = useRouter(),
     client = useQueryClient()
   const account = useAppSelector(selectAccount),
     dev = useAppSelector(selectDev)
-  const [query, setQuery] = useState(''),
+  const [query, setQuery] = useState(initialQuery ?? ''),
     [jumpTo, setJumpTo] = useState<string | null>(focusPlayerId ?? null),
     [flashId, setFlashId] = useState<string | null>(null),
     [offlineRetry, setOfflineRetry] = useState(false)

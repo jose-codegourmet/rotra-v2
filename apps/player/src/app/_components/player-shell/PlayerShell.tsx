@@ -44,6 +44,8 @@ export function PlayerShell({ children }: { children: ReactNode }) {
             pathname.startsWith('/reset-password/')
           ? 'sign-in'
           : null
+  // /card/<RTR ID> is framed by rotra.club: the card alone, no top bar or bands.
+  if (pathname.startsWith('/card/')) return <>{children}</>
   return (
     <>
       <TopBar

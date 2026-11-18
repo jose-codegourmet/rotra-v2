@@ -55,7 +55,7 @@ export function FindPage() {
               </button>
             </div>
             <p className="qsmall qmuted" id="findMsg">
-              Wireframe: search opens the Player Information app.
+              Search opens the Player Information app.
             </p>
           </form>
           <div className="acts">

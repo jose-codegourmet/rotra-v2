@@ -1148,7 +1148,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Age:** you must be 18 to register on your own. Anyone under 18 may use ROTRA only with a parent's or guardian's consent. A club that adds a minor confirms it has that consent.
   - **Club licenses and refunds:** the license, fees, period, payment and refunds are the ones in the club's accepted quotation. A quotation request on rotra.club is not a contract until a quotation is accepted. Nothing overrides rights the law gives.
   - **Google sign-in:** every statement about Google is true whether the `player_google_sign_in` flag ([D-2026-11-18-01](#d-2026-11-18-01)) is on or off ("If you sign in with Google", "or with Google where it is offered").
-  - **rotra.club** gets `#privacy` and `#terms` with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
+  - **rotra.club** gets `/privacy` and `/terms` (first built as the hash routes `#privacy` and `#terms`; moved to pages of their own on November 18, 2026 so each has a URL Google's sign-in branding check can fetch) with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
   - **Effective date** on both, everywhere: November 18, 2026.
 - **Open:**
   - The text is still a plain-language draft that a lawyer has not reviewed.

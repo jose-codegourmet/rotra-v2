@@ -1,12 +1,10 @@
 'use client'
 
 import { rotraProfileUrl } from '@rotra/data/app-origins'
-import { useClub } from '@rotra/data/club'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
-import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
-import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
 import { statsYear } from '@rotra/data/player/rules'
 import { isStatsHidden, selfCheckInMark, visibleStats } from '@rotra/data/public-session/rules'
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
@@ -40,8 +38,6 @@ import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
-import { useAppSelector } from '@/store/hooks'
-import { selectAccount } from '@/store/slices/authSlice'
 
 export type PreparationRosterProps = {
   sessionId: string
@@ -90,8 +86,19 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const clubPlayers = useClubPlayers()
-  // A guest's invite is the club invite link with its current code (#712).
-  const club = useClub(useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID)
+  // A guest's invite link is their own: registering through it claims that record
+  // (D-2026-11-18-07). One link per guest while this screen stays open, since making a new link
+  // cancels the earlier one.
+  const invite = useCreatePlayerInvite()
+  const inviteLinks = useRef(new Map<string, Promise<string>>())
+  const inviteLinkFor = (clubPlayerId: string) => () => {
+    const known = inviteLinks.current.get(clubPlayerId)
+    if (known) return known
+    const link = invite.mutateAsync(clubPlayerId).then((result) => result.url)
+    inviteLinks.current.set(clubPlayerId, link)
+    link.catch(() => inviteLinks.current.delete(clubPlayerId))
+    return link
+  }
   const setLevel = useSetRosterLevel()
   const setPresence = useSetPresenceMany(sessionId, {
     onSuccess: (result) => toast(result.message),
@@ -315,7 +322,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           phoneOnFile={profile.hasPhone}
           emailOnFile={profile.emailOnFile}
           detailsRequired={profile.detailsRequired}
-          inviteUrl={clubInviteUrl(profile.clubId, club.data?.inviteCode)}
+          getInviteLink={profile.identity === 'guest' ? inviteLinkFor(profile.id) : undefined}
         />
       ) : null}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}

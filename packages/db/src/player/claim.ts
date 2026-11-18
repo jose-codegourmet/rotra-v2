@@ -34,14 +34,14 @@ function newToken() {
   return Buffer.from(bytes).toString('base64url')
 }
 
-const NEEDS_PHONE_TO_INVITE = 'Add this player’s phone before inviting them.'
-
 /**
- * Q-SAVED-PLAYERS · Invite. Issues a link for this club's unclaimed player and returns the plaintext
- * token once; only its digest is stored. Since D-2026-11-11-03 an unclaimed profile is the club's own
- * record (no `players` row), so its link is keyed by `(club_id, club_player_id)`
+ * Q-SAVED-PLAYERS · Invite. Issues a link for this club's unclaimed player or guest and returns the
+ * plaintext token once; only its digest is stored. Since D-2026-11-11-03 an unclaimed profile is the
+ * club's own record (no `players` row), so its link is keyed by `(club_id, club_player_id)`
  * (`club_player_claim_links`); a linked, still-unclaimed `players` row keeps the player-keyed link.
- * Names or RTR IDs alone never issue a link: the record needs a phone.
+ * A guest (a name only: no email, phone or shared entry) gets the same record-keyed link
+ * (D-2026-11-18-07): the Queue Master made that record for them, so registering through its link
+ * claims it. The link is the proof; a name alone never matches or merges anyone.
  */
 export async function issueClaimLink(context: ClubContext, clubPlayerId: string) {
   await requireClubEntitlement(context)
@@ -52,8 +52,6 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
       select: {
         id: true,
         removedAt: true,
-        privateInput: { select: { phoneE164: true } },
-        sharedEntryId: true,
         player: { select: { id: true, profileState: true } },
       },
     })
@@ -80,9 +78,8 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
       })
       return { token, expiresAt: toIso(expiresAt) }
     }
-    // An unclaimed record saved with an email (D-2026-11-16-04), or an older one with a phone.
-    if (!clubPlayer.sharedEntryId && !clubPlayer.privateInput?.phoneE164)
-      throw new ServiceError('invalid', { player: NEEDS_PHONE_TO_INVITE })
+    // An unclaimed record saved with an email (D-2026-11-16-04), an older one with a phone, or a
+    // guest with neither (D-2026-11-18-07).
     await tx.clubPlayerClaimLink.updateMany({
       where: { clubId: context.clubId, clubPlayerId: clubPlayer.id, state: 'active' },
       data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
@@ -177,7 +174,10 @@ async function findLink(token: string) {
   return record ? { kind: 'record' as const, link: record } : null
 }
 
-/** The form's empty starting values for a club record: the club typed only name, nickname and email. */
+/**
+ * The form's starting values for a club record: the club typed only name, nickname and email. A
+ * guest's record has no email: the person types their own (D-2026-11-18-07).
+ */
 function recordPresetOf(record: NonNullable<Awaited<ReturnType<typeof findRecordLink>>>) {
   return {
     fullName: record.clubPlayer.displayName,
@@ -307,7 +307,10 @@ async function createLogin(
 }
 
 /**
- * Finish registering from a club record's link (D-2026-11-11-03). Staged like `completeClaim`: the
+ * Finish registering from a club record's link (D-2026-11-11-03), an unclaimed player's or a
+ * guest's (D-2026-11-18-07: no email, phone or shared entry on the record; the person types their
+ * own email and phone, and the record with its roster entries and games becomes theirs because
+ * `club_players.player_id` is set on that same row). Staged like `completeClaim`: the
  * provider login is created first, keyed on the record so a retry reuses it; then one transaction
  * creates the player (claimed), its private contact, the RTR ID (the inviting club's founding
  * location), the account mapping, links this record and every other club's record with the same

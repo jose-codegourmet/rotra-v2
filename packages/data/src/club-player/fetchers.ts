@@ -11,7 +11,6 @@ import { isRealDataMode } from '../real/mode'
 import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
 import type { ClubPlayer } from './clubPlayer.types'
 import { clubPictureState, joinedViaOf } from './clubPlayerPicture.rules'
-import { clubInviteUrl } from './registrationUrl'
 import { deriveSavedPlayerStats } from './savedPlayerStats.rules'
 export type ClubPlayerFilters = {
   search?: string
@@ -206,10 +205,7 @@ export async function createPlayerInvite(clubPlayerId: string) {
   if (!['guest', 'unclaimed'].includes(player.identity))
     throw new MockError('permission', 'This player does not need an invite.')
   if (isRealDataMode()) return realCreatePlayerInvite(player)
-  if (player.identity === 'guest') {
-    const club = readMockState().clubs.find((c) => c.id === player.clubId)
-    return { url: clubInviteUrl(player.clubId, club?.inviteCode), message: 'Invite link ready' }
-  }
+  // A guest's link is their own, like an unclaimed player's (D-2026-11-18-07). Sample link in mocks.
   let hash = 2166136261
   for (const letter of `${player.id}${player.fullName}`) {
     hash ^= letter.charCodeAt(0)

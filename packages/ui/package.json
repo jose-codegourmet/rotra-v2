@@ -287,6 +287,7 @@
     "./replay-card": "./src/components/replay-card/ReplayCard.tsx",
     "./result-slide-frame": "./src/components/result-slide-frame/ResultSlideFrame.tsx",
     "./results-header": "./src/components/results-header/ResultsHeader.tsx",
+    "./standings-faces": "./src/components/standings-faces/StandingsFaces.tsx",
     "./standings-slide": "./src/components/standings-slide/StandingsSlide.tsx",
     "./record-tab-header": "./src/components/record-tab-header/RecordTabHeader.tsx",
     "./record-court-columns": "./src/components/record-court-columns/RecordCourtColumns.tsx",

@@ -51,6 +51,24 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
     return <InvalidSessionNotice variant="results" reason={record.invalidReason ?? undefined} />
 
   const players = record.playerSummaries
+  const rows = standings.data?.map((r) => ({
+    playerId: r.playerId,
+    name: r.name,
+    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
+    wins: r.wins,
+    losses: r.losses,
+    games: r.games,
+  }))
+  // Until the shared positions land (Q23.4/Q23.6): one player per row, position = index + 1.
+  const boardRows: LiveLeaderboardRow[] | undefined = rows?.map((r, i) => ({
+    position: i + 1,
+    players: [{ playerId: r.playerId, name: r.name, level: r.level }],
+    wins: r.wins,
+    losses: r.losses,
+    games: r.games,
+  }))
+  const openProfile = (sessionPlayerId: string) =>
+    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
   /** The saved player's own picture (or character), like the Queue tab */
   const pictureOf = (sessionPlayerId: string) => {
     const clubPlayerId = players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId
@@ -59,17 +77,6 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       ? (profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName) ?? null)
       : null
   }
-  const rows: LiveLeaderboardRow[] | undefined = standings.data?.map((r) => ({
-    playerId: r.playerId,
-    name: r.name,
-    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
-    photoUrl: pictureOf(r.playerId) ?? undefined,
-    wins: r.wins,
-    losses: r.losses,
-    games: r.games,
-  }))
-  const openProfile = (sessionPlayerId: string) =>
-    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
   const c = club.data
   const slug = session.data?.publicSlug
   const link =
@@ -109,7 +116,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       {standings.isError ? (
         <QueryError query={standings} title="Couldn't load the standings." />
       ) : rows ? (
-        <LiveLeaderboard variant="record" rows={rows} onOpenProfile={openProfile} />
+        <LiveLeaderboard variant="record" rows={boardRows ?? []} onOpenProfile={openProfile} />
       ) : (
         <div role="status" aria-busy aria-label="Loading the standings">
           <Skeleton className="h-56 rounded-lg" />
@@ -121,7 +128,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
             rows={rows.map((row, i) => ({
               position: i + 1,
               name: row.name,
-              pictureUrl: row.photoUrl ?? null,
+              pictureUrl: pictureOf(row.playerId),
               wins: row.wins,
               losses: row.losses,
               games: row.games,

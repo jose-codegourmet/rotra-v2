@@ -14,9 +14,10 @@ const NAMES = [
   'K*** S***',
   'Lia Mendoza',
 ]
+/** Three players per position (7–0, 6–1, ...): the number on each row is the shared position, 1, 1, 1, 4, 4, 4. */
 const rows = (count: number, viewer = -1): LeaderboardShareRow[] =>
   Array.from({ length: count }, (_, i) => ({
-    position: i + 1,
+    position: Math.floor(i / 3) * 3 + 1,
     name: NAMES[i % NAMES.length] ?? 'Player',
     wins: Math.max(0, 7 - Math.floor(i / 3)),
     losses: Math.floor(i / 3),
@@ -51,3 +52,18 @@ export const QueueMaster18Light: Story = { globals: { theme: 'light' } }
 export const Players24: Story = { args: { rows: rows(24) } }
 export const YouHighlighted: Story = { args: { rows: rows(24, 12) }, globals: { theme: 'dark' } }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
+
+/** Positions 1, 1, 3, 3, 3, 6 ...: the number is the position, not the row index. */
+export const SharedPositions: Story = {
+  args: {
+    rows: [1, 1, 3, 3, 3, 6, 6, 6, 6, 6, 6, 12].map((position, i) => ({
+      position,
+      name: NAMES[i % NAMES.length] ?? 'Player',
+      wins: 8 - Math.floor(position / 2),
+      losses: Math.floor(position / 2),
+      games: 8,
+      isViewer: i === 4,
+    })),
+  },
+  globals: { theme: 'light' },
+}

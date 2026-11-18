@@ -68,19 +68,25 @@ export function SessionLeaderboard({
     <>
       <SessionStandings
         viewer={viewer}
-        rows={rows.map((row) => ({
-          id: String(row.position),
+        // Until the shared positions land (Q23.4/Q23.6): one player per row.
+        rows={rows.map((row, i) => ({
+          id: String(i),
           position: row.position,
-          name: row.name,
-          pictureUrl: row.pictureUrl,
+          players: [
+            {
+              id: String(i),
+              name: row.name,
+              pictureUrl: row.pictureUrl,
+              isViewer: row.isViewer,
+              onOpen:
+                onOpenParticipant && row.participant !== undefined
+                  ? () => onOpenParticipant(row.participant as number)
+                  : undefined,
+            },
+          ],
           wins: row.wins,
           losses: row.losses,
           games: row.games,
-          isViewer: row.isViewer,
-          onOpen:
-            onOpenParticipant && row.participant !== undefined
-              ? () => onOpenParticipant(row.participant as number)
-              : undefined,
         }))}
         onShareFinish={() => {
           if (!mine) return

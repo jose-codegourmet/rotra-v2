@@ -2,7 +2,69 @@ import { liveStandingsFixture } from '@rotra/data/fixtures/live-standings'
 import { sessionRecordFixture } from '@rotra/data/fixtures/session-record'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { LiveLeaderboard, type LiveLeaderboardProps } from './LiveLeaderboard'
+import {
+  LiveLeaderboard,
+  type LiveLeaderboardPlayer,
+  type LiveLeaderboardProps,
+  type LiveLeaderboardRow,
+} from './LiveLeaderboard'
+
+type FixtureRow = (typeof liveStandingsFixture.rows)[number]
+
+/** Story-only grouping of the fixtures: same wins and losses share a position (1, 1, 3). */
+function group(fixtureRows: FixtureRow[]): LiveLeaderboardRow[] {
+  const out: LiveLeaderboardRow[] = []
+  fixtureRows.forEach((r, i) => {
+    const player: LiveLeaderboardPlayer = { playerId: r.playerId, name: r.name, level: r.level }
+    const last = out[out.length - 1]
+    if (last && last.wins === r.wins && last.losses === r.losses) {
+      last.players.push(player)
+      last.games = {
+        min: Math.min(typeof last.games === 'number' ? last.games : last.games.min, r.games),
+        max: Math.max(typeof last.games === 'number' ? last.games : last.games.max, r.games),
+      }
+    } else
+      out.push({
+        position: i + 1,
+        players: [player],
+        wins: r.wins,
+        losses: r.losses,
+        games: r.games,
+      })
+  })
+  return out
+}
+
+const NAMES = [
+  'Maya Santos',
+  'Ben Cruz',
+  'Jose Buctuanon',
+  'Ana Lim',
+  'Carlo Reyes',
+  'Bea Villanueva-Dela Cruz',
+  'Paolo Tan',
+  'Lia Mendoza',
+]
+const LEVELS: LiveLeaderboardPlayer['level'][] = [
+  'intermediate_mid',
+  'intermediate_high',
+  'advanced_low',
+  'intermediate_low',
+]
+const player = (i: number): LiveLeaderboardPlayer => ({
+  playerId: `p${i}`,
+  name: NAMES[i % NAMES.length] ?? 'Player',
+  level: LEVELS[i % LEVELS.length] ?? null,
+})
+const players = (from: number, count: number) =>
+  Array.from({ length: count }, (_, k) => player(from + k))
+
+/** A leader, then `count` players sharing position 2, then the next position skips the shared places. */
+const sharing = (count: number, games: LiveLeaderboardRow['games'] = 6): LiveLeaderboardRow[] => [
+  { position: 1, players: players(0, 1), wins: 6, losses: 0, games: 6 },
+  { position: 2, players: players(1, count), wins: 4, losses: 2, games },
+  { position: 2 + count, players: players(1 + count, 1), wins: 1, losses: 5, games: 6 },
+]
 
 const meta = {
   title: 'Queue/LiveLeaderboard',
@@ -15,7 +77,7 @@ const meta = {
     ),
   ],
   args: {
-    rows: liveStandingsFixture.rows,
+    rows: group(liveStandingsFixture.rows),
     minimumGames: liveStandingsFixture.minimumGames,
     onOpenProfile: fn(),
   },
@@ -28,7 +90,7 @@ type Story = StoryObj<LiveLeaderboardProps>
 export const Standings: Story = {}
 
 /** The console fixture as is: three players at 1–0 and four at 0–1. */
-export const Ties: Story = { args: { rows: liveStandingsFixture.tiedRows } }
+export const Ties: Story = { args: { rows: group(liveStandingsFixture.tiedRows) } }
 
 export const Empty: Story = { args: { rows: [] } }
 
@@ -44,12 +106,49 @@ export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 
 /** The official standings of Thursday Open Play on the session record's Results tab. */
 export const Record: Story = {
-  args: { variant: 'record', rows: sessionRecordFixture.standings },
+  args: { variant: 'record', rows: group(sessionRecordFixture.standings) },
 }
 
 export const RecordEmpty: Story = { args: { variant: 'record', rows: [] } }
 
 export const RecordPhone: Story = {
-  args: { variant: 'record', rows: sessionRecordFixture.standings },
+  args: { variant: 'record', rows: group(sessionRecordFixture.standings) },
   globals: { viewport: { value: 'phone' } },
+}
+
+/** One player alone on position 2: the unchanged row. */
+export const SharedOne: Story = { args: { rows: sharing(1) }, globals: { theme: 'dark' } }
+export const SharedOneLight: Story = { args: { rows: sharing(1) }, globals: { theme: 'light' } }
+
+/** Two players share position 2; the next position is 4. */
+export const SharedTwo: Story = { args: { rows: sharing(2) }, globals: { theme: 'dark' } }
+export const SharedTwoLight: Story = { args: { rows: sharing(2) }, globals: { theme: 'light' } }
+
+/** Three share position 2 (here a tied second place, tinted with the top three). */
+export const SharedThree: Story = { args: { rows: sharing(3) }, globals: { theme: 'dark' } }
+export const SharedThreeLight: Story = { args: { rows: sharing(3) }, globals: { theme: 'light' } }
+
+/** Six share a position, the games differ inside it (5–6), and a long name wraps. */
+export const SharedSix: Story = {
+  args: { rows: sharing(6, { min: 5, max: 6 }) },
+  globals: { theme: 'dark' },
+}
+export const SharedSixLight: Story = {
+  args: { rows: sharing(6, { min: 5, max: 6 }) },
+  globals: { theme: 'light' },
+}
+
+export const SharedSixPhone: Story = {
+  args: { rows: sharing(6, { min: 5, max: 6 }) },
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+
+export const SharedRecordSix: Story = {
+  args: { variant: 'record', rows: sharing(6, { min: 5, max: 6 }) },
+  globals: { theme: 'light' },
+}
+
+export const SharedRecordSixPhone: Story = {
+  args: { variant: 'record', rows: sharing(6, { min: 5, max: 6 }) },
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
 }

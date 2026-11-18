@@ -38,6 +38,7 @@
     "./player/avatar": "./src/player/avatar.ts",
     "./player/profile": "./src/player/profile.ts",
     "./player/claim": "./src/player/claim.ts",
+    "./player/feature-flags": "./src/player/feature-flags.ts",
     "./player/ranking-settings": "./src/player/ranking-settings.ts",
     "./player/account-access": "./src/player/account-access.ts",
     "./player/contact-change": "./src/player/contact-change.ts",

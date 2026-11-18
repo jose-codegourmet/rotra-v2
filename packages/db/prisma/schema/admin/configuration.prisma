@@ -1,7 +1,8 @@
 // Feature flags and ranking policy versions (admin/modules/configuration-requests.md).
-// No flag consumers and no ranking calculation live here.
+// Flag consumers read `value` only (Player: `@rotra/db/player/feature-flags`). No ranking calculation lives here.
 
-/// Owner-created flag. The catalog starts empty; the key is immutable (trigger in SQL).
+/// A flag. ROTRA's own features ship with theirs, seeded off by a migration (D-2026-11-18-01); the
+/// owner adds any other in Admin. The key is immutable (trigger in SQL).
 model FeatureFlag {
   /// ^[a-z][a-z0-9_]{2,39}$ (CHECK in SQL).
   key              String   @id
@@ -9,14 +10,16 @@ model FeatureFlag {
   name             String   @unique @db.VarChar(50)
   description      String
   value            Boolean  @default(false)
-  createdByAdminId String   @map("created_by_admin_id") @db.Uuid
-  updatedByAdminId String   @map("updated_by_admin_id") @db.Uuid
+  /// Null for a flag that ships with the product (seeded), which no admin added.
+  createdByAdminId String?  @map("created_by_admin_id") @db.Uuid
+  /// Null until an admin changes a seeded flag.
+  updatedByAdminId String?  @map("updated_by_admin_id") @db.Uuid
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision         BigInt   @default(1)
 
-  createdBy AdminAccount @relation("FeatureFlagCreatedBy", fields: [createdByAdminId], references: [id], onDelete: Restrict)
-  updatedBy AdminAccount @relation("FeatureFlagUpdatedBy", fields: [updatedByAdminId], references: [id], onDelete: Restrict)
+  createdBy AdminAccount? @relation("FeatureFlagCreatedBy", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  updatedBy AdminAccount? @relation("FeatureFlagUpdatedBy", fields: [updatedByAdminId], references: [id], onDelete: Restrict)
 
   @@index([createdByAdminId])
   @@index([updatedByAdminId])

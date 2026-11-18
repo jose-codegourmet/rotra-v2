@@ -59,7 +59,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
-| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 
@@ -1118,7 +1118,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-18-01 — Google sign-in ships behind a feature flag that starts off
 - **Decision status:** approved (owner, November 18, 2026); the open items below are not decided.
-- **Implementation status:** not started.
+- **Implementation status:** in progress: the flag is seeded off (mock fixture and migration `20261118000100_seed_player_google_sign_in_flag`) and the Player app can read it (#938); no Google screen consumes it yet.
 - **Ticket:** [#938](https://github.com/jose-codegourmet/rotra-v2/issues/938) (Epic P12, [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892))
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1130,8 +1130,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open:**
   - Whether the invite card (P-INVITE) and the signed-in join steps (P-JOIN-CLUB, P-JOIN-SESSION) also wait for the flag, or show while it is off with the email + password registration behind them. Until answered: they wait for the flag.
   - Turning the flag off again after players registered with Google only: they have no password. Until answered: a connected Google account keeps working when the flag is off; only new Google registration and the prompts are hidden.
-  - Who a flag that ships with the product is "added by" in Admin (the row shows the Admin who added it).
-  - How the Player app reads the flag in real mode (it is needed signed out, on `/login`): through the Go API or a Player Route Handler, and for how long a value may be cached.
+- **Settled (owner, November 18, 2026):** a flag that ships with the product has no "added by" (`created_by_admin_id` and `updated_by_admin_id` are nullable; the migration inserts the row only if it is missing, so an existing value is never overwritten). In real mode the Player app reads the flag server-side over `packages/db` (`@rotra/db/player/feature-flags`), uncached, so it is always fresh; it moves to the Go API with B-04. A missing flag or a failed read is off. Mock mode: off, unless `NEXT_PUBLIC_ROTRA_MOCK_FLAGS=player_google_sign_in` (dev only) forces it on, because Admin's and the Player app's mock stores are separate.
 - **Amends:** [D-2026-11-16-01](#d-2026-11-16-01) (ships behind the flag); the October 27, 2026 rule "the feature flag catalog starts empty" ([configuration module](../business_logic/product/admin/modules/configuration/README.md)).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [configuration module](../business_logic/product/admin/modules/configuration/README.md), [feature flag screens](../screens/product/modules/admin/configuration.md), [`feature_flags` design](../database_design/product/admin/modules/configuration-requests.md).
 

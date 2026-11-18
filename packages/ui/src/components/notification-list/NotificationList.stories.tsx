@@ -105,7 +105,7 @@ function InteractiveList(args: Extract<NotificationListProps, { filter: string }
 
 const meta = {
   title: 'Player/NotificationList',
-  component: NotificationList,
+  component: InteractiveList,
   parameters: { layout: 'fullscreen' },
   args: {
     filter: 'all',
@@ -116,8 +116,8 @@ const meta = {
     onMarkAllRead: () => {},
     onOpen: () => {},
   },
-  render: (args) => (args.state ? <NotificationList {...args} /> : <InteractiveList {...args} />),
-} satisfies Meta<typeof NotificationList>
+  render: (args) => <InteractiveList {...args} />,
+} satisfies Meta<typeof InteractiveList>
 
 export default meta
 type Story = StoryObj<typeof meta>

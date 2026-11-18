@@ -53,6 +53,12 @@ export type DevMenuProps = {
     label: string
     onChange: (value: string) => void
   }
+  /** P13 verification fixtures, available to the mock Player demo account. */
+  verificationScenarios?: {
+    value: string
+    options: { value: string; label: string }[]
+    onChange: (value: string) => void
+  }
   /** Optional until the registration and password-reset preview routes are implemented. */
   playerLinkPreviews?: {
     onRegistration?: (state: 'valid' | 'processing' | 'expired') => void
@@ -93,6 +99,7 @@ export function DevMenu({
   playerAccount,
   googleDeadline,
   inviteStanding,
+  verificationScenarios,
   playerLinkPreviews,
   contactRequestSlot,
   extraToggles,
@@ -254,6 +261,12 @@ export function DevMenu({
                   Applies to the signed-in player. Open the session invite link to see "already in"
                   or "already on the waitlist".
                 </p>
+              </section>
+            ) : null}
+            {verificationScenarios ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>Verification (Jose)</h3>
+                <SegmentedControl aria-label="Verification (Jose)" {...verificationScenarios} />
               </section>
             ) : null}
             {playerScenarios.leaderboardOptions ? (

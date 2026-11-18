@@ -16,6 +16,9 @@ export const adminPlayerCreateSchema = z.object({
   allowDuplicate: z.boolean(),
 })
 
+/** A nonblank reason for an audited Admin player change, trimmed for the record. */
+export const adminPlayerReasonField = z.string().trim().min(1, 'Enter a reason.')
+
 /**
  * Real mode only: the Admin `PATCH /api/players/[playerId]` body (name, nickname, a photo link that
  * is never saved, reason). Real mode keeps this until the backend follow-up of A07.6.
@@ -27,7 +30,7 @@ export const adminPlayerProfilePatchSchema = z.object({
     z.literal(''),
     z.url().refine((value) => value.startsWith('https://'), 'Use an HTTPS photo URL.'),
   ]),
-  reason: z.string().trim().min(1, 'Enter a reason.'),
+  reason: adminPlayerReasonField,
 })
 
 // ---------- A-PLAYER-EDIT (rotra-admin.html peErrors(), pmSave()) ----------

@@ -12,6 +12,7 @@ export type AccountPanelProps = {
   /** P04 places the open contact-change request chip here */
   requestSlot?: ReactNode
   onOpenPrivacy: () => void
+  onOpenVerification?: () => void
   onSignOut: () => void
 }
 /** The owner's private account summary. Only ever rendered on P-OWN-PROFILE. */
@@ -21,6 +22,7 @@ export function AccountPanel({
   phoneHidden,
   requestSlot,
   onOpenPrivacy,
+  onOpenVerification,
   onSignOut,
 }: AccountPanelProps) {
   return (
@@ -50,6 +52,11 @@ export function AccountPanel({
           <Button size="sm" onClick={onOpenPrivacy}>
             Privacy and contact
           </Button>
+          {onOpenVerification ? (
+            <Button size="sm" onClick={onOpenVerification}>
+              Verification
+            </Button>
+          ) : null}
           <Button size="sm" variant="ghost" onClick={onSignOut}>
             Sign out
           </Button>

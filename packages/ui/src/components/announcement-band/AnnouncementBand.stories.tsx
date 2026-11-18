@@ -1,3 +1,4 @@
+import { GOOGLE_SIGN_IN_DEADLINE } from '@rotra/data/google-sign-in/config'
 import { Button } from '@rotra/ui/button'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AnnouncementBand } from './AnnouncementBand'
@@ -8,13 +9,7 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     onRemindLater: () => {},
-    children: (
-      <>
-        <b>Verify your ROTRA account by December 31, 2026.</b> Connect Google, have your phone on
-        file, and use your Google email as your ROTRA email. <b>1 of 3 done.</b> Your profile, games
-        and rank stay the same.
-      </>
-    ),
+    verification: { deadline: GOOGLE_SIGN_IN_DEADLINE.label, completedSteps: 1 },
     actions: (
       <Button size="xs" variant="primary">
         Connect Google
@@ -55,4 +50,20 @@ export const AfterDeadlineLight: Story = {
 export const Phone: Story = {
   args: { actions: twoActions },
   globals: { viewport: { value: 'phone' } },
+}
+
+export const FinishVerification: Story = {
+  args: {
+    verification: { deadline: GOOGLE_SIGN_IN_DEADLINE.label, completedSteps: 2 },
+    actions: (
+      <>
+        <Button size="xs" variant="primary">
+          Finish verification
+        </Button>
+        <Button size="xs" variant="ghost">
+          See what's left
+        </Button>
+      </>
+    ),
+  },
 }

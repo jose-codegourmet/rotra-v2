@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { accountVerificationKeys } from '../account-verification/queryKeys'
 import { adminAuditKeys } from '../admin-audit/queryKeys'
 import { adminPlayerKeys } from '../admin-player/queryKeys'
 import { contactChangeRequestKeys } from './queryKeys'
@@ -18,6 +19,7 @@ export function invalidateContactRequestQueries(client: QueryClient) {
   return Promise.all([
     client.invalidateQueries({ queryKey: contactChangeRequestKeys.all }),
     client.invalidateQueries({ queryKey: adminPlayerKeys.all }),
+    client.invalidateQueries({ queryKey: accountVerificationKeys.mine() }),
     client.invalidateQueries({ queryKey: adminAuditKeys.all }),
   ])
 }

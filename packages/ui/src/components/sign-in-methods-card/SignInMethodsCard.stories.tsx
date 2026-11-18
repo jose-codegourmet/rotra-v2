@@ -8,7 +8,7 @@ const meta = {
     email: 'migs.santos@example.com',
     googleEmail: 'migs.santos@example.com',
     deadline: 'December 31, 2026',
-    verificationLabel: 'Not verified · 2 of 3',
+    verification: { completedSteps: 2 },
     onConnectGoogle: () => {},
     onChangeGoogle: () => {},
     onOpenVerification: () => {},
@@ -24,18 +24,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const WithGoogle: Story = { args: { verificationLabel: 'Verified', verified: true } }
+export const WithGoogle: Story = { args: { verification: { completedSteps: 3 } } }
 export const WithoutGoogle: Story = {
-  args: { googleEmail: null, verificationLabel: 'Not verified · 1 of 3' },
+  args: { googleEmail: null, verification: { completedSteps: 1 } },
 }
 export const DifferentGoogleEmail: Story = {
-  args: { googleEmail: 'migs.s.badminton@gmail.com', verificationLabel: 'Not verified · 2 of 3' },
+  args: { googleEmail: 'migs.s.badminton@gmail.com', verification: { completedSteps: 2 } },
 }
 export const NoPassword: Story = {
-  args: { hasPassword: false, verificationLabel: 'Verified', verified: true },
+  args: { hasPassword: false, verification: { completedSteps: 3 } },
+}
+export const VerifiedByAdmin: Story = {
+  args: { googleEmail: null, verification: { completedSteps: 1, verifiedByAdmin: true } },
 }
 export const WithoutVerificationRow: Story = {
-  args: { verificationLabel: undefined, onOpenVerification: undefined },
+  args: { verification: undefined, onOpenVerification: undefined },
 }
 export const WithGoogleLight: Story = { ...WithGoogle, globals: { theme: 'light' } }
 export const WithoutGoogleLight: Story = { ...WithoutGoogle, globals: { theme: 'light' } }

@@ -20,6 +20,13 @@ enum ProfileVisibility {
   @@map("profile_visibility")
 }
 
+/// The automatic verification result is derived from account facts. Only Admin can override it.
+enum PlayerVerificationOverride {
+  verified
+
+  @@map("player_verification_override")
+}
+
 model Player {
   id                    String             @id @default(uuid(7)) @db.Uuid
   fullName              String             @map("full_name")
@@ -53,6 +60,11 @@ model Player {
   updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision              BigInt             @default(1)
 
+  verificationOverride   PlayerVerificationOverride? @map("verification_override")
+  verificationOverrideBy String?                     @map("verification_override_by") @db.Uuid
+  verificationOverrideAt DateTime?                   @map("verification_override_at") @db.Timestamptz(6)
+
+  verificationAdmin     AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
   banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
   privateContact        PlayerPrivateContact?
   account               PlayerAccount?
@@ -76,6 +88,7 @@ model Player {
 
   @@index([fullName])
   @@index([bannerId])
+  @@index([verificationOverrideBy])
   @@map("players")
 }
 

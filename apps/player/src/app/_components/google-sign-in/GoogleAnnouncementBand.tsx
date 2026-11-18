@@ -1,28 +1,25 @@
 'use client'
+import { useMyAccountVerification } from '@rotra/data/account-verification/useMyAccountVerification'
 import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
 import { useConnectGoogle } from '@rotra/data/google-sign-in/useConnectGoogle'
-import { useGoogleRequirement } from '@rotra/data/google-sign-in/useGoogleRequirement'
+import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { useGoogleTriedEmail } from '@rotra/data/google-sign-in/useGoogleTriedEmail'
 import { useRemindMeLater } from '@rotra/data/google-sign-in/useRemindMeLater'
-import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { AnnouncementBand } from '@rotra/ui/announcement-band'
 import { Button } from '@rotra/ui/button'
 import { toast } from '@rotra/ui/toaster'
+import { useRouter } from 'next/navigation'
 import { useGooglePicker } from './useGooglePicker'
 import { useNoGoogleSheet } from './useNoGoogleSheet'
 
-/**
- * The ROTRA announcement band (D-2026-11-16-02), a second band under the top bar next to the email
- * confirm banner. Mounted by the shell only while `player_google_sign_in` is on. Shown while the
- * signed-in player has no Google account. The "n of 3 done" count and **Finish verification** belong
- * to Epic P13 (Verification), which isn't built: the band is driven by the Google requirement only.
- */
+/** The signed-in player's verification announcement, mounted by the shell while Google sign-in is on. */
 export function GoogleAnnouncementBand({ playerId, name }: { playerId: string; name: string }) {
-  const account = useMyAccount(playerId).data
-  const requirement = useGoogleRequirement(account)
+  const verification = useMyAccountVerification(playerId).data
+  const deadline = useGoogleDeadline().data
   const tried = useGoogleTriedEmail()
   const later = useRemindMeLater()
   const connect = useConnectGoogle()
+  const router = useRouter()
   const connectWith = (identity: GoogleIdentity) =>
     connect.mutate(identity, {
       onSuccess: (result) =>
@@ -33,67 +30,64 @@ export function GoogleAnnouncementBand({ playerId, name }: { playerId: string; n
     })
   const picker = useGooglePicker({ key: 'band', intent: 'connect' }, connectWith)
   const noGoogle = useNoGoogleSheet()
-  if (
-    !account ||
-    !requirement.deadline ||
-    requirement.state === 'connected' ||
-    requirement.reminded
-  )
+  if (!verification || !deadline || verification.verified || (!deadline.passed && later.reminded))
     return null
-  const deadline = requirement.deadline.label
+
+  const openVerification = () => router.push('/profile/verification')
+  const chooseGoogle = () => picker.start(connectWith)
+  const triedEmail = tried.email
   return (
     <>
       <AnnouncementBand
-        afterDeadline={requirement.deadline.passed}
-        onRemindLater={
-          requirement.canRemindLater
-            ? () => {
-                later.remind()
-                toast(`We'll remind you next time. Connect by ${deadline}.`)
-              }
-            : undefined
-        }
+        afterDeadline={deadline.passed}
+        verification={{ deadline: deadline.label, completedSteps: verification.completedSteps }}
+        onRemindLater={() => {
+          later.remind()
+          toast(`We'll remind you next time. Connect by ${deadline.label}.`)
+        }}
         actions={
-          <>
-            {tried.email ? (
-              <>
+          verification.googleEmail ? (
+            <>
+              <Button size="xs" variant="primary" onClick={openVerification}>
+                Finish verification
+              </Button>
+              <Button size="xs" variant="ghost" onClick={openVerification}>
+                See what's left
+              </Button>
+            </>
+          ) : (
+            <>
+              {triedEmail ? (
+                <>
+                  <Button
+                    size="xs"
+                    variant="primary"
+                    disabled={connect.isPending}
+                    onClick={() => picker.startWith({ email: triedEmail, name }, connectWith)}
+                  >
+                    Connect {triedEmail}
+                  </Button>
+                  <Button size="xs" disabled={connect.isPending} onClick={chooseGoogle}>
+                    Use another Google account
+                  </Button>
+                </>
+              ) : (
                 <Button
                   size="xs"
                   variant="primary"
                   disabled={connect.isPending}
-                  onClick={() =>
-                    tried.email && picker.startWith({ email: tried.email, name }, connectWith)
-                  }
+                  onClick={chooseGoogle}
                 >
-                  Connect {tried.email}
+                  Connect Google
                 </Button>
-                <Button
-                  size="xs"
-                  disabled={connect.isPending}
-                  onClick={() => picker.start(connectWith)}
-                >
-                  Use another Google account
-                </Button>
-              </>
-            ) : (
-              <Button
-                size="xs"
-                variant="primary"
-                disabled={connect.isPending}
-                onClick={() => picker.start(connectWith)}
-              >
-                Connect Google
+              )}
+              <Button size="xs" variant="ghost" onClick={noGoogle.open}>
+                I don't have a Google account
               </Button>
-            )}
-            <Button size="xs" variant="ghost" onClick={noGoogle.open}>
-              I don't have a Google account
-            </Button>
-          </>
+            </>
+          )
         }
-      >
-        <b>Verify your ROTRA account by {deadline}.</b> Connect Google, have your phone on file, and
-        use your Google email as your ROTRA email. Your profile, games and rank stay the same.
-      </AnnouncementBand>
+      />
       {picker.sheet}
       {noGoogle.sheet}
     </>

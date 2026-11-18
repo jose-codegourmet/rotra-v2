@@ -8,7 +8,7 @@ export const signInMethodsCardMeta = {
     'Google connected: "Connected · <email>" (plus "(different from your ROTRA email)" when the emails differ), a Required chip and Change. Not connected: "Not connected" and Connect Google.',
     'Email and password: "Password set · <email>" (no Google yet), "Backup only until <deadline>" (Google connected) or "Not used" (hasPassword false).',
     'The deadline is passed in already formatted; never hardcode a date here.',
-    'The verification chip text and state come from the Verification page logic (P13); this card only shows them. Without verificationLabel and onOpenVerification the verification row is hidden.',
+    'Pass the owner’s verification status and onOpenVerification to show the verification row.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
@@ -26,5 +26,5 @@ export const signInMethodsCardMeta = {
     'verified',
     'no-verification-row',
   ],
-  related: ['GoogleIdentityRow', 'GoogleMark', 'Chip', 'AnnouncementBand'],
+  related: ['GoogleIdentityRow', 'GoogleMark', 'VerificationStatusChip', 'AnnouncementBand'],
 } satisfies ComponentMeta

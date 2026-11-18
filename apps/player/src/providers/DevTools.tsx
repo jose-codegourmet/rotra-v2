@@ -1,9 +1,15 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import { contactChangeRequestKeys } from '@rotra/data/contact-change-request/query-keys'
 import type { ContactChangeStatus } from '@rotra/data/contact-change-request/types'
 import { useAdvanceContactChangeRequest } from '@rotra/data/contact-change-request/useAdvanceContactChangeRequest'
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
+import {
+  accountVerificationFixtureOptions,
+  applyAccountVerificationFixture,
+  verificationFixturePlayerId,
+} from '@rotra/data/fixtures/account-verification'
 import {
   googleDeadlineOptions,
   inviteStandingOptions,
@@ -103,6 +109,7 @@ function DevToolsBase({
     toggles = useAppSelector(selectDev),
     client = useQueryClient()
   const [open, setOpen] = useState(false)
+  const [verificationScenario, setVerificationScenario] = useState('')
   const account = useAppSelector(selectAccount),
     router = useRouter()
   const contactRequest = useMyContactChangeRequest(account?.id ?? null),
@@ -245,6 +252,25 @@ function DevToolsBase({
       }}
       googleDeadline={googleDeadline}
       inviteStanding={inviteStanding}
+      verificationScenarios={
+        !isRealDataMode() && account?.id === verificationFixturePlayerId
+          ? {
+              value: verificationScenario,
+              options: accountVerificationFixtureOptions,
+              onChange: (value) => {
+                const scenario = accountVerificationFixtureOptions.find(
+                  (option) => option.value === value,
+                )
+                if (!scenario) return
+                applyAccountVerificationFixture(scenario.value)
+                setVerificationScenario(scenario.value)
+                void client.invalidateQueries({ queryKey: playerAccountKeys.all })
+                void client.invalidateQueries({ queryKey: contactChangeRequestKeys.all })
+                setOpen(false)
+              },
+            }
+          : undefined
+      }
       contactRequestSlot={contactRequestSlot}
       open={open}
       onOpenChange={setOpen}
@@ -254,6 +280,7 @@ function DevToolsBase({
         signOut.mutate(undefined, {
           onSuccess: () => {
             resetDemoData()
+            setVerificationScenario('')
             dispatch(resetDev())
             dispatch(setAccount(null))
             void client.invalidateQueries()

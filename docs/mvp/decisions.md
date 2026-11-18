@@ -981,7 +981,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-02 — Player account verification with an Admin override
 - **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
-- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-account-verification.md)); the Admin control is not designed yet.
+- **Implementation status:** #915 implements the private Player and Admin reads and the audited override in real-mode source. Migration and batch verification are pending. [Player verification mockup](../mockup-changes/2026-11-16-player-account-verification.md) and [Admin verification mockup](../mockup-changes/2026-11-18-admin-player-verification.md).
 - **Ticket:** [#889](https://github.com/jose-codegourmet/rotra-v2/issues/889) (Epic P13)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -994,7 +994,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - What an unverified player can't do (the mockup blocks nothing).
   - Whether the phone must be confirmed (no SMS exists; "on file" means present).
   - Whether other players and clubs see the badge (the mockup shows it only to the player).
-  - Whether Admin can also set **Not verified**, and whether a reason is required and kept in the audit log.
+- **Owner amendment, November 18, 2026 (#907):** Admin can set **Verified by Admin** or clear it to restore the automatic checks; no forced **Not verified** override. Both actions require a reason recorded in the Admin audit log. Admin › Player detail gets a **Verification** card showing the status, all three checks and the set/clear action. #915 may use the existing Google account fields without waiting for #922's separate OAuth/registration acceptance work; the owner approved proceeding on that basis.
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#account-verification), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md#p-verification--account-verification), [identity database design](../database_design/product/player-information/modules/identity.md#account-verification-d-2026-11-16-02).
 
 ### D-2026-11-16-03 — Player notifications page

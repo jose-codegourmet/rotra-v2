@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerIdentityCardMeta = {
   name: 'PlayerIdentityCard',
   description:
-    'Profile identity card: the ProfileHero (5:1 banner strip, the picture on its bottom edge, display name and full name), the permanent RTR ID with Copy, then the actions one full-width button per row: Edit profile, My player ID, Share profile (own), or Compare with me, Share profile (someone else).',
+    'Profile identity card: the ProfileHero (5:1 banner strip, the picture on its bottom edge, display name and full name), the permanent RTR ID with Copy, then the actions one full-width button per row: Edit profile, My player ID, Verification, Share profile (own), or Compare with me, Share profile (someone else).',
   usage: [
     'Use as the side column of P-PUBLIC-PROFILE and P-OWN-PROFILE; never pass private contact data.',
     'An unclaimed player saved by one club shows that club, the level, leaderboard place chips and permitted calendar-year stats.',
@@ -11,6 +11,7 @@ export const playerIdentityCardMeta = {
     'The owner picture edit button calls onChangePicture; public profiles do not show it.',
     'The owner banner pencil (top-right of the banner) calls onChangeBanner to open BannerSheet; public profiles never show it.',
     'bannerKey (or an uploaded bannerImageUrl) picks the banner; missing = Court.',
+    'The owner sees their verification status beside This is you. The chip and Verification button both open the Verification page.',
     'Clipboard handling and toasts belong to the container.',
   ],
   prototype: {

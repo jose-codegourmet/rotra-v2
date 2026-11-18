@@ -35,6 +35,7 @@ import { notFound, useRouter, useSearchParams } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { PlayerManagementActions } from '../../../_components/player-management-actions/PlayerManagementActions'
+import { PlayerVerification } from '../player-verification/PlayerVerification'
 import { PlayerDetailSkeleton } from './PlayerDetailSkeleton'
 
 /** Grey bars while a card's read is still out. */
@@ -50,7 +51,7 @@ function LinesSkeleton({ label }: { label: string }) {
 
 /**
  * A-PLAYER-DETAIL: one player identity as Admin sees it. Identity, private contacts (the applied
- * values, never a pending request's), account, read-only rank, this player's contact-change requests
+ * values, never a pending request's), account, verification, read-only rank, contact-change requests
  * and the record of actions on them. Approved profile edits require review and a reason. Admin cannot change ranks,
  * winners or scores, rebuild sessions, overwrite contacts or merge players. `from` is the directory's
  * query, so Back restores its search, filter and shown count. Skeleton while the player loads,
@@ -217,7 +218,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         ]}
       >
         <TabsContent value="overview">
-          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-[minmax(0,1fr)_340px]">
             <div className="flex min-w-0 flex-col gap-5">
               <AdminPlayerIdentityCard
                 fullName={player.name}
@@ -227,6 +228,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                 createdBy={createdBy}
               />
               <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
+              {player.claimed ? <PlayerVerification key={player.id} player={player} /> : null}
             </div>
             <div className="flex min-w-0 flex-col gap-5">
               {matchRequirement !== undefined ? (

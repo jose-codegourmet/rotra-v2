@@ -19,6 +19,8 @@ export type AdminAuditAction =
   | 'player_restored'
   | 'player_removed'
   | 'player_link_issued'
+  | 'player_verification_override_set'
+  | 'player_verification_override_cleared'
   | 'club_created'
   | 'club_price_changed'
   | 'club_name_change_approved'

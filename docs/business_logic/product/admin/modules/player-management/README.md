@@ -32,6 +32,13 @@ Bulk actions: Archive, Restore, Remove (only when all selected records qualify),
 
 Management mutations remain an in-memory mock. In real mode, the directory, identity detail, selected-ID reads and read-only history load persisted players through Admin-only endpoints (2026-11-01). Contact-request reads, Decline and the Record of actions also load saved data (#401). Approve, Retry application and Check status for a contact change run on saved data too (#575, November 8, 2026): approval reviews then applies, an unclaimed player (no login) changes only the contact, and any failure shows Application failed. Edit profile saves name and nickname for real (`PATCH /api/players/[playerId]`, revision-checked, audit `player.profile_updated` with before/after and reason, shown as the record line). A registered player sees "Changed by ROTRA Admin: <reason>" from the latest such event since the claim. The unclaimed photo link stays mock-only, and club-owned names are not rewritten in real mode. Create, archive, restore, remove, claim-link transport and ranking-settings reads remain F07 work.
 
+## Account verification (#907, owner decision November 18, 2026)
+
+Admin can set **Verified by Admin** for a registered player or clear the override to resume the
+[automatic checks](../../../player-information/modules/identity/README.md#account-verification).
+The Verification card on Player detail shows the status and all three checks. Each successful set or
+clear adds one entry with the required reason to the player's **Record of actions**.
+
 ## Reviewed password recovery (#491, owner request November 8, 2026)
 
 Player Forgot password submits the registered email for Admin review, without automatic email.

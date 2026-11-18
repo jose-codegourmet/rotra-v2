@@ -6,10 +6,7 @@ import { z } from 'zod'
  * nickname). Empty is allowed and removes the club nickname.
  */
 export const clubNicknameSchema = z.object({
-  nickname: z
-    .string()
-    .trim()
-    .max(NICKNAME_MAX, `Use ${NICKNAME_MAX} characters or fewer.`),
+  nickname: z.string().trim().max(NICKNAME_MAX, `Use ${NICKNAME_MAX} characters or fewer.`),
 })
 
 export type ClubNicknameFormInput = z.input<typeof clubNicknameSchema>

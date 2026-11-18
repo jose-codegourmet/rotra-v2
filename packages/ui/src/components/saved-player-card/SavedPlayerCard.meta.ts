@@ -17,7 +17,8 @@ export const savedPlayerCardMeta = {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-SAVED-PLAYERS › playerCard() (.sp-card)',
   },
-  docs: ['docs/screens/product/modules/queue/access-home.md',
+  docs: [
+    'docs/screens/product/modules/queue/access-home.md',
     'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
     'docs/mockup-changes/2026-11-18-queue-club-nickname.md',
   ],

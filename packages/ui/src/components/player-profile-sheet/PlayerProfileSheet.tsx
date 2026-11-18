@@ -145,10 +145,9 @@ export function PlayerProfileSheet({
 }: PlayerProfileSheetProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
   const detailsRequired = detailsRequiredProp && identity === 'unclaimed'
-  const statusLine =
-    detailsRequired
-      ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet'
-      : STATUS[identity]
+  const statusLine = detailsRequired
+    ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet'
+    : STATUS[identity]
   const phone = phoneHidden
     ? 'Hidden by player'
     : identity === 'guest' || !phoneOnFile
@@ -257,7 +256,12 @@ export function PlayerProfileSheet({
                 : []),
               ...(identity === 'registered'
                 ? []
-                : [{ label: 'Email', value: emailOnFile ? 'On file and kept private' : 'None on file' }]),
+                : [
+                    {
+                      label: 'Email',
+                      value: emailOnFile ? 'On file and kept private' : 'None on file',
+                    },
+                  ]),
             ]}
           />
         </ProfileCardSection>
@@ -267,8 +271,8 @@ export function PlayerProfileSheet({
               Invite to ROTRA
             </h3>
             <p className="m-0 text-[13px] text-fg2">
-              Send this link so they can register for ROTRA Player. Games they played here as a guest
-              don't follow them. To keep those games, add their email in Edit details first.
+              Send this link so they can register for ROTRA Player. Games they played here as a
+              guest don't follow them. To keep those games, add their email in Edit details first.
             </p>
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>

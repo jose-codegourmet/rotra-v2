@@ -4,7 +4,7 @@ import { plainIdentity } from '../club/club.rules'
 import { PLAYING_LEVELS } from '../player/player.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type {
-  AdminPlayerAccountFilter,
+  AdminPlayerAccountOption,
   AdminPlayerChangedField,
   AdminPlayerEdit,
   RankStatus,
@@ -63,7 +63,7 @@ export function matchesAdminPlayerSearch(
 
 export function matchesAccountFilter(
   claimed: boolean,
-  account: AdminPlayerAccountFilter = 'all',
+  account: AdminPlayerAccountOption = 'all',
 ): boolean {
   return account === 'all' || (account === 'registered' ? claimed : !claimed)
 }
@@ -87,6 +87,11 @@ export function createdOnFromRtrId(rtrId: string): string {
 /** The toast when Save changes finds no difference; nothing is saved or logged. */
 export const ADMIN_PLAYER_NOTHING_CHANGED = 'Nothing changed.'
 
+/** 'RTR-PH-CEB-031526-0001' → 'PH-CEB' (the founding city code); '' for no RTR ID or a malformed one. */
+export function placeCodeFromRtrId(rtrId: string | null): string {
+  return /^RTR-(.+)-\d{6}-\d+$/.exec(rtrId ?? '')?.[1] ?? ''
+}
+
 /** The Edit form's starting values: the loaded record, an empty password and an empty reason. */
 export function adminPlayerEditValuesOf(edit: AdminPlayerEdit): AdminPlayerEditValues {
   return {
@@ -103,6 +108,8 @@ export function adminPlayerEditValuesOf(edit: AdminPlayerEdit): AdminPlayerEditV
     email: edit.email ?? '',
     password: '',
     reason: '',
+    registrationPlace: placeCodeFromRtrId(edit.rtrId),
+    registrationDate: edit.rtrId ? createdOnFromRtrId(edit.rtrId) : '',
   }
 }
 

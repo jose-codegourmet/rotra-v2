@@ -53,6 +53,8 @@ export type AdminPlayer = {
     clubId: string
     name: string
     addedAt: number | null
+    /** This club's own name for the person; set when more than one club saved an unclaimed player */
+    savedAs?: string
     identity: import('../club-player/clubPlayer.types').ClubPlayer['identity']
   }[]
   archivedAt: string | null
@@ -64,9 +66,12 @@ export type AdminPlayer = {
 
 export type AdminPlayerAccountFilter = 'all' | 'registered' | 'unclaimed'
 
+/** The toolbar's account switch: the three counted states plus Details required (D-2026-11-16-04). */
+export type AdminPlayerAccountOption = AdminPlayerAccountFilter | 'details'
+
 export type AdminPlayerListParams = {
   q?: string
-  account?: AdminPlayerAccountFilter
+  account?: AdminPlayerAccountOption
   /** Rows to return; the screen asks for 25 more each time */
   limit?: number
   level?: 'beginner' | 'intermediate' | 'advanced' | 'none'

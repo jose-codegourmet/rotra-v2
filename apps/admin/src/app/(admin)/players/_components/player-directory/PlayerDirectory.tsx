@@ -141,8 +141,8 @@ export function PlayerDirectory() {
         actions={<AddAdminPlayer onCreated={clear} />}
         description={
           data
-            ? `${data.total} player${data.total === 1 ? '' : 's'} · permanent RTR IDs`
-            : 'Players · permanent RTR IDs'
+            ? `${data.total} player${data.total === 1 ? '' : 's'}`
+            : 'Players'
         }
         className="flex-nowrap [&>div:last-child]:!flex [&>div:last-child]:!w-auto [&>div:last-child]:shrink-0"
       />

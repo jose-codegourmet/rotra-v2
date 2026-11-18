@@ -1,7 +1,29 @@
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import { Chip } from '@rotra/ui/chip'
-export type AdminPlayerClubsProps = { clubs: AdminPlayer['clubs']; expanded?: boolean }
-export function AdminPlayerClubs({ clubs, expanded }: AdminPlayerClubsProps) {
+import { NOT_ON_LEADERBOARD_NOTE, type SavedByClub } from './AdminPlayerClubs.helpers'
+
+export type AdminPlayerClubsProps = {
+  clubs: AdminPlayer['clubs']
+  expanded?: boolean
+  /**
+   * An unclaimed player saved by more than one club: each club is listed with its own name for
+   * them, then the line that they are not on the leaderboard. Replaces the chips.
+   */
+  savedBy?: SavedByClub[]
+}
+export function AdminPlayerClubs({ clubs, expanded, savedBy }: AdminPlayerClubsProps) {
+  if (savedBy?.length) {
+    return (
+      <div className="flex flex-col gap-1">
+        {savedBy.map((c) => (
+          <span key={c.club}>
+            {c.club} · saved as <b>{c.name}</b>
+          </span>
+        ))}
+        <span className="text-sm text-fg2">{NOT_ON_LEADERBOARD_NOTE}</span>
+      </div>
+    )
+  }
   return (
     <div
       className="flex flex-wrap gap-1"

@@ -19,3 +19,9 @@ export const Phone: Story = { args: account.unclaimed, globals: { viewport: { va
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 export const Light: Story = { globals: { theme: 'light' } }
 export const UnclaimedLight: Story = { args: account.unclaimed, globals: { theme: 'light' } }
+
+/** An older record with a phone and no email: the Details required notice. */
+export const DetailsRequired: Story = {
+  args: { ...account.unclaimed, detailsRequired: true, clubName: 'Lahug Smash Club' },
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }

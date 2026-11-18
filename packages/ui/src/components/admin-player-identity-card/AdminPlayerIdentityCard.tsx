@@ -1,3 +1,5 @@
+import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
+import type { SavedByClub } from '@rotra/ui/admin-player-clubs/helpers'
 import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { formatYmd } from '@rotra/ui/license-access-chip/variants'
@@ -12,6 +14,11 @@ export type AdminPlayerIdentityCardProps = {
   createdOn: string
   /** The club that created the profile */
   createdBy: string
+  /**
+   * An unclaimed player saved by more than one club: each club with its own name for them replaces
+   * the single creator (D-2026-11-16-04).
+   */
+  savedBy?: SavedByClub[]
 }
 
 /**
@@ -24,6 +31,7 @@ export function AdminPlayerIdentityCard({
   rtrId,
   createdOn,
   createdBy,
+  savedBy,
 }: AdminPlayerIdentityCardProps) {
   const headingId = useId()
   return (
@@ -38,12 +46,22 @@ export function AdminPlayerIdentityCard({
               label: 'RTR ID',
               value: rtrId ? <span className="font-mono">{rtrId}</span> : 'Not registered yet',
             },
-            { label: 'Created', value: `${formatYmd(createdOn)} by ${createdBy}` },
+            savedBy?.length
+              ? {
+                  label: 'Created',
+                  value: (
+                    <div className="flex flex-col gap-1">
+                      <span>{formatYmd(createdOn)}</span>
+                      <AdminPlayerClubs clubs={[]} savedBy={savedBy} />
+                    </div>
+                  ),
+                }
+              : { label: 'Created', value: `${formatYmd(createdOn)} by ${createdBy}` },
           ]}
         />
         <p className="m-0 text-[13px] text-fg2">
           {rtrId
-            ? 'The RTR ID never changes, including after a contact change.'
+            ? "A contact change doesn't change the RTR ID. Admin can change it from Edit profile, by changing the registration place or date."
             : 'Saved by the club with a phone. The RTR ID is given when they register.'}
         </p>
       </section>

@@ -1,3 +1,4 @@
+import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import { managementPlayer } from '@rotra/data/fixtures/admin-player-management'
 import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -13,6 +14,58 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Light: Story = { globals: { theme: 'light' } }
+
+const registered: AdminPlayer = {
+  ...managementPlayer,
+  claimed: true,
+  email: 'alex.reyes@example.com',
+  registeredOn: '2026-10-05',
+  levelIndex: 5,
+  rankStatus: { kind: 'board', text: 'Intermediate Mid · on the overall leaderboard' },
+}
+const unclaimed: AdminPlayer = { ...managementPlayer, email: 'alex.reyes@example.com' }
+/** Two clubs saved the same unclaimed person, each under its own name. */
+const savedByTwo: AdminPlayer = {
+  ...unclaimed,
+  name: 'Nina Ocampo',
+  levelIndex: 3,
+  rankStatus: { kind: 'below', text: 'Beginner High · not on the leaderboard until they register' },
+  clubs: [
+    {
+      clubId: 'c1',
+      name: 'Talamban Racket Club',
+      addedAt: null,
+      savedAs: 'Nina Ocampo',
+      identity: 'unclaimed',
+    },
+    {
+      clubId: 'c2',
+      name: 'IT Park Badminton Club',
+      addedAt: null,
+      savedAs: 'Nina O.',
+      identity: 'unclaimed',
+    },
+  ],
+}
+/** Registered row. */
+export const RegisteredRow: Story = { args: { player: registered } }
+export const RegisteredRowLight: Story = { ...RegisteredRow, globals: { theme: 'light' } }
+/** Unclaimed with an email. */
+export const UnclaimedRow: Story = { args: { player: unclaimed } }
+export const UnclaimedRowLight: Story = { ...UnclaimedRow, globals: { theme: 'light' } }
+/** An older unclaimed record with a phone and no email: the warn Details required chip. */
+export const DetailsRequired: Story = { args: { player: managementPlayer, detailsRequired: true } }
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
+/** "<First club> and 1 more club" and the Not on leaderboard chip. */
+export const SavedByTwoClubs: Story = { args: { player: savedByTwo } }
+export const SavedByTwoClubsLight: Story = { ...SavedByTwoClubs, globals: { theme: 'light' } }
+export const GridRegistered: Story = { args: { player: registered, view: 'grid' } }
+export const GridUnclaimed: Story = { args: { player: unclaimed, view: 'grid' } }
+export const GridDetailsRequired: Story = {
+  args: { player: managementPlayer, detailsRequired: true, view: 'grid' },
+}
+export const GridSavedByTwoClubs: Story = { args: { player: savedByTwo, view: 'grid' } }
+export const GridSavedByTwoClubsLight: Story = { ...GridSavedByTwoClubs, globals: { theme: 'light' } }
 export const Archived: Story = {
   args: { player: { ...managementPlayer, archivedAt: '2026-10-31' } },
 }

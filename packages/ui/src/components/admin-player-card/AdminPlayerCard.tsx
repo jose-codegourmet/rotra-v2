@@ -2,7 +2,9 @@
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Card } from '@rotra/ui/card'
+import { moreClubsLine, savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import { Checkbox } from '@rotra/ui/checkbox'
+import { IdentityChip } from '@rotra/ui/identity-chip'
 import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RankStatusChip } from '@rotra/ui/rank-status-chip'
@@ -17,6 +19,11 @@ export type AdminPlayerCardProps = {
   selected?: boolean
   onSelect?: (selected: boolean) => void
   view?: 'list' | 'grid'
+  /**
+   * An older unclaimed record with no email (D-2026-11-16-04): the warn Details required chip sits
+   * next to Unclaimed. Ignored for a registered player.
+   */
+  detailsRequired?: boolean
 }
 
 function formatAdded(value: string) {
@@ -40,8 +47,10 @@ export function AdminPlayerCard({
   selected,
   onSelect,
   view = 'list',
+  detailsRequired = false,
 }: AdminPlayerCardProps) {
   const grid = view === 'grid'
+  const savedBy = savedByClubs(p)
   return (
     <Card
       className={
@@ -97,11 +106,14 @@ export function AdminPlayerCard({
         )}
         <div className={grid ? 'flex flex-wrap justify-center gap-1.5' : 'flex flex-wrap gap-1.5'}>
           <PlayerAccountChip claimed={p.claimed} />
-          <RankStatusChip status={p.rankStatus} />
+          {detailsRequired && !p.claimed ? (
+            <IdentityChip identity="unclaimed" detailsRequired />
+          ) : null}
+          <RankStatusChip status={p.rankStatus} notOnLeaderboard={!!savedBy} />
           {p.archivedAt ? <span className="text-sm text-fg2">Archived</span> : null}
         </div>
         <p className="text-sm text-fg2 [overflow-wrap:anywhere]">
-          {createdBy} · Added {formatAdded(p.addedOn)}
+          {savedBy ? moreClubsLine(savedBy) : createdBy} · Added {formatAdded(p.addedOn)}
         </p>
       </div>
       <div

@@ -187,9 +187,7 @@ export function EditProfileForm({
                   items={[
                     {
                       label: 'Phone',
-                      value: (
-                        <span className="font-mono">{maskPhone(account.phone)}</span>
-                      ),
+                      value: <span className="font-mono">{maskPhone(account.phone)}</span>,
                     },
                     {
                       label: 'Email',

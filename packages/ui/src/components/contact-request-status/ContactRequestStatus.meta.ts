@@ -5,7 +5,7 @@ export const contactRequestStatusMeta = {
     "The contact-change request's status: Waiting for review, Approved · being applied, Applied, Needs attention or Not approved, by chip and text.",
   usage: [
     "Full on P-PHONE-PRIVACY under Contact details; compact in AccountPanel's requestSlot while a request is open.",
-    "Only for the request's owner: it shows their current and new phone (masked, \"+63 917 ••• ••42\") or email.",
+    'Only for the request\'s owner: it shows their current and new phone (masked, "+63 917 ••• ••42") or email.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

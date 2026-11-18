@@ -9,3 +9,10 @@ export const GOOGLE_SIGN_IN_DEADLINE = {
   /** The way it is written in copy ("Backup only until …", "Verify your ROTRA account by …"). */
   label: 'December 31, 2026',
 } as const
+
+/**
+ * Real mode (#922): the one cookie the page may read after the trip to Google. It holds only the
+ * key of the screen a Google result is waiting for (`login`, `invite`, `claim`, …), never an email
+ * or a token; those stay in httpOnly cookies. Set by the OAuth callback, taken by `takeGoogleReturn`.
+ */
+export const GOOGLE_RETURN_COOKIE = 'rotra-player-google-return'

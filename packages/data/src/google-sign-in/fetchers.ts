@@ -12,7 +12,15 @@ import { queueSessionUrl } from '../player/mySessions'
 import { finishClaim } from '../player-account/fetchers'
 import { getGuestRegistrationClub } from '../player-account/guestRegistration'
 import { myAccountOf } from '../player-account/visibilitySettings'
+import {
+  realCompleteClaimWithGoogle,
+  realConfirmGoogleLink,
+  realGetInviteLanding,
+  realReadGoogleOutcome,
+  realRegisterWithGoogle,
+} from '../real/google'
 import { isRealDataMode } from '../real/mode'
+import { realGetMyAccount } from '../real/player'
 import { googleRegistrationSchema } from './googleRegistration.schema'
 import { GOOGLE_SIGN_IN_DEADLINE } from './googleSignIn.config'
 import { isGoogleDeadlinePassed, normalizeGoogleEmail, shortPlayerName } from './googleSignIn.rules'
@@ -32,11 +40,16 @@ import type {
   MockInviteStanding,
 } from './googleSignIn.types'
 
-// Mock fetchers for the Google identity on the player account (P12, #909). Real mode (Supabase
-// Google provider, #922) is not connected yet: every write here refuses with the usual
-// "isn't connected to saved data yet" error, and the deadline alone works (it needs no server).
+// The Google identity on the player account (P12, #909). Mock mode works on the mock store. Real
+// mode (#922) goes through the Player app's Route Handlers over Supabase Auth: a real Google sign-in
+// is a redirect, so by the time these run the OAuth callback has already decided the outcome and
+// the server holds the verified Google account. The `google` a screen passes is display only there;
+// the server never trusts it. Not connected in real mode: the Admin link (no club) and the dev stand-ins.
 
 const OFFLINE = "You're offline. Google sign-in needs an internet connection."
+const GOOGLE_FAILED = "Couldn't finish with Google. Try again."
+/** Real mode, when the provider refuses a Google account without saying which one it was. */
+const A_GOOGLE = 'That Google account'
 const taken = (email: string) => `${email} is already used by another ROTRA account.`
 const SIGN_IN = 'Sign in to connect Google.'
 
@@ -61,7 +74,12 @@ export async function signInWithGoogle(input: {
   google: GoogleIdentity
   context: GoogleSignInContext
 }): Promise<GoogleSignInOutcome> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) {
+    const result = await realReadGoogleOutcome()
+    if (result.outcome === 'taken') throw new MockError('conflict', taken(result.email || A_GOOGLE))
+    if (result.outcome === 'connected') throw new MockError('retryable', GOOGLE_FAILED)
+    return result
+  }
   await delay(700)
   if (getConnectivity() === 'offline') throw new MockError('offline', OFFLINE)
   const email = normalizeGoogleEmail(input.google.email)
@@ -87,7 +105,7 @@ export async function signInWithGoogle(input: {
 
 /** P-GOOGLE-LINK "Connect Google and sign in": the one confirmation, then connected and signed in. */
 export async function confirmGoogleLink(input: { playerId: string; googleEmail: string }) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realConfirmGoogleLink(input)
   await delay(500)
   if (getConnectivity() === 'offline') throw new MockError('offline', OFFLINE)
   const email = normalizeGoogleEmail(input.googleEmail)
@@ -115,7 +133,14 @@ export async function confirmGoogleLink(input: { playerId: string; googleEmail: 
  * different email. The ROTRA email never changes. There is no disconnect.
  */
 export async function connectGoogle(google: GoogleIdentity): Promise<ConnectGoogleOutcome> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) {
+    // The connect trip to Google already happened; this reads what it decided.
+    const result = await realReadGoogleOutcome()
+    if (result.outcome === 'taken') return { outcome: 'taken', email: result.email || A_GOOGLE }
+    const account = result.outcome === 'connected' ? await realGetMyAccount() : null
+    if (!account) throw new MockError('retryable', GOOGLE_FAILED)
+    return { outcome: 'connected', account }
+  }
   await delay(600)
   if (getConnectivity() === 'offline') throw new MockError('offline', OFFLINE)
   const session = await getSession('player')
@@ -140,7 +165,15 @@ export async function connectGoogle(google: GoogleIdentity): Promise<ConnectGoog
 export async function registerWithGoogle(
   input: GoogleRegistrationInput,
 ): Promise<GoogleRegistrationResult> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) {
+    // The Admin link has no club to give the RTR ID its city yet, as with password registration.
+    if (!input.clubId) throw new NotConnectedError()
+    return realRegisterWithGoogle({
+      ...input,
+      clubId: input.clubId,
+      values: googleRegistrationSchema.parse(input.values),
+    })
+  }
   await delay(1000)
   requireOnline()
   const email = normalizeGoogleEmail(input.google.email)
@@ -296,7 +329,13 @@ export async function completeClaimWithGoogle(input: {
   google: GoogleIdentity
   values: Omit<GoogleRegistrationInput['values'], 'phone' | 'cityCode'> & { phone?: string }
 }): Promise<GoogleClaimResult> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) {
+    const { phone, ...rest } = input.values
+    return realCompleteClaimWithGoogle({
+      token: input.token,
+      values: { ...personalProfileSchema.parse(rest), phone },
+    })
+  }
   await delay(1100)
   if (getConnectivity() === 'offline')
     throw new MockError(
@@ -473,7 +512,14 @@ export async function getInviteLanding(
   link: InviteLink,
   signal?: AbortSignal,
 ): Promise<InviteLanding> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) {
+    if (!link.clubId) throw new NotConnectedError()
+    const landing = await realGetInviteLanding({ ...link, clubId: link.clubId }, signal)
+    // The server doesn't know the Queue app's origin as this browser sees it.
+    if (landing.card.kind === 'session')
+      landing.card.continueUrl = `${queueSessionUrl(landing.card.session.slug)}?join=1`
+    return landing
+  }
   await delay(250, signal)
   requireOnline()
   const state = readMockState()

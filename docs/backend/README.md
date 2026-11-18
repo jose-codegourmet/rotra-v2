@@ -30,6 +30,7 @@ docs/backend/
   README.md            this page
   open-decisions.md    backend questions waiting for the owner (B-ids), plus the settled ones
   infrastructure.md    Railway setup as Infrastructure as Code, side-by-side rollout
+  google-sign-in-setup.md  Google sign-in for players on Supabase Auth: owner setup and design
   decisions/<date>-<topic>/01-proposal.md   one folder per proposal, same shape as docs/decisions/
 ```
 
@@ -42,6 +43,7 @@ docs/backend/
 ## Other backend pages
 
 - [Infrastructure](infrastructure.md): Railway Infrastructure as Code (`.railway/railway.ts`), services, regions, side-by-side rollout
+- [Google sign-in setup](google-sign-in-setup.md): what the owner sets up in Google Cloud and Supabase (#896) and how the Player app's real mode uses Supabase Auth for it (#922); written, not run against Google
 - [Sign-in tables](../database_design/product/sign-in.md) (in database design)
 - [Monitoring](../observability.md#planned-go-api-postgres-and-pictures-on-railway) (in observability)
 - [Conductor tracks](../../conductor/tracks.md): the backend work plan, in priority order

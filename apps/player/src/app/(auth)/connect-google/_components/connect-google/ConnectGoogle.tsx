@@ -85,15 +85,6 @@ function GoogleRequired({ playerId, name }: { playerId: string; name: string }) 
   const requirement = useGoogleRequirement(account)
   const tried = useGoogleTriedEmail()
   const connect = useConnectGoogle()
-  const picker = useGooglePicker()
-  const noGoogle = useNoGoogleSheet()
-  const signOut = useSignOut('player')
-  // Already connected, or before the deadline: nothing to require here.
-  useEffect(() => {
-    if (account && requirement.deadline && requirement.state !== 'required')
-      router.replace(`/players/${playerId}`)
-  }, [account, requirement.deadline, requirement.state, router, playerId])
-  if (!account || requirement.state !== 'required' || !requirement.deadline) return null
   const connectWith = (identity: GoogleIdentity) =>
     connect.mutate(identity, {
       onSuccess: (result) => {
@@ -104,6 +95,15 @@ function GoogleRequired({ playerId, name }: { playerId: string; name: string }) 
       },
       onError: (error) => toast.error(error.message),
     })
+  const picker = useGooglePicker({ key: 'required', intent: 'connect' }, connectWith)
+  const noGoogle = useNoGoogleSheet()
+  const signOut = useSignOut('player')
+  // Already connected, or before the deadline: nothing to require here.
+  useEffect(() => {
+    if (account && requirement.deadline && requirement.state !== 'required')
+      router.replace(`/players/${playerId}`)
+  }, [account, requirement.deadline, requirement.state, router, playerId])
+  if (!account || requirement.state !== 'required' || !requirement.deadline) return null
   return (
     <>
       <GoogleRequiredCard
@@ -118,7 +118,7 @@ function GoogleRequired({ playerId, name }: { playerId: string; name: string }) 
         triedEmail={tried.email}
         pending={connect.isPending}
         onConnectTried={() => {
-          if (tried.email) connectWith({ email: tried.email, name })
+          if (tried.email) picker.startWith({ email: tried.email, name }, connectWith)
         }}
         onChooseGoogle={() => picker.start(connectWith)}
         onNoGoogle={noGoogle.open}

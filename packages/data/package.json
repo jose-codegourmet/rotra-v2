@@ -486,7 +486,8 @@
     "./profile-banner/types": "./src/profile-banner/profileBanner.types.ts",
     "./profile-banner/rules": "./src/profile-banner/profileBanner.rules.ts",
     "./profile-banner/query-keys": "./src/profile-banner/queryKeys.ts",
-    "./fixtures/profile-banners": "./src/fixtures/profileBanners.ts"
+    "./fixtures/profile-banners": "./src/fixtures/profileBanners.ts",
+    "./real/google": "./src/real/google.ts"
   },
   "scripts": {
     "lint": "biome check .",

@@ -115,11 +115,38 @@ export function GoogleInvite({
   const registration = useGoogleRegistration()
   const googleSignIn = useGoogleSignIn()
   const join = useJoinClub()
-  const picker = useGooglePicker()
   const noGoogle = useNoGoogleSheet()
   const profile = usePlayerProfile(playerId ?? '').data
   const [google, setGoogle] = useState<GoogleIdentity | null>(null)
   const route = inviteRoute(link)
+  const chooseGoogle = (identity: GoogleIdentity) =>
+    googleSignIn.mutate(
+      { google: identity, context: 'register' },
+      {
+        onSuccess: (outcome) => {
+          if (outcome.outcome === 'signed-in') {
+            dispatch(setAccount(outcome.session.account))
+            toast('Signed in with Google')
+          } else if (outcome.outcome === 'ask-to-connect') {
+            dispatch(
+              setPendingLink({
+                google: outcome.google,
+                playerId: outcome.playerId,
+                playerName: outcome.playerName,
+                returnTo: route,
+              }),
+            )
+            router.push('/connect-google')
+          } else if (outcome.outcome === 'new-account') {
+            setGoogle(outcome.google)
+            window.scrollTo(0, 0)
+          }
+        },
+        onError: (failure) => toast.error(failure.message),
+      },
+    )
+  // Real mode comes back here from Google; the same handler then reads what the server decided.
+  const picker = useGooglePicker({ key: 'invite', intent: 'register' }, chooseGoogle)
   const adminSignedIn = !clubId && playerId !== null
   useEffect(() => {
     if (adminSignedIn) router.replace(`/players/${playerId}`)
@@ -296,6 +323,7 @@ export function GoogleInvite({
               google,
               clubId: clubId || null,
               sessionSlug: sessionSlug ?? null,
+              clubInviteCode: clubInviteCode ?? null,
               values,
             },
             {
@@ -324,35 +352,7 @@ export function GoogleInvite({
           pending={googleSignIn.isPending}
           hint="ROTRA accounts sign in with Google. You don't need a password, and you add your mobile number next."
           onNoGoogle={noGoogle.open}
-          onGoogle={() =>
-            picker.start((identity) =>
-              googleSignIn.mutate(
-                { google: identity, context: 'register' },
-                {
-                  onSuccess: (outcome) => {
-                    if (outcome.outcome === 'signed-in') {
-                      dispatch(setAccount(outcome.session.account))
-                      toast('Signed in with Google')
-                    } else if (outcome.outcome === 'ask-to-connect') {
-                      dispatch(
-                        setPendingLink({
-                          google: outcome.google,
-                          playerId: outcome.playerId,
-                          playerName: outcome.playerName,
-                          returnTo: route,
-                        }),
-                      )
-                      router.push('/connect-google')
-                    } else if (outcome.outcome === 'new-account') {
-                      setGoogle(outcome.google)
-                      window.scrollTo(0, 0)
-                    }
-                  },
-                  onError: (failure) => toast.error(failure.message),
-                },
-              ),
-            )
-          }
+          onGoogle={() => picker.start(chooseGoogle)}
           signIn={{
             label:
               card.kind === 'session'

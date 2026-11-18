@@ -23,7 +23,15 @@ export function GoogleAnnouncementBand({ playerId, name }: { playerId: string; n
   const tried = useGoogleTriedEmail()
   const later = useRemindMeLater()
   const connect = useConnectGoogle()
-  const picker = useGooglePicker()
+  const connectWith = (identity: GoogleIdentity) =>
+    connect.mutate(identity, {
+      onSuccess: (result) =>
+        result.outcome === 'connected'
+          ? toast('Google connected')
+          : toast(`${result.email} is already used by another ROTRA account.`),
+      onError: (error) => toast.error(error.message),
+    })
+  const picker = useGooglePicker({ key: 'band', intent: 'connect' }, connectWith)
   const noGoogle = useNoGoogleSheet()
   if (
     !account ||
@@ -33,14 +41,6 @@ export function GoogleAnnouncementBand({ playerId, name }: { playerId: string; n
   )
     return null
   const deadline = requirement.deadline.label
-  const connectWith = (identity: GoogleIdentity) =>
-    connect.mutate(identity, {
-      onSuccess: (result) =>
-        result.outcome === 'connected'
-          ? toast('Google connected')
-          : toast(`${result.email} is already used by another ROTRA account.`),
-      onError: (error) => toast.error(error.message),
-    })
   return (
     <>
       <AnnouncementBand
@@ -61,7 +61,9 @@ export function GoogleAnnouncementBand({ playerId, name }: { playerId: string; n
                   size="xs"
                   variant="primary"
                   disabled={connect.isPending}
-                  onClick={() => tried.email && connectWith({ email: tried.email, name })}
+                  onClick={() =>
+                    tried.email && picker.startWith({ email: tried.email, name }, connectWith)
+                  }
                 >
                   Connect {tried.email}
                 </Button>

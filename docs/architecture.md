@@ -275,7 +275,9 @@ Redux never holds server data and has no async thunks.
 In mock mode, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
 mock session. In real mode, Queue (club), Admin and Player sign-in use Supabase Auth (below); Player
 registration (`/api/claim/[token]`) and Admin-reviewed password reset (`/api/auth/{password-reset,reset-password}`; #491)
-are real too (#483). **No Facebook or any social login.**
+are real too (#483). **No Facebook or any social login**, except Google sign-in for players behind the
+`player_google_sign_in` flag ([D-2026-11-16-01](mvp/decisions.md#d-2026-11-16-01)): written on Supabase Auth,
+not run against Google yet ([setup and design](backend/google-sign-in-setup.md)).
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
 no fallback from real to mock. `NEXT_PUBLIC_ROTRA_DATA_MODE` (F07.34) is its client mirror: set both

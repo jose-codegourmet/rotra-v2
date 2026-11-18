@@ -65,7 +65,11 @@
     "./admin/sales": "./src/admin/sales.ts",
     "./admin/profile-characters": "./src/admin/profile-characters.ts",
     "./admin/profile-banners": "./src/admin/profile-banners.ts",
-    "./queue/match-requests": "./src/queue/match-requests.ts"
+    "./queue/match-requests": "./src/queue/match-requests.ts",
+    "./auth/google-cookies": "./src/auth/google-cookies.ts",
+    "./auth/google-oauth": "./src/auth/google-oauth.ts",
+    "./player/google-sign-in": "./src/player/google-sign-in.ts",
+    "./player/invite-landing": "./src/player/invite-landing.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

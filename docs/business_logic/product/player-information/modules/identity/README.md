@@ -85,6 +85,7 @@ Experience can inform the initial operator assessment but is not automatic ranki
 - **Google sign-in on `/login` never creates an account** (owner, November 18, 2026): new accounts come only from the registration sources above.
 - **Recovery:** Admin-reviewed password reset applies to password accounts only; an account that signs in with Google is told to use Google.
 - **Owner, November 18, 2026:** the deadline is December 31, 2026 (a swappable value, not an Admin setting yet); the password stays a backup until then once Google is connected; a signed-in player confirmed for a session at a club they aren't in does not join that club's saved players.
+- **Real mode (#922, November 18, 2026): written, not run against Google** (the Google and Supabase setup, #896, is pending). ROTRA's own record of the connected Google email decides who is signed in: a Google account that the sign-in provider attaches to a password account by itself is not a connection until the player answers **Connect Google to your account?**, and choosing **Use my password instead** or leaving signs nobody in. A Google sign-in that matches no account leaves no usable login behind on `/login`. Not in real mode yet: registration from the Admin link, and the inviting player's name on a session invite. [Setup and design](../../../../../backend/google-sign-in-setup.md).
 - Still open: Supabase's automatic linking of same-email identities must not skip the "ask first" step.
 
 Earlier rules, still true for password accounts until the deadline:

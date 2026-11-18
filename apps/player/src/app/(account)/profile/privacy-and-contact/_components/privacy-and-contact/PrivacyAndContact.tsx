@@ -61,7 +61,15 @@ export function PrivacyAndContact({
   const googleSignIn = usePlayerGoogleSignInEnabled()
   const googleDeadline = useGoogleDeadline().data
   const connectGoogle = useConnectGoogle()
-  const picker = useGooglePicker()
+  const connectWith = (identity: GoogleIdentity) =>
+    connectGoogle.mutate(identity, {
+      onSuccess: (result) =>
+        result.outcome === 'connected'
+          ? toast('Google connected')
+          : toast(`${result.email} is already used by another ROTRA account.`),
+      onError: (error) => toast.error(error.message),
+    })
+  const picker = useGooglePicker({ key: 'sign-in-methods', intent: 'connect' }, connectWith)
   const router = useRouter()
   const dispatch = useAppDispatch()
   const data = myAccount.data
@@ -82,14 +90,6 @@ export function PrivacyAndContact({
     )
   }
   const request = contactChange.request.data
-  const connectWith = (identity: GoogleIdentity) =>
-    connectGoogle.mutate(identity, {
-      onSuccess: (result) =>
-        result.outcome === 'connected'
-          ? toast('Google connected')
-          : toast(`${result.email} is already used by another ROTRA account.`),
-      onError: (error) => toast.error(error.message),
-    })
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 pt-5 pb-[120px]">
       <div className="flex flex-col gap-1.5">

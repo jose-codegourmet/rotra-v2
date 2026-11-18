@@ -52,7 +52,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
-| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mockup only | #892 | [Player](workstreams/player.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mock app behind the flag; real mode written, not run against Google (#922, pending #896) | #892 | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
@@ -957,7 +957,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-01 — Google sign-in is mandatory for players
 - **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the first questions were settled on November 18, 2026; the open item below is not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
+- **Implementation status:** in the mock app behind the flag; real mode is **written but not run against Google** (#922, November 18, 2026): the Google Cloud OAuth client and the Supabase provider (#896) are not set up, and migration `20261118000200_player_google_sign_in` is not applied. Not in real mode: registration from the Admin link, and the inviting player on a session invite. [Setup and design](../backend/google-sign-in-setup.md); [log](../mockup-changes/2026-11-16-player-google-sign-in.md).
 - **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Amended by:** [D-2026-11-18-01](#d-2026-11-18-01): everything below ships behind the feature flag `player_google_sign_in`, which starts off.

@@ -59,6 +59,8 @@ export type GoogleRegistrationInput = {
   /** The invite's club; empty for the Admin link */
   clubId?: string | null
   sessionSlug?: string | null
+  /** The club invite link's `k`; the server checks it in real mode, like the password registration */
+  clubInviteCode?: string | null
   values: GoogleRegistrationValues
 }
 
@@ -180,3 +182,9 @@ export type InviteLink = {
 
 /** A player's standing on a session, for the dev stand-in that puts the signed-in player there. */
 export type MockInviteStanding = 'none' | 'in' | 'waitlist'
+
+/**
+ * Real mode (#922): why the browser is sent to Google. `connect` is a signed-in player adding or
+ * changing Google; the others are Continue with Google on P-LOGIN, an invite and a registration link.
+ */
+export type GoogleRedirectIntent = 'login' | 'register' | 'claim' | 'connect'

@@ -1,6 +1,6 @@
 'use client'
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
-import type { InviteLink } from '@rotra/data/google-sign-in/types'
+import type { GoogleIdentity, InviteLink } from '@rotra/data/google-sign-in/types'
 import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { useGoogleSignIn } from '@rotra/data/google-sign-in/useGoogleSignIn'
 import { useInviteLanding } from '@rotra/data/google-sign-in/useInviteLanding'
@@ -112,7 +112,6 @@ function GoogleSignInBody({
     store = useAppSelector(selectLoginEmail)
   const deadline = useGoogleDeadline().data
   const googleSignIn = useGoogleSignIn()
-  const picker = useGooglePicker()
   const finish = useFinishSignIn(returnTo)
   // "Use my password instead" from P-GOOGLE-LINK: the email arrives through the store, never the URL.
   const [defaultEmail] = useState(store ?? undefined)
@@ -120,37 +119,38 @@ function GoogleSignInBody({
     dispatch(setLoginEmail(null))
   }, [dispatch])
   const result = googleSignIn.data
+  const continueWith = (identity: GoogleIdentity) =>
+    googleSignIn.mutate(
+      { google: identity, context: 'login' },
+      {
+        onSuccess: (outcome) => {
+          if (outcome.outcome === 'signed-in') {
+            dispatch(setAccount(outcome.session.account))
+            finish(outcome.session.account.id)
+            toast('Signed in with Google')
+          } else if (outcome.outcome === 'ask-to-connect') {
+            dispatch(
+              setPendingLink({
+                google: outcome.google,
+                playerId: outcome.playerId,
+                playerName: outcome.playerName,
+                returnTo,
+              }),
+            )
+            router.push('/connect-google')
+          }
+        },
+        onError: (error) => toast.error(error.message),
+      },
+    )
+  // Real mode comes back here from Google; the same handler then reads what the server decided.
+  const picker = useGooglePicker({ key: 'login', intent: 'login' }, continueWith)
   const google: SignInGoogle = {
     pending: googleSignIn.isPending,
     deadlineLabel: deadline?.label ?? '',
     contextMessage,
     notConnectedEmail: result?.outcome === 'not-connected' ? result.triedEmail : undefined,
-    onContinue: () =>
-      picker.start((identity) =>
-        googleSignIn.mutate(
-          { google: identity, context: 'login' },
-          {
-            onSuccess: (outcome) => {
-              if (outcome.outcome === 'signed-in') {
-                dispatch(setAccount(outcome.session.account))
-                finish(outcome.session.account.id)
-                toast('Signed in with Google')
-              } else if (outcome.outcome === 'ask-to-connect') {
-                dispatch(
-                  setPendingLink({
-                    google: outcome.google,
-                    playerId: outcome.playerId,
-                    playerName: outcome.playerName,
-                    returnTo,
-                  }),
-                )
-                router.push('/connect-google')
-              }
-            },
-            onError: (error) => toast.error(error.message),
-          },
-        ),
-      ),
+    onContinue: () => picker.start(continueWith),
   }
   return (
     <>

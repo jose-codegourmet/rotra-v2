@@ -17,7 +17,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useGooglePicker } from '@/app/_components/google-sign-in/useGooglePicker'
+import { useGooglePicker, useGoogleReturn } from '@/app/_components/google-sign-in/useGooglePicker'
 import { useNoGoogleSheet } from '@/app/_components/google-sign-in/useNoGoogleSheet'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch } from '@/store/hooks'
@@ -42,6 +42,14 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
   const dispatch = useAppDispatch()
   const [step, setStep] = useState<Step>('check')
   const [done, setDone] = useState<Done | null>(null)
+  const pickGoogle = (identity: GoogleIdentity) => {
+    setGoogle(identity)
+    setMethodError('')
+    setStep('form')
+    window.scrollTo(0, 0)
+  }
+  // Real mode comes back to this page from Google: the form opens with the account it verified.
+  useGoogleReturn('claim', pickGoogle)
 
   if (done)
     return (
@@ -136,18 +144,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
       />
     )
   if (step === 'method' && googleOn)
-    return (
-      <GoogleMethodStep
-        clubName={data.clubName}
-        error={methodError}
-        onPick={(identity) => {
-          setGoogle(identity)
-          setMethodError('')
-          setStep('form')
-          window.scrollTo(0, 0)
-        }}
-      />
-    )
+    return <GoogleMethodStep clubName={data.clubName} error={methodError} onPick={pickGoogle} />
   if (googleOn && google)
     return (
       <ClaimForm
@@ -259,7 +256,7 @@ function GoogleMethodStep({
   error: string
   onPick: (identity: GoogleIdentity) => void
 }) {
-  const picker = useGooglePicker()
+  const picker = useGooglePicker({ key: 'claim', intent: 'claim' })
   const noGoogle = useNoGoogleSheet()
   return (
     <>

@@ -1,9 +1,10 @@
 import 'server-only'
 import { requireClubInvite } from '../admin/club-invite'
+import type { GoogleCookies, PendingGoogle } from '../auth/google-oauth'
 import type { CookieAdapter } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
-import { type ClaimDetails, registerFromClaim } from './account-access'
+import { type ClaimDetails, registerFromClaim, registerFromClaimWithGoogle } from './account-access'
 import { CLAIM_LINK_DAYS } from './claim'
 import { allocateRtrId, linkClubRecordsByPhone } from './identity'
 import { addPlayerToClub } from './my-clubs'
@@ -77,6 +78,50 @@ export async function registerGuest(
   if (!/^[a-f0-9]{64}$/.test(input.attempt)) throw new ServiceError('invalid')
   const email = input.email.trim().toLowerCase()
   const token = `registration:${input.attempt}`
+  const staged = { ...input, email }
+  if (!(await stageRegistration(clubId, token, staged))) return MATCH
+  return finishRegistration(clubId, context, input.phoneE164, () =>
+    registerFromClaim(cookies, token, staged),
+  )
+}
+
+/**
+ * Registration from a club or session invite with Google (D-2026-11-16-01, #922): the same staging
+ * and the same joins as `registerGuest`, with Google's login instead of a new email + password
+ * login. `pending` is the held Google sign-in, verified with the provider by the caller, on a login
+ * with no ROTRA account. The Google email is the ROTRA email, confirmed at once; the phone is
+ * required. The attempt is keyed on Google's login, so a retry resumes the same registration.
+ */
+export async function registerGuestWithGoogle(
+  jar: GoogleCookies,
+  clubId: string,
+  pending: PendingGoogle,
+  input: { phoneE164: string; details: ClaimDetails },
+  sessionSlug?: string | null,
+  inviteCode?: string | null,
+) {
+  const context = await guestRegistrationClub(clubId, sessionSlug, inviteCode)
+  const token = `registration:google:${pending.subject}`
+  const staged = { ...input, email: pending.google.email }
+  if (!(await stageRegistration(clubId, token, staged, pending.subject))) return MATCH
+  return finishRegistration(clubId, context, input.phoneE164, () =>
+    registerFromClaimWithGoogle(jar, token, pending, input),
+  )
+}
+
+/**
+ * Step 1 of registration: the unclaimed player, its private contact, its RTR ID and the staging
+ * link, in one transaction. False when the phone or email already belongs to an account (nothing
+ * is created). `googleSubject` is the login Google made for this very email, which is therefore
+ * not "another login"; a Google email connected to an account also counts as used.
+ */
+async function stageRegistration(
+  clubId: string,
+  token: string,
+  input: { email: string; phoneE164: string; details: ClaimDetails },
+  googleSubject?: string,
+) {
+  const { email } = input
   const tokenDigest = new Uint8Array(
     await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)),
   )
@@ -108,8 +153,20 @@ export async function registerGuest(
           select: { playerId: true },
         })
         if (existing) return false
+        if (googleSubject) {
+          const connected = await tx.playerAccount.findUnique({
+            where: { googleEmail: email },
+            select: { playerId: true },
+          })
+          if (connected) return false
+        }
         // Club/Admin logins also reserve an email, even without a Player account mapping.
-        const provider = await tx.$queryRaw<{ present: boolean }[]>`
+        const provider = googleSubject
+          ? await tx.$queryRaw<{ present: boolean }[]>`
+          SELECT EXISTS(
+            SELECT 1 FROM auth.users WHERE lower(email) = ${email} AND id <> ${googleSubject}::uuid
+          ) AS present`
+          : await tx.$queryRaw<{ present: boolean }[]>`
           SELECT EXISTS(SELECT 1 FROM auth.users WHERE lower(email) = ${email}) AS present`
         if (provider[0]?.present) return false
         const now = new Date()
@@ -138,17 +195,29 @@ export async function registerGuest(
       throw error
     }
   }
-  if (!prepared) return MATCH
+  return prepared
+}
+
+/**
+ * Step 2 of registration: `complete` makes (or maps) the login, claims the staged profile and signs
+ * the player in; then the phone links every club's unclaimed record and the player joins the club.
+ */
+async function finishRegistration<
+  R extends { playerId: string; rtrId: string; firstName: string; session: unknown },
+>(
+  clubId: string,
+  context: Awaited<ReturnType<typeof guestRegistrationClub>>,
+  phoneE164: string,
+  complete: () => Promise<R>,
+) {
   for (let attempt = 0; ; attempt++) {
     try {
-      const result = await registerFromClaim(cookies, token, { ...input, email })
+      const result = await complete()
       // Repeat-safe, so a retried attempt that already linked or joined is a no-op. The account is
       // made and signed in by now: a failed link or join must not report the registration as
       // failed; the player can still tap Join from the same link.
       await prisma
-        .$transaction((tx) =>
-          linkClubRecordsByPhone(tx, result.playerId, input.phoneE164, new Date()),
-        )
+        .$transaction((tx) => linkClubRecordsByPhone(tx, result.playerId, phoneE164, new Date()))
         .catch((error: unknown) => {
           console.error(
             '[guest-registration] link club records',

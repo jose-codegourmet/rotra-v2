@@ -119,20 +119,11 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
       requestDetails[r.id] = { waitlistPosition: waitlistPositionOf(r.clubPlayerId) }
   for (const r of view?.join ?? []) {
     const hint = hints.data?.[r.id]
-    const match = hint?.linked ?? hint?.phoneMatch
     requestDetails[r.id] = {
       ...requestDetails[r.id],
       account: r.account ? (r.account.inClub ? 'in-club' : 'new-to-club') : undefined,
       sharedRank: hint?.sharedRank ? levelLabel(hint.sharedRank) : null,
       invitedBy: r.invitedByName ?? undefined,
-      phoneMatch: match
-        ? {
-            name: match.name,
-            linked: Boolean(hint?.linked),
-            onLink: () => run(link.mutate, { requestId: r.id, clubPlayerId: match.clubPlayerId }),
-            onNotThem: () => run(notThem.mutate, r.id, true),
-          }
-        : undefined,
     }
   }
 

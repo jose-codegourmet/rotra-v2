@@ -6,6 +6,7 @@ export const participantProfileSheetMeta = {
     'The session page’s participant profile card for a signed-in ROTRA Player (D-PARTICIPANT-PROFILE, #731): a header-less ProfileBannerCard with the name block (display name, new-tab icon, full name, Copy RTR ID), the Registered chip and a level badge, the status pill while live, boxed About (Registered in) and Latest stats (the win rate with its fire, Games, Wins, Losses) or “No games yet this year”. Footer Close, Share profile and Open ROTRA profile (new tab).',
   usage: [
     'Opened from a registered participant’s or waitlist tile on the public session page (PublicParticipants onOpenParticipant), and from the viewer’s own tile whatever their visibility. Never for visitors.',
+    'unclaimed (the club\'s own saved player, D-2026-11-16-04) swaps the chip for Unclaimed, adds "Saved by the club. Not registered with ROTRA yet." and drops Share profile and Open ROTRA profile. The guest "no profile" card is PrivateProfileCard and is unchanged.',
     'Public fields only: no phone, contacts or club-private rows (those belong to PlayerProfileSheet on operator screens).',
     'stats comes from useParticipantStats (the calendar year, reset on January 1); pass statsLoading while it loads and statsError when it failed. null is “No games yet this year”. showStats false (the player turned off Show my profile stats and the viewer is someone else) leaves Latest stats out.',
     'profileHref is the Player app’s /find/<RTR> profile, opened in a new tab from the name icon and Open ROTRA profile; both hide without it. onShare opens the share dialog (Share profile).',
@@ -18,6 +19,7 @@ export const participantProfileSheetMeta = {
   docs: [
     'docs/screens/product/dialogs.md#d-participant-profile--participant-profile-card',
     'docs/screens/product/modules/queue/public-session.md',
+    'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
   ],
   related: ['ProfileBannerCard', 'PrivateProfileCard', 'PublicParticipants', 'Sheet'],
 } satisfies ComponentMeta

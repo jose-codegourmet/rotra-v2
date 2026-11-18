@@ -7,6 +7,7 @@ import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { Notice } from '@rotra/ui/notice'
 import {
   ProfileBannerCard,
   ProfileCardSection,
@@ -57,6 +58,16 @@ export type PlayerProfileSheetProps = {
   sessionsHere: number
   /** The player hid their phone. The number itself is never passed to this component */
   phoneHidden: boolean
+  /** An unclaimed player saved with no phone reads "None on file"; omitted means one is on file */
+  phoneOnFile?: boolean
+  /**
+   * The club has an email for them (guests and unclaimed players): the Email row reads "On file
+   * and kept private" or "None on file". The address itself is never passed. Registered players
+   * have no Email row.
+   */
+  emailOnFile?: boolean
+  /** An older unclaimed record with no email: the warn chip, the notice and the reworded status line */
+  detailsRequired?: boolean
   /** How they joined; null or absent reads "Added by the club" */
   joinedVia?: 'club' | 'session' | null
   /** Opened from a dialog: the footer offers Back to that dialog instead of Close */
@@ -68,8 +79,6 @@ export type PlayerProfileSheetProps = {
   onEdit?: () => void
   /** Delete player, any saved player; hidden when opened from another dialog */
   onDelete?: () => void
-  /** Opens the Link to saved player… sheet. Pass only for a guest's record, and not when opened from another dialog. */
-  onLinkToSavedPlayer?: () => void
   /** The delete is being checked or saved */
   deleting?: boolean
   /** Absolute ROTRA Player registration link. Guests get an Invite to ROTRA section; hidden when absent. */
@@ -78,7 +87,7 @@ export type PlayerProfileSheetProps = {
 
 const STATUS: Record<Identity, string> = {
   registered: 'Registered ROTRA player',
-  unclaimed: 'Saved by your club with a phone. Not registered with ROTRA yet',
+  unclaimed: 'Saved by your club with their email. Not registered with ROTRA yet',
   guest: 'Guest, no ROTRA profile',
   pending: 'Profile lookup after the session syncs',
 }
@@ -88,7 +97,7 @@ const STATUS: Record<Identity, string> = {
  * profile card (D-PARTICIPANT-PROFILE) with the name block (display name, new-tab icon, full name,
  * Copy RTR ID), the identity chip and level badge, the identity line, the status pill while live,
  * boxed About, Latest stats and In your club, then the guest invite and the levels note. Never shows
- * a phone number.
+ * a phone number or an email address.
  */
 export function PlayerProfileSheet({
   open,
@@ -113,20 +122,27 @@ export function PlayerProfileSheet({
   addedLabel,
   sessionsHere,
   phoneHidden,
+  phoneOnFile = true,
+  emailOnFile = false,
+  detailsRequired: detailsRequiredProp = false,
   joinedVia = null,
   backLabel,
   onBack,
   onInvite,
   onEdit,
   onDelete,
-  onLinkToSavedPlayer,
   deleting = false,
   inviteUrl,
 }: PlayerProfileSheetProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
+  const detailsRequired = detailsRequiredProp && identity === 'unclaimed'
+  const statusLine =
+    detailsRequired
+      ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet'
+      : STATUS[identity]
   const phone = phoneHidden
     ? 'Hidden by player'
-    : identity === 'guest'
+    : identity === 'guest' || !phoneOnFile
       ? 'None on file'
       : 'Kept private; confirmed in person when adding them to a session'
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
@@ -163,9 +179,6 @@ export function PlayerProfileSheet({
               Delete player
             </Button>
           ) : null}
-          {identity === 'guest' && onLinkToSavedPlayer && !backLabel ? (
-            <Button onClick={onLinkToSavedPlayer}>Link to saved player…</Button>
-          ) : null}
           {canInvite && onEdit ? <Button onClick={onEdit}>Edit details</Button> : null}
           {canInvite && onInvite ? (
             <Button variant="primary" onClick={onInvite}>
@@ -186,7 +199,7 @@ export function PlayerProfileSheet({
         bannerImageUrl={bannerImageUrl}
         chips={
           <>
-            <IdentityChip identity={identity} />
+            <IdentityChip identity={identity} detailsRequired={detailsRequired} />
             <ProfileLevelBadge>
               {tonightLevel
                 ? `${levelLabel(tonightLevel)} tonight`
@@ -196,9 +209,15 @@ export function PlayerProfileSheet({
             </ProfileLevelBadge>
           </>
         }
-        identityLine={STATUS[identity]}
+        identityLine={statusLine}
         tonight={tonight}
       >
+        {detailsRequired ? (
+          <Notice tone="warn" title="Details required.">
+            An unclaimed player needs an email. Add their email in Edit details, or delete the
+            player.
+          </Notice>
+        ) : null}
         <ProfileCardSection label="About">
           <KeyValueList
             items={[
@@ -216,6 +235,9 @@ export function PlayerProfileSheet({
               { label: 'Added to club', value: addedLabel },
               { label: 'Sessions here', value: sessionsHere },
               { label: 'Phone', value: phone },
+              ...(identity === 'registered'
+                ? []
+                : [{ label: 'Email', value: emailOnFile ? 'On file and kept private' : 'None on file' }]),
             ]}
           />
         </ProfileCardSection>
@@ -225,8 +247,8 @@ export function PlayerProfileSheet({
               Invite to ROTRA
             </h3>
             <p className="m-0 text-[13px] text-fg2">
-              Send this link so they can register for ROTRA Player. Their guest record stays
-              unlinked until they accept a separate linking invitation.
+              Send this link so they can register for ROTRA Player. Games they played here as a guest
+              don't follow them. To keep those games, add their email in Edit details first.
             </p>
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>

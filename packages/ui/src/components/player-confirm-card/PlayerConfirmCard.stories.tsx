@@ -40,7 +40,16 @@ const propsFor = (p: ClubPlayer): PlayerConfirmCardProps => ({
 /** Holds the level like the sheet does. */
 function Demo(props: PlayerConfirmCardProps) {
   const [level, setLevel] = useState<PlayingLevel | null>(props.level)
-  return <PlayerConfirmCard {...props} level={level} onLevelChange={setLevel} />
+  const [ownName, setOwnName] = useState(props.ownName ?? '')
+  return (
+    <PlayerConfirmCard
+      {...props}
+      level={level}
+      onLevelChange={setLevel}
+      ownName={ownName}
+      onOwnNameChange={setOwnName}
+    />
+  )
 }
 
 const meta = {
@@ -53,7 +62,7 @@ const meta = {
       </div>
     ),
   ],
-  // Unclaimed players have no RTR ID until they register (D-2026-11-11-03).
+  // An older unclaimed record has no RTR ID and no email yet (D-2026-11-16-04).
   args: { ...propsFor(unclaimed), rtrId: null, suggestion: null, level: null },
   render: (args) => <Demo {...args} />,
 } satisfies Meta<typeof PlayerConfirmCard>
@@ -61,9 +70,27 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** An unclaimed saved player with no level: "Not registered yet", no identity check, pick a level. */
-export const UnclaimedNoLevel: Story = {}
-export const UnclaimedNoLevelLight: Story = { globals: { theme: 'light' } }
+/** An older unclaimed record with no level: "Details required" under the name, pick a level. */
+export const UnclaimedNoLevel: Story = { args: { detailsRequired: true } }
+export const UnclaimedNoLevelLight: Story = {
+  args: { detailsRequired: true },
+  globals: { theme: 'light' },
+}
+
+/** Another club's unclaimed player: no name, picture or level. This club types its own name. */
+export const OtherClubUnclaimed: Story = {
+  args: {
+    name: '',
+    rtrId: 'RTR-PH-MNL-020326-0231',
+    nameRequired: true,
+    ownName: '',
+    onOwnNameChange: fn(),
+  },
+}
+export const OtherClubUnclaimedLight: Story = { ...OtherClubUnclaimed, globals: { theme: 'light' } }
+export const OtherClubUnclaimedNameMissing: Story = {
+  args: { ...OtherClubUnclaimed.args, nameError: 'Enter a name.' },
+}
 
 export const HiddenPhone: Story = { args: { phoneHidden: true } }
 

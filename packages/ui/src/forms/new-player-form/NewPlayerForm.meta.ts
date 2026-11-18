@@ -3,11 +3,12 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const newPlayerFormMeta = {
   name: 'NewPlayerForm',
   description:
-    'Q-ADD-PLAYER › New player: full or display name (required), nickname and phone (optional), and the level for this club. Submits "Confirm player slot", or "Add to waitlist" when every slot is taken.',
+    'Q-ADD-PLAYER › New player: full or display name (required), nickname and email (optional), and the level for this club. Submits "Confirm player slot", or "Add to waitlist" when every slot is taken.',
   usage: [
     'Use inside AddPlayerSheet on the New player tab; it works offline because nothing is looked up.',
     'context="club" (Saved players › Add player) uses newSavedPlayerSchema: the level is optional (null when empty), the label reads "Level for this club (optional)" and the submit Save player.',
-    'onSubmit receives nickname and phone as null when empty, the phone in E.164, and a required level. No phone means a guest; a phone makes profile lookup possible when the session syncs.',
+    'onSubmit receives nickname and email as null when empty and a required level. No email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player when the email is already on ROTRA (D-2026-11-16-04). The email is checked with the shared emailField from @rotra/schema.',
+    'emailSavedAs (the container found the email on a saved player) shows "That email is already NAME in your saved players." under the field; nothing is saved.',
     'Pass id and hideSubmit to submit it from a sheet footer button (type="submit" form={id}). Remount it (new key) to clear it after an add; autoFocus puts the cursor back in the name field.',
     'The form never adds: the container owns the mutation, the success toast and serverError. A failed add keeps what was typed.',
   ],

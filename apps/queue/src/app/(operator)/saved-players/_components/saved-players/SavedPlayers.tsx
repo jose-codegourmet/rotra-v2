@@ -350,14 +350,6 @@ export function SavedPlayers() {
           statsLoading={profileStats.isPending}
           addedLabel={longDateLabel(profile.addedAt)}
           joinedVia={joinedViaProp(profile.joinedVia)}
-          onLinkToSavedPlayer={
-            profile.identity === 'guest'
-              ? () => {
-                  setProfileId(null)
-                  setLinkId(profile.id)
-                }
-              : undefined
-          }
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
           onInvite={

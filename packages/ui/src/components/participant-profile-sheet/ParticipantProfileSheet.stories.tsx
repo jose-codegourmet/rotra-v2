@@ -54,5 +54,27 @@ export const NotOnRoster: Story = { args: { tonight: null } }
 export const NoLevelYet: Story = { args: { levelLabel: null } }
 /** The viewer's own tile opens their full card, always-private or not. */
 export const OwnProfile: Story = { args: { tonight: { kind: 'free', restMinutes: 11 } } }
+/** A registered player: Registered chip, Share profile and Open ROTRA profile. */
+export const RegisteredPlayer: Story = {}
+/** An unclaimed player (the club's own record): full name, Unclaimed chip, no Share, no Open ROTRA profile. */
+export const UnclaimedPlayer: Story = {
+  args: {
+    name: 'Jomar Dela Cruz',
+    nickname: null,
+    photoUrl: undefined,
+    unclaimed: true,
+    rtrId: null,
+    profileHref: null,
+    onShare: undefined,
+    registeredCity: null,
+    stats: null,
+    tonight: null,
+  },
+}
+export const UnclaimedPlayerLight: Story = { ...UnclaimedPlayer, globals: { theme: 'light' } }
+export const UnclaimedPlayerPhone: Story = {
+  ...UnclaimedPlayer,
+  globals: { viewport: { value: 'phone' } },
+}
 export const Light: Story = { globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

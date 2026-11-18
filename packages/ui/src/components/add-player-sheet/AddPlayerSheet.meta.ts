@@ -7,10 +7,12 @@ export const addPlayerSheetMeta = {
   usage: [
     'Open it from Add player (preparation) or Add late player (live console, live=true). The container owns the add mutations: pass isPending, serverError, and after each success a new lastAdded and addedCount so the tab clears and focus returns to its first field.',
     'savedPlayers is the whole club list; inSessionIds (roster + waitlist) are left out of it and counted in "N saved players are already in this session and not listed."',
-    'Player Information: report the query with onDirectorySearch, pass directoryResults and directoryLoading (Skeleton rows; end it yourself, it never spins forever). offline swaps the tab for the reconnect notice.',
+    'Player Information is an exact lookup (D-2026-11-16-04): the placeholder reads "Full RTR ID or email" and the list is empty until one matches. Report the query with onDirectorySearch, pass directoryResults and directoryLoading (Skeleton rows; end it yourself, it never spins forever). directorySavedName says "NAME is already in your saved players." when the exact RTR ID or email is a saved player; otherwise a query with no result reads "No ROTRA player has that RTR ID or email." offline swaps the tab for the reconnect notice (add them as a new player with their email).',
+    'Another club\'s unclaimed player comes back with ownNameRequired: the row reads "Not registered yet" with the RTR ID and no name, picture or level. Picking it always opens the card with a required "Full or display name" (this club\'s own name); onConfirm then carries it as input.name. A candidate with detailsRequired (an older unclaimed record with no email) shows the warn "Details required" chip and line.',
+    'New player has Email (optional) in place of Phone. newPlayerEmailSavedAs shows "That email is already NAME in your saved players." under the field.',
     'onConfirm receives the picked candidate, its source and the level. Any pick with a level (its suggestion) is added in one tap at that level; a pick without one opens PlayerConfirmCard for the level. There is no identity check (withdrawn November 11, 2026, D-2026-11-11-03); onSubmitNewPlayer receives the New player form values.',
-    'Saved players rows show the RTR ID, "Not registered yet" for an unclaimed player without one, or "Guest".',
-    'Candidates never carry a phone number; phoneHidden only shows the hidden-phone line.',
+    'Saved players rows show the RTR ID, "Details required" for an unclaimed record without one, or "Guest".',
+    'Candidates never carry a phone number or an email; phoneHidden only shows the hidden-phone line.',
     'context="club" is Saved players › Add player with no session: no session props, Player Information (default) and New player tabs only, "Adding to your saved players. They won\'t be added to a session.", an optional level (onConfirm and onSubmitNewPlayer may get level null) and the primary Save player.',
     'serverError keeps the card or form with what was typed (a failed save); with serverErrorReturnsToList (a duplicate, refused as a conflict) the sheet drops the card and shows the error above the list, so nobody is ever replaced.',
   ],
@@ -22,6 +24,7 @@ export const addPlayerSheetMeta = {
   docs: [
     'docs/screens/product/modules/queue/players-roster.md#q-add-player--searchadd-to-roster',
     'docs/mockup-changes/2026-11-11-queue-club-only-unclaimed.md',
+    'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
     'docs/business_logic/product/queue/modules/players/README.md#entry-and-identity',
     'docs/business_logic/product/queue/modules/players/README.md#slots-and-waitlist',
   ],

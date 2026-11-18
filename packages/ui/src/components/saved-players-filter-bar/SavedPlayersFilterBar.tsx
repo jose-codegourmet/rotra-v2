@@ -12,7 +12,7 @@ export type SavedPlayersFilters = {
   /** 'all', a city name, or 'none' (not registered yet) */
   city: string
   added: 'any' | '7' | '30' | '90' | 'older'
-  status: 'all' | 'registered' | 'unclaimed' | 'guest'
+  status: 'all' | 'registered' | 'unclaimed' | 'details' | 'guest'
   live: 'all' | 'playing' | 'waiting' | 'session'
 }
 
@@ -63,7 +63,8 @@ const SELECTS = {
     [
       ['all', 'Everyone'],
       ['registered', 'Registered'],
-      ['unclaimed', 'Unclaimed profile'],
+      ['unclaimed', 'Unclaimed'],
+      ['details', 'Details required'],
       ['guest', 'Guest'],
     ],
   ],

@@ -54,13 +54,21 @@ export type ParticipantProfileSheetProps = {
   profileHref?: string | null
   /** Share profile in the footer (the share dialog); hidden when missing */
   onShare?: () => void
+  /**
+   * An unclaimed player (D-2026-11-16-04): the club's own saved record, public to a signed-in
+   * viewer. The chip reads Unclaimed, the line "Saved by the club. Not registered with ROTRA yet.",
+   * and the footer has no Share profile and no Open ROTRA profile.
+   */
+  unclaimed?: boolean
 }
 
 /**
  * D-PARTICIPANT-PROFILE, full card: the session page's participant profile for a signed-in ROTRA
  * Player. Header-less banner card with the name block (display name, new-tab icon, full name, Copy
  * RTR ID), the Registered chip and level badge, the status pill while live, boxed About (Registered
- * in) and Latest stats; footer Close, Share profile and Open ROTRA profile (new tab).
+ * in) and Latest stats; footer Close, Share profile and Open ROTRA profile (new tab). An unclaimed
+ * player's card has the Unclaimed chip and "Saved by the club. Not registered with ROTRA yet.", and no
+ * Share profile or Open ROTRA profile.
  */
 export function ParticipantProfileSheet({
   open,
@@ -82,6 +90,7 @@ export function ParticipantProfileSheet({
   showStats = true,
   profileHref,
   onShare,
+  unclaimed = false,
 }: ParticipantProfileSheetProps) {
   return (
     <Sheet
@@ -92,13 +101,13 @@ export function ParticipantProfileSheet({
       footer={
         <>
           <Button onClick={() => onOpenChange(false)}>Close</Button>
-          {rtrId && onShare ? (
+          {!unclaimed && rtrId && onShare ? (
             <Button onClick={onShare}>
               <Icon name="share" size={16} />
               Share profile
             </Button>
           ) : null}
-          {profileHref ? (
+          {!unclaimed && profileHref ? (
             <Button asChild variant="primary">
               <a
                 href={profileHref}
@@ -118,17 +127,18 @@ export function ParticipantProfileSheet({
         name={name}
         nickname={nickname}
         rtrId={rtrId}
-        profileLink={profileHref ? { href: profileHref, newTab: true } : null}
+        profileLink={!unclaimed && profileHref ? { href: profileHref, newTab: true } : null}
         photoUrl={photoUrl}
         onPhotoClick={onPhotoClick}
         bannerKey={bannerKey}
         bannerImageUrl={bannerImageUrl}
         chips={
           <>
-            <IdentityChip identity="registered" />
+            <IdentityChip identity={unclaimed ? 'unclaimed' : 'registered'} />
             <ProfileLevelBadge>{levelLabel ?? 'No level yet'}</ProfileLevelBadge>
           </>
         }
+        identityLine={unclaimed ? 'Saved by the club. Not registered with ROTRA yet.' : undefined}
         tonight={tonight}
       >
         <ProfileCardSection label="About">

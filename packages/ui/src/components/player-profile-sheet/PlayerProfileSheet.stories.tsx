@@ -85,20 +85,38 @@ export const Light: Story = {
 }
 export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
 /**
- * Unclaimed (club-only, D-2026-11-11-03): "Saved by your club with a phone. Not registered with
- * ROTRA yet", Registered in "Not registered yet", RTR ID "Given when they register".
+ * Unclaimed with an email (D-2026-11-16-04): "Saved by your club with their email. Not registered
+ * with ROTRA yet", Email "On file and kept private", no Details required notice.
  */
 export const Unclaimed: Story = {
   args: propsFor(storyIdentityPlayers.unclaimed, {
     sessionsHere: 5,
     rtrId: null,
     registeredCity: null,
+    emailOnFile: true,
   }),
 }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const UnclaimedPhone: Story = { ...Unclaimed, globals: { viewport: { value: 'phone' } } }
+/** An older record with a phone and no email: warn chip, the Details required notice, Email "None on file". */
+export const DetailsRequired: Story = {
+  args: propsFor(storyIdentityPlayers.unclaimed, {
+    sessionsHere: 5,
+    rtrId: null,
+    registeredCity: null,
+    detailsRequired: true,
+    emailOnFile: false,
+    onEdit: fn(),
+    onDelete: fn(),
+  }),
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
+export const DetailsRequiredPhone: Story = {
+  ...DetailsRequired,
+  globals: { viewport: { value: 'phone' } },
+}
 export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
-/** Saved players footer: Delete player, Edit details and Invite. */
+/** Saved players footer: Delete player, Edit details and Invite. A guest's Email row reads "None on file". */
 export const SavedPlayerActions: Story = {
   args: {
     ...propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }),
@@ -107,29 +125,17 @@ export const SavedPlayerActions: Story = {
     onInvite: () => {},
   },
 }
-/** Guest record: footer gains Link to saved player…. */
-export const GuestWithLink: Story = {
-  args: propsFor(storyIdentityPlayers.guest, {
-    sessionsHere: 1,
-    onLinkToSavedPlayer: fn(),
-    onDelete: fn(),
-  }),
-}
-/** Unclaimed profile: no Link to saved player… even if the handler were passed. */
-export const UnclaimedNoLink: Story = {
-  args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5, onDelete: fn() }),
-}
-/** Guest opened from inside another dialog: Back to match, no Link to saved player…. */
+/** Guest opened from inside another dialog: Back to match, no Edit or Delete. */
 export const GuestOpenedFromMatch: Story = {
   args: propsFor(storyIdentityPlayers.guest, {
     sessionsHere: 1,
     backLabel: 'match',
     onBack: fn(),
-    onLinkToSavedPlayer: fn(),
   }),
 }
 export const JoinedViaClubLink: Story = { args: { joinedVia: 'club' } }
 export const JoinedViaSessionLink: Story = { args: { joinedVia: 'session' } }
+/** A guest with an invite link: the text says their games here don't follow them without an email. */
 export const GuestWithInvite: Story = {
   decorators: [
     (Story) => (

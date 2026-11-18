@@ -14,3 +14,5 @@ export const Registered: Story = {}
 export const Unclaimed: Story = { args: { identity: 'unclaimed' } }
 export const Guest: Story = { args: { identity: 'guest' } }
 export const LookupPending: Story = { args: { identity: 'pending' } }
+/** An older unclaimed record with no email: the warn chip replaces Unclaimed. */
+export const DetailsRequired: Story = { args: { identity: 'unclaimed', detailsRequired: true } }

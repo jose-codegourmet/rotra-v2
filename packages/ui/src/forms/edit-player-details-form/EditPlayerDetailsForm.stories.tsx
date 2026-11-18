@@ -46,6 +46,17 @@ const meta = {
 } satisfies Meta<typeof EditPlayerDetailsForm>
 export default meta
 type Story = StoryObj<typeof meta>
+/** An unclaimed player with an email and no phone yet: the email is read-only, Phone (optional) shows. */
+export const UnclaimedWithEmail: Story = {
+  args: { details: { ...unclaimed, profile: { ...unclaimed.profile!, email: 'faye@example.com' } } },
+}
+export const UnclaimedWithEmailLight: Story = {
+  ...UnclaimedWithEmail,
+  globals: { theme: 'light' },
+}
+/** An older record with a phone and no email: the Details required notice and a required-looking Email. */
+export const OlderRecordNoEmail: Story = { args: { details: { ...unclaimed, phoneOnFile: true } } }
+export const OlderRecordNoEmailLight: Story = { ...OlderRecordNoEmail, globals: { theme: 'light' } }
 export const UnclaimedNoPhone: Story = {}
 export const UnclaimedPhoneOnFile: Story = {
   args: {
@@ -56,6 +67,7 @@ export const UnclaimedPhoneOnFile: Story = {
     },
   },
 }
+/** A guest gets Email (optional); no phone field. */
 export const Guest: Story = {
   args: {
     details: {
@@ -68,6 +80,7 @@ export const Guest: Story = {
     },
   },
 }
+export const GuestLight: Story = { ...Guest, globals: { theme: 'light' } }
 export const GuestInitials: Story = {
   args: { details: guestDetails, picture: initialsPicture },
 }

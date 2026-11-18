@@ -52,8 +52,12 @@ const matchRequests = [
     onAddToQueue: fn(),
   },
 ]
-/** The prototype's four sample guests: Tracy, Gretchen, PJ Perez, Jess. */
+/**
+ * The prototype's four sample guests: Tracy, Gretchen, PJ Perez, Jess. A guest row reads "Says LEVEL ·
+ * requested TIME" (no phone, no "pending" status, no Link / Not them) and the intro says to match their name.
+ */
 export const FourGuests: Story = {}
+export const FourGuestsLight: Story = { globals: { theme: 'light' } }
 export const SlotsFull: Story = { args: { slotsFull: true } }
 /** Jess said "Not sure", so the level is empty; Confirm guest shows the error. */
 export const LevelError: Story = {
@@ -169,22 +173,6 @@ export const Placements: Story = {
   },
 }
 export const PlacementsLight: Story = { ...Placements, globals: { theme: 'light' } }
-export const PhoneMatch: Story = {
-  args: {
-    requestDetails: {
-      [firstId]: { phoneMatch: { name: 'Kiko Salazar', onLink: fn(), onNotThem: fn() } },
-    },
-  },
-}
-export const PhoneLinked: Story = {
-  args: {
-    requestDetails: {
-      [firstId]: {
-        phoneMatch: { name: 'Kiko Salazar', linked: true, onLink: fn(), onNotThem: fn() },
-      },
-    },
-  },
-}
 /** Live: no tabs, match requests only, with the match-request intro. */
 export const LiveMatchRequests: Story = { args: { live: true, matchRequests, dropOuts } }
 export const LiveNoMatchRequests: Story = { args: { live: true, requests: [] } }
@@ -193,8 +181,6 @@ export const LiveServerError: Story = {
 }
 export const WithDropOutsLight: Story = { ...WithDropOuts, globals: { theme: 'light' } }
 export const PlayerRequestsLight: Story = { ...PlayerRequests, globals: { theme: 'light' } }
-export const PhoneMatchLight: Story = { ...PhoneMatch, globals: { theme: 'light' } }
-export const PhoneLinkedLight: Story = { ...PhoneLinked, globals: { theme: 'light' } }
 export const LiveMatchRequestsLight: Story = { ...LiveMatchRequests, globals: { theme: 'light' } }
 export const LiveNoMatchRequestsLight: Story = {
   ...LiveNoMatchRequests,

@@ -19,7 +19,6 @@ if (!guest) throw new Error('Join request fixture missing')
 const filled = {
   name: guest.name,
   nickname: guest.nickname ?? '',
-  phone: '0917 555 0142',
   statedBand: guest.statedBand,
   placement: guest.placement,
 }
@@ -42,9 +41,12 @@ type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {}
 
-/** Sending with nothing filled in and a short phone shows every field error next to its field. */
+/** The guest join form has no phone field (D-2026-11-16-04): name, nickname, level and how to join. */
+export const GuestJoinForm: Story = {}
+export const GuestJoinFormLight: Story = { globals: { theme: 'light' } }
+
+/** Sending with nothing filled in shows every field error next to its field. */
 export const ValidationErrors: Story = {
-  args: { defaultValues: { phone: '0917 55' } },
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('button', { name: 'Send request' }))

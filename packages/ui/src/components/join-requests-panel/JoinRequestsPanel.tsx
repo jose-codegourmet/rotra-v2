@@ -2,7 +2,6 @@
 
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { SessionJoinRequest } from '@rotra/data/session-roster/types'
-import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -20,7 +19,6 @@ export type JoinRequestDetails = {
   account?: 'in-club' | 'new-to-club'
   sharedRank?: string | null
   invitedBy?: string
-  phoneMatch?: { name: string; linked?: boolean; onLink: () => void; onNotThem: () => void }
   /** A Join from waitlist request: the player's current 1-based place ("Waitlist #N · asks for a slot") */
   waitlistPosition?: number | null
 }
@@ -88,11 +86,6 @@ function bandMid(band: SessionJoinRequest['statedBand']): PlayingLevel | null {
   return band === 'unsure' ? null : (`${band}_mid` as PlayingLevel)
 }
 
-/** "+639175550142" → "0917 555 0142", the way the prototype shows a guest's number. */
-function localPhone(phoneE164: string) {
-  return formatPhoneForDisplay(phoneE164.replace(/^\+63/, '0'))
-}
-
 const formatTime = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
@@ -101,11 +94,10 @@ const LEVEL_ERROR = 'Choose a level for this club before confirming.'
 /**
  * The Requests panel, no tabs (owner, November 11, 2026). Live: match requests only. Before Start:
  * drop-out notices, then join requests: each waiting guest with
- * initials, name, phone, stated band and time, the choice they made (Asks for a slot / Asks to be
+ * initials, name, stated band and time ("Says LEVEL · requested TIME"; a guest gives no phone), the choice they made (Asks for a slot / Asks to be
  * waitlisted / Waitlist #N · asks for a slot; D-2026-11-11-02), a level select preset to the middle
  * of that band, and Decline / Confirm guest (Confirm to waitlist for a waitlist request or when slots
- * are full before start; Give slot / Admit player for a request from the waitlist). Phones show here
- * only, never on public components. While loading it shows Skeleton rows.
+ * are full before start; Give slot / Admit player for a request from the waitlist). While loading it shows Skeleton rows.
  */
 export function JoinRequestsPanel({
   requests,
@@ -235,8 +227,8 @@ export function JoinRequestsPanel({
           <p className="m-0 text-[13px] text-fg2">
             {pending.length ? (
               <>
-                Check each one is a real person you expect (ask at the door, or match their name and
-                phone) before confirming. Oldest first.
+                Check each one is a real person you expect (ask at the door, or match their name)
+                before confirming. Oldest first.
                 {slotsFull && !live
                   ? ' Slots are full, so confirmed players go on the waitlist.'
                   : ''}
@@ -277,10 +269,7 @@ export function JoinRequestsPanel({
                           {details?.account ? (
                             `Requested ${formatTime(r.requestedAt)}`
                           ) : (
-                            <>
-                              {r.phoneE164 ? localPhone(r.phoneE164) : 'No phone given'} · says{' '}
-                              {BAND_LABEL[r.statedBand]} · requested {formatTime(r.requestedAt)}
-                            </>
+                            `Says ${BAND_LABEL[r.statedBand]} · requested ${formatTime(r.requestedAt)}`
                           )}
                         </span>
                         <span className="text-[13px] font-semibold">
@@ -308,37 +297,6 @@ export function JoinRequestsPanel({
                         <Chip tone="warn">Guest request</Chip>
                       )}
                     </div>
-                    {details?.phoneMatch ? (
-                      details.phoneMatch.linked ? (
-                        <Notice tone="success">
-                          Linked to {details.phoneMatch.name} from your saved players.
-                        </Notice>
-                      ) : (
-                        <Notice
-                          action={
-                            <div className="flex gap-2">
-                              <Button
-                                size="xs"
-                                variant="primary"
-                                disabled={isPending}
-                                onClick={details.phoneMatch.onLink}
-                              >
-                                Link
-                              </Button>
-                              <Button
-                                size="xs"
-                                disabled={isPending}
-                                onClick={details.phoneMatch.onNotThem}
-                              >
-                                Not them
-                              </Button>
-                            </div>
-                          }
-                        >
-                          Is this {details.phoneMatch.name} from your saved players?
-                        </Notice>
-                      )
-                    ) : null}
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
                       <LevelSelect
                         disabled={isPending}

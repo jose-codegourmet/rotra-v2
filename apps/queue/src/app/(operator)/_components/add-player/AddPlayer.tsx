@@ -223,7 +223,6 @@ function SessionAddPlayer({
           sessionId,
           name: values.name,
           nickname: values.nickname ?? undefined,
-          phone: values.phone ?? undefined,
           level: values.level,
           ...placement,
         },
@@ -290,7 +289,7 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
   const submitNewPlayer = (values: NewSavedPlayerFormValues) => {
     if (!add.begin()) return
     addNew.mutate(
-      { name: values.name, nickname: values.nickname, phone: values.phone, level: values.level },
+      { name: values.name, nickname: values.nickname, level: values.level },
       add.options,
     )
   }

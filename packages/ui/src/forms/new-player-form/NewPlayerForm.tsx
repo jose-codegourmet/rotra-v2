@@ -35,6 +35,11 @@ type NewPlayerFormBaseProps = {
   /** Leave the submit button out; the container renders its own with type="submit" form={id} */
   hideSubmit?: boolean
   defaultValues?: Partial<NewPlayerFormInput>
+  /**
+   * The email typed already belongs to a saved player of this club (the container found it): the
+   * email field says "That email is already NAME in your saved players." and nothing is saved.
+   */
+  emailSavedAs?: string
 }
 
 /**
@@ -47,8 +52,11 @@ export type NewPlayerFormProps = NewPlayerFormBaseProps &
     | { context: 'club'; onSubmit: (values: NewSavedPlayerFormValues) => void }
   )
 
-export const PHONE_HINT =
-  "Without a phone they're saved as a guest. With one, ROTRA can link them to their account if they're registered, when the session syncs. Only your club sees them otherwise."
+export const EMAIL_HINT =
+  "Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly."
+
+export const emailSavedMessage = (name: string) =>
+  `That email is already ${name} in your saved players.`
 
 /** The submit label the prototype uses: a slot when one is open, otherwise the waitlist; Save player with no session. */
 export function addPlayerSubmitLabel(
@@ -61,7 +69,7 @@ export function addPlayerSubmitLabel(
 }
 
 /**
- * Q-ADD-PLAYER › New player tab: name, optional nickname and phone, and the level for this club.
+ * Q-ADD-PLAYER › New player tab: name, optional nickname and email, and the level for this club.
  * Works offline; the container owns the add mutation and its toasts.
  */
 export function NewPlayerForm(props: NewPlayerFormProps) {
@@ -74,6 +82,7 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
     id,
     hideSubmit = false,
     defaultValues,
+    emailSavedAs,
   } = props
   const club = props.context === 'club'
   // Both schemas share the fields; the club one only lets the level stay empty (null).
@@ -116,16 +125,22 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
           />
         </Field>
         <Field
-          label="Phone"
+          label="Email"
           optional
-          hint={errors.phone ? undefined : PHONE_HINT}
-          error={errors.phone?.message}
+          hint={errors.email || emailSavedAs ? undefined : EMAIL_HINT}
+          error={errors.email?.message ?? (emailSavedAs ? emailSavedMessage(emailSavedAs) : undefined)}
         >
           <Controller
             control={form.control}
-            name="phone"
+            name="email"
             render={({ field }) => (
-              <TextInput {...field} type="tel" inputMode="tel" autoComplete="off" />
+              <TextInput
+                {...field}
+                type="email"
+                inputMode="email"
+                autoComplete="off"
+                placeholder="name@example.com"
+              />
             )}
           />
         </Field>

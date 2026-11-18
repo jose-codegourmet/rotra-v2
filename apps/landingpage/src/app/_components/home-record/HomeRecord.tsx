@@ -154,22 +154,10 @@ export function HomeRecord() {
             {'Find '}
             <em>your profile.</em>
           </h2>
-          {/* biome-ignore lint/a11y/useSemanticElements: markup kept as in the original page */}
-          <form className="find card" role="search" id="findForm">
-            <label htmlFor="findq" className="qsmall qmuted">
-              Find your player profile
-            </label>
-            <div className="find-row">
-              <input id="findq" placeholder="Name or RTR ID" autoComplete="off" />
-              <button className="btn pri" type="submit">
-                Search
-              </button>
-            </div>
-            <p className="qsmall qmuted" id="findMsg">
-              Wireframe: search opens the Player Information app.
-            </p>
-          </form>
           <div className="acts" style={{ justifyContent: 'center' }}>
+            <a className="btn pri" href="#find">
+              Find your profile →
+            </a>
             <a className="btn" href="#ranking">
               How ranking works
             </a>

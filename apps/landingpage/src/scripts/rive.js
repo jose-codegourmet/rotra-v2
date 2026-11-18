@@ -79,9 +79,12 @@ export function initRive() {
     }
     function onScreen(el){
       if (!el._in) return false;
+      // data-warm (the hero's cut-to poses): keeps playing while only hidden by visibility, so the cut shows a
+      // drawn frame at once instead of waiting for the next check
+      var warm = el.hasAttribute('data-warm');
       for (var n = el; n && n !== document.body; n = n.parentElement) {
         var cs = getComputedStyle(n);
-        if (+cs.opacity < 0.02 || cs.visibility === 'hidden' || cs.display === 'none') return false;
+        if (+cs.opacity < 0.02 || cs.display === 'none' || (cs.visibility === 'hidden' && !warm)) return false;
       }
       return true;
     }

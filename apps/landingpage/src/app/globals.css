@@ -180,8 +180,7 @@ a{color:inherit}
 .odd-tall .fig2{transform:scaleY(1.14) scaleX(.86);transform-origin:bottom}
 .odd-small .fig2{transform:scale(.78);transform-origin:bottom;filter:hue-rotate(180deg) saturate(1.6)}
 .odd-ghost .fig2{opacity:.4;filter:blur(1.5px)}
-.odd-glitch .fig2{filter:contrast(1.4);box-shadow:-4px 0 0 rgba(255,90,95,.55),4px 0 0 rgba(61,155,255,.55);animation:glitch 2.4s steps(1) infinite}
-@keyframes glitch{0%,100%{clip-path:inset(0)}92%{clip-path:inset(20% 0 55% 0);transform:translateX(4px)}95%{clip-path:inset(60% 0 10% 0);transform:translateX(-4px)}}
+/* .odd-glitch (line-up figure 5): the periodic clip-and-shift glitch read as a rendering bug and is gone */
 /* the reveal */
 .clone:not(.real){transition:opacity .5s,transform .5s,filter .5s}
 .lineup-wrap .clone.on:not(.real){opacity:calc(1 - var(--m,0)*.85);filter:grayscale(var(--m,0));transform:translateY(calc(var(--m,0)*16px)) scale(calc(1 - var(--m,0)*.08))}
@@ -202,7 +201,6 @@ a{color:inherit}
   .lineup-wrap .rcard{left:50%;top:auto;bottom:2%;width:min(300px,86vw);transform:translate(-50%,0) translateY(calc((1 - var(--m,0))*30px))}
   .lineup-wrap .clone.on:not(.real){opacity:calc(1 - var(--m,0)*.95)}
 }
-@media (prefers-reduced-motion:reduce){.odd-glitch .fig2{animation:none}}
 
 /* Half-body busts: from the bottom edge of the screen up to its middle (artifact comment, Nov 17) */
 .ch1 .stage{padding-top:84px}
@@ -534,23 +532,15 @@ ul.ticks.g2{display:grid}
 /* Footer slides over the story at the end */
 .hunt{z-index:60}
 
-/* ===== Hero v12: the court with a hole (Disco Dungeon-style drop) ===== */
+/* ===== Hero v12: the court (the hole and the drop are gone: see the hero smash block) ===== */
 .hero.hx{height:280vh}
 .hx .stage{display:block;perspective:900px}
 .hx-scene{position:absolute;inset:0;transform-origin:50% 70%;transform:translate3d(0,calc(var(--o1,0)*-18vh),0) scale(calc(1 + var(--o1,0)*.14))}
 .hx-back{position:absolute;inset:-4% -3% -8% -3%;border:0;border-radius:0;justify-content:flex-start;padding-top:30vh;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);background:radial-gradient(60% 50% at 50% 34%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%),repeating-linear-gradient(-45deg,var(--slot-line) 0 12px,transparent 12px 24px),var(--slot)}
 .hx-back span{max-width:46ch}
 .hx-lines{position:absolute;left:0;right:0;bottom:0;height:62%;width:100%;color:color-mix(in srgb,var(--court-line) 30%,transparent);opacity:.7}
-/* the spot: hole + Tara, centred low in the scene */
 .hx-spot{position:absolute;left:50%;top:72%;width:0;height:0}
-.hx-hole{position:absolute;left:0;top:0;width:clamp(200px,24vw,320px);aspect-ratio:1.5;transform:translate(-50%,-50%) rotateX(58deg);transform-style:preserve-3d}
-.hx-pit,.hx-plate,.hx-rim{position:absolute;inset:0;border-radius:14px}
-.hx-pit{background:radial-gradient(60% 60% at 50% 40%,color-mix(in srgb,var(--accent) 35%,#04140c),#020604 75%);box-shadow:inset 0 0 40px #000}
-.hx-rim{border:3px solid var(--accent);box-shadow:0 0 24px var(--accent),inset 0 0 18px color-mix(in srgb,var(--accent) 60%,transparent);opacity:calc(.35 + var(--o1,0)*.65)}
-.hx-plate{background:linear-gradient(160deg,#eafff4,#9df5c8 60%,#4fe0a0);display:grid;place-items:center;transform:translateZ(calc(var(--o1,0)*-140px)) scale(calc(1 - var(--o1,0)*.25));opacity:calc(1 - var(--o1,0)*1.1);box-shadow:0 0 50px color-mix(in srgb,var(--accent) 70%,transparent)}
-.hx-plate svg{width:56%;height:56%;fill:none;stroke:#0b3b24;stroke-width:5;opacity:.55}
-.hx-plate svg .dot{fill:#0b3b24;stroke:none}
-/* Tara: a clip box whose bottom edge is the hole's front lip, so she disappears into it */
+/* Tara's box */
 .hx-tara-clip{position:absolute;left:0;bottom:calc(clamp(200px,24vw,320px)/1.5*-.26);width:clamp(150px,17vw,240px);height:80vh;transform:translateX(-50%);overflow:hidden;pointer-events:none}
 .hx-tara{position:absolute;left:0;right:0;bottom:calc(clamp(200px,24vw,320px)/1.5*.26 + 6px);height:clamp(230px,40vh,400px);border-radius:var(--r-lg) var(--r-lg) 0 0;border-bottom:0;border-color:var(--accent);background:repeating-linear-gradient(-45deg,var(--slot-line) 0 12px,transparent 12px 24px),color-mix(in srgb,var(--slot) 92%,transparent);transform:translate3d(0,calc(var(--d,0)*120% + var(--o1,0)*-14px),0)}
 .hx-tag{position:absolute;left:0;top:calc(clamp(200px,24vw,320px)/1.5*.36);transform:translateX(-50%);white-space:nowrap;opacity:calc(1 - var(--o1,0)*3)}
@@ -564,13 +554,9 @@ ul.ticks.g2{display:grid}
 .hx-sign b{font-size:16px}
 /* Title */
 .hx-title{position:absolute;left:0;right:0;top:clamp(76px,10vh,110px);display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;z-index:3;transform:translateY(calc(var(--o1,0)*-14vh));opacity:calc(1 - var(--o1,0)*1.4)}
-.hx-logo{height:clamp(56px,11vh,120px);filter:drop-shadow(0 0 22px color-mix(in srgb,var(--accent) 55%,transparent))}
-.hx-title h1{font-size:clamp(30px,min(5vw,7vh),68px);letter-spacing:-.03em}
-.hx-title h1 em{font-style:normal;color:var(--accent)}
-.hx-sub{max-width:52ch;color:var(--fg2);font-size:17px}
-/* Dive: the hole grows to fill the screen, then the veil hands over to chapter 01 */
-.hx-spot{transform:scale(calc(1 + var(--z,0)*var(--z,0)*16));transform-origin:0 0}
-.hx-veil{position:absolute;inset:0;background:var(--base,var(--bg));opacity:clamp(0,(var(--z,0) - .55)/.4,1);pointer-events:none;z-index:4}
+/* the headline: big, always two lines (the em is its own line), sized to stay above Tara's head */
+.hx-title h1{font-size:clamp(38px,min(11.2vw,13vh),150px);font-weight:800;letter-spacing:-.045em;line-height:.92;white-space:nowrap}
+.hx-title h1 em{display:block;font-style:normal;color:var(--accent)}
 @media (max-width:700px){
   .hx-side{left:84%;top:58%}
   .hx-sign{left:-30px}
@@ -581,7 +567,6 @@ ul.ticks.g2{display:grid}
 
 /* ===== Chapter 01 v13: out of the hole. Tara drops in, clones slide in from the sides, then the heading ===== */
 .hero.hx{height:240vh}
-.hx-veil{background:#050807}
 .ch1-head{opacity:var(--h,0);transform:translateY(calc((1 - var(--h,0))*-28px))}
 .ruler{opacity:calc(.7*var(--a,0))}
 .lineup-wrap .clone{opacity:1;transition:none}
@@ -720,7 +705,8 @@ ul.ticks.g2{display:grid}
 .fnote a{color:var(--warn)}
 .sdots{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);display:flex;gap:6px;z-index:3}
 .sdots i{width:16px;height:4px;border-radius:2px;background:var(--border-strong);transition:background .3s,width .3s}
-.sdots i.done{background:color-mix(in srgb,var(--accent) 45%,transparent)}
+/* .sd-done, not .done: .done is the request form's full-size success panel and turned a passed dot into a green block */
+.sdots i.sd-done{background:color-mix(in srgb,var(--accent) 45%,transparent)}
 .sdots i.on{background:var(--accent);width:34px}
 /* 02: the match-up and the four outcomes */
 .vs{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,64px);flex-wrap:wrap}
@@ -791,14 +777,10 @@ ul.ticks.g2{display:grid}
 .hx-fig img{display:block;width:100%;height:100%;object-fit:contain;object-position:bottom}
 /* the spot sits on the centre of the painted ring (87.3% down the frame); --hx-nx/--hx-ny are the
    court's parallax offset (depth .85), set by the hero Rive script so the feet stay on the plate */
-.hx-spot{position:absolute;left:50%;top:87.3%;width:0;height:0;transform:translate3d(var(--hx-nx,0px),var(--hx-ny,0px),0) scale(calc(1 + var(--z,0)*var(--z,0)*16));transform-origin:0 0}
-.hx-hole{position:absolute;left:0;top:0;width:calc(var(--aw)*.317);aspect-ratio:1.5;transform:translate(-50%,-50%) rotateX(70deg);border-radius:50%}
-.hx-pit,.hx-rim{border-radius:50%}
-.hx-pit{opacity:var(--o1,0);transform:scale(calc(.3 + var(--o1,0)*.7))}
-.hx-rim{opacity:calc(var(--o1,0)*1)}
-/* Tara: clipped at the ring's front edge so she drops into it */
+.hx-spot{position:absolute;left:50%;top:87.3%;width:0;height:0;transform:translate3d(var(--hx-nx,0px),var(--hx-ny,0px),0)}
+/* Tara: three poses in one box (idle, wind-up, follow-through); the hero smash block shows one at a time */
 .hx-tara-clip{position:absolute;left:0;bottom:calc(var(--ah)*-.068);width:calc(var(--aw)*.2);height:calc(var(--ah)*.8);transform:translateX(-50%);overflow:hidden;pointer-events:none}
-.hx-tara{left:0;right:0;bottom:calc(var(--ah)*.068);height:calc(var(--ah)*.48);transform:translate3d(0,calc(var(--d,0)*130%),0)}
+.hx-tara{left:0;right:0;bottom:calc(var(--ah)*.068);height:calc(var(--ah)*.48);transform:none}
 .hx-tag{top:calc(var(--ah)*.09)}
 /* Rion stands on the floor to the right */
 .hx-side{left:79%;top:82%;transform:translate3d(var(--hx-nx,0px),var(--hx-ny,0px),0)}
@@ -835,7 +817,8 @@ ul.ticks.g2{display:grid}
 .lineup-wrap .clone .fig2.chr{background-color:transparent}
 .odd-small .fig2.chr{filter:hue-rotate(160deg) saturate(1.4)}
 .odd-ghost .fig2.chr{opacity:.35;filter:blur(2px) grayscale(.6)}
-.odd-glitch .fig2.chr{filter:contrast(1.5) saturate(1.6)}
+/* .odd-glitch: the contrast(1.5) saturate(1.6) look is baked into lineup-clone-5's art; as a live CSS filter over
+   the animating canvas it shimmered */
 .clone.real .fig2.chr{filter:drop-shadow(0 0 calc(var(--m,0)*18px) var(--accent))}
 .mfig{width:clamp(90px,10vw,150px);height:clamp(140px,28vh,250px)}
 .mfig.chr{position:relative}
@@ -1191,6 +1174,89 @@ ul.ticks.g2{display:grid}
 .plan.rfq{width:min(640px,100%);margin:8px auto 0;text-align:left;align-items:stretch}
 .plan.rfq .btn{align-self:flex-start}
 .plan.rfq .rfq-note{margin:-8px 0 0;font-size:13px;color:var(--fg2)}
+/* ===== Hero smash (replaces the hole and the drop); the clock is "Hero smash" in the main script =====
+   The hero is 260vh (a 160vh pin). Chapter 01 starts under it (-190vh), so it is pinned from 44% of the hero's
+   progress, just before the smash fires at 46%. The hero stage sits on top (z 2) until .sm-done hides it.
+   Classes on #top: .sm-wind (scroll) wind-up pose and the shuttle coming in (--sd); then, on the clock: .sm-hit the
+   follow-through, smear, burst and a dark impact frame; .sm-smash the shuttle flies at the camera; .sm-flash the
+   cork fills the screen; .sm-thru only the flash is left and it fades over chapter 01 (.arrived); .sm-done;
+   .sm-back on the way up. */
+@property --push{syntax:'<number>';inherits:true;initial-value:0}
+#top.hx{height:260vh}
+#top.hx > .stage{z-index:2;background:#08080b}
+#top.hx.sm-thru > .stage{background:none}
+#top.hx.sm-done > .stage{display:none}
+#s-real{margin-top:-190vh}
+.ch1 .stage::before{opacity:0}
+/* the camera pushes in about the bottom edge, so the court's lower edge never lifts into view */
+.hx-scene{transform-origin:50% 100%;transform:scale(calc(1 + var(--o1,0)*.14 - var(--push,0)*.1))}
+/* poses: standing -> crouch (w1) -> take-off (w2) -> wind-up plays on a clock (.sm-wup, .46s) when the scroll
+   crosses SM_WIND, each drawing easing into the next (sink, push, lift); .sm-unw is the short way back down.
+   The wind-up hangs 3% above the ground; the follow-through lands. */
+.hx-pose-w1,.hx-pose-w2,.hx-pose-wind,.hx-pose-hit{visibility:hidden;transform-origin:50% 100%}
+.hx-pose-idle{transform-origin:50% 100%}
+.hx.sm-wind .hx-pose-idle{visibility:hidden}
+.hx.sm-wind .hx-pose-wind{visibility:visible;translate:0 -3%}
+.hx.sm-wup .hx-pose-idle{animation:hx-w0 .46s linear both}
+.hx.sm-wup .hx-pose-w1{animation:hx-w1 .46s linear both}
+.hx.sm-wup .hx-pose-w2{animation:hx-w2 .46s linear both}
+.hx.sm-wup .hx-pose-wind{animation:hx-w3 .46s linear both}
+@keyframes hx-w0{0%{visibility:visible;scale:1 1;animation-timing-function:cubic-bezier(.4,0,1,1)}20%{visibility:visible;scale:1.035 .93}20.1%,100%{visibility:hidden}}
+@keyframes hx-w1{0%,20%{visibility:hidden}20.1%{visibility:visible;scale:.985 1.03;translate:0 0;animation-timing-function:cubic-bezier(0,0,.3,1)}36%{visibility:visible;scale:1.03 .95;animation-timing-function:cubic-bezier(.5,0,1,1)}48%{visibility:visible;scale:.98 1.05}48.1%,100%{visibility:hidden}}
+@keyframes hx-w2{0%,48%{visibility:hidden}48.1%{visibility:visible;scale:1.02 .96;translate:0 0;animation-timing-function:cubic-bezier(0,0,.4,1)}70%{visibility:visible;scale:.985 1.03;translate:0 -2%}70.1%,100%{visibility:hidden}}
+@keyframes hx-w3{0%,70%{visibility:hidden}70.1%{visibility:visible;scale:.985 1.03;translate:0 -.5%;animation-timing-function:cubic-bezier(.1,.6,.3,1)}100%{visibility:visible;scale:1 1;translate:0 -3%}}
+.hx.sm-unw .hx-pose-idle{animation:hx-u0 .24s linear both}
+.hx.sm-unw .hx-pose-w2{animation:hx-u2 .24s linear both}
+.hx.sm-unw .hx-pose-w1{animation:hx-u1 .24s linear both}
+@keyframes hx-u2{0%,35%{visibility:visible}35.1%,100%{visibility:hidden}}
+@keyframes hx-u1{0%,35%{visibility:hidden}35.1%,70%{visibility:visible}70.1%,100%{visibility:hidden}}
+@keyframes hx-u0{0%,70%{visibility:hidden}70.1%{visibility:visible;scale:1.03 .95;animation-timing-function:cubic-bezier(0,0,.3,1)}100%{visibility:visible;scale:1 1}}
+.hx.sm-hit .hx-pose-idle,.hx.sm-hit .hx-pose-w1,.hx.sm-hit .hx-pose-w2,.hx.sm-hit .hx-pose-wind{visibility:hidden;animation:none}
+.hx.sm-hit .hx-pose-hit{visibility:visible;animation:hx-pop .14s cubic-bezier(.2,1.4,.4,1)}
+@keyframes hx-pop{from{scale:1.07 .93}}
+/* the shuttle comes in from the upper right, cork first, to the racket of the wind-up pose (4.6% of the art's
+   width left of the spot, 43.9% of its height above it); the smash starts from wherever this image is */
+.hx-drop{position:absolute;left:calc(var(--aw)*-.046);top:calc(var(--ah)*-.453);width:0;height:0;pointer-events:none;visibility:hidden}
+.hx.sm-wind .hx-drop{visibility:visible}
+.hx.sm-smash .hx-drop,.hx.sm-thru .hx-drop{visibility:hidden}
+.hx-drop img{position:absolute;left:0;top:0;width:calc(var(--aw)*.03);height:auto;max-width:none;display:block;transform:translate(-50%,-50%) translate(calc((1 - var(--sd,0))*46vw),calc((1 - var(--sd,0))*-16vh)) rotate(calc(32deg - var(--sd,0)*12deg))}
+/* the swing's smear: two frames of an arc from the wind-up racket down to the front */
+.hx-smear{position:absolute;left:calc(var(--aw)*-.085);top:calc(var(--ah)*-.47);width:calc(var(--aw)*.17);height:calc(var(--ah)*.44);border-radius:50%;border:calc(var(--aw)*.012) solid transparent;border-left-color:var(--accent);border-top-color:#eafff4;rotate:-18deg;opacity:0;pointer-events:none}
+.hx.sm-hit .hx-smear{animation:hx-smear .2s steps(2,end) both}
+@keyframes hx-smear{from{opacity:1}to{opacity:0}}
+/* hit-stop: a dark impact frame and a short shake, then the hall pushes back as the shuttle leaves */
+.hx.sm-hit .hx-scene{animation:hx-impact .11s steps(1,end) both}
+@keyframes hx-impact{from{filter:brightness(.28) saturate(.3) contrast(1.5)}to{filter:none}}
+.hx.sm-hit .hx-art{animation:hx-shake .22s steps(1,end) both}
+@keyframes hx-shake{0%{translate:7px -5px}25%{translate:-6px 4px}50%{translate:4px 3px}75%{translate:-2px -2px}100%{translate:0 0}}
+.hx.sm-smash .hx-scene{animation:hx-push .46s cubic-bezier(.5,0,.9,.5) both}
+@keyframes hx-push{from{--push:0;filter:brightness(1)}to{--push:1;filter:brightness(.55)}}
+/* effects layer over the whole stage */
+.hx-fx{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.hx-burst{position:absolute;left:var(--bx,50%);top:var(--by,50%);width:70vmin;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:repeating-conic-gradient(from 0deg,#eafff4 0 4deg,transparent 4deg 15deg,var(--accent) 15deg 17deg,transparent 17deg 30deg);-webkit-mask-image:radial-gradient(circle,transparent 9%,#000 12%,transparent 68%);mask-image:radial-gradient(circle,transparent 9%,#000 12%,transparent 68%);opacity:0}
+.hx.sm-hit .hx-burst{animation:hx-burst .36s cubic-bezier(.1,.7,.2,1) both}
+@keyframes hx-burst{0%{opacity:1;scale:.35}30%{opacity:1;scale:1}100%{opacity:0;scale:1.25}}
+.hx-speed{position:absolute;inset:-25%;background:repeating-conic-gradient(from 3deg,transparent 0 5deg,color-mix(in srgb,var(--accent) 70%,transparent) 5deg 5.6deg,transparent 5.6deg 11deg,rgba(234,255,244,.65) 11deg 11.3deg,transparent 11.3deg 19deg);-webkit-mask-image:radial-gradient(circle,transparent 18%,#000 55%);mask-image:radial-gradient(circle,transparent 18%,#000 55%);opacity:0}
+.hx.sm-smash .hx-speed{animation:hx-speed .46s linear both}
+@keyframes hx-speed{0%{opacity:0;scale:.8}25%{opacity:.7}100%{opacity:.9;scale:1.5}}
+/* the flying shuttle: 90vmax wide, turned and scaled about its cork by the main script */
+.hx-fly{position:absolute;left:0;top:0;width:90vmax;height:auto;max-width:none;display:block;transform-origin:20.9% 81.3%;visibility:hidden}
+.hx.sm-smash .hx-fly{visibility:visible}
+/* the flash is the cork's own colour, so the shuttle filling the screen and the flash are one thing */
+.hx-flash{position:absolute;inset:0;background:#04ed7d;opacity:0}
+.hx.sm-flash .hx-flash{opacity:1}
+.hx.sm-thru .hx-flash{opacity:0;transition:opacity .45s cubic-bezier(.3,0,.4,1)}
+/* opacity, not visibility: the poses set their own visibility, which a hidden parent would not override */
+.hx.sm-thru .hx-scene,.hx.sm-thru .hx-title,.hx.sm-thru .hx-fly,.hx.sm-thru .hx-speed,.hx.sm-thru .hx-burst{opacity:0!important;animation:none}
+.hero.hx.sm-thru .stage::after{opacity:0}
+.hx.sm-back .hx-flash{animation:hx-back .4s ease-out both}
+@keyframes hx-back{from{opacity:.5}to{opacity:0}}
+/* chapter 01 settles in under the fading flash */
+.ch1.arrived .lineup-wrap{transform-origin:50% 100%;animation:ch1-arrive .7s cubic-bezier(.16,.8,.3,1) both}
+.ch1.arrived .bgl{animation:ch1-arrive-bg .9s cubic-bezier(.16,.8,.3,1) both}
+@keyframes ch1-arrive{from{scale:1.08;translate:0 3vh}}
+@keyframes ch1-arrive-bg{from{scale:1.14}}
+@media (prefers-reduced-motion:reduce){.ch1.arrived .lineup-wrap,.ch1.arrived .bgl{animation:none}}
 /* mobile pass (phones, 700 px and below; nothing above 700 px changes) */
 @media (max-width:700px){
   /* 1 · header: a solid-looking bar (height unchanged: the 1 px border replaces 1 px of bottom padding); the logo and
@@ -1199,11 +1265,12 @@ ul.ticks.g2{display:grid}
   .top .rlogo,.top nav .btn{position:relative}
   .top .rlogo::after{content:"";position:absolute;inset:-7px -4px}
   .top nav .btn::after{content:"";position:absolute;inset:-2px 0}
-  /* 2 · hero: 200vh (a 100vh pin, main script: phone timings) above chapter 01, which starts under it (-100vh) and
-     is already pinned when the hero stage fades out (--hf) */
+  /* 2 · hero: 200vh (a 100vh pin) above chapter 01, which starts under it (-158vh), so it is pinned from 42% of the
+     hero's progress, before the smash fires at 46% (hero smash block); no shake and no speed lines on phones */
   #top.hx{height:200vh}
-  #top.hx > .stage{z-index:2;opacity:var(--hf,1);pointer-events:none}
-  #s-real{margin-top:-100vh}
+  #s-real{margin-top:-158vh}
+  .hx.sm-hit .hx-art{animation:none}
+  .hx-speed{display:none}
   /* 3 · chapter 01 cards: five equal cards, 4 px apart (centres 20vw apart), number + level pill only; the pill text
      is 10 px and wraps (hyphenated) inside its card */
   #s-real .clone figcaption{width:calc(20vw - 4px);max-width:none;padding:4px 2px;gap:4px}
@@ -1265,3 +1332,97 @@ ul.ticks.g2{display:grid}
   #s-pricing{--b-m:.42}
   #s-request{--b-m:.5}
 }
+
+/* ===== Loading screen (SiteBoot.tsx, "Boot" in src/scripts/boot.js): always dark, first paint =====
+   .boot-mark is the mark's box (the still SVG fills it); the Rive canvas is three times that box (the artboard is
+   1200 with the 400 mark in its middle) so the exit can grow past the mark. .boot-live: Rive has drawn, the still
+   goes. .boot-out: the screen fades while the mark flies out. If the scripts never run, boot-bail lifts the screen. */
+html.booting,html.booting body{overflow:hidden}
+.boot{--bg:#0b0b0c;--fg:#f0f0f2;--fg2:#8a8a93;--ring3:#71c173;--logo-wm:var(--fg);color-scheme:dark;position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:var(--bg);color:var(--fg);animation:boot-bail .4s 30s forwards}
+.boot-in{display:flex;flex-direction:column;align-items:center;gap:22px;transform:translateY(-2vh)}
+.boot-mark{position:relative;width:clamp(104px,17vmin,156px);aspect-ratio:1}
+.boot-still{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.boot-still circle{fill:none;stroke:var(--ring3);stroke-width:14.4}
+.boot-still .b1{opacity:.2}.boot-still .b2{opacity:.4}.boot-still .b3{opacity:.22}
+.boot-still .bd{fill:var(--ring3);stroke:none}
+.boot-riv{position:absolute;left:-100%;top:-100%;width:300%;height:300%;display:block;pointer-events:none}
+.boot.boot-live .boot-still{visibility:hidden}
+.boot-wm{height:clamp(22px,3.4vmin,30px);width:auto;overflow:hidden}
+.boot-pct{font:500 12px/1 var(--mono);letter-spacing:.14em;color:var(--fg2);font-variant-numeric:tabular-nums}
+.boot.boot-out{pointer-events:none;animation:boot-fade .5s .3s cubic-bezier(.4,0,.2,1) forwards}
+.boot.boot-out .boot-wm,.boot.boot-out .boot-pct{transition:opacity .25s;opacity:0}
+@keyframes boot-fade{to{opacity:0;visibility:hidden}}
+@keyframes boot-bail{to{opacity:0;visibility:hidden;pointer-events:none}}
+@media (prefers-reduced-motion:reduce){.boot.boot-out{animation-delay:0s}}
+/* sample-player avatars (ROTRA_AV in the main script): the portrait covers the initials circle */
+.has-av{background-size:cover;background-position:50% 30%;background-repeat:no-repeat;color:transparent!important;text-shadow:none}
+/* page transition (ROTRA_PT in boot.js): the loading screen's mark between views */
+.boot.pt{animation:none;opacity:0;transition:opacity .22s cubic-bezier(.4,0,.2,1)}
+.boot.pt.on{opacity:1}
+.boot.pt.boot-out{animation:boot-fade .42s .14s cubic-bezier(.4,0,.2,1) forwards}
+/* Find your profile (#find): one screen, everything centred over the "find" scene */
+.find-hero{position:relative;isolation:isolate;overflow:hidden;min-height:100vh;min-height:100svh;display:grid;place-items:center;padding-top:120px;padding-bottom:96px;--b-far:.5;--b-mid:.5;--b-near:.7;--veil:.72}
+.find-hero .bgl{-webkit-mask-image:linear-gradient(#000 86%,transparent);mask-image:linear-gradient(#000 86%,transparent)}
+.find-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px;animation:pagein .5s cubic-bezier(.2,.9,.3,1)}
+.find-in .lede{font-size:19px;color:var(--fg2);max-width:52ch;margin:0}
+.find-in form.find{display:flex;flex-direction:column;gap:8px;padding:16px;max-width:560px;width:100%;text-align:left}
+.find-in .acts{justify-content:center}
+/* ===== How ranking works (#ranking): a full-screen hero and pinned story chapters, like the landing ===== */
+body[data-view="ranking"] .rail,body[data-view="find"] .rail{display:none}
+.rk-hero{position:relative;isolation:isolate;overflow:hidden;min-height:100vh;min-height:100svh;display:grid;align-items:center;padding-top:110px;padding-bottom:72px;--b-far:.4;--b-mid:.4;--b-near:.55;--veil:.7}
+.rk-hero .bgl{-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+.rk-hero .p-hero{align-items:center}
+.rk-hero .lede{font-size:19px;color:var(--fg2);max-width:56ch}
+.rk-hero .p-copy{display:flex;flex-direction:column;gap:22px;align-items:flex-start}
+/* Tara is waist-up art: she stands on the hero's bottom edge so the cut never shows */
+.rk-hero .bc-rank{position:absolute;right:max(2vw,calc(50% - 720px));bottom:0;width:min(44vw,640px);height:min(84vh,860px);z-index:0}
+.rk-hero .wrap{position:relative;z-index:1}
+.rk-hero .p-hero{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.rk-story{--b-far:.4;--b-mid:.42;--b-near:.5;--veil:.78}
+.rk-story .anno{max-width:60ch}
+.rk-story{--veil:.86}
+.rk-story .scene .say{color:color-mix(in srgb,var(--fg) 84%,transparent);font-size:clamp(18px,1.7vw,24px)}
+/* a figure beside the copy: waist-up art, so it stands on the stage's bottom edge (never a floating cut) */
+.rk-duo{flex-direction:row;justify-content:flex-end;text-align:left;padding-inline:max(6vw,calc(50% - 620px))}
+.rk-duo.rk-flip{justify-content:flex-start}
+.rk-duo .rk-fig{position:absolute;left:max(2vw,calc(50% - 700px));bottom:0;width:min(44vw,620px);height:min(80vh,800px)}
+.rk-duo.rk-flip .rk-fig{left:auto;right:max(2vw,calc(50% - 700px))}
+.rk-duo .rk-copy{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(12px,2vh,20px);width:min(46vw,560px)}
+.rk-duo .mega-sm{font-size:clamp(30px,min(4.2vw,7vh),64px)}
+.rk-duo .say{text-wrap:pretty;max-width:48ch}
+.rk-bands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:min(920px,92vw);text-align:left}
+.rk-bands .qchip{font-size:15px;padding:6px 12px}
+.rk-bands .p-card{padding:28px;display:flex;flex-direction:column;gap:14px;border-radius:var(--r-lg)}
+.rk-bands .p-card h3{display:flex;align-items:center;gap:10px;font-size:clamp(20px,2.2vw,30px);font-weight:800;letter-spacing:-.02em}
+@media (max-width:700px){
+  .rk-hero .p-hero{grid-template-columns:minmax(0,1fr)}
+  .rk-hero{align-items:start;padding-bottom:44vh}
+  .rk-hero .bc-rank{right:0;left:0;width:auto;height:42vh}
+  .rk-duo,.rk-duo.rk-flip{flex-direction:column;justify-content:flex-start;text-align:center;padding-inline:20px;padding-bottom:36vh}
+  .rk-duo .rk-fig,.rk-duo.rk-flip .rk-fig{left:0;right:0;width:auto;height:34vh}
+  .rk-duo .rk-copy{align-items:center;width:100%}
+  .rk-bands{grid-template-columns:minmax(0,1fr)}
+  .rk-bands .p-card{padding:14px}
+}
+/* #find already is the "Find your profile" call: the footer's arena CTA is left out there */
+body[data-view="find"] .h-arena{display:none}
+/* footer band: black (always dark, like the arena above it), light text, mint column captions */
+.hunt{background:#0b0b0c;color:#f0f0f2}
+.h-band{--bg:#0b0b0c;--fg:#f0f0f2;--accent:#00ff88;--on-accent:#0b0b0c;color-scheme:dark;background:var(--bg);color:var(--fg);border-top:1px solid #2a2a2e}
+.h-band .h-brand{--ring1:rgba(113,193,115,.2);--ring2:rgba(113,193,115,.4);--ring3:#71c173;--logo-wm:var(--fg)}
+.h-band .h-cap{color:var(--accent)}
+.h-band .h-links a{color:color-mix(in srgb,var(--fg) 82%,transparent)}
+.h-band .h-links a:hover{color:var(--fg)}
+.h-band .h-base{border-top-color:#2a2a2e}
+.h-band .h-top:hover{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.h-band .h-colo{color:#8a8a93}
+/* scene dots are clickable (main script): a taller hit area around each 4px bar */
+.sdots{pointer-events:auto}
+.sdots i{box-sizing:content-box;padding-block:12px;background-clip:content-box;cursor:pointer}
+.sdots i.on,.sdots i.sd-done{background-clip:content-box}
+.sdots i:hover{background-color:var(--fg2)}
+.sdots i.on:hover{background-color:var(--accent)}
+.sdots{bottom:calc(env(safe-area-inset-bottom,0px) + 6px)}
+/* the top bar slides away as the footer reaches it (body.at-foot, main script) */
+.top{transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s}
+body.at-foot .top{transform:translateY(-100%);opacity:0;pointer-events:none}

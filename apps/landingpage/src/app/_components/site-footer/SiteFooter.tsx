@@ -14,7 +14,7 @@ export function SiteFooter() {
             <em>Earn the rank.</em>
           </h2>
           <div className="h-acts">
-            <a className="btn pri" href="#s-record">
+            <a className="btn pri" href="#find">
               Find your profile
             </a>
             <a className="btn" href="#clubs">
@@ -23,7 +23,7 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      {/* Zone B: the band (solid accent, dark text) */}
+      {/* Zone B: the band (black, light text; always dark) */}
       <div className="h-band gut">
         <div className="wrap h-row">
           <span className="rlogo h-brand" role="img" aria-label="ROTRA">
@@ -36,7 +36,7 @@ export function SiteFooter() {
               <span className="h-cap">Players</span>
               <a href="#home">The story</a>
               <a href="#ranking">How ranking works</a>
-              <a href="#s-record">Find your profile</a>
+              <a href="#find">Find your profile</a>
             </div>
             <div>
               <span className="h-cap">Clubs</span>

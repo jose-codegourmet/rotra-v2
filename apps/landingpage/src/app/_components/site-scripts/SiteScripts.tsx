@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { initBoot } from '@/scripts/boot'
 import { initRive } from '@/scripts/rive'
 import { initSite } from '@/scripts/site'
 import { initVignettes } from '@/scripts/vignettes'
@@ -18,6 +19,7 @@ export function SiteScripts() {
     initSite()
     initRive()
     initVignettes()
+    initBoot()
   }, [])
   return null
 }

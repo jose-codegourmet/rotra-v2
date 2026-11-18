@@ -185,7 +185,7 @@ Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Ad
 | License prices | No fixed price. Each club has its own monthly and yearly price, set when the club is added and changeable later. The yearly price must be less than twelve months at the monthly price |
 | Free tester clubs | A club can be set to Free instead of a price, for example a tester club. It still gets license terms, so expiry and retention work the same; each term is recorded at ₱0 and shown as Free |
 | License amount | Activation and renewal fill in the amount from the club's current price for the chosen plan; the platform owner can still change it. Changing a price never changes payments already recorded |
-| Feature flags | The platform owner creates flags in Admin: a name, a key the apps check (suggested from the name and fixed once saved), a description of what it does, and whether it starts on (off by default). The catalog starts empty |
+| Feature flags | The platform owner creates flags in Admin: a name, a key the apps check (suggested from the name and fixed once saved), a description of what it does, and whether it starts on (off by default). The catalog starts with the flags ROTRA's own features ship with, all off (`player_google_sign_in`, [D-2026-11-18-01](../../mvp/decisions.md#d-2026-11-18-01)); it used to start empty |
 
 ## Not open for accidental reversal
 

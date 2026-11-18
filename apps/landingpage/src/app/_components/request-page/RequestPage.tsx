@@ -17,8 +17,7 @@ export function RequestPage() {
               </p>
               <ol className="next card p-card">
                 <li>
-                  <b>We review it</b>
-                  {' within [N] working days.'}
+                  <b>We review it.</b>
                 </li>
                 <li>
                   <b>We contact you</b>
@@ -144,8 +143,14 @@ export function RequestPage() {
                 />
               </label>
               <label className="agree" htmlFor="agree">
-                <input id="agree" type="checkbox" required />I agree to the partner terms and to
-                ROTRA contacting me about this request.
+                <input id="agree" type="checkbox" required />
+                <span>
+                  {'I agree to the '}
+                  <a href="#terms">Terms of Service</a>
+                  {' and '}
+                  <a href="#privacy">Privacy Policy</a>, and to ROTRA contacting me about this
+                  request.
+                </span>
               </label>
               <div className="submit">
                 <button className="btn pri" type="submit">
@@ -170,18 +175,11 @@ export function RequestPage() {
                   </svg>
                 </span>
                 <h3>Request received</h3>
-                <p>
-                  We'll contact you by email or mobile within [N] working days to confirm your plan
-                  and payment.
-                </p>{' '}
+                <p>We'll contact you by email or mobile to confirm your plan and payment.</p>{' '}
                 <button className="btn" type="button" id="editReq">
                   Edit request
                 </button>
               </div>
-              <p className="anno" style={{ gridColumn: '1/-1' }}>
-                WIREFRAME: where requests land (Admin inbox? email?) is undecided. Today clubs are
-                created only by the platform owner.
-              </p>
             </form>
           </div>
         </section>

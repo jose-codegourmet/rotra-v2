@@ -140,7 +140,7 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     return window.matchMedia('(prefers-color-scheme: light)').matches;
   }
   function mix(a, b, t){ return a + (b - a) * t; }
-  var PAGE_SKY = { ranking: 3, partners: 0, request: 6, assets: 0 };
+  var PAGE_SKY = { ranking: 3, partners: 0, request: 6, privacy: 0, terms: 0 };
   function sky(ai, bi, t){
     var set = SKY[isLight() ? 'light' : 'dark'];
     var A = set[ai], B = set[bi];
@@ -266,38 +266,76 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     if (smash.state === 'idle' && ph >= SM_T) { if (reduce || jump || ph >= .98) smashDone(); else smashPlay(); }
     else if (smash.state === 'done' && ph < SM_BACK) smashReset();
   }
-  // The scene dots are buttons: a click glides to the middle of that scene's stretch of the section's scroll
-  document.addEventListener('click', function(e){
-    var d = e.target.closest && e.target.closest('.sdots i');
-    if (!d) return;
-    var sec = d.closest('.story'), n = +sec.getAttribute('data-n') || 1;
-    var i = Array.prototype.indexOf.call(d.parentNode.children, d);
+  // The scene dots are buttons: a click glides to the middle of that scene's stretch of the section's scroll.
+  // So is the leaderboard's Weekly / Monthly / Annual switch: board b is scene b + 1 of its section.
+  function gotoScene(sec, i){
+    var n = +sec.getAttribute('data-n') || 1;
     var y = sec.getBoundingClientRect().top + window.scrollY + (sec.offsetHeight - window.innerHeight) * storyEnd(sec) * (i + .5) / n;
     if (lenis) lenis.scrollTo(y, { duration: 1 }); else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  function sceneTarget(t){
+    var d = t.closest && t.closest('.sdots i');
+    if (d) return [d.closest('.story'), Array.prototype.indexOf.call(d.parentNode.children, d)];
+    var b = t.closest && t.closest('.story .lb-seg [data-b]');
+    return b ? [b.closest('.story'), +b.getAttribute('data-b') + 1] : null;
+  }
+  document.addEventListener('click', function(e){ var g = sceneTarget(e.target); if (g) gotoScene(g[0], g[1]); });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var g = e.target.matches && e.target.matches('.lb-seg [data-b]') ? sceneTarget(e.target) : null;
+    if (g) { e.preventDefault(); gotoScene(g[0], g[1]); }
   });
   var fadeIn = Array.prototype.slice.call(document.querySelectorAll('.fade-io'));
   var lineupWrap = ch1.querySelector('.lineup-wrap');
-  // Line-up figures (CSS v18): the real one is 68vh tall (46vh at 700 px and below) and grows 10% on the reveal.
-  // If that would reach the heading block, --fk shrinks every figure by the same factor.
+  // Line-up figures (CSS v18): the real one is 68vh tall and grows 10% on the reveal. If that would reach the
+  // heading block, --fk shrinks every figure by the same factor.
   var ch1Head = ch1.querySelector('.ch1-head'), ch1Stage = ch1.querySelector('.stage');
   var ch1Hs = ch1.querySelector('.hs'), ch1Card = ch1.querySelector('.lineup-wrap .rcard');
+  var ch1Lineup = ch1.querySelector('.lineup'), ch1RealBody = ch1.querySelector('.clone.real .cbody');
   function fitLineup(){
     if (!ch1Stage.clientHeight) return; // home view hidden: refitted on the hash change that shows it
-    var vh = window.innerHeight, phone = window.matchMedia('(max-width: 700px)').matches, real = (phone ? .46 : .68) * vh * 1.1;
-    var room = ch1Stage.clientHeight + vh * .03 - (ch1Head.offsetTop + ch1Head.offsetHeight) - 16;
-    var fk = Math.max(.4, Math.min(1, room / real));
+    var vh = window.innerHeight, phone = window.matchMedia('(max-width: 700px)').matches;
+    var headBottom = ch1Head.offsetTop + ch1Head.offsetHeight, fk, figTop;
+    if (phone && ch1Lineup && ch1RealBody) {
+      // 700 px and below (CSS: phone line-up): the five stand on the captions row, which sits a fixed gap above the
+      // stage's bottom (the line-up's computed bottom). The art is contain, bottom centre, 1600x2342, so it is at
+      // most the box's width / .6832 tall; the real one is scaled 1.08 for depth and 1.1 on the reveal.
+      var rc = ch1RealBody.parentNode, cap = rc.querySelector('figcaption');
+      var boxBottom = ch1Stage.clientHeight - (parseFloat(getComputedStyle(ch1Lineup).bottom) || 0)
+        - (cap ? cap.offsetHeight : 0) - (parseFloat(getComputedStyle(rc).rowGap) || 0);
+      var art = Math.min(ch1RealBody.offsetHeight, ch1RealBody.offsetWidth / .6832) * 1.08 * 1.1;
+      // the real one also stands clear of the rank card (placed under the answer heading, see below), so the card
+      // never covers her face on the reveal
+      var clearTop = headBottom;
+      // the heading block rises 28px while it fades in (CSS: --h), so measure it as if it had landed
+      var stTop = ch1Stage.getBoundingClientRect().top - (1 - (parseFloat(getComputedStyle(ch1Head).opacity) || 0)) * 28;
+      if (ch1Hs && ch1Card) clearTop = Math.max(clearTop, ch1Hs.getBoundingClientRect().bottom - stTop + 10 + ch1Card.offsetHeight);
+      fk = Math.max(.4, Math.min(1, (boxBottom - clearTop - 12) / (art || 1)));
+      figTop = boxBottom - art * fk;
+    } else {
+      var real = .68 * vh * 1.1;
+      fk = Math.max(.4, Math.min(1, (ch1Stage.clientHeight + vh * .03 - headBottom - 16) / real));
+    }
     ch1.style.setProperty('--fk', fk.toFixed(4));
-    // 700 px and below (CSS v18): the rank card's top sits 10 px under the answer heading (the sub line is gone
-    // by then); it scales down, to .7 at most, when it would reach the top of the real figure's box
-    if (phone && ch1Hs && ch1Card) {
-      var top = ch1Head.offsetTop + ch1Hs.offsetTop + ch1Hs.offsetHeight + 10;
-      var figTop = ch1Stage.clientHeight + vh * .03 - real * fk;
-      ch1.style.setProperty('--rct', Math.round(top) + 'px');
+    // 700 px and below: the rank card's top sits 10 px under the answer heading (the sub line is gone by then); it
+    // scales down, to .7 at most, when it would reach the top of the real figure
+    if (phone && ch1Hs && ch1Card && figTop != null) {
+      // measured on screen (stage coordinates); the card's top is relative to the line-up box, not the stage
+      var stTop2 = stTop;
+      var top = ch1Hs.getBoundingClientRect().bottom - stTop2 + 10;
+      var wrapTop = ch1Card.offsetParent ? ch1Card.offsetParent.getBoundingClientRect().top - ch1Stage.getBoundingClientRect().top : 0;
+      ch1.style.setProperty('--rct', Math.round(top - wrapTop) + 'px');
       ch1.style.setProperty('--rcs', Math.max(.7, Math.min(1, (figTop - top) / (ch1Card.offsetHeight || 1))).toFixed(4));
     }
   }
   fitLineup();
   window.addEventListener('resize', fitLineup);
+  // the measures are only right once the chapter is laid out on screen (not during the loading screen): refit as it
+  // comes into view and once the page is ready
+  window.addEventListener('rotra:ready', function(){ requestAnimationFrame(fitLineup); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es){
+    if (es.some(function(x){ return x.isIntersecting; })) requestAnimationFrame(fitLineup);
+  }).observe(ch1Stage);
   window.addEventListener('hashchange', function(){ requestAnimationFrame(fitLineup); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitLineup);
   // Chapter 02 match-up (CSS bigchars): figures 50vh tall (30vh at 700 px and below, teams stacked). If the heading,
@@ -343,11 +381,12 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   measureTracks(); update(); requestAnimationFrame(raf);
   window.addEventListener('resize', function(){ measureTracks(); update(); });
 
-  // ---- Pages: #home (the story), #ranking, #partners, #request (#pricing redirects to #request) ----
-  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, assets: 1, find: 1 };
+  // ---- Pages: #home (the story), #clubs (#partners is an alias), #ranking, #request (#pricing redirects to
+  // #request), #find, #privacy, #terms. The legal pages have no chapters and no art: the sky is PAGE_SKY's. ----
+  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, find: 1, privacy: 1, terms: 1 };
   var ALIAS = { partners: 'clubs' };
   var REDIRECT = { pricing: 'request' };
-  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', assets: 'Asset list · ROTRA', find: 'Find your profile · ROTRA' };
+  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', find: 'Find your profile · ROTRA', privacy: 'Privacy Policy · ROTRA', terms: 'Terms of Service · ROTRA' };
   var NAV_OF = { clubs: 'clubs', request: 'clubs', ranking: 'ranking', find: 'find' };
   var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
@@ -369,8 +408,12 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   }
   // Chapter 01 starts under the hero (its top is still the hero's wind-up), and its heading and line-up come in with
   // the scroll, so a link to it lands where all five figures and the heading are in and the reveal has not begun
-  // (42% of its beats; 22% on phones, where they come in sooner)
-  function landing(el){ return el === ch1 ? Math.round((ch1.offsetHeight - window.innerHeight) * CH1_END * (PHONE.matches ? .22 : .42)) : 0; }
+  // (42% of its beats; 22% on phones, where they come in sooner). A legal page's section heading (#privacy-…,
+  // #terms-…) lands 96 px down, clear of the fixed top bar.
+  function landing(el){
+    if (el === ch1) return Math.round((ch1.offsetHeight - window.innerHeight) * CH1_END * (PHONE.matches ? .22 : .42));
+    return el.closest && el.closest('.legal') ? -96 : 0;
+  }
   function route(){
     var h = location.hash.slice(1);
     if (REDIRECT[h]) { h = REDIRECT[h]; try { history.replaceState(null, '', '#' + h); } catch (err) { location.replace('#' + h); return; } }
@@ -417,6 +460,36 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     });
   });
   route();
+
+  // ---- Phone menu (760 px and below): the bar's menu button opens a fullscreen sheet. Any link in it, Escape, a
+  // route change or a wider screen closes it; while it is open the page does not scroll (html.menu-open, Lenis
+  // stopped). Its links carry data-nav, so setView marks the current one with aria-current like the bar's. ----
+  (function(){
+    var menu = document.getElementById('siteMenu');
+    var openBtn = document.getElementById('menuOpen');
+    var closeBtn = document.getElementById('menuClose');
+    if (!menu || !openBtn) return;
+    var WIDE = window.matchMedia('(min-width: 761px)');
+    function isOpen(){ return !menu.hidden; }
+    function setOpen(on, refocus){
+      if (on === isOpen()) return;
+      menu.hidden = !on;
+      document.documentElement.classList.toggle('menu-open', on);
+      openBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      openBtn.setAttribute('aria-label', on ? 'Close menu' : 'Open menu');
+      if (lenis) { if (on) lenis.stop(); else lenis.start(); }
+      if (on) { var first = menu.querySelector('.menu-links a'); if (first) first.focus(); }
+      else if (refocus) openBtn.focus();
+    }
+    openBtn.addEventListener('click', function(){ setOpen(!isOpen(), true); });
+    if (closeBtn) closeBtn.addEventListener('click', function(){ setOpen(false, true); });
+    // closes before the page's own click handler runs (it is on document), so Lenis is running again for its scroll
+    menu.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('a')) setOpen(false, true); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && isOpen()) setOpen(false, true); });
+    window.addEventListener('hashchange', function(){ setOpen(false, false); });
+    function onWide(){ if (WIDE.matches) setOpen(false, false); }
+    if (WIDE.addEventListener) WIDE.addEventListener('change', onWide); else if (WIDE.addListener) WIDE.addListener(onWide);
+  })();
 
 
   // ---- Footer: back to top; the two arena figures shift up to 10px opposite a desktop mouse, eased ----
@@ -503,34 +576,6 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     }
   };
   document.querySelectorAll('.vg-av, .qav, .avatar').forEach(AV.paint);
-
-  // ---- Asset list page: built from every placeholder on the site ----
-  (function(){
-    var out = document.getElementById('assetLists');
-    if (!out) return;
-    var CH = 'Characters (one looping Rive file per pose, state machine Main, 900x1356; lineup-* 1600x2342)';
-    var groups = { 'Background layers (stills, 3 per section; one tall still for phones)': [] };
-    groups[CH] = []; groups['Other images and cut-outs'] = [];
-    document.querySelectorAll('img.ly').forEach(function(l){ groups['Background layers (stills, 3 per section; one tall still for phones)'].push([l.getAttribute('data-layer'), 'Generated · ' + l.getAttribute('src')]); });
-    var seen = {};
-    function addChar(n){ if (seen['chr:' + n]) return; seen['chr:' + n] = 1; groups[CH].push([n, CHR.riv(n).replace(/\?.*$/, '') + ' · still ' + CHR.still(n)]); }
-    document.querySelectorAll('.chr[data-char]').forEach(function(el){ addChar(el.getAttribute('data-char')); });
-    document.querySelectorAll('.hx-ly').forEach(function(l){ groups['Background layers (stills, 3 per section; one tall still for phones)'].push([l.querySelector('b').textContent, l.querySelector('span').textContent]); });
-    document.querySelectorAll('.slot:not(.sprite):not(.ly):not(.hx-ly)').forEach(function(el){
-      var b = el.querySelector('b'); if (!b) return;
-      var t = b.textContent; if (seen[t]) return; seen[t] = 1;
-      var sp = el.querySelector('span');
-      groups['Other images and cut-outs'].push([t, sp ? sp.textContent : el.textContent.trim()]);
-    });
-    Object.keys(groups).forEach(function(g){
-      var card = document.createElement('div'); card.className = 'card asset-list';
-      var h = document.createElement('h3'); h.textContent = g + ' · ' + groups[g].length; card.appendChild(h);
-      var ol = document.createElement('ol');
-      groups[g].forEach(function(it){ var li = document.createElement('li'); var b = document.createElement('b'); b.textContent = it[0]; var sp = document.createElement('span'); sp.textContent = it[1]; li.appendChild(b); li.appendChild(sp); ol.appendChild(li); });
-      card.appendChild(ol); out.appendChild(card);
-    });
-  })();
-
 
   // ---- Chapter 03 podium (same design as the player app's leaderboard) ----
   var BOARDS = [

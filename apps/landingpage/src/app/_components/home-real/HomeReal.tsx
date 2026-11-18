@@ -76,7 +76,8 @@ export function HomeReal() {
                 <span className="src">Tuesday Night BC</span>
                 <span className="lvpill" data-band="int">
                   <i />
-                  Inter­mediate
+                  <span className="lv-l">Inter­mediate</span>
+                  <span className="lv-s">Int</span>
                 </span>
               </figcaption>
             </figure>
@@ -92,7 +93,8 @@ export function HomeReal() {
                 <span className="src">Saturday Smashers</span>
                 <span className="lvpill" data-band="beg">
                   <i />
-                  Beginner High
+                  <span className="lv-l">Beginner High</span>
+                  <span className="lv-s">Beg Hi</span>
                 </span>
               </figcaption>
             </figure>
@@ -106,7 +108,10 @@ export function HomeReal() {
                 <span className="lvpill real-pill">
                   <i />
                   <span className="rp-q">?</span>
-                  <span className="rp-a">Inter­mediate Mid</span>
+                  <span className="rp-a">
+                    <span className="lv-l">Inter­mediate Mid</span>
+                    <span className="lv-s">Int Mid</span>
+                  </span>
                 </span>
               </figcaption>
             </figure>
@@ -122,7 +127,8 @@ export function HomeReal() {
                 <span className="src">QC Shuttlers</span>
                 <span className="lvpill" data-band="none">
                   <i />
-                  No level
+                  <span className="lv-l">No level</span>
+                  <span className="lv-s">No lvl</span>
                 </span>
               </figcaption>
             </figure>
@@ -138,7 +144,8 @@ export function HomeReal() {
                 <span className="src">The group chat</span>
                 <span className="lvpill" data-band="adv">
                   <i />
-                  Advanced daw
+                  <span className="lv-l">Advanced daw</span>
+                  <span className="lv-s">Adv daw</span>
                 </span>
               </figcaption>
             </figure>

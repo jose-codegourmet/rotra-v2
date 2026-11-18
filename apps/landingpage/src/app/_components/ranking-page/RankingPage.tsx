@@ -259,10 +259,6 @@ export function RankingPage() {
               <small className="lo">lower</small>
               <small className="hi">higher</small>
             </div>
-            <p className="anno">
-              WIREFRAME: step sizes and band edges are still open (#247). No numbers on the site
-              until decided.
-            </p>
           </div>
           <div className="sdots" aria-hidden="true">
             <i />

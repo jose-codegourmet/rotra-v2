@@ -6,6 +6,8 @@
 
 **Source:** [identity rules](../../../../business_logic/product/player-information/modules/identity/README.md).
 
+**Feature flag (November 18, 2026, [D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01)):** every Google control and surface on this page (**Continue with Google**, the No Google account sheet, `P-INVITE`, `P-JOIN-CLUB`, `P-JOIN-SESSION`, `P-GOOGLE-LINK`, `P-GOOGLE-REQUIRED`) shows only while the platform feature flag `player_google_sign_in` is on. It starts off; while off, these screens stay as they are in the app today (email + password).
+
 ## P-LOGIN — Google, then email plus password
 
 Order: logo and "Your player profile.", "Sign in", a context notice when the player came from an invite ("Sign in to join <club>." / "Sign in to request a spot in <session>."), **Continue with Google** (pending: "Waiting for Google…"), a divider "Signed up with a password?", "Sign in with your email and password once, then connect Google. Google sign-in is required from <deadline>.", then the Email, Password (with **Forgot password?** beside its label) and **Sign in** controls described below. Footer: "New to ROTRA? Create your account from your club's invite link or a session invite. You don't need an account to view profiles or the leaderboard."

@@ -4,7 +4,7 @@
 
 The platform owner manages feature flags in Admin. Updated October 27, 2026 from the [ROTRA Admin prototype](../../../../../../apps/mockup/admin-app/rotra-admin.html):
 
-- The catalog starts empty. The platform owner creates each flag with **Add flag**.
+- The catalog starts with the flags ROTRA's own features ship with, all off; today that is one, `player_google_sign_in` (**Google sign-in for players**, November 18, 2026, [D-2026-11-18-01](../../../../../mvp/decisions.md#d-2026-11-18-01)). The platform owner creates every other flag with **Add flag**. *(Changed November 18, 2026: the catalog used to start empty.)*
 - A flag has a **name** (unique, up to 50 characters), a **key** the apps' code checks (suggested from the name; lowercase letters, numbers and underscores, starting with a letter, 3–40 characters, unique, fixed once saved), a **description** of what it does, and an on/off value.
 - New flags start off unless the platform owner chooses to turn it on right away. Turning a flag on or off is confirmed first.
 - Flags are on/off switches for the whole platform. Targeting particular clubs or players, rollout schedules, and when offline Queue devices pick up a change have not been selected.

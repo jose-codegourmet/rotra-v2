@@ -1,6 +1,6 @@
 # Matches and result integrity
 
-**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and substitution game credit ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
+**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and substitution game credit ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). Updated November 18, 2026 for scoring modes ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).
 
 ## Formats
 
@@ -54,20 +54,42 @@ Removing a court is blocked while any match (On court or Playing) is on it. Sinc
 
 There are two ways to complete a valid game:
 
-1. Enter both teams' final scores, which identify the winner.
+1. Pick the winning team, then enter the scores if wanted.
 2. Pick the winning team without entering scores.
 
 Scores are optional supporting data, never a condition for ordinary game completion. A winner must be declared. No draw workflow was agreed.
 
-Score rules:
+### Scoring modes (owner, November 18, 2026; mockup only)
 
-- If either score is entered, both are required, as whole numbers 0 or more.
-- The higher score wins. A tie cannot decide a winner; the operator corrects it or clears the scores and picks a winner.
-- If a winner is also picked, it must agree with the score.
-- There is no fixed target such as 21, and no set or deuce system.
-- **Clear scores** removes both deliberately. Blank scores are stored as no score, never 0–0.
+Each Queue Session has one **Scoring mode**, picked in setup ([Sessions](../sessions/README.md#scoring-mode)). It decides which game scores are valid and how many games a match has. The match result dialog asks only for what the mode needs.
 
-A review step shows the winner, the opponents, the score or "No score entered", and the court(s), then **Confirm Team A wins** (or B). After confirmation, the winner and any submitted scores are **permanent**. Neither the operator nor Admin can edit them. This follows the user's “touch move” rule.
+| Mode | Games | Game to | Deuce |
+|---|---|---|---|
+| 16/31 (default) | One | 31, change sides at 16 | Yes |
+| 16/31, no deuce | One | 31, change sides at 16 | No |
+| 11/21 | One | 21, change sides at 11 | Yes |
+| 11/21 × 3 | Best of 3 | 21, change sides at 11 | Yes |
+| 21 × 3 | Best of 3 | 21, change sides after each game | No |
+
+Score rules, per game. Let the target be 31 or 21 as the mode says:
+
+- The winner is picked first. The winning side's score is the target, so only the **losing score** is typed.
+- **Normal finish:** the losing score is a whole number from 0 up to the target minus 2 (0 to 29 for 31). In a mode **without deuce** it goes up to the target minus 1 (0 to 30 for 31), because the first to the target wins.
+- **Deuce** (only in the deuce modes: 16/31, 11/21, 11/21 × 3): at one point short of the target for both pairs (30–30 for 31, 20–20 for 21) the game goes on. There is **no cap**. The first pair to lead by 2 wins, so 32–30, 33–31, 34–32 and so on. The Queue Master types both scores for a deuce game.
+- A score that cannot happen in the mode is **refused**, not just warned: a tie (31–31), a lead of one past the target (31–30), a losing 30 or 31 in a no-deuce mode, a deuce score that does not end on a 2-point lead, a non-whole number, or a score whose higher side is not the picked winner. The result stays unconfirmed until it is fixed or the scores are cleared.
+- Scores stay **optional**: **Clear score** removes them and the winner alone still confirms. If any score is entered, the score rules apply to it. Blank scores are stored as no score, never 0–0.
+
+**Best of 3** (11/21 × 3 and 21 × 3):
+
+- The **games decide the winner**: the first pair to win 2 games. Game 3 is played only when games 1 and 2 were split.
+- Each game that was played has its own score under the rules above, and its own winner. Scores are **all or none** across the games played: either every game played has a score, or none does. A missing score in one game is refused.
+- The match winner follows the games. Picking the other team by hand is refused.
+- **Every game score is kept** (owner go-ahead, November 18, 2026), not only the games won. The pair's games won (2–1) is still the match score.
+- The winner alone (no game winners, no scores) still confirms.
+
+A session saved before scoring modes existed reads as 16/31. Matches that only have two scores still show.
+
+A review step shows the winner, the opponents, the score (one game: "31–24"; best of 3: the games won and every game score, "2–1 · 21–18, 15–21, 21–19") or "No score entered", and the court(s), then **Confirm Team A wins** (or B). After confirmation, the winner and any submitted scores, **every game score of a best of 3 included**, are **permanent**. Neither the operator nor Admin can edit them. This follows the user's “touch move” rule.
 
 Completion frees the occupied court(s). The permanent result can remain locally pending sync during offline operation. After every confirmed result, in both Manual Queue and Auto Queue, the operator is offered the next match for the freed court (a pick of up to the first five ready waiting matches, or Skip for now); see [the next-match picker](../queueing/README.md#auto-queue-and-manual-queue-court-filling).
 

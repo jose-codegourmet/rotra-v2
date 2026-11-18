@@ -54,7 +54,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
 | [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mock app behind the flag; real mode written, not run against Google (#922, pending #896) | #892 | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
+| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mock and real modes in source | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
@@ -999,7 +999,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-03 — Player notifications page
 - **Decision status:** approved (owner, November 16, 2026; event scope, visibility window and states settled November 18, 2026).
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-notifications.md)).
+- **Implementation status:** mock and real modes implemented in source ([log](../mockup-changes/2026-11-16-player-notifications.md)).
 - **Ticket:** [#890](https://github.com/jose-codegourmet/rotra-v2/issues/890) (Epic P14)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Decision:**
@@ -1009,7 +1009,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open:**
   - Delivery outside the app (push or email would need a backend decision and likely a new dependency).
   - Per-kind opt-out, automatic deletion, and future free-text announcement publishing.
-- **Owner amendment, November 18, 2026:** all eight documented events are approved (contact-change review includes approved and declined); notifications remain visible for 90 days, with automatic database deletion deferred. Only the derived verification reminder is in scope; free-text publishing is deferred. Use standard Player loading/error states; the bell remains a link with no count while loading or failed. Wait for account verification epic #889 rather than adding a stand-in verification state for #899.
+- **Owner amendment, November 18, 2026:** seven documented events are approved; the session-invite notification is deferred because current shareable links have no recipient and real invite-code creation is absent. The mock invite sample remains. The remaining events are approved (contact-change review includes approved and declined); notifications remain visible for 90 days, with automatic database deletion deferred. Only the derived verification reminder is in scope; free-text publishing is deferred. Use standard Player loading/error states; the bell remains a link with no count while loading or failed. The reminder uses account verification from #889.
 - **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID

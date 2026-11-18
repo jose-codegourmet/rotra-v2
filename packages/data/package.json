@@ -494,6 +494,7 @@
     "./account-verification/useAdminAccountVerification": "./src/account-verification/useAdminAccountVerification.ts",
     "./account-verification/useSetAdminVerificationOverride": "./src/account-verification/useSetAdminVerificationOverride.ts",
     "./fixtures/account-verification": "./src/fixtures/accountVerification.ts",
+    "./player-notifications/rules": "./src/player-notifications/playerNotifications.rules.ts",
     "./player-notifications/types": "./src/player-notifications/playerNotifications.types.ts",
     "./player-notifications/query-keys": "./src/player-notifications/queryKeys.ts",
     "./player-notifications/usePlayerNotifications": "./src/player-notifications/usePlayerNotifications.ts",

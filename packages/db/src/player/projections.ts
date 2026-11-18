@@ -9,6 +9,7 @@ import { settleFinalization } from '../queue/finalization'
 import { matchContext } from '../queue/match-store'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
+import { writePlayerNotifications } from './notification-events'
 
 type Tx = Prisma.TransactionClient
 
@@ -63,7 +64,7 @@ const counts = (f: PlayerMatchFact) => f.fullParticipation && f.standardMatch
  * decides the window, so ageing changes eligibility without new games. A stale run (lower input
  * watermark than stored) never overwrites a newer projection.
  */
-export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) {
+export async function recomputeRank(tx: Tx, playerId: string, now: Date, jobId: string) {
   const policy = await tx.rankingPolicyVersion.findFirst({
     where: { effectiveAt: { lte: now } },
     orderBy: [{ effectiveAt: 'desc' }, { version: 'desc' }],
@@ -107,12 +108,24 @@ export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) 
   } as const
   const current = await tx.playerRankCurrent.findUnique({ where: { playerId } })
   if (current && current.inputWatermark > watermark) return current
-  return current
-    ? tx.playerRankCurrent.update({
+  const updated = current
+    ? await tx.playerRankCurrent.update({
         where: { playerId },
         data: { ...data, revision: { increment: 1 } },
       })
-    : tx.playerRankCurrent.create({ data: { playerId, ...data } })
+    : await tx.playerRankCurrent.create({ data: { playerId, ...data } })
+  await writePlayerNotifications(tx, [
+    {
+      playerId,
+      kind: 'rank',
+      sourceType: 'projection_job',
+      sourceId: jobId,
+      title: 'Your rank was updated',
+      body: 'Tap to see what changed.',
+      target: `/players/${playerId}/rank`,
+    },
+  ])
+  return updated
 }
 
 /** The private snapshot for a finalized session: standings, awards and Off Day in its own column. */
@@ -237,7 +250,7 @@ async function runJob(job: ProjectionJob, now: Date) {
             })
             if (a.playerIdAtAssessment) targets = [a.playerIdAtAssessment]
           }
-          for (const playerId of targets) await recomputeRank(tx, playerId, now)
+          for (const playerId of targets) await recomputeRank(tx, playerId, now, job.id)
           break
         }
         default:

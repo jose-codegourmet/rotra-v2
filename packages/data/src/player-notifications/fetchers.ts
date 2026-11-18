@@ -1,34 +1,32 @@
 import { accountVerificationIn } from '../account-verification/mockVerification'
 import { getSession } from '../auth/fetchers'
-import { GOOGLE_SIGN_IN_DEADLINE } from '../google-sign-in/googleSignIn.config'
 import { checkMockSave, requireOnline } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
-import { isPlayerNotificationVisible } from './playerNotifications.rules'
+import {
+  realMarkNotificationsRead,
+  realNotificationUnreadCount,
+  realPlayerNotifications,
+} from '../real/player-notifications'
+import {
+  isPlayerNotificationVisible,
+  playerNotificationUnreadCount,
+  VERIFICATION_REMINDER_ID,
+  verificationReminder,
+} from './playerNotifications.rules'
 import type { PlayerNotification } from './playerNotifications.types'
 
-const VERIFICATION_REMINDER_ID = 'ann-google'
-
-function verificationReminder(
-  state: MockState,
-  playerId: string,
-  now: number,
-): PlayerNotification | null {
+function mockReminder(state: MockState, playerId: string, now: number): PlayerNotification | null {
   const verification = accountVerificationIn(state, playerId)
   if (!verification || verification.verified) return null
 
-  return {
-    id: VERIFICATION_REMINDER_ID,
-    kind: 'announce',
-    title: 'Verify your ROTRA account',
-    body: `Connect Google, have your phone on file and use your Google email, by ${GOOGLE_SIGN_IN_DEADLINE.label}. ${verification.completedSteps} of 3 done.`,
-    target: '/profile/verification',
-    createdAt: new Date(now - 60_000).toISOString(),
-    readAt: state.verificationReminderReads[playerId] ?? null,
-    pinned: true,
-  }
+  return verificationReminder(
+    verification.completedSteps,
+    state.verificationReminderReads[playerId] ?? null,
+    now,
+  )
 }
 
 function resolveClubTarget(
@@ -53,7 +51,7 @@ export async function getPlayerNotifications(
   playerId: string,
   signal?: AbortSignal,
 ): Promise<PlayerNotification[]> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realPlayerNotifications(playerId, signal)
   await delay(200, signal)
   if ((await getSession('player'))?.account.id !== playerId) return []
   requireOnline()
@@ -63,13 +61,18 @@ export async function getPlayerNotifications(
   const rows = (state.playerNotifications[playerId] ?? [])
     .filter((notification) => isPlayerNotificationVisible(notification, now))
     .map((notification) => resolveClubTarget(notification, state, playerId))
-  const reminder = verificationReminder(state, playerId, now)
+  const reminder = mockReminder(state, playerId, now)
   if (reminder) rows.unshift(reminder)
   return rows
 }
 
+export async function getPlayerNotificationUnreadCount(playerId: string, signal?: AbortSignal) {
+  if (isRealDataMode()) return realNotificationUnreadCount(playerId, signal)
+  return playerNotificationUnreadCount(await getPlayerNotifications(playerId, signal))
+}
+
 async function markRead(playerId: string, notificationId?: string): Promise<void> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realMarkNotificationsRead(playerId, notificationId)
   await delay(200)
   if ((await getSession('player'))?.account.id !== playerId)
     throw new MockError('permission', 'Sign in to mark your notifications as read.')
@@ -86,7 +89,7 @@ async function markRead(playerId: string, notificationId?: string): Promise<void
     )
     const reminder =
       notificationId === undefined || notificationId === VERIFICATION_REMINDER_ID
-        ? verificationReminder(draft, playerId, now)
+        ? mockReminder(draft, playerId, now)
         : null
     const markReminder = reminder?.readAt === null
     if (!unread.length && !markReminder) return

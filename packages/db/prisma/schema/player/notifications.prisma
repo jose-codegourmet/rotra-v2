@@ -1,0 +1,30 @@
+enum PlayerNotificationKind {
+  announce
+  session
+  invite
+  club
+  rank
+  account
+
+  @@map("player_notification_kind")
+}
+
+/// Private messages produced in the transaction that records the source event.
+model PlayerNotification {
+  id         String                 @id @default(uuid(7)) @db.Uuid
+  playerId   String                 @map("player_id") @db.Uuid
+  kind       PlayerNotificationKind
+  title      String
+  body       String
+  target     String
+  sourceType String?                @map("source_type")
+  sourceId   String?                @map("source_id") @db.Uuid
+  createdAt  DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  readAt     DateTime?              @map("read_at") @db.Timestamptz(6)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@unique([playerId, kind, sourceType, sourceId], map: "player_notifications_source_key")
+  @@index([playerId, createdAt(sort: Desc)])
+  @@map("player_notifications")
+}

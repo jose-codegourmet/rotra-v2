@@ -34,6 +34,14 @@ These rules are Go-only ([rule-cases bucket 2](../rule-cases_20261113/spec.md#bu
 
 - [ ] Case runs recorded per rule
 
+## Carried in from main (merged November 18, 2026)
+
+Writes added on `main` after this track was written (Epics P13 to P15). They are in scope for R1 and R2.
+
+- **Admin:** verification override with an audited reason (`PATCH /api/players/{playerId}/verification`, [D-2026-11-16-02](../../../docs/mvp/decisions.md#d-2026-11-16-02)); RTR ID edit with its cascade to every record that holds the old one (`player-rtr-id.ts`); Add player saved as the club's unclaimed record, `POST /api/players` ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04)).
+- **Player:** mark one notification read (`PATCH /api/me/notifications/{notificationId}`) or all of them (`PATCH /api/me/notifications`); notifications written from approved events (`notification-events.ts`), including the rank update written inside the projection job ([D-2026-11-16-03](../../../docs/mvp/decisions.md#d-2026-11-16-03)).
+- **Phones** are stored as E.164 and shown masked in one format ([D-2026-11-16-06](../../../docs/mvp/decisions.md#d-2026-11-16-06)).
+
 ## Scope
 
 **In:** Admin and Player POST/PATCH/DELETE routes.

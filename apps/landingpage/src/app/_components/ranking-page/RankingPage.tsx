@@ -11,21 +11,24 @@ export function RankingPage() {
         <div className="bgl" data-bg-scene="lineup" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/lineup-far.webp"
+            src="/art/lite/lineup-far.webp"
+            data-full="/art/lineup-far.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-far"
           />
           <img
             className="ly mid"
-            src="/art/lineup-mid.webp"
+            src="/art/lite/lineup-mid.webp"
+            data-full="/art/lineup-mid.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-mid"
           />
           <img
             className="ly near"
-            src="/art/lineup-near.webp"
+            src="/art/lite/lineup-near.webp"
+            data-full="/art/lineup-near.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-near"
@@ -84,21 +87,24 @@ export function RankingPage() {
           <div className="bgl" data-bg-scene="assess" aria-hidden="true">
             <img
               className="ly far"
-              src="/art/assess-far.webp"
+              src="/art/lite/assess-far.webp"
+              data-full="/art/assess-far.webp"
               alt=""
               loading="lazy"
               data-layer="assess-far"
             />
             <img
               className="ly mid"
-              src="/art/assess-mid.webp"
+              src="/art/lite/assess-mid.webp"
+              data-full="/art/assess-mid.webp"
               alt=""
               loading="lazy"
               data-layer="assess-mid"
             />
             <img
               className="ly near"
-              src="/art/assess-near.webp"
+              src="/art/lite/assess-near.webp"
+              data-full="/art/assess-near.webp"
               alt=""
               loading="lazy"
               data-layer="assess-near"
@@ -166,21 +172,24 @@ export function RankingPage() {
           <div className="bgl" data-bg-scene="moves" aria-hidden="true">
             <img
               className="ly far"
-              src="/art/moves-far.webp"
+              src="/art/lite/moves-far.webp"
+              data-full="/art/moves-far.webp"
               alt=""
               loading="lazy"
               data-layer="moves-far"
             />
             <img
               className="ly mid"
-              src="/art/moves-mid.webp"
+              src="/art/lite/moves-mid.webp"
+              data-full="/art/moves-mid.webp"
               alt=""
               loading="lazy"
               data-layer="moves-mid"
             />
             <img
               className="ly near"
-              src="/art/moves-near.webp"
+              src="/art/lite/moves-near.webp"
+              data-full="/art/moves-near.webp"
               alt=""
               loading="lazy"
               data-layer="moves-near"
@@ -283,21 +292,24 @@ export function RankingPage() {
           <div className="bgl" data-bg-scene="clubs" aria-hidden="true">
             <img
               className="ly far"
-              src="/art/clubs-far.webp"
+              src="/art/lite/clubs-far.webp"
+              data-full="/art/clubs-far.webp"
               alt=""
               loading="lazy"
               data-layer="clubs-far"
             />
             <img
               className="ly mid"
-              src="/art/clubs-mid.webp"
+              src="/art/lite/clubs-mid.webp"
+              data-full="/art/clubs-mid.webp"
               alt=""
               loading="lazy"
               data-layer="clubs-mid"
             />
             <img
               className="ly near"
-              src="/art/clubs-near.webp"
+              src="/art/lite/clubs-near.webp"
+              data-full="/art/clubs-near.webp"
               alt=""
               loading="lazy"
               data-layer="clubs-near"
@@ -365,21 +377,24 @@ export function RankingPage() {
           <div className="bgl" data-bg-scene="ladder" aria-hidden="true">
             <img
               className="ly far"
-              src="/art/ladder-far.webp"
+              src="/art/lite/ladder-far.webp"
+              data-full="/art/ladder-far.webp"
               alt=""
               loading="lazy"
               data-layer="ladder-far"
             />
             <img
               className="ly mid"
-              src="/art/ladder-mid.webp"
+              src="/art/lite/ladder-mid.webp"
+              data-full="/art/ladder-mid.webp"
               alt=""
               loading="lazy"
               data-layer="ladder-mid"
             />
             <img
               className="ly near"
-              src="/art/ladder-near.webp"
+              src="/art/lite/ladder-near.webp"
+              data-full="/art/ladder-near.webp"
               alt=""
               loading="lazy"
               data-layer="ladder-near"
@@ -458,21 +473,24 @@ export function RankingPage() {
           <div className="bgl" data-bg-scene="record" aria-hidden="true">
             <img
               className="ly far"
-              src="/art/record-far.webp"
+              src="/art/lite/record-far.webp"
+              data-full="/art/record-far.webp"
               alt=""
               loading="lazy"
               data-layer="record-far"
             />
             <img
               className="ly mid"
-              src="/art/record-mid.webp"
+              src="/art/lite/record-mid.webp"
+              data-full="/art/record-mid.webp"
               alt=""
               loading="lazy"
               data-layer="record-mid"
             />
             <img
               className="ly near"
-              src="/art/record-near.webp"
+              src="/art/lite/record-near.webp"
+              data-full="/art/record-near.webp"
               alt=""
               loading="lazy"
               data-layer="record-near"

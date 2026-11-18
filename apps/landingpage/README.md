@@ -182,10 +182,24 @@ greens, one mint `#00FF88`).
 - Loading screen (`site-boot/SiteBoot.tsx`, `src/scripts/boot.js`, “Loading screen” block in `globals.css`): the ROTRA mark
   on a dark page, server-rendered so it is the first paint. `art/boot.riv` (built from `rive/boot/`: `rive rive/boot --publish`,
   then copy `rive/boot/build/boot.riv` to `public/art/`) replaces the still mark; its view model takes `progress` (0..1, fills
-  the inner ring) and `out` (1 plays the exit). Meanwhile every art file this device will use on every view (images, character
-  stills and `.riv`, the hero hall, the section scenes off touch) is fetched into the HTTP cache six at a time and the page
-  cannot scroll (`html.booting`, Lenis stopped until the `rotra:ready` event). The screen leaves when all are in: at least
+  the inner ring) and `out` (1 plays the exit). Meanwhile the art the visitor meets first is fetched into the HTTP cache six at a time and the page
+  cannot scroll (`html.booting`, Lenis stopped until the `rotra:ready` event): on desktop all the art of the view being
+  opened, on phones and touch the stills within two screens of its top and the
+  Rive files within one. The screen leaves when all are in: at least
   1.4 s, at most 25 s; failed files count as done. Without scripts it is hidden (`noscript`), and a CSS timer lifts it after 30 s.
+- Light-first loading (`src/scripts/boot.js` “what to load”, `rive.js` `fullLayers`, `site.js` character stills):
+  - The three scene layers load as 960 px copies in `public/art/lite/` (about 20 KB each; rebuild one with
+    `cwebp -resize 960 0 -q 55 -alpha_q 70 public/art/<scene>-<layer>.webp -o public/art/lite/<scene>-<layer>.webp`
+    whenever its original changes). Each `<img class="ly">` names its 2880 px original in `data-full`.
+  - Where the scene `.riv` plays (desktop), the light layers only cover the moment before its first frames. Where it
+    does not (reduced motion, touch above 700 px, a failed file), the layers are swapped for the originals once the
+    section is within one screen. Phones keep their tall still (`art/mobile/`).
+  - A character still is painted when its element comes within two screens of the viewport.
+  - After the loading screen the rest is fetched two at a time at low priority: the rest of the view, the footer,
+    and on desktop the other views. Pointing at, touching or focusing a link to another view fetches that view's art
+    first. Nothing is prefetched on data saver or a 2G connection.
+  - `vercel.json` (the `landingpage` service) caches `/art/*` and `/hero-a/*` for one hour, then serves the cached
+    copy while it re-checks for up to 30 days, so a changed file reaches a returning visitor on their next visit.
 - Hero smash (the hero to 01 handover; “Hero smash” in `src/scripts/site.js`, “Hero smash” block in `globals.css`):
   with the scroll the title lifts, Tara swaps to the wind-up pose (`tara-smash`) and a shuttle (`public/art/shuttle.webp`)
   comes in to her racket. At 46% of the hero's progress the smash plays on its own clock, about 1.1 s: the

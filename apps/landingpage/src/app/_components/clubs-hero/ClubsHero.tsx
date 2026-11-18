@@ -11,21 +11,24 @@ export function ClubsHero() {
       <div className="bgl" data-bg-scene="clubs" aria-hidden="true">
         <img
           className="ly far"
-          src="/art/clubs-far.webp"
+          src="/art/lite/clubs-far.webp"
+          data-full="/art/clubs-far.webp"
           alt=""
           loading="lazy"
           data-layer="clubs-far"
         />
         <img
           className="ly mid"
-          src="/art/clubs-mid.webp"
+          src="/art/lite/clubs-mid.webp"
+          data-full="/art/clubs-mid.webp"
           alt=""
           loading="lazy"
           data-layer="clubs-mid"
         />
         <img
           className="ly near"
-          src="/art/clubs-near.webp"
+          src="/art/lite/clubs-near.webp"
+          data-full="/art/clubs-near.webp"
           alt=""
           loading="lazy"
           data-layer="clubs-near"

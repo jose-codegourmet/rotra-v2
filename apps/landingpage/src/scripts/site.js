@@ -560,7 +560,24 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
       el.style.backgroundRepeat = 'no-repeat'; el.style.backgroundSize = 'contain'; el.style.backgroundPosition = '50% 100%';
     }
   };
-  document.querySelectorAll('.chr[data-char]').forEach(CHR.showStill);
+  // A still is painted when its element comes within two screens of the viewport (and at once in the view being
+  // opened, for the ones near the top), so a view does not fetch every still it has at load.
+  (function(){
+    var els = document.querySelectorAll('.chr[data-char]');
+    if (!('IntersectionObserver' in window)) { els.forEach(CHR.showStill); return; }
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        if (!e.target._chrShown) CHR.showStill(e.target);
+      });
+    }, { rootMargin: '200% 0px 200% 0px' });
+    var vh = window.innerHeight;
+    els.forEach(function(el){
+      var b = el.getBoundingClientRect();
+      if ((b.width || b.height) && b.top < vh * 2) CHR.showStill(el); else io.observe(el);
+    });
+  })();
 
   // Sample-player avatars: every initials circle (.vg-av, .qav, .avatar) whose initials have a portrait in
   // art/avatars/<initials>.webp shows it (.has-av); the initials stay in the markup as the fallback.

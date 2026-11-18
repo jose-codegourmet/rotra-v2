@@ -1681,7 +1681,7 @@ const IDENT = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest'
 function seedPlayers() {
   const mk = (id, name, nick, identity, rtr, sugg, prior, base, phoneHidden) => ({ id, name, nick, identity, rtr, sugg, prior, base, phoneHidden: !!phoneHidden, added: ['p18', 'p19', 'p20'].includes(id) ? Date.now() : Date.now() - (30 + Number(id.slice(1))) * 864e5 });
   return [
-    mk('p1', 'Miguel Santos', 'Migs', 'registered', 'RTR-PH-CEB-031526-0001', 23, 6, 0.62, true),
+    { ...mk('p1', 'Miguel Santos', 'Migs', 'registered', 'RTR-PH-CEB-031526-0001', 23, 6, 0.62, true), clubNick: 'Kuya Migs' },
     mk('p2', 'Bea Castillo', '', 'registered', 'RTR-PH-CEB-031526-0002', 19, 7, 0.55),
     { ...mk('p3', 'Jomar dela Cruz', 'Jom', 'unclaimed', 'RTR-PH-CEB-052026-0017', 18, 5, 0.48), email: 'jomar.delacruz@example.com' },
     mk('p4', 'Kat Lim', '', 'registered', 'RTR-PH-CEB-040226-0011', 15, 8, 0.51, true),
@@ -1812,7 +1812,12 @@ const P = (id) => S.players.find((p) => p.id === id);
 // Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
 const saved = () => S.players.filter((p) => !p.removed);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
-const short = (id) => { const p = P(id); return p ? (p.nick || p.name.split(' ')[0]) : '?'; };
+// Owner, November 18, 2026: a club can give a registered player its own nickname. Only the Queue Master's screens show it
+// (console, roster, Saved players). The session page, results and leaderboards keep the nickname on the player's ROTRA account.
+// Guests and unclaimed players have no account yet, so their one nickname is already the club's (Edit details).
+const clubNickOf = (p) => (p && p.identity === 'registered' && p.clubNick) || '';
+const acctShort = (id) => { const p = P(id); return p ? (p.nick || p.name.split(' ')[0]) : '?'; };
+const short = (id) => { const p = P(id); return p ? (clubNickOf(p) || p.nick || p.name.split(' ')[0]) : '?'; };
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
 
 // Sample profile pictures: illustrated faces for players with a ROTRA profile. Guests and a few profiles
@@ -2367,7 +2372,7 @@ function topBar() {
 function pubTopBar() {
   const v = pubViewer(), open = S.ui.courtMenu === 'pub-account';
   const account = v
-    ? `<div class="cmenu"><button class="acct" data-act="toggleCourtMenu" data-id="pub-account" aria-haspopup="menu" aria-expanded="${open}" aria-label="Signed in as ${esc(v.name)}. Account menu">${avatar(v)}<span class="acct-name">${esc(short(v.id))}</span>${I.down}</button>${open ? `<div class="cmenu-list acct-menu" role="menu" aria-label="Account">
+    ? `<div class="cmenu"><button class="acct" data-act="toggleCourtMenu" data-id="pub-account" aria-haspopup="menu" aria-expanded="${open}" aria-label="Signed in as ${esc(v.name)}. Account menu">${avatar(v)}<span class="acct-name">${esc(acctShort(v.id))}</span>${I.down}</button>${open ? `<div class="cmenu-list acct-menu" role="menu" aria-label="Account">
       <div class="acct-head">${avatar(v)}<div class="acct-head-text"><b>${esc(v.name)}</b>${v.rtr ? `<span>${esc(v.rtr)}</span>` : ''}</div></div>
       <div class="acct-sep" role="separator"></div>
       ${v.rtr ? `<button role="menuitem" data-act="pubMyProfile" data-id="${esc(v.rtr)}" aria-label="My ROTRA profile, opens in a new tab">${I.n_user}<span class="grow">My ROTRA profile</span><span class="trail">${I.ext}</span></button>` : ''}
@@ -3071,7 +3076,7 @@ function historyMatch(s, m) {
   // faces with first names on dark pills (the winning pair ringed in the accent), the score (or "No score") and "◀ Won" / "Won ▶" on the
   // net, Invalid on a desaturated court. Team A is on the left. Faces open the player profile. Substitution lines stay under the court.
   const invalid = m.status === 'invalid', wl = invalid ? null : m.winner === 'A';
-  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}" data-act="openProfile" data-id="${pid}" title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}. View profile">${avatar(P(pid))}<b>${esc(short(pid))}</b></button>`;
+  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}" data-act="openProfile" data-id="${pid}" title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}. View profile">${avatar(P(pid))}<b>${esc(acctShort(pid))}</b></button>`;
   const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
   const score = invalid ? '' : m.scoreA != null ? `<span class="gm-score tnum">${m.scoreA}–${m.scoreB}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
   const res = invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
@@ -3424,7 +3429,7 @@ function viewPlayers() {
   const cities = [...new Set(saved().map(regCity).filter(Boolean))].sort();
   const { sort: _sort, ...filters } = SP_FILTERS;
   const opts = { ...filters, city: ['Registered in', [['all', 'Anywhere'], ...cities.map((c) => [c, c]), ['none', 'Not registered yet']]] };
-  const list = saved().filter((p) => (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))
+  const list = saved().filter((p) => (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q))
     && (f.band === 'all' || bandOf(p) === f.band)
     && (f.city === 'all' || (regCity(p) || 'none') === f.city)
     && addedOk[f.added](p)
@@ -3462,7 +3467,7 @@ function playerCard(p) {
     <button class="sp-main" data-act="openProfile" data-id="${p.id}" aria-label="${esc(p.name)}, ${esc(sub)}, ${esc(IDENT[p.identity])}. Open profile">
       <span class="sp-av">${avatar(p, 'xl')}<i class="sp-dot ${status}" aria-hidden="true"></i></span>
       <span class="sp-name">${esc(p.name)}</span>
-      ${p.nick ? `<span class="sp-nick">“${esc(p.nick)}”</span>` : '<span class="sp-nick">&nbsp;</span>'}
+      ${clubNickOf(p) ? `<span class="sp-nick" title="Club nickname">“${esc(clubNickOf(p))}” <span class="muted">· club nickname</span></span>` : p.nick ? `<span class="sp-nick">“${esc(p.nick)}”</span>` : '<span class="sp-nick">&nbsp;</span>'}
       <span class="small muted">${joinedViaText(p)}</span>
       <span class="sp-level"><span class="lvl-bars b${band}" aria-hidden="true"><i></i><i></i><i></i></span>${esc(sub)}</span>
       ${(() => { const st = liveState(p.id); return st && st.kind !== 'away' ? `<span class="sp-live ${st.kind}"><i aria-hidden="true"></i>${esc(st.text)}</span>` : ''; })()}
@@ -4121,7 +4126,7 @@ function courtSides(s, m) {
   const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => {
     const p = P(pid), r = R(s, pid);
     const g = gamesOf(s, pid);
-    return `<button class="pf" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="pf-n">${esc(short(pid))}</span></button>`;
+    return `<button class="pf" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="pf-n">${esc((s.status === 'finalized' ? acctShort : short)(pid))}</span></button>`;
   }).join('')}</div>`;
   return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`;
 }
@@ -4228,7 +4233,7 @@ function queuePane(s) {
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
     ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
-    ${(() => { const q = (S.ui.qSearch || '').trim().toLowerCase(); const n = q ? list.filter((m) => all(m).some((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''}`.toLowerCase().includes(q); })).length : 0; return `<label class="field"><span class="sr-only">Find a player in the queue</span><input class="input" id="queue-search" type="search" data-bind="ui.qSearch" data-rerender placeholder="Find a player in the queue" autocomplete="off" value="${esc(S.ui.qSearch || '')}">${q ? `<span class="small ${n ? '' : 'muted'}" aria-live="polite">${n ? `${n} queued match${n === 1 ? '' : 'es'} with ${esc(S.ui.qSearch.trim())}` : 'Not in any queued match'}</span>` : ''}</label>`; })()}
+    ${(() => { const q = (S.ui.qSearch || '').trim().toLowerCase(); const n = q ? list.filter((m) => all(m).some((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''} ${clubNickOf(pp)}`.toLowerCase().includes(q); })).length : 0; return `<label class="field"><span class="sr-only">Find a player in the queue</span><input class="input" id="queue-search" type="search" data-bind="ui.qSearch" data-rerender placeholder="Find a player in the queue" autocomplete="off" value="${esc(S.ui.qSearch || '')}">${q ? `<span class="small ${n ? '' : 'muted'}" aria-live="polite">${n ? `${n} queued match${n === 1 ? '' : 'es'} with ${esc(S.ui.qSearch.trim())}` : 'Not in any queued match'}</span>` : ''}</label>`; })()}
     <div class="qgrid" style="grid-template-columns:repeat(${queueCols()}, minmax(0, 1fr))">${list.map((m, i) => queueCard(s, m, i, list.length, queueCols())).join('')}</div>`
       : `<div class="card empty">No waiting matches. Use Generate matches to create a few, or add one yourself.</div>`}`;
 }
@@ -4423,7 +4428,7 @@ function queueCard(s, m, i, n, cols) {
   const b = blockOf(s, m);
   // Owner request, November 9, 2026: searching for a player highlights their cards in the Main Queue and softens the rest.
   const qs = (S.ui.qSearch || '').trim().toLowerCase();
-  const hitIds = qs ? all(m).filter((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''}`.toLowerCase().includes(qs); }) : [];
+  const hitIds = qs ? all(m).filter((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''} ${clubNickOf(pp)}`.toLowerCase().includes(qs); }) : [];
   const row = Math.floor(i / cols), k = i % cols, col = row % 2 === 0 ? k : cols - 1 - k;
   const flow = i === n - 1 ? '' : (k === cols - 1 ? '↓' : row % 2 === 0 ? '→' : '←');
   const status = !b ? `<span class="status-line ok">${I.check} Ready to start</span>`
@@ -5211,7 +5216,7 @@ const SHEETS = {
     const courtSpot = (key, i, label) => {
       const pid = at(key, i);
       const p = pid ? P(pid) : null;
-      return `<button class="pf mr-spot${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change"><span class="pf-face">${p ? avatar(p) : '<span class="avatar mr-plus" aria-hidden="true">+</span>'}</span><span class="pf-n">${p ? esc(short(pid)) : label}</span></button>`;
+      return `<button class="pf mr-spot${p ? '' : ' empty'}" data-act="mrPick" data-key="${key}" data-i="${i}" aria-label="${label}: ${p ? esc(p.name) : 'Anyone'}. Change"><span class="pf-face">${p ? avatar(p) : '<span class="avatar mr-plus" aria-hidden="true">+</span>'}</span><span class="pf-n">${p ? esc(acctShort(pid)) : label}</span></button>`;
     };
     const left = [me, ...spots.filter(([k]) => k === 'partner').map(([k, i, l]) => courtSpot(k, i, l))];
     const right = spots.filter(([k]) => k === 'opp').map(([k, i, l]) => courtSpot(k, i, l));
@@ -5336,6 +5341,7 @@ const SHEETS = {
             <dl class="kv">
               <dt>Added to club</dt><dd>${new Date(addedAt(p)).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</dd>
               <dt>Sessions here</dt><dd>${p.prior}</dd>
+              ${p.identity === 'registered' ? `<dt>Club nickname</dt><dd>${clubNickOf(p) ? `“${esc(clubNickOf(p))}” · only your club sees it` : 'None'}</dd>` : ''}
               <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' || p.noPhone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
               ${p.identity === 'registered' ? '' : `<dt>Email</dt><dd>${p.email ? 'On file and kept private' : 'None on file'}</dd>`}
             </dl></div>
@@ -5343,7 +5349,7 @@ const SHEETS = {
       <p class="small muted" style="margin:0">Levels are set per session while preparing a roster, not here.</p>
         </div>
       </div>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'registered' && !sh.back ? `<button class="btn" data-act="openClubNick" data-id="${p.id}">Club nickname</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
@@ -5509,6 +5515,16 @@ const SHEETS = {
       <p>They're also taken out of any prepared or upcoming session. Their finished games and results stay.</p>`,
       `<button class="btn" data-act="closeSheet" data-autofocus>Keep player</button><button class="btn danger" data-act="confirmDeletePlayer" data-id="${p.id}">Delete player</button>`);
   },
+  clubNick(sh) {
+    // Saved players › a registered player › Club nickname (owner, November 18, 2026). Registered players own their details, so this
+    // is the one thing a club sets for them. It never changes their ROTRA account.
+    const p = P(sh.id), first = p.name.split(' ')[0];
+    return sheetShell(`Club nickname for ${esc(p.name)}`, `
+      <p>What your club calls ${esc(first)}. Only you see it: on the console, the roster and Saved players.</p>
+      <label class="field"><span>Club nickname (optional)</span><input class="input" id="cn-nick" data-bind="ui.sheet.v" value="${esc(sh.v)}" data-autofocus>
+        <span class="hint">The session page, results and leaderboards show ${p.nick ? `the nickname on their ROTRA account, “${esc(p.nick)}”` : 'the name on their ROTRA account'}. Leave this empty to use that here too.</span></label>`,
+      `<button class="btn" data-act="openProfile" data-id="${p.id}">Cancel</button><button class="btn primary" data-act="saveClubNick">Save nickname</button>`);
+  },
   editPlayer(sh) {
     // Saved players › player › Edit details. Guests and unclaimed players only: a registered player owns their details.
     // D-2026-11-16-04: adding an email makes a guest an unclaimed player. A club can't change an email once it is saved.
@@ -5645,7 +5661,7 @@ const SHEETS = {
     body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].filter(([k]) => !club || k !== 'saved').map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>${club && sh.err && !sh.pick && tab === 'global' ? notice('bad', esc(sh.err)) : ''}`;
     if (tab === 'saved') {
       // Players already on the roster or waitlist are left out of the list rather than shown greyed out.
-      const list = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
+      const list = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
       const added = saved().filter((p) => inRoster.has(p.id)).length;
       body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
@@ -6543,6 +6559,14 @@ const ACT = {
     p.removed = true;
     S.ui.sheet = null;
     commit(`${p.name} deleted`);
+    render();
+  },
+  openClubNick: (d) => { const p = P(d.id); if (!p || p.identity !== 'registered') return; openSheet({ type: 'clubNick', id: p.id, v: p.clubNick || '' }); },
+  saveClubNick: () => {
+    const sh = S.ui.sheet, p = P(sh.id), v = (sh.v || '').trim(), had = !!p.clubNick;
+    p.clubNick = v;
+    S.ui.sheet = { type: 'profile', id: p.id };
+    commit(v ? `Club nickname saved · ${p.name}` : had ? `Club nickname removed · ${p.name}` : `No club nickname · ${p.name}`);
     render();
   },
   openEditPlayer: (d) => {

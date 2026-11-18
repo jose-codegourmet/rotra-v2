@@ -34,7 +34,18 @@
     },
     "landingpage": {
       "root": "apps/landingpage",
-      "framework": "nextjs"
+      "framework": "nextjs",
+      "headers": [
+        {
+          "source": "/(art|hero-a)/(.*)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=3600, stale-while-revalidate=2592000"
+            }
+          ]
+        }
+      ]
     }
   },
   "rewrites": [

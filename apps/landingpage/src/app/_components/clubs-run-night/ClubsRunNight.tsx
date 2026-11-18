@@ -17,21 +17,24 @@ export function ClubsRunNight() {
         <div className="bgl" data-bg-scene="queue" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/queue-far.webp"
+            src="/art/lite/queue-far.webp"
+            data-full="/art/queue-far.webp"
             alt=""
             loading="lazy"
             data-layer="queue-far"
           />
           <img
             className="ly mid"
-            src="/art/queue-mid.webp"
+            src="/art/lite/queue-mid.webp"
+            data-full="/art/queue-mid.webp"
             alt=""
             loading="lazy"
             data-layer="queue-mid"
           />
           <img
             className="ly near"
-            src="/art/queue-near.webp"
+            src="/art/lite/queue-near.webp"
+            data-full="/art/queue-near.webp"
             alt=""
             loading="lazy"
             data-layer="queue-near"

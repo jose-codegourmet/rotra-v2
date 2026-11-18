@@ -17,21 +17,24 @@ export function HomeRanking() {
         <div className="bgl" data-bg-scene="moves" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/moves-far.webp"
+            src="/art/lite/moves-far.webp"
+            data-full="/art/moves-far.webp"
             alt=""
             loading="lazy"
             data-layer="moves-far"
           />
           <img
             className="ly mid"
-            src="/art/moves-mid.webp"
+            src="/art/lite/moves-mid.webp"
+            data-full="/art/moves-mid.webp"
             alt=""
             loading="lazy"
             data-layer="moves-mid"
           />
           <img
             className="ly near"
-            src="/art/moves-near.webp"
+            src="/art/lite/moves-near.webp"
+            data-full="/art/moves-near.webp"
             alt=""
             loading="lazy"
             data-layer="moves-near"

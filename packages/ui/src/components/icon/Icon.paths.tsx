@@ -210,6 +210,11 @@ export const ICONS = {
       </>
     ),
   },
+  shield: {
+    size: 16,
+    strokeWidth: 2.2,
+    body: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+  },
   alert: {
     size: 16,
     strokeWidth: 2.2,

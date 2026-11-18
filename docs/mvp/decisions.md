@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 and D-2026-11-18-02 added; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-01 to 03 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -60,8 +60,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
+| [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -981,7 +981,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-02 — Player account verification with an Admin override
 - **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
-- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-account-verification.md)); the Admin control is not designed yet.
+- **Implementation status:** #915 implements the private Player and Admin reads and the audited override in real-mode source. Migration and batch verification are pending. [Player verification mockup](../mockup-changes/2026-11-16-player-account-verification.md) and [Admin verification mockup](../mockup-changes/2026-11-18-admin-player-verification.md).
 - **Ticket:** [#889](https://github.com/jose-codegourmet/rotra-v2/issues/889) (Epic P13)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -994,7 +994,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - What an unverified player can't do (the mockup blocks nothing).
   - Whether the phone must be confirmed (no SMS exists; "on file" means present).
   - Whether other players and clubs see the badge (the mockup shows it only to the player).
-  - Whether Admin can also set **Not verified**, and whether a reason is required and kept in the audit log.
+- **Owner amendment, November 18, 2026 (#907):** Admin can set **Verified by Admin** or clear it to restore the automatic checks; no forced **Not verified** override. Both actions require a reason recorded in the Admin audit log. Admin › Player detail gets a **Verification** card showing the status, all three checks and the set/clear action. #915 may use the existing Google account fields without waiting for #922's separate OAuth/registration acceptance work; the owner approved proceeding on that basis.
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#account-verification), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md#p-verification--account-verification), [identity database design](../database_design/product/player-information/modules/identity.md#account-verification-d-2026-11-16-02).
 
 ### D-2026-11-16-03 — Player notifications page
@@ -1143,15 +1143,15 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Amends:** [D-2026-11-17-01](#d-2026-11-17-01) (operator naming, effective date, the text, where it is shown).
 - **Decision:**
   - **Fuller text.** Both pages are rewritten into a more complete version in the same plain-language voice: the Privacy Policy covers the Data Privacy Act of 2012 (legal basis per use, automated ranks, named service providers, storage outside the Philippines, breach notice, cookies, rights, children, links); the Terms add who can use ROTRA, club accounts and licenses, playing at your own risk, ROTRA's property, other companies' services, limits on liability, claims caused by the user, events outside our control, disputes and general terms.
-  - **Operator:** placeholders for now, exactly `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes), so they can be found and filled. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
+  - **Operator:** first shipped as the placeholders `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes). Filled on November 18, 2026 (owner): the operator is “Jose Adrian Buctuanon (doing business as CodeGourmet IO)”, because CodeGourmet IO is not a registered business; the address is “Lapu-Lapu City, Cebu, Philippines”; the courts are those of Lapu-Lapu City. Revisit the name if the business is registered. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
   - **Age:** you must be 18 to register on your own. Anyone under 18 may use ROTRA only with a parent's or guardian's consent. A club that adds a minor confirms it has that consent.
   - **Club licenses and refunds:** the license, fees, period, payment and refunds are the ones in the club's accepted quotation. A quotation request on rotra.club is not a contract until a quotation is accepted. Nothing overrides rights the law gives.
   - **Google sign-in:** every statement about Google is true whether the `player_google_sign_in` flag ([D-2026-11-18-01](#d-2026-11-18-01)) is on or off ("If you sign in with Google", "or with Google where it is offered").
-  - **rotra.club** gets `#privacy` and `#terms` with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
+  - **rotra.club** gets `/privacy` and `/terms` (first built as the hash routes `#privacy` and `#terms`; moved to pages of their own on November 18, 2026 so each has a URL Google's sign-in branding check can fetch) with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
   - **Effective date** on both, everywhere: November 18, 2026.
 - **Open:**
   - The text is still a plain-language draft that a lawyer has not reviewed.
-  - Filling the three placeholders.
+  - ~~Filling the three placeholders.~~ Done November 18, 2026 (see “Operator” above).
   - Designating a Data Protection Officer, and checking whether ROTRA must register with the National Privacy Commission.
   - The `support@rotra.club` mailbox must exist before launch.
   - Retention periods: the pages give none. (The [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md#public-pages-and-retention) already has six months for public pages after expiry and 90 days for join requests, server request logs and exports, not yet enforced by a job.)
@@ -1159,7 +1159,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the Queue and Admin apps link to the same pages (carried over from D-2026-11-17-01).
 - **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/content.ts`, `apps/player/src/app/(public)/terms/content.ts`, `apps/mockup/player-app/rotra-player.html` › `LEGAL`.
 
-### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
+<a id="d-2026-11-18-03"></a>
+### D-2026-11-18-03 — Club nickname: set by the Queue Master, shown on Queue Master screens only
 - **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
 - **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))

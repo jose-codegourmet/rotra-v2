@@ -20,6 +20,8 @@ const meta = {
     onChangePicture: () => {},
     onChangeBanner: () => {},
     onOpenPlayerId: () => {},
+    onOpenVerification: () => {},
+    verification: { completedSteps: 2 },
     onShare: () => {},
     onCompare: () => {},
   },
@@ -49,3 +51,6 @@ export const PublicSignedIn: Story = { args: { compareSignedIn: true } }
 export const OwnLight: Story = { args: { isOwn: true }, globals: { theme: 'light' } }
 export const DuskBanner: Story = { args: { bannerKey: 'dusk' } }
 export const SunBannerLight: Story = { args: { bannerKey: 'sun' }, globals: { theme: 'light' } }
+export const OwnVerifiedByAdmin: Story = {
+  args: { isOwn: true, verification: { completedSteps: 1, verifiedByAdmin: true } },
+}

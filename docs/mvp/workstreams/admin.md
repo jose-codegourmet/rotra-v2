@@ -10,7 +10,7 @@ Admin manages clubs and access.
 
 ## In scope
 
-Admin sign-in; clubs, licenses, pricing and club-name requests; player directory and history;
+Admin sign-in; clubs, licenses, pricing and club-name requests; player directory, history and account verification;
 configuration (feature flags, ranking settings); audit; contact-change review; the manual player reset
 link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 
@@ -31,6 +31,7 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Change club price | not implemented | `club/fetchers.ts:306` mock only; `setClubPricing` (`clubs.ts:211`) has no route | Ticket: needed |
 | Club-name requests (list/approve/reject) | not implemented | `club/fetchers.ts:350,376,400` mock only; `reviewClubNameChange` (`clubs.ts:502`) has no route | Ticket: needed |
 | Player directory / detail / games | implemented | `admin-player/fetchers.ts:89,103,136,147` → `real/admin-players.ts` → `db/src/admin/players.ts:13,106` | #25 open (epic) |
+| Player verification and audited Admin override | mock implementation in source, pending batch verification | Overview shows the status and three checks below Account for registered players. Set and Clear require a reason and refresh the record of actions. | #912 mock, #915 real mode |
 | Unclaimed player history | implemented in source | Admin history reads the club-only record's finalized match facts by its club-player ID; a missing record is a not-found response, not an Admin permission denial | — |
 | Player edit profile (name + nickname) | implemented (#575) | `admin-player/mutations.ts` → `real/admin-players.ts` → `PATCH api/players/[playerId]` → `updateAdminPlayerProfile` (`db/src/admin/players.ts`); audit `player.profile_updated`; unclaimed photo link mock-only | #575 |
 | Player create/archive/restore/remove (Edit profile also sends an email change as an `owner` contact-change request, #564) | not implemented | `admin-player/mutations.ts` mock only | Ticket: needed (MVP scope: open question 10) |

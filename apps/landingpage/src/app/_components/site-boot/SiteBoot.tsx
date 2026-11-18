@@ -2,8 +2,26 @@
  * The loading screen: the ROTRA mark over a dark page until the site's art is in the browser's cache.
  * Server-rendered so it is the first paint; "Boot" in src/scripts/boot.js swaps the still mark for the Rive
  * one (art/boot.riv), fills its inner ring with the load progress and removes the screen when everything is in.
+ *
+ * An automated browser (a crawler, a link checker, a headless test) never sees it: the inline script below runs
+ * before the screen is painted and sets html.no-boot, which hides the screen; boot.js then leaves the page unlocked.
+ * The page under it is the same for everyone. Google's sign-in branding check reported the home page as
+ * unresponsive while the screen covered it (November 18, 2026).
  */
+const SKIP_FOR_AUTOMATION =
+  "try{if(navigator.webdriver||/bot|crawl|spider|google|lighthouse|headless|preview|slurp|bing|facebookexternalhit/i.test(navigator.userAgent))document.documentElement.classList.add('no-boot')}catch(e){}"
+
 export function SiteBoot() {
+  return (
+    <>
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a fixed string, no user input */}
+      <script dangerouslySetInnerHTML={{ __html: SKIP_FOR_AUTOMATION }} />
+      <SiteBootScreen />
+    </>
+  )
+}
+
+function SiteBootScreen() {
   return (
     <div className="boot" id="boot" role="status" aria-label="Loading ROTRA">
       <div className="boot-in">

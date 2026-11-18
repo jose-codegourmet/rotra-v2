@@ -47,7 +47,9 @@ export async function proxy(request: NextRequest) {
       !path.startsWith('/_next/') &&
       !/\.[a-z0-9]+$/i.test(path)
     ) {
-      const redirect = NextResponse.redirect(new URL('/connect-google', request.url))
+      const connect = new URL('/connect-google', request.url)
+      if (path === '/profile/verification') connect.searchParams.set('returnTo', path)
+      const redirect = NextResponse.redirect(connect)
       session.carryTo(redirect)
       return redirect
     }

@@ -1,3 +1,5 @@
+import type { VerificationOverride } from '../account-verification/accountVerification.types'
+
 /**
  * Admin-only player domain (A-PLAYERS, A-PLAYER-DETAIL). It carries private contacts and the
  * privileged phone/email search, so it is kept apart from the public `player` domain: nothing in
@@ -116,6 +118,7 @@ export type AdminPlayerRecord = {
   revision: number
   createdByClubId: string | null
   adminCreated: boolean
+  verificationOverride?: VerificationOverride | null
   /**
    * Password *(for MVP or beta only)*: only that Admin set one, by whom and when (ISO). The
    * password itself is never stored. Beta only, end date not set — D-2026-11-09-14.

@@ -140,7 +140,7 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
     return window.matchMedia('(prefers-color-scheme: light)').matches;
   }
   function mix(a, b, t){ return a + (b - a) * t; }
-  var PAGE_SKY = { ranking: 3, partners: 0, request: 6, privacy: 0, terms: 0 };
+  var PAGE_SKY = { ranking: 3, partners: 0, request: 6 };
   function sky(ai, bi, t){
     var set = SKY[isLight() ? 'light' : 'dark'];
     var A = set[ai], B = set[bi];
@@ -382,11 +382,13 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   window.addEventListener('resize', function(){ measureTracks(); update(); });
 
   // ---- Pages: #home (the story), #clubs (#partners is an alias), #ranking, #request (#pricing redirects to
-  // #request), #find, #privacy, #terms. The legal pages have no chapters and no art: the sky is PAGE_SKY's. ----
-  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, find: 1, privacy: 1, terms: 1 };
+  // #request), #find. The legal pages are pages of their own (/privacy, /terms): an old #privacy or #terms link,
+  // or one to a section of theirs (#privacy-your-rights), is sent there. ----
+  var PAGES = { home: 1, clubs: 1, partners: 1, ranking: 1, request: 1, find: 1 };
+  var LEGAL = /^(privacy|terms)(-|$)/;
   var ALIAS = { partners: 'clubs' };
   var REDIRECT = { pricing: 'request' };
-  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', find: 'Find your profile · ROTRA', privacy: 'Privacy Policy · ROTRA', terms: 'Terms of Service · ROTRA' };
+  var TITLES = { home: 'ROTRA · Badminton player ranking', clubs: 'For clubs · ROTRA', ranking: 'How ranking works · ROTRA', request: 'Request a quotation · ROTRA', find: 'Find your profile · ROTRA' };
   var NAV_OF = { clubs: 'clubs', request: 'clubs', ranking: 'ranking', find: 'find' };
   var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
@@ -408,14 +410,15 @@ var QUEUE_APP_URL = 'https://queue.rotra.club';
   }
   // Chapter 01 starts under the hero (its top is still the hero's wind-up), and its heading and line-up come in with
   // the scroll, so a link to it lands where all five figures and the heading are in and the reveal has not begun
-  // (42% of its beats; 22% on phones, where they come in sooner). A legal page's section heading (#privacy-…,
-  // #terms-…) lands 96 px down, clear of the fixed top bar.
+  // (42% of its beats; 22% on phones, where they come in sooner).
   function landing(el){
     if (el === ch1) return Math.round((ch1.offsetHeight - window.innerHeight) * CH1_END * (PHONE.matches ? .22 : .42));
-    return el.closest && el.closest('.legal') ? -96 : 0;
+    return 0;
   }
   function route(){
     var h = location.hash.slice(1);
+    var legal = LEGAL.exec(h);
+    if (legal) { location.replace('/' + legal[1] + (h === legal[1] ? '' : '#' + h)); return; }
     if (REDIRECT[h]) { h = REDIRECT[h]; try { history.replaceState(null, '', '#' + h); } catch (err) { location.replace('#' + h); return; } }
     var target = !PAGES[h] && h ? document.getElementById(h) : null;
     var next = PAGES[h] ? (ALIAS[h] || h) : ownerView(target);

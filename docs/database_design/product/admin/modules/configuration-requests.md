@@ -83,6 +83,9 @@ UUID PK; actor admin FK; action; target type/ID; source command ID; timestamp; r
 
 Do not log passwords, raw claim/reset tokens, or unnecessary contact values. **Admin-set password (MVP or beta only, [D-2026-11-09-14](../../../../mvp/decisions.md#d-2026-11-09-14)):** the edit-player save may set a registered player's password through the auth provider; record only `player.password_set_by_admin` (actor, target, time), never the value, and remove the capability after the beta. This conflicts with [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01) and needs owner sign-off before any build. The same save records one `player.profile_updated` event listing every changed field (picture, profile fields, privacy switches, phone, email) with redacted before/after and the reason. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
 
+Setting or clearing **Verified by Admin** for a registered player records the actor, player, time,
+action and required reason using the existing audit metadata ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)).
+
 Business sources: [configuration](../../../../business_logic/product/admin/modules/configuration/README.md), [player management](../../../../business_logic/product/admin/modules/player-management/README.md).
 
 ## F07 follow-up: player management (#335)

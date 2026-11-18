@@ -40,6 +40,7 @@
     "./player/claim": "./src/player/claim.ts",
     "./player/feature-flags": "./src/player/feature-flags.ts",
     "./player/ranking-settings": "./src/player/ranking-settings.ts",
+    "./player/account-verification": "./src/player/account-verification.ts",
     "./player/account-access": "./src/player/account-access.ts",
     "./player/contact-change": "./src/player/contact-change.ts",
     "./queue/public-session": "./src/queue/public-session.ts",

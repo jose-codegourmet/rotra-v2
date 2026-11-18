@@ -4,7 +4,9 @@ import type { ReactNode } from 'react'
 
 export type AnnouncementBandProps = {
   /** The message, e.g. "<b>Verify your ROTRA account by December 31, 2026.</b> …" */
-  children: ReactNode
+  children?: ReactNode
+  /** The verification reminder copy and progress for the signed-in player. */
+  verification?: { deadline: string; completedSteps: 0 | 1 | 2 | 3 }
   /** One or two buttons (Button size "xs") and a secondary link, in the order they should show */
   actions?: ReactNode
   /**
@@ -25,6 +27,7 @@ export type AnnouncementBandProps = {
  */
 export function AnnouncementBand({
   children,
+  verification,
   actions,
   afterDeadline = false,
   onRemindLater,
@@ -47,7 +50,16 @@ export function AnnouncementBand({
             <span className="mr-1.5 inline-block text-[11px] font-bold tracking-[0.5px] text-ann-tag uppercase">
               ROTRA announcement
             </span>
-            {children}
+            {verification ? (
+              <>
+                <b>Verify your ROTRA account by {verification.deadline}.</b> Connect Google, have
+                your phone on file, and use your Google email as your ROTRA email.{' '}
+                <b>{verification.completedSteps} of 3 done.</b> Your profile, games and rank stay
+                the same.
+              </>
+            ) : (
+              children
+            )}
           </span>
           {actions || showRemind ? (
             <div className="mt-2 flex flex-wrap items-center gap-1.5">

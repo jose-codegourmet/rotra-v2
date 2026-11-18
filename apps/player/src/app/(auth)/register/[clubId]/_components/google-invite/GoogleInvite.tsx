@@ -161,6 +161,7 @@ export function GoogleInvite({
         clubName={result.clubName ?? undefined}
         sessionTitle={result.sessionTitle}
         googleEmail={google.email}
+        verificationComplete
         onBackToSession={
           result.sessionSlug
             ? () =>

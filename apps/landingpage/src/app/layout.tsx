@@ -15,7 +15,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={fontVariables}>
+    // suppressHydrationWarning: SiteBoot's inline script may add the no-boot class before hydration
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   )

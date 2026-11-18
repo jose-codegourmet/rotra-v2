@@ -18,7 +18,7 @@ export const termsOfService = {
         },
         {
           kind: 'paragraph',
-          text: 'ROTRA is operated by [OPERATOR LEGAL NAME], [OPERATOR ADDRESS]. In these terms, "ROTRA", "we" and "us" mean [OPERATOR LEGAL NAME]. These terms cover the ROTRA apps and the website rotra.club.',
+          text: 'ROTRA is operated by Jose Adrian Buctuanon (doing business as CodeGourmet IO), Lapu-Lapu City, Cebu, Philippines. In these terms, "ROTRA", "we" and "us" mean Jose Adrian Buctuanon. These terms cover the ROTRA apps and the website rotra.club.',
         },
         {
           kind: 'paragraph',
@@ -296,7 +296,7 @@ export const termsOfService = {
         },
         {
           kind: 'paragraph',
-          text: "If we can't settle it, it goes to the proper courts of [OPERATOR CITY], Philippines. This doesn't take away any right the law gives you to bring a case somewhere else.",
+          text: "If we can't settle it, it goes to the proper courts of Lapu-Lapu City, Philippines. This doesn't take away any right the law gives you to bring a case somewhere else.",
         },
       ],
     },
@@ -320,7 +320,7 @@ export const termsOfService = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '[OPERATOR LEGAL NAME], [OPERATOR ADDRESS].',
+          text: 'Jose Adrian Buctuanon (doing business as CodeGourmet IO), Lapu-Lapu City, Cebu, Philippines.',
         },
         {
           kind: 'paragraph',

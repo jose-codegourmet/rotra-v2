@@ -32,11 +32,23 @@ Separate sections:
 2. Private current phone/email and their relevant verification/application state.
 3. Claimed account link/status and phone privacy preference.
 4. Pending contact-change requests.
-5. Read-only rank/history context needed for support: the page is split into **tabs** (owner comment, November 8, 2026): **Overview** (Identity, Account, Rank and games, and a small **Recent games** list of the three latest sessions with **View all**), **Contact** (Private contact and Contact-change requests; a “N open” chip when a request is waiting), **Game history** (the full list, newest first, each row with the session title, club, date and wins–losses; read-only) and **Activity** (Record of actions, with a count). “View full history” in the quick view opens the player page on the Game history tab; “View full profile” opens it on Overview.
+5. Read-only rank/history context needed for support: the page is split into **tabs** (owner comment, November 8, 2026): **Overview** (Identity, Account, Verification for registered players, Rank and games, and a small **Recent games** list of the three latest sessions with **View all**), **Contact** (Private contact and Contact-change requests; a “N open” chip when a request is waiting), **Game history** (the full list, newest first, each row with the session title, club, date and wins–losses; read-only) and **Activity** (Record of actions, with a count). “View full history” in the quick view opens the player page on the Game history tab; “View full profile” opens it on Overview.
 
 Profile information oversight does not automatically authorize a rank editor, winner/score changes, hidden-contact sharing with clubs, account merging, or deleting retained game history. Admin may edit every field the player can, plus phone, email and (for MVP or beta only) the password, with a required reason ([A-PLAYER-EDIT](#a-player-edit--edit-a-player-everything-the-player-can-change), D-2026-11-09-14; this replaced the November 8 rule that a new email is only sent as a contact-change request, #564). Archive hides reversibly; Remove requires a typed RTR ID and reason and cannot remove a claimed account or any game history (#344).
 
 Current contacts should reflect actual usable account state, not a merely approved but unapplied request. Audit/support details must not contain passwords or reusable recovery/claim tokens.
+
+### Verification
+
+The **Verification** card sits below **Account** on **Overview** for registered players ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02), [mockup log](../../../../mockup-changes/2026-11-18-admin-player-verification.md)). The status chip reads **Not verified · N of 3**, **Verified**, or **Verified by Admin**. All three check rows stay visible even when the override is active. Each row shows a check icon when complete and its step number otherwise.
+
+| Check | Details |
+|---|---|
+| **Google account** | “Connected · <Google email>” or “Not connected” |
+| **Mobile number** | “On file · <masked phone>” or “Not on file” |
+| **ROTRA email matches Google** | “Both are <email>”, “Google must be connected first.”, or “ROTRA email: <ROTRA email>. Google email: <Google email>.” An open request to change to the Google email adds **Change sent for Admin review**. |
+
+**Set Verified by Admin** opens a confirmation sheet; while the override is active the card offers **Clear override**. The sheet shows the player, RTR ID, current status, and status after saving. Both actions require **Reason for the change**. Cancel closes the sheet. A failed save preserves the reason and leaves the status and audit record as they were. A successful save closes the sheet, refreshes the card, and adds the action and reason to **Activity** › **Record of actions**.
 
 ## A-PLAYER-EDIT — Edit a player: everything the player can change
 

@@ -146,9 +146,9 @@ export function RequestPage() {
                 <input id="agree" type="checkbox" required />
                 <span>
                   {'I agree to the '}
-                  <a href="#terms">Terms of Service</a>
+                  <a href="/terms">Terms of Service</a>
                   {' and '}
-                  <a href="#privacy">Privacy Policy</a>, and to ROTRA contacting me about this
+                  <a href="/privacy">Privacy Policy</a>, and to ROTRA contacting me about this
                   request.
                 </span>
               </label>

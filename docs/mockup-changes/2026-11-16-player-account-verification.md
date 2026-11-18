@@ -1,6 +1,6 @@
 # Player app: account verification page (Google, phone, matching email) with an Admin override
 
-Status: TICKETED — #889
+Status: IN MOCK APP — #889
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewVerify, verifyCard, verifyChip, verifyOf, gRequiredBand, viewProfile (status chip, Verification button), privatePanel
@@ -50,3 +50,7 @@ Superseded by: none
 
 ## Real app work
 - The verification page and chip in apps/player; a derived verification status in packages/db; the Admin override control in apps/admin (Players › player), which needs its own Admin mockup change first.
+
+## Batch verification — 2026-11-18
+
+Player and Admin screens checked at 375 px and 1280 px in dark and light themes against the canonical mockups. Local real-mode checks cover automatic status, pending email mismatch, required reason, set/clear, persisted reload, Activity audit reason, and failed-save reason retention. Screenshots were delivered in chat only. Google OAuth itself remains separate in #922.

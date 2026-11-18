@@ -32,7 +32,13 @@ export function GoogleRequiredGate({
     outside &&
     (requirement.state === 'required' || (deadline?.passed === true && account.isPending))
   useEffect(() => {
-    if (holding && requirement.state === 'required') router.replace('/connect-google')
-  }, [holding, requirement.state, router])
+    if (holding && requirement.state === 'required') {
+      router.replace(
+        pathname === '/profile/verification'
+          ? '/connect-google?returnTo=%2Fprofile%2Fverification'
+          : '/connect-google',
+      )
+    }
+  }, [holding, pathname, requirement.state, router])
   return holding ? null : children
 }

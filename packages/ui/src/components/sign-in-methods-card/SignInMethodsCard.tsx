@@ -3,6 +3,10 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { GoogleMark } from '@rotra/ui/google-mark'
 import { Icon } from '@rotra/ui/icon'
+import {
+  VerificationStatusChip,
+  type VerificationStatusChipProps,
+} from '@rotra/ui/verification-status-chip'
 import type { ReactNode } from 'react'
 
 export type SignInMethodsCardProps = {
@@ -18,14 +22,9 @@ export type SignInMethodsCardProps = {
   onConnectGoogle: () => void
   /** Change the connected Google account */
   onChangeGoogle: () => void
-  /**
-   * The verification status chip's text: "Verified", "Verified by Admin", "Not verified · 1 of 3".
-   * Leave out with `onOpenVerification` to hide the verification row (until the Verification page, P13, exists).
-   */
-  verificationLabel?: string
-  /** Verified shows the green chip with a check; otherwise the warn chip */
-  verified?: boolean
-  /** Opens the Verification page. The row shows only when this and `verificationLabel` are given. */
+  /** The owner's status. Leave out to hide the row while it loads. */
+  verification?: VerificationStatusChipProps
+  /** Opens the Verification page. */
   onOpenVerification?: () => void
 }
 
@@ -71,8 +70,7 @@ export function SignInMethodsCard({
   deadline,
   onConnectGoogle,
   onChangeGoogle,
-  verificationLabel,
-  verified = false,
+  verification,
   onOpenVerification,
 }: SignInMethodsCardProps) {
   const googleDetail = googleEmail
@@ -111,14 +109,11 @@ export function SignInMethodsCard({
           Google sign-in is required for every ROTRA player. Any Google account you own works, even
           with a different email. Your ROTRA email stays {email}.
         </p>
-        {verificationLabel !== undefined && onOpenVerification ? (
+        {verification && onOpenVerification ? (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
             <span className="text-[13px]">Account verification is in its own page.</span>
             <Button size="sm" onClick={onOpenVerification}>
-              <Chip tone={verified ? 'accent' : 'warn'}>
-                {verified ? <Icon name="check" size={12} /> : null}
-                {verificationLabel}
-              </Chip>
+              <VerificationStatusChip {...verification} />
             </Button>
           </div>
         ) : null}

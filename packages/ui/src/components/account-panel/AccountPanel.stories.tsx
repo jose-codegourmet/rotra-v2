@@ -13,6 +13,7 @@ const meta = {
     email: jose.email,
     phoneHidden: jose.phoneHidden,
     onOpenPrivacy: () => {},
+    onOpenVerification: () => {},
     onSignOut: () => {},
   },
 } satisfies Meta<typeof AccountPanel>

@@ -2,6 +2,7 @@ import { AuthCard } from '@rotra/ui/auth-card'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Notice } from '@rotra/ui/notice'
+import { VerificationStatusChip } from '@rotra/ui/verification-status-chip'
 import { LinkPage } from './link-page/LinkPage'
 
 export type AccountLinkStatusVariant =
@@ -29,6 +30,8 @@ export type AccountLinkStatusProps = {
   sessionTitle?: string | null
   /** claim-done after Google (player_google_sign_in flag): "You sign in with Google (<email>)." */
   googleEmail?: string
+  /** All three verification checks passed on the registration that just finished. */
+  verificationComplete?: boolean
   onBackToSession?: () => void
   /** claim-processing: Check again is running */
   isPending?: boolean
@@ -51,6 +54,7 @@ export function AccountLinkStatus({
   standalone = false,
   sessionTitle,
   googleEmail,
+  verificationComplete = false,
   onBackToSession,
   isPending = false,
   onBackToSignIn,
@@ -187,6 +191,12 @@ export function AccountLinkStatus({
               </p>
               {standalone && googleEmail ? (
                 <p className="m-0 text-[13px] text-fg2">You sign in with Google ({googleEmail}).</p>
+              ) : null}
+              {googleEmail && verificationComplete ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <VerificationStatusChip completedSteps={3} />
+                  <span className="text-[13px] text-fg2">Google, phone and email are all set.</span>
+                </div>
               ) : null}
               <div className={actions}>
                 {onBackToSession ? (

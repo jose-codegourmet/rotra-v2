@@ -141,7 +141,9 @@ Claiming is not permission to edit contact identity directly. Initial email comp
 
 ## Account verification ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02))
 
-Derived, not stored: verified = `google_email` is set **and** `player_private_contacts` has a phone **and** `google_email` equals the normalized account email. The Admin override is stored: `players.verification_override` enum (`verified`; `not_verified` if that is approved) nullable, with `verification_override_by` (admin account) and `verification_override_at`, and an Admin audit entry (reason column if a reason is required; open). Clearing the override returns to the derived status.
+For a registered player, the automatic status is derived: verified = `google_email` is set **and** `player_private_contacts` has a phone **and** `google_email` equals the normalized account email. The Admin override is stored: `players.verification_override` enum (`verified` only) nullable, with `verification_override_by` (admin account) and `verification_override_at`. Each set and clear writes an [Admin audit entry](../../admin/modules/configuration-requests.md#admin_audit_events) with a required reason in its metadata (owner, November 18, 2026, #907). Clearing the override returns to the derived status.
+
+Migration `20261118000300_player_verification_override` adds the three nullable columns to `players`. A check requires either three nulls or a claimed player with all three fields set. The indexed `verification_override_by` foreign key references `admin_accounts.id` with restricted deletion. The private Player and Admin reads derive the three checks from the same rules as mock mode. The Admin write locks the player row, compares its revision, and commits the override, revision increment and audit entry in one transaction.
 
 ## Registration links
 

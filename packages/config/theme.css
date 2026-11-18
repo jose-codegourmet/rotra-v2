@@ -53,6 +53,15 @@
   --color-error-subtle: var(--error-subtle);
   --color-warn: var(--warn);
   --color-warn-subtle: var(--warn-subtle);
+  /* ROTRA announcement band: yellow, distinct from the amber warnings (Google sign-in log, 2026-11-16) */
+  --color-ann-bg: var(--ann-bg);
+  --color-ann-border: var(--ann-border);
+  --color-ann-tag: var(--ann-tag);
+  /* The Google mark only; the same in both themes */
+  --color-g-blue: var(--g-blue);
+  --color-g-red: var(--g-red);
+  --color-g-yellow: var(--g-yellow);
+  --color-g-green: var(--g-green);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-scrim: var(--scrim);
@@ -180,6 +189,14 @@
   --error-subtle: rgba(255, 77, 77, 0.12);
   --warn: #ffb800;
   --warn-subtle: rgba(255, 184, 0, 0.12);
+  --ann-bg: #3a3000;
+  --ann-border: #ffd400;
+  --ann-tag: #ffd400;
+  /* Google mark colours, same in both themes */
+  --g-blue: #4285f4;
+  --g-red: #ea4335;
+  --g-yellow: #fbbc05;
+  --g-green: #34a853;
   --border: #2a2a2e;
   --border-strong: #404048;
   --scrim: rgba(0, 0, 0, 0.6);
@@ -241,6 +258,9 @@
   --error-subtle: rgba(198, 40, 40, 0.07);
   --warn: #a35600;
   --warn-subtle: rgba(217, 119, 6, 0.09);
+  --ann-bg: #fff3b0;
+  --ann-border: #e6b800;
+  --ann-tag: #7a5c00;
   --border: #e2e5df;
   --border-strong: #cdd2c9;
   --scrim: rgba(18, 21, 19, 0.4);

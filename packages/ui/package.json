@@ -478,7 +478,13 @@
     "./award-card": "./src/components/award-card/AwardCard.tsx",
     "./public-awards": "./src/components/public-awards/PublicAwards.tsx",
     "./win-rate-share-card": "./src/components/win-rate-share-card/WinRateShareCard.tsx",
-    "./pixel-fire": "./src/components/top-three-podium/pixel-fire/PixelFire.tsx"
+    "./pixel-fire": "./src/components/top-three-podium/pixel-fire/PixelFire.tsx",
+    "./google-mark": "./src/components/google-mark/GoogleMark.tsx",
+    "./google-button": "./src/components/google-button/GoogleButton.tsx",
+    "./invite-card": "./src/components/invite-card/InviteCard.tsx",
+    "./google-identity-row": "./src/components/google-identity-row/GoogleIdentityRow.tsx",
+    "./announcement-band": "./src/components/announcement-band/AnnouncementBand.tsx",
+    "./sign-in-methods-card": "./src/components/sign-in-methods-card/SignInMethodsCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

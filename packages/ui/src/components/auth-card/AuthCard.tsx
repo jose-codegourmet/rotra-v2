@@ -19,6 +19,18 @@ export type AuthCardProps = {
   description?: ReactNode
   /** Shows "Signing in needs an internet connection." above the form */
   offline?: boolean
+  /**
+   * Context notice above the sign-in options, e.g. a Notice "Sign in to join <club>." when the player
+   * came from an invite (P-LOGIN). Opt-in; nothing renders when omitted.
+   */
+  contextNotice?: ReactNode
+  /**
+   * The Google button (GoogleButton) shown above the form. When set, the divider
+   * ("Signed up with a password?" by default) separates it from the form. Opt-in.
+   */
+  google?: ReactNode
+  /** Divider text between the Google button and the form; only used with google */
+  googleDivider?: ReactNode
   /** The app's sign-in form */
   children: ReactNode
   /** Muted note under the form */
@@ -40,6 +52,9 @@ export function AuthCard({
   product,
   description,
   offline,
+  contextNotice,
+  google,
+  googleDivider = 'Signed up with a password?',
   children,
   footer,
   below,
@@ -70,6 +85,18 @@ export function AuthCard({
         {description ? <p className="m-0 text-fg2">{description}</p> : null}
       </div>
       {offline ? <Notice tone="offline">Signing in needs an internet connection.</Notice> : null}
+      {contextNotice}
+      {google ? (
+        <>
+          {google}
+          <div
+            role="separator"
+            className="flex items-center gap-3 text-xs font-semibold tracking-[0.5px] text-fg3 uppercase before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border"
+          >
+            {googleDivider}
+          </div>
+        </>
+      ) : null}
       {children}
       {footer ? <p className="m-0 text-[13px] text-fg2">{footer}</p> : null}
     </Card>

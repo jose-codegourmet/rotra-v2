@@ -33,6 +33,8 @@ model Device {
 
   publicationEvents SessionPublicationEvent[]
 
+  authSessions AuthSession[]
+
   @@unique([clubId, id])
   @@map("devices")
 }

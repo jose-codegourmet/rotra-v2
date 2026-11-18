@@ -51,16 +51,6 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
     return <InvalidSessionNotice variant="results" reason={record.invalidReason ?? undefined} />
 
   const players = record.playerSummaries
-  const rows: LiveLeaderboardRow[] | undefined = standings.data?.map((r) => ({
-    playerId: r.playerId,
-    name: r.name,
-    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
-    wins: r.wins,
-    losses: r.losses,
-    games: r.games,
-  }))
-  const openProfile = (sessionPlayerId: string) =>
-    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
   /** The saved player's own picture (or character), like the Queue tab */
   const pictureOf = (sessionPlayerId: string) => {
     const clubPlayerId = players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId
@@ -69,6 +59,17 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       ? (profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName) ?? null)
       : null
   }
+  const rows: LiveLeaderboardRow[] | undefined = standings.data?.map((r) => ({
+    playerId: r.playerId,
+    name: r.name,
+    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
+    photoUrl: pictureOf(r.playerId) ?? undefined,
+    wins: r.wins,
+    losses: r.losses,
+    games: r.games,
+  }))
+  const openProfile = (sessionPlayerId: string) =>
+    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
   const c = club.data
   const slug = session.data?.publicSlug
   const link =
@@ -120,7 +121,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
             rows={rows.map((row, i) => ({
               position: i + 1,
               name: row.name,
-              pictureUrl: pictureOf(row.playerId),
+              pictureUrl: row.photoUrl ?? null,
               wins: row.wins,
               losses: row.losses,
               games: row.games,

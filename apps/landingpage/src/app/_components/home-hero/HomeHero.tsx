@@ -54,6 +54,17 @@ export function HomeHero() {
             <em>or run the game?</em>
           </h1>
         </div>
+        {/* phones (700 px and below): Rion's side is hidden there, so the clubs path is this button under Tara; it
+            fades out with the title (--o1) and stops taking taps once the wind-up starts (.sm-wind) */}
+        <a className="hx-mclubs" href="#clubs">
+          <span className="eyebrow">I run the game</span>
+          <b>
+            {'For clubs '}
+            <span className="hx-mc-arr" aria-hidden="true">
+              →
+            </span>
+          </b>
+        </a>
         {/* the smash: burst at the hit, speed lines, the shuttle flying at the camera, and the flash that hands
             over to chapter 01, already pinned underneath (main script: smash) */}
         <div className="hx-fx" aria-hidden="true">

@@ -150,9 +150,6 @@ export function HomeRanking() {
             Score doesn't change the step. New players are Provisional for their first games. Your
             rank reads the last 90 days.
           </p>
-          <span className="fnote">
-            Step sizes are still open (#247). No numbers on the site until decided.
-          </span>
         </div>
         <div className="sdots" aria-hidden="true">
           <i />

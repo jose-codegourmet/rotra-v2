@@ -79,7 +79,30 @@ a{color:inherit}
 .top nav a:not(.btn){font-size:14px;font-weight:600;text-decoration:none;color:var(--fg2);padding:10px 12px;border-radius:var(--r)}
 .top nav a:not(.btn):hover{color:var(--fg);background:var(--surface)}
 .top nav .btn{min-height:40px;margin-left:8px}
-@media (max-width:760px){.top nav a:not(.btn){display:none}}
+/* Phone menu: at 760 px and below the bar is the logo and a menu button; the menu is a fullscreen sheet (site.js) */
+.menu-btn{display:none;align-items:center;justify-content:center;width:44px;height:44px;margin:-2px -10px -2px auto;padding:0;border:0;border-radius:var(--r);background:none;color:var(--fg);cursor:pointer}
+.menu-btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.menu{position:fixed;inset:0;height:100vh;height:100dvh;z-index:990;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);overflow-y:auto;overscroll-behavior:contain}
+.menu[hidden]{display:none}
+.menu-bar{display:flex;align-items:center;justify-content:space-between;padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:12px}
+.menu-bar .rlogo{height:30px;margin:0}
+.menu-bar .rlogo svg{width:calc(30px*324.21/120.56)}
+.menu-bar .menu-btn{display:inline-flex}
+.menu-links{display:flex;flex-direction:column;margin-top:16px;border-top:1px solid var(--border)}
+.menu-links a{display:block;padding:18px 0;border-bottom:1px solid var(--border);font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1.1;text-decoration:none;color:var(--fg)}
+.menu-links a[aria-current="page"]{color:var(--accent)}
+.menu-acts{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding-top:32px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px)}
+.menu-acts .btn{min-height:52px;width:100%}
+html.menu-open,html.menu-open body{overflow:hidden}
+@keyframes menu-in{from{opacity:0}}
+@keyframes menu-rise{from{opacity:0;transform:translateY(12px)}}
+.menu:not([hidden]){animation:menu-in .2s ease-out}
+.menu:not([hidden]) .menu-links a{animation:menu-rise .32s cubic-bezier(.2,.9,.3,1) .05s both}
+.menu:not([hidden]) .menu-links a:nth-child(2){animation-delay:.09s}
+.menu:not([hidden]) .menu-links a:nth-child(3){animation-delay:.13s}
+@media (prefers-reduced-motion:reduce){.menu:not([hidden]),.menu:not([hidden]) .menu-links a{animation:none}}
+@media (max-width:760px){.top nav{display:none}.top .menu-btn{display:inline-flex}}
+@media (min-width:761px){.menu{display:none!important}}
 
 /* Chapter rail */
 .rail{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px}
@@ -344,7 +367,6 @@ a{color:inherit}
 .how b{font-size:18px;font-weight:800;letter-spacing:-.02em}
 .how span{font-size:15px;color:var(--fg2)}
 .how .n{font-family:var(--pixel);font-size:22px;color:var(--accent)}
-.anno{font-family:var(--mono);font-size:12px;color:var(--warn);border:1px dashed var(--warn);border-radius:var(--r);padding:10px 12px;max-width:72ch}
 
 .ch6{background:var(--surface);border-top:1px solid var(--border)}
 .req{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:start}
@@ -493,7 +515,7 @@ body:not([data-view="home"]) .rail{display:none}
 .page .rcard.p-rcard{position:relative;left:auto;top:auto;transform:none;opacity:1;width:min(360px,100%);justify-self:center}
 .ticks{margin:0;list-style:none;gap:12px}
 .ticks li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
-.ticks li:not(.anno)::before{content:"";width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--accent);flex:none}
+.ticks li::before{content:"";width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--accent);flex:none}
 ul.ticks.g2{display:grid}
 .faq{display:flex;flex-direction:column;gap:10px;max-width:880px}
 .faq details{padding:0;border-radius:var(--r)}
@@ -597,12 +619,6 @@ ul.ticks.g2{display:grid}
 .sprite{translate:var(--jx,0) var(--jy,0);rotate:var(--jr,0deg)}
 .sprite .fr{position:absolute;right:8px;bottom:8px;font:600 10px var(--mono);font-style:normal;color:var(--accent);background:rgba(0,0,0,.45);border-radius:6px;padding:2px 6px;pointer-events:none}
 .hx-tara,.lineup-wrap .clone.real{transition:none}
-/* Asset list page */
-.asset-list{padding:20px;display:flex;flex-direction:column;gap:10px;border-radius:var(--r-lg)}
-.asset-list h3{font-size:18px;font-weight:800}
-.asset-list ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
-.asset-list li b{font-family:var(--mono);font-size:13px;color:var(--accent)}
-.asset-list li span{display:block;color:var(--fg2);font-size:14px}
 
 /* ===== Chapter 03: weekly, monthly and annual leaderboards ===== */
 .lb-lede{font-size:18px;color:var(--fg2);max-width:60ch}
@@ -675,7 +691,7 @@ ul.ticks.g2{display:grid}
 .lb-row.me.bump{animation:bump .35s steps(4,end)}
 @keyframes bump{30%{transform:translateY(-6px)}}
 .ch4 .boards,.ch4 .ladder{display:none}
-@media (max-width:900px){.lbx{grid-template-columns:minmax(0,1fr);gap:20px}.lbx-copy .anno,.lbx-copy .foot{display:none}.fire{width:140px;height:118px;bottom:calc(100% - 78px)}.pod-who .avatar{width:52px;height:52px}.pod.p1 .pod-who .avatar{width:68px;height:68px}}
+@media (max-width:900px){.lbx{grid-template-columns:minmax(0,1fr);gap:20px}.lbx-copy .foot{display:none}.fire{width:140px;height:118px;bottom:calc(100% - 78px)}.pod-who .avatar{width:52px;height:52px}.pod.p1 .pod-who .avatar{width:68px;height:68px}}
 @media (prefers-reduced-motion:reduce){.embers i,.pod-stage.rise .pod-step,.pod-stage.rise .pod-who,.lb-row.me.bump{animation:none}}
 
 /* ===== v14: smoother section handoffs ===== */
@@ -701,8 +717,6 @@ ul.ticks.g2{display:grid}
 .mega em,.mega-sm em,.line em{font-style:normal;color:var(--accent)}
 .say{font-size:clamp(17px,1.5vw,22px);color:var(--fg2);max-width:46ch;text-wrap:balance}
 .say b{color:var(--fg)}
-.fnote{font-family:var(--mono);font-size:11px;color:var(--warn);max-width:70ch;opacity:.9}
-.fnote a{color:var(--warn)}
 .sdots{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);display:flex;gap:6px;z-index:3}
 .sdots i{width:16px;height:4px;border-radius:2px;background:var(--border-strong);transition:background .3s,width .3s}
 /* .sd-done, not .done: .done is the request form's full-size success panel and turned a passed dot into a green block */
@@ -963,10 +977,17 @@ ul.ticks.g2{display:grid}
 }
 @media (max-width:700px){
   #s-ranking .vs{--fh:calc(30vh*var(--rk,1));grid-template-columns:minmax(0,1fr);gap:6px}
-  #s-assessors .scene[data-scene="0"]{justify-content:flex-start}
-  #s-assessors .bc-rion{left:0;height:calc(34vh + 12px)}
-  #s-assessors .bc-tara{right:0;height:calc(34vh + 12px)}
-  .bc-bub{font-size:12px;padding:8px 10px;max-width:46vw}
+  /* assessors step 1: copy 24 px under the header bar; --ah (figure height) fills the screen under the copy
+     (about 455 px of copy and bubble), at most 92vw so Rion's tablet stays clear of Tara at their sides.
+     Bubbles: 16 px from the screen edges, 12 px apart, each tail on its head (head centres: 30% of the box
+     height in from Rion's left edge, 39.8% in from Tara's right edge) */
+  #s-assessors{--ah:clamp(200px,calc(100svh - 455px),92vw)}
+  #s-assessors .scene[data-scene="0"]{justify-content:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + 88px)}
+  #s-assessors .bc-rion{left:0;height:calc(var(--ah) + 12px)}
+  #s-assessors .bc-tara{right:0;height:calc(var(--ah) + 12px)}
+  .bc-bub{padding:8px 10px;max-width:min(46vw,calc(50vw - 22px))}
+  #s-assessors .bc-rion .bc-bub{left:16px;--tail:clamp(18px,calc((var(--ah) + 12px)*.3 - 16px),calc(100% - 18px))}
+  #s-assessors .bc-tara .bc-bub{right:16px;--tail:clamp(18px,calc(100% - (var(--ah) + 12px)*.398 + 16px),calc(100% - 18px))}
 }
 @media (prefers-reduced-motion:reduce){#s-assessors .bc-a{transform:none!important}}
 /* vignettes: the four animated Queue stories in #c-get (HTML/CSS, they replace the art/shots screenshots).
@@ -1306,6 +1327,24 @@ ul.ticks.g2{display:grid}
   .plan.rfq .btn,#partnerForm .submit .btn{align-self:stretch;width:100%}
   form.card{padding:20px}
   #partnerForm .done[hidden]{display:none}
+  /* 7b · clubs 04 (#s-request): the copy block from the top, 24 px under the header bar, so the art keeps the lower
+     part; the four steps as a 2×2 grid of equal chips numbered 1–4 in the pixel font, no arrows; CTA 52 px, up to 320 px */
+  #s-request{align-items:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + 88px)}
+  #s-request .flowline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;max-width:400px;counter-reset:fl}
+  #s-request .flowline i{display:none}
+  #s-request .flowline .chip{justify-content:center;min-height:40px;padding:6px 10px;white-space:normal;text-align:center;line-height:1.25;counter-increment:fl}
+  #s-request .flowline .chip::before{content:counter(fl);flex:none;font-family:var(--pixel);font-size:11px;line-height:1;color:var(--accent)}
+  #s-request .acts{width:100%}
+  #s-request .acts .btn{min-height:52px;width:min(100%,320px)}
+  /* 7c · request page: copy 24 px under the header bar; Rion 150 px tall, 8 px under the steps box, the form 8 px under
+     him; one field per row except courts and nights, which share one; submit 52 px */
+  .page[data-view="request"]{padding-top:calc(env(safe-area-inset-top,0px) + 88px)}
+  .req{gap:8px}
+  .req .p-fig.sm{height:150px;margin-top:-10px;padding:0}
+  #partnerForm{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}
+  #partnerForm > *{grid-column:1/-1}
+  #partnerForm > label[for="courts"],#partnerForm > label[for="nights"]{grid-column:auto}
+  #partnerForm .submit .btn{min-height:52px}
   /* 8 · body copy 13 px or more; footer links 44 px tall */
   .bc-bub{font-size:13px}
   .f small{font-size:13px}
@@ -1317,20 +1356,50 @@ ul.ticks.g2{display:grid}
 }
 /* mobile backgrounds: at 700 px and below each section scene shows one tall still (art/mobile/<scene>.webp) instead
    of the three wide layers, which stay unloaded there (loading="lazy" + display:none); no drift, no animation.
-   --b-m is its brightness per section; the veil (::after) stays above it. Above 700 px the still is hidden. */
+   The still has the layer brightness baked in, so --b-m defaults to 1 and only dims sections with busy bright shapes
+   behind the copy; the veil (::after) stays above it; anchored bottom so the floor stays. Above 700 px it is hidden. */
 .bgl .ly.m{display:none}
 @media (max-width:700px){
   .bgl img.ly.far,.bgl img.ly.mid,.bgl img.ly.near{display:none}
-  .bgl img.ly.m{display:block;top:0;left:0;right:0;width:100%;height:100%;object-fit:cover;object-position:center;transform:none;will-change:auto;animation:none;filter:brightness(var(--b-m,.5))}
-  #s-real{--b-m:.4}
-  #s-ranking{--b-m:.5}
-  #s-ladder{--b-m:.5}
-  #s-record{--b-m:.5}
-  #c-top{--b-m:.5}
-  #s-assessors{--b-m:.55}
-  #c-get{--b-m:.42}
-  #s-pricing{--b-m:.42}
-  #s-request{--b-m:.5}
+  .bgl img.ly.m{display:block;top:0;left:0;right:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;transform:none;will-change:auto;animation:none;filter:brightness(var(--b-m,1))}
+  #s-ranking{--b-m:.8}
+  #s-ladder{--b-m:.6}
+  #s-pricing{--b-m:.85}
+  #s-request{--b-m:.85}
+}
+
+/* ===== Phone hero clubs button and chapter 01 line-up (700 px and below; nothing above 700 px changes) =====
+   .hx-mclubs (HomeHero): Rion's side and its sign are hidden on phones, so this pill under Tara is the clubs way in.
+   It fades with the title lift (--o1, a little faster, so it is gone at SM_WIND) and stops taking taps at the
+   wind-up (.sm-wind). The "I play" chip (.hx-tag) would sit under it, so phones drop the chip.
+   Line-up: five equal columns standing on the captions row; each .cbody is 300% of its column (neighbours overlap),
+   scaled for depth (--ds: real 1.08 in front, 2 and 4 .92, 1 and 5 .84 behind) and by --fk (main script: fitLineup
+   shrinks all five alike when the real one would reach the heading, and places the rank card, --rct/--rcs).
+   .clone keeps no transform, opacity, filter or z-index (v18), so the cards sit over every figure.
+   .lv-s: the short level label in each pill, shown instead of the full one (.lv-l) on phones. */
+.hx-mclubs,.lv-s{display:none}
+@media (max-width:700px){
+  .hx-tag{display:none}
+  .hx-mclubs{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);z-index:4;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;padding:6px 22px;border-radius:999px;background:color-mix(in srgb,var(--bg) 85%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--border-strong);color:var(--fg);text-decoration:none;text-align:center;white-space:nowrap;opacity:calc(1 - var(--o1,0)*1.6)}
+  .hx-mclubs .eyebrow{font-size:11px;line-height:1.2}
+  .hx-mclubs b{font-size:16px;line-height:1.2}
+  .hx-mc-arr{color:var(--accent)}
+  .hx.sm-wind .hx-mclubs,.hx.sm-thru .hx-mclubs{pointer-events:none}
+  #s-real .lineup{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));justify-content:stretch;align-items:end;gap:0;top:auto;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);height:auto;padding:0 8px}
+  #s-real .clone{position:relative;left:auto;bottom:auto;width:auto;height:auto;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+  #s-real .cbody{position:relative;inset:auto;flex:none;width:300%;margin-inline:-100%;height:clamp(240px,56vh,560px);height:clamp(240px,56svh,560px);scale:calc(var(--ds,1)*var(--fk,1))}
+  #s-real .odd-tall,#s-real .odd-glitch{--z:1;--ds:.84}
+  #s-real .odd-small,#s-real .odd-ghost{--z:2;--ds:.92}
+  #s-real .clone.real{--z:3;--ds:1.08}
+  #s-real .clone figcaption{position:relative;left:auto;bottom:auto;flex:none;width:calc(100% - 2px);max-width:none;padding:4px 1px;gap:4px;z-index:10}
+  #s-real .clone:not(.real) figcaption{transform:translate3d(calc(var(--side,0)*(1 - var(--ca))*75vw),calc(var(--m,0)*16px),0)}
+  #s-real .clone.real figcaption{transform:translate3d(0,calc((1 - var(--t,0))*-115vh),0)}
+  #s-real .clone .no{font-size:14px}
+  #s-real .clone .lvpill{display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;width:auto;max-width:100%;min-width:0;min-height:22px;padding:0 6px;font-size:10px;line-height:1;letter-spacing:-.01em;text-align:center;white-space:nowrap;flex-wrap:nowrap;overflow:hidden;overflow-wrap:normal;-webkit-hyphens:manual;hyphens:manual}
+  #s-real .clone .lvpill > span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #s-real .lv-l{display:none}
+  #s-real .lv-s{display:inline}
+  #s-real .lineup-wrap .rcard{width:min(300px,84vw)}
 }
 
 /* ===== Loading screen (SiteBoot.tsx, "Boot" in src/scripts/boot.js): always dark, first paint =====
@@ -1366,6 +1435,7 @@ html.booting,html.booting body{overflow:hidden}
 .find-in{display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px;animation:pagein .5s cubic-bezier(.2,.9,.3,1)}
 .find-in .lede{font-size:19px;color:var(--fg2);max-width:52ch;margin:0}
 .find-in form.find{display:flex;flex-direction:column;gap:8px;padding:16px;max-width:560px;width:100%;text-align:left}
+@media (max-width:560px){.find-row{flex-direction:column}.find-row input,.find-row .btn{width:100%;min-height:52px}.find-in .acts{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;width:100%}.find-in .acts .btn{width:100%;min-height:52px;justify-content:center}.find-in .lede{font-size:17px}}
 .find-in .acts{justify-content:center}
 /* ===== How ranking works (#ranking): a full-screen hero and pinned story chapters, like the landing ===== */
 body[data-view="ranking"] .rail,body[data-view="find"] .rail{display:none}
@@ -1379,7 +1449,6 @@ body[data-view="ranking"] .rail,body[data-view="find"] .rail{display:none}
 .rk-hero .wrap{position:relative;z-index:1}
 .rk-hero .p-hero{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
 .rk-story{--b-far:.4;--b-mid:.42;--b-near:.5;--veil:.78}
-.rk-story .anno{max-width:60ch}
 .rk-story{--veil:.86}
 .rk-story .scene .say{color:color-mix(in srgb,var(--fg) 84%,transparent);font-size:clamp(18px,1.7vw,24px)}
 /* a figure beside the copy: waist-up art, so it stands on the stage's bottom edge (never a floating cut) */
@@ -1396,11 +1465,19 @@ body[data-view="ranking"] .rail,body[data-view="find"] .rail{display:none}
 .rk-bands .p-card h3{display:flex;align-items:center;gap:10px;font-size:clamp(20px,2.2vw,30px);font-weight:800;letter-spacing:-.02em}
 @media (max-width:700px){
   .rk-hero .p-hero{grid-template-columns:minmax(0,1fr)}
-  .rk-hero{align-items:start;padding-bottom:44vh}
-  .rk-hero .bc-rank{right:0;left:0;width:auto;height:42vh}
-  .rk-duo,.rk-duo.rk-flip{flex-direction:column;justify-content:flex-start;text-align:center;padding-inline:20px;padding-bottom:36vh}
-  .rk-duo .rk-fig,.rk-duo.rk-flip .rk-fig{left:0;right:0;width:auto;height:34vh}
+  /* hero: a column, copy 24 px under the header bar, then Tara in the flow, 8 px under the buttons and filling the
+     rest of the screen down to the hero's bottom edge (at least 200 px; the hero grows past one screen only then);
+     the two buttons share a row when they fit and stack full width when they don't */
+  .rk-hero{display:flex;flex-direction:column;align-items:stretch;padding-top:calc(env(safe-area-inset-top,0px) + 88px);padding-bottom:0}
+  .rk-hero .bc-rank{position:relative;left:auto;right:auto;bottom:auto;order:1;flex:1 1 auto;width:auto;height:auto;min-height:clamp(200px,30svh,300px);margin-top:8px}
+  .rk-hero .acts{align-self:stretch}
+  .rk-hero .acts .btn{flex:1 1 auto;padding-inline:16px}
+  /* story figures: copy 24 px under the header bar, then the figure in the flow, 8 px under it, filling the rest of
+     the screen down to the stage's bottom edge (Contain, bottom centre, so it is never cut at the sides) */
+  .rk-duo,.rk-duo.rk-flip{flex-direction:column;justify-content:flex-start;text-align:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 88px) 20px 0}
+  .rk-duo .rk-fig,.rk-duo.rk-flip .rk-fig{position:relative;left:auto;right:auto;bottom:auto;order:1;flex:1 1 0;align-self:stretch;width:auto;height:auto;min-height:160px;aspect-ratio:auto}
   .rk-duo .rk-copy{align-items:center;width:100%}
+  .rk-story .rk-duo .say{font-size:16px;line-height:1.5}
   .rk-bands{grid-template-columns:minmax(0,1fr)}
   .rk-bands .p-card{padding:14px}
 }
@@ -1434,3 +1511,24 @@ body.at-foot .top{transform:translateY(-100%);opacity:0;pointer-events:none}
 .pcard.on .pcard-wait{display:none}
 .pcard-wait{margin:0;font:500 13px var(--mono);letter-spacing:.08em;color:#b9b9c2}
 @keyframes pcard-in{from{opacity:0}}
+/* the leaderboard's Weekly / Monthly / Annual switch scrolls to that board (main script) */
+.story .lb-seg span{cursor:pointer}
+.story .lb-seg span:not(.on):hover{color:var(--fg)}
+.story .lb-seg span:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ===== Legal pages (#privacy, #terms; legal-page/LegalPage.tsx): text only, one 720 px column, centred. Top
+   spacing as the request page (.page 120 px; 88 px under the bar at 700 px and below); no art, no animation ===== */
+.legal{padding-top:120px;padding-bottom:96px}
+.legal-doc{max-width:720px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:40px;line-height:1.7}
+.legal-head{display:flex;flex-direction:column;gap:12px}
+.legal-head h1{font-size:clamp(32px,4vw,52px);line-height:1.05}
+.legal-eff{font-size:15px;color:var(--fg2)}
+.legal-doc section{display:flex;flex-direction:column;gap:14px}
+.legal-doc h2{font-size:22px;line-height:1.25;letter-spacing:-.02em}
+.legal-doc section p,.legal-doc section li{color:var(--fg2)}
+.legal-doc ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.legal-doc li::marker{color:var(--accent)}
+.legal-more{padding-top:24px;border-top:1px solid var(--border);font-size:15px;color:var(--fg2)}
+.legal-more a{color:var(--fg);font-weight:600}
+.legal-more a:hover{color:var(--accent)}
+.agree a{color:var(--fg);font-weight:600}
+@media (max-width:700px){.legal{padding-top:calc(env(safe-area-inset-top,0px) + 88px);padding-bottom:64px}.legal-doc{gap:32px}}

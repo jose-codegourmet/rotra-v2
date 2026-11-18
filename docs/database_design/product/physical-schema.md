@@ -37,7 +37,7 @@ only through server Route Handlers and services, never through the Supabase Data
 | `club_expiry_cycles` | PK `id`; unique `(club_id, id)`; partial unique `club_id WHERE state = 'running'`; index `(state, delete_public_pages_after, id)` for cleanup, `(club_id, expired_at desc)` | deadline > expiry; `cancelled` ⇔ `cancelled_at`; cancellation term only on cancelled; composite FK to the cancelling term | `RESTRICT` |
 | `club_name_change_requests` | PK `id`; unique `source_command_id`; partial unique `club_id WHERE state = 'pending'`; index `(club_id, requested_at desc)`, `(state, requested_at)` | non-blank name/key; approved/rejected ⇒ reviewer + time | `RESTRICT` |
 | `admin_audit_events` | PK `id`; unique `source_command_id`; index `(actor_admin_id, occurred_at desc)`, `(target_type, target_id, occurred_at desc)` | **append-only** trigger; metadata is redacted | `RESTRICT` to admin |
-| `feature_flags` | PK `key`; unique `name varchar(50)` | key `^[a-z][a-z0-9_]{2,39}$`; key-immutable trigger; catalog starts empty | `RESTRICT` to admins |
+| `feature_flags` | PK `key`; unique `name varchar(50)` | key `^[a-z][a-z0-9_]{2,39}$`; key-immutable trigger; catalog starts with the shipped flags, all off (`player_google_sign_in`, D-2026-11-18-01) | `RESTRICT` to admins |
 | `ranking_policy_versions` | PK `id`; unique `version`; index `effective_at desc` | each weight 0–10000, sum 10000; threshold 1–40; **append-only** trigger; seeded 7000/3000/10 | `RESTRICT` to admin |
 
 - Changing a club's price never touches `club_license_terms`: each term keeps the amount and pricing it

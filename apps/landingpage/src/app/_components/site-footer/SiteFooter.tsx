@@ -45,10 +45,9 @@ export function SiteFooter() {
             </div>
             <div>
               <span className="h-cap">ROTRA</span>
-              <a href="#assets">Asset list</a>
               <a href="#home">Contact</a>
-              <a href="#home">Privacy</a>
-              <a href="#home">Terms</a>
+              <a href="#privacy">Privacy</a>
+              <a href="#terms">Terms</a>
             </div>
             <div>
               <span className="h-cap">Sign in</span>
@@ -65,7 +64,7 @@ export function SiteFooter() {
           <button className="h-top" type="button" id="backTop">
             ↑ Back to top
           </button>
-          <span className="h-colo">© 2026 ROTRA · rotra.club · Art: Higgsfield placeholders.</span>
+          <span className="h-colo">© 2026 ROTRA · rotra.club</span>
         </div>
       </div>
     </footer>

@@ -33,11 +33,18 @@ Biome skips `src/scripts/`, `globals.css` and `rive/` (moved as is from the old 
 | `#home` | Player landing: hero (“Do you play, or run the game?”, Tara smashes a shuttle at the camera), 01 the real Tara, 02 how a rank moves, 03 the leaderboards, 04 one record |
 | `#clubs` | Club owners and Queue Masters: hero, 01 the assessors (Roster and levels), 02 run the night, 03 partner up (what a club gets, “Request a quotation”; prices are not public), 04 partner request |
 | `#ranking`, `#request` | Detail pages (`#request` is the quotation request form) |
-| `#assets` | List of every art asset on the site |
+| `#find` | Find your profile (name or RTR ID search) |
+| `#privacy`, `#terms` | Privacy Policy and Terms of Service (`legal-page/LegalPage.tsx`, “Legal pages” block in `globals.css`): text only, one 720 px column. The copy in `legal-page/privacy-content.ts` and `terms-content.ts` is a copy of the Player Information app's `(public)/privacy/content.ts` and `(public)/terms/content.ts` (only the type import differs); change them together. Section headings have ids `<view>-<heading slug>` (e.g. `#privacy-your-rights`). The footer's Privacy and Terms and the request form's agreement link here |
 
-`#pricing` no longer has a page: the router redirects it to `#request`.
+`#pricing` no longer has a page: the router redirects it to `#request`. The asset list page (`#assets`) was removed on
+November 18, 2026; like any unknown hash it now shows home.
 
-Sign-in links (header “Sign in”, footer Player and Club account) are `a[data-app="player|queue"]`; `src/scripts/site.js`
+At 760 px and below the top bar is the logo and a menu button; the button opens a fullscreen menu (`#siteMenu` in
+`site-header/SiteHeader.tsx`, “Phone menu” in `site.js` and `globals.css`) with the three main links, Sign in and Club
+account. Links, Escape, a route change or a wider screen close it; while open, the page does not scroll
+(`html.menu-open`, Lenis stopped).
+
+Sign-in links (header “Sign in”, the phone menu’s Sign in and Club account, footer Player and Club account) are `a[data-app="player|queue"]`; `src/scripts/site.js`
 sets their hrefs to `<origin>/login` from the `PLAYER_APP_URL` and `QUEUE_APP_URL` constants at its top
 (`https://player.rotra.club`, `https://queue.rotra.club`, per `docs/architecture.md`).
 
@@ -72,11 +79,15 @@ greens, one mint `#00FF88`).
   footer's dark arena uses `public/art/footer-sky.webp` (opaque, cover, anchored bottom, brightness .5) behind Tara
   (`tara-outro`) and Rion (`rion-wave`) standing above the black footer band. The three layers carry
   `loading="lazy"`, so phones (where they are `display:none`) never download them.
-- `public/art/mobile/<scene>.webp` (the same nine scenes), 1080 px wide, 9:16: one tall still per section for phones, made
-  with Higgsfield (`gpt_image_2_6`, reference = the scene's three layers flattened) and recomposed for portrait:
-  structures and lights in the top third, a calm dark middle third for the copy, floor and foreground at the bottom.
+- `public/art/mobile/<scene>.webp` (the same ten scenes), 760×1620: one tall still per section for phones, made with
+  ffmpeg by flattening the scene's `-far`, `-mid` and `-near` layers with each layer's desktop brightness baked into
+  its RGB (the section's `--b-far/--b-mid/--b-near` in `globals.css`, or the .45/.6/.8 defaults), then taking a
+  full-height 760×1620 crop, centred (X = 1060) unless that cuts the main structure: `moves` X = 1700 (the big
+  shuttle), `queue` X = 1750 (scoreboard and bottles), `assess` X = 1400 (the green table), `find` X = 2080 (a whole
+  figure under the banners; the centre is empty). Encoded with `cwebp -q 78`.
   At 700 px and below it is the section's only background (`<img class="ly m">` in the `.bgl`, `loading="lazy"`,
-  cover, centred, no drift or animation, `filter: brightness(var(--b-m))` set per section in the
+  cover, anchored centre bottom so the floor stays, no drift or animation, `filter: brightness(var(--b-m))`
+  (default 1, since the brightness is baked; a few busy sections dim to .8–.85) in the
   `/* mobile backgrounds */` CSS block) under the same veil; the three wide layers are hidden there. Above 700 px it
   is `display:none` and never loads.
 - Section scenes: a section background can also be one Rive canvas, like the hero hall, by giving its `.bgl` a

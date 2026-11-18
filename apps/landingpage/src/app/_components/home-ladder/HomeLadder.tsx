@@ -75,11 +75,18 @@ export function HomeLadder() {
               </span>
             </h3>
             <div className="seg lb-seg">
-              <span data-b="0" className="on">
+              {/* biome-ignore lint/a11y/useSemanticElements: markup kept as in the original page; the main script makes these scroll to their board */}
+              <span data-b="0" className="on" role="button" tabIndex={0}>
                 Weekly
               </span>
-              <span data-b="1">Monthly</span>
-              <span data-b="2">Annual</span>
+              {/* biome-ignore lint/a11y/useSemanticElements: as above */}
+              <span data-b="1" role="button" tabIndex={0}>
+                Monthly
+              </span>
+              {/* biome-ignore lint/a11y/useSemanticElements: as above */}
+              <span data-b="2" role="button" tabIndex={0}>
+                Annual
+              </span>
             </div>
             <section className="podium">
               <span className="embers" aria-hidden="true">
@@ -165,10 +172,6 @@ export function HomeLadder() {
               Sample players
             </p>
           </div>
-          <span className="fnote">
-            NEW: weekly, monthly and annual boards aren't in the docs yet (today: one overall board,
-            90 days). Needs a decision.
-          </span>
         </div>
         <div className="sdots" aria-hidden="true">
           <i />

@@ -981,7 +981,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-02 — Player account verification with an Admin override
 - **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
-- **Implementation status:** [Player verification mockup](../mockup-changes/2026-11-16-player-account-verification.md) and [Admin verification mockup](../mockup-changes/2026-11-18-admin-player-verification.md).
+- **Implementation status:** #915 implements the private Player and Admin reads and the audited override in real-mode source. Migration and batch verification are pending. [Player verification mockup](../mockup-changes/2026-11-16-player-account-verification.md) and [Admin verification mockup](../mockup-changes/2026-11-18-admin-player-verification.md).
 - **Ticket:** [#889](https://github.com/jose-codegourmet/rotra-v2/issues/889) (Epic P13)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**

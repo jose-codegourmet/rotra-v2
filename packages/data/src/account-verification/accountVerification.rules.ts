@@ -4,12 +4,13 @@ import { maskPhone } from '../player-account/playerAccount.rules'
 import type { MyAccount } from '../player-account/playerAccount.types'
 import type { AccountVerification, VerificationEmail } from './accountVerification.types'
 
+type VerificationRequest = Pick<ContactChangeRequest, 'playerId' | 'field' | 'status' | 'toValue'>
 type VerificationAccount = Pick<MyAccount, 'playerId' | 'googleEmail' | 'email' | 'phone'>
 
 function emailCheck(
   account: VerificationAccount,
   googleEmail: string | null,
-  requests: readonly ContactChangeRequest[],
+  requests: readonly VerificationRequest[],
 ): VerificationEmail {
   if (!googleEmail) return { kind: 'google_missing' }
   const rotraEmail = normalizeGoogleEmail(account.email)
@@ -30,7 +31,7 @@ function emailCheck(
 /** The three checks are independent of the Admin override, so Admin can still inspect them. */
 export function deriveAccountVerification(
   account: VerificationAccount,
-  requests: readonly ContactChangeRequest[],
+  requests: readonly VerificationRequest[],
   verifiedByAdmin: boolean,
 ): AccountVerification {
   const googleEmail = normalizeGoogleEmail(account.googleEmail ?? '') || null

@@ -17,8 +17,9 @@ import { normalizeContact } from '../contact-change-request/contactChangeRequest
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
 import { checkMockSave } from '../mock/bridge'
-import { ConflictError, MockError, NotConnectedError } from '../mock/errors'
+import { ConflictError, MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
+import { realSetAdminVerificationOverride } from '../real/account-verification'
 import { realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
 import {
@@ -240,7 +241,7 @@ const editResult = (
 export async function setAdminVerificationOverride(
   input: SetAdminVerificationOverrideInput,
 ): Promise<AdminAccountVerification> {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realSetAdminVerificationOverride(input)
   await owner()
   const overrideReason = reason(input.reason)
   return adminMutation(400, (draft) => {

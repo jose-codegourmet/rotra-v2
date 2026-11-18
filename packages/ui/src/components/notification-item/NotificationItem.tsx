@@ -39,7 +39,7 @@ export function NotificationItem({
       type="button"
       className={cn(
         'flex min-h-11 w-full cursor-pointer items-start gap-3 px-4 py-3.5 text-left text-[15px] text-fg focus-visible:outline-offset-[-2px]',
-        announcement && 'bg-ann-bg inset-shadow-[1px_0_0_var(--ann-border)]',
+        announcement && 'bg-ann-bg',
         !announcement && (read ? 'hover:bg-elev' : 'bg-accent-subtle'),
       )}
       onClick={onOpen}
@@ -59,7 +59,7 @@ export function NotificationItem({
           {pinned ? ' · Pinned' : null}
         </span>
         <b className="wrap-anywhere">{title}</b>
-        <span className="truncate text-[13px] text-fg2">{body}</span>
+        <span className="text-[13px] text-fg2">{body}</span>
       </span>
       <span className="flex flex-none flex-col items-end gap-1.5">
         <span className="text-[12px] whitespace-nowrap text-fg3">

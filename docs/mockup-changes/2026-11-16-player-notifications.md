@@ -1,6 +1,6 @@
 # Player app: notifications page and bell
 
-Status: IN PROGRESS — #890
+Status: IN MOCK APP — #890
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › topBar (bell), viewNotifs, allNotifs, seedNotifs, NOTIF_KIND
@@ -43,3 +43,12 @@ Superseded by: none
 
 ## Real app work
 - The bell and page in apps/player, notification fixtures and hooks in packages/data, and (real mode) a notifications table written by the events above. Delivery beyond the app is open.
+
+## Implementation verification — November 18, 2026
+
+- #895, #899, #905 and #908: components, private mock inbox, bell, route and states implemented.
+- Compared notification content and layout with the canonical prototype; body text wraps on mobile.
+- All 22 notification stories rendered in both themes at 375/1280 px without horizontal overflow.
+- Browser: signed-out return path, item navigation/read, mark all, empty Unread, verification reminder removal, and retryable error/count hiding checked. Keyboard filter focus and reduced-motion skeleton checked. Screenshots delivered in chat only.
+- #914: seven real event sources implemented. Local authenticated APIs rejected anonymous and cross-owner requests; read state survived reload. Session-invite notification deferred by the owner; its mock sample remains.
+- Local migrations, database integrity and event integration checks passed. Hosted migration deployment is recorded in the PR.

@@ -9,8 +9,8 @@ import { useContactRequests } from '@rotra/data/contact-change-request/useContac
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { ActivityLog } from '@rotra/ui/activity-log'
-import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
+import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { AdminPlayerIdentityCard } from '@rotra/ui/admin-player-identity-card'
 import { Avatar } from '@rotra/ui/avatar'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -179,10 +179,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
             {player.detailsRequired && !player.claimed ? (
               <Chip tone="warn">Details required</Chip>
             ) : null}
-            <RankStatusChip
-              status={player.rankStatus}
-              notOnLeaderboard={!!savedByClubs(player)}
-            />
+            <RankStatusChip status={player.rankStatus} notOnLeaderboard={!!savedByClubs(player)} />
             {player.rtrId ? (
               <span className="font-mono text-[13px] text-fg2">{player.rtrId}</span>
             ) : (

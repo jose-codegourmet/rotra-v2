@@ -139,9 +139,7 @@ export function PlayerDirectory() {
       <PageHeader
         title="Players"
         actions={<AddAdminPlayer onCreated={clear} />}
-        description={
-          data ? `${data.total} player${data.total === 1 ? '' : 's'}` : 'Players'
-        }
+        description={data ? `${data.total} player${data.total === 1 ? '' : 's'}` : 'Players'}
         className="flex-nowrap [&>div:last-child]:!flex [&>div:last-child]:!w-auto [&>div:last-child]:shrink-0"
       />
       {!list.isError ? (

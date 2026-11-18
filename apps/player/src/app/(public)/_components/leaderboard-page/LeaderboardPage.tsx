@@ -189,7 +189,6 @@ export function LeaderboardPage({
     nameSearch,
     loading,
     failed,
-    board.data,
     board.hasNextPage,
     board.isFetching,
     board.isError,

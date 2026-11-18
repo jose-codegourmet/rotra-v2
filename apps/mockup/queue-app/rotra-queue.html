@@ -1147,6 +1147,8 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
 .gm-fmt { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: rgba(0, 0, 0, .72); color: rgba(255, 255, 255, .9); white-space: nowrap; }
 .gm-score { font-family: var(--mono); font-size: 22px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.gm-games { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; max-width: 120px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, .85); }
+.gm-games span { white-space: nowrap; }
 .gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
 .gm-who { font-size: 12px; font-weight: 800; color: var(--accent); white-space: nowrap; }
 .gm.partial .gm-court { filter: saturate(.4); }
@@ -1207,6 +1209,13 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .wiz-steps button:disabled { cursor: default; opacity: .55; }
 .wiz-steps .num { font-family: var(--mono); font-size: 11px; }
 @media (max-width: 520px) { .wiz-steps .lbl { display: none; } .wiz-steps button { align-items: center; } }
+.score-fixed { display: flex; align-items: center; justify-content: center; border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); font-family: var(--mono); }
+.res-deuce { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.res-deuce .small { color: var(--fg2); }
+.game-row { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); }
+.game-row .g-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.game-row .g-deuce { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--fg2); }
+.res-tally { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r); background: var(--accent-subtle); border: 1px solid var(--accent); }
 .or-sep { display: flex; align-items: center; gap: 12px; color: var(--fg2); font-size: 12px; font-weight: 800; letter-spacing: 2px; }
 .or-sep::before, .or-sep::after { content: ""; flex: 1; height: 1px; background: var(--border-strong); }
 .score-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: end; }
@@ -1675,6 +1684,110 @@ const MODES = {
   fair: { label: 'Fair', text: 'Mainly level-matched games, roughly 10% easy games.' },
   hard: { label: 'Hard', text: 'Demanding runs, including 2–3 consecutive games.' },
 };
+
+// Scoring modes (Q22.1). One table drives setup, the result dialog, history and the seed data. A session with no value uses 16/31.
+const SCORING = {
+  '31': { label: '16/31', text: 'One game to 31. Change sides at 16. Deuce at 30–30.', target: 31, games: 1, deuce: true },
+  '31nd': { label: '16/31, no deuce', text: 'One game to 31. Change sides at 16. The first to 31 wins.', target: 31, games: 1, deuce: false },
+  '21': { label: '11/21', text: 'One game to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 1, deuce: true },
+  '21x3': { label: '11/21 × 3', text: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 3, deuce: true },
+  '21x3nd': { label: '21 × 3', text: 'Best of 3 games to 21. Change sides after each game. No deuce: the first to 21 wins.', target: 21, games: 3, deuce: false },
+};
+// Sessions saved in the browser before this change have no `scoring`: they read as 16/31.
+const scoringOf = (s) => (s && SCORING[s.scoring] ? s.scoring : '31');
+const scoringDef = (s) => SCORING[scoringOf(s)];
+// Score of a finished match for display: { main, games } or null. Old matches only have scoreA/scoreB. `flip` shows Team B first.
+function scoreParts(m, flip) {
+  if (!m || m.scoreA == null || m.scoreB == null) return null;
+  const pair = (a, b) => (flip ? `${b}–${a}` : `${a}–${b}`);
+  return { main: pair(m.scoreA, m.scoreB), games: Array.isArray(m.games) && m.games.length ? m.games.map((g) => pair(g.a, g.b)) : null };
+}
+const gmScore = (m, flip) => {
+  const p = scoreParts(m, flip);
+  return p ? `<span class="gm-score tnum">${p.main}</span>${p.games ? `<span class="gm-games tnum">${p.games.map((g) => `<span>${g}</span>`).join('')}</span>` : ''}` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+};
+// One game's score is valid when: no deuce, the winner has exactly the target and the loser 0 to target − 1; deuce, the winner has the target and the
+// loser at most target − 2, or the winner has more than the target and leads by exactly 2 (no cap).
+const gameValid = (T, deuce, w, l) => Number.isInteger(w) && Number.isInteger(l) && l >= 0 && (deuce ? (w === T && l <= T - 2) || (w > T && w - l === 2) : w === T && l <= T - 1);
+// Seed data: a believable finished score for a mode. `lose` is the old random 9–19; no randomness is consumed here.
+function seedScore(key, aWins, lose) {
+  const sc = SCORING[key] || SCORING['31'], T = sc.target;
+  if (sc.games === 1) {
+    const deuce = sc.deuce && lose === 16;
+    const w = deuce ? T + 1 : T, l = deuce ? T - 1 : Math.min(lose + (T - 21), T - 2);
+    return { scoreA: aWins ? w : l, scoreB: aWins ? l : w };
+  }
+  // [who takes the game (true: the match winner), the game loser's score]. A split match goes to a third game.
+  const wl = Math.min(lose, T - 2), plan = lose % 3 === 0 ? [[true, wl], [false, Math.max(wl - 3, 0)], [true, Math.max(wl - 1, 0)]] : [[true, wl], [true, Math.max(wl - 2, 0)]];
+  const games = plan.map(([byWinner, l]) => (byWinner === aWins ? { a: T, b: l } : { a: l, b: T }));
+  return { games, scoreA: games.filter((g) => g.a > g.b).length, scoreB: games.filter((g) => g.b > g.a).length };
+}
+
+// ---- Match result dialog (Q22.1): what each mode asks for, and what it refuses ----
+const filledV = (v) => v !== '' && v != null;
+const wholeNum = (v) => filledV(v) && /^\d+$/.test(String(v).trim());
+const newResultGame = () => ({ w: null, deuce: false, lose: '', a: '', b: '' });
+const newResultSheet = (id) => ({ type: 'result', id, winner: null, deuce: false, lose: '', a: '', b: '', g: [newResultGame(), newResultGame(), newResultGame()], err: '' });
+// Best of 3: which game rows show (Game 3 only when games 1 and 2 were split), the games each pair won, and the winner when one pair has 2.
+function gamesState(sh) {
+  const g = sh.g || [], vis = [0, 1].concat(g[0] && g[1] && g[0].w && g[1].w && g[0].w !== g[1].w ? [2] : []);
+  const wins = { A: vis.filter((i) => g[i].w === 'A').length, B: vis.filter((i) => g[i].w === 'B').length };
+  return { vis, wins, played: vis.filter((i) => g[i].w), decided: wins.A >= 2 ? 'A' : wins.B >= 2 ? 'B' : null };
+}
+const syncGames = (sh) => { const st = gamesState(sh); if (st.decided) sh.winner = st.decided; };
+const gameEntered = (o) => (o.deuce ? filledV(o.a) || filledV(o.b) : filledV(o.lose));
+// One game: { err } or { scored, a, b }. `o.w` is the game's winner.
+function gameOutcome(sc, o, pre, row) {
+  const T = sc.target, W = o.w;
+  if (o.deuce) {
+    if (!gameEntered(o)) return { scored: false };
+    const a = +o.a, b = +o.b;
+    if (!wholeNum(o.a) || !wholeNum(o.b) || Math.max(a, b) <= T || Math.abs(a - b) !== 2) return { err: `${pre}A deuce game ends when one pair leads by 2, like ${T + 1}–${T - 1}.` };
+    const by = a > b ? 'A' : 'B';
+    if (by !== W) return { err: `${pre}The score says Team ${by} won, but Team ${W} is picked. Fix one of them.` };
+    return { scored: true, a, b };
+  }
+  if (!gameEntered(o)) return { scored: false };
+  const max = sc.deuce ? T - 2 : T - 1, l = +o.lose;
+  if (!wholeNum(o.lose) || l > max) {
+    if (sc.deuce && wholeNum(o.lose) && l === T - 1) return { err: `${pre}At ${T - 1}–${T - 1} the game goes to deuce. Turn on ${row ? 'Deuce for this game' : 'Went to deuce'} and type both scores.` };
+    return { err: `${pre}Enter the losing score as a whole number from 0 to ${max}.` };
+  }
+  return { scored: true, a: W === 'A' ? T : l, b: W === 'A' ? l : T };
+}
+// The whole result from the sheet state: { err } or { winner, scoreA?, scoreB?, games? }. No score at all is a winner-only result.
+function resultCheck(sc, sh) {
+  if (sc.games === 1) {
+    if (!sh.winner) return { err: 'Pick the winner.' };
+    const o = gameOutcome(sc, { w: sh.winner, deuce: sh.deuce, lose: sh.lose, a: sh.a, b: sh.b }, '', false);
+    return o.err ? { err: o.err } : o.scored ? { winner: sh.winner, scoreA: o.a, scoreB: o.b } : { winner: sh.winner };
+  }
+  const g = sh.g, used = g.some((x) => x.w || gameEntered(x));
+  if (!used) return sh.winner ? { winner: sh.winner } : { err: 'Pick the winner.' };
+  const st = gamesState(sh);
+  if (!st.decided) return { err: 'Pick who won each game. One pair must win 2 games to decide the match.' };
+  if (sh.winner && sh.winner !== st.decided) return { err: `The games say Team ${st.decided} won, but Team ${sh.winner} is picked. Fix one of them.` };
+  const entered = st.played.filter((i) => gameEntered(g[i])).length;
+  if (entered && entered < st.played.length) return { err: 'Enter a score for every game played, or clear them all.' };
+  const outs = [];
+  for (const i of st.played) { const o = gameOutcome(sc, g[i], `Game ${i + 1}: `, true); if (o.err) return { err: o.err }; outs.push(o); }
+  if (!entered) return { winner: st.decided };
+  return { winner: st.decided, scoreA: st.wins.A, scoreB: st.wins.B, games: outs.map((o) => ({ a: o.a, b: o.b })) };
+}
+// The score cells for one game: the winner's side shows the fixed target, the other side is the losing-score box; deuce shows two boxes.
+function scoreEntry(m, o) {
+  const T = o.T, tn = (t) => (t === 'A' ? m.teamA : m.teamB);
+  const lab = (t) => (o.short ? `Team ${t}` : `Team ${t} · ${esc(listNames(tn(t)))}`);
+  const box = (k, text, aria) => `<label class="field"><span>${text}</span><input class="input tnum" id="${o.id}-${k}" type="number" min="0" step="1" inputmode="numeric" data-bind="${o.base}.${k}" data-rerender value="${esc(o.v[k] ?? '')}" placeholder="0" aria-label="${esc(aria)}"></label>`;
+  let ca, cb;
+  if (o.deuce) { ca = box('a', lab('A'), `${o.gl}Team A score`); cb = box('b', lab('B'), `${o.gl}Team B score`); }
+  else {
+    const L = o.w === 'A' ? 'B' : 'A', fix = (t) => `<div class="field"><span>${lab(t)}</span><div class="input score-fixed tnum" role="img" aria-label="${o.gl}Team ${t} score, ${T}">${T}</div></div>`;
+    const lose = box('lose', o.short ? `Team ${L} scored` : `${esc(listNames(tn(L)))} scored (optional)`, `${o.gl}${listNames(tn(L))} scored`);
+    ca = o.w === 'A' ? fix('A') : lose; cb = o.w === 'A' ? lose : fix('B');
+  }
+  return `<div class="score-row">${ca}<span class="vs" style="padding-bottom:12px">–</span>${cb}</div>`;
+}
 
 // ---------- Seed data (fictional) ----------
 const IDENT = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest', pending: 'Lookup pending' };
@@ -2916,7 +3029,7 @@ function simulateHistory(spec) {
   const courts = Array.from({ length: spec.courts }, (_, i) => ({ id: `c${i + 1}`, label: `Court ${i + 1}` }));
   const roster = spec.players.map((pid) => ({ pid, level: (P(pid) || {}).sugg ?? 4, present: true, locked: true, presentAt: start }));
   const lv = (pid) => roster.find((x) => x.pid === pid).level;
-  const s = { id: spec.id, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', minimum: spec.minimum, minAuto: spec.minAuto !== false, notes: spec.notes || '', status: spec.status, download: 'none', roster, matches: [], seq: 0, published: spec.published ? { slides: [0, 1], offDay: false, at: end } : null, startedAt: start, finalizedAt: end + 6e5, invalidReason: spec.reason || null, finance: spec.finance || null, payments: {} };
+  const s = { id: spec.id, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', scoring: spec.scoring || '31', minimum: spec.minimum, minAuto: spec.minAuto !== false, notes: spec.notes || '', status: spec.status, download: 'none', roster, matches: [], seq: 0, published: spec.published ? { slides: [0, 1], offDay: false, at: end } : null, startedAt: start, finalizedAt: end + 6e5, invalidReason: spec.reason || null, finance: spec.finance || null, payments: {} };
   if (spec.finance && spec.status === 'finalized') roster.forEach((x, i) => { if (i < roster.length - (spec.unpaid || 0)) s.payments[x.pid] = { at: start + (i % 40) * 6e4, amount: duePerHead(s) }; });
   const games = {}, free = {}, courtFree = {};
   roster.forEach((x) => { games[x.pid] = 0; free[x.pid] = start + Math.floor(r() * 20) * 6e4; });
@@ -2936,7 +3049,7 @@ function simulateHistory(spec) {
     seq += 1;
     const invalid = (spec.invalidSeq || []).includes(seq);
     const withScore = !invalid && r() < 0.6, lose = 9 + Math.floor(r() * 11);
-    s.matches.push({ id: `${spec.id}-m${seq}`, seq, format: 'doubles', teamA: o.A, teamB: o.B, status: invalid ? 'invalid' : 'done', origin: r() < 0.7 ? 'auto' : 'manual', protected: false, courts: [c.id], subs: [], pos: seq, startedAt: t0, endedAt: t0 + dur * 6e4, winner: invalid ? null : (aWins ? 'A' : 'B'), scoreA: withScore ? (aWins ? 21 : lose) : undefined, scoreB: withScore ? (aWins ? lose : 21) : undefined });
+    s.matches.push({ id: `${spec.id}-m${seq}`, seq, format: 'doubles', teamA: o.A, teamB: o.B, status: invalid ? 'invalid' : 'done', origin: r() < 0.7 ? 'auto' : 'manual', protected: false, courts: [c.id], subs: [], pos: seq, startedAt: t0, endedAt: t0 + dur * 6e4, winner: invalid ? null : (aWins ? 'A' : 'B'), ...(withScore ? seedScore(s.scoring, aWins, lose) : {}) });
     pick.forEach((p) => { if (!invalid) games[p] += 1; free[p] = t0 + dur * 6e4 + (1 + Math.floor(r() * 6)) * 6e4; });
     courtFree[c.id] = t0 + (dur + 2) * 6e4;
   }
@@ -2951,7 +3064,7 @@ function simulateLive(spec) {
   const courts = Array.from({ length: spec.courts }, (_, i) => ({ id: `c${i + 1}`, label: `Court ${i + 1}` }));
   const late = spec.late || {};
   const roster = spec.players.map((pid) => ({ pid, level: (P(pid) || {}).sugg ?? 3, present: !(spec.away || []).includes(pid), locked: true, presentAt: start + (late[pid] || 0) * 6e4 }));
-  const s = { id: `demo-live-${spec.key}-${now.toString(36)}`, demo: spec.key, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', minimum: 0, minAuto: spec.minimum == null, notes: spec.notes || '', status: 'active', download: 'ready', roster, waitlist: [], requests: [], matches: [], seq: 0, published: null, startedAt: start, finance: spec.finance || null, payments: {}, courtFill: 'manual' };
+  const s = { id: `demo-live-${spec.key}-${now.toString(36)}`, demo: spec.key, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', scoring: spec.scoring || '31', minimum: 0, minAuto: spec.minimum == null, notes: spec.notes || '', status: 'active', download: 'ready', roster, waitlist: [], requests: [], matches: [], seq: 0, published: null, startedAt: start, finance: spec.finance || null, payments: {}, courtFill: 'manual' };
   s.minimum = spec.minimum ?? sessionEstimate(s).low;
   const lv = (pid) => roster.find((x) => x.pid === pid).level;
   // A small per-player lean (some get picked a little more often) keeps game counts from all being equal.
@@ -2973,7 +3086,7 @@ function simulateLive(spec) {
     else {
       const sa = o.A.reduce((t, p) => t + lv(p), 0), sb = o.B.reduce((t, p) => t + lv(p), 0);
       const aWins = r() < 1 / (1 + 10 ** ((sb - sa) / 4)), withScore = r() < 0.6, lose = 9 + Math.floor(r() * 11);
-      Object.assign(m, { status: 'done', endedAt: t1, winner: aWins ? 'A' : 'B', scoreA: withScore ? (aWins ? 21 : lose) : undefined, scoreB: withScore ? (aWins ? lose : 21) : undefined });
+      Object.assign(m, { status: 'done', endedAt: t1, winner: aWins ? 'A' : 'B', ...(withScore ? seedScore(s.scoring, aWins, lose) : {}) });
       pick.forEach((p) => { games[p] += 1; free[p] = t1 + (1 + Math.floor(r() * (spec.rest || 6))) * 6e4; });
       courtFree[c.id] = t1 + 2 * 6e4;
     }
@@ -3049,13 +3162,13 @@ function upcomingExamples() {
 }
 // Example sessions, versioned by S.histV: a bump replaces these ids in older saves and leaves everything else alone.
 function ensureHistory() {
-  if (S.histV === 5) return;
+  if (S.histV === 6) return;
   // Older saves get the example players they're missing (levels already on the nine-step list by now).
   seedPlayers().forEach((p) => { if (!S.players.some((x) => x.id === p.id)) S.players.push({ ...p, sugg: p.sugg == null ? p.sugg : oldToNewLevel(p.sugg) }); });
   const ids = pidRange;
   const specs = [
     { id: 'h1', title: 'Thursday Open Play', ago: 3, h: 19, len: 3, courts: 3, players: ids(1, 18), minimum: 6, status: 'finalized', published: true, seed: 11, invalidSeq: [14], unpaid: 3, finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 700, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
-    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
+    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, scoring: '21x3', finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
     { id: 'h3', title: 'Tuesday Drills', ago: 12, h: 19, len: 2, courts: 2, players: ids(3, 14), minimum: 4, status: 'invalid', seed: 33, venue: 'Lahug Covered Court', address: 'Salinas Dr, Lahug, Cebu City', reason: 'The original device was lost before its records synced, so this session could not be recorded.' },
     // An ordinary night, a full house (24 of 24 slots), over budget (27 of 24) and few players for the courts.
     { id: 'x-ordinary', title: 'Open Play Night', ago: 2, h: 19, len: 3, courts: 3, players: ids(5, 22), minimum: 6, status: 'finalized', published: true, seed: 44, unpaid: 2, finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }, { itemId: 'inv2', tubes: 2 }] }, ...BANILAD },
@@ -3067,7 +3180,7 @@ function ensureHistory() {
   S.sessions = S.sessions.filter((x) => !built.some((b) => b.id === x.id)).concat(built);
   // One live example, unless something is already live (one session at a time).
   if (!S.sessions.some((x) => x.status === 'active')) S.sessions.push(buildLive('full'));
-  S.histV = 5;
+  S.histV = 6;
   save();
 }
 function historyMatch(s, m) {
@@ -3078,7 +3191,7 @@ function historyMatch(s, m) {
   const invalid = m.status === 'invalid', wl = invalid ? null : m.winner === 'A';
   const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}" data-act="openProfile" data-id="${pid}" title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}. View profile">${avatar(P(pid))}<b>${esc(acctShort(pid))}</b></button>`;
   const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
-  const score = invalid ? '' : m.scoreA != null ? `<span class="gm-score tnum">${m.scoreA}–${m.scoreB}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+  const score = invalid ? '' : gmScore(m, false);
   const res = invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${m.id}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${m.teamA.map((x) => esc(nm(x))).join(' and ')} versus ${m.teamB.map((x) => esc(nm(x))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
     <span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
@@ -3171,7 +3284,7 @@ function histPublicPane(s, { invalid }) {
     <div class="grid2">
       <section class="card stack"><h3>Details</h3><dl class="kv">
         <dt>When</dt><dd>${fmtDate(s.start)}, ${fmtRange(s.start, s.end)}</dd><dt>Venue</dt><dd>${esc(s.venue)}</dd>
-        <dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl></section>
+        <dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Minimum</dt><dd>${s.minimum} games per player</dd></dl></section>
       <section class="card stack"><h3>Results on the page</h3>
         ${invalid ? '<p class="small muted">Invalid sessions have no results to share.</p>'
           : pub ? `<dl class="kv"><dt>Shared</dt><dd>${[pub.slides.includes(0) && 'Standings', pub.slides.includes(1) && 'Awards'].filter(Boolean).join(' and ') || 'Nothing'}</dd><dt>Off Day</dt><dd>${pub.offDay ? 'Shared' : 'Private'}</dd><dt>Published</dt><dd>${fmtDate(pub.at)} · ${fmtTime(pub.at)}</dd></dl>`
@@ -3489,8 +3602,8 @@ function draftFrom(s, day) {
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
   const dstr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const t = (x) => { const z = new Date(x); return `${pad(z.getHours())}:${pad(z.getMinutes())}`; };
-  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), endDay: dayDiff(s.start, s.end), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtStartDays: s.courts.map((c) => c.startsAt ? dayDiff(s.start, c.startsAt) : 0), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), courtEndDays: s.courts.map((c) => c.until ? dayDiff(s.start, c.until) : 0), dayAware: true, singles: s.singles, doubles: s.doubles, reqFormats: { ...reqAllowed(s) }, mode: s.mode, minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || '', expectedAuto: !s.expected, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
-    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', endDay: 0, venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtStartDays: [0, 0], courtEnds: ['', ''], courtEndDays: [0, 0], dayAware: true, singles: false, doubles: true, reqFormats: reqDefaults({ singles: false, doubles: true }), mode: 'fair', minimum: 4, minAuto: true, expected: 2 * (S.club.perCourt || 8), expectedAuto: true, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
+  return s ? { id: s.id, title: s.title, date: dstr, start: t(s.start), end: t(s.end), venue: s.venue, address: s.address, venueId: ((S.venues || []).find((v) => v.name === s.venue) || {}).id || null, courts: s.courts.map((c) => c.label), endDay: dayDiff(s.start, s.end), courtStarts: s.courts.map((c) => c.startsAt ? t(c.startsAt) : ''), courtStartDays: s.courts.map((c) => c.startsAt ? dayDiff(s.start, c.startsAt) : 0), courtEnds: s.courts.map((c) => c.until ? t(c.until) : ''), courtEndDays: s.courts.map((c) => c.until ? dayDiff(s.start, c.until) : 0), dayAware: true, singles: s.singles, doubles: s.doubles, reqFormats: { ...reqAllowed(s) }, mode: s.mode, scoring: scoringOf(s), minimum: s.minimum, minAuto: s.minAuto !== false, expected: s.expected || '', expectedAuto: !s.expected, perCourt: perCourtOf(s), notes: s.notes, ...financeDraft(s) }
+    : { id: null, title: '', date: dstr, start: '19:00', end: '22:00', endDay: 0, venue: '', address: '', venueId: null, courts: ['Court 1', 'Court 2'], courtStarts: ['', ''], courtStartDays: [0, 0], courtEnds: ['', ''], courtEndDays: [0, 0], dayAware: true, singles: false, doubles: true, reqFormats: reqDefaults({ singles: false, doubles: true }), mode: 'fair', scoring: '31', minimum: 4, minAuto: true, expected: 2 * (S.club.perCourt || 8), expectedAuto: true, perCourt: S.club.perCourt || 8, notes: '', ...financeDraft(null) };
 }
 // Three pages, each holding two sections, so a session can be set up quickly. Only page 1 has required fields;
 // "Create session" works from any page and fills the rest with defaults.
@@ -3650,7 +3763,10 @@ function viewSetup() {
       <div class="field"><span>Players can request</span><div class="seg mr-fmts" role="group" aria-label="Formats players can request">${REQ_FORMATS.map((k) => `<button aria-pressed="${!!(d.reqFormats || {})[k]}" data-act="toggleReqFormat" data-k="${k}">${REQ_LABEL[k]}</button>`).join('')}</div>
       <span class="hint">Which kinds of games a signed-in player can ask for with Request a match. Greyed pills on their side are the ones you leave off here.${REQ_FORMATS.every((k) => !(d.reqFormats || {})[k]) ? ' With none on, players can\'t send match requests.' : ''}</span></div>
       <div class="field"><span>Mode</span><div class="choices">${Object.entries(MODES).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="mode" data-v="${k}" aria-pressed="${d.mode === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div>
-      <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>`,
+      <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>
+      <div class="field"><span>Scoring</span>${(() => { const ex = d.id && S.sessions.find((x) => x.id === d.id), locked = !!ex && ex.status !== 'prepared', sel = SCORING[d.scoring] ? d.scoring : '31';
+        return locked ? `<div class="choices"><div class="choice" aria-disabled="true" style="cursor:default"><b>${SCORING[sel].label}</b><span class="small muted">${SCORING[sel].text}</span></div></div><span class="hint">Scoring can't change after Start.</span>`
+          : `<div class="choices">${Object.entries(SCORING).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="scoring" data-v="${k}" aria-pressed="${sel === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div><span class="hint">How games are scored tonight. The match result dialog asks only for what this needs.</span>`; })()}</div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
       <div class="fgrid">
         ${rosterN ? `<div class="field"><span>Players</span><span>${rosterN} on the roster</span><span class="hint">Updates as you add or remove players.</span></div>`
@@ -3670,6 +3786,7 @@ function viewSetup() {
           <dt>Venue</dt><dd>${esc(d.venue || '—')}${d.address ? `<br><span class="small muted">${esc(d.address)}</span>` : ''}</dd>
           <dt>Courts</dt><dd>${d.courts.map((c) => esc(c)).join(', ')} · ${+d.perCourt || 8} per court (${d.courts.length * (+d.perCourt || 8)} slots) <button class="btn xs ghost" data-act="wizGo" data-k="0">Edit</button></dd>
           <dt>Formats</dt><dd>${fmtFormats(d)} · ${MODES[d.mode].label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
+          <dt>Scoring</dt><dd>${(SCORING[d.scoring] || SCORING['31']).label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Minimum</dt><dd>${d.minAuto ? est.low : esc(d.minimum)} games per player ${d.minAuto ? '(calculated)' : ''} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Costs</dt><dd>${(() => { const c = financeCalc(d, d.courts.length, durMins, nPlayers); return `${peso(c.total)} total · players pay ${peso(c.perHead)}${c.custom ? ' (custom)' : ' (break-even)'} · ${resultText(c)}`; })()}</dd>
         </dl></div>`,
@@ -3917,6 +4034,7 @@ function prepOverview(s) {
         <dt>Formats</dt><dd>${fmtFormats(s)}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Requests</dt><dd>${(() => { const a = reqAllowed(s), on = REQ_FORMATS.filter((k) => a[k]); return on.length ? `Players can request ${on.map((k) => REQ_LABEL[k]).join(', ')}` : 'Players can\'t request matches'; })()}</dd>
         <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Scoring</dt><dd>${scoringDef(s).label} · <span class="muted">${scoringDef(s).text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
@@ -4076,7 +4194,7 @@ function viewConsole() {
   const endSt = endStatus(s);
   return `<main class="wrap">
     <div class="between">
-      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}</div>
+      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}</div>
         ${sessTitle(s)}<p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
         ${(() => { const n = reqCount(s), open = S.ui.courtMenu === 'live-more'; return `<div class="row live-acts" style="flex:none;justify-content:flex-end;gap:8px">
           <button class="btn sm${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>
@@ -4695,7 +4813,7 @@ function pubHistoryMatch(s, m, me) {
   const L = flip ? m.teamB : m.teamA, Rt = flip ? m.teamA : m.teamB, wl = m.winner ? (m.winner === 'A') !== flip : null, invalid = m.status === 'invalid';
   const face = (pid, won) => { const p = P(pid), name = pid === me ? 'You' : pubNameText(p).split(' ')[0]; return pubFace(p, `gm-pl${won ? ' won' : ''}`, pubNameText(p), `${pubAvatarOf(p)}<b>${esc(name)}</b>`); };
   const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
-  const score = invalid ? '' : m.scoreA != null ? `<span class="gm-score tnum">${flip ? `${m.scoreB}–${m.scoreA}` : `${m.scoreA}–${m.scoreB}`}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+  const score = invalid ? '' : gmScore(m, flip);
   const res = invalid ? chip('Invalid', 'bad') : mine && wl != null ? chip(wl ? 'Won' : 'Lost', wl ? 'ok' : 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${esc(m.id)}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${L.map((x) => esc(x === me ? 'You' : pubNameText(P(x)))).join(' and ')} versus ${Rt.map((x) => esc(x === me ? 'You' : pubNameText(P(x)))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
     <span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>${side(L, wl === true)}<div class="gm-res">${score}${res}</div>${side(Rt, wl === false)}</div></article>`;
@@ -4912,6 +5030,7 @@ function viewPublic() {
       <dt>Courts</dt><dd>${s.courts.length} · ${s.courts.map((c) => esc(c.label)).join(', ')}</dd>
       <dt>Formats</dt><dd>${fmtFormats(s)}</dd>
       <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span></dd>
+      <dt>Scoring</dt><dd>${scoringDef(s).label} · <span class="muted">${scoringDef(s).text}</span></dd>
       <dt>Minimum</dt><dd>${s.minimum} games per player</dd>
       ${(() => { const due = duePerHead(s); return due == null ? '' : `<dt>Payment</dt><dd>${due ? `${peso(due)} per player` : 'Free'}${due ? ' <span class="muted small">· paid at the venue</span>' : ''}</dd>`; })()}</dl>
       ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
@@ -5691,7 +5810,7 @@ const SHEETS = {
     const s = cur(), now = Date.now(), late = startNeedsEnd(s, now);
     const endPicker = late ? `${notice('warn', `This session was planned for ${plannedFor(s)}. Set a new end time to start.`)}
       ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'st-end', value: sh.endAt, days: daysBetween(now, now + 864e5), base: dayStart(now), ok: (t) => t > now && t <= now + 864e5, set: (t) => { sh.endAt = t; }, autofocus: true })}` : '';
-    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
+    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
       ${notice('', "Every player's level locks now. Players you add later get a level when you add them, and it locks too.")}
       ${!S.online ? notice('warn', 'Starting needs an internet connection.') : ''}`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart" ${!S.online || (late && !(sh.endAt > now)) ? 'disabled' : ''}>Start session</button>`);
@@ -5783,7 +5902,7 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))}`, `
-      <p class="small muted">${FORMAT_LABEL[m.format]} · started ${fmtWhen(m.startedAt, { lower: true })} · ${mins} min in</p>
+      <p class="small muted">${FORMAT_LABEL[m.format]} · started ${fmtWhen(m.startedAt, { lower: true })} · ${mins} min in · Scoring · ${scoringDef(s).label}</p>
       ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in. */
         const tap = (h) => h.replace(/data-act="openProfile" data-id="([^"]+)" data-back="1"/g, `data-act="playerAction" data-mid="${m.id}" data-pid="$1"`).replace(/\. View profile/g, '. Substitute or replace');
         return `<div class="qteams">${tap(faceTeam(s, m.teamA, 'Team A'))}<span class="vs">VS</span>${tap(faceTeam(s, m.teamB, 'Team B'))}</div><p class="small muted" style="margin:0">Tap a player to substitute or replace them.</p>`; })()}
@@ -5794,28 +5913,46 @@ const SHEETS = {
   result(sh) {
     const s = cur();
     const m = s.matches.find((x) => x.id === sh.id);
-    const mode = sh.mode || 'winner';
+    const sc = scoringDef(s), T = sc.target, nmT = (x) => esc(listNames(x === 'A' ? m.teamA : m.teamB));
     if (sh.step === 'review') {
-      const w = sh.winner;
+      const r = sh.res, w = r.winner, p = scoreParts(r, false);
       return sheetShell('Confirm match result', `
         <div class="card stack"><span class="label">Winner</span><h2>Team ${w}: ${esc(listNames(w === 'A' ? m.teamA : m.teamB))}</h2>
         <p class="small muted">Against Team ${w === 'A' ? 'B' : 'A'}: ${esc(listNames(w === 'A' ? m.teamB : m.teamA))}</p>
-        ${mode === 'scores' ? `<p class="tnum"><b>${esc(sh.a)}–${esc(sh.b)}</b> <span class="muted small">(Team A–Team B)</span></p>` : '<p class="small muted">No score entered</p>'}
+        ${p ? `<p class="tnum"><b>${p.main}</b>${p.games ? ` · ${p.games.join(', ')}` : ''} <span class="muted small">(Team A–Team B)</span></p>` : '<p class="small muted">No score entered</p>'}
         <p class="small muted">${esc(courtsOf(s, m))}</p></div>
         ${notice('warn', `<b>This result cannot be changed after confirmation.</b> ${m.courts.length > 1 ? 'Both courts' : 'The court'} will become available.`)}`,
         `<button class="btn" data-act="sheetSet" data-k="step" data-v="">Back to result</button><button class="btn primary" data-act="confirmResult">Confirm Team ${w} wins</button>`);
     }
-    const hasScore = (sh.a !== '' && sh.a != null) || (sh.b !== '' && sh.b != null);
-    const body = `<span class="label">Pick the winner</span>
-      <div class="choices">${['A', 'B'].map((t) => `<button class="choice" aria-pressed="${sh.winner === t}" data-act="sheetSet" data-k="winner" data-v="${t}"><span class="label">Team ${t}</span><b>${esc(listNames(t === 'A' ? m.teamA : m.teamB))}</b></button>`).join('')}</div>
+    const best3 = sc.games === 3, g = sh.g || [];
+    const anyScore = best3 ? g.some(gameEntered) : gameEntered(sh);
+    const pick = `<span class="label">Pick the winner</span>
+      <div class="choices">${['A', 'B'].map((t) => `<button class="choice" aria-pressed="${sh.winner === t}" data-act="resWinner" data-v="${t}"><span class="label">Team ${t}</span><b>${nmT(t)}</b></button>`).join('')}</div>`;
+    const dsw = (on, attrs, label) => `<div class="res-deuce"><span><b>Went to deuce</b><br><span class="small">${T - 1}–${T - 1} and on: the first to lead by 2 wins.</span></span>${sw(on, 'resDeuce', attrs, label)}</div>`;
+    const foot = (hint) => `<div class="between">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : `<span class="hint">${hint}</span>`}${anyScore ? `<button class="btn xs ghost" data-act="clearScores">${best3 ? 'Clear scores' : 'Clear score'}</button>` : ''}</div>`;
+    let body;
+    if (!best3) {
+      body = `${pick}
+      ${!sh.winner ? `<span class="hint">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : 'Pick the winner first. The score is optional.'}</span>`
+        : `${sc.deuce ? dsw(!!sh.deuce, '', 'Went to deuce') : ''}
+      ${scoreEntry(m, { T, w: sh.winner, deuce: !!sh.deuce, base: 'ui.sheet', id: 'score', v: sh, gl: '' })}
+      ${foot(sh.deuce ? `Deuce at ${T - 1}–${T - 1}: the first to lead by 2 wins. Type both scores.` : `Game to ${T}. Enter the losing score, or leave it empty.`)}`}`;
+    } else {
+      const st = gamesState(sh), any = st.played.length > 0;
+      const rows = st.vis.map((i) => {
+        const o = g[i];
+        return `<div class="game-row" role="group" aria-label="Game ${i + 1}">
+          <div class="g-head"><b>Game ${i + 1}</b>${sc.deuce ? `<span class="g-deuce">Deuce ${sw(!!o.deuce, 'resDeuce', `data-g="${i}"`, `Game ${i + 1} went to deuce`)}</span>` : ''}</div>
+          <div class="seg" role="group" aria-label="Game ${i + 1} winner">${['A', 'B'].map((t) => `<button aria-pressed="${o.w === t}" data-act="resGameWin" data-g="${i}" data-v="${t}">Team ${t}</button>`).join('')}</div>
+          ${o.w ? scoreEntry(m, { T, w: o.w, deuce: !!o.deuce, base: `ui.sheet.g.${i}`, id: `score-g${i + 1}`, v: o, short: true, gl: `Game ${i + 1}, ` }) : ''}</div>`;
+      }).join('');
+      body = `${pick}
       <div class="or-sep" role="separator"><span>OR</span></div>
-      <span class="label">Enter the final score</span>
-      <div class="score-row">
-        <label class="field"><span>Team A · ${esc(listNames(m.teamA))}</span><input class="input tnum" id="score-a" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.sheet.a" value="${esc(sh.a ?? '')}" placeholder="0"></label>
-        <span class="vs" style="padding-bottom:12px">–</span>
-        <label class="field"><span>Team B · ${esc(listNames(m.teamB))}</span><input class="input tnum" id="score-b" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.sheet.b" value="${esc(sh.b ?? '')}" placeholder="0"></label>
-      </div>
-      <div class="between">${sh.err ? `<span class="err">${esc(sh.err)}</span>` : '<span class="hint">Scores are optional. If you enter them, the higher score wins.</span>'}${hasScore ? '<button class="btn xs ghost" data-act="clearScores">Clear scores</button>' : ''}</div>`;
+      <span class="label">Enter each game</span>
+      ${any ? `<div class="res-tally" aria-live="polite"><span>Games won · Team A <b class="tnum">${st.wins.A} – ${st.wins.B}</b> Team B</span>${st.decided ? `<span>Winner: <b>Team ${st.decided}</b> · ${nmT(st.decided)}</span>` : ''}</div>` : ''}
+      ${rows}
+      ${foot(`Best of 3 to ${T}. The first pair to win 2 games wins. Scores are optional.`)}`;
+    }
     return sheetShell(`Match ${m.seq} result`, body, `<button class="btn" data-act="openMatch" data-id="${m.id}">Back</button><button class="btn primary" data-act="reviewResult">Review result</button>`);
   },
   sub(sh) {
@@ -6740,7 +6877,7 @@ const ACT = {
     const courts = d.courts.map((label, i) => ({ id: `c${i + 1}`, label: label.trim() || `Court ${i + 1}`, startsAt: when(d.courtStarts[i], d.courtStartDays[i]), until: when(d.courtEnds[i], d.courtEndDays[i]) }));
     const finance = { courtFee: d.courtFee === '' ? null : +d.courtFee, entryFee: d.entryFee === '' ? null : +d.entryFee, custom: !!d.custom, payFee: d.custom ? +d.payFee : null, shuttles: (d.shuttles || []).filter((x) => x.itemId && +x.tubes > 0).map((x) => ({ itemId: x.itemId, tubes: +x.tubes })) };
     const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected || courts.length * (+d.perCourt || 8), perGameOf(d));
-    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, reqFormats: { ...reqDefaults(d), ...(d.reqFormats || {}) }, mode: d.mode, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
+    const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, reqFormats: { ...reqDefaults(d), ...(d.reqFormats || {}) }, mode: d.mode, scoring: SCORING[d.scoring] ? d.scoring : '31', minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, notes: d.notes.trim(), finance };
     let bal = { moved: 0, filled: 0 };
     if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); }
     let made = 1, skipped = 0;
@@ -7071,34 +7208,26 @@ const ACT = {
   },
   openMatch: (d) => { const m = cur().matches.find((x) => x.id === d.id); openSheet({ type: m && m.status === 'oncourt' ? 'onCourt' : 'match', id: d.id }); },
   openChooseMatch: (d) => openSheet({ type: 'chooseMatch', court: d.court }),
-  openResult: (d) => openSheet({ type: 'result', id: d.id, mode: 'winner', winner: null, a: '', b: '' }),
+  openResult: (d) => openSheet(newResultSheet(d.id)),
+  resWinner: (d) => { const sh = S.ui.sheet; sh.winner = d.v; sh.err = ''; render(); },
+  resDeuce: (d) => { const sh = S.ui.sheet, o = d.g != null ? sh.g[+d.g] : sh; o.deuce = !o.deuce; o.lose = ''; o.a = ''; o.b = ''; sh.err = ''; render(); },
+  resGameWin: (d) => { const sh = S.ui.sheet; sh.g[+d.g].w = d.v; sh.err = ''; syncGames(sh); render(); },
   reviewResult: () => {
-    const sh = S.ui.sheet;
-    const filled = (v) => v !== '' && v != null;
-    const ok = (v) => filled(v) && Number.isInteger(+v) && +v >= 0;
-    if (filled(sh.a) || filled(sh.b)) {
-      if (!ok(sh.a) || !ok(sh.b)) { sh.err = 'Enter both scores as whole numbers, or clear them.'; render(); return; }
-      if (+sh.a === +sh.b) { sh.err = 'A tie can’t decide a winner. Correct the score, or clear it and pick a winner.'; render(); return; }
-      const byScore = +sh.a > +sh.b ? 'A' : 'B';
-      if (sh.winner && sh.winner !== byScore) { sh.err = `The score says Team ${byScore} won, but Team ${sh.winner} is picked. Fix one of them.`; render(); return; }
-      sh.winner = byScore; sh.mode = 'scores';
-    } else {
-      if (!sh.winner) { sh.err = 'Pick a winner or enter the final score.'; render(); return; }
-      sh.mode = 'winner';
-    }
-    sh.err = ''; sh.step = 'review'; render();
+    const sh = S.ui.sheet, m = cur().matches.find((x) => x.id === sh.id), r = resultCheck(scoringDef(cur()), sh);
+    if (r.err) { sh.err = r.err; render(); return; }
+    sh.res = r; sh.winner = r.winner; sh.err = ''; sh.step = 'review'; render();
   },
-  clearScores: () => { const sh = S.ui.sheet; sh.a = ''; sh.b = ''; sh.err = ''; render(); },
+  clearScores: () => { const sh = S.ui.sheet; [sh, ...(sh.g || [])].forEach((o) => { o.lose = ''; o.a = ''; o.b = ''; }); sh.err = ''; render(); },
   confirmResult: () => {
-    const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
+    const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id), r = sh.res;
     if (m.status !== 'active') { closeSheet(); return; }
-    m.status = 'done'; m.winner = sh.winner; m.endedAt = Date.now();
-    if (sh.mode === 'scores') { m.scoreA = +sh.a; m.scoreB = +sh.b; }
+    m.status = 'done'; m.winner = r.winner; m.endedAt = Date.now();
+    if (r.scoreA != null) { m.scoreA = r.scoreA; m.scoreB = r.scoreB; if (r.games) m.games = r.games; }
     // The first freed court is offered to the picker (Q-NEXT-MATCH); Auto Queue fills every other court as before.
     const first = m.courts[0];
     const placed = autoFill(s, { only: s.courts.map((c) => c.id).filter((id) => id !== first) });
     S.ui.sheet = { type: 'nextMatch', court: first, seq: m.seq, err: '' };
-    commit(`Team ${sh.winner} wins match ${m.seq} · ${courtsOf(s, m)} free${autoNote(s, placed)}`); render();
+    commit(`Team ${r.winner} wins match ${m.seq} · ${courtsOf(s, m)} free${autoNote(s, placed)}`); render();
   },
   // Pick one of the two offered matches: placed On court (getting ready), never started. Rechecked first.
   pickNextMatch: (d) => {

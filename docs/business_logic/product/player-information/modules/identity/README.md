@@ -119,7 +119,9 @@ The status is worked out from those facts. The one exception is **Verified by Ad
 
 The player sees it on its own profile setting, **Verification**, and as a chip on the own profile; it is not part of Privacy and contact. The yellow ROTRA announcement asks unverified players to finish by the Google deadline.
 
-Still open: what an unverified player can't do (nothing for now); whether the phone must be confirmed (no SMS exists); whether others see the badge; whether Admin can set Not verified and must give a reason.
+Still open: what an unverified player can't do (nothing for now); whether the phone must be confirmed (no SMS exists); whether others see the badge.
+
+**Owner, November 18, 2026 (#907):** Admin can set **Verified by Admin** for a registered player or clear that override, returning to the derived status. There is no forced **Not verified** override. Each set or clear requires a reason, retained in the Admin audit log. Admin sees a Verification card on Player detail with status and all three checks, including while the override is active.
 
 ## Personal editing and privacy
 

@@ -158,6 +158,11 @@ button.brand { display: flex; align-items: baseline; gap: 8px; background: none;
 .hero h1 { overflow-wrap: anywhere; }
 .sec-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .sec-head > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.vstep { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.vstep:first-child { border-top: 0; padding-top: 0; }
+.vstep .vic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; border: 2px solid var(--border-strong); color: var(--fg3); font-size: 13px; font-weight: 700; }
+.vstep.done .vic { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.vstep .vmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 
 /* Tables: rows become stacked label/value blocks on phones */
 .tbl-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
@@ -464,7 +469,7 @@ body:has(.player-select:checked) .shell-main { padding-bottom: 120px; }
 .checks li.ok svg { color: var(--accent); }
 .checks li.bad svg { color: var(--error); }
 .log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.log li { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.log li { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; overflow-wrap: anywhere; }
 .log li:first-child { border-top: 0; padding-top: 0; }
 .log li span { color: var(--fg2); font-size: 12px; }
 .prog { height: 8px; background: var(--elev); border-radius: 999px; overflow: hidden; }
@@ -736,6 +741,7 @@ const DETAILS_NOTE = (p) => notice('warn', `<b>Details required.</b> This older 
 const rtrParts = (rtr) => { const m = /^RTR-(.+)-(\d{6})-(\d+)$/.exec(rtr || ''); return m ? { code: m[1], date: m[2], seq: m[3] } : null; };
 const rtrYmd = (rtr) => { const x = rtrParts(rtr); return x ? `20${x.date.slice(4)}-${x.date.slice(0, 2)}-${x.date.slice(2, 4)}` : ''; };
 const rtrWith = (rtr, code, ymd) => { const x = rtrParts(rtr); return x && code && /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? `RTR-${code}-${ymd.slice(5, 7)}${ymd.slice(8, 10)}${ymd.slice(2, 4)}-${x.seq}` : rtr; };
+const demoGoogleEmails = { p2: 'bea.castillo.cebu@example.com', p4: 'kat.lim.smash@example.com', p5: 'enzo.plays@example.com', p20: 'andi.cruz@example.com' };
 function seedPlayers() {
   const out = [
     P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18', pic: { kind: 'char', charId: 'ch1', seed: 'base' } }),
@@ -752,10 +758,10 @@ function seedPlayers() {
     P('p11', 'Paulo Garcia', 'Pau', 'RTR-PH-DVO-070926-0031', 'Matina Smash Club', '+63 926 555 0149', 'paulo.garcia@example.com', 6, 13, { registered: '2026-07-12' }),
     P('p13', 'Dani Rivera', '', 'RTR-PH-CEB-081326-0040', 'Lahug Smash Club', '+63 917 555 0566', 'dani.rivera@example.com', 4, 10, { registered: '2026-08-15' }),
     P('p14', 'Theo Ramos', '', 'RTR-PH-MNL-081326-0042', 'Sampaloc Shuttle Club', '+63 905 555 0297', 'theo.ramos@example.com', 8, 18, { registered: '2026-08-16' }),
-    P('p16', 'Marco Lopez', '', 'RTR-PH-ILO-090226-0047', 'Molo Shuttle Club', '+63 933 555 0611', 'marco.lopez@example.com', 7, 11, { registered: '2026-09-03' }),
+    P('p16', 'Marco Lopez', '', 'RTR-PH-ILO-090226-0047', 'Molo Shuttle Club', '', 'marco.lopez@example.com', 7, 11, { registered: '2026-09-03' }),
     P('p17', 'Gab Torres', '', 'RTR-PH-CEB-090226-0050', 'Talamban Racket Club', '', 'gab.torres@example.com', 2, 4),
     P('p18', 'Iya Mercado', '', 'RTR-PH-CEB-091626-0055', 'IT Park Badminton Club', '+63 917 555 0904', 'iya.mercado@example.com', 4, 6, { registered: '2026-09-18' }),
-    P('p20', 'Andi Cruz', '', 'RTR-PH-CEB-100726-0061', 'Lahug Smash Club', '+63 921 555 0730', 'andi.cruz@example.com', null, 0, { registered: '2026-10-09' }),
+    P('p20', 'Andi Cruz', '', 'RTR-PH-CEB-100726-0061', 'Lahug Smash Club', '', 'andi.cruz@example.com', null, 0, { registered: '2026-10-09' }),
   ];
   for (let i = 0; i < 168; i++) {
     const h = hashStr(`ap${i}`);
@@ -770,6 +776,7 @@ function seedPlayers() {
       claimed || i !== 11 ? `${plain(first)}.${plain(last)}${i}@example.com` : '', lv > 8 ? null : lv, (h >>> 24) % 19,
       { phoneHidden: claimed && (h >>> 11) % 3 === 0, registered: claimed ? `2026-${mm}-${pad(Math.min(28, +dd + 3))}` : null }));
   }
+  out.forEach((p) => { if (p.claimed) p.googleEmail = demoGoogleEmails[p.id] ?? null; });
   return out;
 }
 
@@ -866,7 +873,7 @@ function freshState() {
     flags: [],
     chars: seedChars(),
     banners: seedBanners(), defaultBanner: 'bn1',
-    demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false },
+    demo: { timeoutNext: false, failApply: false, failConfig: false, conflictConfig: false, failVerification: false },
     ui: freshUi(),
   };
 }
@@ -892,6 +899,8 @@ if (!Array.isArray(S.banners)) S.banners = seedBanners();
 if (!S.defaultBanner) S.defaultBanner = 'bn1';
 // Saves from before unclaimed players had an email get the sample players again.
 if (!S.players.some((p) => !p.registered && p.email)) S.players = seedPlayers();
+// Supply the Google facts for existing demo saves without replacing players or their edits.
+S.players.forEach((p) => { if (p.claimed && p.googleEmail === undefined) p.googleEmail = demoGoogleEmails[p.id] ?? null; });
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false, upload: null });
 S.ui.login.pending = false;
@@ -1602,6 +1611,39 @@ function playerManagementSheet(action,id) {
 }
 
 // ---------- A-PLAYER-DETAIL ----------
+function playerVerification(p) {
+  const google = p.googleEmail?.trim().toLowerCase() || '';
+  const email = p.email?.trim().toLowerCase() || '';
+  const phone = (p.phone || '').replace(/\D/g, '');
+  const matches = !!google && email === google;
+  const pending = google && !matches && S.requests.some((r) => r.pid === p.id && r.field === 'email'
+    && ['submitted', 'applying'].includes(r.status) && r.to.trim().toLowerCase() === google);
+  const steps = [
+    { title: 'Google account', done: !!google, detail: google ? `Connected · ${esc(google)}` : 'Not connected' },
+    { title: 'Mobile number', done: !!phone, detail: phone ? `On file · +${phone.slice(0, 2)} ${phone.slice(2, 5)} ••• ••${phone.slice(-2)}` : 'Not on file' },
+    { title: 'ROTRA email matches Google', done: matches, detail: matches ? `Both are ${esc(email)}`
+      : google ? `ROTRA email: ${esc(email || 'Not given')}. Google email: ${esc(google)}.` : 'Google must be connected first.',
+      extra: pending ? chip('Change sent for Admin review', 'warn') : '' },
+  ];
+  return { steps, count: steps.filter((step) => step.done).length, overridden: p.verificationOverride === 'verified' };
+}
+const verificationChip = (count, overridden) => overridden || count === 3
+  ? chip(`${I.check} ${overridden ? 'Verified by Admin' : 'Verified'}`, 'ok')
+  : chip(`Not verified · ${count} of 3`, 'warn');
+const verificationAction = (clear) => clear ? 'Clear override' : 'Set Verified by Admin';
+function playerVerificationCard(p) {
+  const { steps, count, overridden } = playerVerification(p);
+  return `<section class="card stack" aria-labelledby="verification-title">
+    <div class="between"><h2 id="verification-title">Verification</h2>${verificationChip(count, overridden)}</div>
+    <div>${steps.map((step, i) => `<div class="vstep${step.done ? ' done' : ''}">
+      <span class="vic" aria-hidden="true">${step.done ? I.check : i + 1}</span>
+      <div class="vmain"><b><span class="sr-only">Step ${i + 1}. ${step.done ? 'Done. ' : ''}</span>${step.title}</b>
+        <span class="small muted">${step.detail}</span>${step.extra ? `<div class="row">${step.extra}</div>` : ''}
+      </div>
+    </div>`).join('')}</div>
+    <div class="row"><button type="button" id="verification-action" class="btn${overridden ? '' : ' primary'}" data-act="openVerification" data-id="${esc(p.id)}">${verificationAction(overridden)}</button></div>
+  </section>`;
+}
 function viewPlayer() {
   const p = playerOf(S.viewId);
   if (!p) return shell(`${backBtn('players', 'Players')}<div class="card empty"><b>Player not found.</b></div>`);
@@ -1623,6 +1665,7 @@ function viewPlayer() {
         <p class="small muted">A contact change doesn't change the RTR ID. Admin can change it from Edit profile, by changing the registration place or date.</p></section>
       <section class="card stack"><h2>Account</h2><dl class="kv">
         <dt>Status</dt><dd>${p.claimed ? `Registered ${fmtYmd(p.registered)}` : 'Unclaimed. The club created this profile; the player hasn\'t finished registering.'}</dd></dl>${needsDetails(p) ? DETAILS_NOTE(p) : ''}</section>
+      ${p.claimed ? playerVerificationCard(p) : ''}
     </div><div>
       <section class="card stack"><h2>Rank and games</h2><dl class="kv">
         <dt>Rank</dt><dd>${esc(rk.text)}</dd>
@@ -1962,6 +2005,31 @@ const SHEETS = {
     return sheetWrap('Reject name change?', `<p>${esc(c.name)} keeps its current name, and the request for “${esc(c.nameRequest.name)}” is closed. The club can send a new request.</p>${errLine(sh.err)}`,
       `<button class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Back</button><button class="btn danger" data-act="doNameReject" ${sh.pending ? 'disabled' : ''}>${sh.pending ? 'Rejecting…' : 'Reject request'}</button>`, !sh.pending);
   },
+  verification: (sh) => {
+    const p = playerOf(sh.id);
+    const { count, overridden } = playerVerification(p);
+    const label = verificationAction(sh.clear);
+    const consequence = sh.clear ? 'ROTRA will determine verification from the three automatic checks.'
+      : 'ROTRA will mark this account verified through Admin.';
+    return sheetWrap(`${label}?`, `<dl class="kv">
+      <dt>Player</dt><dd><b>${esc(p.name)}</b></dd>
+      <dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd>
+      <dt>Current status</dt><dd>${verificationChip(count, overridden)}</dd>
+      <dt>After saving</dt><dd>${verificationChip(count, !sh.clear)}</dd>
+    </dl>
+    <p>${consequence}</p>
+    <form id="verification-form" data-form="verification" novalidate>
+      <div class="field">
+        <label class="small" for="verification-reason"><b>Reason for the change</b></label>
+        <textarea id="verification-reason" class="input${sh.reasonErr ? ' bad' : ''}" rows="3" required data-bind="ui.sheet.reason"
+          aria-describedby="verification-hint${sh.reasonErr ? ' verification-error' : ''}" aria-invalid="${!!sh.reasonErr}" ${sh.pending ? 'disabled' : ''}>${esc(sh.reason)}</textarea>
+        <span class="hint" id="verification-hint">Required. Saved in the record of actions.</span>
+        ${sh.reasonErr ? '<p class="err" id="verification-error" role="alert">Enter a reason.</p>' : ''}
+      </div>
+    </form>${errLine(sh.err)}`,
+    `<button type="button" class="btn" data-act="closeSheet" ${sh.pending ? 'disabled' : ''}>Cancel</button>
+    <button id="verification-confirm" type="submit" form="verification-form" class="btn primary" ${sh.pending ? 'disabled' : ''}>${sh.pending ? '<span class="spin" aria-hidden="true"></span> Saving…' : label}</button>`, !sh.pending);
+  },
   approve: (sh) => {
     const r = reqOf(sh.id), p = playerOf(r.pid), f = FIELD[r.field];
     return sheetWrap(`Approve ${f} change?`, `<dl class="kv"><dt>Player</dt><dd><b>${esc(p.name)}</b></dd><dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd><dt>From</dt><dd class="mono">${esc(reqVal(r, r.from))}</dd><dt>To</dt><dd class="mono">${esc(reqVal(r, r.to))}</dd></dl>
@@ -1999,6 +2067,7 @@ const SHEETS = {
       ${toggle('online', 'Offline', 'Lists stay readable; every save fails without changing anything.', !S.online, 'toggleOnline')}
       ${toggle('timeoutNext', 'Next license save gets no reply', 'The term is saved, but the reply is lost. Check status finds it instead of adding a second one.', S.demo.timeoutNext)}
       ${toggle('failApply', 'Next contact change fails to apply', 'Approval saves; applying it to the account fails and needs a retry.', S.demo.failApply)}
+      ${toggle('failVerification', 'Next verification save fails', 'The verification status stays the same and the reason is kept in the form.', S.demo.failVerification)}
       ${toggle('failConfig', 'Next settings save fails', 'The values in effect stay; the draft is kept.', S.demo.failConfig)}
       ${toggle('conflictConfig', 'Someone else saves settings first', 'Your next settings save meets a newer version.', S.demo.conflictConfig)}
       ${toggle('flag', 'Show a placeholder flag', 'Shows how a defined flag looks. It isn\'t a real flag.', S.flags.some((x) => x.id === 'placeholder'), 'demoFlag')}
@@ -2262,6 +2331,12 @@ const ACT = {
   admShareCopy: (el) => { try { navigator.clipboard.writeText(el.dataset.v); } catch (e) { /* clipboard unavailable */ } toast('Link copied'); },
   copyRtr: (el) => { try { navigator.clipboard.writeText(el.dataset.v); } catch (e) { /* clipboard unavailable */ } toast('RTR ID copied'); },
   pmSheet: (el) => playerManagementSheet(el.dataset.v, el.dataset.id),
+  openVerification: (el) => {
+    const p = playerOf(el.dataset.id);
+    if (!S.me || S.denied || !p?.claimed) return;
+    S.ui.sheet = { type: 'verification', id: p.id, clear: playerVerification(p).overridden, reason: '' };
+    render();
+  },
   pmMenu: (el) => showPlayerActions(el, el.dataset.id),
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
   plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },
@@ -2305,6 +2380,7 @@ const ACT = {
     }
     if (sh.type === 'discard') S.ui.pendingGo = null;
     S.ui.sheet = null; render();
+    if (sh.type === 'verification') document.getElementById('verification-action')?.focus();
   },
   // License
   openLicense: (el) => licStart(clubOf(el.dataset.id)),
@@ -2630,6 +2706,40 @@ const FORM = {
   addClub: () => ACT.addReview(),
   addFlag: () => ACT.flagCreate(),
   price: () => ACT.doPrice(),
+  verification: () => {
+    const sh = S.ui.sheet;
+    if (sh?.type !== 'verification' || sh.pending || !S.me || S.denied) return;
+    const p = playerOf(sh.id);
+    if (!p?.claimed) return;
+    sh.reason = document.getElementById('verification-reason').value;
+    sh.reasonErr = !sh.reason.trim();
+    sh.err = '';
+    if (sh.reasonErr) {
+      render();
+      document.getElementById('verification-reason')?.focus();
+      return;
+    }
+    if (offlineBlock(sh)) return;
+    sh.pending = true;
+    render();
+    document.getElementById('sheet-title')?.focus();
+    later(400, () => {
+      if (S.ui.sheet !== sh || !S.me || S.denied || !p.claimed) return;
+      sh.pending = false;
+      if (!S.online) { sh.err = OFFLINE_ERR; return; }
+      if (S.demo.failVerification) {
+        S.demo.failVerification = false;
+        sh.err = 'Changes could not be saved';
+        return;
+      }
+      p.verificationOverride = sh.clear ? null : 'verified';
+      const summary = sh.clear ? `Cleared Verified by Admin for ${p.name}.` : `Set ${p.name} to Verified by Admin.`;
+      log('player', p.id, `${summary} Reason: ${sh.reason.trim()}`);
+      S.ui.sheet = null;
+      toast(sh.clear ? 'Verification override cleared' : 'Verified by Admin saved');
+      requestAnimationFrame(() => document.getElementById('verification-action')?.focus());
+    });
+  },
   config: () => {
     const d = cfgDraft();
     if (!cfgDirty() || Object.keys(cfgCheck(d)).length || S.ui.cfgConflict) return;
@@ -2678,6 +2788,7 @@ document.addEventListener('input', (ev) => {
   const el = ev.target;
   if (!el.dataset.bind) return;
   setPath(el.dataset.bind, el.value);
+  if (el.dataset.bind === 'ui.sheet.reason') return;
   if (el.dataset.bind === 'ui.playersQ') S.ui.shown = 25;
   // The username follows the club name until it's edited by hand.
   if (el.dataset.bind === 'ui.add.username') S.ui.add.userTouched = true;
@@ -2758,6 +2869,9 @@ function render() {
   let sheetHtml = showSheet ? SHEETS[sh.type](sh) : '';
   if (same) sheetHtml = sheetHtml.replace('class="scrim"', 'class="scrim still"').replace('class="sheet', 'class="sheet still');
   document.getElementById('app').innerHTML = topBar() + page + sheetHtml;
+  if (showSheet && sh.type === 'verification') {
+    document.querySelectorAll('#app > :not(.scrim, .sheet)').forEach((el) => { el.inert = true; });
+  }
   if (same) { const sb = document.querySelector('.sheet .sb'); if (sb) sb.scrollTop = sbTop; }
   document.body.style.overflow = showSheet || S.ui.nav ? 'hidden' : '';
   if (showSheet && key !== lastSheet && !(focusId && document.getElementById(focusId)?.closest('.sheet'))) {

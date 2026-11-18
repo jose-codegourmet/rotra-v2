@@ -18,12 +18,15 @@ export type SignInMethodsCardProps = {
   onConnectGoogle: () => void
   /** Change the connected Google account */
   onChangeGoogle: () => void
-  /** The verification status chip's text: "Verified", "Verified by Admin", "Not verified · 1 of 3" */
-  verificationLabel: string
+  /**
+   * The verification status chip's text: "Verified", "Verified by Admin", "Not verified · 1 of 3".
+   * Leave out with `onOpenVerification` to hide the verification row (until the Verification page, P13, exists).
+   */
+  verificationLabel?: string
   /** Verified shows the green chip with a check; otherwise the warn chip */
   verified?: boolean
-  /** Opens the Verification page */
-  onOpenVerification: () => void
+  /** Opens the Verification page. The row shows only when this and `verificationLabel` are given. */
+  onOpenVerification?: () => void
 }
 
 /** Prototype's .method row: an icon, a bold title with a muted line, and an action on the right. */
@@ -74,7 +77,9 @@ export function SignInMethodsCard({
 }: SignInMethodsCardProps) {
   const googleDetail = googleEmail
     ? `Connected · ${googleEmail}${
-        googleEmail.toLowerCase() !== email.toLowerCase() ? ' (different from your ROTRA email)' : ''
+        googleEmail.toLowerCase() !== email.toLowerCase()
+          ? ' (different from your ROTRA email)'
+          : ''
       }`
     : 'Not connected'
   const passwordDetail =
@@ -106,15 +111,17 @@ export function SignInMethodsCard({
           Google sign-in is required for every ROTRA player. Any Google account you own works, even
           with a different email. Your ROTRA email stays {email}.
         </p>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
-          <span className="text-[13px]">Account verification is in its own page.</span>
-          <Button size="sm" onClick={onOpenVerification}>
-            <Chip tone={verified ? 'accent' : 'warn'}>
-              {verified ? <Icon name="check" size={12} /> : null}
-              {verificationLabel}
-            </Chip>
-          </Button>
-        </div>
+        {verificationLabel !== undefined && onOpenVerification ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+            <span className="text-[13px]">Account verification is in its own page.</span>
+            <Button size="sm" onClick={onOpenVerification}>
+              <Chip tone={verified ? 'accent' : 'warn'}>
+                {verified ? <Icon name="check" size={12} /> : null}
+                {verificationLabel}
+              </Chip>
+            </Button>
+          </div>
+        ) : null}
       </section>
     </Card>
   )

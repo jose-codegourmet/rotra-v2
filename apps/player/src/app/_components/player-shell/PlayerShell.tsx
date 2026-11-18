@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import { requestLeave, selectUnsavedDraft } from '@/store/slices/uiSlice'
+import { GoogleAnnouncementBand } from '../google-sign-in/GoogleAnnouncementBand'
 import { GoogleRequiredGate } from '../google-sign-in/GoogleRequiredGate'
 
 export function PlayerShell({ children }: { children: ReactNode }) {
@@ -88,6 +89,9 @@ export function PlayerShell({ children }: { children: ReactNode }) {
               : undefined
           }
         />
+      ) : null}
+      {googleSignIn && account && pathname !== '/connect-google' ? (
+        <GoogleAnnouncementBand playerId={account.id} name={account.name} />
       ) : null}
       {dev.offline && dev.offlineAt ? <OfflineBand savedAt={new Date(dev.offlineAt)} /> : null}
       {googleSignIn ? (

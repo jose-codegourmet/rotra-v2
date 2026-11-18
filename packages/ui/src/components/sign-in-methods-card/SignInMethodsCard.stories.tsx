@@ -34,6 +34,9 @@ export const DifferentGoogleEmail: Story = {
 export const NoPassword: Story = {
   args: { hasPassword: false, verificationLabel: 'Verified', verified: true },
 }
+export const WithoutVerificationRow: Story = {
+  args: { verificationLabel: undefined, onOpenVerification: undefined },
+}
 export const WithGoogleLight: Story = { ...WithGoogle, globals: { theme: 'light' } }
 export const WithoutGoogleLight: Story = { ...WithoutGoogle, globals: { theme: 'light' } }
 export const DifferentGoogleEmailLight: Story = {

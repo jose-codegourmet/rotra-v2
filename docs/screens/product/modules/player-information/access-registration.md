@@ -73,6 +73,8 @@ Shown when a Google account with the same email as a password account is picked 
 
 A yellow band under the top bar on every page while the signed-in player isn't verified ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)): label "ROTRA announcement", "Verify your ROTRA account by <deadline>. Connect Google, have your phone on file, and use your Google email as your ROTRA email. n of 3 done. Your profile, games and rank stay the same.", the next step's button (**Connect Google**, **Connect <tried email>** + **Use another Google account**, or **Finish verification**), **I don't have a Google account** or **See what's left**, and **Remind me later** (hides it until the next sign-in; not offered after the deadline, when the bottom border is thicker). Colours: `--ann-bg`, `--ann-border`, `--ann-tag`.
 
+*Until P-VERIFICATION is built (Epic P13), the app shows the band while Google isn't connected, without "n of 3 done" and **Finish verification** / **See what's left**; it is hidden on `/connect-google`.*
+
 The **No Google account?** sheet: "You don't need Gmail. Google lets you make a free account with the email you already use." Steps: open accounts.google.com/signup; choose **Use my current email address instead**; enter the code Google sends and set a Google password; come back and tap **Continue with Google**. "Still stuck? Ask your club or contact ROTRA. Nothing on your profile is lost while you sort it out." **Got it**.
 
 ## P-CLAIM — Complete a club-created profile

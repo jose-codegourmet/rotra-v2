@@ -1422,6 +1422,8 @@ html.booting,html.booting body{overflow:hidden}
 .boot.boot-out .boot-wm,.boot.boot-out .boot-pct{transition:opacity .25s;opacity:0}
 @keyframes boot-fade{to{opacity:0;visibility:hidden}}
 @keyframes boot-bail{to{opacity:0;visibility:hidden;pointer-events:none}}
+/* an automated browser (SiteBoot's inline script) never sees the loading screen */
+html.no-boot #boot{display:none}
 @media (prefers-reduced-motion:reduce){.boot.boot-out{animation-delay:0s}}
 /* sample-player avatars (ROTRA_AV in the main script): the portrait covers the initials circle */
 .has-av{background-size:cover;background-position:50% 30%;background-repeat:no-repeat;color:transparent!important;text-shadow:none}

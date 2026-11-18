@@ -68,7 +68,9 @@ export function NotificationList(props: NotificationListProps) {
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-4 pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))] text-[15px]">
       <header className="flex flex-col gap-1.5">
-        <h1 className="text-[26px] leading-tight font-extrabold tracking-[-0.3px]">Notifications</h1>
+        <h1 className="text-[26px] leading-tight font-extrabold tracking-[-0.3px]">
+          Notifications
+        </h1>
         {!props.state && (
           <p className="text-fg2">
             {props.unreadCount ? `${props.unreadCount} unread` : "You're all caught up."}

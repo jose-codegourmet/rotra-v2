@@ -9,7 +9,7 @@ import {
   listPlayerNotifications,
   markPlayerNotificationsRead,
 } from '../src/player/notifications'
-import { runProjectionJobs, retryProjectionJob } from '../src/player/projections'
+import { retryProjectionJob, runProjectionJobs } from '../src/player/projections'
 import { joinSessionAsPlayer } from '../src/queue/public-session'
 import { publishResults } from '../src/queue/results'
 import { confirmJoinRequest, giveSlot, removeRosterPlayer } from '../src/queue/session-roster'

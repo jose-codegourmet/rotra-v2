@@ -263,7 +263,8 @@ export async function setAdminVerificationOverride(
       : null
     management.revision++
     if (input.verifiedByAdmin) {
-      const notifications = (draft.playerNotifications[player.id] ??= [])
+      draft.playerNotifications[player.id] ??= []
+      const notifications = draft.playerNotifications[player.id]
       notifications.push(
         createAdminVerifiedNotification(`admin-verified-${management.revision}`, at),
       )

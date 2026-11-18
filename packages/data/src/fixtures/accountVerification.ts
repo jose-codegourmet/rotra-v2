@@ -100,7 +100,8 @@ export function applyAccountVerificationFixture(
     record.verificationOverride = fixture.adminOverrideReason
       ? { status: 'verified', adminId: adminAccount.id, at }
       : null
-    const notifications = (draft.playerNotifications[playerId] ??= [])
+    draft.playerNotifications[playerId] ??= []
+    const notifications = draft.playerNotifications[playerId]
     const sampleIndex = notifications.findIndex((notification) => notification.id === 'ann-admin')
     if (sampleIndex >= 0) notifications.splice(sampleIndex, 1)
     if (fixture.adminOverrideReason) {

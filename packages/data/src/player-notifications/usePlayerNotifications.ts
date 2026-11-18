@@ -1,6 +1,6 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
-import { getPlayerNotificationUnreadCount, getPlayerNotifications } from './fetchers'
+import { getPlayerNotifications, getPlayerNotificationUnreadCount } from './fetchers'
 import { groupPlayerNotifications } from './playerNotifications.rules'
 import type { PlayerNotificationFilter } from './playerNotifications.types'
 import { playerNotificationKeys } from './queryKeys'

@@ -145,9 +145,7 @@ export const Loading: Story = {
 }
 
 export const Error: Story = {
-  render: () => (
-    <NotificationList state={{ kind: 'error', retrying: false, onRetry: () => {} }} />
-  ),
+  render: () => <NotificationList state={{ kind: 'error', retrying: false, onRetry: () => {} }} />,
 }
 
 export const Light: Story = { globals: { theme: 'light' } }

@@ -387,3 +387,7 @@ Verified November 18, 2026 on isolated local Supabase and applied to ROTRA v2 AS
 `146f16747655f8df6338ef7c154eac5bed228b68326ad2246366e0634a8c297b`.
 The nullable columns, CHECK, FK, index and existing deny-by-default RLS were confirmed remotely.
 The separate Go sign-in migration remains outside this batch.
+
+## P14.5 — Player notifications
+
+Migration `20261118000400_player_notifications` adds `player_notifications` with a recipient FK, a unique source key, a CHECK for paired source fields, and a recipient / newest-first index. It enables RLS and revokes all table privileges from `anon`, `authenticated` and `PUBLIC`. `player_accounts.verification_reminder_read_at` stores the first read of the state-derived reminder. See [Player notifications](player-information/modules/notifications.md).

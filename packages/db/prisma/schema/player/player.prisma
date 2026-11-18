@@ -73,6 +73,7 @@ model Player {
   idAllocation          PlayerIdAllocation?
   passwordResetRequests PlayerPasswordResetRequest[]
   contactChanges        PlayerContactChangeRequest[]
+  notifications         PlayerNotification[]
   adminEmailEdits       AdminPlayerEmailEdit[]
   clubPlayers           ClubPlayer[]
   resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
@@ -134,6 +135,8 @@ model PlayerAccount {
   googleEmail        String?                 @unique @map("google_email")
   /// When Google was connected or last changed. Set together with `googleEmail` (SQL CHECK).
   googleLinkedAt     DateTime?               @map("google_linked_at") @db.Timestamptz(6)
+  /// First read of the derived verification reminder. Its visibility still follows account verification.
+  verificationReminderReadAt DateTime?       @map("verification_reminder_read_at") @db.Timestamptz(6)
   createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision           BigInt                  @default(1)

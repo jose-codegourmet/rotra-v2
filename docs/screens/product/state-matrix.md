@@ -47,6 +47,12 @@
 | Change player personal fields | Requires accepted server save. Real mode (#400): saved under the last-read account revision, online only | Do not claim a local draft is saved remotely | Validate current account revision |
 | Admin activation/approval/configuration | Online | Unavailable | Recover request status before retrying |
 
+## Player Information screen states
+
+| Screen | Loading | Empty | Error | Signed out |
+|---|---|---|---|---|
+| [P-NOTIFICATIONS](modules/player-information/notifications.md) | Skeleton rows. The bell link remains available without a count while its query loads. | Bell icon and “No notifications yet” (All) or “No unread notifications” (Unread), followed by “Session updates, invites, club changes and messages from ROTRA show up here.” | “Couldn't load notifications.” with **Retry**. The bell link remains available without a count if its query fails. | Hide the bell. Redirect `/notifications` to P-LOGIN with `returnTo` and reopen Notifications after sign-in. |
+
 ## Club entitlement
 
 | License/session condition | Allowed screen access |

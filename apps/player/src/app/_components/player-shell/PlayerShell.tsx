@@ -2,9 +2,11 @@
 import { useConfirmMockEmail } from '@rotra/data/player-account/useConfirmMockEmail'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useResendConfirmationEmail } from '@rotra/data/player-account/useResendConfirmationEmail'
+import { usePlayerNotificationUnreadCount } from '@rotra/data/player-notifications/usePlayerNotifications'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { TopBar } from '@rotra/ui/app-shell/top-bar'
 import { EmailConfirmBanner } from '@rotra/ui/email-confirm-banner'
+import { NotificationBell } from '@rotra/ui/notification-bell'
 import { OfflineBand } from '@rotra/ui/offline-band'
 import { PlayerNav, type PlayerNavCurrent } from '@rotra/ui/player-nav'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
@@ -23,6 +25,7 @@ import { GoogleRequiredGate } from '../google-sign-in/GoogleRequiredGate'
 
 export function PlayerShell({ children }: { children: ReactNode }) {
   const account = useAppSelector(selectAccount)
+  const unreadNotifications = usePlayerNotificationUnreadCount(account?.id ?? null)
   const myAccount = useMyAccount(account?.id ?? null)
   const resend = useResendConfirmationEmail()
   const confirm = useConfirmMockEmail()
@@ -64,6 +67,14 @@ export function PlayerShell({ children }: { children: ReactNode }) {
           signIn={target('/login')}
           linkAs={Link}
         />
+        {account ? (
+          <NotificationBell
+            unreadCount={unreadNotifications.isSuccess ? unreadNotifications.data : 0}
+            current={pathname === '/notifications'}
+            linkAs={Link}
+            {...target('/notifications')}
+          />
+        ) : null}
         <ThemeToggle />
         {process.env.NODE_ENV !== 'production' ? <DevTools /> : null}
       </TopBar>

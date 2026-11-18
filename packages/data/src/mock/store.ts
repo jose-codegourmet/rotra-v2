@@ -20,9 +20,16 @@ import { inventoryItems } from '../fixtures/inventory'
 import { seedLeaderboardHistory } from '../fixtures/leaderboardHistory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
+import { createPlayerNotificationFixtures } from '../fixtures/playerNotifications'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
-import { clubPlayers, GAB_CLUB_PLAYER_ID, GAB_PHONE_E164, players } from '../fixtures/players'
+import {
+  clubPlayers,
+  GAB_CLUB_PLAYER_ID,
+  GAB_PHONE_E164,
+  JOSE_PLAYER_ID,
+  players,
+} from '../fixtures/players'
 import { profileBanners } from '../fixtures/profileBanners'
 import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
@@ -37,6 +44,7 @@ import type { MatchRequest } from '../match-request/matchRequest.types'
 import type { PasswordResetRequest } from '../password-reset/passwordReset.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
+import type { PlayerNotification } from '../player-notifications/playerNotifications.types'
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
 import type {
@@ -75,6 +83,8 @@ export type MockState = {
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
   playerAccounts: typeof playerAccounts
+  playerNotifications: Record<string, PlayerNotification[]>
+  verificationReminderReads: Record<string, string>
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
   /** Player requests and their Admin review/application, in every state */
@@ -198,6 +208,8 @@ function seedState(): MockState {
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
+    playerNotifications: { [JOSE_PLAYER_ID]: createPlayerNotificationFixtures(now) },
+    verificationReminderReads: {},
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),

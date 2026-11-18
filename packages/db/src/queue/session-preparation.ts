@@ -12,6 +12,7 @@ import type { QueueSession as SessionView } from '@rotra/data/queue-session/type
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
+import { notifyWaitlistPlace } from '../player/notification-events'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { courtDto, requestFormatsInput, sessionDto } from './dto'
@@ -395,6 +396,18 @@ export async function updateQueueSession(
             demotedConfirmedAt: entry.confirmedAt,
           },
         })
+      }
+      if (movedOut.length) {
+        const recipients = await tx.clubPlayer.findMany({
+          where: { id: { in: movedOut.map((entry) => entry.clubPlayerId) } },
+          select: { id: true, playerId: true },
+        })
+        const players = new Map(recipients.map(({ id, playerId }) => [id, playerId]))
+        const waitlist = await orderedWaitlist(tx, sessionId)
+        for (const [index, entry] of waitlist.entries()) {
+          const playerId = players.get(entry.clubPlayerId)
+          if (playerId) await notifyWaitlistPlace(tx, session, playerId, entry.id, index + 1)
+        }
       }
       let movedIn = 0
       if (!movedOut.length)

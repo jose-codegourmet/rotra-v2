@@ -6,17 +6,18 @@ import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { requireAdmin, requireOwnPlayer, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
+import { writePlayerNotifications } from './notification-events'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** Private facts shared by the owner's page and Admin's card. The owner gets the masked phone only; Admin also gets the full one. */
-async function readVerification(db: Prisma.TransactionClient, playerId: string) {
+/** Private verification facts: only Admin's response includes the full phone. */
+export async function readVerification(db: Prisma.TransactionClient, playerId: string) {
   const player = await db.player.findUnique({
     where: { id: playerId, profileState: 'claimed' },
     select: {
       revision: true,
       verificationOverride: true,
-      account: { select: { googleEmail: true } },
+      account: { select: { googleEmail: true, verificationReminderReadAt: true } },
       privateContact: { select: { email: true, phoneE164: true } },
       contactChanges: {
         where: { field: 'email', status: { in: ['pending', 'approved', 'applying'] } },
@@ -43,6 +44,7 @@ async function readVerification(db: Prisma.TransactionClient, playerId: string) 
   return {
     verification,
     revision: player.revision,
+    reminderReadAt: player.account.verificationReminderReadAt,
     phone: player.privateContact?.phoneE164?.trim() || null,
   }
 }
@@ -97,7 +99,7 @@ export async function setAdminVerificationOverride(
       },
       select: { revision: true },
     })
-    await recordAudit(tx, context, {
+    const audit = await recordAudit(tx, context, {
       action: verifiedByAdmin
         ? 'player.verification_override_set'
         : 'player.verification_override_cleared',
@@ -105,6 +107,18 @@ export async function setAdminVerificationOverride(
       targetId: playerId,
       metadata: { reason },
     })
+    if (verifiedByAdmin)
+      await writePlayerNotifications(tx, [
+        {
+          playerId,
+          kind: 'account',
+          sourceType: 'admin_audit_event',
+          sourceId: audit.id,
+          title: 'ROTRA Admin verified your account',
+          body: "You don't need to finish the verification steps.",
+          target: '/profile/verification',
+        },
+      ])
     return {
       ...current.verification,
       phone: current.phone,

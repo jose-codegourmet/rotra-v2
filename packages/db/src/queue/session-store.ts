@@ -7,6 +7,7 @@ import {
 } from '@rotra/data/queue-session/queueSession.rules'
 import type { ClubContext } from '../auth/account-context'
 import type { Prisma, QueueSession } from '../generated/prisma/client'
+import { notifySpotConfirmed } from '../player/notification-events'
 import { requireClubEntitlement } from '../service/authorize'
 import { denyScope, ServiceError } from '../service/errors'
 
@@ -267,7 +268,8 @@ export async function promoteWaiter(
         },
       })
   // Each admission records its level as new assessment evidence, keyed on the operation.
-  await assessEntry(tx, context, entry, waiter.skillLevelId, operationId, now)
+  const assessment = await assessEntry(tx, context, entry, waiter.skillLevelId, operationId, now)
+  await notifySpotConfirmed(tx, session, clubPlayer.playerId, assessment.id)
   if (active)
     await tx.sessionPlayer.update({ where: { id: entry.id }, data: { levelLockedAt: now } })
   return tx.sessionPlayer.findUniqueOrThrow({ where: { id: entry.id } })

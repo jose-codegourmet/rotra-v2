@@ -2,6 +2,7 @@ import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
+import { notifySavedPlayer, notifyWaitlistPlace } from '../player/notification-events'
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
@@ -118,11 +119,11 @@ async function place(
     },
   })
   const atBudget = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
-  if (toWaitlist || (atBudget && !allowOverfill))
-    return {
-      rosterEntry: null,
-      waitlist: waitlistDto(waiter, await waitlistPosition(tx, session.id, waiter.id)),
-    }
+  if (toWaitlist || (atBudget && !allowOverfill)) {
+    const position = await waitlistPosition(tx, session.id, waiter.id)
+    await notifyWaitlistPlace(tx, session, clubPlayer.playerId, waiter.id, position)
+    return { rosterEntry: null, waitlist: waitlistDto(waiter, position) }
+  }
   const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
   return { rosterEntry: rosterEntryDto(entry, clubPlayer.nickname), waitlist: null }
 }
@@ -242,14 +243,15 @@ export async function clubPlayerForProfile(
 ) {
   const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, playerId } })
   // A deleted saved player is restored rather than duplicated (one saved row per profile per club).
-  if (saved?.removedAt)
-    return {
-      clubPlayer: await tx.clubPlayer.update({
-        where: { clubId_id: { clubId: context.clubId, id: saved.id } },
-        data: { removedAt: null, revision: { increment: 1 } },
-      }),
-      created: true,
-    }
+  if (saved?.removedAt) {
+    const restored = await tx.clubPlayer.updateMany({
+      where: { clubId: context.clubId, id: saved.id, removedAt: { not: null } },
+      data: { removedAt: null, revision: { increment: 1 } },
+    })
+    if (restored.count) await notifySavedPlayer(tx, context.clubId, playerId, operationId)
+    const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({ where: { id: saved.id } })
+    return { clubPlayer, created: restored.count > 0 }
+  }
   if (saved) return { clubPlayer: saved, created: false }
   const player = await tx.player.findUnique({
     where: { id: playerId },
@@ -267,6 +269,7 @@ export async function clubPlayerForProfile(
       addedAt: now,
     },
   })
+  await notifySavedPlayer(tx, context.clubId, playerId, operationId)
   return { clubPlayer, created: true }
 }
 
@@ -484,6 +487,17 @@ export async function stepDownIn(
       demotedConfirmedAt: entry.confirmedAt,
     },
   })
+  const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+    where: { id: entry.clubPlayerId },
+    select: { playerId: true },
+  })
+  await notifyWaitlistPlace(
+    tx,
+    session,
+    clubPlayer.playerId,
+    waitlistId,
+    await waitlistPosition(tx, session.id, waitlistId),
+  )
   return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
 }
 

@@ -16,6 +16,7 @@ import { appendAdminAudit } from '../admin-audit/fetchers'
 import { normalizeContact } from '../contact-change-request/contactChangeRequest.rules'
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
+import { createAdminVerifiedNotification } from '../fixtures/playerNotifications'
 import { checkMockSave } from '../mock/bridge'
 import { ConflictError, MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
@@ -256,10 +257,18 @@ export async function setAdminVerificationOverride(
 
     checkMockSave()
     const { player, record: management } = record(draft, input.playerId)
+    const at = new Date().toISOString()
     management.verificationOverride = input.verifiedByAdmin
-      ? { status: 'verified', adminId: session.account.id, at: new Date().toISOString() }
+      ? { status: 'verified', adminId: session.account.id, at }
       : null
     management.revision++
+    if (input.verifiedByAdmin) {
+      const notifications = draft.playerNotifications[player.id] ?? []
+      draft.playerNotifications[player.id] = notifications
+      notifications.push(
+        createAdminVerifiedNotification(`admin-verified-${management.revision}`, at),
+      )
+    }
     const action = input.verifiedByAdmin
       ? 'player_verification_override_set'
       : 'player_verification_override_cleared'

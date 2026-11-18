@@ -55,7 +55,7 @@ async function firstRegistered(engine: Engine, pool: PlayerPool) {
   return entry
 }
 
-test('REG-31 self check-in: I\'m here, I\'m leaving, and the club switch off refusal', async () => {
+test("REG-31 self check-in: I'm here, I'm leaving, and the club switch off refusal", async () => {
   await inLiveSession('REG-31', async (engine, pool, qm) => {
     const api = new QueueMasterApi(qm)
     const entry = await firstRegistered(engine, pool)
@@ -100,7 +100,7 @@ test('REG-31 self check-in: I\'m here, I\'m leaving, and the club switch off ref
   })
 })
 
-test('REG-32 Courts now: the signed-in Player\'s access read lists every court of a live session', async () => {
+test("REG-32 Courts now: the signed-in Player's access read lists every court of a live session", async () => {
   await inLiveSession('REG-32', async (engine, pool) => {
     const entry = await firstRegistered(engine, pool)
     const player = (await pool.for(entry.id)).client
@@ -185,7 +185,7 @@ async function inPreparedSession(
 /** Seeded player `n` (1-based) on the Player app, called from the paired Queue origin. */
 const seededPlayer = (n: number) => playerClient(n)
 
-test('REG-33 a name-only guest\'s invite link registers onto the same club player', async () => {
+test("REG-33 a name-only guest's invite link registers onto the same club player", async () => {
   const name = `E2E Claim Guest ${Date.now() % 1_000_000}`
   await inPreparedSession(
     'REG-33',
@@ -235,7 +235,7 @@ test('REG-33 a name-only guest\'s invite link registers onto the same club playe
   )
 })
 
-test('REG-34 I can\'t make it: Keep leaves the Player on the roster, Remove from roster releases the slot', async () => {
+test("REG-34 I can't make it: Keep leaves the Player on the roster, Remove from roster releases the slot", async () => {
   await inPreparedSession('REG-34', async ({ qm, api, sessionId, slug, saved }) => {
     const first = saved[0]
     if (!first) throw new Error('[e2e] no saved seeded player')
@@ -248,7 +248,11 @@ test('REG-34 I can\'t make it: Keep leaves the Player on the roster, Remove from
       )
     const rosterIds = async () => (await api.readRoster(sessionId)).map((p) => p.clubPlayerId)
     try {
-      const sent = await player.send<{ noticeId: string }>('POST', sessionPath(slug, '/drop-out'), {})
+      const sent = await player.send<{ noticeId: string }>(
+        'POST',
+        sessionPath(slug, '/drop-out'),
+        {},
+      )
       expect(sent.status, JSON.stringify(sent.body)).toBe(200)
       // The slot stays, and a second notice is a 409.
       expect((await player.send('POST', sessionPath(slug, '/drop-out'), {})).status).toBe(409)
@@ -262,7 +266,11 @@ test('REG-34 I can\'t make it: Keep leaves the Player on the roster, Remove from
       expect(await rosterIds()).toContain(first.id)
 
       // A new notice, then Remove from roster: the entry is released.
-      const again = await player.send<{ noticeId: string }>('POST', sessionPath(slug, '/drop-out'), {})
+      const again = await player.send<{ noticeId: string }>(
+        'POST',
+        sessionPath(slug, '/drop-out'),
+        {},
+      )
       expect(again.status, JSON.stringify(again.body)).toBe(200)
       read = await requests()
       expect(read.dropOuts.map((d) => d.id)).toEqual([again.body.noticeId])

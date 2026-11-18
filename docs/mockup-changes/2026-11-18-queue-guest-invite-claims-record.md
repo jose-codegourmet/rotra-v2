@@ -1,6 +1,6 @@
 # Queue app: a guest's invite link is their own, and registering through it claims that guest's record
 
-Status: IN MOCK APP — branch claude/tender-pasteur-w5ijfn, no PR yet
+Status: IN PROGRESS — #966
 Date: 2026-11-18
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheets `profile` (Invite to ROTRA, guests) and `invite`; `playerInviteLink()` (new); actions `copyGuestInvite`, `shareGuestInvite`

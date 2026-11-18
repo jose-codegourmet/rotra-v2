@@ -63,8 +63,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
-| [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | none | [Queue](workstreams/queue.md) |
-| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | mockup only | none | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | none | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1214,7 +1214,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-18-05 — Session standings: players with the same wins and losses share a position
 - **Decision status:** approved (owner, November 18, 2026: “players within the same standing should be in the same position stacking their avatars”; the two answers below). The open items are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-shared-standings-positions.md)). The real app still breaks ties by head-to-head, then name.
-- **Ticket:** none
+- **Ticket:** [#961](https://github.com/jose-codegourmet/rotra-v2/issues/961) (epic Q23)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**
   - **Same wins and same losses share one position** (owner's answer). Head-to-head and name no longer separate players; the name only orders the faces inside a shared position.
@@ -1230,7 +1230,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 ### D-2026-11-18-06 — Record games: a Queue Session can run without recording its games
 - **Decision status:** approved in part (owner, November 18, 2026: “add a feature where the QM has the option record the session games or not. but the default is recorded”; the two answers below). The open items are not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-record-games-option.md)).
-- **Ticket:** none
+- **Ticket:** [#961](https://github.com/jose-codegourmet/rotra-v2/issues/961) (epic Q23)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**
   - **A Record games switch on the session form, on by default,** changeable until the session starts and fixed after (owner's answer: “Session form, until start”).

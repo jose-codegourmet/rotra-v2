@@ -1,6 +1,6 @@
 # Queue app: a Record games switch per session; off runs the night and keeps no results
 
-Status: NEW
+Status: TICKETED — #961
 Date: 2026-11-18
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › session setup (part "Formats and mode" and the review), Preparation › Setup card, the console header and tabs, sheet `result`, the Start session sheet, Finishing, the session record (all tabs), the public session page; helpers `recordedOf()`, `NOT_RECORDED`

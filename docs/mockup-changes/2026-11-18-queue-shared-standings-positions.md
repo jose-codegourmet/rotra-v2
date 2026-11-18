@@ -1,6 +1,6 @@
 # Queue app: players with the same wins and losses share a standings position, with their faces stacked
 
-Status: NEW
+Status: TICKETED — #961
 Date: 2026-11-18
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console › Leaderboard, session record › Results › Standings, finished session page › Leaderboard, the Standings slide, Share leaderboard images; helpers `standings()`, `standGroups()`, `groupGames()`

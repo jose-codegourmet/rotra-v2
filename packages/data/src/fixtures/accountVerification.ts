@@ -6,6 +6,7 @@ import { mockStore } from '../mock/store'
 import type { PlayerAccountRecord } from '../player-account/playerAccount.types'
 import { adminAccount } from './adminAccounts'
 import { playerAccounts } from './playerAccounts'
+import { createAdminVerifiedNotification } from './playerNotifications'
 
 const demoAccount = playerAccounts.find((account) => account.email === 'jose@example.com')
 if (!demoAccount) throw new Error('Missing the demo account for verification fixtures.')
@@ -99,6 +100,14 @@ export function applyAccountVerificationFixture(
     record.verificationOverride = fixture.adminOverrideReason
       ? { status: 'verified', adminId: adminAccount.id, at }
       : null
+    const notifications = (draft.playerNotifications[playerId] ??= [])
+    const sampleIndex = notifications.findIndex((notification) => notification.id === 'ann-admin')
+    if (sampleIndex >= 0) notifications.splice(sampleIndex, 1)
+    if (fixture.adminOverrideReason) {
+      notifications.push(
+        createAdminVerifiedNotification('ann-admin', new Date(now - 120_000).toISOString()),
+      )
+    }
     draft.adminAuditEvents = draft.adminAuditEvents.filter((event) => event.id !== auditId)
     if (fixture.adminOverrideReason) {
       draft.adminAuditEvents.unshift({

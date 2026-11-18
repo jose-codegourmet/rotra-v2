@@ -77,8 +77,16 @@ export function InviteCard(props: InviteCardProps) {
     )
   }
   if (props.variant === 'session') {
-    const { sessionTitle, clubName, clubInitials, clubLogoUrl, startsAt, when, inviter, className } =
-      props
+    const {
+      sessionTitle,
+      clubName,
+      clubInitials,
+      clubLogoUrl,
+      startsAt,
+      when,
+      inviter,
+      className,
+    } = props
     return (
       <Shell label="Session invite" className={className}>
         <Top>

@@ -11,8 +11,8 @@ const meta = {
     children: (
       <>
         <b>Verify your ROTRA account by December 31, 2026.</b> Connect Google, have your phone on
-        file, and use your Google email as your ROTRA email. <b>1 of 3 done.</b> Your profile,
-        games and rank stay the same.
+        file, and use your Google email as your ROTRA email. <b>1 of 3 done.</b> Your profile, games
+        and rank stay the same.
       </>
     ),
     actions: (

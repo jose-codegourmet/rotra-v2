@@ -32,8 +32,7 @@ export function AnnouncementBand({
 }: AnnouncementBandProps) {
   const showRemind = !afterDeadline && onRemindLater !== undefined
   return (
-    <div
-      role="region"
+    <section
       aria-label="Announcement from ROTRA"
       className={
         afterDeadline
@@ -62,6 +61,6 @@ export function AnnouncementBand({
           ) : null}
         </div>
       </div>
-    </div>
+    </section>
   )
 }

@@ -89,10 +89,7 @@ export function AuthCard({
       {google ? (
         <>
           {google}
-          <div
-            role="separator"
-            className="flex items-center gap-3 text-xs font-semibold tracking-[0.5px] text-fg3 uppercase before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border"
-          >
+          <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.5px] text-fg3 uppercase before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
             {googleDivider}
           </div>
         </>

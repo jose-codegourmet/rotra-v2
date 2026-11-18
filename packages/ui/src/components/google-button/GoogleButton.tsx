@@ -2,7 +2,10 @@ import { Button, type ButtonProps } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { GoogleMark } from '@rotra/ui/google-mark'
 
-export type GoogleButtonProps = Omit<ButtonProps, 'children' | 'variant' | 'asChild' | 'loading'> & {
+export type GoogleButtonProps = Omit<
+  ButtonProps,
+  'children' | 'variant' | 'asChild' | 'loading'
+> & {
   /** Google's window is open: the label becomes "Waiting for Google…" and the button is disabled */
   pending?: boolean
   /** Replaces "Continue with Google", e.g. "Connect Google" on P-GOOGLE-REQUIRED */

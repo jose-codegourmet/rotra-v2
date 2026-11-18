@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-05 and 06 added; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -63,6 +63,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | none | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | mockup only | none | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -1206,3 +1208,36 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
 - **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.
+
+### D-2026-11-18-05 — Session standings: players with the same wins and losses share a position
+- **Decision status:** approved (owner, November 18, 2026: “players within the same standing should be in the same position stacking their avatars”; the two answers below). The open items are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-shared-standings-positions.md)). The real app still breaks ties by head-to-head, then name.
+- **Ticket:** none
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Same wins and same losses share one position** (owner's answer). Head-to-head and name no longer separate players; the name only orders the faces inside a shared position.
+  - **The next position skips the shared places:** 1, 1, 3 (owner's answer).
+  - On the standings tables (the console Leaderboard, the record's Standings, the finished session page's Leaderboard) a shared position is one row with the players' pictures stacked and their names listed.
+- **Open:** (the mockup shows a placeholder for each)
+  - Share images and the Standings slide (mockup: one row per player, with the shared number).
+  - MVP and other awards when several players share position 1 (mockup: awards unchanged).
+  - Whether Player Information ranking reads the shared position (mockup: no change).
+- **Amends:** the standings order in the [results module](../business_logic/product/queue/modules/results/README.md#session-standings) (“Positions are unique (no shared ranks)” and the head-to-head and name tiebreaks no longer hold).
+- **References:** [results module](../business_logic/product/queue/modules/results/README.md), [results screens](../screens/product/modules/queue/results-sharing.md), [console](../screens/product/modules/queue/session-console.md)
+
+### D-2026-11-18-06 — Record games: a Queue Session can run without recording its games
+- **Decision status:** approved in part (owner, November 18, 2026: “add a feature where the QM has the option record the session games or not. but the default is recorded”; the two answers below). The open items are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-record-games-option.md)).
+- **Ticket:** none
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **A Record games switch on the session form, on by default,** changeable until the session starts and fixed after (owner's answer: “Session form, until start”).
+  - **Off means run only, keep nothing** (owner's answer): the queue, courts and minimum games work on the night, but there are no standings, result slides or awards, and nothing goes to player history or ranking.
+- **Open:** (the mockup shows a placeholder for each)
+  - Whether Match done still takes a winner or score for the night only (mockup: no result is asked).
+  - Whether the session shows in the club's records and on a player's own session list (mockup: in the club's records, marked Not recorded; the Player app is unchanged).
+  - What the finished public session page shows (mockup: “This session's games were not recorded.”, no Leaderboard tab).
+  - Match requests, My night's won and lost counts, and the Facebook post on an unrecorded session (mockup: unchanged).
+  - A club default in Club settings (mockup: none; every session starts recorded).
+  - Database: the stored field and what finishing an unrecorded session writes (proposed: `record_games` boolean on the session, default true; no migration yet).
+- **References:** [sessions module](../business_logic/product/queue/modules/sessions/README.md#record-games), [results module](../business_logic/product/queue/modules/results/README.md)

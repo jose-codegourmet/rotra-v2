@@ -36,10 +36,12 @@ Order by:
 
 1. Most wins.
 2. Fewest losses.
-3. Head-to-head between the two tied players: whoever won more of the matches where they were on opposite teams.
-4. Alphabetical name order if head-to-head does not resolve the tie.
 
-Only players with at least one counted game are listed; players who never completed a counted game are left out. Positions are unique (no shared ranks). Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. Head-to-head is applied pairwise while sorting; exact handling of three-or-more-way ties remains open.
+**Shared positions (owner, November 18, 2026, [D-2026-11-18-05](../../../../../mvp/decisions.md#d-2026-11-18-05); [log](../../../../../mockup-changes/2026-11-18-queue-shared-standings-positions.md); mockup only).** Players with the same wins and the same losses share one position. The next position skips the shared places: two players at 1 are followed by 3 (1, 1, 3). Head-to-head no longer separates anyone, and the name only orders the players inside a shared position. On the standings tables a shared position is one row with the players' pictures stacked; share images and the Standings slide keep one row per player and show the shared number.
+
+Only players with at least one counted game are listed; players who never completed a counted game are left out. Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. Until the real app is changed, it still runs the earlier order (wins, losses, head-to-head between two tied players, then name, with unique positions).
+
+A session with **Record games** off has no standings, result slides or awards at all ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [sessions](../sessions/README.md#record-games)).
 
 Guests participate in standings. Fun-game wins/losses count. A partial game counts for neither substituted player unless the operator gave the game to one of them; that player gets the game, the win or loss, and minimum credit for the session. Invalid matches count for no one.
 

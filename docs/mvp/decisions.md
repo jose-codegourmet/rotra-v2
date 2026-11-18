@@ -57,7 +57,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mock and real modes in source | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
-| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mock app (Player #904, Admin #911) | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
@@ -1081,7 +1081,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
-- **Implementation status:** mockup only: [Player](../mockup-changes/2026-11-16-player-phone-mask-format.md) and [Admin](../mockup-changes/2026-11-16-admin-phone-format.md) logs. The real app already stores E.164 (`phoneField` in `packages/schema`) and has `maskPhone` and `formatPhoneForDisplay`; where it still shows a player their full phone is to be checked when ticketed.
+- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part in the mock app (#911): every phone Admin shows as text is full and grouped, and the Edit player and Add player phone fields group while typing and save E.164 ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The Admin Verification card's “On file” row shows the full number too (owner, November 18, 2026: “Yes, show full”; [log](../mockup-changes/2026-11-18-admin-verification-full-phone.md)). The real app already stores E.164 (`phoneField`).
 - **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1092,7 +1092,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Admin always sees the full number** (owner, later the same day: "admin should always see it"), grouped as "+63 917 555 0142".
 - **Open:**
   - Whether a player may reveal their own full number anywhere.
-- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/data/src/player-account/playerAccount.rules.ts`.
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/schema/src/phone.ts` (`maskPhone`).
 
 <a id="d-2026-11-17-01"></a>
 ### D-2026-11-17-01 — Privacy Policy and Terms of Service pages on the Player app

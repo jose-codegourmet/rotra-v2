@@ -1,5 +1,5 @@
 import { type AdminPlayerEditValues, adminPlayerEditSchemaFor } from '@rotra/schema/admin-player'
-import { phoneField } from '@rotra/schema/phone'
+import { formatPhoneForDisplay, phoneField } from '@rotra/schema/phone'
 import { plainIdentity } from '../club/club.rules'
 import { PLAYING_LEVELS } from '../player/player.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
@@ -99,7 +99,7 @@ export function adminPlayerEditValuesOf(edit: AdminPlayerEdit): AdminPlayerEditV
     ...edit.socialLinks,
     profilePrivate: edit.profilePrivate,
     phoneHidden: edit.phoneHidden,
-    phone: edit.phone ?? '',
+    phone: edit.phone ? formatPhoneForDisplay(edit.phone) : '',
     email: edit.email ?? '',
     password: '',
     reason: '',

@@ -1,4 +1,4 @@
-import { maskPhone } from '../player-account/playerAccount.rules'
+import { maskPhone } from '@rotra/schema/phone'
 import type { ClaimLinkRecord, PlayerAccountRecord } from '../player-account/playerAccount.types'
 import { playerProfiles } from './playerProfiles'
 

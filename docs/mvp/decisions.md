@@ -60,6 +60,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1159,3 +1160,22 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - A liability cap for players who pay ROTRA nothing: the cap is the fees paid in the 12 months before a claim, if any, which is zero for them.
   - Whether the Queue and Admin apps link to the same pages (carried over from D-2026-11-17-01).
 - **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/content.ts`, `apps/player/src/app/(public)/terms/content.ts`, `apps/mockup/player-app/rotra-player.html` › `LEGAL`.
+
+### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
+- **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
+- **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - A Queue Master can give a **registered** player a **club nickname**. It is kept by the club and used in every session of that club until changed; it is not set per session.
+  - **Queue Master screens only:** the console (courts, Main Queue, Auto Queue, pickers, toasts), the roster and Saved players show the club nickname in place of the player's own nickname, and search there matches it.
+  - **Everything else uses the account nickname** (the name when there is none): the public session page, the player's live view, Match history and finished-session results, leaderboards, awards and share images.
+  - It never changes the player's ROTRA account, and another club never sees it.
+  - Guests and unclaimed players are unchanged: they have no account, so the nickname in Edit details is already the club's.
+- **Open:**
+  - The length limit of a club nickname (the mockup has none).
+  - Whether the player can see or remove the nickname a club gave them.
+  - Results the Queue Master reads on their own screens after Session done (the mockup: account nickname there too).
+  - Nicknames already copied onto linked saved-player rows before this rule (database).
+- **Amends:** the November 11, 2026 rule (#705) that Saved players always show a registered player's own nickname; “Registered players have no Edit details” still holds, the club nickname is the one exception.
+- **References:** [players module](../business_logic/product/queue/modules/players/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Club nickname](../product-terms.md).

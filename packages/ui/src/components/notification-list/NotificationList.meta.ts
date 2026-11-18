@@ -6,11 +6,12 @@ export const notificationListMeta = {
   usage: [
     'Pass the New and Earlier groups for the selected filter and the total unread count.',
     'Handle changes to the selected filter, Mark all as read and opening a notification.',
+    'Use the loading or error state while the list is unavailable. Wire Retry to load it again.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'P-NOTIFICATIONS (viewNotifs)',
   },
   docs: ['docs/screens/product/modules/player-information/notifications.md'],
-  related: ['NotificationBell', 'NotificationItem', 'SegmentedControl'],
+  related: ['NotificationBell', 'NotificationItem', 'SegmentedControl', 'Skeleton', 'ErrorState'],
 } satisfies ComponentMeta

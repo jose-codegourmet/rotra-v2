@@ -77,7 +77,7 @@ const earlierNotifications: NotificationListItem[] = [
   },
 ]
 
-function InteractiveList(args: NotificationListProps) {
+function InteractiveList(args: Extract<NotificationListProps, { filter: string }>) {
   const [filter, setFilter] = useState(args.filter)
   const [openedIds, setOpenedIds] = useState<string[]>([])
   const [allRead, setAllRead] = useState(false)
@@ -116,7 +116,7 @@ const meta = {
     onMarkAllRead: () => {},
     onOpen: () => {},
   },
-  render: (args) => <InteractiveList {...args} />,
+  render: (args) => (args.state ? <NotificationList {...args} /> : <InteractiveList {...args} />),
 } satisfies Meta<typeof NotificationList>
 
 export default meta
@@ -138,6 +138,16 @@ export const AllEmpty: Story = {
 
 export const UnreadEmpty: Story = {
   args: { ...AllRead.args, filter: 'unread' },
+}
+
+export const Loading: Story = {
+  render: () => <NotificationList state={{ kind: 'loading' }} />,
+}
+
+export const Error: Story = {
+  render: () => (
+    <NotificationList state={{ kind: 'error', retrying: false, onRetry: () => {} }} />
+  ),
 }
 
 export const Light: Story = { globals: { theme: 'light' } }

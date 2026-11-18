@@ -36,7 +36,33 @@ export function PlayerNotifications() {
   const markAllRead = useMarkAllPlayerNotificationsRead(playerId ?? '')
   const router = useRouter()
 
-  if (signedOut || !playerId || !notifications.data) return null
+  if (signedOut) return null
+
+  if (!playerId && session.isError) {
+    return (
+      <NotificationList
+        state={{
+          kind: 'error',
+          retrying: session.isFetching,
+          onRetry: () => void session.refetch(),
+        }}
+      />
+    )
+  }
+
+  if (notifications.isError) {
+    return (
+      <NotificationList
+        state={{
+          kind: 'error',
+          retrying: notifications.isFetching,
+          onRetry: () => void notifications.refetch(),
+        }}
+      />
+    )
+  }
+
+  if (!notifications.data) return <NotificationList state={{ kind: 'loading' }} />
 
   const { unreadCount, newNotifications, earlierNotifications } = notifications.data
   const now = Date.now()

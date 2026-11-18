@@ -1,9 +1,11 @@
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { EmptyState } from '@rotra/ui/empty-state'
+import { ErrorState } from '@rotra/ui/error-state'
 import { Icon } from '@rotra/ui/icon'
 import { NotificationItem, type NotificationItemProps } from '@rotra/ui/notification-item'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
+import { Skeleton } from '@rotra/ui/skeleton'
 
 const FILTER_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -16,7 +18,8 @@ export type NotificationListItem = Omit<NotificationItemProps, 'onOpen'> & {
   id: string
 }
 
-export type NotificationListProps = {
+type ReadyProps = {
+  state?: never
   filter: NotificationFilter
   /** Total unread across both groups regardless of the selected filter. */
   unreadCount: number
@@ -28,6 +31,12 @@ export type NotificationListProps = {
   onOpen: (id: string) => void
 }
 
+export type NotificationListProps =
+  | ReadyProps
+  | {
+      state: { kind: 'loading' } | { kind: 'error'; onRetry: () => void; retrying: boolean }
+    }
+
 function NotificationGroup({
   title,
   items,
@@ -35,7 +44,7 @@ function NotificationGroup({
 }: {
   title: 'New' | 'Earlier'
   items: readonly NotificationListItem[]
-  onOpen: NotificationListProps['onOpen']
+  onOpen: ReadyProps['onOpen']
 }) {
   if (!items.length) return null
 
@@ -55,7 +64,40 @@ function NotificationGroup({
   )
 }
 
-export function NotificationList({
+export function NotificationList(props: NotificationListProps) {
+  return (
+    <main className="mx-auto flex max-w-[640px] flex-col gap-4 pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))] text-[15px]">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-[26px] leading-tight font-extrabold tracking-[-0.3px]">Notifications</h1>
+        {!props.state && (
+          <p className="text-fg2">
+            {props.unreadCount ? `${props.unreadCount} unread` : "You're all caught up."}
+          </p>
+        )}
+      </header>
+      {!props.state ? (
+        <NotificationListContent {...props} />
+      ) : props.state.kind === 'loading' ? (
+        <Card>
+          <Skeleton label="Loading notifications" className="h-16" />
+          <Skeleton className="mt-3 h-16" />
+          <Skeleton className="mt-3 h-16" />
+        </Card>
+      ) : (
+        <ErrorState
+          title="Couldn't load notifications."
+          retryLabel="Retry"
+          onRetry={props.state.onRetry}
+          retrying={props.state.retrying}
+        >
+          Check your connection, then try again.
+        </ErrorState>
+      )}
+    </main>
+  )
+}
+
+function NotificationListContent({
   filter,
   unreadCount,
   newNotifications,
@@ -63,19 +105,11 @@ export function NotificationList({
   onFilterChange,
   onMarkAllRead,
   onOpen,
-}: NotificationListProps) {
+}: ReadyProps) {
   const empty = !newNotifications.length && !earlierNotifications.length
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-4 pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))] text-[15px]">
-      <header className="flex flex-col gap-1.5">
-        <h1 className="text-[26px] leading-tight font-extrabold tracking-[-0.3px]">
-          Notifications
-        </h1>
-        <p className="text-fg2">
-          {unreadCount ? `${unreadCount} unread` : "You're all caught up."}
-        </p>
-      </header>
+    <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <SegmentedControl
           aria-label="Show"
@@ -109,6 +143,6 @@ export function NotificationList({
       <p className="text-[13px] text-fg2">
         Notifications stay for 90 days. Prototype: in the app only, no phone or email alerts yet.
       </p>
-    </main>
+    </>
   )
 }

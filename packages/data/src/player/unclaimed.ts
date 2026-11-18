@@ -68,7 +68,8 @@ export function savedRecordByEmail(
 function countRtrId(s: MockState, rtrId: string) {
   const parts = splitRtrId(rtrId)
   if (!parts) return
-  const counters = (s.rtrIdCounters ??= {})
+  s.rtrIdCounters ??= {}
+  const counters = s.rtrIdCounters
   counters[parts.prefix] = Math.max(counters[parts.prefix] ?? 0, parts.number)
 }
 

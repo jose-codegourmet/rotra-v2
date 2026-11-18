@@ -46,6 +46,13 @@ export type DevMenuProps = {
     label: string
     onChange: (value: string) => void
   }
+  /** P12, only while the Google sign-in flag is on and a player is signed in: puts that player on the invited session's roster or waitlist. */
+  inviteStanding?: {
+    value: string
+    options: { value: string; label: string }[]
+    label: string
+    onChange: (value: string) => void
+  }
   /** Optional until the registration and password-reset preview routes are implemented. */
   playerLinkPreviews?: {
     onRegistration?: (state: 'valid' | 'processing' | 'expired') => void
@@ -85,6 +92,7 @@ export function DevMenu({
   playerScenarios,
   playerAccount,
   googleDeadline,
+  inviteStanding,
   playerLinkPreviews,
   contactRequestSlot,
   extraToggles,
@@ -230,6 +238,21 @@ export function DevMenu({
                 <p className="text-xs text-fg2">
                   After the deadline, a password-only player sees only Connect Google to continue
                   and the leaderboard.
+                </p>
+              </section>
+            ) : null}
+            {inviteStanding ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>{inviteStanding.label}</h3>
+                <SegmentedControl
+                  aria-label="Standing on the invited session"
+                  value={inviteStanding.value}
+                  options={inviteStanding.options}
+                  onChange={inviteStanding.onChange}
+                />
+                <p className="text-xs text-fg2">
+                  Applies to the signed-in player. Open the session invite link to see "already in"
+                  or "already on the waitlist".
                 </p>
               </section>
             ) : null}

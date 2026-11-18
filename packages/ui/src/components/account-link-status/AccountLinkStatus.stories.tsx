@@ -54,3 +54,15 @@ export const GuestRegistrationDone: Story = {
     rtrId: claimLinkScenarios.rtrId,
   },
 }
+
+export const GuestRegistrationDoneGoogle: Story = {
+  args: { ...GuestRegistrationDone.args, googleEmail: 'ana.reyes@gmail.com' },
+}
+export const ClaimDoneGoogle: Story = {
+  args: {
+    variant: 'claim-done',
+    firstName: claimLinkScenarios.firstName,
+    rtrId: claimLinkScenarios.rtrId,
+    googleEmail: 'raymark.plays@gmail.com',
+  },
+}

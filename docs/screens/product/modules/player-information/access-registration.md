@@ -59,7 +59,7 @@ The club invite card, then a card "Signed in as <name>" with **Join <club>** (to
 
 ## P-JOIN-SESSION — Signed-in player on a session invite
 
-The session invite card, then "Signed in as <name>", "Your request to join is ready to send on the session page. The Queue Master sees that <inviter> invited you.", **Continue to request to join** (opens the Queue session page `/s/<slug>?join=1&invite=<code>`) and **Not now**. Own invite: "This is your own invite. Share it with the person you want to bring." Already confirmed: "You're already in <session>."; waitlisted: "You're already on the waitlist for <session>."; both with **Go to my profile**.
+The session invite card, then "Signed in as <name>", "Your request to join is ready to send on the session page. The Queue Master sees that <inviter> invited you.", **Continue to request to join** (opens the Queue session page `/s/<slug>?join=1&invite=<code>`) and **Not now**. Own invite: "This is your own invite. Share it with the person you want to bring." Already confirmed: "You're already in <session>."; waitlisted: "You're already on the waitlist for <session>."; both with **Go to my profile**. A session invite the player already sent a request on (a state the prototype doesn't have) shows the plain ready state; the Queue session page then shows the pending request. A signed-in player confirmed for a session at a club they aren't in does not become one of that club's saved players ([owner, November 18, 2026](../../../../mvp/decisions.md#d-2026-11-16-01)). A signed-in player on `/register` (the Admin link) goes to their own profile.
 
 ## P-GOOGLE-LINK — Connect Google to a password account
 

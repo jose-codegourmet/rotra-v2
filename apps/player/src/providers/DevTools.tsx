@@ -6,13 +6,17 @@ import { useAdvanceContactChangeRequest } from '@rotra/data/contact-change-reque
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import {
   googleDeadlineOptions,
+  inviteStandingOptions,
   leaderboardOptions,
   leaderboardPlaceOptions,
   playerRankOptions,
 } from '@rotra/data/fixtures/dev-menu'
+import { TONIGHT_SESSION_SLUG } from '@rotra/data/fixtures/google-sign-in'
 import { JOSE_PLAYER_ID } from '@rotra/data/fixtures/players'
+import type { MockInviteStanding } from '@rotra/data/google-sign-in/types'
 import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { useSetMockGoogleDeadline } from '@rotra/data/google-sign-in/useSetMockGoogleDeadline'
+import { useSetMockInviteStanding } from '@rotra/data/google-sign-in/useSetMockInviteStanding'
 import {
   connectMockBridge,
   type LeaderboardScenario,
@@ -48,8 +52,28 @@ export function DevTools() {
 function DevToolsWithGoogle() {
   const deadline = useGoogleDeadline().data,
     setDeadline = useSetMockGoogleDeadline()
+  const setStanding = useSetMockInviteStanding(),
+    account = useAppSelector(selectAccount)
+  const [standing, setStandingValue] = useState<MockInviteStanding>('none')
   return (
     <DevToolsBase
+      inviteStanding={
+        account
+          ? {
+              value: standing,
+              options: inviteStandingOptions,
+              label: 'Standing on the invited session',
+              onChange: (value) =>
+                setStanding.mutate(
+                  { sessionSlug: TONIGHT_SESSION_SLUG, standing: value as MockInviteStanding },
+                  {
+                    onSuccess: () => setStandingValue(value as MockInviteStanding),
+                    onError: (error) => toast.error(error.message),
+                  },
+                ),
+            }
+          : undefined
+      }
       googleDeadline={
         deadline
           ? {
@@ -63,7 +87,13 @@ function DevToolsWithGoogle() {
     />
   )
 }
-function DevToolsBase({ googleDeadline }: { googleDeadline?: DevMenuProps['googleDeadline'] }) {
+function DevToolsBase({
+  googleDeadline,
+  inviteStanding,
+}: {
+  googleDeadline?: DevMenuProps['googleDeadline']
+  inviteStanding?: DevMenuProps['inviteStanding']
+}) {
   const settings = useRankingSettings(),
     setSettings = useSetRankingSettings()
   const signIn = useSignIn('player'),
@@ -214,6 +244,7 @@ function DevToolsBase({ googleDeadline }: { googleDeadline?: DevMenuProps['googl
           }),
       }}
       googleDeadline={googleDeadline}
+      inviteStanding={inviteStanding}
       contactRequestSlot={contactRequestSlot}
       open={open}
       onOpenChange={setOpen}

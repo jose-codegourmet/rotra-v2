@@ -7,6 +7,7 @@ export const claimMeta = {
     'After success, consumes a validated pending public session return; claiming never confirms admission.',
     'Only a club-issued link opens this route; public RTR IDs and profile pages never start a claim.',
     'An unknown token shows the expired state, so the page never reveals whether a profile exists.',
+    'Flag player_google_sign_in on: after Is this you? the method step "Connect your Google account" (Google only), then the form in Google mode with "← Use another Google account"; completing says "Sign in from now on with Google (<email>)." A Google email already on another account returns to the method step with the error.',
     "'This isn't me' writes nothing; completing signs the player in.",
   ],
   prototype: {
@@ -17,5 +18,15 @@ export const claimMeta = {
     'docs/screens/product/modules/player-information/access-registration.md',
     'docs/business_logic/product/player-information/modules/identity/flow/claim-and-recover.md',
   ],
-  variants: ['loading', 'check', 'wrong', 'form', 'claimed', 'expired', 'processing', 'done'],
+  variants: [
+    'loading',
+    'check',
+    'wrong',
+    'method',
+    'form',
+    'claimed',
+    'expired',
+    'processing',
+    'done',
+  ],
 } satisfies ComponentMeta

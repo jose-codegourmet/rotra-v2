@@ -1,4 +1,6 @@
 'use client'
+import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
+import { useCompleteClaimWithGoogle } from '@rotra/data/google-sign-in/useCompleteClaimWithGoogle'
 import { MockError } from '@rotra/data/mock/errors'
 import { useCheckClaimStatus } from '@rotra/data/player-account/useCheckClaimStatus'
 import { useClaimLink } from '@rotra/data/player-account/useClaimLink'
@@ -10,15 +12,19 @@ import { Card } from '@rotra/ui/card'
 import { ClaimForm } from '@rotra/ui/claim-form'
 import { ClaimIdentityCheck } from '@rotra/ui/claim-identity-check'
 import { ErrorState } from '@rotra/ui/error-state'
+import { GoogleChooseCard } from '@rotra/ui/google-choose-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useGooglePicker } from '@/app/_components/google-sign-in/useGooglePicker'
+import { useNoGoogleSheet } from '@/app/_components/google-sign-in/useNoGoogleSheet'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
 
-type Step = 'check' | 'wrong' | 'form'
-type Done = { playerId: string; firstName: string; rtrId: string }
+type Step = 'check' | 'wrong' | 'method' | 'form'
+type Done = { playerId: string; firstName: string; rtrId: string; googleEmail?: string }
 
 export function Claim({ token, returnTo }: { token: string; returnTo?: string }) {
   useEffect(() => {
@@ -26,6 +32,11 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
   }, [returnTo])
   const link = useClaimLink(token)
   const complete = useCompleteClaim()
+  // Google mode (player_google_sign_in flag): the method step and the form with the Google row.
+  const googleOn = usePlayerGoogleSignInEnabled()
+  const completeGoogle = useCompleteClaimWithGoogle()
+  const [google, setGoogle] = useState<GoogleIdentity | null>(null)
+  const [methodError, setMethodError] = useState('')
   const check = useCheckClaimStatus()
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -38,6 +49,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
         variant="claim-done"
         firstName={done.firstName}
         rtrId={done.rtrId}
+        googleEmail={done.googleEmail}
         onOpenProfile={() => router.push(`/players/${done.playerId}`)}
       />
     )
@@ -118,9 +130,83 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
         preview={data.preview}
         onReject={() => setStep('wrong')}
         onConfirm={() => {
+          setStep(googleOn ? 'method' : 'form')
+          window.scrollTo(0, 0)
+        }}
+      />
+    )
+  if (step === 'method' && googleOn)
+    return (
+      <GoogleMethodStep
+        clubName={data.clubName}
+        error={methodError}
+        onPick={(identity) => {
+          setGoogle(identity)
+          setMethodError('')
           setStep('form')
           window.scrollTo(0, 0)
         }}
+      />
+    )
+  if (googleOn && google)
+    return (
+      <ClaimForm
+        clubName={data.clubName}
+        maskedPhone={data.preview.maskedPhone}
+        defaultValues={data.preset}
+        google={{
+          ...google,
+          onChange: () => {
+            setGoogle(null)
+            completeGoogle.reset()
+            setStep('method')
+            window.scrollTo(0, 0)
+          },
+        }}
+        isPending={completeGoogle.isPending}
+        serverError={
+          completeGoogle.error
+            ? {
+                message: completeGoogle.error.message,
+                field:
+                  completeGoogle.error instanceof MockError &&
+                  completeGoogle.error.fieldErrors?.phone
+                    ? 'phone'
+                    : undefined,
+              }
+            : undefined
+        }
+        onSubmit={({
+          confirmPassword: _confirm,
+          email: _email,
+          password: _password,
+          cityCode: _city,
+          ...values
+        }) =>
+          completeGoogle.mutate(
+            { token, google, values },
+            {
+              onSuccess: (result) => {
+                if (result.outcome === 'taken') {
+                  setGoogle(null)
+                  setMethodError(
+                    `${result.email} is already on another ROTRA account. Pick another Google account or set a password.`,
+                  )
+                  setStep('method')
+                  window.scrollTo(0, 0)
+                  return
+                }
+                dispatch(setAccount(result.session.account))
+                setDone({ ...result, googleEmail: google.email })
+                const back = consumeSessionReturn(returnTo)
+                if (back) window.location.assign(back)
+                window.scrollTo(0, 0)
+                toast('Registration complete')
+              },
+              onError: (failure) => toast.error(failure.message),
+            },
+          )
+        }
       />
     )
   const error = complete.error
@@ -160,5 +246,37 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
         )
       }
     />
+  )
+}
+
+/** P-CLAIM method step, Google only: "Connect your Google account". */
+function GoogleMethodStep({
+  clubName,
+  error,
+  onPick,
+}: {
+  clubName: string
+  error: string
+  onPick: (identity: GoogleIdentity) => void
+}) {
+  const picker = useGooglePicker()
+  const noGoogle = useNoGoogleSheet()
+  return (
+    <>
+      <LinkPage
+        label={`Registration link from ${clubName}`}
+        title="Connect your Google account"
+        description="ROTRA players sign in with Google. Connect yours to finish registering."
+      >
+        <GoogleChooseCard
+          error={error || undefined}
+          hint="Your Google email becomes your ROTRA email and is already confirmed."
+          onGoogle={() => picker.start(onPick)}
+          onNoGoogle={noGoogle.open}
+        />
+      </LinkPage>
+      {picker.sheet}
+      {noGoogle.sheet}
+    </>
   )
 }

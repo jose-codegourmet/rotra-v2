@@ -27,6 +27,8 @@ export type AccountLinkStatusProps = {
   /** Newly registered through a guest invitation; no existing games or guest record were linked. */
   standalone?: boolean
   sessionTitle?: string | null
+  /** claim-done after Google (player_google_sign_in flag): "You sign in with Google (<email>)." */
+  googleEmail?: string
   onBackToSession?: () => void
   /** claim-processing: Check again is running */
   isPending?: boolean
@@ -48,6 +50,7 @@ export function AccountLinkStatus({
   rtrId,
   standalone = false,
   sessionTitle,
+  googleEmail,
   onBackToSession,
   isPending = false,
   onBackToSignIn,
@@ -168,7 +171,9 @@ export function AccountLinkStatus({
               ? clubName !== 'your club'
                 ? `You're now in ${clubName}'s saved players.`
                 : 'Your ROTRA account is ready.'
-              : 'Your profile is registered. Sign in from now on with your email and your password.'}
+              : googleEmail
+                ? `Your profile is registered. Sign in from now on with Google (${googleEmail}).`
+                : 'Your profile is registered. Sign in from now on with your email and your password.'}
           </Notice>
           {standalone && sessionTitle ? (
             <Notice>Your request to join {sessionTitle} is ready to send.</Notice>
@@ -180,6 +185,9 @@ export function AccountLinkStatus({
                 <span className="font-mono">{rtrId}</span>.
                 {standalone ? '' : ' Your games and rank carry over.'}
               </p>
+              {standalone && googleEmail ? (
+                <p className="m-0 text-[13px] text-fg2">You sign in with Google ({googleEmail}).</p>
+              ) : null}
               <div className={actions}>
                 {onBackToSession ? (
                   <Button variant="primary" onClick={onBackToSession}>

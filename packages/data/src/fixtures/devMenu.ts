@@ -30,3 +30,9 @@ export const googleDeadlineOptions = [
   { value: 'before', label: 'Before the deadline' },
   { value: 'passed', label: 'Deadline passed' },
 ]
+/** Where the signed-in player stands on the seeded Session invite (P-JOIN-SESSION states). */
+export const inviteStandingOptions = [
+  { value: 'none', label: 'Not on it' },
+  { value: 'in', label: 'Already in' },
+  { value: 'waitlist', label: 'Waitlisted' },
+]

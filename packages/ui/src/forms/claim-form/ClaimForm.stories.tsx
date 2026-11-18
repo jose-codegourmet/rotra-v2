@@ -46,3 +46,31 @@ export const GuestRegistration: Story = {
 export const GuestAccountMatch: Story = {
   args: { standalone: true, maskedPhone: '', accountMatch: true, onDismissMatch: fn() },
 }
+
+/** Google mode: the Google row replaces Email and the password fields; the full name starts from Google. */
+export const GoogleRegistration: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Ana Reyes' },
+    google: { name: 'Ana Reyes', email: 'ana.reyes@gmail.com', onChange: fn() },
+  },
+}
+export const GoogleRegistrationAdminLink: Story = {
+  args: {
+    ...GoogleRegistration.args,
+    cities: [
+      { value: 'CEB', label: 'Cebu City' },
+      { value: 'MNL', label: 'Manila' },
+    ],
+  },
+}
+export const GoogleRegistrationLight: Story = {
+  ...GoogleRegistration,
+  globals: { theme: 'light' },
+}
+export const GoogleClaim: Story = {
+  args: {
+    google: { name: 'Raymark', email: 'raymark.plays@gmail.com', onChange: fn() },
+  },
+}

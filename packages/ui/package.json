@@ -489,7 +489,9 @@
     "./google-account-picker-sheet": "./src/components/google-account-picker-sheet/GoogleAccountPickerSheet.tsx",
     "./player-account-row": "./src/components/player-account-row/PlayerAccountRow.tsx",
     "./google-link-card": "./src/components/google-link-card/GoogleLinkCard.tsx",
-    "./google-required-card": "./src/components/google-required-card/GoogleRequiredCard.tsx"
+    "./google-required-card": "./src/components/google-required-card/GoogleRequiredCard.tsx",
+    "./google-choose-card": "./src/components/google-choose-card/GoogleChooseCard.tsx",
+    "./invite-signed-in-card": "./src/components/invite-signed-in-card/InviteSignedInCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

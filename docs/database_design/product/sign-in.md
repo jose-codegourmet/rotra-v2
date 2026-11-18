@@ -256,9 +256,9 @@ Decided November 14, 2026 ([B-27](../../backend/open-decisions.md#settled)).
 - **Cookies.** Host-only per app, `HttpOnly`, `Secure`, `SameSite=Lax`; the refresh cookie is
   limited to the auth endpoints (`/api/auth`), so sign-out receives it too (B-62 amendment).
 
-## Proposed: Go sign-in contract (B-62)
+## Go sign-in contract (B-62)
 
-**Status: proposed on November 17, 2026, not decided.** The tables above fix the data; they leave the wire details open. This section fills them with defaults so the Go work can start. The owner reviews it (B-62) before any Go sign-in code merges; changing a default later costs a migration of passes or cookies, so review it before staging. Everything here is configuration or contract, none of it is migration SQL.
+**Status: decided November 18, 2026 ([B-62](../../backend/open-decisions.md#settled)).** Proposed on November 17, amended in the owner review on November 18, and built in go-sign-in. The tables above fix the data; this section fixes the wire details. Changing one of them later costs a migration of passes or cookies. Everything here is configuration or contract, none of it is migration SQL.
 
 **Pass.** A compact JWS signed with EdDSA (Ed25519), written on the Go standard library and verified in each app with WebCrypto (no JOSE library in Go or JavaScript). Header: `alg` pinned to `EdDSA`, `kid`. Claims: `sub` (identity id), `sid` (session id), `aud` (`club`, `player` or `admin`), the account id, `club_id` for club passes, `iat`, `nbf`, `exp`. Verifiers pin `alg`, require `kid`, check `exp`/`nbf`, and check `aud` against the app (a club pass never opens the Admin app, even though cookies are per host).
 

@@ -33,6 +33,16 @@ Club, players, sessions (roster, matches, queue, cost, payments, results), inven
 
 - [ ] Club scope and entitlement checks match `@rotra/db/service/authorize`
 
+## Carried in from settled decisions
+
+Fixes to the public reads, decided on November 18, 2026 ([backend decisions](../../../docs/backend/open-decisions.md#settled)). Each one changes the TypeScript and Go together and updates the golden cases in `apps/api/internal/publicreads/testdata/`.
+
+- **B-53:** a private or always-private RTR ID answers 404 to a caller who is not signed in.
+- **B-54:** one server-side masking rule for leaderboard, profile, rank and games; `/rank` gets the approved-algorithm gate; `/games` is paged.
+- **B-55:** the public club read sends no invite code; masked members carry no level and no stable key. The Join button change starts in the mockup first.
+- **B-56:** published results on the public session page mask private and always-private players.
+- **B-60:** list `/api/leaderboard`, `/api/players` and `/api/rtr-ids` in `ROTRA_GO_MOVED_AREAS` once their signed-in siblings are in Go.
+
 ## Scope
 
 **In:** All signed-in GET routes.

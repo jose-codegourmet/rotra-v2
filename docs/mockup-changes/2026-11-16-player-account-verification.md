@@ -1,6 +1,6 @@
 # Player app: account verification page (Google, phone, matching email) with an Admin override
 
-Status: TICKETED — #889
+Status: IN PROGRESS — #889
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewVerify, verifyCard, verifyChip, verifyOf, gRequiredBand, viewProfile (status chip, Verification button), privatePanel

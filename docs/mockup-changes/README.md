@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 9 · IN MOCK APP: 178 · CANCELLED: 3 · MOCKUP ONLY: 4
+TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 178 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -364,7 +364,7 @@ TICKETED: 9 · IN MOCK APP: 178 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-15-share-save-to-photos](2026-11-15-share-save-to-photos.md) | Share dialogs: Save to Photos on iPhone and iPad | share-image-picker, share-image-viewer, share-card (helpers: isAppleMobile) | IN MOCK APP — PR #868 |
 | [2026-11-16-admin-phone-format](2026-11-16-admin-phone-format.md) | Admin app: phones are kept as the database holds them and shown in one grouped format | player-quick-view, admin-player-form, contact-change-review | TICKETED — #893 |
 | [2026-11-16-admin-unclaimed-rtr-id-edit](2026-11-16-admin-unclaimed-rtr-id-edit.md) | Admin › Players: unclaimed players have an email and an RTR ID; Admin can change the email and the RTR ID | admin-player-card, admin-player-filters, admin-player-quick-view, admin-player-clubs, admin-player-identity-card, admin-edit-player-form, player-account-chip, rank-status-chip, confirm-sheet, change-compare | TICKETED — #900 |
-| [2026-11-16-player-account-verification](2026-11-16-player-account-verification.md) | Player app: account verification page (Google, phone, matching email) with an Admin override | verification-card, verification-step, status chip, announcement-band, page-head | TICKETED — #889 |
+| [2026-11-16-player-account-verification](2026-11-16-player-account-verification.md) | Player app: account verification page (Google, phone, matching email) with an Admin override | verification-card, verification-step, status chip, announcement-band, page-head | IN PROGRESS — #889 |
 | [2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md) | Player app: Google sign-in (mandatory), invite landings and connecting Google to existing accounts | auth-card, google-button, invite-card, google-identity-row, announcement-band, sign-in-methods-card, sheet | TICKETED — #892 |
 | [2026-11-16-player-leaderboard-periods](2026-11-16-player-leaderboard-periods.md) | Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks | leaderboard-row, leaderboard-podium, your-position-card, segmented-control | TICKETED — #891 |
 | [2026-11-16-player-notifications](2026-11-16-player-notifications.md) | Player app: notifications page and bell | notification-bell, notification-item, notification-list, segmented filter | TICKETED — #890 |

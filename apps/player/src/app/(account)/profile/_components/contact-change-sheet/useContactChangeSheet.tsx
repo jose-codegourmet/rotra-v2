@@ -4,7 +4,7 @@ import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/us
 import { useSubmitContactChangeRequest } from '@rotra/data/contact-change-request/useSubmitContactChangeRequest'
 import { MockError } from '@rotra/data/mock/errors'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { ContactChangeRequestForm } from '@rotra/ui/contact-change-request-form'
+import { ContactChangeRequestForm, type ContactChangeRequestFormProps } from '@rotra/ui/contact-change-request-form'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 
@@ -19,6 +19,7 @@ export function useContactChangeSheet(playerId: string | null) {
   const request = useMyContactChangeRequest(playerId)
   const submit = useSubmitContactChangeRequest()
   const [open, setOpen] = useState(false)
+  const [defaults, setDefaults] = useState<ContactChangeRequestFormProps['defaultValues']>()
   const [fieldError, setFieldError] = useState<string>()
   const [serverError, setServerError] = useState<string>()
   const hasOpenRequest = Boolean(
@@ -29,8 +30,13 @@ export function useContactChangeSheet(playerId: string | null) {
     setFieldError(undefined)
     setServerError(undefined)
   }
-  const openSheet = () => {
-    if (account.data?.emailConfirmedAt === null) {
+  const openWithDefaults = (initial?: ContactChangeRequestFormProps['defaultValues']) => {
+    if (!account.data) {
+      toast.error("Couldn't load your contact details. Try again.")
+      void account.refetch()
+      return
+    }
+    if (account.data.emailConfirmedAt === null) {
       toast.error('Confirm your email first.')
       return
     }
@@ -40,12 +46,14 @@ export function useContactChangeSheet(playerId: string | null) {
     }
     setFieldError(undefined)
     setServerError(undefined)
+    setDefaults(initial)
     setOpen(true)
   }
   const sheet = account.data ? (
     <ContactChangeRequestForm
       open={open}
       onOpenChange={(next) => (next ? setOpen(true) : close())}
+      defaultValues={defaults}
       currentPhone={account.data.phone}
       currentEmail={account.data.email}
       isPending={submit.isPending}
@@ -74,5 +82,5 @@ export function useContactChangeSheet(playerId: string | null) {
       }}
     />
   ) : null
-  return { openSheet, sheet, request, hasOpenRequest }
+  return { openSheet: () => openWithDefaults(), openWithDefaults, sheet, request, hasOpenRequest }
 }

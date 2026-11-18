@@ -56,7 +56,7 @@ export const GuestRegistrationDone: Story = {
 }
 
 export const GuestRegistrationDoneGoogle: Story = {
-  args: { ...GuestRegistrationDone.args, googleEmail: 'ana.reyes@gmail.com' },
+  args: { ...GuestRegistrationDone.args, googleEmail: 'ana.reyes@gmail.com', verificationComplete: true },
 }
 export const ClaimDoneGoogle: Story = {
   args: {

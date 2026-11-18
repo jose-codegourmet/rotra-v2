@@ -1,4 +1,5 @@
 'use client'
+import { useMyAccountVerification } from '@rotra/data/account-verification/useMyAccountVerification'
 import { useSession } from '@rotra/data/auth/use-session'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
@@ -89,6 +90,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
+  const verification = useMyAccountVerification(session.data?.account.id === playerId ? playerId : null)
+  const openVerification = () => router.push('/profile/verification')
   // Clubs show on every readable profile (#766); the read applies the profile's access rule.
   const clubs = usePlayerClubs(playerId)
   // D-CLUB-PROFILE: a Clubs card row opens the club's profile card.
@@ -267,6 +270,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               }
               onEdit={() => router.push('/profile/edit')}
               onOpenPlayerId={() => router.push('/profile/player-id')}
+              verification={verification.data ?? undefined}
+              onOpenVerification={isOwn ? openVerification : undefined}
               onShare={sharing.openProfile}
             />
             {pictureEditor.sheet}
@@ -286,6 +291,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                   ) : null
                 }
                 onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
+                onOpenVerification={openVerification}
                 onSignOut={leaveSignedOut}
               />
             ) : null}

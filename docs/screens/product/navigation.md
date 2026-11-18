@@ -103,6 +103,8 @@ sign-in forms and the remaining screens arrive in their product tickets.
 P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions.md#d-2026-11-08-02)): it
 needs a signed-in player, so signed out it goes to `/login` and returns there.
 
+P-VERIFICATION is `/profile/verification` and requires a signed-in player. Signed-out players go to `/login` and return to Verification after signing in.
+
 Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
 sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.
 

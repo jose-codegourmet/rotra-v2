@@ -6,8 +6,8 @@ export const announcementBandMeta = {
     'The yellow "ROTRA announcement" band at the top of every Player page while the signed-in player isn\'t verified. A message, one or two actions, and Remind me later; after the deadline the bottom border is thicker and Remind me later is gone.',
   usage: [
     'Put it in the same slot as EmailConfirmBanner, as a second band under the header.',
-    'Pass the message as children (with <b> lead-in), the buttons (Button size "xs", primary then ghost) as actions, and onRemindLater to show Remind me later.',
-    'The deadline is passed in: write it into the message text and set afterDeadline once it has passed. Never hardcode a date here.',
+    'Pass verification for the reminder copy and progress, or children for a custom message. Pass the buttons as actions and onRemindLater to show Remind me later.',
+    'The deadline is passed in already formatted. Set afterDeadline once it has passed.',
     'Uses the --ann-* tokens (yellow), distinct from the amber warn notices.',
   ],
   prototype: {

@@ -33,6 +33,16 @@ export const accountVerificationFixtures = {
   },
 } satisfies Record<string, VerificationFixture>
 
+export const accountVerificationFixtureOptions = [
+  { value: 'zeroOfThree', label: '0 of 3' },
+  { value: 'oneOfThree', label: '1 of 3' },
+  { value: 'mismatch', label: '2 of 3 · Email mismatch' },
+  { value: 'mismatchPending', label: 'Email request pending' },
+  { value: 'noPhone', label: 'No phone' },
+  { value: 'allThree', label: '3 of 3' },
+  { value: 'verifiedByAdmin', label: 'Verified by Admin' },
+] satisfies { value: keyof typeof accountVerificationFixtures; label: string }[]
+
 const requestId = 'verification-fixture-email-change'
 const auditId = 'verification-fixture-admin-override'
 

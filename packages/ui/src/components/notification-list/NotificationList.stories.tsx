@@ -144,7 +144,7 @@ export const Loading: Story = {
   render: () => <NotificationList state={{ kind: 'loading' }} />,
 }
 
-export const Error: Story = {
+export const Failed: Story = {
   render: () => <NotificationList state={{ kind: 'error', retrying: false, onRetry: () => {} }} />,
 }
 

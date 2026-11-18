@@ -1,5 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
+import { realGetUnclaimedIdentities } from '../real/google'
+import { isRealDataMode } from '../real/mode'
 import { playerAccountKeys } from './queryKeys'
 import { getUnclaimedIdentities } from './unclaimedIdentity'
 
@@ -13,7 +15,10 @@ import { getUnclaimedIdentities } from './unclaimedIdentity'
 export function useUnclaimedIdentities(googleEmail: string | null) {
   return useQuery({
     queryKey: playerAccountKeys.unclaimedIdentities(googleEmail ?? ''),
-    queryFn: ({ signal }) => getUnclaimedIdentities(googleEmail ?? '', signal),
+    queryFn: ({ signal }) =>
+      isRealDataMode()
+        ? realGetUnclaimedIdentities(googleEmail ?? '', signal)
+        : getUnclaimedIdentities(googleEmail ?? '', signal),
     enabled: !!googleEmail,
   })
 }

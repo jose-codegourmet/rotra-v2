@@ -69,7 +69,10 @@
     "./auth/google-cookies": "./src/auth/google-cookies.ts",
     "./auth/google-oauth": "./src/auth/google-oauth.ts",
     "./player/google-sign-in": "./src/player/google-sign-in.ts",
-    "./player/invite-landing": "./src/player/invite-landing.ts"
+    "./player/invite-landing": "./src/player/invite-landing.ts",
+    "./queue/club-player-move": "./src/queue/club-player-move.ts",
+    "./player/shared-entry": "./src/player/shared-entry.ts",
+    "./player/unclaimed-identities": "./src/player/unclaimed-identities.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

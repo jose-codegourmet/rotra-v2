@@ -14,6 +14,7 @@ model LocationCode {
   foundedClubs  Club[]
   idCounters    PlayerIdCounter[]
   idAllocations PlayerIdAllocation[]
+  sharedEntries SharedPlayerEntry[]
 
   @@unique([countryCode, cityCode])
   @@map("location_codes")

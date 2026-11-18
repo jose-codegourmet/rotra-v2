@@ -2,6 +2,7 @@ import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
+import { retireEntryIfOrphan } from '../player/shared-entry'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { closeStaleMatchRequests } from './match-request-store'
@@ -112,6 +113,13 @@ export async function deleteClubPlayer(context: ClubContext, clubPlayerId: strin
       where: { clubId_id: { clubId: context.clubId, id: row.id } },
       data: { removedAt: now, revision: { increment: 1 } },
     })
+    // D-2026-11-16-04: deleting the last record of an unclaimed person (a mistyped email) retires
+    // the shared entry; its RTR ID is never reused and counters are not rewound.
+    const saved = await tx.clubPlayer.findUniqueOrThrow({
+      where: { clubId_id: { clubId: context.clubId, id: row.id } },
+      select: { sharedEntryId: true },
+    })
+    await retireEntryIfOrphan(tx, saved.sharedEntryId, now)
     return { clubPlayerId: row.id, name: row.displayName }
   })
 }

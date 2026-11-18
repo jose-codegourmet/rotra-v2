@@ -144,8 +144,10 @@ export function unclaimedIdentitiesOf(s: MockState, playerId: string, now = Date
 /**
  * The identity cards for the Google account the person just picked, or null when no club saved that
  * email (an ordinary new registration). Only for an email the person has proved is theirs: it is
- * called after Continue with Google, never for an email typed into a form. Real mode answers null
- * until D-2026-11-16-04 is built there (P15.8): the server must read the verified Google email.
+ * called after Continue with Google, never for an email typed into a form. Real mode (P15.8):
+ * `useUnclaimedIdentities` calls `realGetUnclaimedIdentities`, which reads the server's held,
+ * verified Google sign-in (this module stays free of the real transport, which server code
+ * type-imports through it); here real mode answers null.
  */
 export async function getUnclaimedIdentities(
   googleEmail: string,

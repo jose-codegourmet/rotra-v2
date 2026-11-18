@@ -720,10 +720,22 @@ export async function readLeaderboard(limit = 50) {
  * games. Always private (#715) has no column yet, so no profile is refused here.
  */
 export async function readRecentGameStatsByRtrId(rtrId: string) {
+  const id = rtrId.trim().toUpperCase()
   const allocation = await prisma.playerIdAllocation.findUnique({
-    where: { rtrId: rtrId.trim().toUpperCase() },
-    select: { playerId: true },
+    where: { rtrId: id },
+    select: { playerId: true, player: { select: { profileState: true } } },
   })
-  if (!allocation) throw new ServiceError('not_found')
-  return yearGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
+  if (allocation?.player.profileState === 'claimed')
+    return yearGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
+  // An unclaimed player (D-2026-11-16-04): the games of every club record under their shared
+  // entry, which is public (no visibility setting until they register).
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { rtrId: id, claimedPlayerId: null, retiredAt: null },
+    select: { clubPlayers: { select: { id: true, clubId: true } } },
+  })
+  if (!entry) throw new ServiceError('not_found')
+  const sessions: Awaited<ReturnType<typeof readClubPlayerMatchHistory>> = []
+  for (const record of entry.clubPlayers)
+    sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+  return yearGameStats(sessions, Date.now())
 }

@@ -10,6 +10,7 @@ import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 import { allocateRtrId, linkClubRecordsByPhone } from './identity'
 import { currentExperienceMonths, playingStyle } from './profile'
+import { claimSharedEntry } from './shared-entry'
 
 /**
  * Links last 7 days and work once; a new link revokes the player's earlier one (#244). The database
@@ -59,6 +60,7 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
         id: true,
         removedAt: true,
         privateInput: { select: { phoneE164: true } },
+        sharedEntryId: true,
         player: { select: { id: true, profileState: true } },
       },
     })
@@ -85,7 +87,8 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
       })
       return { token, expiresAt: toIso(expiresAt) }
     }
-    if (!clubPlayer.privateInput?.phoneE164)
+    // An unclaimed record saved with an email (D-2026-11-16-04), or an older one with a phone.
+    if (!clubPlayer.sharedEntryId && !clubPlayer.privateInput?.phoneE164)
       throw new ServiceError('invalid', { player: NEEDS_PHONE_TO_INVITE })
     await tx.clubPlayerClaimLink.updateMany({
       where: { clubId: context.clubId, clubPlayerId: clubPlayer.id, state: 'active' },
@@ -166,6 +169,7 @@ async function findRecordLink(tokenDigest: Uint8Array<ArrayBuffer>) {
           removedAt: true,
           club: { select: { name: true } },
           privateInput: { select: { phoneE164: true, email: true } },
+          sharedEntry: { select: { email: true, rtrId: true } },
         },
       },
     },
@@ -185,7 +189,7 @@ function recordPresetOf(record: NonNullable<Awaited<ReturnType<typeof findRecord
   return {
     fullName: record.clubPlayer.displayName,
     nickname: record.clubPlayer.nickname ?? '',
-    email: record.clubPlayer.privateInput?.email ?? '',
+    email: record.clubPlayer.sharedEntry?.email ?? record.clubPlayer.privateInput?.email ?? '',
     playingStyle: '',
     experienceYears: '',
     experienceMonths: '',
@@ -221,7 +225,8 @@ export async function readClaimLink(token: string) {
         playerId: link.clubPlayer.playerId,
         fullName: link.clubPlayer.displayName,
         nickname: link.clubPlayer.nickname,
-        rtrId: null,
+        // Saved with an email: the RTR ID the person keeps (D-2026-11-16-04); else none yet.
+        rtrId: link.clubPlayer.sharedEntry?.rtrId ?? null,
         picture: null,
         maskedPhone: link.clubPlayer.privateInput?.phoneE164
           ? maskPhone(link.clubPlayer.privateInput.phoneE164)
@@ -387,7 +392,12 @@ async function completeRecordClaim(
         ...(viaGoogle ? { emailVerifiedAt: now } : {}),
       },
     })
-    const rtrId = await allocateRtrId(tx, player.id, record.clubId, now)
+    // The record's own shared entry (saved with an email) keeps its RTR ID, as does an entry
+    // under the registering email (D-2026-11-16-04).
+    const rtrId = await allocateRtrId(tx, player.id, record.clubId, now, [
+      record.sharedEntry?.email,
+      input.email,
+    ])
     await tx.playerAccount.create({
       data: {
         playerId: player.id,
@@ -400,8 +410,11 @@ async function completeRecordClaim(
     })
     await tx.clubPlayer.update({
       where: { clubId_id: { clubId: record.clubId, id: record.id } },
-      data: { playerId: player.id, revision: { increment: 1 } },
+      // The record's nickname became the account's; the club nickname starts empty (D-2026-11-18-02).
+      data: { playerId: player.id, nickname: null, revision: { increment: 1 } },
     })
+    // Every other club's record under the same shared entry joins the account too.
+    await claimSharedEntry(tx, player.id, [record.sharedEntry?.email, input.email], now)
     if (record.privateInput)
       await tx.clubPlayerPrivateInput.update({
         where: { clubPlayerId: record.id },

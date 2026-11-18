@@ -183,7 +183,7 @@ export function adminPlayerChangedFields(
  * The RTR ID after this save, when the registration place or date changed it (rotra-admin.html
  * pmSave() rtrChanged): it follows both and keeps its number at the end. Null when it stays as it
  * is, or the player has none. Kept apart from `adminPlayerChangedFields`, which the real service
- * shares: there the RTR ID change is not connected yet.
+ * shares: there the RTR ID change runs as its own step (P15.8).
  */
 export function adminPlayerRtrIdChange(
   edit: Pick<AdminPlayerEdit, 'rtrId'>,

@@ -1,9 +1,10 @@
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { isCurrentRecord, savedDisplayName, savedRecordByEmail } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
+import { realMoveSavedPlayer } from '../real/queue'
 
 /**
  * Placeholder copy (not in the mockup): the record being moved is in a match of a session the other
@@ -44,7 +45,7 @@ export function moveSavedPlayer(input: {
   /** The email as typed in Edit details */
   email: string
 }) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realMoveSavedPlayer(input)
   return queueMutation({ area: 'Roster', clubAccess: true }, (s) => {
     const moved = savedRow(s, input.clubPlayerId)
     if (moved.identity === 'registered' || moved.playerId || s.pendingEmails?.[moved.id])

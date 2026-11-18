@@ -26,7 +26,7 @@ export type GoogleSignInContext = 'login' | 'register'
  *   `unclaimed` is set when clubs saved this email as an unclaimed player (D-2026-11-16-04): the
  *   person keeps its RTR ID. One record: Finish registering opens with that club's details filled
  *   in. More than one: "Which identity is correct?" first, then pass the pick as `identityRecordId`.
- *   Null or missing (real mode until P15.8): an ordinary new registration.
+ *   Null or missing: an ordinary new registration.
  */
 export type GoogleSignInOutcome =
   | { outcome: 'signed-in'; session: MockSession; google: GoogleIdentity }

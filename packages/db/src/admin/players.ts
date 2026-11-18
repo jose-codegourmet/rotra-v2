@@ -16,15 +16,91 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 type AdminPlayerRow = Omit<AdminPlayer, 'revision'> & { revision: string }
 
 /**
- * A-PLAYERS rows for the clubs' unclaimed records (D-2026-11-11-03, owner answer November 12, 2026):
- * a `club_players` row with a phone and no global player, listed under its club as "Not registered
- * yet" with no RTR ID. Its `id` is the club player id; the place is the club's founding location,
- * where the RTR ID would be allocated on registration. Never a guest (no phone).
+ * A-PLAYERS rows for unclaimed people saved with an email (D-2026-11-16-04, P15.8): one row per
+ * open shared entry, its `id` the entry id, with the RTR ID, the email (Admin only) and every club
+ * that saved them (`savedAs`: each club's own name, when more than one club did). The name and
+ * nickname shown are the first club's. Never a guest.
+ */
+async function readSharedEntryRows(id?: string): Promise<AdminPlayerRow[]> {
+  const entries = await prisma.sharedPlayerEntry.findMany({
+    where: { claimedPlayerId: null, retiredAt: null, ...(id ? { id } : {}) },
+    orderBy: [{ allocatedAt: 'asc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      email: true,
+      rtrId: true,
+      creatingClubId: true,
+      cityCode: true,
+      revision: true,
+      location: { select: { displayName: true } },
+      clubPlayers: {
+        where: { removedAt: null, playerId: null },
+        orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+        select: {
+          clubId: true,
+          displayName: true,
+          nickname: true,
+          addedAt: true,
+          club: { select: { name: true } },
+          privateInput: { select: { phoneE164: true } },
+        },
+      },
+    },
+  })
+  return entries.flatMap((entry) => {
+    const first = entry.clubPlayers[0]
+    if (!first) return []
+    const createdOn = createdOnFromRtrId(entry.rtrId)
+    const several = entry.clubPlayers.length > 1
+    return [
+      {
+        id: entry.id,
+        name: first.displayName,
+        nickname: entry.clubPlayers.find((p) => p.nickname)?.nickname ?? null,
+        rtrId: entry.rtrId,
+        createdByClubId: entry.creatingClubId,
+        createdOn,
+        addedOn: createdOn,
+        picture: null,
+        registeredPlace: { code: entry.cityCode, name: entry.location.displayName },
+        phone:
+          entry.clubPlayers.find((p) => p.privateInput?.phoneE164)?.privateInput?.phoneE164 ??
+          undefined,
+        email: entry.email ?? undefined,
+        phoneHidden: false,
+        claimed: false,
+        detailsRequired: false,
+        registeredOn: undefined,
+        clubs: entry.clubPlayers.map((p) => ({
+          clubId: p.clubId,
+          name: p.club.name,
+          addedAt: p.addedAt.getTime(),
+          ...(several ? { savedAs: p.displayName } : {}),
+          identity: 'unclaimed' as const,
+        })),
+        levelIndex: null,
+        levelBand: null,
+        recentStandardMatches: 0,
+        rankStatus: { kind: 'none' as const, text: 'No rank yet' },
+        archivedAt: null,
+        revision: entry.revision.toString(),
+        removalReason: 'Saved by its club only; the club manages this record',
+      },
+    ]
+  })
+}
+
+/**
+ * A-PLAYERS rows for the clubs' older unclaimed records: a `club_players` row with a phone, no
+ * email (no shared entry) and no global player, listed under its club as "Not registered yet" with
+ * no RTR ID and **Details required** (D-2026-11-16-04: the club adds an email or deletes it). Its
+ * `id` is the club player id; the place is the club's founding location. Never a guest (no phone).
  */
 async function readClubOnlyRecords(id?: string): Promise<AdminPlayerRow[]> {
   const records = await prisma.clubPlayer.findMany({
     where: {
       playerId: null,
+      sharedEntryId: null,
       removedAt: null,
       privateInput: { phoneE164: { not: null } },
       ...(id ? { id } : {}),
@@ -65,6 +141,7 @@ async function readClubOnlyRecords(id?: string): Promise<AdminPlayerRow[]> {
       email: record.privateInput?.email ?? undefined,
       phoneHidden: false,
       claimed: false,
+      detailsRequired: true,
       registeredOn: undefined,
       clubs: [
         {
@@ -129,10 +206,15 @@ export async function readAdminPlayerDirectory(
       },
     },
   })
+  const shared = await readSharedEntryRows(playerId)
   const clubOnly = await readClubOnlyRecords(playerId)
+  // A registration in progress copies an open entry's RTR ID (D-2026-11-16-04); the entry's row
+  // stands for the person until the registration completes.
+  const openRtrIds = new Set(shared.map((row) => row.rtrId))
   const rows = players.flatMap((player) => {
     const allocation = player.idAllocation
     if (!allocation) return []
+    if (player.profileState !== 'claimed' && openRtrIds.has(allocation.rtrId)) return []
     const rank = player.rankCurrent
     const level = rank?.skillLevel
     const levelIndex = level?.displayOrder ?? null
@@ -181,7 +263,7 @@ export async function readAdminPlayerDirectory(
       },
     ]
   })
-  return [...rows, ...clubOnly]
+  return [...rows, ...shared, ...clubOnly]
 }
 
 /** Current edit values, behind the same Admin boundary as the directory. */
@@ -246,9 +328,20 @@ export async function readAdminPlayerGames(
   // Admin sees every name, as on its other player reads; public reads mask always-private players.
   if (player) sessions = await readPlayerMatchHistory(playerId, { maskAlwaysPrivate: false })
   else {
-    const [clubOnly] = await readClubOnlyRecords(playerId)
-    if (!clubOnly?.createdByClubId) throw new ServiceError('not_found')
-    sessions = await readClubPlayerMatchHistory(clubOnly.createdByClubId, playerId)
+    // An unclaimed person's shared entry: the games of every club record pointing to it.
+    const records = await prisma.clubPlayer.findMany({
+      where: { sharedEntryId: playerId, playerId: null },
+      select: { id: true, clubId: true },
+    })
+    if (records.length) {
+      sessions = []
+      for (const record of records)
+        sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+    } else {
+      const [clubOnly] = await readClubOnlyRecords(playerId)
+      if (!clubOnly?.createdByClubId) throw new ServiceError('not_found')
+      sessions = await readClubPlayerMatchHistory(clubOnly.createdByClubId, playerId)
+    }
   }
   return sessions.flatMap((s) =>
     s.finishedAt

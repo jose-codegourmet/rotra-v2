@@ -18,8 +18,8 @@ export type SessionPlayer = {
   /**
    * The club nickname of the linked registered saved player (D-2026-11-18-02). Derived by the
    * Queue Master roster read and by mutation helpers (`withClubNickname`); never stored on the
-   * roster row and never present in public or player reads. Missing = none (real mode, until
-   * ticket P15.8 reads it).
+   * roster row and never present in public or player reads. Missing = none (the real Queue Master
+   * roster and match reads send it since P15.8).
    */
   clubNickname?: string | null
   /**

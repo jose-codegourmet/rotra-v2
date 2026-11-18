@@ -1,8 +1,9 @@
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { queueMutation } from '../mock/transaction'
 import { isCurrentRecord } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
+import { realSetClubNickname } from '../real/queue'
 
 export type SetClubNicknameInput = {
   clubPlayerId: string
@@ -19,10 +20,11 @@ const NOT_REGISTERED = 'Only a registered player has a club nickname.'
  * NAME", "Club nickname removed · NAME" (it had one, the field is now empty) or "No club nickname ·
  * NAME" (it had none and still has none). NAME is the player's full name, as in the mockup.
  *
- * Real mode (ticket P15.8) must store it on the club's saved-player record and return the same text.
+ * Real mode (P15.8) stores it on the club's saved-player record (`club_players.nickname`) and the
+ * server returns the same text.
  */
 export function setClubNickname(input: SetClubNicknameInput) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realSetClubNickname(input)
   return queueMutation({ area: 'Roster', clubAccess: true }, (s) => {
     const row = s.clubPlayers.find(
       (p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID && isCurrentRecord(p),

@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { formatRtrId, nextPlayerSequence, rtrSyncDate } from './rtr-id'
+import { adoptEntryAllocation } from './shared-entry'
 
 type Tx = Prisma.TransactionClient
 
@@ -30,8 +31,18 @@ async function lockPhone(tx: Tx, phoneE164: string) {
 /**
  * Allocates the permanent RTR ID for a new player in the caller's transaction: one atomic counter
  * step for the creating club's founding city and sync day, then the immutable allocation row.
+ * When an open shared entry has one of `emails` (the registering ROTRA or Google email), the player
+ * keeps that entry's RTR ID instead (D-2026-11-16-04, P15.8): the allocation copies it.
  */
-export async function allocateRtrId(tx: Tx, playerId: string, clubId: string, at: Date) {
+export async function allocateRtrId(
+  tx: Tx,
+  playerId: string,
+  clubId: string,
+  at: Date,
+  emails: (string | null | undefined)[] = [],
+) {
+  const adopted = await adoptEntryAllocation(tx, playerId, emails)
+  if (adopted) return adopted
   const club = await tx.club.findUniqueOrThrow({
     where: { id: clubId },
     select: { foundingLocation: true },

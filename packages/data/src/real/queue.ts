@@ -5,6 +5,7 @@ import type { Club } from '../club/club.types'
 import type {
   ClubPlayerDetails,
   ClubPlayerDetailsInput,
+  ClubPlayerDetailsResult,
   DeleteImpact,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
@@ -31,6 +32,7 @@ import type {
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
+  PlayerLookup,
   SessionJoinRequest,
   SessionNoShow,
   SessionPlayer,
@@ -465,6 +467,8 @@ export type WireRosterEntry = {
   confirmedAt: string
   /** Present on the roster GET; mutations still use the stored entry DTO. */
   hasPlayedAtClubBefore?: boolean
+  /** A registered player's club nickname (D-2026-11-18-02); Queue Master reads only */
+  clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
 }
@@ -561,15 +565,12 @@ export async function realUndoNoShow(input: { sessionId: string; rosterId: strin
   return accepted(null, `${reply.name} back on the roster · ${reply.count}/${reply.capacity}`)
 }
 
-export async function realAddNewPlayerToSession({
-  email: _email,
-  ...input
-}: {
+export async function realAddNewPlayerToSession(input: {
   sessionId: string
   name: string
   nickname?: string
   phone?: string
-  /** Not sent yet: the server saves a guest until D-2026-11-16-04 is built there (P15.8) */
+  /** No email adds a guest; an email adds an unclaimed player or links one (D-2026-11-16-04) */
   email?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
@@ -578,6 +579,8 @@ export async function realAddNewPlayerToSession({
   const result = await realRequest<{
     rosterEntry: WireRosterEntry | null
     waitlist: WireWaitlistEntry | null
+    /** What the email did ("unclaimed · RTR-…"); null for a guest */
+    emailWords?: string | null
   }>(`/api/sessions/${encodeURIComponent(input.sessionId)}/roster`, {
     method: 'POST',
     body: { ...input, operationId: input.operationId ?? crypto.randomUUID() },
@@ -589,8 +592,8 @@ export async function realAddNewPlayerToSession({
     { waitlistPosition, locked: false, clubPlayerId },
     waitlistPosition
       ? `${input.name.trim()} added to the waitlist as #${waitlistPosition}`
-      : input.phone?.trim()
-        ? `${input.name.trim()} added · profile lookup after sync`
+      : result.emailWords
+        ? `${input.name.trim()} added · ${result.emailWords}`
         : `${input.name.trim()} added as a guest`,
   )
 }
@@ -614,9 +617,9 @@ export type WireClubPlayer = Omit<
   'addedAt' | 'displayName' | 'suggestion' | 'emailOnFile' | 'detailsRequired' | 'clubNickname'
 > & {
   addedAt: string
-  /** Not sent until the club nickname is built on the server (P15.8); missing reads as none */
+  /** A registered player's club nickname (D-2026-11-18-02); missing reads as none */
   clubNickname?: string | null
-  /** Not sent until D-2026-11-16-04 is built on the server (P15.8); missing reads as false */
+  /** D-2026-11-16-04 (P15.8); missing (an older server) reads as false */
   emailOnFile?: boolean
   detailsRequired?: boolean
 }
@@ -688,9 +691,10 @@ export async function realGetClubPlayerDetails(id: string) {
   )
   return details
 }
+/** Save details: the toast and, for an email another saved player has, the Same person step. */
 export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetailsInput) {
   const number = (typed: string) => (typed.trim() ? Number(typed) : null)
-  return realRequest<{ clubPlayerId: string }>(`/api/club/players/${encodeURIComponent(id)}`, {
+  return realRequest<ClubPlayerDetailsResult>(`/api/club/players/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     body: {
       fullName: values.fullName,
@@ -711,12 +715,61 @@ export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetail
   })
 }
 
-/** Player Information results: profiles with an RTR ID the club has not saved yet. */
+/**
+ * Player lookup (D-2026-11-16-04): the one person whose RTR ID or email is exactly `q`, or this
+ * club's name for them when already saved. Rank places are not computed in real mode yet.
+ */
+export async function realLookupPlayer(q: string): Promise<PlayerLookup> {
+  const wire = await realRequest<{
+    player: Omit<DirectoryPlayer, 'rankLabel'> | null
+    savedName: string | null
+  }>(`/api/players?q=${encodeURIComponent(q)}`)
+  return {
+    player: wire.player ? { ...wire.player, rankLabel: 'Not ranked' } : null,
+    savedName: wire.savedName,
+  }
+}
+
+/** Player lookup as the list the Add player sheet draws: the one match, or nothing. */
 export async function realPlayerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
-  const wire = await realRequest<{ players: Omit<DirectoryPlayer, 'rankLabel'>[] }>(
-    `/api/players?q=${encodeURIComponent(q)}`,
+  const { player } = await realLookupPlayer(q)
+  return player ? [player] : []
+}
+
+/** Same person (D-2026-11-16-04): moves the record into the saved player with that email. */
+export async function realMoveSavedPlayer(input: {
+  clubPlayerId: string
+  intoClubPlayerId: string
+  email: string
+}) {
+  const moved = await realRequest<{
+    clubPlayerId: string
+    movedClubPlayerId: string
+    name: string
+  }>(`/api/club/players/${encodeURIComponent(input.clubPlayerId)}/move`, {
+    method: 'POST',
+    body: { intoClubPlayerId: input.intoClubPlayerId, email: input.email },
+  })
+  return accepted(
+    { clubPlayerId: moved.clubPlayerId, movedClubPlayerId: moved.movedClubPlayerId },
+    `Moved to ${moved.name}`,
   )
-  return wire.players.map((p) => ({ ...p, rankLabel: 'Not ranked' }))
+}
+
+/** Club nickname sheet › Save nickname (D-2026-11-18-02); the server words the toast. */
+export async function realSetClubNickname(input: { clubPlayerId: string; clubNickname: string }) {
+  const saved = await realRequest<{
+    clubPlayerId: string
+    clubNickname: string | null
+    message: string
+  }>(`/api/club/players/${encodeURIComponent(input.clubPlayerId)}/club-nickname`, {
+    method: 'POST',
+    body: { clubNickname: input.clubNickname },
+  })
+  return accepted(
+    { clubPlayerId: saved.clubPlayerId, clubNickname: saved.clubNickname },
+    saved.message,
+  )
 }
 
 type RosterAdd = { rosterEntry: WireRosterEntry | null; waitlist: WireWaitlistEntry | null }
@@ -750,13 +803,10 @@ export async function realAddSavedPlayerToSession(input: {
   return rosterAdded(result, input.level)
 }
 
-export async function realAddDirectoryPlayerToSession({
-  name: _name,
-  ...input
-}: {
+export async function realAddDirectoryPlayerToSession(input: {
   sessionId: string
   playerId: string
-  /** Not sent yet: real mode finds registered players only until P15.8 */
+  /** This club's own name for another club's unclaimed player (`ownNameRequired`) */
   name?: string
   level: PlayingLevel
 }) {
@@ -768,35 +818,33 @@ export async function realAddDirectoryPlayerToSession({
 }
 
 /** Saved players › Add player › New player: saved to the club only. */
-export async function realAddNewSavedPlayer({
-  email: _email,
-  ...input
-}: {
+export async function realAddNewSavedPlayer(input: {
   name: string
   nickname?: string | null
   phone?: string | null
-  /** Not sent yet: the server saves a guest until D-2026-11-16-04 is built there (P15.8) */
+  /** No email saves a guest; an email an unclaimed player or a linked one (D-2026-11-16-04) */
   email?: string | null
 }) {
-  const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
+  const saved = await realRequest<{
+    clubPlayerId: string
+    name: string
+    emailWords?: string | null
+  }>('/api/club/players', {
     method: 'POST',
     body: { ...input, operationId: crypto.randomUUID() },
   })
   return accepted(
     { clubPlayerId: saved.clubPlayerId },
-    input.phone?.trim()
-      ? `${saved.name} saved · profile lookup after sync`
+    saved.emailWords
+      ? `${saved.name} saved · ${saved.emailWords}`
       : `${saved.name} saved as a guest`,
   )
 }
 
 /** Saved players › Add player › Player Information: saved to the club only, with no level yet. */
-export async function realAddDirectoryPlayerToClub({
-  name: _name,
-  ...input
-}: {
+export async function realAddDirectoryPlayerToClub(input: {
   playerId: string
-  /** Not sent yet: real mode finds registered players only until P15.8 */
+  /** This club's own name for another club's unclaimed player (`ownNameRequired`) */
   name?: string | null
 }) {
   const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {

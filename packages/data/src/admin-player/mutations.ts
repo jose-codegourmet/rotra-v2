@@ -12,7 +12,7 @@ import { normalizeContact } from '../contact-change-request/contactChangeRequest
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
 import { checkMockSave } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { allocateMockRtrId, replaceRtrId } from '../player/unclaimed'
 import { realUpdateAdminPlayer } from '../real/admin-players'
@@ -347,9 +347,11 @@ async function realEditAdminPlayer(input: AdminPlayerEditInput): Promise<AdminPl
   if (!edit) throw new MockError('conflict', 'Player not found. Reload the list.')
   if (edit.revision !== input.revision) throw new MockError('conflict', STALE_EDIT)
   const { id: _id, revision: _revision, ...form } = input
-  // Changing the registration place or date (the RTR ID) is not connected in real mode yet (P15.8).
-  if (adminPlayerRtrIdChange(edit, form)) throw new NotConnectedError()
+  // A changed registration place or date reissues the RTR ID on the server (P15.8): it replaces
+  // the old one on every record, and a taken one is refused on the registration date.
+  const rtrIdChanged = !!adminPlayerRtrIdChange(edit, form)
   const changed = adminPlayerChangedFields(edit, form)
+  if (rtrIdChanged) changed.push('RTR ID')
   const parsed = adminPlayerEditSchemaFor(edit).safeParse(checkedForm(form, changed))
   const errors: Record<string, string> = {}
   if (!parsed.success)

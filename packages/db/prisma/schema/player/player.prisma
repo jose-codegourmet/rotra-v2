@@ -59,6 +59,7 @@ model Player {
   socialLinks           PlayerSocialLink[]
   claimLinks            PlayerClaimLink[]
   idAllocation          PlayerIdAllocation?
+  claimedSharedEntry    SharedPlayerEntry?
   passwordResetRequests PlayerPasswordResetRequest[]
   contactChanges        PlayerContactChangeRequest[]
   adminEmailEdits       AdminPlayerEmailEdit[]

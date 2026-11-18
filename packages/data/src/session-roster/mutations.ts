@@ -28,6 +28,7 @@ import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
 import {
   realAddDirectoryPlayerToSession,
+  realLookupPlayer,
   realMarkNoShow,
   realPlayerDirectorySearch,
   realSetRosterLevel,
@@ -178,12 +179,9 @@ const NO_MATCH: PlayerLookup = { player: null, savedName: null }
  * is the result whose RTR ID is exactly what was typed; an email finds nobody yet.
  */
 export async function lookupPlayer(q: string): Promise<PlayerLookup> {
-  if (isRealDataMode()) {
-    const id = normalizeRtrId(q)
-    if (!isRtrId(id)) return NO_MATCH
-    const found = (await realPlayerDirectorySearch(q.trim())).find((p) => p.rtrId === id)
-    return found ? { player: found, savedName: null } : NO_MATCH
-  }
+  // Real mode (P15.8): the server looks up the exact RTR ID or email over registered and
+  // unclaimed people and says when this club already saved them.
+  if (isRealDataMode()) return q.trim() ? realLookupPlayer(q.trim()) : NO_MATCH
   await delay()
   requireOnline()
   const s = readMockState(),
@@ -239,8 +237,7 @@ export async function lookupPlayer(q: string): Promise<PlayerLookup> {
 
 /**
  * Player lookup as the list the Add player sheet draws: the one match, or nothing. Kept for the
- * existing screens; `lookupPlayer` also says when the match is already a saved player. Real mode
- * keeps its registered-only search until D-2026-11-16-04 is built there.
+ * existing screens; `lookupPlayer` also says when the match is already a saved player.
  */
 export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
   if (isRealDataMode()) return realPlayerDirectorySearch(q)

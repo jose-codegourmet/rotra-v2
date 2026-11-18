@@ -48,6 +48,7 @@ import {
   lockSession,
   mapDatabaseError,
   requireSessionAccess,
+  rosterNamesFor,
   type Tx,
 } from './session-store'
 
@@ -528,14 +529,17 @@ export async function declineMatchRequest(
     })
     const requester = await tx.sessionPlayer.findUnique({
       where: { id: row.sessionPlayerId },
-      select: { nameSnapshot: true, clubPlayer: { select: { nickname: true } } },
+      select: { nameSnapshot: true, clubPlayerId: true },
     })
+    // The Queue Master's toast: the club nickname first, then the nickname (D-2026-11-18-02).
+    const names = requester ? await rosterNamesFor(tx, requester.clubPlayerId) : null
     return {
       requestId: row.id,
       status: 'declined' as const,
       requester: {
         nameSnapshot: requester?.nameSnapshot ?? 'Player',
-        nicknameSnapshot: requester?.clubPlayer.nickname ?? null,
+        nicknameSnapshot: names?.nickname ?? null,
+        clubNickname: names?.clubNickname ?? null,
       },
     }
   })

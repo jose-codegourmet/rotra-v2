@@ -17,6 +17,7 @@ import {
   mapDatabaseError,
   requireSessionAccess,
   requireState,
+  rosterNamesOf,
   type Tx,
 } from './session-store'
 
@@ -130,13 +131,10 @@ export async function matchContext(tx: Tx, session: QueueSession) {
     sessionMatches(tx, session.id),
     liveCourts(tx, session.id),
   ])
-  const nicknames = new Map(
-    (
-      await tx.clubPlayer.findMany({
-        where: { clubId: session.clubId, id: { in: roster.map((r) => r.clubPlayerId) } },
-        select: { id: true, nickname: true },
-      })
-    ).map((p) => [p.id, p.nickname]),
+  // Queue Master reads: the nickname players see, plus a registered player's club nickname.
+  const nicknames = await rosterNamesOf(
+    tx,
+    roster.map((r) => r.clubPlayerId),
   )
   const ctx: MatchContext = {
     roster: roster.map(
@@ -145,7 +143,8 @@ export async function matchContext(tx: Tx, session: QueueSession) {
         sessionId: r.sessionId,
         clubPlayerId: r.clubPlayerId,
         nameSnapshot: r.nameSnapshot,
-        nicknameSnapshot: nicknames.get(r.clubPlayerId) ?? null,
+        nicknameSnapshot: nicknames.get(r.clubPlayerId)?.nickname ?? null,
+        clubNickname: nicknames.get(r.clubPlayerId)?.clubNickname ?? null,
         present: r.present,
         presentChangedAt: r.presentChangedAt.getTime(),
         level: levelCodeFor(r.skillLevelId),

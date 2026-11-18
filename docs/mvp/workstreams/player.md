@@ -63,7 +63,7 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — manual password recovery.
 - [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — guest identity reconciliation.
 - [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration; built in P08.9 (#757). Superseded in part by D-2026-11-16-04.
-- [D-2026-11-16-04](../decisions.md#d-2026-11-16-04) — four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); the screens (P15.6) and real mode (P15.8) are not built, so real mode below still follows D-2026-11-11-03.
+- [D-2026-11-16-04](../decisions.md#d-2026-11-16-04) — four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927): registration keeps the RTR ID and joins every club record by the ROTRA or Google email, phone linking stays; migration `20261118000300_shared_player_entries` written and applied locally, not yet to the shared database; not run against Supabase Auth or in a browser.
 - [D-2026-11-17-01](../decisions.md#d-2026-11-17-01) — Privacy Policy (`/privacy`) and Terms of Service (`/terms`) pages, public and static; built in the mockup and apps/player together; legal review and details open.
 - [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) — answers to the leftover questions of the November 11 round.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.

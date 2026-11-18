@@ -19,7 +19,8 @@ export async function GET() {
 
 /**
  * Saved players › Add player: saves to the club only, never to a session. `source: 'directory'`
- * saves a Player Information profile; otherwise a new guest or phone-entered player.
+ * saves a Player lookup match (with `name` for another club's unclaimed player); otherwise a new
+ * player: a guest, or with an email an unclaimed player or a linked registered one (D-2026-11-16-04).
  */
 export async function POST(request: Request) {
   return handleAccountRequest('club', routeCookieAdapter(await cookies()), async (club) => {
@@ -29,6 +30,8 @@ export async function POST(request: Request) {
       const saved = await addDirectoryPlayerToClub(club, {
         operationId,
         playerId: text(body.playerId),
+        // This club's own name for another club's unclaimed player (D-2026-11-16-04)
+        name: text(body.name) || null,
       })
       return { status: 201, body: saved }
     }
@@ -41,6 +44,7 @@ export async function POST(request: Request) {
       name: text(body.name),
       nickname: text(body.nickname) || null,
       phone: phone?.success ? phone.data : null,
+      email: text(body.email) || null,
     })
     return { status: 201, body: saved }
   })

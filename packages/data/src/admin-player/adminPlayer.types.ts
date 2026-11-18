@@ -170,7 +170,7 @@ export type AdminPlayerChangedField =
   | 'Instagram link'
   | 'YouTube link'
   | 'LinkedIn link'
-  /** The registration place or date changed, so the RTR ID did (mock mode; real mode: P15.8) */
+  /** The registration place or date changed, so the RTR ID did (both modes since P15.8) */
   | 'RTR ID'
   | 'password'
 

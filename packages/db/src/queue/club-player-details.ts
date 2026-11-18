@@ -1,23 +1,29 @@
 import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
-import type { Prisma, SocialProvider } from '../generated/prisma/client'
+import type { SocialProvider } from '../generated/prisma/client'
+import { currentExperienceMonths, experienceUpdate } from '../player/profile'
 import {
-  currentExperienceMonths,
-  experienceUpdate,
-  PERSONAL_DETAILS_VERSION,
-  playingStyle,
-} from '../player/profile'
+  emailWords,
+  normalizeEmail,
+  pointRecordAt,
+  resolveEmail,
+  savedRecordFor,
+} from '../player/shared-entry'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
+import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
 
-const SOCIAL: SocialProvider[] = ['facebook', 'instagram', 'youtube', 'linkedin']
 const E164 = /^\+639\d{9}$/
+const NOT_EDITABLE = 'This player registered, so they keep their own details.'
+const EMAIL_ERROR = 'Enter an email address, like name@example.com.'
 
 /**
- * Q-SAVED-PLAYERS › Edit details (owner decision 2026-11-08). The club fills in what it knows about
- * its own guest or unclaimed player so their registration is prefilled. A registered player owns
- * their details, so the club cannot edit them; a phone already on file is never replaced here.
+ * Q-SAVED-PLAYERS › Edit details (owner decision 2026-11-08; D-2026-11-16-04 since P15.8). The
+ * club fills in what it knows about its own guest or unclaimed player. A registered player owns
+ * their details, so the club cannot edit them. The email is the club's once: taken only when none
+ * is on file, never changed here (only Admin changes it on the shared entry). A phone already on
+ * file is never replaced here. Only this club's version is returned: never another club's.
  */
 export type ClubPlayerDetailsDto = {
   clubPlayerId: string
@@ -25,7 +31,7 @@ export type ClubPlayerDetailsDto = {
   fullName: string
   nickname: string | null
   phoneOnFile: boolean
-  /** Unclaimed profiles only; null for guests */
+  /** Unclaimed records only (email '' for an older record with none: Details required); null for guests */
   profile: {
     email: string
     playingStyle: string
@@ -43,27 +49,22 @@ async function loadEditable(context: ClubContext, clubPlayerId: string) {
       displayName: true,
       nickname: true,
       playerId: true,
+      sharedEntryId: true,
       removedAt: true,
-      privateInput: { select: { phoneE164: true } },
-      player: {
-        select: {
-          profileState: true,
-          personalDetails: true,
-          experienceMonths: true,
-          experienceRecordedAt: true,
-          privateContact: { select: { phoneE164: true, email: true } },
-          socialLinks: { select: { provider: true, url: true } },
-        },
-      },
+      privateInput: { select: { phoneE164: true, presetFields: true } },
+      sharedEntry: { select: { email: true } },
+      player: { select: { profileState: true } },
     },
   })
   if (!row || row.removedAt) throw new ServiceError('not_found')
   if (row.player?.profileState === 'claimed')
-    throw new ServiceError('forbidden', {
-      player: 'This player registered, so they keep their own details.',
-    })
+    throw new ServiceError('forbidden', { player: NOT_EDITABLE })
   return row
 }
+
+/** Saved with an email (a shared entry), or an older record with a phone and no email. */
+const isUnclaimed = (row: Awaited<ReturnType<typeof loadEditable>>) =>
+  Boolean(row.sharedEntryId || row.playerId || row.privateInput?.phoneE164)
 
 export async function readClubPlayerDetails(
   context: ClubContext,
@@ -71,30 +72,34 @@ export async function readClubPlayerDetails(
 ): Promise<ClubPlayerDetailsDto> {
   await requireClubEntitlement(context)
   const row = await loadEditable(context, clubPlayerId)
-  const player = row.player
-  const months = player
-    ? currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt)
-    : null
-  const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
-  for (const link of player?.socialLinks ?? []) links[link.provider] = link.url
+  const unclaimed = isUnclaimed(row)
+  const own = readOwnDetails(row.privateInput?.presetFields)
+  const months = currentExperienceMonths(own.experienceMonths, own.experienceRecordedAt)
   return {
     clubPlayerId: row.id,
-    identity: player ? 'unclaimed' : row.privateInput?.phoneE164 ? 'pending' : 'guest',
+    identity: unclaimed ? 'unclaimed' : 'guest',
     fullName: row.displayName,
     nickname: row.nickname,
-    phoneOnFile: Boolean(player?.privateContact?.phoneE164 ?? row.privateInput?.phoneE164),
-    profile: player
+    phoneOnFile: Boolean(row.privateInput?.phoneE164),
+    profile: unclaimed
       ? {
-          email: player.privateContact?.email ?? '',
-          playingStyle: playingStyle(player.personalDetails),
+          email: row.sharedEntry?.email ?? '',
+          playingStyle: own.playingStyle,
           experienceYears: months == null ? null : Math.floor(months / 12),
           experienceMonths: months == null ? null : months % 12,
-          socialLinks: links,
+          socialLinks: own.socialLinks,
         }
       : null,
   }
 }
 
+/**
+ * Saves Edit details (rotra-queue.html saveEditPlayer()), answering like mock mode: `message`
+ * "Details saved · NAME" plus what the email did ("· unclaimed · RTR-…", "· linked to their ROTRA
+ * account", "· already on ROTRA · RTR-…"). When the email typed already belongs to another of this
+ * club's saved players, everything else is saved, the email is not, and `samePerson` names that
+ * player for the "Same person as NAME?" step (`moveSavedPlayer`). One transaction.
+ */
 export async function updateClubPlayerDetails(
   context: ClubContext,
   input: {
@@ -118,9 +123,6 @@ export async function updateClubPlayerDetails(
     throw new ServiceError('invalid', {
       phone: 'Enter a Philippine mobile number, like 0917 555 0142.',
     })
-  const email = input.email?.trim().toLowerCase() || null
-  if (email && !email.includes('@'))
-    throw new ServiceError('invalid', { email: 'Enter an email address, like name@example.com.' })
   const years = input.experienceYears ?? 0
   const months = input.experienceMonths ?? 0
   if (
@@ -138,7 +140,12 @@ export async function updateClubPlayerDetails(
     input.experienceYears == null && input.experienceMonths == null ? null : years * 12 + months
 
   const row = await loadEditable(context, input.clubPlayerId)
-  const onFile = row.player?.privateContact?.phoneE164 ?? row.privateInput?.phoneE164 ?? null
+  const unclaimed = isUnclaimed(row)
+  const emailOnFile = Boolean(row.sharedEntryId || row.playerId)
+  const typedEmail = emailOnFile ? '' : (input.email?.trim() ?? '')
+  const email = typedEmail ? normalizeEmail(typedEmail) : null
+  if (typedEmail && !email) throw new ServiceError('invalid', { email: EMAIL_ERROR })
+  const onFile = row.privateInput?.phoneE164 ?? null
   return prisma.$transaction(async (tx) => {
     const now = new Date()
     await tx.clubPlayer.update({
@@ -149,14 +156,17 @@ export async function updateClubPlayerDetails(
         revision: { increment: 1 },
       },
     })
-    if (phone && !onFile) {
+    // A phone is taken only for an unclaimed player with none on file; a guest has none.
+    const newPhone = unclaimed && phone && !onFile ? phone : null
+    if (newPhone) {
       const taken = await tx.clubPlayer.findFirst({
         where: {
           clubId: context.clubId,
           id: { not: row.id },
+          removedAt: null,
           OR: [
-            { privateInput: { phoneE164: phone } },
-            { player: { privateContact: { phoneE164: phone } } },
+            { privateInput: { phoneE164: newPhone } },
+            { player: { privateContact: { phoneE164: newPhone } } },
           ],
         },
         select: { displayName: true },
@@ -166,81 +176,63 @@ export async function updateClubPlayerDetails(
           phone: `${taken.displayName} already has this number.`,
         })
     }
-    if (!row.playerId || !row.player) {
-      // Guest: a phone becomes private intake, matched to a profile like Add player's.
-      if (phone && !onFile)
-        await tx.clubPlayerPrivateInput.create({
-          data: { clubPlayerId: row.id, clubId: context.clubId, phoneE164: phone, capturedAt: now },
-        })
-      return { clubPlayerId: row.id }
-    }
-    const playerId = row.playerId
-    const contactPhone = row.player.privateContact?.phoneE164 ?? phone
-    if (phone && !row.player.privateContact) {
-      const owner = await tx.playerPrivateContact.findUnique({
-        where: { phoneE164: phone },
-        select: { playerId: true },
+    if (unclaimed) {
+      const own = readOwnDetails(row.privateInput?.presetFields)
+      const shown = currentExperienceMonths(own.experienceMonths, own.experienceRecordedAt)
+      const changed = experienceUpdate(experience, shown, now)
+      const presetFields = ownDetailsJson({
+        playingStyle: input.playingStyle.trim(),
+        experienceMonths:
+          'experienceMonths' in changed ? (changed.experienceMonths ?? null) : own.experienceMonths,
+        experienceRecordedAt:
+          'experienceRecordedAt' in changed
+            ? (changed.experienceRecordedAt ?? null)
+            : own.experienceRecordedAt,
+        socialLinks: {
+          facebook: input.socialLinks.facebook?.trim() ?? own.socialLinks.facebook,
+          instagram: input.socialLinks.instagram?.trim() ?? own.socialLinks.instagram,
+          youtube: input.socialLinks.youtube?.trim() ?? own.socialLinks.youtube,
+          linkedin: input.socialLinks.linkedin?.trim() ?? own.socialLinks.linkedin,
+        },
       })
-      if (owner && owner.playerId !== playerId)
-        throw new ServiceError('conflict', {
-          phone: 'This number belongs to another ROTRA profile.',
-        })
-    }
-    if (email) {
-      const owner = await tx.playerPrivateContact.findUnique({
-        where: { email },
-        select: { playerId: true },
+      await tx.clubPlayerPrivateInput.upsert({
+        where: { clubPlayerId: row.id },
+        update: {
+          presetFields,
+          ...(newPhone ? { phoneE164: newPhone } : {}),
+          revision: { increment: 1 },
+        },
+        create: {
+          clubPlayerId: row.id,
+          clubId: context.clubId,
+          phoneE164: newPhone,
+          presetFields,
+          capturedAt: now,
+        },
       })
-      if (owner && owner.playerId !== playerId)
-        throw new ServiceError('conflict', {
-          email: 'This email belongs to another ROTRA account.',
-        })
     }
-    if (contactPhone) {
-      await tx.playerPrivateContact.upsert({
-        where: { playerId },
-        update: { email, revision: { increment: 1 } },
-        create: { playerId, phoneE164: contactPhone, email },
-      })
-    } else if (email) {
-      throw new ServiceError('invalid', { email: 'Add their phone first, then their email.' })
+    const message = `Details saved · ${fullName}`
+    if (!email) return { clubPlayerId: row.id, message, samePerson: null }
+    const known = await resolveEmail(tx, context.clubId, email, now, false)
+    if (known) {
+      const same = await savedRecordFor(tx, context.clubId, known, row.id)
+      if (same)
+        return {
+          clubPlayerId: row.id,
+          message,
+          samePerson: {
+            clubPlayerId: same.id,
+            name: same.player?.fullName || same.displayName,
+          },
+        }
     }
-    const current = await tx.player.findUniqueOrThrow({
-      where: { id: playerId },
-      select: { experienceMonths: true, experienceRecordedAt: true, personalDetails: true },
-    })
-    const shown = currentExperienceMonths(current.experienceMonths, current.experienceRecordedAt)
-    const details =
-      current.personalDetails &&
-      typeof current.personalDetails === 'object' &&
-      !Array.isArray(current.personalDetails)
-        ? (current.personalDetails as Record<string, unknown>)
-        : {}
-    await tx.player.update({
-      where: { id: playerId },
-      data: {
-        fullName,
-        nickname: input.nickname?.trim() || null,
-        ...experienceUpdate(experience, shown, now),
-        personalDetails: {
-          ...details,
-          playingStyle: input.playingStyle.trim(),
-        } as Prisma.InputJsonValue,
-        detailsVersion: PERSONAL_DETAILS_VERSION,
-        revision: { increment: 1 },
-      },
-    })
-    for (const provider of SOCIAL) {
-      const url = input.socialLinks[provider]?.trim()
-      if (url === undefined) continue
-      if (!url) await tx.playerSocialLink.deleteMany({ where: { playerId, provider } })
-      else
-        await tx.playerSocialLink.upsert({
-          where: { playerId_provider: { playerId, provider } },
-          create: { playerId, provider, url },
-          update: { url },
-        })
+    const resolution = known ?? (await resolveEmail(tx, context.clubId, email, now))
+    if (!resolution) throw new Error('Email resolution failed')
+    await pointRecordAt(tx, context.clubId, row.id, resolution)
+    return {
+      clubPlayerId: row.id,
+      message: `${message} · ${emailWords(resolution)}`,
+      samePerson: null,
     }
-    return { clubPlayerId: row.id }
   })
 }

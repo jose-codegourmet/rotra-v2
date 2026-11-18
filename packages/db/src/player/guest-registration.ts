@@ -8,6 +8,7 @@ import { type ClaimDetails, registerFromClaim, registerFromClaimWithGoogle } fro
 import { CLAIM_LINK_DAYS } from './claim'
 import { allocateRtrId, linkClubRecordsByPhone } from './identity'
 import { addPlayerToClub } from './my-clubs'
+import { claimSharedEntry } from './shared-entry'
 
 const MATCH = { status: 'account-match' as const }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -80,7 +81,7 @@ export async function registerGuest(
   const token = `registration:${input.attempt}`
   const staged = { ...input, email }
   if (!(await stageRegistration(clubId, token, staged))) return MATCH
-  return finishRegistration(clubId, context, input.phoneE164, () =>
+  return finishRegistration(clubId, context, input.phoneE164, [email], null, () =>
     registerFromClaim(cookies, token, staged),
   )
 }
@@ -96,16 +97,23 @@ export async function registerGuestWithGoogle(
   jar: GoogleCookies,
   clubId: string,
   pending: PendingGoogle,
-  input: { phoneE164: string; details: ClaimDetails },
+  input: { phoneE164: string; details: ClaimDetails; identityRecordId?: string | null },
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {
   const context = await guestRegistrationClub(clubId, sessionSlug, inviteCode)
   const token = `registration:google:${pending.subject}`
-  const staged = { ...input, email: pending.google.email }
+  const { identityRecordId = null, ...details } = input
+  const staged = { ...details, email: pending.google.email }
   if (!(await stageRegistration(clubId, token, staged, pending.subject))) return MATCH
-  return finishRegistration(clubId, context, input.phoneE164, () =>
-    registerFromClaimWithGoogle(jar, token, pending, input),
+  // The Google email is the ROTRA email here, so one match covers both (D-2026-11-16-04).
+  return finishRegistration(
+    clubId,
+    context,
+    input.phoneE164,
+    [pending.google.email],
+    identityRecordId,
+    () => registerFromClaimWithGoogle(jar, token, pending, details),
   )
 }
 
@@ -177,7 +185,8 @@ async function stageRegistration(
         await tx.playerPrivateContact.create({
           data: { playerId: player.id, phoneE164: input.phoneE164, email },
         })
-        await allocateRtrId(tx, player.id, clubId, now)
+        // An email clubs already saved keeps its RTR ID (D-2026-11-16-04).
+        await allocateRtrId(tx, player.id, clubId, now, [email])
         await tx.playerClaimLink.create({
           data: {
             playerId: player.id,
@@ -200,7 +209,11 @@ async function stageRegistration(
 
 /**
  * Step 2 of registration: `complete` makes (or maps) the login, claims the staged profile and signs
- * the player in; then the phone links every club's unclaimed record and the player joins the club.
+ * the player in; then the shared entry with the registering email (D-2026-11-16-04: the ROTRA email
+ * or the Google email) is claimed and every club's record pointing to it joins the account, the
+ * phone still links every club's older record with that phone and no email (owner answer,
+ * November 18, 2026), and the player joins the club. `joinedClubs` names the clubs whose
+ * email-saved records joined.
  */
 async function finishRegistration<
   R extends { playerId: string; rtrId: string; firstName: string; session: unknown },
@@ -208,6 +221,8 @@ async function finishRegistration<
   clubId: string,
   context: Awaited<ReturnType<typeof guestRegistrationClub>>,
   phoneE164: string,
+  emails: string[],
+  identityRecordId: string | null,
   complete: () => Promise<R>,
 ) {
   for (let attempt = 0; ; attempt++) {
@@ -216,8 +231,21 @@ async function finishRegistration<
       // Repeat-safe, so a retried attempt that already linked or joined is a no-op. The account is
       // made and signed in by now: a failed link or join must not report the registration as
       // failed; the player can still tap Join from the same link.
+      let joinedClubs: string[] | undefined
       await prisma
-        .$transaction((tx) => linkClubRecordsByPhone(tx, result.playerId, phoneE164, new Date()))
+        .$transaction(async (tx) => {
+          const now = new Date()
+          const claimed = await claimSharedEntry(tx, result.playerId, emails, now, identityRecordId)
+          if (claimed.linked.length) {
+            const clubs = await tx.club.findMany({
+              where: { id: { in: claimed.linked.map((l) => l.clubId) } },
+              select: { name: true },
+              orderBy: { name: 'asc' },
+            })
+            joinedClubs = clubs.map((c) => c.name)
+          }
+          await linkClubRecordsByPhone(tx, result.playerId, phoneE164, now)
+        })
         .catch((error: unknown) => {
           console.error(
             '[guest-registration] link club records',
@@ -233,6 +261,7 @@ async function finishRegistration<
       return {
         status: 'registered' as const,
         ...result,
+        ...(joinedClubs ? { joinedClubs } : {}),
         clubName: context.clubName,
         sessionSlug: context.sessionSlug,
         sessionTitle: context.sessionTitle,

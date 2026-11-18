@@ -6,21 +6,38 @@ import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { readPlayerMatchHistory } from '../player/projections'
+import {
+  normalizeEmail,
+  normalizeRtrId,
+  openEntryByEmail,
+  openEntryByRtrId,
+  registeredPlayerByEmail,
+} from '../player/shared-entry'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { clubPlayerForProfile, createClubPlayer } from './session-roster'
 import { levelCodeFor, mapDatabaseError } from './session-store'
 
-const SEARCH_LIMIT = 20
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** One saved club player as Saved players and the Add player sheet show them. Never carries a phone. */
+/** One saved club player as Saved players and the Add player sheet show them. Never carries a phone or an email. */
 export type ClubPlayerDto = {
   id: string
   clubId: string
+  /**
+   * A registered player's id; for an unclaimed player saved with an email, their shared entry's id
+   * (one email, one person, one RTR ID across clubs; D-2026-11-16-04), as mock mode. Null for a
+   * guest and an older record with a phone and no email.
+   */
   playerId: string | null
   fullName: string
+  /** The nickname players see: a registered player's account nickname, else the club's */
   nickname: string | null
+  /**
+   * The club's own nickname for a registered player (D-2026-11-18-02): this club's Queue Master
+   * reads only. Null for guests and unclaimed players (their `nickname` is already the club's).
+   */
+  clubNickname: string | null
   picture: string | null
   /** Global name used with playerId to reproduce the saved character choice. */
   pictureName: string | null
@@ -33,6 +50,10 @@ export type ClubPlayerDto = {
   playingLevel: string | null
   phoneHidden: boolean
   hasPhone: boolean
+  /** The club saved an email for this unclaimed player (never the email itself) */
+  emailOnFile: boolean
+  /** Details required: an older unclaimed record with a phone and no email (D-2026-11-16-04) */
+  detailsRequired: boolean
   sessionsHere: number
   addedAt: string
 }
@@ -50,6 +71,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       nickname: true,
       addedAt: true,
       privateInput: { select: { phoneE164: true } },
+      sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true } },
       player: {
         select: {
           avatarRef: true,
@@ -72,39 +94,40 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
   })
   const shownBanners = await readShownProfileBanners()
   return rows.map((p) => {
+    const registered = p.player?.profileState === 'claimed'
     // Only a registered player has chosen a banner; guests, unclaimed profiles and players with no
     // pick draw the default Admin sets (D-2026-11-13-03), as in mock mode.
-    const banner =
-      p.player?.profileState === 'claimed'
-        ? resolveProfileBanner(
-            p.player.banner?.id ?? null,
-            () => p.player?.banner ?? undefined,
-            shownBanners,
-          )
-        : resolveProfileBanner(null, () => undefined, shownBanners)
+    const banner = registered
+      ? resolveProfileBanner(
+          p.player?.banner?.id ?? null,
+          () => p.player?.banner ?? undefined,
+          shownBanners,
+        )
+      : resolveProfileBanner(null, () => undefined, shownBanners)
+    const entry =
+      !registered && p.sharedEntry && !p.sharedEntry.claimedPlayerId ? p.sharedEntry : null
+    const phone = p.privateInput?.phoneE164
+    const detailsRequired = !registered && !entry && !p.player && Boolean(phone)
     return {
       id: p.id,
       clubId: p.clubId,
-      playerId: p.playerId,
-      // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
-      // shows on every card (#705). Guests have no profile and keep what the club entered.
-      fullName: p.player?.fullName || p.displayName,
-      nickname: p.player ? p.player.nickname : p.nickname,
-      picture: p.player?.avatarRef ?? null,
-      pictureName: p.player?.fullName ?? null,
+      playerId: registered ? p.playerId : (entry?.id ?? p.playerId),
+      // A registered player's own name wins over the club's saved copy, so a claim or profile edit
+      // shows on every card (#705). Guests and unclaimed players keep what the club entered.
+      fullName: (registered && p.player?.fullName) || p.displayName,
+      nickname: registered ? (p.player?.nickname ?? null) : p.nickname,
+      clubNickname: registered ? p.nickname?.trim() || null : null,
+      picture: registered ? (p.player?.avatarRef ?? null) : null,
+      pictureName: registered ? (p.player?.fullName ?? null) : null,
       bannerKey: banner.bannerKey,
       bannerImageUrl: banner.bannerImageUrl,
-      identity: p.player
-        ? p.player.profileState === 'claimed'
-          ? 'registered'
-          : 'unclaimed'
-        : p.privateInput?.phoneE164
-          ? 'pending'
-          : 'guest',
-      rtrId: p.player?.idAllocation?.rtrId ?? null,
+      identity: registered ? 'registered' : entry || p.player || phone ? 'unclaimed' : 'guest',
+      rtrId: registered ? (p.player?.idAllocation?.rtrId ?? null) : (entry?.rtrId ?? null),
       playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
-      phoneHidden: p.player?.hidePhoneFromClubs ?? false,
-      hasPhone: Boolean(p.player?.privateContact?.phoneE164 ?? p.privateInput?.phoneE164),
+      phoneHidden: registered ? (p.player?.hidePhoneFromClubs ?? false) : false,
+      hasPhone: Boolean((registered && p.player?.privateContact?.phoneE164) || phone),
+      emailOnFile: Boolean(entry),
+      detailsRequired,
       sessionsHere: new Set(p.rosterEntries.map((r) => r.sessionId)).size,
       addedAt: p.addedAt.toISOString(),
     }
@@ -112,53 +135,96 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
 }
 
 /**
- * One Player Information result (Q-ADD-PLAYER › Player Information): a registered (claimed) player.
- * Never carries a phone.
+ * One Player lookup match (Q-ADD-PLAYER › Player Information, D-2026-11-16-04). A registered
+ * player with their public card; an unclaimed person with the RTR ID and status only (`fullName`
+ * '', no picture or level: no club is shown another club's details) and `ownNameRequired`. Never
+ * carries a phone or an email.
  */
 export type DirectoryPlayerDto = {
+  /** A registered player's id, or an unclaimed person's shared entry id: what the add commands take */
   id: string
   fullName: string
   nickname: string | null
   rtrId: string
-  identity: 'registered'
+  identity: 'registered' | 'unclaimed'
   /** The player's own profile picture (avatar reference), or null for initials */
   picture: string | null
   /** The player's current rank level, or null when they have none yet */
   suggestion: string | null
   phoneHidden: boolean
+  ownNameRequired?: boolean
 }
 
+export type PlayerLookupDto = { player: DirectoryPlayerDto | null; savedName: string | null }
+
+const NO_MATCH: PlayerLookupDto = { player: null, savedName: null }
+
 /**
- * Player Information search by name, nickname or RTR ID: registered (claimed) players only. Guests
- * and unclaimed profiles stay in the club that saved them and are never found by another club
- * (D-2026-11-11-03). Profiles this club already saved are left out (the sheet shows them under
- * Saved players), as are players who chose Hide me from Player Information (D-2026-11-12-01; a
- * club that saved them still adds them from Saved players). At most 20 results, by name.
+ * Player lookup (D-2026-11-16-04): the one ROTRA person whose RTR ID or email is exactly `query`
+ * (RTR ID uppercased; email trimmed and lowercased), registered or unclaimed. No name search and
+ * no phone lookup. When this club already saved them, `savedName` is this club's name for them
+ * instead. Players who chose Hide me from Player Information (D-2026-11-12-01) are not found.
  */
-export async function searchPlayerDirectory(
-  context: ClubContext,
-  query: string,
-): Promise<DirectoryPlayerDto[]> {
+export async function lookupPlayer(context: ClubContext, query: string): Promise<PlayerLookupDto> {
   const q = query.trim()
-  const rows = await prisma.player.findMany({
+  if (!q) return NO_MATCH
+  const rtrId = normalizeRtrId(q)
+  const email = rtrId ? null : normalizeEmail(q)
+  if (!rtrId && !email) return NO_MATCH
+  const entry = rtrId
+    ? await openEntryByRtrId(prisma, rtrId)
+    : email
+      ? await openEntryByEmail(prisma, email)
+      : null
+  const playerId = entry
+    ? null
+    : rtrId
+      ? ((
+          await prisma.playerIdAllocation.findUnique({
+            where: { rtrId },
+            select: { playerId: true },
+          })
+        )?.playerId ?? null)
+      : email
+        ? await registeredPlayerByEmail(prisma, email)
+        : null
+  if (!entry && !playerId) return NO_MATCH
+  const saved = await prisma.clubPlayer.findFirst({
     where: {
-      profileState: 'claimed',
-      idAllocation: { isNot: null },
-      hiddenFromDirectory: false,
-      // A profile the club deleted shows again, so it can be added back (which restores it).
-      clubPlayers: { none: { clubId: context.clubId, removedAt: null } },
-      ...(q
-        ? {
-            OR: [
-              { fullName: { contains: q, mode: 'insensitive' } },
-              { nickname: { contains: q, mode: 'insensitive' } },
-              { idAllocation: { rtrId: { contains: q, mode: 'insensitive' } } },
-            ],
-          }
-        : {}),
+      clubId: context.clubId,
+      removedAt: null,
+      ...(entry ? { sharedEntryId: entry.id, playerId: null } : { playerId }),
     },
-    orderBy: { fullName: 'asc' },
-    take: SEARCH_LIMIT,
+    select: { displayName: true, player: { select: { fullName: true, profileState: true } } },
+  })
+  if (saved)
+    return {
+      player: null,
+      savedName:
+        (saved.player?.profileState === 'claimed' && saved.player.fullName) || saved.displayName,
+    }
+  if (entry)
+    return {
+      player: {
+        id: entry.id,
+        fullName: '',
+        nickname: null,
+        rtrId: entry.rtrId,
+        identity: 'unclaimed',
+        picture: null,
+        suggestion: null,
+        phoneHidden: false,
+        ownNameRequired: true,
+      },
+      savedName: null,
+    }
+  const p = await prisma.player.findFirst({
+    where: {
+      id: playerId ?? undefined,
+      profileState: 'claimed',
+      hiddenFromDirectory: false,
+      idAllocation: { isNot: null },
+    },
     select: {
       id: true,
       fullName: true,
@@ -169,29 +235,34 @@ export async function searchPlayerDirectory(
       rankCurrent: { select: { skillLevelId: true } },
     },
   })
-  return rows.map((p) => ({
-    id: p.id,
-    fullName: p.fullName,
-    nickname: p.nickname,
-    rtrId: p.idAllocation?.rtrId ?? '',
-    identity: 'registered',
-    picture: p.avatarRef ?? null,
-    suggestion: levelCodeFor(p.rankCurrent?.skillLevelId ?? null),
-    phoneHidden: p.hidePhoneFromClubs,
-  }))
+  if (!p) return NO_MATCH
+  return {
+    player: {
+      id: p.id,
+      fullName: p.fullName,
+      nickname: p.nickname,
+      rtrId: p.idAllocation?.rtrId ?? '',
+      identity: 'registered',
+      picture: p.avatarRef ?? null,
+      suggestion: levelCodeFor(p.rankCurrent?.skillLevelId ?? null),
+      phoneHidden: p.hidePhoneFromClubs,
+    },
+    savedName: null,
+  }
 }
 
 const alreadySaved = (name: string) =>
   new ServiceError('conflict', { player: `${name} is already in your saved players.` })
 
 /**
- * Saved players › Add player › Player Information: saves a profile to the club only, never to a
- * session. A profile already saved is refused. A level needs a session to be recorded
- * (`club_assessments`), so none is stored here; the club sets it when adding them to a session.
+ * Saved players › Add player › Player Information: saves a lookup match to the club only, never to
+ * a session. `playerId` is a registered player's id or an unclaimed person's shared entry id; for
+ * the latter `name` is this club's own name for them (required). A person already saved is
+ * refused. A level needs a session to be recorded (`club_assessments`), so none is stored here.
  */
 export async function addDirectoryPlayerToClub(
   context: ClubContext,
-  input: { operationId: string; playerId: string },
+  input: { operationId: string; playerId: string; name?: string | null },
 ) {
   await requireClubEntitlement(context)
   try {
@@ -202,9 +273,10 @@ export async function addDirectoryPlayerToClub(
         input.operationId,
         input.playerId,
         new Date(),
+        input.name,
       )
       if (!created) throw alreadySaved(clubPlayer.displayName)
-      return { clubPlayerId: clubPlayer.id, name: clubPlayer.nickname ?? clubPlayer.displayName }
+      return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName }
     })
   } catch (error) {
     if (error instanceof ServiceError) throw error
@@ -213,13 +285,20 @@ export async function addDirectoryPlayerToClub(
 }
 
 /**
- * Saved players › Add player › New player: a guest (no phone) or a pending player (phone kept as
- * private intake) saved to the club only. A phone this club already has for a saved player is
- * refused; same-name guests are never merged. `phone` is E.164 from the Route Handler.
+ * Saved players › Add player › New player, saved to the club only (D-2026-11-16-04): no email saves
+ * a guest; an email makes an unclaimed player with an RTR ID, or links the ROTRA player who has it.
+ * An email or a phone this club already has for a saved player is refused; same-name guests are
+ * never merged. `phone` is E.164 from the Route Handler. `emailWords` says what the email did.
  */
 export async function addNewSavedPlayer(
   context: ClubContext,
-  input: { operationId: string; name: string; nickname?: string | null; phone?: string | null },
+  input: {
+    operationId: string
+    name: string
+    nickname?: string | null
+    phone?: string | null
+    email?: string | null
+  },
 ) {
   await requireClubEntitlement(context)
   try {
@@ -238,13 +317,64 @@ export async function addNewSavedPlayer(
         })
         if (match) throw alreadySaved(match.displayName)
       }
-      const clubPlayer = await createClubPlayer(tx, context, input.operationId, input, new Date())
-      return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName }
+      const { clubPlayer, words } = await createClubPlayer(
+        tx,
+        context,
+        input.operationId,
+        input,
+        new Date(),
+      )
+      return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName, emailWords: words }
     })
   } catch (error) {
     if (error instanceof ServiceError) throw error
     mapDatabaseError(error)
   }
+}
+
+/**
+ * Club nickname sheet › Save nickname (D-2026-11-18-02): sets, changes or clears this club's own
+ * nickname for a registered saved player, stored in `club_players.nickname` (no new column). The
+ * reply's `message` is the mock's toast: "Club nickname saved · NAME", "Club nickname removed ·
+ * NAME" or "No club nickname · NAME", NAME being the player's full name.
+ */
+export async function setClubNickname(
+  context: ClubContext,
+  input: { clubPlayerId: string; clubNickname: string },
+) {
+  await requireClubEntitlement(context)
+  if (!UUID.test(input.clubPlayerId)) throw new ServiceError('not_found')
+  const next = input.clubNickname.trim()
+  return prisma.$transaction(async (tx) => {
+    const row = await tx.clubPlayer.findFirst({
+      where: { id: input.clubPlayerId, clubId: context.clubId, removedAt: null },
+      select: {
+        id: true,
+        nickname: true,
+        player: { select: { fullName: true, profileState: true } },
+      },
+    })
+    if (!row) throw new ServiceError('not_found', { player: 'Player not available.' })
+    if (row.player?.profileState !== 'claimed')
+      throw new ServiceError('forbidden', {
+        player: 'Only a registered player has a club nickname.',
+      })
+    const had = Boolean(row.nickname?.trim())
+    await tx.clubPlayer.update({
+      where: { clubId_id: { clubId: context.clubId, id: row.id } },
+      data: { nickname: next || null, revision: { increment: 1 } },
+    })
+    const name = row.player.fullName
+    return {
+      clubPlayerId: row.id,
+      clubNickname: next || null,
+      message: next
+        ? `Club nickname saved · ${name}`
+        : had
+          ? `Club nickname removed · ${name}`
+          : `No club nickname · ${name}`,
+    }
+  })
 }
 
 /**

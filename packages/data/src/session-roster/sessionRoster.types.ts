@@ -54,7 +54,6 @@ export type SessionJoinRequest = {
   sessionId: string
   name: string
   nickname: string | null
-  phoneE164: string | null
   statedBand: 'beginner' | 'intermediate' | 'advanced' | 'unsure'
   placement: JoinRequestPlacement
   /**
@@ -79,13 +78,6 @@ export type SessionJoinRequest = {
   pictureName?: string | null
   /** The Session invite code the link carried (`?invite=`), read as “Invited by NAME” (D-2026-11-09-08). */
   inviteCodeId?: string | null
-  /**
-   * Guest linking (D-2026-11-09-06): the saved player the QM chose with **Link** on the phone-match
-   * prompt; Confirm then gives that saved player the slot instead of creating a guest.
-   */
-  linkedClubPlayerId?: string | null
-  /** When the QM tapped **Not them** on the phone-match prompt; the prompt stays hidden. */
-  linkDeclinedAt?: number | null
 }
 /**
  * **I can't make it** (D-2026-11-09-03): a confirmed signed-in Player tells the QM before the start.
@@ -116,23 +108,39 @@ export type SessionInviteCode = {
   createdAt: number
 }
 /**
- * A Player Information result the Add player sheet can save or add. Registered (claimed) players
- * only: guests and unclaimed profiles stay in their club (D-2026-11-11-03). Never carries a phone.
+ * A Player lookup result the Add player sheet can save or add (D-2026-11-16-04): a registered or an
+ * unclaimed ROTRA player found by their exact RTR ID or exact email. A guest is never found. Never
+ * carries a phone or an email.
  */
 export type DirectoryPlayer = {
+  /** The public player id: what the add commands take as `playerId` */
   id: string
+  /** '' for another club's unclaimed player: no club is shown another club's name */
   fullName: string
   nickname: string | null
   rtrId: string
-  identity: 'registered'
-  /** Their own profile picture as an avatar reference, or null for initials */
+  identity: 'registered' | 'unclaimed'
+  /** Their own profile picture as an avatar reference, or null for initials (always null for unclaimed) */
   picture: string | null
-  /** Their Player Information level, or null when they have none yet */
+  /** Their Player Information level, or null when they have none yet (always null for unclaimed) */
   suggestion: PlayingLevel | null
   /** "#214", or "Not ranked" */
   rankLabel: string
   phoneHidden?: boolean
+  /**
+   * Another club's unclaimed player: "Not registered yet" with the RTR ID only. The add commands
+   * then need `name`, this club's own name for them.
+   */
+  ownNameRequired?: boolean
 }
+
+/**
+ * What Player lookup answers for one query. `player` is the one match that can be added. When the
+ * exact RTR ID or email belongs to someone already in this club's saved players, `player` is null
+ * and `savedName` is this club's name for them ("NAME is already in your saved players."). Both
+ * null: nothing typed yet, or "No ROTRA player has that RTR ID or email."
+ */
+export type PlayerLookup = { player: DirectoryPlayer | null; savedName: string | null }
 
 /** Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL); omitted on an ordinary add. */
 type AddPlacementFlags = { allowOverfill?: boolean; toWaitlist?: boolean }
@@ -154,6 +162,8 @@ export type RosterBatchOperation =
       operationId: string
       source: 'directory'
       playerId: string
+      /** This club's own name for another club's unclaimed player (`ownNameRequired`) */
+      name?: string
       level: PlayingLevel
     })
   | (AddPlacementFlags & {
@@ -162,7 +172,8 @@ export type RosterBatchOperation =
       source: 'new'
       name: string
       nickname?: string
-      phone?: string
+      /** No email saves a guest; an email saves an unclaimed player or links a ROTRA player */
+      email?: string
       level: PlayingLevel
     })
   | { op: 'remove'; operationId: string; rosterId: string }

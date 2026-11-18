@@ -479,6 +479,8 @@ export type WireWaitlistEntry = {
 export type WireJoinRequest = Omit<SessionJoinRequest, 'requestedAt' | 'decidedAt'> & {
   requestedAt: string
   decidedAt: string | null
+  /** Still sent by the server until D-2026-11-16-04 is built there; the screens no longer read it */
+  phoneE164?: string | null
 }
 
 const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
@@ -515,7 +517,7 @@ export function rosterReadOf(wire: WireRosterRead) {
       }),
     ),
     joinRequests: wire.joinRequests.map(
-      (request): SessionJoinRequest => ({
+      ({ phoneE164: _phone, ...request }): SessionJoinRequest => ({
         ...request,
         requestedAt: msOf(request.requestedAt),
         decidedAt: msOrNull(request.decidedAt),
@@ -559,11 +561,16 @@ export async function realUndoNoShow(input: { sessionId: string; rosterId: strin
   return accepted(null, `${reply.name} back on the roster · ${reply.count}/${reply.capacity}`)
 }
 
-export async function realAddNewPlayerToSession(input: {
+export async function realAddNewPlayerToSession({
+  email: _email,
+  ...input
+}: {
   sessionId: string
   name: string
   nickname?: string
   phone?: string
+  /** Not sent yet: the server saves a guest until D-2026-11-16-04 is built there (P15.8) */
+  email?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string
@@ -602,8 +609,14 @@ export async function realSetRosterLevel(input: {
 
 // ---------- Saved players and Player Information (Q-SAVED-PLAYERS, Q-ADD-PLAYER) ----------
 
-export type WireClubPlayer = Omit<ClubPlayerView, 'addedAt' | 'displayName' | 'suggestion'> & {
+export type WireClubPlayer = Omit<
+  ClubPlayerView,
+  'addedAt' | 'displayName' | 'suggestion' | 'emailOnFile' | 'detailsRequired'
+> & {
   addedAt: string
+  /** Not sent until D-2026-11-16-04 is built on the server (P15.8); missing reads as false */
+  emailOnFile?: boolean
+  detailsRequired?: boolean
 }
 
 /** The club's saved players in the Saved players view shape (`clubPlayerView`). */
@@ -614,6 +627,8 @@ export async function realGetClubPlayers(): Promise<ClubPlayerView[]> {
     displayName: p.fullName,
     suggestion: p.playingLevel,
     addedAt: msOf(p.addedAt),
+    emailOnFile: p.emailOnFile ?? false,
+    detailsRequired: p.detailsRequired ?? false,
   }))
 }
 
@@ -732,9 +747,14 @@ export async function realAddSavedPlayerToSession(input: {
   return rosterAdded(result, input.level)
 }
 
-export async function realAddDirectoryPlayerToSession(input: {
+export async function realAddDirectoryPlayerToSession({
+  name: _name,
+  ...input
+}: {
   sessionId: string
   playerId: string
+  /** Not sent yet: real mode finds registered players only until P15.8 */
+  name?: string
   level: PlayingLevel
 }) {
   const result = await realRequest<RosterAdd>(
@@ -745,10 +765,15 @@ export async function realAddDirectoryPlayerToSession(input: {
 }
 
 /** Saved players › Add player › New player: saved to the club only. */
-export async function realAddNewSavedPlayer(input: {
+export async function realAddNewSavedPlayer({
+  email: _email,
+  ...input
+}: {
   name: string
   nickname?: string | null
   phone?: string | null
+  /** Not sent yet: the server saves a guest until D-2026-11-16-04 is built there (P15.8) */
+  email?: string | null
 }) {
   const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
     method: 'POST',
@@ -763,7 +788,14 @@ export async function realAddNewSavedPlayer(input: {
 }
 
 /** Saved players › Add player › Player Information: saved to the club only, with no level yet. */
-export async function realAddDirectoryPlayerToClub(input: { playerId: string }) {
+export async function realAddDirectoryPlayerToClub({
+  name: _name,
+  ...input
+}: {
+  playerId: string
+  /** Not sent yet: real mode finds registered players only until P15.8 */
+  name?: string | null
+}) {
   const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
     method: 'POST',
     body: { ...input, source: 'directory', operationId: crypto.randomUUID() },

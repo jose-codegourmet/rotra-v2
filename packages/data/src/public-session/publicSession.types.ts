@@ -20,9 +20,11 @@ export type ParticipantTonight =
 
 /**
  * Which card a tap opens on the session page (#731): `registered` the participant profile,
- * `private` the always-private card, `guest` the Not on ROTRA yet card (guests and unclaimed).
+ * `private` the always-private card, `unclaimed` the public card of a player the club saved with
+ * an email ("Saved by the club. Not registered with ROTRA yet.", D-2026-11-16-04), `guest` the Not
+ * on ROTRA yet card (guests, and older records with no email).
  */
-export type ParticipantProfileKind = 'registered' | 'private' | 'guest'
+export type ParticipantProfileKind = 'registered' | 'private' | 'guest' | 'unclaimed'
 
 /** Stats · YEAR (the current calendar year) on the profile cards; null is "No games yet this year". */
 export type ParticipantStats = { games: number; wins: number; losses: number; winRate: number }
@@ -63,8 +65,8 @@ export type PublicSessionParticipant = {
    */
   masked?: boolean
   /**
-   * Signed-in version only, registered players only (the Player app's `/find/<RTR>` profile link).
-   * Never present for a guest or an unclaimed profile, and never for a visitor.
+   * Signed-in version only: a registered player's RTR ID (the Player app's `/find/<RTR>` profile
+   * link) or an unclaimed player's. Never present for a guest, and never for a visitor.
    */
   rtrId?: string | null
   /** Signed-in version only: this row is the viewer's own (the You pill). */
@@ -366,11 +368,10 @@ export type MyNight = {
   /** The Player's Session invite code if one was made already; read-only here, `useSessionInviteCode` makes it */
   inviteCode: string | null
 }
-/** What a guest types in Request to join; the phone is already normalised (E.164) or null. */
+/** What a guest types in Request to join: a name, a nickname and a level. No phone (D-2026-11-16-04). */
 export type SendJoinRequestInput = {
   name: string
   nickname?: string | null
-  phone?: string | null
   statedBand: SessionJoinRequest['statedBand']
   /** Join a slot (default) or Be waitlisted (D-2026-11-11-02); a slot is refused while every slot is taken */
   placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>

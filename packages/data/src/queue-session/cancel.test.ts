@@ -16,7 +16,6 @@ const request = (id: string, status: SessionJoinRequest['status']): SessionJoinR
   sessionId,
   name: `Guest ${id}`,
   nickname: null,
-  phoneE164: null,
   statedBand: 'unsure',
   placement: 'slot',
   status,

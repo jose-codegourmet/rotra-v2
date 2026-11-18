@@ -21,7 +21,28 @@ export type ClubPlayerPicture = {
   previousSrc?: string
 }
 
-/** Saved club roster identity; a guest has no global player link. */
+/**
+ * What a club entered about its own unclaimed player besides the name, nickname, picture and level
+ * (D-2026-11-16-04): each club keeps its own version and no club is shown another club's.
+ */
+export type ClubPlayerOwnDetails = {
+  playingStyle: string
+  experienceYears: number | null
+  experienceMonths: number | null
+  socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
+}
+
+/**
+ * A club's saved player. Four statuses (D-2026-11-16-04), told by `identity` and `playerId`:
+ * - `guest`: a name only. No email, no phone, no `playerId`, no RTR ID.
+ * - `unclaimed` with a `playerId`: saved with an email. `playerId` is the shared entry for that
+ *   email (one email, one person, one RTR ID across clubs); the name, nickname, picture, level and
+ *   phone here are this club's own.
+ * - `unclaimed` without a `playerId`: an older record with a phone and no email (Details required).
+ * - `registered`: linked to a ROTRA account (`playerId`). Verified sits on top of registered.
+ * - `pending`: Lookup pending, a new player entered with an email while offline; ROTRA links them
+ *   or gives them an RTR ID when the device syncs.
+ */
 export type ClubPlayer = {
   addedAt?: number
   id: string
@@ -35,12 +56,15 @@ export type ClubPlayer = {
   removedAt?: number
   joinedVia?: JoinedVia
   /**
-   * Set (with `removedAt`) when the QM linked this guest to another saved player: its slots,
-   * waitlist spots, games, requests and payments now point at that record, and this row is hidden.
+   * Set (with `removedAt`) when the Queue Master moved this record into another saved player (the
+   * Same person step: the email typed for it already belonged to that player): its slots, waitlist
+   * spots, games, requests and payments now point at that record, and this row is hidden.
    */
   linkedToClubPlayerId?: string
   /** Club-set picture; registered players never carry one (their own profile picture shows). */
   picture?: ClubPlayerPicture
+  /** The club's own playing style, experience and links for an unclaimed player (mock store only) */
+  details?: ClubPlayerOwnDetails
 }
 
 /** Unfiltered Saved players overview for one club. */
@@ -59,22 +83,24 @@ export type ClubPlayerDetails = {
   identity: 'guest' | 'pending' | 'unclaimed'
   fullName: string
   nickname: string | null
+  /** The club's own phone for an unclaimed player is on file; a guest never has one */
   phoneOnFile: boolean
   /**
    * Edit details › Profile picture: what shows now and the previous photo, if any. Mock only;
    * missing in real data mode until club-set picture storage is decided (D-2026-11-09-12).
    */
   picture?: ClubPlayerPictureState
-  /** Unclaimed profiles only */
-  profile: {
-    email: string
-    playingStyle: string
-    experienceYears: number | null
-    experienceMonths: number | null
-    socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }
-  } | null
+  /**
+   * The club's own details. Null for a guest. `email` is the one on file ('' for an older record
+   * with none: Details required); once saved it is read-only for the club (D-2026-11-16-04).
+   */
+  profile: (ClubPlayerOwnDetails & { email: string }) | null
 }
-/** Edit details as typed; experience stays text like the profile forms */
+/**
+ * Edit details as typed; experience stays text like the profile forms. `email` is taken only when
+ * none is on file (it makes a guest or an older record unclaimed); `phone` only for an unclaimed
+ * player with none on file.
+ */
 export type ClubPlayerDetailsInput = {
   fullName: string
   nickname: string
@@ -112,3 +138,16 @@ export type ClubPlayerPictureState = {
 export type SetClubPlayerPictureInput =
   | { clubPlayerId: string; kind: 'photo'; file: File }
   | { clubPlayerId: string; kind: 'character'; characterId: PlayerCharacterId }
+
+/**
+ * Save details' answer. `message` is the toast ("Details saved · NAME", plus what the email did:
+ * "· unclaimed · RTR-…", "· linked to their ROTRA account", "· already on ROTRA · RTR-…" or
+ * "· profile lookup after sync"). `samePerson` is set when the email typed already belongs to
+ * another saved player of this club: the other details were saved, the email was not, and the
+ * screen asks "Same person as NAME?" before `moveSavedPlayer`.
+ */
+export type ClubPlayerDetailsResult = {
+  clubPlayerId: string
+  message?: string
+  samePerson?: { clubPlayerId: string; name: string } | null
+}

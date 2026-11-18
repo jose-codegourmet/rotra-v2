@@ -269,8 +269,9 @@ export const clubPlayers = savedClubPlayers.map((player, index) => ({
 }))
 
 /**
- * Story-only club players for the guest and unclaimed states. Every demo club player is registered,
- * so these placeholders are not in clubPlayers or the mock store.
+ * Story-only club players for the guest and unclaimed states: placeholders that are not in
+ * clubPlayers or the mock store. The unclaimed one has no `playerId`, so it reads as an older
+ * record (Details required); the mock store's own unclaimed players are in fixtures/unclaimedPlayers.
  */
 export const storyIdentityPlayers = {
   guest: {
@@ -294,18 +295,20 @@ export const storyIdentityPlayers = {
 } satisfies Record<string, ClubPlayer>
 
 /**
- * The prototype's Gab Torres: the demo club's own unclaimed profile (D-2026-11-11-03). Saved with a
- * phone, not registered: a club-only record with no global player and no RTR ID. The phone lives in
+ * The prototype's Gab Torres: the demo club's own unclaimed player (D-2026-11-16-04). Saved with an
+ * email, so he has a shared entry (`GAB_PLAYER_ID`, seeded by fixtures/unclaimedPlayers with the
+ * email and RTR-PH-CEB-093026-0058) and is not registered. The club's own phone for him lives in
  * the mock store's private phones (`GAB_PHONE_E164`), never on the card.
  */
 export const GAB_CLUB_PLAYER_ID = 'club-only-gab-torres'
+export const GAB_PLAYER_ID = 'player-gab-torres'
 export const GAB_PHONE_E164 = '+639175550177'
-// The array literal above infers registered-only members; the type allows a club-only record.
+// The array literal above infers registered-only members; the type allows an unclaimed record.
 ;(clubPlayers as ClubPlayer[]).push({
   addedAt: savedPlayersSeededAt - 19 * 86_400_000,
   id: GAB_CLUB_PLAYER_ID,
   clubId: '6cd364d4-0e3a-5c3d-9e75-2116cc845714',
-  playerId: null,
+  playerId: GAB_PLAYER_ID,
   fullName: 'Gab Torres',
   nickname: null,
   identity: 'unclaimed',

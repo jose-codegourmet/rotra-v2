@@ -8,7 +8,6 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
 import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
 import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
-import { useLinkGuestToSavedPlayer } from '@rotra/data/club-player/useLinkGuestToSavedPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
@@ -25,7 +24,6 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
-import { LinkSavedPlayerSheet } from '@rotra/ui/link-saved-player-sheet'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
@@ -132,8 +130,6 @@ export function SavedPlayers() {
   const [profileId, setProfileId] = useState<string | null>(null)
   const [inviteId, setInviteId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
-  const [linkId, setLinkId] = useState<string | null>(null)
-  const link = useLinkGuestToSavedPlayer()
   // D-DELETE-PLAYER, only when the player is in the Active Session
   const [deleting, setDeleting] = useState<{
     id: string
@@ -172,7 +168,6 @@ export function SavedPlayers() {
       )
     : undefined
   const invitee = byId(inviteId)
-  const linking = byId(linkId)
   // Load Edit details while the profile is open, so choosing it swaps sheets with no blank gap.
   useClubPlayerDetails(
     profile && (profile.identity === 'guest' || profile.identity === 'unclaimed')
@@ -370,48 +365,6 @@ export function SavedPlayers() {
         />
       ) : null}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
-      {linking && linking.identity === 'guest' ? (
-        <LinkSavedPlayerSheet
-          open
-          onOpenChange={(open) => {
-            if (!open) setLinkId(null)
-          }}
-          guestName={linking.fullName}
-          players={(all.data?.players ?? [])
-            .filter((p) => p.id !== linking.id)
-            .sort((a, b) => a.fullName.localeCompare(b.fullName))
-            .map((p) => ({
-              id: p.id,
-              name: p.fullName,
-              nickname: p.nickname,
-              photoUrl: profilePictureSrc(
-                p.picture,
-                p.playerId ?? p.id,
-                p.pictureName ?? p.fullName,
-              ),
-              rtrId: p.rtrId,
-              identity: p.identity,
-            }))}
-          onChoose={(clubPlayerId) => {
-            if (link.isPending) return
-            const chosen = all.data?.players.find((p) => p.id === clubPlayerId)
-            link.mutate(
-              { guestId: linking.id, clubPlayerId },
-              {
-                onSuccess: () => {
-                  toast(`Linked to ${chosen?.fullName ?? 'player'}`)
-                  setLinkId(null)
-                },
-                onError: (error) => toast.error(error.message),
-              },
-            )
-          }}
-          onBack={() => {
-            setProfileId(linking.id)
-            setLinkId(null)
-          }}
-        />
-      ) : null}
       {deleting?.impact.activeSession ? (
         <DeletePlayerSheet
           open

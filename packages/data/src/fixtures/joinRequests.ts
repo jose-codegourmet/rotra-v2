@@ -8,8 +8,9 @@ import { clubPlayers } from './players'
 export const JOIN_REQUEST_SESSION_ID = 's-tonight'
 
 /**
- * The Queue prototype's four sample guests, oldest first: the same names, nicknames, phones and
- * stated bands the DevMenu "Add sample join request" action cycles through.
+ * The Queue prototype's four sample guests, oldest first: the same names, nicknames and stated
+ * bands the DevMenu "Add sample join request" action cycles through. A guest request carries no
+ * phone (D-2026-11-16-04).
  */
 export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[] {
   const minutesAgo = (minutes: number) => now - minutes * 60_000
@@ -19,7 +20,6 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       sessionId: JOIN_REQUEST_SESSION_ID,
       name: 'Tracy',
       nickname: 'Trace',
-      phoneE164: '+639175550142',
       statedBand: 'intermediate',
       placement: 'slot',
       status: 'pending',
@@ -32,7 +32,6 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       sessionId: JOIN_REQUEST_SESSION_ID,
       name: 'Gretchen',
       nickname: null,
-      phoneE164: null,
       statedBand: 'beginner',
       placement: 'slot',
       status: 'pending',
@@ -45,7 +44,6 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       sessionId: JOIN_REQUEST_SESSION_ID,
       name: 'PJ Perez',
       nickname: 'PJ',
-      phoneE164: '+639285550199',
       statedBand: 'advanced',
       placement: 'slot',
       status: 'pending',
@@ -58,7 +56,6 @@ export function createJoinRequestFixtures(now = Date.now()): SessionJoinRequest[
       sessionId: JOIN_REQUEST_SESSION_ID,
       name: 'Jess',
       nickname: null,
-      phoneE164: '+639055550110',
       statedBand: 'unsure',
       placement: 'slot',
       status: 'pending',
@@ -106,7 +103,6 @@ export function createAccountJoinRequestFixture(now = Date.now()): SessionJoinRe
     sessionId: JOIN_REQUEST_SESSION_ID,
     name: derrick.fullName,
     nickname: derrick.nickname,
-    phoneE164: null,
     statedBand: 'intermediate',
     status: 'pending',
     requestedAt: now - 25 * 60_000,
@@ -140,14 +136,13 @@ export const PAOLO_PLAYER: Player = {
   rtrId: 'RTR-PH-MNL-020326-0201',
 }
 
-/** The prototype's Kiko Salazar (p19): a saved guest whose private phone is 0917 555 0188. */
+/** The prototype's Kiko Salazar (p19): a saved guest, a name only. */
 export const KIKO_CLUB_PLAYER_ID = 'club-player-kiko-salazar'
-export const KIKO_PHONE_E164 = '+639175550188'
 
 /**
- * Saved players the prototype's sample requests need (D-2026-11-09-02/06): Rhea, already in the
- * club, and Kiko, the guest the phone match suggests. Kept out of `clubPlayers` (the shared pool's
- * 23 registered players); the mock store appends them.
+ * Saved players the prototype's sample requests need (D-2026-11-09-02): Rhea, already in the
+ * club, and Kiko, a saved guest. Kept out of `clubPlayers` (the shared pool's 23 registered
+ * players); the mock store appends them.
  */
 export function createRequestSeedClubPlayers(now = Date.now()): ClubPlayer[] {
   return [
@@ -177,15 +172,14 @@ export function createRequestSeedClubPlayers(now = Date.now()): ClubPlayer[] {
 }
 
 /**
- * The prototype's sample requests on Sunday Night Queue (D-2026-11-09-02/06/08), oldest first:
- * Rhea (in the club, invited by Migs; Jose's invite stands in), Paolo Reyes (a ROTRA player new to
- * the club), and Kiko Salazar (a guest whose
- * phone matches the saved guest Kiko).
+ * The prototype's sample requests on Sunday Night Queue (D-2026-11-09-02/08), oldest first: Rhea
+ * (in the club, invited by Migs; Jose's invite stands in), Paolo Reyes (a ROTRA player new to the
+ * club), and Kiko Salazar (a guest with the same name as the saved guest Kiko: nothing links the
+ * two, so confirming makes a second guest record, D-2026-11-16-04).
  */
 export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJoinRequest[] {
   const base = {
     sessionId: JOIN_REQUEST_SESSION_ID,
-    phoneE164: null,
     status: 'pending' as const,
     decidedAt: null,
     clubPlayerId: null,
@@ -217,7 +211,6 @@ export function createSessionPageJoinRequestFixtures(now = Date.now()): SessionJ
       id: 'q-seed-kiko',
       name: 'Kiko Salazar',
       nickname: null,
-      phoneE164: KIKO_PHONE_E164,
       statedBand: 'intermediate',
       placement: 'slot',
       requestedAt: now - 9 * 60_000,

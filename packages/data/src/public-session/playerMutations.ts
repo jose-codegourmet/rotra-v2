@@ -136,7 +136,6 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
           sessionId: session.id,
           name: player.fullName,
           nickname: player.nickname,
-          phoneE164: null,
           statedBand:
             band === 'beginner' || band === 'intermediate' || band === 'advanced' ? band : 'unsure',
           placement: 'from_waitlist',
@@ -167,7 +166,6 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
         sessionId: session.id,
         name: player.fullName,
         nickname: player.nickname,
-        phoneE164: null,
         statedBand:
           band === 'beginner' || band === 'intermediate' || band === 'advanced' ? band : 'unsure',
         placement,

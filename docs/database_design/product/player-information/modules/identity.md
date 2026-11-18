@@ -95,7 +95,7 @@ not application DDL. The existing club-logo pattern is documented in
 
 ## Unclaimed players with an email and an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)) — proposal, not built
 
-Decided behaviour (owner, November 16, 2026), superseding in part the club-only rules in the next section: an unclaimed player is a person a club saved with a **required email**; they get an RTR ID when saved; one email is one person and one RTR ID across clubs; each club keeps its own name, nickname, picture, level and optional phone; a guest is a name only. **Nothing below is built.** The schema, the P08.1 migration and the P08.9 services still follow the November 11 rules described in the next section.
+Decided behaviour (owner, November 16, 2026), superseding in part the club-only rules in the next section: an unclaimed player is a person a club saved with a **required email**; they get an RTR ID when saved; one email is one person and one RTR ID across clubs; each club keeps its own name, nickname, picture, level and optional phone; a guest is a name only. **Nothing below is built in the database.** The schema, the P08.1 migration and the P08.9 services still follow the November 11 rules described in the next section. The mock store (`packages/data`, #923) mirrors the proposed shape so the screens can be built against it: the shared entry is an unclaimed `players` row with a private email, each club's `clubPlayers` row points at it, an older record has no shared entry, and RTR ID counters per place and day only go up.
 
 Proposed shape:
 

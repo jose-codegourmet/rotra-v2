@@ -11,8 +11,6 @@ import {
   createAccountJoinRequestFixture,
   createRequestSeedClubPlayers,
   createSessionPageJoinRequestFixtures,
-  KIKO_CLUB_PLAYER_ID,
-  KIKO_PHONE_E164,
   PAOLO_PLAYER,
   RHEA_PLAYER,
   TONIGHT_INVITE_CODE_ID,
@@ -170,7 +168,6 @@ export function createQueueFixtures(now = Date.now()) {
     /** Saved players (Rhea, Kiko) and profiles (Rhea, Paolo) only the sample requests need */
     clubPlayers: createRequestSeedClubPlayers(now),
     players: [RHEA_PLAYER, PAOLO_PLAYER],
-    privatePhones: { [KIKO_CLUB_PLAYER_ID]: KIKO_PHONE_E164 } as Record<string, string>,
   }
   /** `roster` is tonight's only; the past sessions' rosters, matches and finalizations live under `history`. */
   return { sessions, courts, roster, history, requests }

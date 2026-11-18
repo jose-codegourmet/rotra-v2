@@ -28,8 +28,9 @@ export type AdminPlayer = {
   /** The public nickname, else the first nickname a club saved for the player */
   nickname: string | null
   /**
-   * The permanent RTR ID; null for a club's unclaimed record, which has none until the person
-   * registers (D-2026-11-11-03). Such a row's `id` is the club player id.
+   * The RTR ID. An unclaimed player gets one when a club saves their email (D-2026-11-16-04); only
+   * Admin can change it, by changing the registration place or date. Null for an older club record
+   * with a phone and no email (Details required): such a row's `id` is the club player id.
    */
   rtrId: string | null
   createdByClubId: string | null
@@ -40,6 +41,11 @@ export type AdminPlayer = {
   /** Private, Admin only */
   email?: string
   claimed: boolean
+  /**
+   * Details required (D-2026-11-16-04): an unclaimed record with a phone and no email. The club
+   * must add an email or delete the record. Missing reads as false.
+   */
+  detailsRequired?: boolean
   /** 'YYYY-MM-DD' */
   registeredOn?: string
   phoneHidden: boolean
@@ -164,6 +170,8 @@ export type AdminPlayerChangedField =
   | 'Instagram link'
   | 'YouTube link'
   | 'LinkedIn link'
+  /** The registration place or date changed, so the RTR ID did (mock mode; real mode: P15.8) */
+  | 'RTR ID'
   | 'password'
 
 /** Save changes: the form values plus the record and revision it was loaded under. */

@@ -98,7 +98,6 @@ describe('Public session › real mode', () => {
       requestId: mine.requestId,
       name: 'Ben Cruz',
       nickname: null,
-      phone: '+639171234567',
       statedBand: 'intermediate',
     })
     expect(sent()).toMatchObject({
@@ -108,7 +107,7 @@ describe('Public session › real mode', () => {
         requestId: mine.requestId,
         name: 'Ben Cruz',
         nickname: null,
-        phone: '+639171234567',
+        phone: null,
         statedBand: 'intermediate',
       },
     })

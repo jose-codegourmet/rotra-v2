@@ -1,6 +1,5 @@
 import { flushSessionBatches } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
-import { createClubPlayer } from '../club-player/mutations'
 import { leaderboardLevels } from '../fixtures/players'
 import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
 import { MockError } from '../mock/errors'
@@ -22,9 +21,10 @@ import type { SessionJoinRequest } from './sessionRoster.types'
 
 /**
  * Queue Master decisions on Requests › Join (Q18.12) that the original join-request commands do not
- * cover: confirming a signed-in ROTRA player's request or a linked guest request, the phone-match
- * Link / Not them prompt (D-2026-11-09-06), and the drop-out notices' Remove from roster / Keep
- * (D-2026-11-09-03). Mock only; real mode refuses truthfully.
+ * cover: confirming a signed-in ROTRA player's request, and the drop-out notices' Remove from
+ * roster / Keep (D-2026-11-09-03). There is no Link / Not them on a guest request any more
+ * (D-2026-11-16-04): a guest request carries no phone and nothing links it to a saved player.
+ * Mock only; real mode refuses truthfully.
  */
 
 const NOT_REAL = 'This request action is not available in real mode yet.'
@@ -53,45 +53,14 @@ function pendingRequest(s: MockState, requestId: string) {
   return r
 }
 
-const savedPlayer = (s: MockState, clubId: string, id: string | null | undefined) =>
-  id
-    ? s.clubPlayers.find(
-        (p) => p.id === id && p.clubId === clubId && !p.removedAt && !p.linkedToClubPlayerId,
-      )
-    : undefined
-
-/**
- * The server's phone suggestion for a guest request (D-2026-11-09-06): a saved player of the club
- * who is not registered and whose private phone is the request's phone. Never for an account
- * request, an already linked one, or after Not them.
- */
-export function phoneSuggestion(s: MockState, r: SessionJoinRequest): ClubPlayer | null {
-  if (r.playerId || r.linkedClubPlayerId || r.linkDeclinedAt || !r.phoneE164) return null
-  const clubId = sessionIn(s, r.sessionId).clubId
-  return (
-    s.clubPlayers.find(
-      (p) =>
-        p.clubId === clubId &&
-        !p.removedAt &&
-        !p.linkedToClubPlayerId &&
-        p.identity !== 'registered' &&
-        s.privatePhones[p.id] === r.phoneE164,
-    ) ?? null
-  )
-}
-
 export type JoinRequestHint = {
   /** A signed-in Player's shared rank (“Shared rank: …”); null reads “none yet” */
   sharedRank: PlayingLevel | null
-  /** “Is this NAME from your saved players?” */
-  phoneMatch: { clubPlayerId: string; name: string } | null
-  /** “Linked to NAME from your saved players.” */
-  linked: { clubPlayerId: string; name: string } | null
 }
 
 /**
- * Per pending join request: the shared-rank hint, the phone-match suggestion and the linked saved
- * player. Keyed by request id; mock only (real mode returns no hints).
+ * Per pending join request: the shared-rank hint. Keyed by request id; mock only (real mode
+ * returns no hints).
  */
 export async function getJoinRequestHints(
   sessionId: string,
@@ -99,43 +68,13 @@ export async function getJoinRequestHints(
   if (isRealDataMode()) return {}
   await delay()
   const s = readMockState()
-  const session = sessionIn(s, sessionId)
+  sessionIn(s, sessionId)
   const hints: Record<string, JoinRequestHint> = {}
   for (const r of s.joinRequests) {
     if (r.sessionId !== sessionId || r.status !== 'pending') continue
-    const linked = savedPlayer(s, session.clubId, r.linkedClubPlayerId)
-    const match = phoneSuggestion(s, r)
-    hints[r.id] = {
-      sharedRank: r.playerId ? (leaderboardLevels[r.playerId] ?? null) : null,
-      phoneMatch: match ? { clubPlayerId: match.id, name: match.fullName } : null,
-      linked: linked ? { clubPlayerId: linked.id, name: linked.fullName } : null,
-    }
+    hints[r.id] = { sharedRank: r.playerId ? (leaderboardLevels[r.playerId] ?? null) : null }
   }
   return hints
-}
-
-/** **Link** on the phone-match prompt: confirming the request then gives that saved player the slot. */
-export function linkJoinRequest(input: { requestId: string; clubPlayerId: string }) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
-  const r = pendingRequest(readMockState(), input.requestId)
-  return requestMutation(r.sessionId, (s) => {
-    const request = pendingRequest(s, input.requestId)
-    const match = phoneSuggestion(s, request)
-    if (!match || match.id !== input.clubPlayerId) fail('Player not available.', 'conflict')
-    request.linkedClubPlayerId = match.id
-    return { data: { clubPlayerId: match.id }, text: `Linked to ${match.fullName}` }
-  })
-}
-
-/** **Not them**: hides the phone-match prompt for this request. */
-export function dismissJoinRequestLink(requestId: string) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
-  const r = pendingRequest(readMockState(), requestId)
-  return requestMutation(r.sessionId, (s) => {
-    const request = pendingRequest(s, requestId)
-    request.linkDeclinedAt = Date.now()
-    return { data: null, text: `${request.name} is not a saved player` }
-  })
 }
 
 /** The saved player for a signed-in Player's request, created (registered) when new to the club. */
@@ -164,34 +103,30 @@ function accountPlayer(s: MockState, clubId: string, r: SessionJoinRequest): Clu
 
 /**
  * **Confirm** / **Confirm guest** / **Confirm to waitlist** with the level the QM chose. A guest
- * request goes through `confirmJoinRequest` (a new guest record); a linked guest request gives the
- * linked saved player the slot; a signed-in Player's request uses their saved player, saving a
- * player new to the club as registered and “Joined via session link”.
+ * request goes through `confirmJoinRequest` (a new guest record); a signed-in Player's request uses
+ * their saved player, saving a player new to the club as registered and “Joined via session link”.
  */
 export function confirmRequest(input: { requestId: string; level: PlayingLevel }) {
   const r = isRealDataMode() ? null : pendingRequest(readMockState(), input.requestId)
-  if (!r || (!r.playerId && !r.linkedClubPlayerId)) return confirmJoinRequest(input)
+  if (!r?.playerId) return confirmJoinRequest(input)
   return requestMutation(r.sessionId, (s) => confirmRequestChange(s, input))
 }
 
 /**
  * The mock write behind Confirm for every kind of join request, chosen from the request as saved
- * now: a guest's, a linked guest's, a signed-in Player's, or a Join from waitlist. The roster
- * batch (#718) applies it in click order with the other roster changes of one burst.
+ * now: a guest's, a signed-in Player's, or a Join from waitlist. The roster batch (#718) applies
+ * it in click order with the other roster changes of one burst.
  */
 export function confirmRequestChange(
   s: MockState,
   input: { requestId: string; level: PlayingLevel },
 ) {
   const r = pendingRequest(s, input.requestId)
-  if (!r.playerId && !r.linkedClubPlayerId) return confirmJoinRequestChange(s, input)
+  if (!r.playerId) return confirmJoinRequestChange(s, input)
   if (r.placement === 'from_waitlist') return giveSlotFromRequestChange(s, input)
   const request = pendingRequest(s, input.requestId)
   const clubId = sessionIn(s, request.sessionId).clubId
-  const p = request.playerId
-    ? accountPlayer(s, clubId, request)
-    : savedPlayer(s, clubId, request.linkedClubPlayerId)
-  if (!p) fail('Player not available.', 'conflict')
+  const p = accountPlayer(s, clubId, request)
   const data = place(
     s,
     request.sessionId,

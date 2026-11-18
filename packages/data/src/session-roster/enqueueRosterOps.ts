@@ -1,11 +1,17 @@
 import type { QueryClient } from '@tanstack/react-query'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import { clubEmailWords, emailAlreadySaved, planClubEmail } from '../club-player/email'
+import { OWN_NAME_ERROR } from '../club-player/mutations'
 import { clubPlayerKeys } from '../club-player/queryKeys'
+import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { MockError } from '../mock/errors'
+import { readMockState } from '../mock/store'
 import type { PlayingLevel } from '../player/player.types'
+import { peekMockRtrId, savedDisplayName, savedRecordByEmail } from '../player/unclaimed'
 import { queueSessionKeys } from '../queue-session/queryKeys'
 import { slotCapacity } from '../queue-session/queueSession.rules'
 import type { QueueSession } from '../queue-session/queueSession.types'
+import { isRealDataMode } from '../real/mode'
 import { accepted } from '../real/queue'
 import type { SaveOutcome } from '../sync/sync.types'
 import type {
@@ -22,7 +28,7 @@ import {
   readRosterView,
 } from './rosterBatch'
 import { levelLabel, ROSTER_DUPLICATE_ERROR, shortName } from './sessionRoster.rules'
-import type { DirectoryPlayer, SessionJoinRequest } from './sessionRoster.types'
+import type { DirectoryPlayer, PlayerLookup, SessionJoinRequest } from './sessionRoster.types'
 
 /**
  * Turns one tap into a pending roster operation (#718): checks what the screen already knows,
@@ -93,14 +99,43 @@ function savedPlayerForProfile(client: QueryClient, playerId: string) {
   return undefined
 }
 
+/** The Player lookup result on screen: the list form (`usePlayerDirectorySearch`) or `usePlayerLookup`'s. */
 function directoryPlayer(client: QueryClient, playerId: string) {
-  for (const [, data] of client.getQueriesData<DirectoryPlayer[]>({
+  for (const [, data] of client.getQueriesData<DirectoryPlayer[] | PlayerLookup>({
     queryKey: sessionRosterKeys.all,
   })) {
-    const player = Array.isArray(data) ? data.find((p) => p.id === playerId) : undefined
+    const player = Array.isArray(data)
+      ? data.find((p) => p.id === playerId)
+      : data && 'savedName' in data && data.player?.id === playerId
+        ? data.player
+        : undefined
     if (player) return player
   }
   return undefined
+}
+
+/**
+ * New player with an email, checked as the tap happens (the burst is saved later): a malformed
+ * email and an email that is already one of the club's saved players are refused on the form, and
+ * the words for the toast say what the email will do. Mock mode reads the mock store; real mode
+ * does not look emails up yet (D-2026-11-16-04 is not built there), so the player is added as the
+ * server saves them today: a guest.
+ */
+function newPlayerEmailWords(email: string | undefined): string | null {
+  if (!email?.trim() || isRealDataMode()) return null
+  const s = readMockState()
+  const plan = planClubEmail(s, email)
+  if (plan.kind === 'guest') return null
+  const same = savedRecordByEmail(s, DEMO_CLUB_ID, plan.email)
+  if (same) {
+    const text = emailAlreadySaved(savedDisplayName(s, same))
+    throw new MockError('permission', text, { email: text })
+  }
+  if (plan.kind !== 'new') return clubEmailWords(plan)
+  // The RTR ID the save will give, read ahead: the club's founding city and today. Two new emails
+  // in one burst would read the same one here; the saved players then show the ones really given.
+  const place = s.clubs.find((c) => c.id === DEMO_CLUB_ID)?.locationCode
+  return clubEmailWords(plan, place ? peekMockRtrId(s, place) : undefined)
 }
 
 function preview(
@@ -194,7 +229,11 @@ export function enqueueAddDirectoryPlayer(
   )
     throw new MockError('conflict', ROSTER_DUPLICATE_ERROR)
   const profile = directoryPlayer(client, input.playerId)
-  const fullName = saved?.fullName ?? profile?.fullName ?? 'Player'
+  // Another club's unclaimed player is saved under this club's own name for them.
+  const ownName = input.name?.trim()
+  if (!saved && profile?.ownNameRequired && !ownName)
+    throw new MockError('permission', OWN_NAME_ERROR, { name: OWN_NAME_ERROR })
+  const fullName = saved?.fullName ?? (profile?.fullName || ownName || 'Player')
   const nickname = saved?.nickname ?? profile?.nickname ?? null
   // The club's saved player is only known once the server saves them; a temporary id until then.
   const clubPlayerId = saved?.id ?? crypto.randomUUID()
@@ -205,6 +244,7 @@ export function enqueueAddDirectoryPlayer(
       source: 'directory',
       ...placementFlags(input),
       playerId: input.playerId,
+      ...(ownName ? { name: ownName } : {}),
       level: input.level,
     },
     preview: preview(
@@ -228,6 +268,8 @@ export function enqueueAddNewPlayer(
 ): Enqueued<Placed> {
   const name = input.name.trim()
   if (!name) throw new MockError('permission', 'Enter your name.')
+  const email = input.email?.trim() || undefined
+  const emailWords = newPlayerEmailWords(email)
   const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   const clubPlayerId = crypto.randomUUID()
   getRosterBatch(client, input.sessionId).enqueue({
@@ -238,7 +280,7 @@ export function enqueueAddNewPlayer(
       ...placementFlags(input),
       name,
       nickname: input.nickname?.trim() || undefined,
-      phone: input.phone?.trim() || undefined,
+      ...(email ? { email } : {}),
       level: input.level,
     },
     preview: preview(
@@ -257,8 +299,8 @@ export function enqueueAddNewPlayer(
       placed(place, clubPlayerId),
       place.toWaitlist
         ? `${name} added to the waitlist as #${place.position}`
-        : input.phone?.trim()
-          ? `${name} added · profile lookup after sync`
+        : emailWords
+          ? `${name} added · ${emailWords}`
           : `${name} added as a guest`,
     ),
   }
@@ -303,7 +345,7 @@ export function enqueueAcceptRequest(
   const place = placement(client, request.sessionId, request.placement === 'waitlist')
   // Join from waitlist gives the slot (or is refused by the server); it never re-waitlists.
   if (fromWaitlist) Object.assign(place, { toWaitlist: false, position: 0 })
-  const clubPlayerId = request.clubPlayerId ?? request.linkedClubPlayerId ?? crypto.randomUUID()
+  const clubPlayerId = request.clubPlayerId ?? crypto.randomUUID()
   getRosterBatch(client, request.sessionId).enqueue({
     operation: {
       op: 'acceptRequest',

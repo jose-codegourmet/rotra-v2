@@ -39,19 +39,35 @@ export function seedLeaderboardHistory(state: MockState) {
     }
     history.push(...previousYear)
   }
-  // The prototype's first unclaimed row is saved by exactly one club. Its account nickname and
-  // profile stay public for visitors. The existing multi-club Alex Reyes also has real fixture games.
-  const tricia = leaderboardPlayers[17]
-  const club = state.clubs[1]
-  if (tricia && club) {
+  // The prototype's two unclaimed rows (rotra-player.html UNCLAIMED_SEED, positions 18 and 23): two
+  // existing leaderboard players, each saved by exactly one club with their email and not
+  // registered (D-2026-11-16-04). Their profile stays public for visitors. No row is added. The
+  // 23rd pool player is a registered demo account, so the 17th stands in for the second row. The
+  // existing multi-club Alex Reyes also has real fixture games and stays off the list.
+  const unclaimedRows = [
+    { player: leaderboardPlayers[17], club: state.clubs[1], key: 'tricia', daysAgo: 96 },
+    { player: leaderboardPlayers[16], club: state.clubs[4], key: 'second', daysAgo: 71 },
+  ]
+  for (const { player, club, key, daysAgo } of unclaimedRows) {
+    if (!player || !club) continue
     state.clubPlayers.push({
-      id: 'leaderboard-tricia-membership',
+      id: `leaderboard-${key}-membership`,
       clubId: club.id,
-      playerId: tricia.id,
-      fullName: tricia.fullName,
-      nickname: tricia.nickname,
+      playerId: player.id,
+      fullName: player.fullName,
+      nickname: player.nickname,
       identity: 'unclaimed',
-      playingLevel: leaderboardLevels[tricia.id] ?? null,
+      playingLevel: leaderboardLevels[player.id] ?? null,
+      addedAt: PLAYER_FIXTURE_NOW.getTime() - daysAgo * 86_400_000,
+      joinedVia: 'added',
+    })
+    if (state.playerAccounts.some((account) => account.playerId === player.id)) continue
+    state.playerAccounts.push({
+      playerId: player.id,
+      phone: '',
+      email: `${player.fullName.toLowerCase().replace(/[^a-z]+/g, '.')}@example.com`,
+      phoneHidden: false,
+      claimed: false,
     })
   }
   state.playerGames['admin-demo-0'] = genSessions('admin-demo-0', 16)

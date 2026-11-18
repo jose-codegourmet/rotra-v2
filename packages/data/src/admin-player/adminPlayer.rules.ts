@@ -2,6 +2,7 @@ import { type AdminPlayerEditValues, adminPlayerEditSchemaFor } from '@rotra/sch
 import { phoneField } from '@rotra/schema/phone'
 import { plainIdentity } from '../club/club.rules'
 import { PLAYING_LEVELS } from '../player/player.types'
+import { rtrIdWith } from '../player/rtrId'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type {
   AdminPlayerAccountOption,
@@ -22,9 +23,16 @@ export function rankStatusOf(
   levelIndex: number | null,
   recentStandardMatches: number,
   threshold: number,
+  /** An unclaimed player saved by more than one club: not listed until they register */
+  notOnLeaderboard = false,
 ): RankStatus {
   const level = levelIndex === null ? undefined : PLAYING_LEVELS[levelIndex]
   if (!level) return { kind: 'none', text: 'No rank yet' }
+  if (notOnLeaderboard)
+    return {
+      kind: recentStandardMatches < threshold ? 'below' : 'board',
+      text: `${levelLabel(level)} · not on the leaderboard until they register`,
+    }
   if (recentStandardMatches < threshold) {
     return {
       kind: 'below',
@@ -64,8 +72,19 @@ export function matchesAdminPlayerSearch(
 export function matchesAccountFilter(
   claimed: boolean,
   account: AdminPlayerAccountOption = 'all',
+  detailsRequired = false,
 ): boolean {
+  if (account === 'details') return !claimed && detailsRequired
   return account === 'all' || (account === 'registered' ? claimed : !claimed)
+}
+
+/** Details required (D-2026-11-16-04): an unclaimed record with a phone and no email. */
+export function isAdminDetailsRequired(player: {
+  claimed: boolean
+  phone?: string
+  email?: string
+}): boolean {
+  return !player.claimed && !!player.phone?.trim() && !player.email?.trim()
 }
 
 /** Names that more than one identity shares, in first-seen order (exact name match, never merged). */
@@ -160,6 +179,25 @@ export function adminPlayerChangedFields(
   return changed
 }
 
+/**
+ * The RTR ID after this save, when the registration place or date changed it (rotra-admin.html
+ * pmSave() rtrChanged): it follows both and keeps its number at the end. Null when it stays as it
+ * is, or the player has none. Kept apart from `adminPlayerChangedFields`, which the real service
+ * shares: there the RTR ID change is not connected yet.
+ */
+export function adminPlayerRtrIdChange(
+  edit: Pick<AdminPlayerEdit, 'rtrId'>,
+  values: Pick<AdminPlayerEditValues, 'registrationPlace' | 'registrationDate'>,
+): string | null {
+  if (!edit.rtrId) return null
+  const next = rtrIdWith(
+    edit.rtrId,
+    values.registrationPlace ?? placeCodeFromRtrId(edit.rtrId),
+    values.registrationDate ?? createdOnFromRtrId(edit.rtrId),
+  )
+  return next && next !== edit.rtrId ? next : null
+}
+
 /** The toast after a save (rotra-admin.html pmSave()); never mentions the password itself. */
 export function adminPlayerSavedMessage(
   name: string,
@@ -169,13 +207,18 @@ export function adminPlayerSavedMessage(
   return `Saved ${name}: ${changed.join(', ')}.${changed.includes('password') ? ' Give the new password to the player yourself.' : ''}`
 }
 
-/** The Activity log line for one save (rotra-admin.html pmSave() log()). No contact values, no password. */
+/**
+ * The Activity log line for one save (rotra-admin.html pmSave() log()). No contact values, no
+ * password. A changed RTR ID is named with the one it replaced.
+ */
 export function adminPlayerEditedSummary(
   name: string,
   changed: readonly AdminPlayerChangedField[],
   reason: string,
+  rtrId?: { from: string; to: string } | null,
 ): string {
-  return `Edited ${name}: ${changed.join(', ')}. Reason: ${reason}`
+  const replaced = rtrId ? ` RTR ID ${rtrId.from} replaced with ${rtrId.to} on every record.` : ''
+  return `Edited ${name}: ${changed.join(', ')}.${replaced} Reason: ${reason}`
 }
 
 /** Validate an Admin edit at a service boundary using the shared form rules. */

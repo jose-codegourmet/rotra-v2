@@ -406,7 +406,9 @@ function wireClubPlayersOf(
         rtrId: null,
         playingLevel: p.playingLevel,
         phoneHidden: false,
-        hasPhone: p.identity === 'pending',
+        // A new player has no phone; one entered with an email offline is Lookup pending.
+        hasPhone: false,
+        emailOnFile: p.identity === 'pending',
         sessionsHere: 1,
         addedAt: iso(p.addedAt ?? Date.now()),
       }),

@@ -1,9 +1,8 @@
-import { phoneField } from '@rotra/schema/phone'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
-import { clubPlayerForProfile, createClubPlayer, directoryLevel } from '../club-player/mutations'
+import { clubPlayerForProfile, createClubPlayer } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { directoryPlayers, leaderboardPlayers } from '../fixtures/players'
+import { leaderboardLevels, leaderboardPlayers } from '../fixtures/players'
 import { countedGames, gamesPlayed } from '../match/match.rules'
 import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
@@ -14,6 +13,14 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
+import { isRtrId, normalizeRtrId } from '../player/rtrId'
+import {
+  accountByEmail,
+  isCurrentRecord,
+  isUnclaimedPerson,
+  savedDisplayName,
+  savedRecordByEmail,
+} from '../player/unclaimed'
 import { isListedInDirectory } from '../player/visibility.rules'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { slotCapacity } from '../queue-session/queueSession.rules'
@@ -42,6 +49,7 @@ import {
 import type {
   DirectoryPlayer,
   JoinRequestPlacement,
+  PlayerLookup,
   SessionJoinRequest,
 } from './sessionRoster.types'
 
@@ -125,7 +133,7 @@ export type AddSavedPlayerInput = RosterAddPlacement & {
 }
 /**
  * The mock write of Add player › Saved players; the roster batch (#718) applies it in order. An
- * unclaimed profile is the club's own record, so no identity check applies (D-2026-11-11-03).
+ * unclaimed player already in the club's saved players needs no identity check.
  */
 export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
@@ -154,42 +162,98 @@ export async function addSavedPlayerToSession(input: AddSavedPlayerInput) {
     rosterMutation(input.sessionId, (s) => addSavedPlayerChange(s, input)),
   )
 }
-export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
-  if (isRealDataMode()) return realPlayerDirectorySearch(q)
+const NO_MATCH: PlayerLookup = { player: null, savedName: null }
+
+/**
+ * Player lookup (D-2026-11-16-04): the one ROTRA player, registered or unclaimed, whose RTR ID or
+ * email is exactly what was typed. No name search (names are searched in the club's own saved
+ * players only) and a guest is never found. Another club's unclaimed player comes back with the RTR
+ * ID and status only (`ownNameRequired`): no club is shown another club's name, picture or level.
+ * Someone already in this club's saved players is not repeated: `savedName` says who they are here.
+ * Hide me from Player Information keeps a registered player out. Online only.
+ *
+ * Real mode still runs its registered-only search until D-2026-11-16-04 is built there: the match
+ * is the result whose RTR ID is exactly what was typed; an email finds nobody yet.
+ */
+export async function lookupPlayer(q: string): Promise<PlayerLookup> {
+  if (isRealDataMode()) {
+    const id = normalizeRtrId(q)
+    if (!isRtrId(id)) return NO_MATCH
+    const found = (await realPlayerDirectorySearch(q.trim())).find((p) => p.rtrId === id)
+    return found ? { player: found, savedName: null } : NO_MATCH
+  }
   await delay()
   requireOnline()
   const s = readMockState(),
-    query = q.trim().toLowerCase()
-  // Hide me from Player Information leaves a profile out of this search (name, nickname and RTR ID).
-  return directoryPlayers
-    .filter(
-      (p) =>
-        !s.adminPlayerRecords[p.id]?.archivedAt &&
-        isListedInDirectory(s.playerProfiles.find((profile) => profile.playerId === p.id)),
-    )
-    .map((p, _i) => ({
-      ...p,
-      identity: 'registered' as const,
-      picture: s.playerProfiles.find((profile) => profile.playerId === p.id)?.picture ?? null,
-      suggestion: directoryLevel(p.id),
-      rankLabel: `#${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
-    }))
-    .filter(
-      (p) =>
-        !s.clubPlayers.some(
-          (saved) =>
-            saved.clubId === DEMO_CLUB_ID &&
-            s.players.find((x) => x.id === saved.playerId)?.rtrId === p.rtrId,
-        ) && [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLowerCase().includes(query)),
-    )
+    query = q.trim()
+  if (!query) return NO_MATCH
+  const byRtrId = isRtrId(query)
+    ? s.players.find((p) => p.rtrId === normalizeRtrId(query))
+    : undefined
+  const account = isRtrId(query) ? undefined : accountByEmail(s, query)
+  const player = byRtrId ?? (account ? s.players.find((p) => p.id === account.playerId) : undefined)
+  const saved = player
+    ? s.clubPlayers.find(
+        (c) => c.clubId === DEMO_CLUB_ID && c.playerId === player.id && isCurrentRecord(c),
+      )
+    : savedRecordByEmail(s, DEMO_CLUB_ID, query)
+  if (saved) return { player: null, savedName: savedDisplayName(s, saved) }
+  if (!player || s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
+  if (isUnclaimedPerson(s, player.id))
+    return {
+      player: {
+        id: player.id,
+        fullName: '',
+        nickname: null,
+        rtrId: player.rtrId,
+        identity: 'unclaimed',
+        picture: null,
+        suggestion: null,
+        rankLabel: 'Not ranked',
+        ownNameRequired: true,
+      },
+      savedName: null,
+    }
+  const profile = s.playerProfiles.find((entry) => entry.playerId === player.id)
+  if (!isListedInDirectory(profile)) return NO_MATCH
+  const listed = leaderboardPlayers.findIndex((entry) => entry.id === player.id)
+  const rankIndex = s.playerRanks[player.id]?.levelIndex
+  return {
+    player: {
+      id: player.id,
+      fullName: player.fullName,
+      nickname: player.nickname,
+      rtrId: player.rtrId,
+      identity: 'registered',
+      picture: profile?.picture ?? null,
+      suggestion:
+        leaderboardLevels[player.id] ??
+        (rankIndex == null ? null : (PLAYING_LEVELS[rankIndex] ?? null)),
+      rankLabel: listed >= 0 ? `#${listed + 1}` : 'Not ranked',
+    },
+    savedName: null,
+  }
+}
+
+/**
+ * Player lookup as the list the Add player sheet draws: the one match, or nothing. Kept for the
+ * existing screens; `lookupPlayer` also says when the match is already a saved player. Real mode
+ * keeps its registered-only search until D-2026-11-16-04 is built there.
+ */
+export async function playerDirectorySearch(q: string): Promise<DirectoryPlayer[]> {
+  if (isRealDataMode()) return realPlayerDirectorySearch(q)
+  const { player } = await lookupPlayer(q)
+  return player ? [player] : []
 }
 export type AddDirectoryPlayerInput = RosterAddPlacement & {
   sessionId: string
   playerId: string
+  /** This club's own name for another club's unclaimed player; required for one ("Enter a name.") */
+  name?: string
   level: PlayingLevel
 }
 export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
-  const p = clubPlayerForProfile(s, input.playerId).player
+  const p = clubPlayerForProfile(s, input.playerId, undefined, 'added', input.name).player
   const data = place(
     s,
     input.sessionId,
@@ -215,11 +279,12 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   sessionId: string
   name: string
   nickname?: string
-  phone?: string
+  /** No email adds a guest; an email adds an unclaimed player or links a ROTRA player */
+  email?: string
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
-  const p = createClubPlayer(s, input),
+  const { player: p, how } = createClubPlayer(s, input),
     data = place(
       s,
       input.sessionId,
@@ -233,9 +298,7 @@ export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
     data,
     text: data.waitlistPosition
       ? `${p.fullName} added to the waitlist as #${data.waitlistPosition}`
-      : p.identity === 'guest'
-        ? `${p.fullName} added as a guest`
-        : `${p.fullName} added · profile lookup after sync`,
+      : `${p.fullName} added${how}`,
   }
 }
 export async function addNewPlayerToSession(input: AddNewPlayerInput) {
@@ -544,7 +607,6 @@ export type JoinRequestInput = {
   sessionId: string
   name: string
   nickname?: string
-  phone?: string
   statedBand: SessionJoinRequest['statedBand']
   /** Join a slot (default) or Be waitlisted (D-2026-11-11-02) */
   placement?: Extract<JoinRequestPlacement, 'slot' | 'waitlist'>
@@ -568,8 +630,6 @@ function request(s: MockState, input: JoinRequestInput) {
   const fields: Record<string, string> = {}
   const placement = input.placement ?? 'slot'
   if (!input.name.trim()) fields.name = 'Enter your name.'
-  const phone = input.phone?.trim() ? phoneField.safeParse(input.phone) : null
-  if (phone && !phone.success) fields.phone = 'Enter a full mobile number, or leave it empty.'
   if (!['beginner', 'intermediate', 'advanced', 'unsure'].includes(input.statedBand))
     fields.statedBand = 'Pick your level, or Not sure.'
   if (placement !== 'slot' && placement !== 'waitlist')
@@ -583,7 +643,6 @@ function request(s: MockState, input: JoinRequestInput) {
     sessionId: session.id,
     name: input.name.trim(),
     nickname: input.nickname?.trim() || null,
-    phoneE164: phone?.success ? phone.data : null,
     statedBand: input.statedBand,
     placement,
     status: 'pending',
@@ -606,16 +665,19 @@ function pending(s: MockState, id: string) {
   if (!r || r.status !== 'pending') fail('This join request has already been decided.')
   return r
 }
-/** Confirm a guest's join request: a new guest record, then a slot or the waitlist place. */
+/**
+ * Confirm a guest's join request: a new guest record (a name only), then a slot or the waitlist
+ * place. Nothing links a returning guest's request to an earlier record, so it makes a second one
+ * (D-2026-11-16-04).
+ */
 export function confirmJoinRequestChange(
   s: MockState,
   input: { requestId: string; level: PlayingLevel },
 ) {
   const request = pending(s, input.requestId),
-    p = createClubPlayer(s, {
+    { player: p } = createClubPlayer(s, {
       name: request.name,
       nickname: request.nickname ?? undefined,
-      phone: request.phoneE164 ?? undefined,
     }),
     data = place(
       s,
@@ -672,10 +734,10 @@ export function setAlwaysRequireRequest(input: { sessionId: string; always: bool
   })
 }
 const samples = [
-  { name: 'Tracy', nickname: 'Trace', phone: '0917 555 0142', statedBand: 'intermediate' },
+  { name: 'Tracy', nickname: 'Trace', statedBand: 'intermediate' },
   { name: 'Gretchen', statedBand: 'beginner' },
-  { name: 'PJ Perez', nickname: 'PJ', phone: '0928 555 0199', statedBand: 'advanced' },
-  { name: 'Jess', phone: '0905 555 0110', statedBand: 'unsure' },
+  { name: 'PJ Perez', nickname: 'PJ', statedBand: 'advanced' },
+  { name: 'Jess', statedBand: 'unsure' },
 ] as const
 export function addSampleJoinRequest(sessionId: string) {
   return rosterMutation(sessionId, (s) => {

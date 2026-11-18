@@ -1144,7 +1144,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Amends:** [D-2026-11-17-01](#d-2026-11-17-01) (operator naming, effective date, the text, where it is shown).
 - **Decision:**
   - **Fuller text.** Both pages are rewritten into a more complete version in the same plain-language voice: the Privacy Policy covers the Data Privacy Act of 2012 (legal basis per use, automated ranks, named service providers, storage outside the Philippines, breach notice, cookies, rights, children, links); the Terms add who can use ROTRA, club accounts and licenses, playing at your own risk, ROTRA's property, other companies' services, limits on liability, claims caused by the user, events outside our control, disputes and general terms.
-  - **Operator:** placeholders for now, exactly `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes), so they can be found and filled. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
+  - **Operator:** first shipped as the placeholders `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes). Filled on November 18, 2026 (owner): the operator is “Jose Adrian Buctuanon (doing business as CodeGourmet IO)”, because CodeGourmet IO is not a registered business; the address is “Lapu-Lapu City, Cebu, Philippines”; the courts are those of Lapu-Lapu City. Revisit the name if the business is registered. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
   - **Age:** you must be 18 to register on your own. Anyone under 18 may use ROTRA only with a parent's or guardian's consent. A club that adds a minor confirms it has that consent.
   - **Club licenses and refunds:** the license, fees, period, payment and refunds are the ones in the club's accepted quotation. A quotation request on rotra.club is not a contract until a quotation is accepted. Nothing overrides rights the law gives.
   - **Google sign-in:** every statement about Google is true whether the `player_google_sign_in` flag ([D-2026-11-18-01](#d-2026-11-18-01)) is on or off ("If you sign in with Google", "or with Google where it is offered").
@@ -1152,7 +1152,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Effective date** on both, everywhere: November 18, 2026.
 - **Open:**
   - The text is still a plain-language draft that a lawyer has not reviewed.
-  - Filling the three placeholders.
+  - ~~Filling the three placeholders.~~ Done November 18, 2026 (see “Operator” above).
   - Designating a Data Protection Officer, and checking whether ROTRA must register with the National Privacy Commission.
   - The `support@rotra.club` mailbox must exist before launch.
   - Retention periods: the pages give none. (The [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md#public-pages-and-retention) already has six months for public pages after expiry and 90 days for join requests, server request logs and exports, not yet enforced by a job.)

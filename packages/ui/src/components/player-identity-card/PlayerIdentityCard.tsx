@@ -3,10 +3,19 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { Icon } from '@rotra/ui/icon'
+import { KeyValueList } from '@rotra/ui/key-value-list'
 import { PlayerIdLine } from '@rotra/ui/player-id-line'
+import {
+  ProfileCardSection,
+  ProfileStatsSection,
+  profileStats,
+} from '@rotra/ui/profile-banner-card'
 import { ProfileHero } from '@rotra/ui/profile-hero'
+import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile
+  /** The level and current-year stats in the public card of a player saved by one club. */
+  unclaimedFacts?: { levelLabel: string | null; games: number; wins: number; year: number }
   isOwn?: boolean
   idElementId: string
   onCopyId: () => void
@@ -32,6 +41,7 @@ export type PlayerIdentityCardProps = {
 }
 export function PlayerIdentityCard({
   profile,
+  unclaimedFacts,
   isOwn = false,
   idElementId,
   onCopyId,
@@ -46,6 +56,7 @@ export function PlayerIdentityCard({
   bannerKey,
   bannerImageUrl,
 }: PlayerIdentityCardProps) {
+  const savedBy = isOwn ? undefined : profile.unclaimedSavedBy
   return (
     <Card asChild className="overflow-hidden pt-0">
       <section className="flex flex-col gap-3.5">
@@ -58,8 +69,33 @@ export function PlayerIdentityCard({
           onViewPicture={onViewPicture}
           onChangePicture={isOwn ? (onChangePicture ?? (() => {})) : undefined}
           onChangeBanner={isOwn ? onChangeBanner : undefined}
-          badges={isOwn ? <Chip tone="accent">This is you</Chip> : undefined}
+          badges={
+            isOwn ? (
+              <Chip tone="accent">This is you</Chip>
+            ) : savedBy ? (
+              <Chip tone="warn">Not registered yet</Chip>
+            ) : undefined
+          }
         />
+        {savedBy && unclaimedFacts ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip tone={unclaimedFacts.levelLabel ? 'accent' : 'neutral'}>
+                {unclaimedFacts.levelLabel ?? 'Not ranked yet'}
+              </Chip>
+              <ProfileLeaderboardChips places={profile.leaderboardPlaces ?? []} />
+            </div>
+            <ProfileCardSection label="About">
+              <KeyValueList items={[{ label: 'Saved by', value: savedBy }]} />
+            </ProfileCardSection>
+            {profile.showProfileStats !== false ? (
+              <ProfileStatsSection
+                year={unclaimedFacts.year}
+                stats={profileStats(unclaimedFacts.games, unclaimedFacts.wins)}
+              />
+            ) : null}
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
             Player ID

@@ -70,17 +70,18 @@ Explain that each club can assign its own local level and that the operator's lo
 
 Whether individual clubs' assessments are publicly itemized is undecided. The explanation can describe the method without exposing unapproved club-by-club details or private operator notes.
 
-## P-ELIGIBILITY — Progress and reassessment
+## P-ELIGIBILITY — Shared rank progress and leaderboard places
 
-**Once a player qualifies** (owner artifact comments, November 13, 2026; [log](../../../../mockup-changes/2026-11-13-player-ranking-card.md)), the profile shows a compact **Leaderboard ranking** card in place of this one, with only this player's information: the title and a **Qualifies** chip; “Shared rank” over the rank label (bold) and its status chip on the left; on the right a small box, “Overall”, the position big in the accent and “of N”, which opens the leaderboard at their row (the row flashes); then a footer line “X of T standard matches · last three months” with **Share** (own profile, ranked) and **How this rank works**. No neighbouring rows. Players who don't qualify yet, or need reassessment, keep the eligibility card below, with the same Shared rank head.
+The own profile and readable public profiles show **Shared rank**, the skill label and its status,
+**How this rank works**, and **Share** on the own profile when ranked. While a rank is Provisional,
+the explanation shows the number of standard matches toward the skill rank threshold in the last
+three months. After three months without play the old label remains visible with **Needs
+reassessment** and the profile explains the fresh club assessment. See [profile states](profile.md#profile-states).
 
-For the signed-in owner or permitted public explanation, show actual eligible completed standard matches in the current window and required threshold. Do not count lifetime games toward a rolling requirement.
-
-Below threshold: profile and provisional rank may remain visible, but no overall position. Fun-game local counts cannot inflate this progress.
-
-Three months without play: retain previous label with **Needs reassessment**, remove overall position, and explain return requires a fresh club assessment plus a completed new session and the rolling match threshold. One return session does not waive the threshold.
-
-Define missing/stale calculations as pending, not zero or Beginner. Exact calendar/window boundaries and recalculation behavior are unresolved and must be settled before publishing precise cutoff dates.
+**Leaderboards** appears above the shared rank only when the player places in at least one of the
+three top 50 lists. Each box shows the list name, place and period wins. Opening it selects that
+period and scrolls to and highlights the player's row. Places follow the calendar leaderboard rules
+independently of the skill rank or its progress.
 
 ## P-SESSIONS — Every session a player joined
 
@@ -114,8 +115,8 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08
 
 **Save to Photos on iPhone and iPad (owner, November 15, 2026; [log](../../../../mockup-changes/2026-11-15-share-save-to-photos.md)).** Safari on iPhone and iPad saves downloads to the Files app. There, where the system share sheet takes files, every share dialog shows **Save to Photos** in place of **Download N images**, next to **Share**, with the hint “Save to Photos opens the share menu. Tap **Save Image** there.” (**Save N Images** when several are picked). It opens the system share sheet with the picked PNGs; its **Save Image** puts them in Photos. The full-screen view's button reads **Save to Photos** too. Android and computers keep **Download**. A web page can't write to Photos directly, and can't open the Instagram or Facebook story editor.
 
-- **Share profile** ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): own profile, a card with level (or **Not ranked yet**), position when there is one and this calendar year's wins; a read-only **Profile link** field with **Copy** under the card; **Download image** and **Share**. Post is 1080 × 1350 like the other cards, not the 1080 × 1080 in the owner's pack; to confirm with the owner.
-- **Share rank:** from the profile, see [profile.md](profile.md#p-own-profile--signed-in-owner-view).
+- **Share profile** ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): on a readable profile or its dialog. The card shows the level (or **Not ranked yet**), the **Top annual** place if present, and this calendar year's wins. The **Profile link** field and copy icon sit below the images.
+- **Share rank:** on the own profile when ranked. The card shows the level, the **Top annual** place if present, and the skill ladder.
 - **Share result:** in My sessions (Finished) and on each session group in Match history. Card: session title, date and club, “#N in Standings”, “G games · W–L”.
 - **Share games:** on each session group in Match history. Card: date and club, avatar groups for each team with a prominent score between them, and “Total W–L”. Post shows 3 games, Story 4, then “+N more games”. A missing score shows an em dash and “Winner recorded”.
 - **Your own games, any time** (since November 13, 2026, [D-2026-11-13-06](../../../../mvp/decisions.md#d-2026-11-13-06)): **Share performance** (one card: session title, date · club, your counted record big as “W–L” with “N% won”, then Games, Won, Lost and, once published, Standing “#N”; also in the session matches dialog footer on your own profile) and **Share games** show on every session of your own history, and each counted game has a share icon (**Share game**, one game). **Share result** still appears only after the Queue Master publishes; before that the row says “Share result opens once the club shares the Standings.”

@@ -2,6 +2,7 @@ import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
+import { unclaimedClubCount } from '../leaderboard/identity'
 import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
 import { mockLeaderboard } from '../leaderboard/projection'
 import { playerRequest } from '../leaderboard/request'
@@ -140,7 +141,21 @@ export async function getPlayerProfile(
   if (!profile) return null
   if (profile.adminChangeNote && (await getSession('player'))?.account.id !== playerId)
     delete profile.adminChangeNote
-  return withBanner({ ...profile, leaderboardPlaces: mockLeaderboard(state).places(playerId) })
+  const savingClub =
+    unclaimedClubCount(state, playerId) === 1
+      ? state.clubPlayers.find(
+          (entry) =>
+            entry.playerId === playerId && entry.identity === 'unclaimed' && !entry.removedAt,
+        )?.clubId
+      : undefined
+  const unclaimedSavedBy = savingClub
+    ? state.clubs.find((club) => club.id === savingClub)?.name
+    : undefined
+  return withBanner({
+    ...profile,
+    leaderboardPlaces: mockLeaderboard(state).places(playerId),
+    unclaimedSavedBy,
+  })
 }
 
 /** Mock mode: the profile with its resolved banner (bannerKey, bannerImageUrl), like the server's. */

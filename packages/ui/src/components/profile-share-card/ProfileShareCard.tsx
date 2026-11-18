@@ -16,8 +16,10 @@ export type ProfileShareCardProps = Pick<
   picture?: string | null
   /** Null shows "Not ranked yet". */
   levelLabel: string | null
-  /** The overall leaderboard position; hidden when there is none. */
+  /** The player's place in the named leaderboard, when available. */
   position: number | null
+  /** Player shares use Top annual. Admin shares keep their existing Overall line. */
+  positionLabel?: 'Top annual' | 'Overall'
   /** Counted wins this calendar year; null shows "No games yet this year". */
   wins: number | null
   /** The calendar year the wins count (“In YEAR”); defaults to the current year */
@@ -26,8 +28,8 @@ export type ProfileShareCardProps = Pick<
 }
 
 /**
- * P-OWN-PROFILE's Share profile: the Story, Facebook post and Square images (picture, level, overall
- * position, wins this calendar year “In YEAR”; no QR), picked and downloaded or shared, then OR and the Profile link.
+ * P-OWN-PROFILE's Share profile: the Story, Facebook post and Square images (picture, level,
+ * leaderboard place, wins this calendar year “In YEAR”; no QR), picked and downloaded or shared, then OR and the Profile link.
  * `initialFormat` is kept for older callers and ignored: every size starts picked.
  */
 export function ProfileShareCard({
@@ -37,6 +39,7 @@ export function ProfileShareCard({
   picture,
   levelLabel,
   position,
+  positionLabel = 'Overall',
   wins,
   year = new Date().getFullYear(),
   onCopy,
@@ -96,13 +99,13 @@ export function ProfileShareCard({
               >
                 {levelLabel ?? 'Not ranked yet'}
               </b>
-              {levelLabel === null && position === null ? null : (
+              {position !== null || (positionLabel === 'Overall' && levelLabel !== null) ? (
                 <div className="flex flex-col gap-0.5">
                   <span
                     data-qr-text
                     className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
                   >
-                    Overall
+                    {positionLabel}
                   </span>
                   {position ? (
                     <b
@@ -121,7 +124,7 @@ export function ProfileShareCard({
                     </b>
                   )}
                 </div>
-              )}
+              ) : null}
               {wins === null ? (
                 <b
                   data-qr-text

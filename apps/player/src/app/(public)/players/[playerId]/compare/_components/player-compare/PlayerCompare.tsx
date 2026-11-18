@@ -9,6 +9,7 @@ import { CompareFilterBar } from '@rotra/ui/compare-filter-bar'
 import { type CompareStatRow, CompareStats } from '@rotra/ui/compare-stats'
 import { ErrorState } from '@rotra/ui/error-state'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { LEADERBOARD_PERIOD_COPY, LEADERBOARD_PERIODS } from '@rotra/ui/leaderboard-period-switch'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
@@ -145,13 +146,21 @@ export function PlayerCompare({ playerId }: { playerId: string }) {
       theirs: levelLabel(otherLevel),
       lead: lead(my.rank?.levelIndex, other.rank?.levelIndex),
     },
-    {
-      label: 'Overall position',
-      mine: my.rank?.position == null ? '—' : `#${my.rank.position.toLocaleString('en-PH')}`,
-      theirs:
-        other.rank?.position == null ? '—' : `#${other.rank.position.toLocaleString('en-PH')}`,
-      lead: lead(my.rank?.position, other.rank?.position, true),
-    },
+    ...LEADERBOARD_PERIODS.flatMap((period) => {
+      const mine = my.profile.leaderboardPlaces?.find((place) => place.period === period)?.position
+      const theirs = other.profile.leaderboardPlaces?.find(
+        (place) => place.period === period,
+      )?.position
+      if (mine == null && theirs == null) return []
+      return [
+        {
+          label: LEADERBOARD_PERIOD_COPY[period].label,
+          mine: mine == null ? '—' : `#${mine.toLocaleString('en-PH')}`,
+          theirs: theirs == null ? '—' : `#${theirs.toLocaleString('en-PH')}`,
+          lead: lead(mine, theirs, true),
+        },
+      ]
+    }),
     ...(filter === 'h2h'
       ? [
           {

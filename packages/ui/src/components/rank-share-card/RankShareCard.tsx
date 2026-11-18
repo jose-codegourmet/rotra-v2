@@ -15,11 +15,12 @@ export type RankShareCardProps = Pick<
   picture?: string | null
   level: number
   levelLabel: string
+  /** Top annual place, when the player is in its top 50. */
   position: number | null
   onCopy: () => void
 }
 /**
- * Share rank: the Story, Facebook post and Square images (level, overall position, skill ladder; no
+ * Share rank: the Story, Facebook post and Square images (level, Top annual place, skill ladder; no
  * QR), then OR and the Link. `initialFormat` is kept for older callers and ignored.
  */
 export function RankShareCard({
@@ -85,14 +86,14 @@ export function RankShareCard({
               >
                 {levelLabel}
               </b>
-              <div className="flex flex-col gap-0.5">
-                <span
-                  data-qr-text
-                  className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
-                >
-                  Overall
-                </span>
-                {position ? (
+              {position !== null ? (
+                <div className="flex flex-col gap-0.5">
+                  <span
+                    data-qr-text
+                    className="text-[11px] font-semibold tracking-[0.5px] text-share-muted uppercase"
+                  >
+                    Top annual
+                  </span>
                   <b
                     data-qr-text
                     className={cn(
@@ -101,14 +102,10 @@ export function RankShareCard({
                       'leading-none',
                     )}
                   >
-                    #{position}
+                    #{position.toLocaleString('en-PH')}
                   </b>
-                ) : (
-                  <b data-qr-text className="text-xl text-share-fg">
-                    No position
-                  </b>
-                )}
-              </div>
+                </div>
+              ) : null}
               <SkillLadder level={level} shareCard />
             </div>
           </ShareImage>

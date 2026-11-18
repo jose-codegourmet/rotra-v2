@@ -5,7 +5,7 @@ import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { ProgressBar } from '@rotra/ui/progress-bar'
 
-/** The shared rank's status chip (rankStatus): Not calculated, Needs reassessment, On the leaderboard, … */
+/** The shared rank's status chip, such as Provisional, Needs reassessment or Not calculated. */
 export type RankStatusChip = { label: string; tone: 'accent' | 'warn' | 'neutral' }
 
 /**

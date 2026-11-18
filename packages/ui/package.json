@@ -165,6 +165,7 @@
     "./club-profile-card": "./src/components/club-profile-card/ClubProfileCard.tsx",
     "./profile-banner": "./src/components/profile-banner/ProfileBanner.tsx",
     "./profile-hero": "./src/components/profile-hero/ProfileHero.tsx",
+    "./profile-leaderboard-chips": "./src/components/profile-leaderboard-chips/ProfileLeaderboardChips.tsx",
     "./profile-ranking-card": "./src/components/profile-ranking-card/ProfileRankingCard.tsx",
     "./profile-sessions-card": "./src/components/profile-sessions-card/ProfileSessionsCard.tsx",
     "./session-matches-sheet": "./src/components/session-matches-sheet/SessionMatchesSheet.tsx",

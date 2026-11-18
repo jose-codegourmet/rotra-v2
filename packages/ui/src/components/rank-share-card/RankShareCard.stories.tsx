@@ -11,7 +11,7 @@ const meta = {
     nickname: 'Migs',
     level: 6,
     levelLabel: 'Intermediate High',
-    position: 214,
+    position: 17,
     onCopy: () => {},
   },
 } satisfies Meta<typeof RankShareCard>

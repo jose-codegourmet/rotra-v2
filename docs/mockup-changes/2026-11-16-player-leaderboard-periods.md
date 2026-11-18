@@ -1,13 +1,13 @@
 # Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks
 
-Status: IN PROGRESS — #891; #897 components, #902 data and #906 mock page implemented, batch verification pending
+Status: IN PROGRESS — #891; #897 components, #902 data, #906 mock page and #913 profile, Compare and shares implemented, batch verification pending
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewBoard, `periodList`, `lbMove`, `lbRow`, `lbHead`, `podium`, `meCard`, `.lb-move`, `.lb-wins`, `.lb-tabs`
 Route: /player (Leaderboard)
-Screen ID: P-LEADERBOARD
+Screen ID: P-LEADERBOARD, P-PUBLIC-PROFILE, P-OWN-PROFILE, P-COMPARE, profile dialog, share images
 Artifact: https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN
-Components: leaderboard-row, leaderboard-podium, your-position-card, segmented-control
+Components: leaderboard-row, leaderboard-podium, your-position-card, segmented-control, profile-ranking-card, profile-leaderboard-chips, club-member-profile-sheet, compare-stats, profile-share-card, rank-share-card
 Supersedes: none
 Superseded by: none
 
@@ -66,7 +66,7 @@ Superseded by: none
 ## Docs updated
 - Business logic: docs/business_logic/product/player-information/modules/ranking/README.md — the rules for the three lists.
 - Database design: none yet. Period wins and the previous place need a proposal when this is ticketed.
-- Screen docs: docs/screens/product/modules/player-information/ranking-history.md — P-LEADERBOARD.
+- Screen docs: docs/screens/product/modules/player-information/ranking-history.md — P-LEADERBOARD, skill-rank progress and share cards; docs/screens/product/modules/player-information/profile.md — profile boxes, the profile dialog and Compare.
 
 ## Real app work
 - apps/player and packages/ui: the period switch, row, podium and position card as above.

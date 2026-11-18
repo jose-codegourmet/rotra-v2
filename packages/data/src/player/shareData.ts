@@ -142,7 +142,8 @@ export async function getPlayerProfileShareData(playerId: string, signal?: Abort
     kind: 'profile' as const,
     profile,
     levelIndex: rank?.levelIndex ?? null,
-    position: rank?.position ?? null,
+    annualPosition:
+      profile.leaderboardPlaces?.find((place) => place.period === 'year')?.position ?? null,
     wins: recent.games > 0 ? recent.wins : null,
     link: `/players/${encodeURIComponent(playerId)}`,
   }

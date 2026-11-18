@@ -87,6 +87,8 @@ export type ProfileVisibility = 'public' | 'private' | 'always_private'
 /** Public profile only; private account and contact fields are deliberately excluded. */
 export type PlayerProfile = {
   leaderboardPlaces?: LeaderboardPlace[]
+  /** The one club whose version of an unclaimed player is public. */
+  unclaimedSavedBy?: string
   /** Unset on an identity without a stored level reads as `public` (existing fixture identities). */
   profileVisibility?: ProfileVisibility
   /**

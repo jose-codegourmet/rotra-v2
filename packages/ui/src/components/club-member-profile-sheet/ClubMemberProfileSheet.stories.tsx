@@ -1,3 +1,6 @@
+import { clubs } from '@rotra/data/fixtures/clubs'
+import { leaderboardPlayers } from '@rotra/data/fixtures/players'
+import { profileLeaderboardStoryPlaces } from '@rotra/data/fixtures/rank-states'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { ClubMemberProfileSheet } from './ClubMemberProfileSheet'
@@ -18,7 +21,7 @@ const meta = {
       name: 'Maria Steph',
       nickname: 'Atty Steph',
       levelLabel: 'Intermediate Low',
-      position: 18,
+      leaderboardPlaces: profileLeaderboardStoryPlaces,
       isYou: false,
       registeredCity: 'Cebu City',
       rtrId: 'RTR-PH-CEB-040226-0031',
@@ -36,7 +39,7 @@ export const You: Story = {
       name: 'Jose',
       nickname: null,
       levelLabel: 'Intermediate Low',
-      position: 7,
+      leaderboardPlaces: profileLeaderboardStoryPlaces.slice(0, 2),
       isYou: true,
       registeredCity: 'Cebu City',
       rtrId: 'RTR-PH-CEB-040226-0001',
@@ -52,12 +55,23 @@ export const NoGames: Story = {
       name: 'Kenjie',
       nickname: null,
       levelLabel: null,
-      position: null,
+      leaderboardPlaces: [],
       isYou: false,
       registeredCity: null,
       rtrId: null,
       stats: { games: 0, wins: 0, losses: 0 },
       bannerKey: 'stripe',
+    },
+  },
+}
+export const Unclaimed: Story = {
+  args: {
+    profile: {
+      ...meta.args.profile,
+      name: leaderboardPlayers[17]?.fullName ?? '',
+      nickname: leaderboardPlayers[17]?.nickname ?? null,
+      rtrId: leaderboardPlayers[17]?.rtrId ?? null,
+      unclaimedSavedBy: clubs[1]?.name,
     },
   },
 }

@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 to 03 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -62,6 +62,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -1178,3 +1179,28 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Nicknames already copied onto linked saved-player rows before this rule (database).
 - **Amends:** the November 11, 2026 rule (#705) that Saved players always show a registered player's own nickname; “Registered players have no Edit details” still holds, the club nickname is the one exception.
 - **References:** [players module](../business_logic/product/queue/modules/players/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Club nickname](../product-terms.md).
+
+<a id="d-2026-11-18-04"></a>
+### D-2026-11-18-04 — Scoring modes: a scoring mode per Queue Session and a match result that follows it
+- **Decision status:** approved in part (owner, November 18, 2026: “you can have a play on how you want to display it here”; the four answers below). The open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-scoring-modes.md)).
+- **Ticket:** [#944](https://github.com/jose-codegourmet/rotra-v2/issues/944) ([#955](https://github.com/jose-codegourmet/rotra-v2/issues/955) mockup, [#956](https://github.com/jose-codegourmet/rotra-v2/issues/956) docs)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Mockup first;** the real app follows in a later batch.
+  - **A scoring mode per Queue Session**, picked in setup: 16/31 (default), 16/31 no deuce, 11/21, 11/21 × 3, 21 × 3. The match result dialog asks only for what the mode needs: the winner is picked, the winner's score is fixed at the target, and the losing score is typed.
+  - **Best of 3 keeps every game score** (owner's go-ahead for the stored shape). The games decide the match winner; the pair's games won is the match score.
+  - **Deuce:** 16/31, 11/21 and 11/21 × 3 have deuce; 16/31 no deuce and 21 × 3 do not. There is no cap: deuce runs until one pair leads by 2.
+  - **Scores the mode cannot produce are refused,** not just warned. A winner-only result still confirms.
+  - Permanence is unchanged and now covers every game score.
+- **Open:** (the mockup shows a placeholder for each)
+  - Whether the readings of “16/31” (to 31, change sides at 16) and “11/21” are right.
+  - Changing the mode after Start (mockup: fixed after Start), and a different mode for one match.
+  - A club default in Club settings (mockup: none; every session starts on 16/31).
+  - Whether scores stay optional in every mode (mockup: optional), and a best of 3 with game winners but no scores (mockup: stored as the winner only).
+  - Whether game scores show on share images and the Facebook post (mockup: no).
+  - Whether the mode changes the expected match length (courts and time) or the minimum games estimate (mockup: no).
+  - In a deuce mode a normal finish uses the short losing-score entry with Went to deuce for the rest (mockup: yes).
+  - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
+- **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
+- **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.

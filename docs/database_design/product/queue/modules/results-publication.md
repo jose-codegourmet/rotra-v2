@@ -1,6 +1,6 @@
 # Finalized facts, awards, and publication
 
-**Last verified:** 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed data structures, not proposed new award formulas.
 
@@ -16,7 +16,7 @@
 | `played_at`, `format`, `team`, `winning_team` | Frozen result context |
 | `full_participation`, `standard_match` | Recomputed from source evidence, not accepted client flags |
 | `skill_level_snapshot`, partner/opposition evidence | Session-assigned context for later reproducible math |
-| `team_a_score`, `team_b_score` | Optional score pair |
+| `team_a_score`, `team_b_score` | Optional score pair. For a best of 3 it is the games won; whether the game scores are copied into the fact is open ([proposed shape](matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026)) |
 | `fact_version` | Reducer version; not permission to change winner |
 
 Only a valid session finalization can create official facts. Invalid matches produce none. Fun matches can produce club-local facts but are excluded from global performance/standard-match counts. Partial participation can be retained as source evidence, but both outgoing and incoming substitutes receive no game, win, loss, minimum-game or award credit anywhere (settled October 26, 2026), **except** the one the Queue Master gave the game to (`credit_to`, proposed November 6, 2026): that player counts as a full participant for club-local session facts (standings, awards, games, minimum) and is still excluded from global performance and standard-match counts.

@@ -3,7 +3,7 @@
 > **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
 
 
-**Last verified:** 2026-11-16 for the open points of [D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04); 2026-11-12 for the round-2 columns (D-2026-11-12-01); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
+**Last verified:** 2026-11-18 for the proposed scoring mode columns and game score rows ([D-2026-11-18-04](../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-16 for the open points of [D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04); 2026-11-12 for the round-2 columns (D-2026-11-12-01); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court, substitution-credit, court-fill, cancelled-session and times-and-days decisions (column names settled; drafted in `20261106000100`); 2026-11-01 for the F07.34 wiring gaps (#317).
 
 **Status:** Review register, not a questionnaire or approval request for writing these docs.
 
@@ -50,6 +50,13 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - Sequence formatting above 9999 (the city registry, Admin-added cities and founding-location corrections were settled November 11, 2026).
 - Refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes (renewal dates and overlapping terms were settled November 11, 2026). (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
+
+## Owner decision recorded November 18, 2026
+
+Source: [D-2026-11-18-04](../../mvp/decisions.md#d-2026-11-18-04). Proposed only; no migration, no Prisma change.
+
+- **Go-ahead:** a best of 3 keeps every game score. The proposed shape is in [matches and queue](queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026) and [sessions and roster](queue/modules/sessions-roster.md).
+- **Still open:** whether the game rows are added to the frozen result evidence and to the finalized facts in [results publication](queue/modules/results-publication.md) (today a fact carries only the two scores); whether the two score fields of a best of 3 hold games won (proposed) or are left null; how old matches and sessions without a scoring mode read (proposed: a null mode reads as `16_31`); the stored value of a best of 3 with game winners but no scores (mockup: the winner only); and a club default scoring mode, which would need a column on the club.
 
 ## Owner decisions recorded November 12, 2026
 

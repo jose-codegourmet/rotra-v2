@@ -3,7 +3,7 @@
 > **November 8, 2026:** The owner decisions in [Offline operation and recovery](../../business_logic/product/queue/modules/offline/README.md) supersede conflicting earlier offline, device, finalization, payment and conflict rules below. Late-record recovery and implementation details remain open.
 
 
-**Last verified:** 2026-11-16 for the player statuses ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)); 2026-11-12 for the round-2 answers ([D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01)); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-18 for the scoring mode screen details ([D-2026-11-18-04](../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-16 for the player statuses ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)); 2026-11-12 for the round-2 answers ([D-2026-11-12-01](../../mvp/decisions.md#d-2026-11-12-01)); 2026-11-07 for player login mapping and claim-link rules (#244) and the MVP offline-start note (D-2026-11-07-03); 2026-11-06 for the On court step, court filling, substitution game credit, and the connection rules for Cancel session and the court switch; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Explicit unresolved details, not omitted screens and not a new interview questionnaire. Updated October 26, 2026: items settled by the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html) are listed at the end, followed by those settled with the [ROTRA Admin prototype](../../../apps/mockup/admin-app/rotra-admin.html) on October 27, 2026.
 
@@ -34,6 +34,13 @@ The screen tree specifies all agreed v1 workflows. Where behavior is undecided, 
 
 - Exact routes beyond the approved mock auth boundary (`/login` in all apps, public Queue `/s/[slug]`, public Player `/players/[playerId]`, protected Player `/me`; approved October 27, 2026), component names, page-versus-sheet boundaries, field-length limits, design tokens, and export pixel dimensions.
 - Changing mode/formats/minimum during an active session. They stay visible and fixed until decided.
+- Scoring modes ([D-2026-11-18-04](../../mvp/decisions.md#d-2026-11-18-04); mockup only). The mockup's answers are placeholders until the owner decides:
+  - Changing the scoring mode after Start, or for one match: the Scoring field is read-only after Start (“Scoring can't change after Start.”).
+  - A club default in Club settings: none; every new session starts on 16/31.
+  - Scores optional in every mode, and a best of 3 with game winners but no scores: optional; stored as the winner only.
+  - Game scores on share images and the Facebook post: not shown.
+  - The losing-score entry: in a deuce mode a normal finish uses one losing-score box and a **Went to deuce** switch (a **Deuce** toggle per game in 11/21 × 3).
+  - Whether the “16/31” and “11/21” readings are right.
 - The Generate matches (formerly called Auto Queue) match count is explicitly selected from 2, 3, 4 or 6, with no preselected default (owner decision October 31, 2026).
 - Access to five-session history for award calculations when a returning guest was duplicated rather than recognized.
 - Whether individual club assessments are itemized publicly. Equal-weight aggregation is agreed; public assessment disclosure is not.

@@ -8,5 +8,5 @@ export const playerShellMeta = {
   ],
   prototype: { file: 'apps/mockup/player-app/rotra-player.html', screen: 'topBar' },
   docs: ['docs/screens/product/navigation.md'],
-  related: ['TopBar', 'PlayerNav', 'OfflineBand'],
+  related: ['TopBar', 'PlayerNav', 'NotificationBell', 'OfflineBand'],
 } satisfies ComponentMeta

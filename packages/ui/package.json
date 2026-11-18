@@ -141,6 +141,9 @@
     "./my-position-card": "./src/components/my-position-card/MyPositionCard.tsx",
     "./no-show-panel": "./src/components/no-show-panel/NoShowPanel.tsx",
     "./notice": "./src/components/notice/Notice.tsx",
+    "./notification-bell": "./src/components/notification-bell/NotificationBell.tsx",
+    "./notification-item": "./src/components/notification-item/NotificationItem.tsx",
+    "./notification-list": "./src/components/notification-list/NotificationList.tsx",
     "./now-card": "./src/components/now-card/NowCard.tsx",
     "./now-card/helpers": "./src/components/now-card/NowCard.helpers.ts",
     "./offline-band": "./src/components/offline-band/OfflineBand.tsx",
@@ -384,6 +387,7 @@
     "./player-account-chip": "./src/components/player-account-chip/PlayerAccountChip.tsx",
     "./rank-status-chip": "./src/components/rank-status-chip/RankStatusChip.tsx",
     "./same-name-notice": "./src/components/same-name-notice/SameNameNotice.tsx",
+    "./admin-player-verification-card": "./src/components/admin-player-verification-card/AdminPlayerVerificationCard.tsx",
     "./admin-player-identity-card": "./src/components/admin-player-identity-card/AdminPlayerIdentityCard.tsx",
     "./private-contact-card": "./src/components/private-contact-card/PrivateContactCard.tsx",
     "./player-account-card": "./src/components/player-account-card/PlayerAccountCard.tsx",
@@ -439,6 +443,7 @@
     "./admin-player-history": "./src/components/admin-player-history/AdminPlayerHistory.tsx",
     "./admin-add-player-form": "./src/forms/admin-add-player-form/AdminAddPlayerForm.tsx",
     "./admin-edit-player-form": "./src/forms/admin-edit-player-form/AdminEditPlayerForm.tsx",
+    "./admin-verification-override-form": "./src/forms/admin-verification-override-form/AdminVerificationOverrideForm.tsx",
     "./admin-player-change-form": "./src/forms/admin-player-change-form/AdminPlayerChangeForm.tsx",
     "./admin-player-actions": "./src/components/admin-player-actions/AdminPlayerActions.tsx",
     "./copy-player-value": "./src/components/copy-player-value/CopyPlayerValue.tsx",
@@ -496,7 +501,11 @@
     "./google-link-card": "./src/components/google-link-card/GoogleLinkCard.tsx",
     "./google-required-card": "./src/components/google-required-card/GoogleRequiredCard.tsx",
     "./google-choose-card": "./src/components/google-choose-card/GoogleChooseCard.tsx",
-    "./invite-signed-in-card": "./src/components/invite-signed-in-card/InviteSignedInCard.tsx"
+    "./invite-signed-in-card": "./src/components/invite-signed-in-card/InviteSignedInCard.tsx",
+    "./verification-page": "./src/components/verification-page/VerificationPage.tsx",
+    "./verification-card": "./src/components/verification-card/VerificationCard.tsx",
+    "./verification-status-chip": "./src/components/verification-status-chip/VerificationStatusChip.tsx",
+    "./verification-step": "./src/components/verification-step/VerificationStep.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

@@ -26,7 +26,7 @@ export function bandMiddleLevel(
 }
 type NamedRow = { nameSnapshot: string; nicknameSnapshot: string | null }
 /**
- * The name everyone but the Queue Master sees (D-2026-11-18-02): the player's account nickname,
+ * The name everyone but the Queue Master sees (D-2026-11-18-03): the player's account nickname,
  * else their first name. Public session page, the player's own live view and match request, Match
  * history, finished-session results, leaderboards, awards and share images. Never the club nickname.
  */
@@ -34,7 +34,7 @@ export function playerFacingName(player: NamedRow) {
   return player.nicknameSnapshot || player.nameSnapshot.split(' ')[0] || player.nameSnapshot
 }
 /**
- * The name the Queue Master sees (D-2026-11-18-02): the club nickname, else the account nickname,
+ * The name the Queue Master sees (D-2026-11-18-03): the club nickname, else the account nickname,
  * else the first name. Court tiles, Main Queue and Auto Queue, pickers, bagging pairs, toasts, the
  * roster and Saved players. `clubNickname` is set by the Queue Master reads, never by public reads.
  */

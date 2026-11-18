@@ -531,7 +531,7 @@ export async function declineMatchRequest(
       where: { id: row.sessionPlayerId },
       select: { nameSnapshot: true, clubPlayerId: true },
     })
-    // The Queue Master's toast: the club nickname first, then the nickname (D-2026-11-18-02).
+    // The Queue Master's toast: the club nickname first, then the nickname (D-2026-11-18-03).
     const names = requester ? await rosterNamesFor(tx, requester.clubPlayerId) : null
     return {
       requestId: row.id,

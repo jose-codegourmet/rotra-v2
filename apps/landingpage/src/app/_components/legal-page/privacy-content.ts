@@ -18,7 +18,7 @@ export const privacyPolicy = {
         },
         {
           kind: 'paragraph',
-          text: 'ROTRA is operated by [OPERATOR LEGAL NAME], [OPERATOR ADDRESS]. In this policy, "ROTRA", "we" and "us" mean [OPERATOR LEGAL NAME]. We are responsible for your information under the law. The law calls this the personal information controller.',
+          text: 'ROTRA is operated by Jose Adrian Buctuanon (doing business as CodeGourmet IO), Lapu-Lapu City, Cebu, Philippines. In this policy, "ROTRA", "we" and "us" mean Jose Adrian Buctuanon. We are responsible for your information under the law. The law calls this the personal information controller.',
         },
         {
           kind: 'paragraph',
@@ -347,7 +347,7 @@ export const privacyPolicy = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '[OPERATOR LEGAL NAME], [OPERATOR ADDRESS].',
+          text: 'Jose Adrian Buctuanon (doing business as CodeGourmet IO), Lapu-Lapu City, Cebu, Philippines.',
         },
         {
           kind: 'paragraph',

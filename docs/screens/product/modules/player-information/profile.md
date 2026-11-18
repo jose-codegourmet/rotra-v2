@@ -34,7 +34,7 @@ Unclaimed profiles can exist without a login; the public view does not let any v
 
 ## P-OWN-PROFILE — Signed-in owner view
 
-Start from the same public identity with clearly separated private account controls: Edit profile, My player ID/QR, phone privacy, read-only phone/email, contact-change request, and sign out.
+Start from the same public identity with clearly separated private account controls: Edit profile, My player ID/QR, phone privacy, read-only phone (masked, "+63 917 ••• ••42") and email, contact-change request, and sign out.
 
 Explain which fields are public before saving personal edits. Do not show a player-facing edit control for rank, local assessment, match scores, wins/losses, or eligibility. A player can see their own contact values; that does not make those values public.
 
@@ -62,7 +62,7 @@ Editable: agreed personal name/nickname and supported optional social/playing-st
 
 **Links** (Facebook, Instagram, TikTok, YouTube) stack one per row at every width, like the rest of the form (November 11, 2026).
 
-Phone and email are read-only with **Request a change**. Their fields must not become editable through a generic form payload or hidden input. Permanent RTR ID is read-only.
+Phone (shown masked, "+63 917 ••• ••42") and email are read-only with **Request a change**. Their fields must not become editable through a generic form payload or hidden input. Permanent RTR ID is read-only.
 
 Save validates actual supported fields, preserves values on error, and shows success only after server persistence. Cancel returns without changing stored details. If navigating away with unsaved edits, a proposed discard prompt may protect the draft; it does not finalize any session.
 

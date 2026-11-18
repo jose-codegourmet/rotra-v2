@@ -2,7 +2,7 @@
 
 `rotra-queue.html` is the single-file design reference for the v1 Queue product: club login, home dashboard, venues, saved players, inventory, club settings, session setup and preparation, the live console, finalization, results, the public session page, and session records. Open it in any browser. Nothing is installed and nothing is sent anywhere.
 
-**November 18, 2026:** a Queue Master can give a registered player a club nickname, shown on Queue Master screens only ([D-2026-11-18-02](../../../docs/mvp/decisions.md#d-2026-11-18-02), [log](../../../docs/mockup-changes/2026-11-18-queue-club-nickname.md)).
+**November 18, 2026:** a Queue Master can give a registered player a club nickname, shown on Queue Master screens only ([D-2026-11-18-03](../../../docs/mvp/decisions.md#d-2026-11-18-03), [log](../../../docs/mockup-changes/2026-11-18-queue-club-nickname.md)).
 
 **November 16, 2026:** unclaimed players need an email and get an RTR ID, Player Information lookup is by exact RTR ID or email only, guests are a name only, and guest linking is removed ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04), [log](../../../docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md)).
 

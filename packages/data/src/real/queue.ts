@@ -467,7 +467,7 @@ export type WireRosterEntry = {
   confirmedAt: string
   /** Present on the roster GET; mutations still use the stored entry DTO. */
   hasPlayedAtClubBefore?: boolean
-  /** A registered player's club nickname (D-2026-11-18-02); Queue Master reads only */
+  /** A registered player's club nickname (D-2026-11-18-03); Queue Master reads only */
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
@@ -617,7 +617,7 @@ export type WireClubPlayer = Omit<
   'addedAt' | 'displayName' | 'suggestion' | 'emailOnFile' | 'detailsRequired' | 'clubNickname'
 > & {
   addedAt: string
-  /** A registered player's club nickname (D-2026-11-18-02); missing reads as none */
+  /** A registered player's club nickname (D-2026-11-18-03); missing reads as none */
   clubNickname?: string | null
   /** D-2026-11-16-04 (P15.8); missing (an older server) reads as false */
   emailOnFile?: boolean
@@ -756,7 +756,7 @@ export async function realMoveSavedPlayer(input: {
   )
 }
 
-/** Club nickname sheet › Save nickname (D-2026-11-18-02); the server words the toast. */
+/** Club nickname sheet › Save nickname (D-2026-11-18-03); the server words the toast. */
 export async function realSetClubNickname(input: { clubPlayerId: string; clubNickname: string }) {
   const saved = await realRequest<{
     clubPlayerId: string

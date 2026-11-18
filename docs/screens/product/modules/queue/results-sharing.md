@@ -1,6 +1,6 @@
 # Private session results, publishing, exports, and history
 
-**Last verified:** 2026-10-28 for settled documentation reconciliation.
+**Last verified:** 2026-11-18 for scoring modes in the session record ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-10-28 for settled documentation reconciliation.
 
 **Surfaces:** `Q-RESULTS`, `Q-STANDINGS-SLIDE`, `Q-AWARDS-SLIDE`, `Q-OFF-DAY-SLIDE`, `Q-PUBLISH`, `Q-EXPORT`, `Q-HISTORY`.
 
@@ -69,7 +69,7 @@ Images are files for the operator to share through Instagram/Facebook. No automa
 
 **Entry:** a past session in home or the calendar, or **Match history** from results. Back link **Home**.
 
-Header: “Session record · read-only”, title, date · time · venue. Chips: **Completed** with **Results published** / **Results private**, or **Invalid session** (cancelled sessions: see below). Totals: Games (with “N invalid” when any), Players, Courts, Length.
+Header: “Session record · read-only”, title, date · time · venue. Chips: **Completed** with **Results published** / **Results private**, or **Invalid session** (cancelled sessions: see below). Totals: Games (with “N invalid” when any), Players, Courts, Length. The Details show **Scoring**, the session's mode (November 18, 2026; a session saved before scoring modes reads as 16/31). Each match in the record shows its score as in [Q-MATCH-RECORD](match-control.md#q-match-record--read-only-outcome), with every game score of a best of 3.
 
 Below the totals, tabs: **Public page**, **Results** (default, “N games”), **How the night ran**, **Players** (“N”), **Financials**.
 

@@ -7,6 +7,7 @@ export const accountLinkStatusMeta = {
     'standalone on claim-done shows the new Player ID and explains that the club guest record remains unlinked.',
     'googleEmail on claim-done adds "You sign in with Google (<email>)." (standalone) or "Sign in from now on with Google (<email>)." (claim).',
     'joinedClubs on a standalone claim-done adds "Your records from A and B are now on your account, with their games." and changes the ID line to "Your player ID stays <RTR ID>."',
+    'Pass verificationComplete when all three checks passed on a Google registration to show the Verified chip.',
     'Presentational only; containers choose the variant and own mutations and navigation.',
     "No variant shows a phone or email except the email the player just typed in 'reset-sent'.",
     'Reset outcomes sit in AuthCard; registration outcomes use LinkPage, as in the prototype.',

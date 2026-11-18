@@ -1422,6 +1422,8 @@ html.booting,html.booting body{overflow:hidden}
 .boot.boot-out .boot-wm,.boot.boot-out .boot-pct{transition:opacity .25s;opacity:0}
 @keyframes boot-fade{to{opacity:0;visibility:hidden}}
 @keyframes boot-bail{to{opacity:0;visibility:hidden;pointer-events:none}}
+/* an automated browser (SiteBoot's inline script) never sees the loading screen */
+html.no-boot #boot{display:none}
 @media (prefers-reduced-motion:reduce){.boot.boot-out{animation-delay:0s}}
 /* sample-player avatars (ROTRA_AV in the main script): the portrait covers the initials circle */
 .has-av{background-size:cover;background-position:50% 30%;background-repeat:no-repeat;color:transparent!important;text-shadow:none}
@@ -1515,7 +1517,7 @@ body.at-foot .top{transform:translateY(-100%);opacity:0;pointer-events:none}
 .story .lb-seg span{cursor:pointer}
 .story .lb-seg span:not(.on):hover{color:var(--fg)}
 .story .lb-seg span:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-/* ===== Legal pages (#privacy, #terms; legal-page/LegalPage.tsx): text only, one 720 px column, centred. Top
+/* ===== Legal pages (/privacy, /terms; legal-page/LegalPage.tsx): text only, one 720 px column, centred. Top
    spacing as the request page (.page 120 px; 88 px under the bar at 700 px and below); no art, no animation ===== */
 .legal{padding-top:120px;padding-bottom:96px}
 .legal-doc{max-width:720px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:40px;line-height:1.7}
@@ -1523,7 +1525,7 @@ body.at-foot .top{transform:translateY(-100%);opacity:0;pointer-events:none}
 .legal-head h1{font-size:clamp(32px,4vw,52px);line-height:1.05}
 .legal-eff{font-size:15px;color:var(--fg2)}
 .legal-doc section{display:flex;flex-direction:column;gap:14px}
-.legal-doc h2{font-size:22px;line-height:1.25;letter-spacing:-.02em}
+.legal-doc h2{font-size:22px;line-height:1.25;letter-spacing:-.02em;scroll-margin-top:96px}
 .legal-doc section p,.legal-doc section li{color:var(--fg2)}
 .legal-doc ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
 .legal-doc li::marker{color:var(--accent)}

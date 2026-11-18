@@ -12,6 +12,11 @@ import {
 } from '@rotra/ui/profile-banner-card'
 import { ProfileHero } from '@rotra/ui/profile-hero'
 import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
+import {
+  VerificationStatusChip,
+  type VerificationStatusChipProps,
+} from '@rotra/ui/verification-status-chip'
+
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile
   /**
@@ -41,6 +46,9 @@ export type PlayerIdentityCardProps = {
   onChangeBanner?: () => void
   /** Owner only: opens My player ID */
   onOpenPlayerId?: () => void
+  /** Owner only: the status chip and shortcut to Verification. */
+  verification?: VerificationStatusChipProps
+  onOpenVerification?: () => void
   /** Opens the Share profile sheet: the owner's, or this player's on someone else's profile */
   onShare?: () => void
   /** Public profile: open the comparison (or sign-in). */
@@ -69,6 +77,8 @@ export function PlayerIdentityCard({
   onChangePicture,
   onChangeBanner,
   onOpenPlayerId,
+  verification,
+  onOpenVerification,
   onShare,
   onCompare,
   compareSignedIn = false,
@@ -90,7 +100,18 @@ export function PlayerIdentityCard({
           onChangeBanner={isOwn ? onChangeBanner : undefined}
           badges={
             isOwn ? (
-              <Chip tone="accent">This is you</Chip>
+              <>
+                <Chip tone="accent">This is you</Chip>
+                {verification && onOpenVerification ? (
+                  <button
+                    type="button"
+                    className="inline-flex cursor-pointer items-center rounded-full touch:min-h-11"
+                    onClick={onOpenVerification}
+                  >
+                    <VerificationStatusChip {...verification} />
+                  </button>
+                ) : null}
+              </>
             ) : savedBy ? (
               <Chip tone="warn">Not registered yet</Chip>
             ) : undefined
@@ -151,6 +172,11 @@ export function PlayerIdentityCard({
             <Button size="sm" onClick={onOpenPlayerId}>
               <Icon name="qr" /> My player ID
             </Button>
+            {onOpenVerification ? (
+              <Button size="sm" onClick={onOpenVerification}>
+                <Icon name="shield" /> Verification
+              </Button>
+            ) : null}
             {onShare ? (
               <Button size="sm" onClick={onShare}>
                 <Icon name="share" /> Share profile

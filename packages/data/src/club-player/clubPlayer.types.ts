@@ -51,7 +51,7 @@ export type ClubPlayer = {
   fullName: string
   nickname: string | null
   /**
-   * The club's own nickname for a registered player (D-2026-11-18-02): kept on this record, used in
+   * The club's own nickname for a registered player (D-2026-11-18-03): kept on this record, used in
    * every session of the club, shown on Queue Master screens only. Empty or missing = none. Guests
    * and unclaimed players never have one: the `nickname` above is already the club's.
    */

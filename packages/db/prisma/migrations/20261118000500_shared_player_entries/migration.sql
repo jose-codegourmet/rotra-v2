@@ -1,4 +1,4 @@
--- P15.8 (#927), D-2026-11-16-04 and D-2026-11-18-02, owner answers of November 18, 2026: the thin
+-- P15.8 (#927), D-2026-11-16-04 and D-2026-11-18-03, owner answers of November 18, 2026: the thin
 -- shared entry of an unclaimed player (normalized email + RTR ID allocation, nothing a club typed),
 -- club records pointing to it, the Same person redirect (`club_players.linked_to_club_player_id`,
 -- designed in sessions-roster.md, not built until now), an Admin-only RTR ID change on
@@ -130,7 +130,7 @@ CREATE TRIGGER "player_id_allocations_append_only"
   BEFORE UPDATE OR DELETE ON "player_id_allocations"
   FOR EACH ROW EXECUTE FUNCTION "player_id_allocations_guard"();
 
--- Data step (owner answer, November 18, 2026; D-2026-11-18-02): `club_players.nickname` of a
+-- Data step (owner answer, November 18, 2026; D-2026-11-18-03): `club_players.nickname` of a
 -- linked saved player is now the club nickname. Before this rule, adding a registered player copied
 -- the account nickname there, which would now show as a club nickname. Clear it only where it is
 -- exactly the linked player's account nickname after trimming (case-sensitive); any other text is

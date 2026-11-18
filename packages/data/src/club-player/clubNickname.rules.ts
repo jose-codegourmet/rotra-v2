@@ -3,7 +3,7 @@ import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { ClubPlayer } from './clubPlayer.types'
 
 /**
- * The club nickname of a saved player (D-2026-11-18-02): only a registered player carries one, and
+ * The club nickname of a saved player (D-2026-11-18-03): only a registered player carries one, and
  * only the club's own record is read, so another club never sees it. Null when empty or none.
  */
 export function clubNicknameOf(state: Pick<MockState, 'clubPlayers'>, clubPlayerId: string) {

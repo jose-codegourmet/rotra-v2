@@ -34,7 +34,7 @@ export type ClubPlayerDto = {
   /** The nickname players see: a registered player's account nickname, else the club's */
   nickname: string | null
   /**
-   * The club's own nickname for a registered player (D-2026-11-18-02): this club's Queue Master
+   * The club's own nickname for a registered player (D-2026-11-18-03): this club's Queue Master
    * reads only. Null for guests and unclaimed players (their `nickname` is already the club's).
    */
   clubNickname: string | null
@@ -333,7 +333,7 @@ export async function addNewSavedPlayer(
 }
 
 /**
- * Club nickname sheet › Save nickname (D-2026-11-18-02): sets, changes or clears this club's own
+ * Club nickname sheet › Save nickname (D-2026-11-18-03): sets, changes or clears this club's own
  * nickname for a registered saved player, stored in `club_players.nickname` (no new column). The
  * reply's `message` is the mock's toast: "Club nickname saved · NAME", "Club nickname removed ·
  * NAME" or "No club nickname · NAME", NAME being the player's full name.

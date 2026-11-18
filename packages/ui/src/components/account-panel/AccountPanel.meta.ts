@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const accountPanelMeta = {
   name: 'AccountPanel',
   description:
-    "The dashed 'Your account · Only you see this' panel: the owner's phone, email and phone privacy, with Privacy and contact and Sign out.",
+    "The dashed 'Your account · Only you see this' panel: the owner's phone, email and phone privacy, with Privacy and contact, Verification and Sign out.",
   usage: [
     'Render only on P-OWN-PROFILE after ownership is checked. Never on a public profile or in a public story.',
     'Contact changes are requested in P04; requestSlot shows an open request chip.',

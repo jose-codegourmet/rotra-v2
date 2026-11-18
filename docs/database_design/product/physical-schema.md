@@ -373,9 +373,28 @@ present, or released; the session finished, invalid or cancelled) are command ru
 `packages/db/src/queue/match-requests.ts` and `match-request-store.ts`. Checked on a disposable
 database (`scripts/disposable-db.sh all`: no drift, 70/70 checks); not applied to the shared one.
 
+## P13.6 — Account verification
+
+Migration `20261118000300_player_verification_override` adds the nullable `verified` override,
+Admin FK and timestamp to `players`. The FK has an index and restricts Admin deletion. A CHECK
+requires all three values together on a claimed player, or all three null. Existing rows start
+with automatic verification. The migration adds no grants or new tables. Each set or clear
+appends an owner-attributed `admin_audit_events` row with the reason in its metadata. See
+[Account verification](player-information/modules/identity.md#account-verification-d-2026-11-16-02).
+
+Verified November 18, 2026 on isolated local Supabase and applied to ROTRA v2 ASIA
+(`xvsgwgihgbuqkcazikek`). Prisma history checksum:
+`146f16747655f8df6338ef7c154eac5bed228b68326ad2246366e0634a8c297b`.
+The nullable columns, CHECK, FK, index and existing deny-by-default RLS were confirmed remotely.
+The separate Go sign-in migration remains outside this batch.
+
+## P14.5 — Player notifications
+
+Migration `20261118000400_player_notifications` adds `player_notifications` with a recipient FK, a unique source key, a CHECK for paired source fields, and a recipient / newest-first index. It enables RLS and revokes all table privileges from `anon`, `authenticated` and `PUBLIC`. `player_accounts.verification_reminder_read_at` stores the first read of the state-derived reminder. See [Player notifications](player-information/modules/notifications.md).
+
 ## P15.8 — Shared entries of unclaimed players, Same person redirect, club nickname (D-2026-11-16-04)
 
-`20261118000300_shared_player_entries` (#927; owner answers of November 18, 2026). Additive except one
+`20261118000500_shared_player_entries` (#927; owner answers of November 18, 2026). Additive except one
 data step and one trigger function swap; nothing dropped, moved or deleted.
 
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |

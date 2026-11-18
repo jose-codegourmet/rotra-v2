@@ -89,7 +89,7 @@ export function courtDto(court: SessionCourt) {
 /**
  * A Queue Master roster row (Q-ROSTER): club-scoped, never a public or player read. `names` from
  * `rosterNamesOf`: the nickname players see, and the club nickname of a registered player
- * (D-2026-11-18-02), which only this club's Queue Master reads carry.
+ * (D-2026-11-18-03), which only this club's Queue Master reads carry.
  */
 export function rosterEntryDto(entry: SessionPlayer, names: RosterNames | null) {
   return {

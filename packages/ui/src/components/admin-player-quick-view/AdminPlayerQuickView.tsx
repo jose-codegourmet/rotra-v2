@@ -2,6 +2,7 @@
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import type { PlayerProfile, PlayerSessionRecord } from '@rotra/data/player/types'
 import type { ParticipantStats } from '@rotra/data/public-session/types'
+import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import {
   AdminEditPlayerForm,
   type AdminEditPlayerFormProps,
@@ -355,7 +356,9 @@ function QuickViewPanel({
               ) : null}
               <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm max-[420px]:grid-cols-1 max-[420px]:gap-y-0 [&>dt]:text-fg2 [&>dd]:min-w-0 [&>dd]:[overflow-wrap:anywhere] max-[420px]:[&>dd]:mb-2">
                 <dt>Phone</dt>
-                <dd className="font-mono">{p.phone || 'Not given'}</dd>
+                <dd className="font-mono">
+                  {p.phone ? formatPhoneForDisplay(p.phone) : 'Not given'}
+                </dd>
                 <dt>Email</dt>
                 <dd className="font-mono">{p.email || 'Not given'}</dd>
                 <dt>Socials</dt>

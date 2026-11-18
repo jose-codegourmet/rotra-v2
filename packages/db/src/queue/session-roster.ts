@@ -2,6 +2,7 @@ import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
+import { notifySavedPlayer, notifyWaitlistPlace } from '../player/notification-events'
 import {
   emailWords,
   normalizeEmail,
@@ -131,11 +132,11 @@ async function place(
     },
   })
   const atBudget = (await liveRoster(tx, session.id)).length >= (await capacityOf(tx, session))
-  if (toWaitlist || (atBudget && !allowOverfill))
-    return {
-      rosterEntry: null,
-      waitlist: waitlistDto(waiter, await waitlistPosition(tx, session.id, waiter.id)),
-    }
+  if (toWaitlist || (atBudget && !allowOverfill)) {
+    const position = await waitlistPosition(tx, session.id, waiter.id)
+    await notifyWaitlistPlace(tx, session, clubPlayer.playerId, waiter.id, position)
+    return { rosterEntry: null, waitlist: waitlistDto(waiter, position) }
+  }
   const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
   return {
     rosterEntry: rosterEntryDto(entry, await rosterNamesFor(tx, clubPlayer.id)),
@@ -273,7 +274,7 @@ const OWN_NAME_ERROR = 'Enter a name.'
  * shared entry: then the club's own record is made with `ownName` (another club's name, picture
  * and level are never shown) and no nickname. A deleted saved player is restored rather than
  * duplicated (one row per person per club). A registered player's row keeps no nickname: the
- * account's shows, and the club nickname is set on its own (D-2026-11-18-02).
+ * account's shows, and the club nickname is set on its own (D-2026-11-18-03).
  */
 export async function clubPlayerForProfile(
   tx: Tx,
@@ -305,19 +306,22 @@ export async function clubPlayerForProfile(
   const name = entry ? (ownName?.trim() ?? '') : (player?.fullName ?? '')
   if (!name) throw new ServiceError('invalid', { name: OWN_NAME_ERROR })
   // A deleted saved player is restored rather than duplicated (one saved row per person per club).
-  if (saved)
-    return {
-      clubPlayer: await tx.clubPlayer.update({
-        where: { clubId_id: { clubId: context.clubId, id: saved.id } },
-        data: {
-          removedAt: null,
-          linkedToClubPlayerId: null,
-          ...(entry ? { displayName: name } : {}),
-          revision: { increment: 1 },
-        },
-      }),
-      created: true,
-    }
+  // The guarded write restores once, so a replayed operation tells a registered player once.
+  if (saved) {
+    const restored = await tx.clubPlayer.updateMany({
+      where: { clubId: context.clubId, id: saved.id, removedAt: { not: null } },
+      data: {
+        removedAt: null,
+        linkedToClubPlayerId: null,
+        ...(entry ? { displayName: name } : {}),
+        revision: { increment: 1 },
+      },
+    })
+    if (restored.count && !entry)
+      await notifySavedPlayer(tx, context.clubId, profileId, operationId)
+    const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({ where: { id: saved.id } })
+    return { clubPlayer, created: restored.count > 0 }
+  }
   const clubPlayer = await tx.clubPlayer.create({
     data: {
       id: await derivedId(operationId, 'club-player'),
@@ -328,6 +332,8 @@ export async function clubPlayerForProfile(
       addedAt: now,
     },
   })
+  // Only a registered player has an inbox; an unclaimed person's shared entry has no account.
+  if (!entry) await notifySavedPlayer(tx, context.clubId, profileId, operationId)
   return { clubPlayer, created: true }
 }
 
@@ -554,12 +560,23 @@ export async function stepDownIn(
       demotedConfirmedAt: entry.confirmedAt,
     },
   })
+  const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+    where: { id: entry.clubPlayerId },
+    select: { playerId: true },
+  })
+  await notifyWaitlistPlace(
+    tx,
+    session,
+    clubPlayer.playerId,
+    waitlistId,
+    await waitlistPosition(tx, session.id, waitlistId),
+  )
   return { name: entry.nameSnapshot, clubPlayerId: entry.clubPlayerId }
 }
 
 /** The short name the roster toasts use: the club nickname, else the first word of the name. */
 async function shortNameOf(tx: Tx, entry: { clubPlayerId: string; nameSnapshot: string }) {
-  // queueMasterName: the club nickname, else the nickname, else the first name (D-2026-11-18-02).
+  // queueMasterName: the club nickname, else the nickname, else the first name (D-2026-11-18-03).
   const names = await rosterNamesFor(tx, entry.clubPlayerId)
   return (
     names?.clubNickname || names?.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot

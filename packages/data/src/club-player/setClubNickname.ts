@@ -14,7 +14,7 @@ export type SetClubNicknameInput = {
 const NOT_REGISTERED = 'Only a registered player has a club nickname.'
 
 /**
- * Club nickname sheet › Save nickname (D-2026-11-18-02, rotra-queue.html saveClubNick()): sets,
+ * Club nickname sheet › Save nickname (D-2026-11-18-03, rotra-queue.html saveClubNick()): sets,
  * changes or clears the club's own nickname for a registered saved player. Queued like the other
  * Saved players edits, so it works offline. The toast tells which happened: "Club nickname saved ·
  * NAME", "Club nickname removed · NAME" (it had one, the field is now empty) or "No club nickname ·

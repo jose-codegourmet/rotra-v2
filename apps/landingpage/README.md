@@ -34,7 +34,7 @@ Biome skips `src/scripts/`, `globals.css` and `rive/` (moved as is from the old 
 | `#clubs` | Club owners and Queue Masters: hero, 01 the assessors (Roster and levels), 02 run the night, 03 partner up (what a club gets, “Request a quotation”; prices are not public), 04 partner request |
 | `#ranking`, `#request` | Detail pages (`#request` is the quotation request form) |
 | `#find` | Find your profile (name or RTR ID search) |
-| `#privacy`, `#terms` | Privacy Policy and Terms of Service (`legal-page/LegalPage.tsx`, “Legal pages” block in `globals.css`): text only, one 720 px column. The copy in `legal-page/privacy-content.ts` and `terms-content.ts` is a copy of the Player Information app's `(public)/privacy/content.ts` and `(public)/terms/content.ts` (only the type import differs); change them together. Section headings have ids `<view>-<heading slug>` (e.g. `#privacy-your-rights`). The footer's Privacy and Terms and the request form's agreement link here |
+| `/privacy`, `/terms` | Privacy Policy and Terms of Service: pages of their own (`src/app/privacy/page.tsx`, `src/app/terms/page.tsx`, `legal-page/LegalPage.tsx`, “Legal pages” block in `globals.css`), not hash routes, so each has a URL a crawler can fetch (Google's sign-in branding check needs one). Text only, one 720 px column, a top bar with the logo and main links, no page scripts and no loading screen. The router sends old `#privacy` and `#terms` links (and their section links) here. The copy in `legal-page/privacy-content.ts` and `terms-content.ts` is a copy of the Player Information app's `(public)/privacy/content.ts` and `(public)/terms/content.ts` (only the type import differs); change them together. Section headings have ids `<page>-<heading slug>` (e.g. `/privacy#privacy-your-rights`). The footer's Privacy and Terms and the request form's agreement link here |
 
 `#pricing` no longer has a page: the router redirects it to `#request`. The asset list page (`#assets`) was removed on
 November 18, 2026; like any unknown hash it now shows home.
@@ -186,7 +186,7 @@ greens, one mint `#00FF88`).
   cannot scroll (`html.booting`, Lenis stopped until the `rotra:ready` event): on desktop all the art of the view being
   opened, on phones and touch the stills within two screens of its top and the
   Rive files within one. The screen leaves when all are in: at least
-  1.4 s, at most 25 s; failed files count as done. Without scripts it is hidden (`noscript`), and a CSS timer lifts it after 30 s.
+  1.4 s, at most 25 s; failed files count as done. Without scripts it is hidden (`noscript`), and a CSS timer lifts it after 30 s. An automated browser (a crawler, a link checker, a headless test: `navigator.webdriver` or a bot user agent) never sees it: an inline script in `SiteBoot.tsx` sets `html.no-boot` before the first paint, the screen is hidden and `boot.js` leaves the page unlocked and fires `rotra:ready` at once. The page under it is the same for everyone (added November 18, 2026, after Google's sign-in branding check reported the home page as unresponsive).
 - Light-first loading (`src/scripts/boot.js` “what to load”, `rive.js` `fullLayers`, `site.js` character stills):
   - The three scene layers load as 960 px copies in `public/art/lite/` (about 20 KB each; rebuild one with
     `cwebp -resize 960 0 -q 55 -alpha_q 70 public/art/<scene>-<layer>.webp -o public/art/lite/<scene>-<layer>.webp`

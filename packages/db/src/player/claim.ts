@@ -1,4 +1,5 @@
 import 'server-only'
+import { maskPhone } from '@rotra/schema/phone'
 import type { ClubContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
@@ -31,14 +32,6 @@ async function digest(token: string) {
 function newToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
   return Buffer.from(bytes).toString('base64url')
-}
-
-/** '+63 918 ••• ••77': country code, first three, last two. */
-export function maskPhone(e164: string) {
-  const digits = e164.replace(/^\+/, '')
-  const country = digits.slice(0, digits.length - 10) || digits.slice(0, 2)
-  const rest = digits.slice(country.length)
-  return `+${country} ${rest.slice(0, 3)} ••• ••${rest.slice(-2)}`
 }
 
 const NEEDS_PHONE_TO_INVITE = 'Add this player’s phone before inviting them.'
@@ -410,7 +403,7 @@ async function completeRecordClaim(
     })
     await tx.clubPlayer.update({
       where: { clubId_id: { clubId: record.clubId, id: record.id } },
-      // The record's nickname became the account's; the club nickname starts empty (D-2026-11-18-02).
+      // The record's nickname became the account's; the club nickname starts empty (D-2026-11-18-03).
       data: { playerId: player.id, nickname: null, revision: { increment: 1 } },
     })
     // Every other club's record under the same shared entry joins the account too.

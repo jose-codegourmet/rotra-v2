@@ -1,4 +1,6 @@
 'use client'
+import { useMyAccountVerification } from '@rotra/data/account-verification/useMyAccountVerification'
+import { useSession } from '@rotra/data/auth/use-session'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
 import { useConnectGoogle } from '@rotra/data/google-sign-in/useConnectGoogle'
@@ -60,6 +62,10 @@ export function PrivacyAndContact({
   const [hiddenError, setHiddenError] = useState<string>()
   const googleSignIn = usePlayerGoogleSignInEnabled()
   const googleDeadline = useGoogleDeadline().data
+  const session = useSession('player')
+  const verification = useMyAccountVerification(
+    googleSignIn ? (session.data?.account.id ?? null) : null,
+  )
   const connectGoogle = useConnectGoogle()
   const connectWith = (identity: GoogleIdentity) =>
     connectGoogle.mutate(identity, {
@@ -204,7 +210,6 @@ export function PrivacyAndContact({
         }}
       />
       {googleSignIn && googleDeadline ? (
-        // The verification row waits for Epic P13 (Verification page); no label, no row.
         <SignInMethodsCard
           email={data.email}
           googleEmail={data.googleEmail}
@@ -212,6 +217,8 @@ export function PrivacyAndContact({
           deadline={googleDeadline.label}
           onConnectGoogle={() => picker.start(connectWith)}
           onChangeGoogle={() => picker.start(connectWith)}
+          verification={verification.data ?? undefined}
+          onOpenVerification={() => router.push('/profile/verification')}
         />
       ) : null}
       <ContactDetailsCard

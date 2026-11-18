@@ -16,8 +16,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## The site
 
 A static export (`output: 'export'`, `next build` writes `out/`): one page, `/`, whose hash routes (`#home`,
-`#clubs`, `#ranking`, `#request`, `#find`, `#privacy`, `#terms`; `#pricing` redirects to `#request`) show one `<main class="view">` at
-a time. The markup is server components in `src/app/_components/`; the plain scripts in `src/scripts/` run once
+`#clubs`, `#ranking`, `#request`, `#find`; `#pricing` redirects to `#request`) show one `<main class="view">` at
+a time, plus two plain pages with their own URLs, `/privacy` and `/terms` (no page scripts, no loading screen;
+old `#privacy` and `#terms` links redirect to them). The markup is server components in `src/app/_components/`; the plain scripts in `src/scripts/` run once
 after hydration (`SiteScripts`) and change that DOM directly, so the markup components must never re-render or
 hold state. Its own stylesheet (`src/app/globals.css`), no Tailwind, no `@rotra/ui`. Art and the Rive pipeline:
 see the README.

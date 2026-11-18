@@ -2,6 +2,8 @@
 
 **Surfaces:** `Q-DISPATCH`, `Q-CHOOSE-MATCH`, `Q-ON-COURT`, `Q-ACTIVE-MATCH`, `Q-SUBSTITUTE`, `Q-MATCH-DONE`, `Q-NEXT-MATCH`, `Q-INVALID-MATCH`, `Q-MATCH-RECORD`.
 
+**Last verified:** 2026-11-18 for Q-MATCH-DONE and Q-MATCH-RECORD scoring modes ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only: the real app still asks for two free scores until its ticket).
+
 **Source:** [match rules](../../../../business_logic/product/queue/modules/matches/README.md). Dialog language: [shared confirmations](../../dialogs.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html).
 
 **Owner decision, November 6, 2026** ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)): getting a match going is two steps. **Put on court** places it (status **On court**, court chip **Getting ready**); **Start match** starts it (status **Playing**). Neither the Manual Queue nor the Auto Queue mode ever starts a match.
@@ -61,28 +63,38 @@ The choice locks when the match is done or invalid; an invalid match still gives
 
 ## Q-MATCH-DONE — Two completion paths
 
-Sheet “Match N result”:
+Sheet “Match N result”. Since November 18, 2026 it follows the session's [scoring mode](../../../../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) ("""+D+"""; """+LOG+"""; mockup only). The sheet line reads “· Scoring · 16/31” (the mode's label).
 
-1. **Pick the winner** — two choice cards, Team A and Team B, with names.
-2. **OR — Enter the final score** — Team A and Team B number fields labeled with their players.
+**One game (16/31, 16/31 no deuce, 11/21):**
 
-Hint: “Scores are optional. If you enter them, the higher score wins.” **Clear scores** appears once a score is typed.
+1. **Pick the winner** — two choice cards, Team A and Team B, with names. Required. Until one is picked the area shows only “Pick the winner first. The score is optional.”
+2. Once picked, the winner's side shows the fixed score (“Team A · 31”; 21 for 11/21) and one box, “<losing names> scored (optional)”, asks for the losing score. Hint: “Game to 31. Enter the losing score, or leave it empty.” (21 for 11/21).
+3. In the deuce modes a **Went to deuce** switch (hint “30–30 and on: the first to lead by 2 wins.”, 20–20 for 21) turns the area into two boxes, “Team A scored” and “Team B scored”, to type by hand (“Deuce at 30–30: the first to lead by 2 wins. Type both scores.”). Turning it off restores the single box.
+4. **Clear score** appears once anything is typed.
 
-**Review result** validates:
+**Best of 3 (11/21 × 3, 21 × 3):** **Pick the winner** stays on top (picking only the winner still works), then **OR**, then **Enter each game** with the hint “Best of 3 to 21. The first pair to win 2 games wins. Scores are optional.” Rows **Game 1**, **Game 2**, and **Game 3** only when games 1 and 2 were split. Each row has a Team A / Team B pick for who won the game, the fixed winning score and the losing-score box; in 11/21 × 3 a **Deuce** toggle turns the row into two boxes. Above the rows: “Games won · Team A 2 – 1 Team B” and “Winner: Team A · names”. The top pick follows the games. **Clear scores** appears once anything is typed.
+
+**Review result** refuses what the mode cannot produce. The sheet stays open with an inline message; nothing is only warned:
 
 | Problem | Message |
 |---|---|
-| Nothing chosen | “Pick a winner or enter the final score.” |
-| Only one score, or not a whole number ≥ 0 | “Enter both scores as whole numbers, or clear them.” |
-| Tied score | “A tie can't decide a winner. Correct the score, or clear it and pick a winner.” |
+| No winner picked | “Pick the winner.” |
+| Losing score not a whole number in range | “Enter the losing score as a whole number from 0 to 29.” (30 for 16/31 no deuce; 19 for 11/21; 20 for 21 × 3) |
+| Reached the deuce score without deuce on | “At 30–30 the game goes to deuce. Turn on Went to deuce and type both scores.” (20–20 for 21; on a best-of-3 row “Turn on Deuce for this game and type both scores.”, prefixed “Game 2: ”) |
+| Deuce game not ending on a 2-point lead | “A deuce game ends when one pair leads by 2, like 32–30.” (22–20 for 21) |
 | Score disagrees with the picked team | “The score says Team B won, but Team A is picked. Fix one of them.” |
+| Games disagree with the top pick | “The games say Team A won, but Team B is picked. Fix one of them.” |
+| A game played has no score while others do | “Enter a score for every game played, or clear them all.” |
+| A game has no winner, or nobody has 2 games | “Pick who won each game. One pair must win 2 games to decide the match.” |
 
-The review step **Confirm match result** shows Winner “Team A: names”, “Against Team B: names”, the score “21–17 (Team A–Team B)” or “No score entered”, the court(s), and the warning “This result cannot be changed after confirmation. The court will become available.” (“Both courts” for 5v5). Actions **Back to result** and **Confirm Team A wins**.
+A winner-only result still confirms. Scores stay optional in every mode (placeholder; see [open decisions](../../open-decisions.md)).
+
+The review step **Confirm match result** shows Winner “Team A: names”, “Against Team B: names”, the score “31–24 (Team A–Team B)”, for a best of 3 “2–1 · 21–18, 15–21, 21–19 (Team A–Team B)”, or “No score entered”, the court(s), and the warning “This result cannot be changed after confirmation. The court will become available.” (“Both courts” for 5v5). Actions **Back to result** and **Confirm Team A wins**.
 
 After confirmation:
 
 - Save durably before freeing the court(s).
-- Lock winner and provided scores permanently, including against Admin edits.
+- Lock winner and provided scores (every game score of a best of 3) permanently, including against Admin edits.
 - No Undo, Change winner, Add score later, or Reopen.
 - Toast: “Team A wins match N · Court X free”. Leaderboard and game counts update.
 - Offline: the toast adds “Saved on this device, waiting to sync”.
@@ -123,11 +135,14 @@ Success frees all occupied courts: “Match N marked invalid · Court X free”.
 
 ## Q-MATCH-RECORD — Read-only outcome
 
-In the [session record](results-sharing.md#q-history--session-record), each match shows “#N”, its time range, a Fun chip when relevant, both teams with the winning side highlighted “✓ Won”, the score or “no score” (or an **Invalid** chip), and “S substitutions; partial games not counted”, plus one line per substitution with a credit choice, e.g. “Kiko replaced Jom · Kiko got the game (QM choice)”.
+In the [session record](results-sharing.md#q-history--session-record), each match shows “#N”, its time range, a Fun chip when relevant, both teams with the winning side highlighted “✓ Won”, the score, for a best of 3 “2–1” with every game score under it, or “No score” (or an **Invalid** chip), and “S substitutions; partial games not counted”, plus one line per substitution with a credit choice, e.g. “Kiko replaced Jom · Kiko got the game (QM choice)”.
 
 ## Acceptance examples
 
 - Winner-only confirmation succeeds with no score values.
+- 16/31: Team A picked, losing score 24 → “31–24”. 31–31, 31–30 and a losing 30 or 31 in 16/31 no deuce are refused.
+- 16/31 with Went to deuce: 32–30 confirms; 32–31 is refused.
+- 11/21 × 3: games 21–18 and 15–21 need Game 3; 2–0 shows two rows.
 - Closing the score sheet before confirming does not release the court.
 - A failed local write cannot display Match done or free the court.
 - Invalidating a 5v5 game frees both courts and adds zero games to everyone.

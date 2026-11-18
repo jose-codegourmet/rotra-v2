@@ -11,6 +11,8 @@ import * as rive from '@rive-app/canvas'
 //      (see "what to load").
 //   5. ROTRA_PT (below) reuses the screen and the file as the transition between views.
 //   4. When all are in (and at least MIN ms have passed, at most MAX), the exit plays and the screen is removed.
+// An automated browser (html.no-boot, set by SiteBoot's inline script) gets none of it: the screen is hidden, the
+// page is never locked and 'rotra:ready' fires at once. The art still loads behind the page.
 export function initBoot() {
   var el = document.getElementById('boot');
   if (!el) return;
@@ -18,13 +20,16 @@ export function initBoot() {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PHONE = window.matchMedia('(max-width: 700px)').matches;
   var FLAT = window.matchMedia('(max-width: 700px), (hover: none), (pointer: coarse)').matches;
-  var MIN = 1400, MAX = 25000, t0 = performance.now();
+  var AUTO = root.classList.contains('no-boot');
+  var MIN = AUTO ? 0 : 1400, MAX = 25000, t0 = performance.now();
   var pctEl = document.getElementById('boot-pct'), mark = el.querySelector('.boot-mark');
-  root.classList.add('booting');
   // nothing scrolls under the screen (Lenis is held by the main script; this covers native wheel and touch)
   function block(e){ e.preventDefault(); }
-  window.addEventListener('wheel', block, { passive: false, capture: true });
-  window.addEventListener('touchmove', block, { passive: false, capture: true });
+  if (!AUTO) {
+    root.classList.add('booting');
+    window.addEventListener('wheel', block, { passive: false, capture: true });
+    window.addEventListener('touchmove', block, { passive: false, capture: true });
+  }
 
   // ---- what to load
   // Light first. The screen waits only for what the visitor meets first; the rest arrives behind the shown page.
@@ -77,7 +82,7 @@ export function initBoot() {
 
   // ---- the Rive mark
   var vmP = null, vmOut = null, shown = 0, target = 0, live = true;
-  if (!reduce) (function(){
+  if (!reduce && !AUTO) (function(){
     var cv = document.createElement('canvas');
     cv.className = 'boot-riv'; cv.style.visibility = 'hidden';
     mark.appendChild(cv);
@@ -115,7 +120,7 @@ export function initBoot() {
   function finish(){
     if (finished) return;
     finished = true; target = 1;
-    var wait = Math.max(0, MIN - (performance.now() - t0)) + 320;   // + the ring's last stretch
+    var wait = AUTO ? 0 : Math.max(0, MIN - (performance.now() - t0)) + 320;   // + the ring's last stretch
     setTimeout(function(){
       shown = 1; if (pctEl) pctEl.textContent = '100'; if (vmP) vmP.value = 1;
       if (vmOut) vmOut.value = 1;
@@ -231,4 +236,5 @@ export function initBoot() {
   }
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).catch(function(){}).then(step);
   setTimeout(finish, MAX);
+  if (AUTO) finish();
 }

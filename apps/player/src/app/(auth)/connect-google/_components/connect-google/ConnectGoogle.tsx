@@ -22,7 +22,7 @@ import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { selectPendingLink, setLoginEmail, setPendingLink } from '@/store/slices/googleSlice'
 
 /** `/connect-google`: P-GOOGLE-LINK (signed out, a held link) or P-GOOGLE-REQUIRED (signed in, after the deadline). */
-export function ConnectGoogle() {
+export function ConnectGoogle({ returnToVerification }: { returnToVerification: boolean }) {
   const enabled = usePlayerGoogleSignInEnabled(),
     router = useRouter(),
     account = useAppSelector(selectAccount),
@@ -32,7 +32,14 @@ export function ConnectGoogle() {
     if (goesToLogin) router.replace('/login')
   }, [goesToLogin, router])
   if (goesToLogin) return null
-  if (account) return <GoogleRequired playerId={account.id} name={account.name} />
+  if (account)
+    return (
+      <GoogleRequired
+        playerId={account.id}
+        name={account.name}
+        destination={returnToVerification ? '/profile/verification' : `/players/${account.id}`}
+      />
+    )
   return pendingLink ? <GoogleLink link={pendingLink} /> : null
 }
 
@@ -77,7 +84,15 @@ function GoogleLink({ link }: { link: NonNullable<ReturnType<typeof selectPendin
   )
 }
 
-function GoogleRequired({ playerId, name }: { playerId: string; name: string }) {
+function GoogleRequired({
+  playerId,
+  name,
+  destination,
+}: {
+  playerId: string
+  name: string
+  destination: string
+}) {
   const router = useRouter(),
     dispatch = useAppDispatch()
   const account = useMyAccount(playerId).data
@@ -90,7 +105,7 @@ function GoogleRequired({ playerId, name }: { playerId: string; name: string }) 
       onSuccess: (result) => {
         if (result.outcome === 'connected') {
           toast('Google connected')
-          router.replace(`/players/${playerId}`)
+          router.replace(destination)
         } else toast(`${result.email} is already used by another ROTRA account.`)
       },
       onError: (error) => toast.error(error.message),
@@ -101,8 +116,8 @@ function GoogleRequired({ playerId, name }: { playerId: string; name: string }) 
   // Already connected, or before the deadline: nothing to require here.
   useEffect(() => {
     if (account && requirement.deadline && requirement.state !== 'required')
-      router.replace(`/players/${playerId}`)
-  }, [account, requirement.deadline, requirement.state, router, playerId])
+      router.replace(destination)
+  }, [account, destination, requirement.deadline, requirement.state, router])
   if (!account || requirement.state !== 'required' || !requirement.deadline) return null
   return (
     <>

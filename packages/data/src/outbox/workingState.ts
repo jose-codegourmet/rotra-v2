@@ -47,6 +47,8 @@ export function emptyWorkingState(now = Date.now()): MockState {
     costEstimates: {},
     paymentMarks: [],
     playerAccounts: [],
+    playerNotifications: {},
+    verificationReminderReads: {},
     resetLinks: {},
     claimLinks: {},
     contactChangeRequests: [],

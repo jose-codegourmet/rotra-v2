@@ -7,6 +7,7 @@ import {
 } from '@rotra/data/queue-session/queueSession.rules'
 import type { ClubContext } from '../auth/account-context'
 import type { Prisma, QueueSession } from '../generated/prisma/client'
+import { notifySpotConfirmed } from '../player/notification-events'
 import { requireClubEntitlement } from '../service/authorize'
 import { denyScope, ServiceError } from '../service/errors'
 
@@ -85,7 +86,7 @@ export function liveCourts(tx: Tx, sessionId: string) {
 export const LIVE_ENTRY = { releasedAt: null, noShowAt: null } as const
 
 /**
- * The names a Queue Master read shows for a saved player (D-2026-11-18-02): `nickname` is the one
+ * The names a Queue Master read shows for a saved player (D-2026-11-18-03): `nickname` is the one
  * players see (a registered player's account nickname; for a guest or unclaimed player, the club's,
  * their only one) and `clubNickname` the club's own nickname for a registered player, stored in
  * `club_players.nickname` and returned to that club's Queue Master reads only.
@@ -300,7 +301,8 @@ export async function promoteWaiter(
         },
       })
   // Each admission records its level as new assessment evidence, keyed on the operation.
-  await assessEntry(tx, context, entry, waiter.skillLevelId, operationId, now)
+  const assessment = await assessEntry(tx, context, entry, waiter.skillLevelId, operationId, now)
+  await notifySpotConfirmed(tx, session, clubPlayer.playerId, assessment.id)
   if (active)
     await tx.sessionPlayer.update({ where: { id: entry.id }, data: { levelLockedAt: now } })
   return tx.sessionPlayer.findUniqueOrThrow({ where: { id: entry.id } })

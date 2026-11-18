@@ -63,7 +63,7 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     ...player,
     fullName,
     nickname: own ? own.nickname : player.nickname,
-    /** The club's own nickname for a registered player (D-2026-11-18-02); null when none */
+    /** The club's own nickname for a registered player (D-2026-11-18-03); null when none */
     clubNickname: registered ? player.clubNickname?.trim() || null : null,
     /** Avatar reference: the club-set picture for a guest or unclaimed player, else their own. */
     picture: clubPictureState(player, own?.picture ?? null).reference,

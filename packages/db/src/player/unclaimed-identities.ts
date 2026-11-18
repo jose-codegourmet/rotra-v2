@@ -4,7 +4,7 @@ import { levelLabel } from '@rotra/data/session-roster/sessionRoster.rules'
 import { prisma } from '../client/prisma'
 import { readOwnDetails } from '../queue/club-player-own-details'
 import { levelCodeFor } from '../queue/session-store'
-import { maskPhone } from './claim'
+import { maskPhone } from '@rotra/schema/phone'
 import { currentExperienceMonths } from './profile'
 import { normalizeEmail, openEntryByEmail } from './shared-entry'
 

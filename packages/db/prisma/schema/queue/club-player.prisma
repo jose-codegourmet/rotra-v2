@@ -13,7 +13,7 @@ model ClubPlayer {
   sharedEntryId        String?   @map("shared_entry_id") @db.Uuid
   displayName          String    @map("display_name")
   /// The club's own nickname. For a guest or unclaimed player it is their nickname; for a
-  /// registered player it is the club nickname (D-2026-11-18-02), returned to that club's Queue
+  /// registered player it is the club nickname (D-2026-11-18-03), returned to that club's Queue
   /// Master reads only, never to public, player, results or leaderboard reads.
   nickname             String?
   /// When the club first saved this player (Saved players "Added" sort/filter).

@@ -16,7 +16,7 @@ export type SessionPlayer = {
    */
   hasPlayedAtClubBefore?: boolean
   /**
-   * The club nickname of the linked registered saved player (D-2026-11-18-02). Derived by the
+   * The club nickname of the linked registered saved player (D-2026-11-18-03). Derived by the
    * Queue Master roster read and by mutation helpers (`withClubNickname`); never stored on the
    * roster row and never present in public or player reads. Missing = none (the real Queue Master
    * roster and match reads send it since P15.8).

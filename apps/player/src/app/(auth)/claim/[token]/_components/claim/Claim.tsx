@@ -1,4 +1,5 @@
 'use client'
+import { useMyAccountVerification } from '@rotra/data/account-verification/useMyAccountVerification'
 import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
 import { useCompleteClaimWithGoogle } from '@rotra/data/google-sign-in/useCompleteClaimWithGoogle'
 import { MockError } from '@rotra/data/mock/errors'
@@ -43,6 +44,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
   const dispatch = useAppDispatch()
   const [step, setStep] = useState<Step>('check')
   const [done, setDone] = useState<Done | null>(null)
+  const verification = useMyAccountVerification(done?.googleEmail ? done.playerId : null)
   const pickGoogle = (identity: GoogleIdentity) => {
     setGoogle(identity)
     setMethodError('')
@@ -59,6 +61,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
         firstName={done.firstName}
         rtrId={done.rtrId}
         googleEmail={done.googleEmail}
+        verificationComplete={verification.data?.completedSteps === 3}
         onOpenProfile={() => router.push(`/players/${done.playerId}`)}
       />
     )

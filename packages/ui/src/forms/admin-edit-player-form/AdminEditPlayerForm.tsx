@@ -17,6 +17,7 @@ import { ExperienceFields, playingSinceOf } from '@rotra/ui/experience-fields'
 import { Field } from '@rotra/ui/field'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
+import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Select } from '@rotra/ui/select'
 import { Switch } from '@rotra/ui/switch'
@@ -407,12 +408,23 @@ export function AdminEditPlayerForm({
         </Section>
         <Section label="Account">
           <div className={GRID}>
-            {text('phone', 'Phone', {
-              type: 'tel',
-              inputMode: 'tel',
-              className: 'font-mono',
-              placeholder: '+63 9XX XXX XXXX',
-            })}
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field label="Phone" error={fieldState.error?.message}>
+                  <PhoneOrEmailInput
+                    {...field}
+                    mode="phone"
+                    type="tel"
+                    autoComplete="off"
+                    disabled={disabled}
+                    className="font-mono"
+                    placeholder="+63 9XX XXX XXXX"
+                  />
+                </Field>
+              )}
+            />
             {text('email', 'Email', { type: 'email', inputMode: 'email', className: 'font-mono' })}
           </div>
           <p className="text-xs text-fg2">

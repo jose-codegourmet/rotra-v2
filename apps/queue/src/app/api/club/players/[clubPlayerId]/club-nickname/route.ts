@@ -5,7 +5,7 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
 /**
- * Club nickname sheet › Save nickname (D-2026-11-18-02): this club's own nickname for a registered
+ * Club nickname sheet › Save nickname (D-2026-11-18-03): this club's own nickname for a registered
  * saved player; an empty `clubNickname` removes it. Queue Master only.
  */
 export async function POST(

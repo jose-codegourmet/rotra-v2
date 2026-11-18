@@ -19,7 +19,9 @@ export async function proxy(request: NextRequest) {
   const goMode = goApiEnabled()
   const protectedPath =
     /^\/players\/[^/]+\/compare\/?$/.test(path) ||
-    ['/me', '/profile'].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+    ['/me', '/profile', '/notifications'].some(
+      (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+    )
   const toLogin = () => {
     const login = new URL('/login', request.url)
     login.searchParams.set('returnTo', `${path}${request.nextUrl.search}`)
@@ -47,7 +49,9 @@ export async function proxy(request: NextRequest) {
       !path.startsWith('/_next/') &&
       !/\.[a-z0-9]+$/i.test(path)
     ) {
-      const redirect = NextResponse.redirect(new URL('/connect-google', request.url))
+      const connect = new URL('/connect-google', request.url)
+      if (path === '/profile/verification') connect.searchParams.set('returnTo', path)
+      const redirect = NextResponse.redirect(connect)
       session.carryTo(redirect)
       return redirect
     }

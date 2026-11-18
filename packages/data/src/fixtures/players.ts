@@ -46,7 +46,7 @@ const savedClubPlayers = [
     playerId: '2c7f6a7b-eed9-5051-9426-6dbce5133fbc',
     fullName: 'Jose',
     nickname: null,
-    // The prototype's Miguel Santos has the club nickname "Kuya Migs" (D-2026-11-18-02).
+    // The prototype's Miguel Santos has the club nickname "Kuya Migs" (D-2026-11-18-03).
     clubNickname: 'Kuya Migs',
     identity: 'registered',
     playingLevel: 'intermediate_low',

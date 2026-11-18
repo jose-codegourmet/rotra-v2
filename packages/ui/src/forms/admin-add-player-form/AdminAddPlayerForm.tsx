@@ -4,6 +4,7 @@ import type { AdminPlayerCreateValues } from '@rotra/schema/admin-player'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
+import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { Select } from '@rotra/ui/select'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
@@ -62,11 +63,15 @@ export function AdminAddPlayerForm({
                   optional={name !== 'name'}
                   error={fieldState.error?.message}
                 >
-                  <TextInput
-                    {...field}
-                    disabled={isPending}
-                    type={name === 'email' ? 'email' : name === 'phone' ? 'tel' : 'text'}
-                  />
+                  {name === 'phone' ? (
+                    <PhoneOrEmailInput {...field} mode="phone" type="tel" disabled={isPending} />
+                  ) : (
+                    <TextInput
+                      {...field}
+                      disabled={isPending}
+                      type={name === 'email' ? 'email' : 'text'}
+                    />
+                  )}
                 </Field>
               )}
             />

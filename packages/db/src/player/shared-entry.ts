@@ -157,7 +157,7 @@ export function savedRecordFor(
 /**
  * Points a club's record at the resolved person, keeping the club's own name, nickname and level.
  * A registered player's row keeps no copied nickname (the account's shows; the club nickname is
- * set on its own, D-2026-11-18-02). A removed row of this club for the same person is moved out of
+ * set on its own, D-2026-11-18-03). A removed row of this club for the same person is moved out of
  * the unique key's way only by refusing: the caller checks `savedRecordFor` first.
  */
 export async function pointRecordAt(
@@ -372,7 +372,7 @@ export async function replaceRtrId(
     data: { ...data, revision: { increment: 1 } },
   })
   // player_id_allocations is append-only except this change, allowed by its trigger only while
-  // the transaction-local setting is on (migration 20261118000300_shared_player_entries).
+  // the transaction-local setting is on (migration 20261118000500_shared_player_entries).
   await tx.$executeRaw`SELECT set_config('rotra.rtr_id_change', 'on', true)`
   const allocations = await tx.playerIdAllocation.updateMany({ where: { rtrId: from }, data })
   await tx.$executeRaw`SELECT set_config('rotra.rtr_id_change', 'off', true)`

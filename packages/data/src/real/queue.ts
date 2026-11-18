@@ -10,6 +10,7 @@ import type {
 import type { ClubPlayerView } from '../club-player/fetchers'
 import { clubInviteUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
+import { queueDeviceId, queueDeviceLabel } from '../device/deviceIdentity'
 import {
   deviceDownloadOf,
   deviceDownloadRecords,
@@ -49,7 +50,13 @@ export function realGetClubSession() {
 export function realSignInClub(input: SignInInput) {
   return realRequest<MockSession>('/api/auth/sign-in', {
     method: 'POST',
-    body: { identifier: input.identifier, password: input.password },
+    // B-28: the device is enrolled at Queue sign-in (Go reads these; the TypeScript route ignores them).
+    body: {
+      identifier: input.identifier,
+      password: input.password,
+      deviceId: queueDeviceId(),
+      deviceLabel: queueDeviceLabel(),
+    },
   })
 }
 export function realSignOutClub() {

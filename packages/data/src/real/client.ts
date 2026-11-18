@@ -24,6 +24,53 @@ const KIND_BY_STATUS: Record<number, MockErrorKind> = {
   404: 'permission',
   409: 'conflict',
   422: 'permission',
+  // Go's rate_limited envelope (Retry-After): the server message says when to try again.
+  429: 'retryable',
+}
+
+/**
+ * One refresh per origin at a time (go-sign-in 4.1). Concurrent calls that all got 'expired' share the
+ * same in-flight POST; a Queue call to the Player app refreshes at the Player origin, with the same
+ * credentials mode as the call that failed.
+ */
+type RefreshOutcome = 'ok' | 'denied' | 'unreachable'
+const refreshing = new Map<string, Promise<RefreshOutcome>>()
+
+function originOf(path: string): string {
+  try {
+    const base = typeof location === 'undefined' ? undefined : location.origin
+    return new URL(path, base).origin
+  } catch {
+    return ''
+  }
+}
+
+/** Refreshes the access pass at the origin of `path`; the Go refresh cookie rotates server-side. */
+export function refreshAccessPass(
+  path: string,
+  credentials: RequestCredentials = 'same-origin',
+): Promise<RefreshOutcome> {
+  const origin = originOf(path)
+  const key = `${origin}|${credentials}`
+  const running = refreshing.get(key)
+  if (running) return running
+  const attempt = (async (): Promise<RefreshOutcome> => {
+    try {
+      const response = await fetch(`${origin}/api/auth/refresh`, {
+        method: 'POST',
+        credentials,
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        cache: 'no-store',
+      })
+      if (response.ok) return 'ok'
+      return response.status === 401 || response.status === 403 ? 'denied' : 'unreachable'
+    } catch {
+      return 'unreachable'
+    }
+  })().finally(() => refreshing.delete(key))
+  refreshing.set(key, attempt)
+  return attempt
 }
 
 /**
@@ -58,33 +105,50 @@ export async function realRequest<T>(
   }
   if (offline) throw new MockError('offline', "You're offline. This needs an internet connection.")
   const multipart = typeof FormData !== 'undefined' && options.body instanceof FormData
-  let response: Response
-  try {
-    response = await fetch(path, {
-      method,
-      credentials: options.credentials ?? 'same-origin',
-      headers:
-        options.body === undefined || multipart
-          ? undefined
-          : { 'Content-Type': 'application/json' },
-      body:
-        options.body === undefined
-          ? undefined
-          : multipart
-            ? (options.body as FormData)
-            : JSON.stringify(options.body),
-      signal: options.signal,
-      cache: 'no-store',
-    })
-  } catch (error) {
-    if (options.signal?.aborted) throw error
-    if (method === 'GET') throw new MockError('retryable', "Couldn't reach ROTRA. Try again.")
-    throw new MockError(
-      'timeout',
-      'No reply came back. Check whether it saved before trying again.',
-    )
+  const send = async (): Promise<Response> => {
+    try {
+      return await fetch(path, {
+        method,
+        credentials: options.credentials ?? 'same-origin',
+        headers:
+          options.body === undefined || multipart
+            ? undefined
+            : { 'Content-Type': 'application/json' },
+        body:
+          options.body === undefined
+            ? undefined
+            : multipart
+              ? (options.body as FormData)
+              : JSON.stringify(options.body),
+        signal: options.signal,
+        cache: 'no-store',
+      })
+    } catch (error) {
+      if (options.signal?.aborted) throw error
+      if (method === 'GET') throw new MockError('retryable', "Couldn't reach ROTRA. Try again.")
+      throw new MockError(
+        'timeout',
+        'No reply came back. Check whether it saved before trying again.',
+      )
+    }
   }
-  const body = (await response.json().catch(() => null)) as (T & ErrorBody) | null
+  let response = await send()
+  let body = (await response.json().catch(() => null)) as (T & ErrorBody) | null
+  // Go's short-lived pass ran out (401 'expired', never 'unauthenticated'): one shared refresh, then the
+  // same call once more. A refused refresh surfaces as the ordinary sign-in refusal, with no loop.
+  if (
+    response.status === 401 &&
+    body?.error?.code === 'expired' &&
+    !path.endsWith('/api/auth/refresh')
+  ) {
+    const outcome = await refreshAccessPass(path, options.credentials)
+    if (outcome === 'unreachable')
+      throw new MockError('retryable', "Couldn't reach ROTRA. Try again.")
+    if (outcome === 'denied')
+      throw new RealRequestError('permission', 'Your session ended. Sign in again.', 401)
+    response = await send()
+    body = (await response.json().catch(() => null)) as (T & ErrorBody) | null
+  }
   if (response.ok) {
     if (method === 'GET') rememberGetBody(path, body)
     return body as T

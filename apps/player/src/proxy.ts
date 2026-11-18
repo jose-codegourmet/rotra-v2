@@ -1,5 +1,6 @@
 import { dataMode } from '@rotra/api-proxy/data-mode'
 import { forwardToGo, goApiEnabled } from '@rotra/api-proxy/go-forward'
+import { accessCookieName, verifyAccessPass } from '@rotra/api-proxy/pass'
 import { mockCookieName, parseMockSession } from '@rotra/data/auth/cookie'
 import { refreshProxySession } from '@rotra/db/auth/proxy-session'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -11,7 +12,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
   // Beta (B-32): moved paths reach Go first; with Go in front nobody is signed in and Supabase is never called.
-  const moved = await forwardToGo(request)
+  const moved = await forwardToGo(request, 'player')
   if (moved) return moved
   const goMode = goApiEnabled()
   const protectedPath =
@@ -22,7 +23,18 @@ export async function proxy(request: NextRequest) {
     login.searchParams.set('returnTo', `${path}${request.nextUrl.search}`)
     return NextResponse.redirect(login)
   }
-  if (goMode) return protectedPath ? toLogin() : NextResponse.next()
+  if (goMode) {
+    // A pass signed by Go for this app lets the page load, even an expired one (the client refreshes on
+    // 'expired'). No pass, a bad signature or another app's pass: /login.
+    if (protectedPath) {
+      const pass = await verifyAccessPass(
+        request.cookies.get(accessCookieName('player'))?.value,
+        'player',
+      )
+      if (!pass.ok) return toLogin()
+    }
+    return NextResponse.next()
+  }
   if (dataMode() === 'real') {
     const session = await refreshProxySession('player', request, () =>
       NextResponse.next({ request }),

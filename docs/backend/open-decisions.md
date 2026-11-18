@@ -1,18 +1,19 @@
 # Backend open decisions
 
-**Last verified:** 2026-11-18 · **Status:** B-38 and B-40 open (B-40 parked as BL-9); **B-53 to B-61 opened November 17, 2026** from the go-public-reads port, all settled November 18; **B-62** from the go-sign-in plan, settled November 18. B-01 to B-20 decided November 13, 2026
+**Last verified:** 2026-11-18 · **Status:** B-38, B-40 and B-63 open (B-40 parked as BL-9; **B-63 opened November 18, 2026** from the merge of `main` into the Go work); **B-53 to B-61 opened November 17, 2026** from the go-public-reads port, all settled November 18; **B-62** from the go-sign-in plan, settled November 18. B-01 to B-20 decided November 13, 2026
 ([D-2026-11-13-01](../mvp/decisions.md#d-2026-11-13-01)); B-21 to B-23 decided November 14, 2026 ([D-2026-11-14-01](../mvp/decisions.md#d-2026-11-14-01)). **B-24 to B-37 opened November 14, 2026** from an architecture review of the plan on `main`; B-24 to B-33 settled the same day, B-34 to B-37 on November 15; **B-40 to B-47 opened November 15, 2026** from a second review; B-41 to B-47 settled the same day; B-38 and B-39 raised by the owner, B-39 settled; **B-48 to B-50 opened November 15, 2026** from a review of the live-update event design; B-48 and B-49 settled the same day and amended after a table review (transaction-order cursor); B-50 settled the same day. Never fill a question in by guessing.
 
 ## Open
 
 Raised by the architecture reviews on November 14 and 15, 2026. Each row names the track it blocks; a track
 doesn't start the blocked requirement until its row is answered. The recommendation is the
-reviewer's, not a decision. New backend questions take the next B-id (B-63).
+reviewer's, not a decision. New backend questions take the next B-id (B-64).
 
 ### Blocks a track
 
 | ID | Question | Why it matters | Recommendation | Blocks |
 |---|---|---|---|---|
+| B-63 | **What does a profile read answer when the viewer may not see the profile?** The TypeScript read changed on `main` in `c7a252f0` (the period leaderboard work, #918): `readVisibleProfile` in `packages/db/src/player/profile.ts`, behind `GET /api/players/{playerId}` and `GET /api/rtr-ids/{rtrId}`, now refuses where B-53 and B-54 say to answer 404 or a masked profile. Four cases: **(1)** an always-private profile, any caller but the owner: `403 forbidden`; **(2)** the RTR ID route for a private or always-private player: `401` or `403`, not 404; **(3)** a private profile, caller not signed in, direct profile route: `401 unauthenticated`; **(4)** an unclaimed player saved by more than one club, caller not signed in: `401 unauthenticated`. No owner decision is recorded for the change, and Jose has not been asked whether (1) and (2) were intended | (1) contradicts B-54 and [identity › Always private](../business_logic/product/player-information/modules/identity/README.md): the page should still show the picture, the banner and the masked name. (2) contradicts B-53 and [D-2026-11-09-07](../mvp/decisions.md#d-2026-11-09-07): a 401 or 403 tells the caller the RTR ID exists. (3) fits the "Log in with ROTRA to see this profile." screen in D-2026-11-09-07 and only differs from B-54's wording. (4) follows from [D-2026-11-16-04](../mvp/decisions.md#d-2026-11-16-04) but is written down nowhere. Go still has the older behavior, and its golden cases pass against it, so the two stacks disagree today | **(1)** Go back to the masked profile (keep B-54). **(2)** Answer 404 on the RTR ID route whenever the profile would be refused or hidden (keep B-53, including `hidden_from_directory`). **(3)** Accept the `401` on the direct profile route and amend B-54 to say so. **(4)** Keep the `401` and record it. Fix TypeScript and Go together with the golden cases, in go-signed-in-reads | [go-signed-in-reads](../../conductor/tracks/go-signed-in-reads_20261113/spec.md#carried-in-from-main-merged-november-18-2026): the port of `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}`. The rest of the track is not blocked |
 
 ### Will hurt later
 

@@ -48,7 +48,12 @@ export function AccountVerification() {
       onAddPhone: () => contactChange.openWithDefaults({ field: 'phone' }),
       onChangeEmail: (email) => contactChange.openWithDefaults({ field: 'email', toValue: email }),
     }
-  } else if (session.isError || verification.isError || verification.data === null || deadline.isError) {
+  } else if (
+    session.isError ||
+    verification.isError ||
+    verification.data === null ||
+    deadline.isError
+  ) {
     state = {
       kind: 'error',
       retrying: session.isFetching || verification.isFetching || deadline.isFetching,
@@ -63,7 +68,9 @@ export function AccountVerification() {
     <>
       <VerificationPage
         state={state}
-        onBack={playerId ? () => router.push(`/players/${encodeURIComponent(playerId)}`) : undefined}
+        onBack={
+          playerId ? () => router.push(`/players/${encodeURIComponent(playerId)}`) : undefined
+        }
       />
       {contactChange.sheet}
       {googleEnabled ? picker.sheet : null}

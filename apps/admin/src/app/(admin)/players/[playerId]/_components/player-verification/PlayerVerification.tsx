@@ -13,7 +13,11 @@ import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 
-export function PlayerVerification({ player }: { player: Pick<AdminPlayer, 'id' | 'name' | 'rtrId'> }) {
+export function PlayerVerification({
+  player,
+}: {
+  player: Pick<AdminPlayer, 'id' | 'name' | 'rtrId'>
+}) {
   const query = useAdminAccountVerification(player.id)
   const mutation = useSetAdminVerificationOverride()
   const { offline } = useAdminConnectivity()
@@ -53,7 +57,9 @@ export function PlayerVerification({ player }: { player: Pick<AdminPlayer, 'id' 
       {
         onSuccess: () => {
           setOpen(false)
-          toast.success(verifiedByAdmin ? 'Verified by Admin saved' : 'Verification override cleared')
+          toast.success(
+            verifiedByAdmin ? 'Verified by Admin saved' : 'Verification override cleared',
+          )
         },
         onError: (error) => {
           setServerError(

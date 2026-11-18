@@ -4,7 +4,10 @@ import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/us
 import { useSubmitContactChangeRequest } from '@rotra/data/contact-change-request/useSubmitContactChangeRequest'
 import { MockError } from '@rotra/data/mock/errors'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { ContactChangeRequestForm, type ContactChangeRequestFormProps } from '@rotra/ui/contact-change-request-form'
+import {
+  ContactChangeRequestForm,
+  type ContactChangeRequestFormProps,
+} from '@rotra/ui/contact-change-request-form'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 

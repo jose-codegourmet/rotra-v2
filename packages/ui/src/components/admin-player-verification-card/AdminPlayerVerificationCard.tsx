@@ -62,9 +62,7 @@ export function AdminPlayerVerificationCard({
                 title="Mobile number"
                 done={Boolean(verification.maskedPhone)}
                 status={
-                  verification.maskedPhone
-                    ? `On file · ${verification.maskedPhone}`
-                    : 'Not on file'
+                  verification.maskedPhone ? `On file · ${verification.maskedPhone}` : 'Not on file'
                 }
               />
               <VerificationStep
@@ -73,7 +71,8 @@ export function AdminPlayerVerificationCard({
                 done={verification.email.kind === 'match'}
                 status={matchingEmailStatus(verification.email)}
                 chip={
-                  verification.email.kind === 'mismatch' && verification.email.pendingEmailRequest ? (
+                  verification.email.kind === 'mismatch' &&
+                  verification.email.pendingEmailRequest ? (
                     <Chip tone="warn">Change sent for Admin review</Chip>
                   ) : null
                 }

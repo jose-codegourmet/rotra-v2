@@ -11,7 +11,8 @@ export const adminVerificationOverrideFormMeta = {
   ],
   prototype: {
     file: 'apps/mockup/admin-app/rotra-admin.html',
-    screen: 'Players › Full profile › Overview › Verification › Set Verified by Admin / Clear override',
+    screen:
+      'Players › Full profile › Overview › Verification › Set Verified by Admin / Clear override',
   },
   docs: ['docs/screens/product/modules/admin/players-requests.md#verification'],
   related: ['AdminPlayerVerificationCard', 'ConfirmSheet', 'VerificationStatusChip', 'Textarea'],

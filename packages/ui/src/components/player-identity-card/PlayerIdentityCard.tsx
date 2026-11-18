@@ -12,7 +12,10 @@ import {
 } from '@rotra/ui/profile-banner-card'
 import { ProfileHero } from '@rotra/ui/profile-hero'
 import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
-import { VerificationStatusChip, type VerificationStatusChipProps } from '@rotra/ui/verification-status-chip'
+import {
+  VerificationStatusChip,
+  type VerificationStatusChipProps,
+} from '@rotra/ui/verification-status-chip'
 
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile

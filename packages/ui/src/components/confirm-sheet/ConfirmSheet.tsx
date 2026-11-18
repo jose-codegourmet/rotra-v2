@@ -113,7 +113,7 @@ export function ConfirmSheet({
             form={formId}
             onClick={formId ? undefined : confirm}
           >
-            {isPending ? pendingLabel ?? confirmLabel : confirmLabel}
+            {isPending ? (pendingLabel ?? confirmLabel) : confirmLabel}
           </Button>
         </>
       }

@@ -50,7 +50,9 @@ const auditId = 'verification-fixture-admin-override'
  * Switch the demo account to one verification fixture in a mock development session. Invalidate
  * active queries after applying it. For the signed-out state, use the normal Player sign-out.
  */
-export function applyAccountVerificationFixture(scenario: keyof typeof accountVerificationFixtures) {
+export function applyAccountVerificationFixture(
+  scenario: keyof typeof accountVerificationFixtures,
+) {
   if (isProductionBuild()) return
   const fixture: VerificationFixture = accountVerificationFixtures[scenario]
   const playerId = verificationFixturePlayerId
@@ -86,12 +88,13 @@ export function applyAccountVerificationFixture(scenario: keyof typeof accountVe
       })
     }
 
-    const record = (draft.adminPlayerRecords[playerId] ??= {
+    draft.adminPlayerRecords[playerId] ??= {
       archivedAt: null,
       revision: 1,
       createdByClubId: adminPlayerOf(draft, player).createdByClubId,
       adminCreated: false,
-    })
+    }
+    const record = draft.adminPlayerRecords[playerId]
     record.revision++
     record.verificationOverride = fixture.adminOverrideReason
       ? { status: 'verified', adminId: adminAccount.id, at }

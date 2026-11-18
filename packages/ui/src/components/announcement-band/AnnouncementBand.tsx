@@ -57,7 +57,9 @@ export function AnnouncementBand({
                 <b>{verification.completedSteps} of 3 done.</b> Your profile, games and rank stay
                 the same.
               </>
-            ) : children}
+            ) : (
+              children
+            )}
           </span>
           {actions || showRemind ? (
             <div className="mt-2 flex flex-wrap items-center gap-1.5">

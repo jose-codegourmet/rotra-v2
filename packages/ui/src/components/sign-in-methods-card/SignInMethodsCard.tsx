@@ -3,7 +3,10 @@ import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { GoogleMark } from '@rotra/ui/google-mark'
 import { Icon } from '@rotra/ui/icon'
-import { VerificationStatusChip, type VerificationStatusChipProps } from '@rotra/ui/verification-status-chip'
+import {
+  VerificationStatusChip,
+  type VerificationStatusChipProps,
+} from '@rotra/ui/verification-status-chip'
 import type { ReactNode } from 'react'
 
 export type SignInMethodsCardProps = {

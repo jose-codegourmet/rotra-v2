@@ -90,7 +90,9 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
-  const verification = useMyAccountVerification(session.data?.account.id === playerId ? playerId : null)
+  const verification = useMyAccountVerification(
+    session.data?.account.id === playerId ? playerId : null,
+  )
   const openVerification = () => router.push('/profile/verification')
   // Clubs show on every readable profile (#766); the read applies the profile's access rule.
   const clubs = usePlayerClubs(playerId)

@@ -63,7 +63,9 @@ export function PrivacyAndContact({
   const googleSignIn = usePlayerGoogleSignInEnabled()
   const googleDeadline = useGoogleDeadline().data
   const session = useSession('player')
-  const verification = useMyAccountVerification(googleSignIn ? session.data?.account.id ?? null : null)
+  const verification = useMyAccountVerification(
+    googleSignIn ? (session.data?.account.id ?? null) : null,
+  )
   const connectGoogle = useConnectGoogle()
   const connectWith = (identity: GoogleIdentity) =>
     connectGoogle.mutate(identity, {

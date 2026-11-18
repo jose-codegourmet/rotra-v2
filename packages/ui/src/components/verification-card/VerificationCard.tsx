@@ -29,7 +29,10 @@ export function VerificationCard({
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2>Your status</h2>
-          <VerificationStatusChip completedSteps={completedSteps} verifiedByAdmin={verifiedByAdmin} />
+          <VerificationStatusChip
+            completedSteps={completedSteps}
+            verifiedByAdmin={verifiedByAdmin}
+          />
         </div>
         {verifiedByAdmin ? (
           <Notice tone="success">

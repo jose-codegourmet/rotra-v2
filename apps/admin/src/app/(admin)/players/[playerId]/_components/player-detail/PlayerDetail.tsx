@@ -8,6 +8,7 @@ import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
 import { useContactRequests } from '@rotra/data/contact-change-request/useContactRequests'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { ActivityLog } from '@rotra/ui/activity-log'
 import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { AdminPlayerIdentityCard } from '@rotra/ui/admin-player-identity-card'
@@ -15,6 +16,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { cn } from '@rotra/ui/cn'
 import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { DetailHero } from '@rotra/ui/detail-hero'
@@ -35,6 +37,7 @@ import { notFound, useRouter, useSearchParams } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { PlayerManagementActions } from '../../../_components/player-management-actions/PlayerManagementActions'
+import { PlayerVerification } from '../player-verification/PlayerVerification'
 import { PlayerDetailSkeleton } from './PlayerDetailSkeleton'
 
 /** Grey bars while a card's read is still out. */
@@ -50,7 +53,7 @@ function LinesSkeleton({ label }: { label: string }) {
 
 /**
  * A-PLAYER-DETAIL: one player identity as Admin sees it. Identity, private contacts (the applied
- * values, never a pending request's), account, read-only rank, this player's contact-change requests
+ * values, never a pending request's), account, verification, read-only rank, contact-change requests
  * and the record of actions on them. Approved profile edits require review and a reason. Admin cannot change ranks,
  * winners or scores, rebuild sessions, overwrite contacts or merge players. `from` is the directory's
  * query, so Back restores its search, filter and shown count. Skeleton while the player loads,
@@ -158,6 +161,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         : null
 
   const picture = profilePictureSrc(player.picture, player.id, player.name)
+  const mockMode = !isRealDataMode()
   return (
     <>
       {back}
@@ -217,7 +221,14 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         ]}
       >
         <TabsContent value="overview">
-          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-2">
+          <div
+            className={cn(
+              'grid grid-cols-[minmax(0,1fr)] items-start gap-5',
+              mockMode
+                ? 'min-[1040px]:grid-cols-[minmax(0,1fr)_340px]'
+                : 'min-[1040px]:grid-cols-2',
+            )}
+          >
             <div className="flex min-w-0 flex-col gap-5">
               <AdminPlayerIdentityCard
                 fullName={player.name}
@@ -227,6 +238,9 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                 createdBy={createdBy}
               />
               <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
+              {player.claimed && mockMode ? (
+                <PlayerVerification key={player.id} player={player} />
+              ) : null}
             </div>
             <div className="flex min-w-0 flex-col gap-5">
               {matchRequirement !== undefined ? (

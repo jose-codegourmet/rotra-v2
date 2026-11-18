@@ -1,12 +1,12 @@
 # Admin player detail shows verification checks and the Admin override
 
-Status: NEW
+Status: TICKETED — #912
 Date: 2026-11-18
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › Players › Full profile › Overview › Verification
 Route: /admin/players/p1
 Screen ID: A-PLAYER-DETAIL
-Artifact: none
+Artifact: https://rotra-admin-verification-889.exuberantwaffle5.chatgpt.site
 Components: card, verification-step, verification-status-chip, confirm-sheet, textarea, button, toaster
 Supersedes: none
 Superseded by: none
@@ -56,7 +56,7 @@ Superseded by: none
 
 ## Real app work
 
-- [#912](https://github.com/jose-codegourmet/rotra-v2/issues/912) wires the mock detail read and set/clear mutation to Player detail and the existing Activity feed. The same mock verification state feeds Player's Verification page.
+- [#912](https://github.com/jose-codegourmet/rotra-v2/issues/912) wires the mock detail read and set/clear mutation to Player detail and the existing Activity feed. The Admin and Player queries use the same verification read model. The apps have separate in-memory mock stores when run on their own origins, so a change cannot be checked across both browser apps in mock mode. The #912 implementation awaits batch verification.
 
 ## Prototype fixtures
 

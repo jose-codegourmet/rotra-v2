@@ -6,6 +6,7 @@ export const playerDetailMeta = {
     'A-PLAYER-DETAIL container with URL-backed Overview, Contact, Game history and Activity tabs, retaining Admin player actions and read-only history.',
   usage: [
     'Rendered by /players/[playerId], which awaits params and searchParams from (the directory query) and passes them in. Back goes to /players plus from, restoring the search, account filter and shown count.',
+    'In mock mode, registered players show the Verification card directly below Account on Overview.',
     'Private contact shows the applied phone and email only, never a pending request; Phone shown to clubs comes from the player’s own preference.',
     'Each contact-change request row opens /requests/contact-changes/{requestId} with its next action (Review, Check status, Retry application, View).',
     'Same-name twins link to their own detail, keeping from. Admin never merges players.',
@@ -27,6 +28,7 @@ export const playerDetailMeta = {
     'ContactRequestList',
     'ContactRequestStatusChip',
     'PlayerAccountCard',
+    'PlayerVerification',
     'PlayerRankCard',
     'ActivityLog',
     'Tabs',

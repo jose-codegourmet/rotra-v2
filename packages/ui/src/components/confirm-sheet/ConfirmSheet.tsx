@@ -20,7 +20,12 @@ export type ConfirmSheetProps = {
   notice?: ReactNode
   /** Names the action ("Confirm invalid match", "Start session"); never a neutral "Save" */
   confirmLabel: string
-  onConfirm: () => void
+  /** Use formId instead when the footer button submits a form in the sheet body. */
+  onConfirm?: () => void
+  formId?: string
+  /** Form content after the consequence and before the save error. */
+  children?: ReactNode
+  pendingLabel?: string
   /** "Back", "Back to result", "Keep playing" */
   backLabel?: string
   /** Called by the secondary button; defaults to closing */
@@ -57,6 +62,9 @@ export function ConfirmSheet({
   notice,
   confirmLabel,
   onConfirm,
+  formId,
+  children,
+  pendingLabel,
   backLabel = 'Back',
   onBack,
   extraAction,
@@ -73,7 +81,7 @@ export function ConfirmSheet({
   }, [open, isPending, error])
 
   const confirm = () => {
-    if (fired.current || isPending) return
+    if (!onConfirm || fired.current || isPending) return
     fired.current = true
     onConfirm()
   }
@@ -101,9 +109,11 @@ export function ConfirmSheet({
             variant={solidDanger ? 'danger-solid' : destructive ? 'danger' : 'primary'}
             loading={isPending}
             disabled={confirmDisabled}
-            onClick={confirm}
+            type={formId ? 'submit' : 'button'}
+            form={formId}
+            onClick={formId ? undefined : confirm}
           >
-            {confirmLabel}
+            {isPending ? pendingLabel ?? confirmLabel : confirmLabel}
           </Button>
         </>
       }
@@ -112,6 +122,7 @@ export function ConfirmSheet({
       <p className="m-0">{consequence}</p>
       {note ? <p className="m-0 text-[13px] text-fg2">{note}</p> : null}
       {notice}
+      {children}
       {error ? <Notice tone="error">{error}</Notice> : null}
     </Sheet>
   )

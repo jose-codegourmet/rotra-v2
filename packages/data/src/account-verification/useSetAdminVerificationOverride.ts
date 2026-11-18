@@ -10,11 +10,13 @@ export function useSetAdminVerificationOverride() {
   return useMutation({
     mutationFn: setAdminVerificationOverride,
     networkMode: 'always',
-    onSuccess: (_, { playerId }) =>
-      Promise.all([
+    onSuccess: (verification, { playerId }) => {
+      client.setQueryData(accountVerificationKeys.admin(playerId), verification)
+      return Promise.all([
         client.invalidateQueries({ queryKey: adminPlayerKeys.all }),
         client.invalidateQueries({ queryKey: accountVerificationKeys.owner(playerId) }),
         client.invalidateQueries({ queryKey: adminAuditKeys.all }),
-      ]),
+      ])
+    },
   })
 }

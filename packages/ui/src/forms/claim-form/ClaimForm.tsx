@@ -4,6 +4,7 @@ import { LinkPage } from '@rotra/ui/account-link-status/link-page'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Field } from '@rotra/ui/field'
+import { GoogleIdentityRow } from '@rotra/ui/google-identity-row'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
@@ -11,9 +12,9 @@ import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { Select, type SelectOption } from '@rotra/ui/select'
 import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useState } from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Controller, FormProvider, type Resolver, useForm } from 'react-hook-form'
 import { claimDefaultValues } from './ClaimForm.defaultValues'
-import { type ClaimValues, claimSchema } from './ClaimForm.schema'
+import { type ClaimValues, claimGoogleSchema, claimSchema } from './ClaimForm.schema'
 
 export type ClaimFormProps = {
   clubName: string
@@ -30,6 +31,12 @@ export type ClaimFormProps = {
   standalone?: boolean
   accountMatch?: boolean
   onDismissMatch?: () => void
+  /**
+   * Google mode (player_google_sign_in flag): the Google account row replaces Email, Password and
+   * Confirm password, and the email is Google's. `onChange` is "← Other ways to sign up" (standalone)
+   * or "← Use another Google account" (claim).
+   */
+  google?: { name: string; email: string; onChange: () => void }
 }
 const sectionLabel = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 function Required({ children }: { children: string }) {
@@ -55,10 +62,13 @@ export function ClaimForm({
   standalone = false,
   accountMatch = false,
   onDismissMatch,
+  google,
 }: ClaimFormProps) {
   const [showPasswords, setShowPasswords] = useState(false)
   const form = useForm<ClaimValues>({
-    resolver: zodResolver(claimSchema),
+    resolver: google
+      ? (zodResolver(claimGoogleSchema) as unknown as Resolver<ClaimValues>)
+      : zodResolver(claimSchema),
     defaultValues: { ...claimDefaultValues, ...defaultValues },
   })
   const errors = form.formState.errors
@@ -85,13 +95,24 @@ export function ClaimForm({
   return (
     <LinkPage
       label={contextLabel ?? `Registration link from ${clubName}`}
-      title={standalone ? 'Create your account' : 'Finish registering'}
+      title={standalone && !google ? 'Create your account' : 'Finish registering'}
       description={
-        standalone
-          ? 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.'
-          : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
+        google
+          ? standalone
+            ? 'Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.'
+            : "Your club filled in what it knows. Check it and change anything that's wrong."
+          : standalone
+            ? 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.'
+            : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."
       }
     >
+      {google ? (
+        <div>
+          <Button size="sm" variant="ghost" onClick={google.onChange}>
+            {standalone ? '← Other ways to sign up' : '← Use another Google account'}
+          </Button>
+        </div>
+      ) : null}
       <FormProvider {...form}>
         <Card asChild>
           <form
@@ -162,15 +183,25 @@ export function ClaimForm({
             ) : null}
             <div className="flex flex-col gap-3.5">
               <span className={sectionLabel}>Contact · private</span>
+              {google ? (
+                <Field
+                  label="Signs in with"
+                  hint="This becomes your ROTRA email. Never shown publicly."
+                >
+                  <GoogleIdentityRow name={google.name} email={google.email} chip="confirmed" />
+                </Field>
+              ) : null}
               {needsPhone ? (
                 <Field
                   label={<Required>Phone number</Required>}
                   hint={
                     errors.phone
                       ? undefined
-                      : standalone
-                        ? 'Your mobile number identifies your ROTRA profile. Never shown publicly.'
-                        : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
+                      : google && standalone
+                        ? 'Your mobile number. It is never shown publicly.'
+                        : standalone
+                          ? 'Your mobile number identifies your ROTRA profile. Never shown publicly.'
+                          : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
                   }
                   error={errors.phone?.message}
                 >
@@ -196,47 +227,53 @@ export function ClaimForm({
                   <TextInput value={maskedPhone} readOnly className="font-mono" />
                 </Field>
               )}
-              <Field
-                label={<Required>Email</Required>}
-                hint={errors.email ? undefined : 'Used for password resets. Never shown publicly.'}
-                error={errors.email?.message}
-              >
-                <Controller
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <TextInput
-                      {...field}
-                      type="email"
-                      inputMode="email"
-                      autoComplete="email"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      disabled={isPending}
-                    />
-                  )}
-                />
-              </Field>
-              <Field label={<Required>Password</Required>} error={errors.password?.message}>
-                <div className="flex items-center gap-2">
-                  {passwordInput('password')}
-                  <Button
-                    size="sm"
-                    className="shrink-0"
-                    aria-pressed={showPasswords}
-                    aria-label={showPasswords ? 'Hide passwords' : 'Show passwords'}
-                    onClick={() => setShowPasswords((show) => !show)}
+              {google ? null : (
+                <>
+                  <Field
+                    label={<Required>Email</Required>}
+                    hint={
+                      errors.email ? undefined : 'Used for password resets. Never shown publicly.'
+                    }
+                    error={errors.email?.message}
                   >
-                    {showPasswords ? 'Hide' : 'Show'}
-                  </Button>
-                </div>
-              </Field>
-              <Field
-                label={<Required>Confirm password</Required>}
-                error={errors.confirmPassword?.message}
-              >
-                {passwordInput('confirmPassword')}
-              </Field>
+                    <Controller
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <TextInput
+                          {...field}
+                          type="email"
+                          inputMode="email"
+                          autoComplete="email"
+                          autoCapitalize="none"
+                          spellCheck={false}
+                          disabled={isPending}
+                        />
+                      )}
+                    />
+                  </Field>
+                  <Field label={<Required>Password</Required>} error={errors.password?.message}>
+                    <div className="flex items-center gap-2">
+                      {passwordInput('password')}
+                      <Button
+                        size="sm"
+                        className="shrink-0"
+                        aria-pressed={showPasswords}
+                        aria-label={showPasswords ? 'Hide passwords' : 'Show passwords'}
+                        onClick={() => setShowPasswords((show) => !show)}
+                      >
+                        {showPasswords ? 'Hide' : 'Show'}
+                      </Button>
+                    </div>
+                  </Field>
+                  <Field
+                    label={<Required>Confirm password</Required>}
+                    error={errors.confirmPassword?.message}
+                  >
+                    {passwordInput('confirmPassword')}
+                  </Field>
+                </>
+              )}
             </div>
             <div className="flex flex-col gap-3 border-t border-border pt-3">
               <span className={sectionLabel}>About you</span>

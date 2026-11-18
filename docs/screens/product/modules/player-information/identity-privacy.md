@@ -66,6 +66,8 @@ Lost access to both phone and email requires a separate owner-assisted verificat
 
 A card above Contact details. **Google:** "Connected · <google email>" (plus "(different from your ROTRA email)" when it differs) with a **Required** chip and **Change**, or "Not connected" with **Connect Google**. **Email and password:** "Password set · <email>", "Backup only until <deadline>" once Google is connected, or "Not used". Footer: "Google sign-in is required for every ROTRA player. Any Google account you own works, even with a different email. Your ROTRA email stays <email>." and a row "Account verification is in its own page." with the status chip as a button to P-VERIFICATION. A Google email already used by another account is refused with a toast.
 
+*Until P-VERIFICATION is built (Epic P13), the app hides the verification row; the rest of the card is live behind `player_google_sign_in`.*
+
 ## P-VERIFICATION — Account verification
 
 Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)); signed-out visitors sign in first and come back. Opened from the own profile (status chip next to "This is you", **Verification** button after My player ID, **Verification** in the Your account panel), the yellow announcement, and the pinned notification.

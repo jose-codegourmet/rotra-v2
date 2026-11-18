@@ -36,6 +36,9 @@ export function myAccountOf(
     profileVisibility: profile?.profileVisibility ?? 'public',
     hiddenFromDirectory: profile?.hiddenFromDirectory ?? false,
     avatarPreviousRef: account.avatarPreviousRef ?? null,
+    googleEmail: account.googleEmail ?? null,
+    googleLinkedAt: account.googleLinkedAt ?? null,
+    hasPassword: account.hasPassword ?? true,
   }
 }
 

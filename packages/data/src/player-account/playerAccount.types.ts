@@ -13,6 +13,18 @@ export type MyAccount = {
   /** P-PROFILE-PRIVACY › Hide me from Player Information */
   hiddenFromDirectory: boolean
   avatarPreviousRef?: string | null
+  /**
+   * Google identity (D-2026-11-16-01, P12). The connected Google email, or null/absent for none. It
+   * can differ from `email`; connecting never changes the ROTRA email. Never disconnected, only changed.
+   */
+  googleEmail?: string | null
+  /** When Google was connected (ISO); null/absent when it is not. Feeds the verification status (P13). */
+  googleLinkedAt?: string | null
+  /**
+   * Whether the account has a password (read from the auth user in real mode). Absent reads as true:
+   * only accounts made by Google registration or a Google claim have none.
+   */
+  hasPassword?: boolean
 }
 
 export type ClaimLinkStatus = 'valid' | 'claimed' | 'expired' | 'processing'

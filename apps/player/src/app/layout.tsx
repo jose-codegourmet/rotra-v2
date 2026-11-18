@@ -3,7 +3,9 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { PlayerShell } from '@/app/_components/player-shell/PlayerShell'
+import { readPlayerGoogleSignInEnabled } from '@/feature-flags/readPlayerGoogleSignInEnabled'
 import { AppProviders } from '@/providers/AppProviders'
+import { PlayerFlagsProvider } from '@/providers/PlayerFlagsProvider'
 import { THEME_STORAGE_KEY } from '@/providers/themeStorageKey'
 import { fontVariables } from './fonts'
 import './globals.css'
@@ -13,7 +15,8 @@ export const metadata: Metadata = {
   description: 'Player profiles, shared rank and the leaderboard.',
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const googleSignIn = await readPlayerGoogleSignInEnabled()
   return (
     // suppressHydrationWarning: the theme script may switch data-theme before React hydrates
     <html lang="en" data-theme="dark" className={fontVariables} suppressHydrationWarning>
@@ -23,7 +26,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <AppProviders>
-          <PlayerShell>{children}</PlayerShell>
+          <PlayerFlagsProvider googleSignIn={googleSignIn}>
+            <PlayerShell>{children}</PlayerShell>
+          </PlayerFlagsProvider>
         </AppProviders>
         <Analytics />
       </body>

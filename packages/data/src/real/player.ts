@@ -87,10 +87,10 @@ export function realCompleteClaim({
   )
 }
 export function realRequestPasswordReset(email: string) {
-  return realRequest<{ acknowledged: boolean }>('/api/auth/password-reset', {
-    method: 'POST',
-    body: { email },
-  })
+  return realRequest<{ acknowledged: boolean; signsInWithGoogle?: boolean }>(
+    '/api/auth/password-reset',
+    { method: 'POST', body: { email } },
+  )
 }
 export function realResetPassword(input: { token: string; password: string }) {
   return realRequest<{ saved: boolean }>('/api/auth/reset-password', {
@@ -165,6 +165,9 @@ function myAccountOf(account: WireMyAccount): MyAccount {
     phoneHidden: account.phoneHidden,
     profileVisibility: account.profileVisibility,
     hiddenFromDirectory: account.hiddenFromDirectory,
+    googleEmail: account.googleEmail ?? null,
+    googleLinkedAt: account.googleLinkedAt ?? null,
+    hasPassword: account.hasPassword ?? true,
   }
 }
 

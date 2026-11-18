@@ -4,10 +4,17 @@ import { personalDetailsShape } from '@rotra/schema/personal-details'
 import { phoneField } from '@rotra/schema/phone'
 import { socialLinksShape } from '@rotra/schema/social-link'
 import { z } from 'zod'
+
 /**
  * Email and password plus the optional personal details. `phone` is only filled in when the profile
  * has no phone on file (the form then requires it); a phone on file is shown read-only instead.
  */
+const phoneText = z
+  .string()
+  .refine(
+    (value) => !value.trim() || phoneField.safeParse(value).success,
+    'Enter a Philippine mobile number, like 0917 555 0142.',
+  )
 export const claimSchema = z
   .object({
     email: z
@@ -18,12 +25,7 @@ export const claimSchema = z
         (value) => !value || emailField.safeParse(value).success,
         'Enter an email address, like name@example.com.',
       ),
-    phone: z
-      .string()
-      .refine(
-        (value) => !value.trim() || phoneField.safeParse(value).success,
-        'Enter a Philippine mobile number, like 0917 555 0142.',
-      ),
+    phone: phoneText,
     password: z.string().min(1, 'Choose a password.').pipe(passwordField),
     confirmPassword: z.string(),
     cityCode: z.string().optional(),
@@ -35,3 +37,14 @@ export const claimSchema = z
     message: "The two passwords don't match.",
   })
 export type ClaimValues = z.infer<typeof claimSchema>
+
+/**
+ * Google mode (the player_google_sign_in flag): no email and no password. The email is Google's and
+ * is confirmed at once. The phone and the optional city follow the same rules as above.
+ */
+export const claimGoogleSchema = z.object({
+  phone: phoneText,
+  cityCode: z.string().optional(),
+  ...personalDetailsShape,
+  ...socialLinksShape,
+})

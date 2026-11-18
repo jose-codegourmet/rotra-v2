@@ -2,6 +2,7 @@ import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
+import { googleLoginLockKey } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { requireClubEntitlement } from '../service/authorize'
@@ -257,6 +258,41 @@ export async function readClaimLink(token: string) {
 const firstNameOf = (player: { fullName: string; nickname: string | null }) =>
   player.nickname || player.fullName.split(' ')[0] || player.fullName
 
+/**
+ * How the new account signs in. A password makes a provider login here. `googleSubject` (P12, #922)
+ * is the provider login Google already made for a verified Google account: no login is created and
+ * no password set, the Google email is the ROTRA email (confirmed at once) and Google is recorded
+ * as connected.
+ */
+export type ClaimLogin =
+  | { password: string; googleSubject?: undefined }
+  | { googleSubject: string; password?: undefined }
+
+const EMAIL_TAKEN = 'This email is already used by another player.'
+
+/** A Google email already connected to another ROTRA account is refused like a used email. */
+async function refuseConnectedGoogle(login: ClaimLogin, email: string, playerId?: string) {
+  if (!login.googleSubject) return
+  const connected = await prisma.playerAccount.findUnique({
+    where: { googleEmail: email },
+    select: { playerId: true },
+  })
+  if (connected && connected.playerId !== playerId)
+    throw new ServiceError('conflict', { email: EMAIL_TAKEN })
+}
+
+/**
+ * Serializes mapping Google's login to a new account against `deleteOrphanGoogleLogin` (a Google
+ * sign-in on /login removes a login no account uses): whichever runs first wins. Here the login
+ * must still exist once the lock is held, so an account is never mapped to a deleted login.
+ */
+async function lockGoogleLogin(tx: Prisma.TransactionClient, subject: string) {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${googleLoginLockKey(subject)}))`
+  const rows = await tx.$queryRaw<{ present: boolean }[]>`
+    SELECT EXISTS(SELECT 1 FROM auth.users WHERE id = ${subject}::uuid) AS present`
+  if (!rows[0]?.present) throw new ServiceError('conflict')
+}
+
 async function createLogin(
   provider: ProviderAdmin,
   input: { operationRef: string; email: string; phoneE164: string; initialPassword: string },
@@ -282,7 +318,7 @@ async function createLogin(
 async function completeRecordClaim(
   provider: ProviderAdmin,
   link: NonNullable<Awaited<ReturnType<typeof findRecordLink>>>,
-  input: { email: string; password: string; phoneE164?: string },
+  input: { email: string; phoneE164?: string } & ClaimLogin,
 ) {
   const record = link.clubPlayer
   const resultOf = async (tx: Pick<Prisma.TransactionClient, 'player'>, playerId: string) => {
@@ -312,16 +348,21 @@ async function completeRecordClaim(
     where: { email: input.email },
     select: { playerId: true },
   })
-  if (taken)
-    throw new ServiceError('conflict', { email: 'This email is already used by another player.' })
-  const subject = await createLogin(provider, {
-    // Keyed on the club record, not the link: a retry from a reissued link reuses the same login.
-    operationRef: `claim:record:${record.clubId}:${record.id}`,
-    email: input.email,
-    phoneE164,
-    initialPassword: input.password,
-  })
+  if (taken) throw new ServiceError('conflict', { email: EMAIL_TAKEN })
+  await refuseConnectedGoogle(input, input.email)
+  const subject =
+    input.googleSubject !== undefined
+      ? input.googleSubject
+      : await createLogin(provider, {
+          // Keyed on the club record, not the link: a retry from a reissued link reuses the same login.
+          operationRef: `claim:record:${record.clubId}:${record.id}`,
+          email: input.email,
+          phoneE164,
+          initialPassword: input.password,
+        })
+  const viaGoogle = input.googleSubject !== undefined
   return prisma.$transaction(async (tx) => {
+    if (viaGoogle) await lockGoogleLogin(tx, subject)
     const current = await tx.clubPlayerClaimLink.findUniqueOrThrow({ where: { id: link.id } })
     const fresh = await tx.clubPlayer.findUniqueOrThrow({
       where: { clubId_id: { clubId: record.clubId, id: record.id } },
@@ -339,7 +380,12 @@ async function completeRecordClaim(
       select: { id: true, fullName: true, nickname: true },
     })
     const contact = await tx.playerPrivateContact.create({
-      data: { playerId: player.id, phoneE164, email: input.email },
+      data: {
+        playerId: player.id,
+        phoneE164,
+        email: input.email,
+        ...(viaGoogle ? { emailVerifiedAt: now } : {}),
+      },
     })
     const rtrId = await allocateRtrId(tx, player.id, record.clubId, now)
     await tx.playerAccount.create({
@@ -349,6 +395,7 @@ async function completeRecordClaim(
         authSubject: subject,
         claimedAt: now,
         contactSyncVersion: contact.revision,
+        ...(viaGoogle ? { googleEmail: input.email, googleLinkedAt: now } : {}),
       },
     })
     await tx.clubPlayer.update({
@@ -381,10 +428,11 @@ async function completeRecordClaim(
  * rechecks the link, records the email, maps the account, marks the profile claimed and consumes
  * the link.
  * A retry after success returns the same result. The password goes only to the provider.
+ * With `googleSubject` (see `ClaimLogin`) step 1 is skipped: Google's login is mapped instead.
  */
 export async function completeClaim(
   provider: ProviderAdmin,
-  input: { token: string; email: string; password: string; phoneE164?: string },
+  input: { token: string; email: string; phoneE164?: string } & ClaimLogin,
 ) {
   const email = input.email.trim().toLowerCase()
   const found = await findLink(input.token)
@@ -420,17 +468,23 @@ export async function completeClaim(
     select: { playerId: true },
   })
   if (taken && taken.playerId !== player.id)
-    throw new ServiceError('conflict', { email: 'This email is already used by another player.' })
+    throw new ServiceError('conflict', { email: EMAIL_TAKEN })
+  await refuseConnectedGoogle(input, email, player.id)
 
-  const subject = await createLogin(provider, {
-    // Keyed on the player, not the link: a retry from a reissued link reuses the same login.
-    operationRef: `claim:${player.id}`,
-    email,
-    phoneE164,
-    initialPassword: input.password,
-  })
+  const subject =
+    input.googleSubject !== undefined
+      ? input.googleSubject
+      : await createLogin(provider, {
+          // Keyed on the player, not the link: a retry from a reissued link reuses the same login.
+          operationRef: `claim:${player.id}`,
+          email,
+          phoneE164,
+          initialPassword: input.password,
+        })
+  const viaGoogle = input.googleSubject !== undefined
 
   return prisma.$transaction(async (tx) => {
+    if (viaGoogle) await lockGoogleLogin(tx, subject)
     const current = await tx.playerClaimLink.findUniqueOrThrow({ where: { id: link.id } })
     const account = await tx.playerAccount.findUnique({ where: { playerId: player.id } })
     if (account) {
@@ -441,8 +495,13 @@ export async function completeClaim(
     const now = new Date()
     const contact = await tx.playerPrivateContact.upsert({
       where: { playerId: player.id },
-      update: { email, emailVerifiedAt: null, revision: { increment: 1 } },
-      create: { playerId: player.id, phoneE164, email },
+      update: { email, emailVerifiedAt: viaGoogle ? now : null, revision: { increment: 1 } },
+      create: {
+        playerId: player.id,
+        phoneE164,
+        email,
+        ...(viaGoogle ? { emailVerifiedAt: now } : {}),
+      },
     })
     await tx.playerAccount.create({
       data: {
@@ -451,6 +510,7 @@ export async function completeClaim(
         authSubject: subject,
         claimedAt: now,
         contactSyncVersion: contact.revision,
+        ...(viaGoogle ? { googleEmail: email, googleLinkedAt: now } : {}),
       },
     })
     await tx.player.update({

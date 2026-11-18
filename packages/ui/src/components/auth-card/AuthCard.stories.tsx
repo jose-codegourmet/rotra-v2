@@ -1,5 +1,7 @@
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
+import { GoogleButton } from '@rotra/ui/google-button'
+import { Notice } from '@rotra/ui/notice'
 import { TextInput } from '@rotra/ui/text-input'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AuthCard } from './AuthCard'
@@ -75,6 +77,26 @@ export const PlayerWithLegalNote: Story = {
       </p>
     ),
   },
+}
+
+export const PlayerWithGoogle: Story = {
+  args: {
+    ...Player.args,
+    google: <GoogleButton />,
+  },
+}
+
+export const PlayerWithGoogleFromInvite: Story = {
+  args: {
+    ...Player.args,
+    google: <GoogleButton />,
+    contextNotice: <Notice>Sign in to join Lakeside Smashers.</Notice>,
+  },
+}
+
+export const PlayerWithGoogleLight: Story = {
+  args: { ...PlayerWithGoogle.args },
+  globals: { theme: 'light' },
 }
 
 export const Offline: Story = { args: { offline: true, children: <QueueForm disabled /> } }

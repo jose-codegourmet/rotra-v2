@@ -3,6 +3,7 @@ import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
+import { loginHasPassword } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
 import { requireRevision } from '../service/authorize'
@@ -175,8 +176,10 @@ export async function readMyAccount(context: PlayerContext) {
       hiddenFromDirectory: true,
       revision: true,
       privateContact: true,
+      account: { select: { authSubject: true, googleEmail: true, googleLinkedAt: true } },
     },
   })
+  const google = player.account?.googleEmail ?? null
   return {
     playerId: player.id,
     phone: player.privateContact?.phoneE164 ?? '',
@@ -184,6 +187,12 @@ export async function readMyAccount(context: PlayerContext) {
     phoneHidden: player.hidePhoneFromClubs,
     profileVisibility: player.profileVisibility,
     hiddenFromDirectory: player.hiddenFromDirectory,
+    // Google identity (D-2026-11-16-01): ROTRA's own record. Null for every account until connected.
+    googleEmail: google,
+    googleLinkedAt: player.account?.googleLinkedAt?.toISOString() ?? null,
+    // Only an account made with Google can have no password, so the provider is asked only then.
+    hasPassword:
+      google && player.account ? await loginHasPassword(player.account.authSubject) : true,
     revision: toDecimalString(player.revision),
   }
 }

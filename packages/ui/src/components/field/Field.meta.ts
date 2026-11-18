@@ -8,6 +8,7 @@ export const fieldMeta = {
     'Wrap every TextInput, Textarea, Select, DatePicker and TimeField in a Field; the control picks up its id, aria-describedby and aria-invalid automatically.',
     'Mark optional fields with optional; never make scores, social links or financial fields required.',
     'Pass the error message from React Hook Form (fieldState.error?.message); it is announced without moving focus.',
+    "labelAction puts a small control beside the label (P-LOGIN's Forgot password?); it is opt-in and sits outside the <label>.",
     'Checkbox and Switch carry their own label and do not need a Field.',
   ],
   prototype: {

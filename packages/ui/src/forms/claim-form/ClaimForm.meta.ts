@@ -9,6 +9,7 @@ export const claimFormMeta = {
     'The container owns useCompleteClaim, toasts and the next step; the form never mutates.',
     'Submitted values carry email, password and personal details, never the phone.',
     'No SMS step, Facebook authorization, age, gear, tournament or self-rating field.',
+    'google (player_google_sign_in flag): Google mode. The Google row (Email confirmed) replaces Email, Password and Confirm password, the full name starts from Google, and onChange is "← Other ways to sign up" (standalone) or "← Use another Google account" (claim). Submitted values carry no email or password.',
     'Password has no minimum length until the auth specification sets one.',
   ],
   prototype: {

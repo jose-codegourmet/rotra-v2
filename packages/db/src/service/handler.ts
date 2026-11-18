@@ -1,7 +1,13 @@
 import 'server-only'
-import { type AccountAudience, type ContextFor, loadAccountContext } from '../auth/account-context'
+import {
+  type AccountAudience,
+  type AccountContext,
+  type ContextFor,
+  loadAccountContext,
+} from '../auth/account-context'
 import { dataMode, MOCK_COOKIE_PREFIX } from '../auth/data-mode'
 import { type CookieAdapter, verifySubject } from '../auth/supabase'
+import { GOOGLE_REQUIRED, googleRequiredFor } from '../player/google-gate'
 import { errorBody, ServiceError } from './errors'
 import { toJson } from './serialize'
 
@@ -45,6 +51,14 @@ export async function handleAccountRequest<A extends AccountAudience>(
   audience: A,
   cookies: CookieAdapter,
   run: (context: ContextFor<A>) => Promise<ServiceResult>,
+  options: {
+    /**
+     * Player routes only. After the Google deadline (D-2026-11-16-01) a player with no Google
+     * account is refused everywhere except the few routes that pass true: the ones the connect
+     * screen and the leaderboard need. Sign-out and the session read don't come through here.
+     */
+    allowWithoutGoogle?: boolean
+  } = {},
 ): Promise<Response> {
   try {
     if (dataMode() !== 'real') throw new ServiceError('unavailable')
@@ -52,6 +66,13 @@ export async function handleAccountRequest<A extends AccountAudience>(
     if (!verified) throw new ServiceError('unauthenticated')
     const context = await loadAccountContext(verified, audience)
     if (!context) throw new ServiceError('wrong_account')
+    const account: AccountContext = context
+    if (
+      account.kind === 'player' &&
+      !options.allowWithoutGoogle &&
+      (await googleRequiredFor(account))
+    )
+      throw new ServiceError('forbidden', { google: GOOGLE_REQUIRED })
     const result = await run(context)
     return respond(result.status ?? 200, result.body, PRIVATE_HEADERS)
   } catch (error) {
@@ -111,6 +132,10 @@ export const VISITOR_COMMANDS = [
   'player.club-page',
   'leaderboard.list',
   'player.public-profile',
+  /** Google sign-in (#922): start, outcome, link, registration and claim; each checks the flag */
+  'player.google-sign-in',
+  /** P-INVITE: the invite card and, signed in, where the viewer stands */
+  'player.invite-landing',
 ] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]

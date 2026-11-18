@@ -6,6 +6,7 @@ import { LinkPage } from './link-page/LinkPage'
 
 export type AccountLinkStatusVariant =
   | 'reset-sent'
+  | 'reset-google'
   | 'reset-invalid'
   | 'claim-claimed'
   | 'claim-expired'
@@ -14,7 +15,7 @@ export type AccountLinkStatusVariant =
   | 'claim-done'
 export type AccountLinkStatusProps = {
   variant: AccountLinkStatusVariant
-  /** reset-sent: the email the player just typed; nothing else ever shows contact data */
+  /** reset-sent, reset-google: the email the player just typed; nothing else ever shows contact data */
   email?: string
   /** reset-invalid: a failed redemption also needs a new reviewed link. */
   resetError?: string
@@ -26,6 +27,8 @@ export type AccountLinkStatusProps = {
   /** Newly registered through a guest invitation; no existing games or guest record were linked. */
   standalone?: boolean
   sessionTitle?: string | null
+  /** claim-done after Google (player_google_sign_in flag): "You sign in with Google (<email>)." */
+  googleEmail?: string
   onBackToSession?: () => void
   /** claim-processing: Check again is running */
   isPending?: boolean
@@ -47,6 +50,7 @@ export function AccountLinkStatus({
   rtrId,
   standalone = false,
   sessionTitle,
+  googleEmail,
   onBackToSession,
   isPending = false,
   onBackToSignIn,
@@ -66,6 +70,23 @@ export function AccountLinkStatus({
           <Notice tone="success">
             If an account uses <b>{email}</b>, ROTRA Admin can review your request after verifying
             ownership.
+          </Notice>
+          <p className="text-[13px] text-fg2">
+            Contact ROTRA support through your usual channel to verify ownership. An Admin will
+            provide your reset link.
+          </p>
+          <p className="text-xs text-fg2">No automatic email is sent.</p>
+          <Button variant="ghost" block onClick={onBackToSignIn}>
+            Back to sign in
+          </Button>
+        </AuthCard>
+      )
+    case 'reset-google':
+      return (
+        <AuthCard showBrand={false} title="Request received">
+          <Notice tone="info">
+            <b>{email}</b> signs in with Google and has no password. Go back and choose{' '}
+            <b>Continue with Google</b>.
           </Notice>
           <p className="text-[13px] text-fg2">
             Contact ROTRA support through your usual channel to verify ownership. An Admin will
@@ -150,7 +171,9 @@ export function AccountLinkStatus({
               ? clubName !== 'your club'
                 ? `You're now in ${clubName}'s saved players.`
                 : 'Your ROTRA account is ready.'
-              : 'Your profile is registered. Sign in from now on with your email and your password.'}
+              : googleEmail
+                ? `Your profile is registered. Sign in from now on with Google (${googleEmail}).`
+                : 'Your profile is registered. Sign in from now on with your email and your password.'}
           </Notice>
           {standalone && sessionTitle ? (
             <Notice>Your request to join {sessionTitle} is ready to send.</Notice>
@@ -162,6 +185,9 @@ export function AccountLinkStatus({
                 <span className="font-mono">{rtrId}</span>.
                 {standalone ? '' : ' Your games and rank carry over.'}
               </p>
+              {standalone && googleEmail ? (
+                <p className="m-0 text-[13px] text-fg2">You sign in with Google ({googleEmail}).</p>
+              ) : null}
               <div className={actions}>
                 {onBackToSession ? (
                   <Button variant="primary" onClick={onBackToSession}>

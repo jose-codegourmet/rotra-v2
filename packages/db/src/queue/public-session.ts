@@ -404,6 +404,19 @@ export async function readMyJoinRequest(
 type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
 
 /**
+ * P-JOIN-SESSION (#922): where a signed-in player already stands on a session, for the invite
+ * landing. Read only; it never joins anyone.
+ */
+export async function readPlayerSessionStanding(playerId: string, sessionId: string) {
+  const standing = await prisma.$transaction((tx) => playerStanding(tx, playerId, sessionId))
+  return {
+    inSession: standing.inSession,
+    waitlistPosition: standing.waitlistPosition,
+    requestPending: standing.joinRequest?.status === 'pending',
+  }
+}
+
+/**
  * The signed-in Player's own place in this session (D-2026-11-09-02), for the join card: their
  * name, whether they hold a slot or a waitlist place, and their latest request. Own data only.
  */

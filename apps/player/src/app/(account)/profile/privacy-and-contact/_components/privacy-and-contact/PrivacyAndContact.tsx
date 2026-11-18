@@ -1,5 +1,8 @@
 'use client'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
+import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
+import { useConnectGoogle } from '@rotra/data/google-sign-in/useConnectGoogle'
+import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useSetHiddenFromDirectory } from '@rotra/data/player-account/useSetHiddenFromDirectory'
@@ -17,11 +20,14 @@ import {
   ProfileVisibilityControl,
   profileVisibilityWord,
 } from '@rotra/ui/profile-visibility-control'
+import { SignInMethodsCard } from '@rotra/ui/sign-in-methods-card'
 import { SignOutCard } from '@rotra/ui/sign-out-card'
 import { StatsVisibilityCard, type StatsVisibilityKey } from '@rotra/ui/stats-visibility-card'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useGooglePicker } from '@/app/_components/google-sign-in/useGooglePicker'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { useContactChangeSheet } from '../../../_components/contact-change-sheet/useContactChangeSheet'
@@ -52,6 +58,18 @@ export function PrivacyAndContact({
   const [privacyError, setPrivacyError] = useState<string>()
   const [visibilityError, setVisibilityError] = useState<string>()
   const [hiddenError, setHiddenError] = useState<string>()
+  const googleSignIn = usePlayerGoogleSignInEnabled()
+  const googleDeadline = useGoogleDeadline().data
+  const connectGoogle = useConnectGoogle()
+  const connectWith = (identity: GoogleIdentity) =>
+    connectGoogle.mutate(identity, {
+      onSuccess: (result) =>
+        result.outcome === 'connected'
+          ? toast('Google connected')
+          : toast(`${result.email} is already used by another ROTRA account.`),
+      onError: (error) => toast.error(error.message),
+    })
+  const picker = useGooglePicker({ key: 'sign-in-methods', intent: 'connect' }, connectWith)
   const router = useRouter()
   const dispatch = useAppDispatch()
   const data = myAccount.data
@@ -185,6 +203,17 @@ export function PrivacyAndContact({
           )
         }}
       />
+      {googleSignIn && googleDeadline ? (
+        // The verification row waits for Epic P13 (Verification page); no label, no row.
+        <SignInMethodsCard
+          email={data.email}
+          googleEmail={data.googleEmail}
+          hasPassword={data.hasPassword}
+          deadline={googleDeadline.label}
+          onConnectGoogle={() => picker.start(connectWith)}
+          onChangeGoogle={() => picker.start(connectWith)}
+        />
+      ) : null}
       <ContactDetailsCard
         phone={data.phone}
         email={data.email}
@@ -206,6 +235,7 @@ export function PrivacyAndContact({
         }
       />
       {contactChange.sheet}
+      {googleSignIn ? picker.sheet : null}
     </main>
   )
 }

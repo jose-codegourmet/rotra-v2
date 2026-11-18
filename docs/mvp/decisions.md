@@ -52,14 +52,14 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
-| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | #892 | [Player](workstreams/player.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mock app behind the flag; real mode written, not run against Google (#922, pending #896) | #892 | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
-| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 
@@ -956,8 +956,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [Players module](../business_logic/product/queue/modules/players/README.md), [sessions-roster design](../database_design/product/queue/modules/sessions-roster.md), `packages/db/src/queue/session-roster.ts` (`markNoShow`, `undoNoShow`), `apps/queue/src/app/api/sessions/[sessionId]/roster/[rosterId]/no-show/route.ts`.
 
 ### D-2026-11-16-01 — Google sign-in is mandatory for players
-- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the open items below are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
+- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the first questions were settled on November 18, 2026; the open item below is not decided.
+- **Implementation status:** in the mock app behind the flag; real mode is **written but not run against Google** (#922, November 18, 2026): the Google Cloud OAuth client and the Supabase provider (#896) are not set up, and migration `20261118000200_player_google_sign_in` is not applied. Not in real mode: registration from the Admin link, and the inviting player on a session invite. [Setup and design](../backend/google-sign-in-setup.md); [log](../mockup-changes/2026-11-16-player-google-sign-in.md).
 - **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Amended by:** [D-2026-11-18-01](#d-2026-11-18-01): everything below ships behind the feature flag `player_google_sign_in`, which starts off.
@@ -969,11 +969,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **No Google account.** "I don't have a Google account" explains making a free Google account with the email they already use.
   - **Invites.** Club and session invites open an invite card first (P-INVITE). A signed-in player on a session invite gets P-JOIN-SESSION, which hands over to the Queue session page to send the request. An existing player who picks Google on an invite goes through the same link step, then on to the join step.
   - **Announcements are yellow** (`--ann-bg`, `--ann-border`, `--ann-tag`), distinct from the amber warnings.
-- **Open (placeholders in the mockup):**
-  - The deadline date (the mockup says December 31, 2026).
-  - Whether the password stops working after the deadline once Google is connected (the mockup keeps it as a backup until then).
-  - Whether Google sign-in on `/login` with no ROTRA account may ever create one (the mockup: no, invites only).
-  - Whether a signed-in player confirmed for a session at a club they aren't in joins that club's saved players.
+- **Settled by the owner, November 18, 2026 (build on the mockup's answers):**
+  - The deadline is **December 31, 2026**, one swappable mock value in `packages/data` (not an Admin setting yet).
+  - The password stays a backup until the deadline once Google is connected.
+  - Google sign-in on `/login` with no ROTRA account never creates one (invites and the Admin link only).
+  - A signed-in player confirmed for a session at a club they aren't in does **not** join that club's saved players.
+- **Open:**
   - Supabase links identities with the same verified email automatically; the "ask first" step needs that turned off or handled in the callback (backend).
 - **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) (password recovery applies only to password accounts; Google accounts are told to use Google), [D-2026-11-09-06](#d-2026-11-09-06) (registration sources unchanged; the form becomes Google), identity rule "No Facebook/social login" (Google is now required; no other social login).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [access and registration screens](../screens/product/modules/player-information/access-registration.md), [identity database design](../database_design/product/player-information/modules/identity.md#private-contacts-and-account-mapping), artifact https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN.
@@ -1118,7 +1119,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-18-01 — Google sign-in ships behind a feature flag that starts off
 - **Decision status:** approved (owner, November 18, 2026); the open items below are not decided.
-- **Implementation status:** not started.
+- **Implementation status:** in progress: the flag is seeded off (mock fixture and migration `20261118000100_seed_player_google_sign_in_flag`) and the Player app can read it (#938); no Google screen consumes it yet.
 - **Ticket:** [#938](https://github.com/jose-codegourmet/rotra-v2/issues/938) (Epic P12, [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892))
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1130,8 +1131,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open:**
   - Whether the invite card (P-INVITE) and the signed-in join steps (P-JOIN-CLUB, P-JOIN-SESSION) also wait for the flag, or show while it is off with the email + password registration behind them. Until answered: they wait for the flag.
   - Turning the flag off again after players registered with Google only: they have no password. Until answered: a connected Google account keeps working when the flag is off; only new Google registration and the prompts are hidden.
-  - Who a flag that ships with the product is "added by" in Admin (the row shows the Admin who added it).
-  - How the Player app reads the flag in real mode (it is needed signed out, on `/login`): through the Go API or a Player Route Handler, and for how long a value may be cached.
+- **Settled (owner, November 18, 2026):** a flag that ships with the product has no "added by" (`created_by_admin_id` and `updated_by_admin_id` are nullable; the migration inserts the row only if it is missing, so an existing value is never overwritten). In real mode the Player app reads the flag server-side over `packages/db` (`@rotra/db/player/feature-flags`), uncached, so it is always fresh; it moves to the Go API with B-04. A missing flag or a failed read is off. Mock mode: off, unless `NEXT_PUBLIC_ROTRA_MOCK_FLAGS=player_google_sign_in` (dev only) forces it on, because Admin's and the Player app's mock stores are separate.
 - **Amends:** [D-2026-11-16-01](#d-2026-11-16-01) (ships behind the flag); the October 27, 2026 rule "the feature flag catalog starts empty" ([configuration module](../business_logic/product/admin/modules/configuration/README.md)).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [configuration module](../business_logic/product/admin/modules/configuration/README.md), [feature flag screens](../screens/product/modules/admin/configuration.md), [`feature_flags` design](../database_design/product/admin/modules/configuration-requests.md).
 

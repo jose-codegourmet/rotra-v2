@@ -5,7 +5,11 @@ import { cookies } from 'next/headers'
 
 /** `MyAccount`: the signed-in player's own contacts, phone privacy and profile visibility settings. Private, no-store. */
 export async function GET() {
-  return handleAccountRequest('player', routeCookieAdapter(await cookies()), async (player) => ({
-    body: { account: await readMyAccount(player) },
-  }))
+  // Open after the Google deadline too: the connect screen (P-GOOGLE-REQUIRED) shows this account.
+  return handleAccountRequest(
+    'player',
+    routeCookieAdapter(await cookies()),
+    async (player) => ({ body: { account: await readMyAccount(player) } }),
+    { allowWithoutGoogle: true },
+  )
 }

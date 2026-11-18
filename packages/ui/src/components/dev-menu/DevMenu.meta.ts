@@ -5,6 +5,8 @@ export const devMenuMeta = {
     'Prototype controls with Queue sync, recovery, download and authorization scenarios, plus Player Information rank/leaderboard and account previews, and an Admin-only scenario section.',
   usage: [
     'Mount only in development or with the explicit developer-menu build flag.',
+    'inviteStanding adds the Not on it / Already in / Waitlisted switch for the signed-in player on the seeded Session invite (Player app, mock mode, flag on, signed in).',
+    'googleDeadline adds the Before / After the Google deadline switch (Player app, mock mode, only while the player_google_sign_in flag is on).',
     'Player link previews stay disabled until their callbacks are supplied. Account/private flows are not implemented by this component.',
   ],
   prototype: { file: 'apps/mockup/queue-app/rotra-queue.html', screen: 'Prototype controls' },

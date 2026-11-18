@@ -36,3 +36,30 @@ export const LegalLinksPhone: Story = {
   args: { legalLinks },
   globals: { viewport: { value: 'phone' } },
 }
+const google = { onContinue: () => {}, deadlineLabel: 'December 31, 2026' }
+export const WithGoogle: Story = { args: { google, prototypeHints: true, legalLinks } }
+export const WithGoogleLight: Story = {
+  args: { google, legalLinks },
+  globals: { theme: 'light' },
+}
+export const WithGooglePhone: Story = {
+  args: { google, legalLinks },
+  globals: { viewport: { value: 'phone' } },
+}
+export const GooglePending: Story = { args: { google: { ...google, pending: true } } }
+export const GoogleInviteContext: Story = {
+  args: { google: { ...google, contextMessage: 'Sign in to join Lipa Smashers.' } },
+}
+export const GoogleSessionContext: Story = {
+  args: {
+    google: { ...google, contextMessage: 'Sign in to request a spot in Thursday Open Play.' },
+  },
+}
+export const GoogleNotConnected: Story = {
+  args: { google: { ...google, notConnectedEmail: 'ana.reyes@gmail.com' } },
+}
+export const GoogleNotConnectedLight: Story = {
+  args: { google: { ...google, notConnectedEmail: 'ana.reyes@gmail.com' } },
+  globals: { theme: 'light' },
+}
+export const GoogleOffline: Story = { args: { google, offline: true } }

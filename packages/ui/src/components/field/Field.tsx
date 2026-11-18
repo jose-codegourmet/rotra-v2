@@ -34,6 +34,8 @@ export type FieldProps = {
   error?: ReactNode
   /** Adds "(optional)" to the label, as the prototypes write it */
   optional?: boolean
+  /** A control beside the label at the far end, e.g. P-LOGIN's "Forgot password?" button. Opt-in. */
+  labelAction?: ReactNode
   /** Control id; generated when omitted */
   id?: string
   className?: string
@@ -41,7 +43,16 @@ export type FieldProps = {
 }
 
 /** The prototypes' .field: label, control, hint and inline error, stacked. */
-export function Field({ label, hint, error, optional, id, className, children }: FieldProps) {
+export function Field({
+  label,
+  hint,
+  error,
+  optional,
+  labelAction,
+  id,
+  className,
+  children,
+}: FieldProps) {
   const autoId = useId()
   const controlId = id ?? `field${autoId}`
   const labelId = `${controlId}-label`
@@ -59,10 +70,24 @@ export function Field({ label, hint, error, optional, id, className, children }:
     >
       <FieldLabelContext.Provider value={labelId}>
         <div className={cn('flex min-w-0 flex-col gap-1.5', className)}>
-          <label id={labelId} htmlFor={controlId} className="text-[13px] font-semibold text-fg2">
-            {label}
-            {optional ? ' (optional)' : null}
-          </label>
+          {labelAction ? (
+            <div className="flex items-center justify-between gap-2">
+              <label
+                id={labelId}
+                htmlFor={controlId}
+                className="text-[13px] font-semibold text-fg2"
+              >
+                {label}
+                {optional ? ' (optional)' : null}
+              </label>
+              {labelAction}
+            </div>
+          ) : (
+            <label id={labelId} htmlFor={controlId} className="text-[13px] font-semibold text-fg2">
+              {label}
+              {optional ? ' (optional)' : null}
+            </label>
+          )}
           {children}
           {hint ? (
             <span id={hintId} className="text-xs font-normal text-fg2">

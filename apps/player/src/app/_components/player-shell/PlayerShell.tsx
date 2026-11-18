@@ -13,10 +13,13 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { DevTools } from '@/providers/DevTools'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import { requestLeave, selectUnsavedDraft } from '@/store/slices/uiSlice'
+import { GoogleAnnouncementBand } from '../google-sign-in/GoogleAnnouncementBand'
+import { GoogleRequiredGate } from '../google-sign-in/GoogleRequiredGate'
 
 export function PlayerShell({ children }: { children: ReactNode }) {
   const account = useAppSelector(selectAccount)
@@ -28,6 +31,7 @@ export function PlayerShell({ children }: { children: ReactNode }) {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const unsavedDraft = useAppSelector(selectUnsavedDraft)
+  const googleSignIn = usePlayerGoogleSignInEnabled()
   // With unsaved edits open, leaving goes through the form's D-DISCARD instead of navigating.
   const target = (href: string) =>
     unsavedDraft ? { onNavigate: () => dispatch(requestLeave(href)) } : { href }
@@ -86,8 +90,15 @@ export function PlayerShell({ children }: { children: ReactNode }) {
           }
         />
       ) : null}
+      {googleSignIn && account && pathname !== '/connect-google' ? (
+        <GoogleAnnouncementBand playerId={account.id} name={account.name} />
+      ) : null}
       {dev.offline && dev.offlineAt ? <OfflineBand savedAt={new Date(dev.offlineAt)} /> : null}
-      {children}
+      {googleSignIn ? (
+        <GoogleRequiredGate playerId={account?.id ?? null}>{children}</GoogleRequiredGate>
+      ) : (
+        children
+      )}
     </>
   )
 }

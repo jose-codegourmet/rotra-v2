@@ -12,6 +12,7 @@ import {
   formatMinutes,
   formatsLabel,
   MODE_OPTIONS,
+  recordGamesLabel,
   REPEAT_LABEL,
   slotBudget,
 } from '../SessionSetupForm.helpers'
@@ -98,6 +99,10 @@ export function SetupNotesReviewSection({
       ),
     },
     { label: 'Formats', value: row(`${formatsLabel(values)} · ${mode_?.label ?? ''}`, 1) },
+    {
+      label: 'Record games',
+      value: row(recordGamesLabel(values.recordGames !== false), 1),
+    },
     {
       label: 'Minimum',
       value: row(

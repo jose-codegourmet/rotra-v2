@@ -18,6 +18,8 @@
 
 Offline notice: “Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.”
 
+**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** The header shows a warn **Not recorded** chip after “Min N games”. The Leaderboard tab is gone, so the console has Session, Queue, Players and Payments; a stale `leaderboard` view is never shown. [Match done](match-control.md#q-match-done--two-completion-paths) opens “Finish match N?” with no winner or score. The footer line “G games recorded” still counts finished matches (open: whether it should read differently when nothing is recorded). Everything else on the console is unchanged. A recorded session shows none of this.
+
 **Views (tabs), each with a live count chip:**
 
 | Tab | Chip | Content |
@@ -25,7 +27,7 @@ Offline notice: “Working offline on this device. Matches, results and roster c
 | Session | “X/Y courts in use” | Q-COURTS, then one row of upcoming queued matches |
 | Queue | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md) |
 | Players | “P/R present” | Q-POOL |
-| Leaderboard | “NAME leads” once a game is done | Q-LEADERBOARD |
+| Leaderboard | “NAME leads” (or “N tied”) once a game is done; **no tab at all when Record games is off** | Q-LEADERBOARD |
 | Payments | “P/N paid” | The session's payments checklist ([financials](financials-inventory.md)) |
 
 These are operator workspace views. They do not reintroduce the prohibited public Matches tab.
@@ -83,6 +85,8 @@ Footer copy: “Make match shows the teams on a court first; Arrange to balance 
 One success toast per batch: “N player(s) marked present, M away” (omit a zero group); append “ · K waiting match(es) need(s) attention”, counting each affected waiting match once. Existing offline-save wording still applies. One existing error toast per failed batch; roll back only that batch's unchanged revisions and preserve newer taps. Pending presence is flushed before console/preparation tab changes, Make match, Add late player/Add player, and other roster writes, and on unmount, pagehide or hiding the page. A browser leave warns while a flush is outstanding; this in-memory mock cannot promise durable saves after the browser is destroyed. No per-player toast and no optimistic “saved” claim.
 
 ## Q-LEADERBOARD — Tonight's standings
+
+Not reachable when Record games is off: the session has no Leaderboard tab and no standings ([D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06)).
 
 Copy: “Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count.”
 

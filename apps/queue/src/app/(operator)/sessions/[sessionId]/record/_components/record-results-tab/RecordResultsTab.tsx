@@ -12,6 +12,7 @@ import { Icon } from '@rotra/ui/icon'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
 import { LeaderboardShareCard } from '@rotra/ui/leaderboard-share-card'
 import { LiveLeaderboard } from '@rotra/ui/live-leaderboard'
+import { NotRecordedNotice } from '@rotra/ui/not-recorded-notice'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { ShareDialog } from '@rotra/ui/share-dialog'
@@ -36,7 +37,8 @@ const date = (at: number) =>
  * The Results tab of the session record (Q-HISTORY): "Standings" with Share leaderboard
  * (2026-11-13-share-leaderboard: ShareDialog with LeaderboardShareCard, no viewer row), Result
  * slides (the results route) and Download images (the export sheet), then the official standings
- * as the LiveLeaderboard record variant. An invalid session shows only the no-official-result notice.
+ * as the LiveLeaderboard record variant. An invalid session shows only the no-official-result notice;
+ * a session with Record games off shows only the not-recorded notice.
  */
 export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
   const invalid = record.state === 'invalid'
@@ -50,6 +52,8 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
 
   if (invalid)
     return <InvalidSessionNotice variant="results" reason={record.invalidReason ?? undefined} />
+  // Record games off: no standings, slides or images, only the notice.
+  if (record.recordGames === false) return <NotRecordedNotice variant="results" />
 
   const players = record.playerSummaries
   const rows = standings.data?.map((r) => ({

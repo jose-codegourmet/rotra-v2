@@ -50,6 +50,7 @@ export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
             rank={rankOf.get(p.sessionPlayerId)}
             games={p.completedGames}
             minimum={record.minimumGames}
+            recorded={record.recordGames !== false}
             wins={p.wins}
             losses={p.losses}
             onSelectPlayer={(id) =>

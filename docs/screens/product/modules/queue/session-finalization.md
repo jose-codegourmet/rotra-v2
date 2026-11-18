@@ -36,6 +36,8 @@ A live status line announces the current stage. When done, the results view open
 
 These are UI stages, not separate APIs. Do not show fictitious percentages. If finalization committed but slides are still processing, show “Session finished; results are being prepared” and retry only the failed work. A lost response requires status recovery before resubmitting.
 
+**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** The screen shows **two** stages, Checking session records and Finishing the session; “Updating player records” and “Preparing result slides” never appear, because nothing goes to player records and no slides are made. When done, the [session record](results-sharing.md#q-history--session-record) opens instead of the result slides, with the toast “Session finished · games not recorded”. The failure states are those of a run that stops before commit: the session stays running and Try again re-runs both stages; there is no “results are being prepared” state. A recorded session shows none of this.
+
 ## Q-INVALID-SESSION — No official result
 
 Shown in the [session record](results-sharing.md#q-history--session-record): chip **Invalid session** and “This session has no official result. REASON It doesn't count toward player records or rankings, and there are no standings or result slides. Its partial records aren't shown as match history.” Games show “—”; players show “Not counted”.

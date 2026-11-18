@@ -23,6 +23,8 @@ export type MatchHistoryProps = {
   history: PublicMatchHistory | null | undefined
   /** A face was tapped: its index in the signed-in read's participants (opens the profile card) */
   onOpenParticipant?: (index: number) => void
+  /** False for an unrecorded session (Record games off): the not-recorded line, whoever is viewing */
+  recorded?: boolean
 }
 
 const MINUTE = 60_000
@@ -75,7 +77,7 @@ function replayHistory(history: PublicMatchHistory): SessionRecordHistory {
  * only matches started by the replay's time show (newest first) and those on court glow. Play
  * starts from the first match. The viewer's pair sits on the left, labelled “You”.
  */
-export function MatchHistory({ history, onOpenParticipant }: MatchHistoryProps) {
+export function MatchHistory({ history, onOpenParticipant, recorded = true }: MatchHistoryProps) {
   const [tab, setTab] = useState<'mine' | 'all'>('mine')
   const [moment, setMoment] = useState<number | null>(null)
   const [playing, setPlaying] = useState(false)
@@ -94,6 +96,19 @@ export function MatchHistory({ history, onOpenParticipant }: MatchHistoryProps) 
     if (playing && end !== null && moment !== null && moment >= end) setPlaying(false)
   }, [playing, end, moment])
 
+  if (!recorded)
+    return (
+      <PublicMatchHistorySection
+        recorded={false}
+        signedIn={false}
+        tab="mine"
+        onTabChange={() => {}}
+        mineCount={0}
+        allCount={0}
+        shared={false}
+        items={[]}
+      />
+    )
   if (!history)
     return (
       <PublicMatchHistorySection

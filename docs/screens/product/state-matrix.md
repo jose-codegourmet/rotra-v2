@@ -1,6 +1,6 @@
 # Cross-product states and permissions
 
-**Last verified:** 2026-11-07.
+**Last verified:** 2026-11-07; the Match and participant counting table 2026-11-19 (Record games off).
 
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
@@ -92,6 +92,7 @@
 | Invalid match | On confirmed invalidation | None | No recorded game/win/loss | None |
 | Invalid session | Session-slot release policy unresolved | No official finalized credit | No official results/slides | None |
 | Cancelled session (never started) | No court was occupied | None | None; no games, standings or slides | None |
+| Match done in a session with Record games off ([D-2026-11-18-06](../../mvp/decisions.md#d-2026-11-18-06); mock app) | On confirmation, with no winner or score (“Finish match N?”) | Counts | No W/L, standings, slides or awards; the session shows **Not recorded** | None: nothing goes to player records or rankings |
 
 ## Rank and award gates
 

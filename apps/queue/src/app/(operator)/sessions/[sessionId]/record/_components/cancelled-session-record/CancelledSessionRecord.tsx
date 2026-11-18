@@ -5,6 +5,7 @@ import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
+import { queueMasterName } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { formatPeso } from '@rotra/schema/money'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -117,7 +118,7 @@ export function CancelledSessionRecord({ sessionId }: { sessionId: string }) {
           const paid = marks.get(r.clubPlayerId)?.paid
           return {
             id: r.id,
-            name: r.nameSnapshot,
+            name: queueMasterName(r),
             photoUrl: marks.get(r.clubPlayerId)?.picture,
             levelLabel: levelLabel(r.level),
             paidLabel: paid ? `Paid ${formatPeso(paid.amount)}` : 'Not paid',

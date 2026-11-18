@@ -205,7 +205,7 @@ function OpenActiveMatch({
   }
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({
     id: p.id,
-    name: p.nameSnapshot,
+    name: queueMasterName(p),
     photoUrl: photoOf(p),
     level: p.level,
     games: countedGames(p.id, matches),
@@ -218,9 +218,13 @@ function OpenActiveMatch({
     (id) => session.courts.find((c) => c.id === id)?.label ?? 'Court',
   )
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
+  const nameOf = (id: string) => {
+    const p = byId(id)
+    return p ? queueMasterName(p) : 'Player'
+  }
   const substitutions = match.substitutions.map((sub) => ({
-    outName: byId(sub.outId)?.nameSnapshot ?? 'Player',
-    inName: byId(sub.inId)?.nameSnapshot ?? 'Player',
+    outName: nameOf(sub.outId),
+    inName: nameOf(sub.inId),
     creditTo: !sub.creditTo || sub.creditTo === 'none' ? ('nobody' as const) : sub.creditTo,
   }))
 
@@ -516,7 +520,7 @@ function OpenActiveMatch({
         <PlayerActionSheet
           open
           onOpenChange={onOpenChange}
-          name={tapped?.nameSnapshot ?? 'Player'}
+          name={tapped ? queueMasterName(tapped) : 'Player'}
           photoUrl={photoOf(tapped)}
           team={team}
           matchNo={match.matchNo}

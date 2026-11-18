@@ -31,7 +31,7 @@ Index `(player_id_at_finalization, played_at DESC, match_id)` for player history
 
 `session_result_snapshots`: one immutable generated snapshot per session/version, containing standings, MVP evidence, improvement/off-day eligibility and output, calculation version, exact prior-session IDs/baseline window, and generated time. It is private by default. Versioning supports reviewed algorithm changes, not result correction.
 
-Compute local standings from wins, losses, head-to-head when applicable, then name. Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
+Compute local standings from wins, then losses; players with the same wins and losses share a position and the next position skips the shared places ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05), mockup only; the code still breaks ties by head-to-head, then name). Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
 
 The live console leaderboard uses the same ordering over the provisional projection and adds win % (wins ÷ games). It is a read model only.
 

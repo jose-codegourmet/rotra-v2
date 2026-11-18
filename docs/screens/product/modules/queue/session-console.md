@@ -84,7 +84,7 @@ One success toast per batch: “N player(s) marked present, M away” (omit a ze
 
 ## Q-LEADERBOARD — Tonight's standings
 
-Copy: “Tonight's standings from completed games: most wins, then fewest losses, then head-to-head. It updates each time you confirm a result. Partial and invalid games don't count.”
+Copy: “Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count.”
 
 Table: rank (top three highlighted), player picture, name and level, W, L, Games “g/min” (the adjusted games played count after a Set games played override, #717; W and L stay as recorded), Win %. Empty: “No completed games yet. Standings appear after the first confirmed result.”
 

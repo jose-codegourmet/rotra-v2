@@ -78,6 +78,20 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 **Owner, November 18, 2026 ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).** One session-wide setting that says how games are scored tonight. Five modes: **16/31** (default), **16/31, no deuce**, **11/21**, **11/21 × 3** and **21 × 3**. The valid scores, deuce and best of 3 are in [Matches](../matches/README.md#scoring-modes-owner-november-18-2026-mockup-only). A session saved before this setting reads as 16/31. In the prototype the mode is fixed after Start (a placeholder: whether it can change is open). It shows on Preparation, the console, the playing-match view, the Start session summary and the public Details.
 
+### Record games
+
+**Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mockup only).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
+
+While it is **off**, the session is run only and nothing is kept:
+
+- The queue, courts, presence, payments and minimum games work as usual. A finished game still counts toward each player's games for the night.
+- **Match done** asks for no winner and no score.
+- There is no Leaderboard, no standings, no result slides, no awards and nothing to publish.
+- Nothing goes to player records, player history or ranking.
+- The session still appears in the club's records, marked **Not recorded**, with its roster, games played against the minimum and financials.
+
+Open points are listed in the decision.
+
 ### Minimum games
 
 The minimum is a target, not a guarantee and not a closing rule. Full fun games count toward it; partial and invalid games do not.

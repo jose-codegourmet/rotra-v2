@@ -1,6 +1,7 @@
 # Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks
 
-Status: IN MOCK APP — #891; #897, #902, #906, #913 and #918 implemented and verified. Evidence: [screenshots/891](../../screenshots/891/README.md).
+Status: IN MOCK APP — #891 (PR #946)
+Evidence: #897, #902, #906, #913 and #918 implemented and verified. [screenshots/891](../../screenshots/891/README.md).
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewBoard, `periodList`, `lbMove`, `lbRow`, `lbHead`, `podium`, `meCard`, `.lb-move`, `.lb-wins`, `.lb-tabs`

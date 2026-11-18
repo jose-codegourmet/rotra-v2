@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 7 · IN MOCK APP: 185 · CANCELLED: 3 · MOCKUP ONLY: 4
+TICKETED: 8 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -366,8 +366,8 @@ TICKETED: 7 · IN MOCK APP: 185 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-16-admin-unclaimed-rtr-id-edit](2026-11-16-admin-unclaimed-rtr-id-edit.md) | Admin › Players: unclaimed players have an email and an RTR ID; Admin can change the email and the RTR ID | admin-player-card, admin-player-filters, admin-player-quick-view, admin-player-clubs, admin-player-identity-card, admin-edit-player-form, player-account-chip, rank-status-chip, confirm-sheet, change-compare | TICKETED — #900 |
 | [2026-11-16-player-account-verification](2026-11-16-player-account-verification.md) | Player app: account verification page (Google, phone, matching email) with an Admin override | verification-card, verification-step, status chip, announcement-band, page-head | IN MOCK APP — #889 |
 | [2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md) | Player app: Google sign-in (mandatory), invite landings and connecting Google to existing accounts | auth-card, google-button, invite-card, google-identity-row, announcement-band, sign-in-methods-card, sheet | TICKETED — #892 |
-| [2026-11-16-player-leaderboard-periods](2026-11-16-player-leaderboard-periods.md) | Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks | leaderboard-row, leaderboard-podium, your-position-card, segmented-control, profile-ranking-card, profile-leaderboard-chips, club-member-profile-sheet, compare-stats, profile-share-card, rank-share-card | IN MOCK APP — #891; #897, #902, #906, #913 and #918 implemented and verified. Evidence: [screenshots/891](../../screenshots/891/README.md). |
-| [2026-11-16-player-notifications](2026-11-16-player-notifications.md) | Player app: notifications page and bell | notification-bell, notification-item, notification-list, segmented filter | TICKETED — #890 |
+| [2026-11-16-player-leaderboard-periods](2026-11-16-player-leaderboard-periods.md) | Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks | leaderboard-row, leaderboard-podium, your-position-card, segmented-control, profile-ranking-card, profile-leaderboard-chips, club-member-profile-sheet, compare-stats, profile-share-card, rank-share-card | IN MOCK APP — #891 (PR #946) |
+| [2026-11-16-player-notifications](2026-11-16-player-notifications.md) | Player app: notifications page and bell | notification-bell, notification-item, notification-list, segmented filter | IN MOCK APP — #890 |
 | [2026-11-16-player-phone-mask-format](2026-11-16-player-phone-mask-format.md) | Player app: every phone shown is masked and grouped; phones are kept as the database holds them | contact-details-card, private-contact-card, contact-change-request-form, claim-form | IN MOCK APP — #904 |
 | [2026-11-16-player-unclaimed-identity](2026-11-16-player-unclaimed-identity.md) | Player app: unclaimed players are public, found by email, and pick an identity on registration | profile-card, leaderboard-row, claim-form, chip, sheet, share-image-picker (carousel) | TICKETED — #900 |
 | [2026-11-16-queue-unclaimed-email-lookup](2026-11-16-queue-unclaimed-email-lookup.md) | Queue app: unclaimed players need an email and get an RTR ID; lookup by RTR ID or email only; guest linking removed | add-player-sheet, saved-player-card, player-profile-sheet, edit-player-form, invite-sheet, join-request-row, join-request-form, participant-profile-card, chip | TICKETED — #900 |
@@ -376,7 +376,9 @@ TICKETED: 7 · IN MOCK APP: 185 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-18-admin-verification-full-phone](2026-11-18-admin-verification-full-phone.md) | Admin Verification card: “On file” shows the full phone, grouped | admin-player-verification-card | IN MOCK APP — PR #957 |
 | [2026-11-18-legal-operator-details](2026-11-18-legal-operator-details.md) | Player app and rotra.club: operator name and address in the legal text | legal-document | IN MOCK APP — PR #951 |
 | [2026-11-18-player-google-link-copy](2026-11-18-player-google-link-copy.md) | Player app: P-GOOGLE-LINK says Google can be changed, not disconnected | google-link-card | IN MOCK APP — #916 |
-| [2026-11-18-player-legal-text-rewrite](2026-11-18-player-legal-text-rewrite.md) | Player app: fuller Privacy Policy and Terms of Service text | legal-document | IN MOCK APP — PR #<n> |
+| [2026-11-18-player-legal-text-rewrite](2026-11-18-player-legal-text-rewrite.md) | Player app: fuller Privacy Policy and Terms of Service text | legal-document | IN MOCK APP — PR #940 |
 | [2026-11-18-queue-club-nickname](2026-11-18-queue-club-nickname.md) | Queue app: a club nickname the Queue Master sets for a registered player, shown on Queue Master screens only | player-profile-sheet, saved-player-card, club-nickname-form (new) | TICKETED — #900 |
+| [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 |
 | [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | TICKETED — #944 |
+| [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 <!-- status-index:end -->

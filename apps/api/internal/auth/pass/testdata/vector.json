@@ -1,0 +1,32 @@
+{
+  "note": "Throwaway test key (seed 00..1f). Join tokenParts with '.' and verify the token with jwk at now; expect claims. expired.now must give 'expired', wrongAudience must give 'wrong audience'.",
+  "jwk": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "x": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+    "kid": "1IG2tMH7J2wbJZnOf8LJzQitKf7LMvoAElsuDMVM54Y",
+    "alg": "EdDSA",
+    "use": "sig"
+  },
+  "tokenParts": [
+    "eyJhbGciOiJFZERTQSIsImtpZCI6IjFJRzJ0TUg3SjJ3Ykpabk9mOExKelFpdEtmN0xNdm9BRWxzdURNVk01NFkiLCJ0eXAiOiJKV1QifQ",
+    "eyJzdWIiOiJpZGVudGl0eS0xIiwic2lkIjoic2Vzc2lvbi0xIiwiYXVkIjoiY2x1YiIsImFjYyI6ImFjY291bnQtMSIsImNsdWJfaWQiOiJjbHViLTEiLCJpYXQiOjE3OTQ5MTY4MDAsIm5iZiI6MTc5NDkxNjgwMCwiZXhwIjoxNzk0OTE3NzAwfQ",
+    "a3dsLx5tQ5ZndKbdxOduUS-A3SgOICPhndGHUtWVw2qTXfyBf5ao1PNSpHsaNzc5OuI7kiua_O_WV1nqZlu7CQ"
+  ],
+  "audience": "club",
+  "now": "2026-11-17T12:01:00Z",
+  "claims": {
+    "sub": "identity-1",
+    "sid": "session-1",
+    "aud": "club",
+    "acc": "account-1",
+    "club_id": "club-1",
+    "iat": 1794916800,
+    "nbf": 1794916800,
+    "exp": 1794917700
+  },
+  "expired": {
+    "now": "2026-11-17T12:15:00Z"
+  },
+  "wrongAudience": "admin"
+}

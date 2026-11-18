@@ -1,0 +1,509 @@
+{
+  "submit_eligible": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_eligible_again": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_eligible_shouting": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_unknown": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_disabled": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_sync_failed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "acknowledged": true
+    }
+  },
+  "submit_no_email": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_email_number": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_email_empty": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_no_at": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_two_ats": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_no_dot": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_space_inside": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_too_long": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "email": "Enter an email address, like name@example.com."
+        }
+      }
+    }
+  },
+  "submit_array_body": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "submit_string_body": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "submit_null_body": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "submit_broken_json": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "reset_no_password": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "password": "Enter a new password."
+        }
+      }
+    }
+  },
+  "reset_empty_password": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "password": "Enter a new password."
+        }
+      }
+    }
+  },
+  "reset_password_number": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "password": "Enter a new password."
+        }
+      }
+    }
+  },
+  "reset_empty_both": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again.",
+        "fields": {
+          "password": "Enter a new password."
+        }
+      }
+    }
+  },
+  "reset_no_token": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_empty_token": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_token_number": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_token_too_long": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_unknown_token": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_account_disabled": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_sync_failed": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_email_changed": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_subject_mismatch": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "link": "This reset link has expired or was already used."
+        }
+      }
+    }
+  },
+  "reset_array_body": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  },
+  "reset_broken_json": {
+    "status": 422,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "invalid",
+        "message": "Check the details and try again."
+      }
+    }
+  }
+}

@@ -11,21 +11,24 @@ export function ClubsPartner() {
       <div className="bgl" data-bg-scene="pricing" aria-hidden="true">
         <img
           className="ly far"
-          src="/art/pricing-far.webp"
+          src="/art/lite/pricing-far.webp"
+          data-full="/art/pricing-far.webp"
           alt=""
           loading="lazy"
           data-layer="pricing-far"
         />
         <img
           className="ly mid"
-          src="/art/pricing-mid.webp"
+          src="/art/lite/pricing-mid.webp"
+          data-full="/art/pricing-mid.webp"
           alt=""
           loading="lazy"
           data-layer="pricing-mid"
         />
         <img
           className="ly near"
-          src="/art/pricing-near.webp"
+          src="/art/lite/pricing-near.webp"
+          data-full="/art/pricing-near.webp"
           alt=""
           loading="lazy"
           data-layer="pricing-near"

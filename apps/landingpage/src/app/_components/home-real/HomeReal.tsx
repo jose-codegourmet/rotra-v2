@@ -8,21 +8,24 @@ export function HomeReal() {
         <div className="bgl" data-bg-scene="lineup" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/lineup-far.webp"
+            src="/art/lite/lineup-far.webp"
+            data-full="/art/lineup-far.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-far"
           />
           <img
             className="ly mid"
-            src="/art/lineup-mid.webp"
+            src="/art/lite/lineup-mid.webp"
+            data-full="/art/lineup-mid.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-mid"
           />
           <img
             className="ly near"
-            src="/art/lineup-near.webp"
+            src="/art/lite/lineup-near.webp"
+            data-full="/art/lineup-near.webp"
             alt=""
             loading="lazy"
             data-layer="lineup-near"

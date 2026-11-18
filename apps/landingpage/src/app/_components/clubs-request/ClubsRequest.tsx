@@ -11,21 +11,24 @@ export function ClubsRequest() {
       <div className="bgl" data-bg-scene="request" aria-hidden="true">
         <img
           className="ly far"
-          src="/art/request-far.webp"
+          src="/art/lite/request-far.webp"
+          data-full="/art/request-far.webp"
           alt=""
           loading="lazy"
           data-layer="request-far"
         />
         <img
           className="ly mid"
-          src="/art/request-mid.webp"
+          src="/art/lite/request-mid.webp"
+          data-full="/art/request-mid.webp"
           alt=""
           loading="lazy"
           data-layer="request-mid"
         />
         <img
           className="ly near"
-          src="/art/request-near.webp"
+          src="/art/lite/request-near.webp"
+          data-full="/art/request-near.webp"
           alt=""
           loading="lazy"
           data-layer="request-near"

@@ -199,6 +199,30 @@ export function initRive() {
   // the layers on its second drawn frame (the images are decoded before onLoad; the first frame still has the
   // default view model values); pages never read pixels from these canvases. Backing store: layout px x min(SCN.dpr, dpr).
   var SCN = window.ROTRA_SCN = { v: 3, dpr: 2 };   // bump v with a new art/scenes/*.riv
+  // Light first: the three layers load as 960 px copies (art/lite/, about 20 KB each) and each <img> names its
+  // 2880 px original in data-full. Where the scene file plays, the light layers only cover the moment before its
+  // first frames. Where it does not (reduced motion, touch above 700 px, a failed file) the layers are the picture,
+  // so they are swapped for the originals once the section is within one screen. Phones show their own tall still.
+  var PHONE = window.matchMedia('(max-width: 700px)');
+  function fullLayers(el){
+    if (PHONE.matches) return;
+    Array.prototype.forEach.call(el.querySelectorAll('img.ly[data-full]'), function(img){
+      var full = img.getAttribute('data-full');
+      if (img.getAttribute('src') !== full) img.setAttribute('src', full);
+    });
+  }
+  SCN.fullLayers = fullLayers;
+  (function(){
+    var els = Array.prototype.slice.call(document.querySelectorAll('.bgl'));
+    function stills(){ return reduce || FLAT.matches; }
+    if (!('IntersectionObserver' in window)) { els.forEach(fullLayers); return; }
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ e.target._nearFull = e.isIntersecting; if (e.isIntersecting && stills()) fullLayers(e.target); });
+    }, { rootMargin: '100% 0px 100% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+    function onChange(){ if (stills()) els.forEach(function(el){ if (el._nearFull) fullLayers(el); }); }
+    if (FLAT.addEventListener) { FLAT.addEventListener('change', onChange); PHONE.addEventListener('change', onChange); }
+  })();
   if (!reduce && 'IntersectionObserver' in window) (function(){
     var els = Array.prototype.slice.call(document.querySelectorAll('.bgl[data-bg-scene]'));
     if (!els.length) return;
@@ -250,7 +274,7 @@ export function initRive() {
           el._ready = el._playing = true;
           sync(el);
         },
-        onLoadError: function(){ if (el._r !== r) return; el._fail = true; destroy(el); }
+        onLoadError: function(){ if (el._r !== r) return; el._fail = true; destroy(el); fullLayers(el); }
       });
     }
     SCN.live = function(){ return live.map(function(el){ return { scene: el.getAttribute('data-bg-scene'), playing: !!el._playing, shown: el.classList.contains('rv'), w: el._cv && el._cv.width, h: el._cv && el._cv.height }; }); };

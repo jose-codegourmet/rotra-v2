@@ -17,21 +17,24 @@ export function ClubsAssessors() {
         <div className="bgl" data-bg-scene="assess" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/assess-far.webp"
+            src="/art/lite/assess-far.webp"
+            data-full="/art/assess-far.webp"
             alt=""
             loading="lazy"
             data-layer="assess-far"
           />
           <img
             className="ly mid"
-            src="/art/assess-mid.webp"
+            src="/art/lite/assess-mid.webp"
+            data-full="/art/assess-mid.webp"
             alt=""
             loading="lazy"
             data-layer="assess-mid"
           />
           <img
             className="ly near"
-            src="/art/assess-near.webp"
+            src="/art/lite/assess-near.webp"
+            data-full="/art/assess-near.webp"
             alt=""
             loading="lazy"
             data-layer="assess-near"

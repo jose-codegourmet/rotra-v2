@@ -17,21 +17,24 @@ export function HomeRecord() {
         <div className="bgl" data-bg-scene="record" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/record-far.webp"
+            src="/art/lite/record-far.webp"
+            data-full="/art/record-far.webp"
             alt=""
             loading="lazy"
             data-layer="record-far"
           />
           <img
             className="ly mid"
-            src="/art/record-mid.webp"
+            src="/art/lite/record-mid.webp"
+            data-full="/art/record-mid.webp"
             alt=""
             loading="lazy"
             data-layer="record-mid"
           />
           <img
             className="ly near"
-            src="/art/record-near.webp"
+            src="/art/lite/record-near.webp"
+            data-full="/art/record-near.webp"
             alt=""
             loading="lazy"
             data-layer="record-near"

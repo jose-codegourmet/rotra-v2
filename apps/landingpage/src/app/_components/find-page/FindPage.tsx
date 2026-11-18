@@ -6,21 +6,24 @@ export function FindPage() {
         <div className="bgl" data-bg-scene="find" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/find-far.webp"
+            src="/art/lite/find-far.webp"
+            data-full="/art/find-far.webp"
             alt=""
             loading="lazy"
             data-layer="find-far"
           />
           <img
             className="ly mid"
-            src="/art/find-mid.webp"
+            src="/art/lite/find-mid.webp"
+            data-full="/art/find-mid.webp"
             alt=""
             loading="lazy"
             data-layer="find-mid"
           />
           <img
             className="ly near"
-            src="/art/find-near.webp"
+            src="/art/lite/find-near.webp"
+            data-full="/art/find-near.webp"
             alt=""
             loading="lazy"
             data-layer="find-near"

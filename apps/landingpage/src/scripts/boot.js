@@ -5,8 +5,10 @@ import * as rive from '@rive-app/canvas'
 //   1. The page is locked (html.booting; the main script holds Lenis until 'rotra:ready').
 //   2. art/boot.riv replaces the still mark. Its view model: progress (0..1) fills the inner ring, out = 1 plays
 //      the exit (the mark flies at the camera).
-//   3. Every art file this device will use, on every view, is fetched into the HTTP cache (the same URLs the page
-//      and the Rive loaders ask for later), six at a time. Files that fail still count: the page has its own stills.
+//   3. The art the visitor meets first is fetched into the HTTP cache (the same URLs the page and the Rive loaders
+//      ask for later), six at a time: on desktop the whole view being opened, on phones and touch its first two
+//      screens. Files that fail still count: the page has its own stills. The rest is fetched behind the shown page
+//      (see "what to load").
 //   5. ROTRA_PT (below) reuses the screen and the file as the transition between views.
 //   4. When all are in (and at least MIN ms have passed, at most MAX), the exit plays and the screen is removed.
 export function initBoot() {
@@ -25,28 +27,53 @@ export function initBoot() {
   window.addEventListener('touchmove', block, { passive: false, capture: true });
 
   // ---- what to load
-  var urls = [], seen = {};
-  function add(u){ if (!u || /^data:/.test(u) || seen[u]) return; seen[u] = 1; urls.push(u); }
-  Array.prototype.forEach.call(document.images, function(img){
-    var layer = img.classList.contains('ly');
-    if (layer && img.classList.contains('m') !== PHONE) return;   // one tall still on phones, three layers otherwise
-    add(img.getAttribute('src'));
-  });
-  add('/hero-a/still.webp');
+  // Light first. The screen waits only for what the visitor meets first; the rest arrives behind the shown page.
+  //   Desktop: all the art of the view being opened (the screen is there anyway, so it buys that time).
+  //   Phones and touch: the stills within two screens of the top of that view and the Rive files within one.
+  // Scene layers count as their light copies (art/lite/), or as the originals where the scene file does not play
+  // (reduced motion, touch above 700 px). After 'rotra:ready' the rest of the view, the footer and (desktop only)
+  // the other views are fetched two at a time at low priority; pointing at, touching or focusing a link to another
+  // view moves that view's art to the front. Nothing is prefetched for a visitor on data saver or a 2G connection.
   var CHR = window.ROTRA_CHR, SCN = window.ROTRA_SCN;
-  Array.prototype.forEach.call(document.querySelectorAll('.chr[data-char]'), function(c){
-    var name = c.getAttribute('data-char');
-    if (!CHR) return;
-    add(CHR.still(name));
-    if (!reduce) add(CHR.riv(name));
-  });
-  if (window.ROTRA_AV) window.ROTRA_AV.list.forEach(function(k){ add(window.ROTRA_AV.url(k)); });
-  if (!reduce) {
-    Array.prototype.forEach.call(document.querySelectorAll('[data-riv]'), function(c){ add(c.getAttribute('data-riv')); });
-    if (!FLAT && SCN) Array.prototype.forEach.call(document.querySelectorAll('.bgl[data-bg-scene]'), function(c){
-      add('/art/scenes/' + c.getAttribute('data-bg-scene') + '.riv?v=' + SCN.v);
+  var STILLS = reduce || FLAT;
+  var CONN = navigator.connection || {};
+  var SAVE = !!CONN.saveData || /(^|-)2g$/.test(CONN.effectiveType || '');
+  var VH = window.innerHeight;
+  function near(el, riv){ var b = el.getBoundingClientRect(); return (b.width || b.height) ? b.top < VH * (riv ? 1 : 2) : false; }
+  function assets(root, pick){
+    var out = [];
+    function add(u, el, riv){ if (!u || /^data:/.test(u) || (pick && !pick(el, riv))) return; out.push(u); }
+    Array.prototype.forEach.call(root.querySelectorAll('img'), function(img){
+      if (!img.classList.contains('ly')) { add(img.getAttribute('src'), img); return; }
+      if (img.classList.contains('m') !== PHONE) return;   // one tall still on phones, three layers otherwise
+      add((STILLS && !PHONE && img.getAttribute('data-full')) || img.getAttribute('src'), img);
     });
+    Array.prototype.forEach.call(root.querySelectorAll('.hx-bg'), function(c){ add('/hero-a/still.webp', c); });
+    Array.prototype.forEach.call(root.querySelectorAll('.has-av'), function(c){
+      var m = /url\(["']?([^"')]+)/.exec(c.style.backgroundImage || '');
+      if (m) add(m[1], c);
+    });
+    if (CHR) Array.prototype.forEach.call(root.querySelectorAll('.chr[data-char]'), function(c){
+      var name = c.getAttribute('data-char');
+      add(CHR.still(name), c);
+      if (!reduce) add(CHR.riv(name), c, true);
+    });
+    if (!reduce) {
+      Array.prototype.forEach.call(root.querySelectorAll('[data-riv]'), function(c){ add(c.getAttribute('data-riv'), c, true); });
+      if (!FLAT && SCN) Array.prototype.forEach.call(root.querySelectorAll('.bgl[data-bg-scene]'), function(c){
+        add('/art/scenes/' + c.getAttribute('data-bg-scene') + '.riv?v=' + SCN.v, c, true);
+      });
+    }
+    return out;
   }
+  var started = {};
+  function fresh(list){ return list.filter(function(u){ if (started[u]) return false; started[u] = 1; return true; }); }
+  var cur = document.querySelector('.view:not([hidden])') || document.body;
+  var urls = fresh(assets(cur, FLAT ? near : null));
+  // behind the shown page, in this order: the rest of this view, what is outside the views (footer), the other views
+  window.ROTRA_BOOT = { first: urls.slice() };   // what the screen waits for (for checks in the console)
+  var rest = assets(cur, null).concat(assets(document, function(el){ return !el.closest('.view'); }));
+  if (!FLAT) Array.prototype.forEach.call(document.querySelectorAll('.view'), function(v){ if (v !== cur) rest = rest.concat(assets(v, null)); });
 
   // ---- the Rive mark
   var vmP = null, vmOut = null, shown = 0, target = 0, live = true;
@@ -154,15 +181,54 @@ export function initBoot() {
     }, PT_OUT + 650);
   } };
 
+  function get(u, low){
+    return fetch(u, low ? { credentials: 'same-origin', priority: 'low' } : { credentials: 'same-origin' })
+      .then(function(res){ return res.ok ? res.blob() : null; }).catch(function(){});
+  }
   var queue = urls.slice(), running = 0;
   function pump(){
     while (running < 6 && queue.length) (function(u){
       running++;
-      fetch(u, { credentials: 'same-origin' }).then(function(res){ return res.ok ? res.blob() : null; }).catch(function(){})
-        .then(function(){ running--; step(); pump(); });
+      get(u).then(function(){ running--; step(); pump(); });
     })(queue.shift());
   }
   pump();
+
+  // ---- behind the shown page
+  var bg = [], bgRun = 0, bgMax = 2, bgOn = false;
+  function bgPump(){
+    if (!bgOn) return;
+    while (bgRun < bgMax && bg.length) {
+      var u = bg.shift();
+      if (started[u]) continue;
+      started[u] = 1; bgRun++;
+      get(u, true).then(function(){ bgRun--; bgPump(); });
+    }
+  }
+  if (!SAVE) {
+    bg = rest.filter(function(u){ return !started[u]; });
+    window.addEventListener('rotra:ready', function(){
+      var go = function(){ bgOn = true; bgPump(); };
+      if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 2500 }); else setTimeout(go, 1200);
+    });
+    // a link to another view, pointed at, touched or focused: that view's art goes first
+    var VIEW_OF = { partners: 'clubs', pricing: 'request' };
+    var intent = function(e){
+      var a = e.target && e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      var h = a.getAttribute('href').slice(1);
+      var v = document.querySelector('.view[data-view="' + (VIEW_OF[h] || h).replace(/[^\w-]/g, '') + '"]');
+      if (!v && h) { var t = document.getElementById(h); v = t && t.closest('.view'); }
+      if (!v || !v.hidden || v._pf) return;
+      v._pf = true;
+      var first = assets(v, null).filter(function(u){ return !started[u]; });
+      bg = first.concat(bg);
+      bgMax = 4; bgOn = true; bgPump();
+    };
+    document.addEventListener('pointerover', intent, { passive: true });
+    document.addEventListener('touchstart', intent, { passive: true });
+    document.addEventListener('focusin', intent);
+  }
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).catch(function(){}).then(step);
   setTimeout(finish, MAX);
 }

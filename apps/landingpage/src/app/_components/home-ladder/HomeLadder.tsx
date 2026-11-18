@@ -17,21 +17,24 @@ export function HomeLadder() {
         <div className="bgl" data-bg-scene="ladder" aria-hidden="true">
           <img
             className="ly far"
-            src="/art/ladder-far.webp"
+            src="/art/lite/ladder-far.webp"
+            data-full="/art/ladder-far.webp"
             alt=""
             loading="lazy"
             data-layer="ladder-far"
           />
           <img
             className="ly mid"
-            src="/art/ladder-mid.webp"
+            src="/art/lite/ladder-mid.webp"
+            data-full="/art/ladder-mid.webp"
             alt=""
             loading="lazy"
             data-layer="ladder-mid"
           />
           <img
             className="ly near"
-            src="/art/ladder-near.webp"
+            src="/art/lite/ladder-near.webp"
+            data-full="/art/ladder-near.webp"
             alt=""
             loading="lazy"
             data-layer="ladder-near"

@@ -86,7 +86,7 @@ const meta = {
 export default meta
 type Story = StoryObj<LiveLeaderboardProps>
 
-/** A clear leader, then three players at 2–1 ordered by head-to-head, then a bottom tie by name. */
+/** The console fixture grouped by wins and losses: players on the same record share a position, ordered by name inside it. */
 export const Standings: Story = {}
 
 /** The console fixture as is: three players at 1–0 and four at 0–1. */

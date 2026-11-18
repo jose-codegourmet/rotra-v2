@@ -3,6 +3,7 @@
 import { useClub } from '@rotra/data/club'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { groupStandings } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -10,7 +11,7 @@ import { Button } from '@rotra/ui/button'
 import { Icon } from '@rotra/ui/icon'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
 import { LeaderboardShareCard } from '@rotra/ui/leaderboard-share-card'
-import { LiveLeaderboard, type LiveLeaderboardRow } from '@rotra/ui/live-leaderboard'
+import { LiveLeaderboard } from '@rotra/ui/live-leaderboard'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { ShareDialog } from '@rotra/ui/share-dialog'
@@ -55,14 +56,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
     playerId: r.playerId,
     name: r.name,
     level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
-    wins: r.wins,
-    losses: r.losses,
-    games: r.games,
-  }))
-  // Until the shared positions land (Q23.4/Q23.6): one player per row, position = index + 1.
-  const boardRows: LiveLeaderboardRow[] | undefined = rows?.map((r, i) => ({
-    position: i + 1,
-    players: [{ playerId: r.playerId, name: r.name, level: r.level }],
+    position: r.position,
     wins: r.wins,
     losses: r.losses,
     games: r.games,
@@ -77,6 +71,15 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       ? (profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName) ?? null)
       : null
   }
+  // One row per position; every face keeps its own picture and opens that player's profile.
+  const boardRows = rows
+    ? groupStandings(rows, (r) => ({
+        playerId: r.playerId,
+        name: r.name,
+        level: r.level,
+        photoUrl: pictureOf(r.playerId) ?? undefined,
+      }))
+    : undefined
   const c = club.data
   const slug = session.data?.publicSlug
   const link =
@@ -125,8 +128,8 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       {rows && c && link ? (
         <ShareDialog open={sharing} onOpenChange={setSharing} title="Share leaderboard">
           <LeaderboardShareCard
-            rows={rows.map((row, i) => ({
-              position: i + 1,
+            rows={rows.map((row) => ({
+              position: row.position,
               name: row.name,
               pictureUrl: pictureOf(row.playerId),
               wins: row.wins,

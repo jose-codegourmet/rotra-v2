@@ -196,7 +196,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   // Match requests · N: open match requests, carried by the live session read. Join requests close
   // at Start, so none count here; real mode has no Requests read yet and shows 0.
   const matchRequestCount = s?.requestCount ?? 0
-  const leader = standings.data?.[0]
+  // The top position: one leader ("NAME leads") or the players sharing it ("3 tied").
+  const leaders = (standings.data ?? []).filter((r) => r.position === 1)
+  const leader = leaders[0]
   const leaderPlayer = leader ? rosterList.find((p) => p.id === leader.playerId) : undefined
   const formats =
     [s?.allowSingles && 'Singles', s?.allowDoubles && 'Doubles'].filter(Boolean).join(' + ') ||
@@ -232,7 +234,14 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       label: 'Leaderboard',
       shortLabel: 'Board',
       badges: leader
-        ? [{ text: `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads` }]
+        ? [
+            {
+              text:
+                leaders.length > 1
+                  ? `${leaders.length} tied`
+                  : `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads`,
+            },
+          ]
         : [],
     },
     {

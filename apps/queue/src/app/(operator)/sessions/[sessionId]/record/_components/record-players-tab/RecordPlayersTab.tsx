@@ -17,7 +17,7 @@ export type RecordPlayersTabProps = {
 /**
  * The Players tab of the session record (Q-HISTORY): "Players" with "Minimum N games · M below it"
  * ("Not counted" on an invalid session) and a RecordPlayerCard per roster player, most games first
- * then by name, ranked from the standings. A picture opens the player profile dialog.
+ * then by name, ranked by the shared standings position. A picture opens the player profile dialog.
  */
 export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
   const invalid = record.state === 'invalid'
@@ -26,7 +26,7 @@ export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
   const [profileId, setProfileId] = useState<string | null>(null)
 
   const rankOf = new Map(
-    invalid ? [] : (standings.data ?? []).map((r, i) => [r.playerId, i + 1] as const),
+    invalid ? [] : (standings.data ?? []).map((r) => [r.playerId, r.position] as const),
   )
   const players = record.playerSummaries
 

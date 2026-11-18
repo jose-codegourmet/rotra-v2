@@ -1082,7 +1082,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
-- **Implementation status:** mockup only: [Player](../mockup-changes/2026-11-16-player-phone-mask-format.md) and [Admin](../mockup-changes/2026-11-16-admin-phone-format.md) logs. The real app already stores E.164 (`phoneField` in `packages/schema`) and has `maskPhone` and `formatPhoneForDisplay`; where it still shows a player their full phone is to be checked when ticketed.
+- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part is mockup only so far ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The real app already stores E.164 (`phoneField`).
 - **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1093,7 +1093,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Admin always sees the full number** (owner, later the same day: "admin should always see it"), grouped as "+63 917 555 0142".
 - **Open:**
   - Whether a player may reveal their own full number anywhere.
-- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/data/src/player-account/playerAccount.rules.ts`.
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/schema/src/phone.ts` (`maskPhone`).
 
 <a id="d-2026-11-17-01"></a>
 ### D-2026-11-17-01 — Privacy Policy and Terms of Service pages on the Player app

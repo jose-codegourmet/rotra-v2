@@ -1,6 +1,6 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { formatPhoneForDisplay } from '@rotra/schema/phone'
+import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
@@ -188,7 +188,7 @@ export function EditProfileForm({
                     {
                       label: 'Phone',
                       value: (
-                        <span className="font-mono">{formatPhoneForDisplay(account.phone)}</span>
+                        <span className="font-mono">{maskPhone(account.phone)}</span>
                       ),
                     },
                     {

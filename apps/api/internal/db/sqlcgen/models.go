@@ -1137,6 +1137,52 @@ func (ns NullPlayerContactSyncStatus) Value() (driver.Value, error) {
 	return string(ns.PlayerContactSyncStatus), nil
 }
 
+type PlayerNotificationKind string
+
+const (
+	PlayerNotificationKindAnnounce PlayerNotificationKind = "announce"
+	PlayerNotificationKindSession  PlayerNotificationKind = "session"
+	PlayerNotificationKindInvite   PlayerNotificationKind = "invite"
+	PlayerNotificationKindClub     PlayerNotificationKind = "club"
+	PlayerNotificationKindRank     PlayerNotificationKind = "rank"
+	PlayerNotificationKindAccount  PlayerNotificationKind = "account"
+)
+
+func (e *PlayerNotificationKind) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PlayerNotificationKind(s)
+	case string:
+		*e = PlayerNotificationKind(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PlayerNotificationKind: %T", src)
+	}
+	return nil
+}
+
+type NullPlayerNotificationKind struct {
+	PlayerNotificationKind PlayerNotificationKind
+	Valid                  bool // Valid is true if PlayerNotificationKind is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPlayerNotificationKind) Scan(value interface{}) error {
+	if value == nil {
+		ns.PlayerNotificationKind, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PlayerNotificationKind.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPlayerNotificationKind) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PlayerNotificationKind), nil
+}
+
 type PlayerProfileState string
 
 const (
@@ -1177,6 +1223,47 @@ func (ns NullPlayerProfileState) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.PlayerProfileState), nil
+}
+
+type PlayerVerificationOverride string
+
+const (
+	PlayerVerificationOverrideVerified PlayerVerificationOverride = "verified"
+)
+
+func (e *PlayerVerificationOverride) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PlayerVerificationOverride(s)
+	case string:
+		*e = PlayerVerificationOverride(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PlayerVerificationOverride: %T", src)
+	}
+	return nil
+}
+
+type NullPlayerVerificationOverride struct {
+	PlayerVerificationOverride PlayerVerificationOverride
+	Valid                      bool // Valid is true if PlayerVerificationOverride is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPlayerVerificationOverride) Scan(value interface{}) error {
+	if value == nil {
+		ns.PlayerVerificationOverride, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PlayerVerificationOverride.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPlayerVerificationOverride) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PlayerVerificationOverride), nil
 }
 
 type ProfileVisibility string
@@ -2224,16 +2311,18 @@ type ClubNameChangeRequest struct {
 }
 
 type ClubPlayer struct {
-	ID          pgtype.UUID
-	ClubID      pgtype.UUID
-	PlayerID    pgtype.UUID
-	DisplayName string
-	Nickname    pgtype.Text
-	AddedAt     pgtype.Timestamptz
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
-	Revision    int64
-	RemovedAt   pgtype.Timestamptz
+	ID                   pgtype.UUID
+	ClubID               pgtype.UUID
+	PlayerID             pgtype.UUID
+	DisplayName          string
+	Nickname             pgtype.Text
+	AddedAt              pgtype.Timestamptz
+	CreatedAt            pgtype.Timestamptz
+	UpdatedAt            pgtype.Timestamptz
+	Revision             int64
+	RemovedAt            pgtype.Timestamptz
+	LinkedToClubPlayerID pgtype.UUID
+	SharedEntryID        pgtype.UUID
 }
 
 type ClubPlayerClaimLink struct {
@@ -2438,38 +2527,44 @@ type MatchParticipation struct {
 }
 
 type Player struct {
-	ID                    pgtype.UUID
-	FullName              string
-	Nickname              pgtype.Text
-	AvatarRef             pgtype.Text
-	ProfileState          PlayerProfileState
-	HidePhoneFromClubs    bool
-	ExperienceMonths      pgtype.Int4
-	ExperienceRecordedAt  pgtype.Timestamptz
-	PersonalDetails       []byte
-	DetailsVersion        pgtype.Int4
-	CreatedAt             pgtype.Timestamptz
-	UpdatedAt             pgtype.Timestamptz
-	Revision              int64
-	BannerID              pgtype.Text
-	HiddenFromDirectory   bool
-	ProfileVisibility     ProfileVisibility
-	AvatarPreviousRef     pgtype.Text
-	ShowProfileStats      bool
-	ShowWeeklyPerformance bool
+	ID                     pgtype.UUID
+	FullName               string
+	Nickname               pgtype.Text
+	AvatarRef              pgtype.Text
+	ProfileState           PlayerProfileState
+	HidePhoneFromClubs     bool
+	ExperienceMonths       pgtype.Int4
+	ExperienceRecordedAt   pgtype.Timestamptz
+	PersonalDetails        []byte
+	DetailsVersion         pgtype.Int4
+	CreatedAt              pgtype.Timestamptz
+	UpdatedAt              pgtype.Timestamptz
+	Revision               int64
+	BannerID               pgtype.Text
+	HiddenFromDirectory    bool
+	ProfileVisibility      ProfileVisibility
+	AvatarPreviousRef      pgtype.Text
+	ShowProfileStats       bool
+	ShowWeeklyPerformance  bool
+	VerificationOverride   NullPlayerVerificationOverride
+	VerificationOverrideBy pgtype.UUID
+	VerificationOverrideAt pgtype.Timestamptz
 }
 
 type PlayerAccount struct {
-	PlayerID           pgtype.UUID
-	AuthProvider       string
-	AuthSubject        pgtype.UUID
-	ClaimedAt          pgtype.Timestamptz
-	ContactSyncVersion int64
-	ContactSyncStatus  PlayerContactSyncStatus
-	DisabledAt         pgtype.Timestamptz
-	CreatedAt          pgtype.Timestamptz
-	UpdatedAt          pgtype.Timestamptz
-	Revision           int64
+	PlayerID                   pgtype.UUID
+	AuthProvider               string
+	AuthSubject                pgtype.UUID
+	ClaimedAt                  pgtype.Timestamptz
+	ContactSyncVersion         int64
+	ContactSyncStatus          PlayerContactSyncStatus
+	DisabledAt                 pgtype.Timestamptz
+	CreatedAt                  pgtype.Timestamptz
+	UpdatedAt                  pgtype.Timestamptz
+	Revision                   int64
+	GoogleEmail                pgtype.Text
+	GoogleLinkedAt             pgtype.Timestamptz
+	VerificationReminderReadAt pgtype.Timestamptz
 }
 
 type PlayerClaimLink struct {
@@ -2568,6 +2663,19 @@ type PlayerMatchFact struct {
 	TeamBScore             pgtype.Int4
 	FactVersion            int32
 	CreatedAt              pgtype.Timestamptz
+}
+
+type PlayerNotification struct {
+	ID         pgtype.UUID
+	PlayerID   pgtype.UUID
+	Kind       PlayerNotificationKind
+	Title      string
+	Body       string
+	Target     string
+	SourceType pgtype.Text
+	SourceID   pgtype.UUID
+	CreatedAt  pgtype.Timestamptz
+	ReadAt     pgtype.Timestamptz
 }
 
 type PlayerPasswordResetRequest struct {
@@ -2952,6 +3060,25 @@ type SessionWaitlist struct {
 	CreatedAt          pgtype.Timestamptz
 	UpdatedAt          pgtype.Timestamptz
 	Revision           int64
+}
+
+type SharedPlayerEntry struct {
+	ID              pgtype.UUID
+	Email           pgtype.Text
+	RtrID           string
+	CreatingClubID  pgtype.UUID
+	LocationCodeID  pgtype.UUID
+	CountryCode     string
+	CityCode        string
+	SyncDate        pgtype.Date
+	Sequence        int32
+	AllocatedAt     pgtype.Timestamptz
+	ClaimedPlayerID pgtype.UUID
+	ClaimedAt       pgtype.Timestamptz
+	RetiredAt       pgtype.Timestamptz
+	CreatedAt       pgtype.Timestamptz
+	UpdatedAt       pgtype.Timestamptz
+	Revision        int64
 }
 
 type SkillLevel struct {

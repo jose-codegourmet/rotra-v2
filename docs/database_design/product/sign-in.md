@@ -256,6 +256,28 @@ Decided November 14, 2026 ([B-27](../../backend/open-decisions.md#settled)).
 - **Cookies.** Host-only per app, `HttpOnly`, `Secure`, `SameSite=Lax`; the refresh cookie is
   limited to the refresh path.
 
+## Proposed: Go sign-in contract (B-62)
+
+**Status: proposed on November 17, 2026, not decided.** The tables above fix the data; they leave the wire details open. This section fills them with defaults so the Go work can start. The owner reviews it (B-62) before any Go sign-in code merges; changing a default later costs a migration of passes or cookies, so review it before staging. Everything here is configuration or contract, none of it is migration SQL.
+
+**Pass.** A compact JWS signed with EdDSA (Ed25519), written on the Go standard library and verified in each app with WebCrypto (no JOSE library in Go or JavaScript). Header: `alg` pinned to `EdDSA`, `kid`. Claims: `sub` (identity id), `sid` (session id), `aud` (`club`, `player` or `admin`), the account id, `club_id` for club passes, `iat`, `nbf`, `exp`. Verifiers pin `alg`, require `kid`, check `exp`/`nbf`, and check `aud` against the app (a club pass never opens the Admin app, even though cookies are per host).
+
+**Keys.** `ROTRA_AUTH_SIGNING_KEY` (current) and a second variable for the next key, both Railway only. The public key set is served by Go behind the proxy secret, so B-30 (404 without the secret except `/healthz` and the ticket route) is unchanged; the apps hold the secret. Apps cache the set for 10 minutes; an unknown `kid` triggers one refetch, at most once a minute. Tests generate keys per run; no key material is committed.
+
+**Cookies.** Names per audience, so Queue, Player and Admin on `localhost` never collide: `rotra-<aud>-access` (`Path=/`) and `rotra-<aud>-refresh` (`Path` = the refresh endpoint). Both host-only (no `Domain`), `HttpOnly`, `Secure` (relaxed on localhost), `SameSite=Lax`. The refresh cookie lives as long as the refresh lifetime; the access cookie as long as the access pass. Go sends the two as separate `Set-Cookie` lines (`go-forward` keeps them separate). "Across the beta subdomains" in staging-verification means each app works on its own host.
+
+**Endpoints.** Existing paths stay: `GET /api/auth/session` (still 200 with null or `signed-out` when signed out; Admin `denied` still a 200 body), `POST /api/auth/sign-in`, `POST /api/auth/sign-out`, `POST /api/auth/password-reset`, `POST /api/auth/reset-password`, claim. New: `POST /api/auth/refresh`, `GET /api/auth/devices`, `POST /api/auth/devices/{id}/sign-out`, `POST /api/auth/sign-out-all`. Queue sign-in gains `deviceId` and `deviceLabel` in its body. Errors keep the existing envelope and the generic credential messages; an expired access pass is a 401 with a distinct code so clients can tell it from "not signed in".
+
+**Refresh.** `proxy.ts` refreshes on page loads. After an API 401 with the expired code, the browser makes one refresh call per tab (concurrent callers share it) and retries the original request once, in `realRequest` in `packages/data` (spec R2). B-29's 30 second grace covers the races.
+
+**Hashing.** argon2id at the OWASP baseline (memory 19 MiB, 2 iterations, 1 lane), rehash on sign-in when the parameters or scheme change (bcrypt imports rehash on first sign-in). A semaphore caps concurrent hashes so a venue signing in at once cannot exhaust the instance. A dummy hash runs for unknown accounts so timing does not reveal which logins exist.
+
+**Rate limits.** Fixed windows (the table's `window_start`). The `login` subject is an HMAC of `audience:login_key` with a key derived (HKDF) from the signing key, so the table never holds reversible emails. The upsert commits in its own statement **before** the sign-in transaction (inside it, a failed attempt would roll the count back and brute force would never be counted); this is a deviation from the transaction list above. A limited request gets the `rate_limited` 429 envelope used by the public reads. Starting values as in B-30.
+
+**Revocation.** Every write checks the session row through a cache of about 5 seconds (configuration); reads lag at most the 15 minute access pass.
+
+**In this track.** The Go per-request auth (verify the pass, load the account by `(rotra, auth_subject)`, check the account-table disables, check the session on writes) is built here because tracks 7 to 9 need it. Guest registration and the Admin password and email writes belong to track 8 and call this track's identity services; refusing replays from a revoked device belongs to track 9; the revoke dialog and device screens go through the mockup step first (BL-7). Until track 7, signed-in Route Handlers still check Supabase sessions, so after a Go sign-in `/api/me/*` calls fail on purpose.
+
 ## Open
 
 - Club and admin password policy; email verification stays as decided for claims (none).

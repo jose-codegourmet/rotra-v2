@@ -138,6 +138,13 @@ export type MockState = {
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
   privatePhones: Record<string, string>
   sampleRequestIndex: number
+  /** Development switch (P12): true once the Google deadline counts as passed; absent reads false */
+  googleDeadlinePassed?: boolean
+  /**
+   * Development stand-in (P12): puts a signed-in player on a session's roster or waitlist so every
+   * invite landing state is reachable; keyed `<playerId>:<sessionId>`. Used only when the saved roster and waitlist don't already place them.
+   */
+  inviteStandings?: Record<string, 'in' | 'waitlist'>
 }
 type DeepReadonly<T> = T extends object ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> } : T
 function freeze<T>(value: T): DeepReadonly<T> {

@@ -3,6 +3,8 @@ import { passwordField } from '@rotra/schema/password'
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import { getSession, signIn } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
+import { isMockFlagOn } from '../feature-flag/mockFlagOverride'
 import { claimLinkScenarios } from '../fixtures/playerAccounts'
 import { playerRequest } from '../leaderboard/request'
 import { checkMockSave } from '../mock/bridge'
@@ -32,8 +34,14 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
   return session ? myAccountOf(readMockState(), session.account.id) : null
 }
 
-/** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
-export async function requestPasswordReset(email: string) {
+/**
+ * Same acknowledgement for known and unknown emails. No email is delivered in the mock. An account
+ * that signs in with Google and has no password (P12) answers `signsInWithGoogle` instead, and no
+ * Admin review request is made for it.
+ */
+export async function requestPasswordReset(
+  email: string,
+): Promise<{ acknowledged: boolean; signsInWithGoogle?: boolean }> {
   if (isRealDataMode()) return realRequestPasswordReset(emailField.parse(email))
   await delay(400)
   if (getConnectivity() === 'offline')
@@ -41,7 +49,18 @@ export async function requestPasswordReset(email: string) {
       'offline',
       "Couldn't send because you're offline. Try again when you're connected.",
     )
-  submitMockPasswordReset(emailField.parse(email))
+  const address = emailField.parse(email)
+  const googleOnly =
+    isMockFlagOn(PLAYER_GOOGLE_SIGN_IN_FLAG) &&
+    readMockState().playerAccounts.some(
+      (a) =>
+        a.claimed &&
+        a.email.toLowerCase() === address.toLowerCase() &&
+        !!a.googleEmail &&
+        a.hasPassword === false,
+    )
+  if (googleOnly) return { acknowledged: true, signsInWithGoogle: true }
+  submitMockPasswordReset(address)
   return { acknowledged: true }
 }
 /** Real mode can't check a recovery token without using it up, so the form opens and submit decides. */
@@ -129,7 +148,10 @@ export type CompleteClaimInput = {
  * Registers the linked profile: sets email and personal details and marks it claimed. Without
  * changes it only closes the link, for a profile that is already registered.
  */
-function finishClaim(token: string, changes?: { email: string; personal: PersonalProfileValues }) {
+export function finishClaim(
+  token: string,
+  changes?: { email: string; personal: PersonalProfileValues },
+) {
   let result: CompleteClaimResult | undefined
   mockStore.update((draft) => {
     const record = draft.claimLinks[token]

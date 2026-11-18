@@ -52,7 +52,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
-| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | #892 | [Player](workstreams/player.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mockup only | #892 | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
@@ -956,7 +956,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [Players module](../business_logic/product/queue/modules/players/README.md), [sessions-roster design](../database_design/product/queue/modules/sessions-roster.md), `packages/db/src/queue/session-roster.ts` (`markNoShow`, `undoNoShow`), `apps/queue/src/app/api/sessions/[sessionId]/roster/[rosterId]/no-show/route.ts`.
 
 ### D-2026-11-16-01 — Google sign-in is mandatory for players
-- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the open items below are not decided.
+- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the first questions were settled on November 18, 2026; the open item below is not decided.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
 - **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
@@ -969,11 +969,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **No Google account.** "I don't have a Google account" explains making a free Google account with the email they already use.
   - **Invites.** Club and session invites open an invite card first (P-INVITE). A signed-in player on a session invite gets P-JOIN-SESSION, which hands over to the Queue session page to send the request. An existing player who picks Google on an invite goes through the same link step, then on to the join step.
   - **Announcements are yellow** (`--ann-bg`, `--ann-border`, `--ann-tag`), distinct from the amber warnings.
-- **Open (placeholders in the mockup):**
-  - The deadline date (the mockup says December 31, 2026).
-  - Whether the password stops working after the deadline once Google is connected (the mockup keeps it as a backup until then).
-  - Whether Google sign-in on `/login` with no ROTRA account may ever create one (the mockup: no, invites only).
-  - Whether a signed-in player confirmed for a session at a club they aren't in joins that club's saved players.
+- **Settled by the owner, November 18, 2026 (build on the mockup's answers):**
+  - The deadline is **December 31, 2026**, one swappable mock value in `packages/data` (not an Admin setting yet).
+  - The password stays a backup until the deadline once Google is connected.
+  - Google sign-in on `/login` with no ROTRA account never creates one (invites and the Admin link only).
+  - A signed-in player confirmed for a session at a club they aren't in does **not** join that club's saved players.
+- **Open:**
   - Supabase links identities with the same verified email automatically; the "ask first" step needs that turned off or handled in the callback (backend).
 - **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) (password recovery applies only to password accounts; Google accounts are told to use Google), [D-2026-11-09-06](#d-2026-11-09-06) (registration sources unchanged; the form becomes Google), identity rule "No Facebook/social login" (Google is now required; no other social login).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [access and registration screens](../screens/product/modules/player-information/access-registration.md), [identity database design](../database_design/product/player-information/modules/identity.md#private-contacts-and-account-mapping), artifact https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN.

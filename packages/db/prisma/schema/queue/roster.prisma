@@ -40,6 +40,13 @@ model SessionPlayer {
   /// No show (cancelled) (#839): set after Start on a live entry that will not come; never together
   /// with released_at (CHECK in SQL). The live roster excludes it; Back to roster clears it.
   noShowAt         DateTime?            @map("no_show_at") @db.Timestamptz(6)
+  /// I'm here (D-2026-11-09-03): when the signed-in Player last set Present themselves. The roster
+  /// shows “checked in themselves” only while present and present_changed_at is not later (the
+  /// Queue Master's last action wins). History, never cleared.
+  selfCheckedInAt  DateTime?            @map("self_checked_in_at") @db.Timestamptz(6)
+  /// I'm leaving: when the signed-in Player last turned Present off themselves. “Left” shows only
+  /// while not present and present_changed_at is not later. History, never cleared.
+  leftAt           DateTime?            @map("left_at") @db.Timestamptz(6)
   /// Set games played (#717): requested − games counted from completed matches at override time.
   /// Displayed games played = counted + this, floored at 0; may be negative. Session-running aid only.
   gamesAdjustment  Int                  @default(0) @map("games_adjustment")

@@ -33,6 +33,9 @@ model Club {
   /// letters and digits, 8–16 characters (CHECK in SQL), unique. Regenerate overwrites it; null =
   /// no link yet.
   inviteCode              String?        @unique @map("invite_code")
+  /// Players can check themselves in (D-2026-11-09-03). Off: I'm here is refused and only the Queue
+  /// Master marks presence.
+  selfCheckInEnabled      Boolean        @default(true) @map("self_check_in_enabled")
   /// Idempotency key of the Add club command.
   sourceCommandId         String         @unique @map("source_command_id") @db.Uuid
   createdAt               DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)

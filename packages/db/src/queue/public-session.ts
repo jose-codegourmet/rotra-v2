@@ -9,6 +9,7 @@ import {
   publicFirstName,
   publicLevel,
   publicSkillMix,
+  selfCheckInMark,
 } from '@rotra/data/public-session/rules'
 import type {
   MyNightStage,
@@ -613,9 +614,10 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
  * `MyNight` shape (`@rotra/data/public-session/types`), epoch-ms `startsAt`. Own standing only:
  * their status and stage, counted games, wins and losses, the minimum, the first waiting match with
  * them in it and the match holding a court with them in it (faces by the signed-in name rule, first
- * name only), their latest join request and open match request, and club membership. Self check-in
- * marks, drop-out notices and Session invites are not real yet, so `checkedIn`, `hasLeft`,
- * `cantMakeItSent` and `canInvite` read false and `inviteCode` null. Never another player's results
+ * name only), their latest join request and open match request, club membership, and their own
+ * I'm here / I'm leaving marks (`checkedIn`, `hasLeft`: the Queue Master's last action wins, like
+ * the roster's mark). Drop-out notices and Session invites are not real yet, so `cantMakeItSent`
+ * and `canInvite` read false and `inviteCode` null. Never another player's results
  * or positions, presence of others, contacts or operator notes.
  */
 export async function readMyNight(context: PlayerContext, slug: string) {
@@ -638,9 +640,24 @@ export async function readMyNight(context: PlayerContext, slug: string) {
         ...LIVE_ENTRY,
         clubPlayer: { playerId: context.playerId },
       },
-      select: { id: true },
+      select: {
+        id: true,
+        present: true,
+        presentChangedAt: true,
+        selfCheckedInAt: true,
+        leftAt: true,
+      },
     })
     const row = own ? (ctx.roster.find((r) => r.id === own.id) ?? null) : null
+    // The same rule as the roster's mark: a later presence change by the Queue Master hides it.
+    const mark = own
+      ? selfCheckInMark({
+          present: own.present,
+          presentChangedAt: own.presentChangedAt.getTime(),
+          selfCheckedInAt: own.selfCheckedInAt?.getTime() ?? null,
+          leftAt: own.leftAt?.getTime() ?? null,
+        })
+      : null
     const waitlisted = !row && standing.waitlistPosition !== null
     const takesPart =
       session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
@@ -699,8 +716,8 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       waitlistPosition: standing.waitlistPosition,
       startsAt: session.scheduledStartAt.getTime(),
       present: row?.present ?? false,
-      checkedIn: false,
-      hasLeft: false,
+      checkedIn: mark?.kind === 'checked-in',
+      hasLeft: mark?.kind === 'left',
       cantMakeItSent: false,
       offline: false,
       games: result?.games ?? 0,
@@ -1053,6 +1070,97 @@ export async function movePlayerToWaitlist(
       await closeStaleMatchRequests(tx, session.id)
       await recomputeMinimum(tx, await touchSession(tx, session))
       return { clubPlayerId: moved.clubPlayerId, message: 'You moved to the waitlist' }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/** The signed-in Player's own live roster entry in a session found by its public link. */
+async function ownEntry(tx: Tx, sessionId: string, playerId: string) {
+  const entry = await tx.sessionPlayer.findFirst({
+    where: { sessionId, ...LIVE_ENTRY, clubPlayer: { playerId } },
+    select: { id: true, present: true },
+  })
+  if (!entry)
+    throw new ServiceError('invalid', {
+      player: 'Only confirmed players in this session can do this.',
+    })
+  return entry
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I'm here** (D-2026-11-09-03) from the Queue session page, live sessions only:
+ * the signed-in Player's own roster entry becomes Present with the “checked in themselves” mark
+ * (`self_checked_in_at` = `present_changed_at`). Refused while the club has self check-in off, and
+ * for anyone without a live entry in this session. A check-in after the Queue Master turned Present
+ * off is a new check-in with a new mark; a tap while already present is a 409 that changes nothing.
+ * A tap only: no location and no venue QR.
+ */
+export async function selfCheckIn(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      requireState(session, ['active'], 'Check-in opens when the session starts.')
+      const club = await tx.club.findUniqueOrThrow({
+        where: { id: session.clubId },
+        select: { selfCheckInEnabled: true },
+      })
+      if (!club.selfCheckInEnabled)
+        throw new ServiceError('invalid', { player: 'Your club has turned self check-in off.' })
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      if (entry.present)
+        throw new ServiceError('conflict', { player: "You're already marked present." })
+      const now = new Date()
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: {
+          present: true,
+          presentChangedAt: now,
+          selfCheckedInAt: now,
+          revision: { increment: 1 },
+        },
+      })
+      await touchSession(tx, session)
+      return { rosterId: entry.id, message: 'Checked in' }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I'm leaving** (D-2026-11-09-03), live sessions only: the signed-in Player's own
+ * entry turns Present off with the “Left” mark (`left_at` = `present_changed_at`), and every open
+ * match request that names them closes. Never releases the slot, and never ends a match they are
+ * in. Allowed with self check-in off: it only tells the Queue Master.
+ */
+export async function leaveSessionAsPlayer(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      requireState(session, ['active'], 'Only a live session can be left.')
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      if (!entry.present)
+        throw new ServiceError('conflict', { player: "You're not marked present." })
+      const now = new Date()
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: { present: false, presentChangedAt: now, leftAt: now, revision: { increment: 1 } },
+      })
+      await closeStaleMatchRequests(tx, session.id, now)
+      await touchSession(tx, session)
+      return { rosterId: entry.id, message: "Told the QM you're leaving" }
     })
   } catch (error) {
     mapDatabaseError(error)

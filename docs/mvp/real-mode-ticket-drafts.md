@@ -120,6 +120,11 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   (`match-request/fetchers.ts:50,99`).
 - **Acceptance:** self check-in (only when the club allows it), leave, drop-out notice, send/cancel a match
   request all reach the Queue Master's Requests in real mode.
+- **Update, November 18, 2026 (owner: “full version migration”):** **I'm here** and **I'm leaving** are
+  real (`selfCheckIn`, `leaveSessionAsPlayer`; Player app routes `check-in` and `leave`), with the
+  roster marks and the club's switch (migration `20261118000600_self_check_in`, **not applied to the
+  shared database**). Written and type-checked; not run against a database. Still open here: the
+  drop-out notice (**I can't make it**) and the Session invite code.
 
 ---
 

@@ -13,7 +13,8 @@ export async function GET() {
 }
 
 /**
- * Logo write, or the Facebook post fields (template, description, court rules). Scope comes from the
+ * Logo write, or the Facebook post fields (template, description, court rules) and the Players can
+ * check themselves in switch (`selfCheckInEnabled`). Scope comes from the
  * verified club account, never the request body. `template: null` restores the default template.
  */
 export async function PATCH(request: Request) {
@@ -32,6 +33,8 @@ export async function PATCH(request: Request) {
         typeof body.template !== 'string'
       )
         throw new ServiceError('invalid', { template: 'Enter text.' })
+      if (body.selfCheckInEnabled !== undefined && typeof body.selfCheckInEnabled !== 'boolean')
+        throw new ServiceError('invalid', { selfCheckInEnabled: 'Choose on or off.' })
       return {
         body: {
           club: await updateClubSettings(club, {
@@ -39,6 +42,7 @@ export async function PATCH(request: Request) {
             postTemplate: body.template as string | null | undefined,
             description: text(body.description, 'description'),
             courtRules: text(body.courtRules, 'courtRules'),
+            selfCheckInEnabled: body.selfCheckInEnabled as boolean | undefined,
           }),
         },
       }

@@ -105,6 +105,8 @@ export function rosterEntryDto(entry: SessionPlayer, names: RosterNames | null) 
     levelLockedAt: toIsoOrNull(entry.levelLockedAt),
     confirmedAt: toIso(entry.confirmedAt),
     gamesAdjustment: entry.gamesAdjustment,
+    selfCheckedInAt: toIsoOrNull(entry.selfCheckedInAt),
+    leftAt: toIsoOrNull(entry.leftAt),
     revision: toDecimalString(entry.revision),
   }
 }

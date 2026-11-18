@@ -94,6 +94,8 @@ type WireClubSettings = {
   description: string
   courtRules: string
   postTemplate: string | null
+  /** Missing on a server from before self check-in was connected: reads as on */
+  selfCheckInEnabled?: boolean
   foundingAddress: string
   city: string
   cityCode: string
@@ -116,6 +118,7 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     description: club.description,
     courtRules: club.courtRules || null,
     postTemplate: club.postTemplate,
+    selfCheckInEnabled: club.selfCheckInEnabled !== false,
     defaultPlayersPerCourt: club.defaultPlayersPerCourt,
     defaultEntranceFeeMinor: minorOf(club.defaultEntranceFee),
     foundingAddress: club.foundingAddress,
@@ -144,6 +147,19 @@ export async function realUpdateClubLogo(input: {
 }) {
   await realRequest('/api/club', { method: 'PATCH', body: input })
   return accepted(null, input.logoUrl === null ? 'Club logo removed' : 'Club logo updated')
+}
+
+/** Q-CLUB › Players can check themselves in (D-2026-11-09-03): the club's switch for I'm here. */
+export async function realUpdateSelfCheckIn(input: { enabled: boolean }) {
+  const { revision } = await realGetClub()
+  await realRequest('/api/club', {
+    method: 'PATCH',
+    body: { selfCheckInEnabled: input.enabled, expectedRevision: revision },
+  })
+  return accepted(
+    null,
+    input.enabled ? 'Players can check themselves in' : 'Only you mark presence now',
+  )
 }
 
 /** Q-CLUB › Regenerate link (#712): the old link and its QR images stop working. */
@@ -471,6 +487,9 @@ export type WireRosterEntry = {
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
+  /** The Player's own I'm here / I'm leaving times (D-2026-11-09-03); missing on older servers */
+  selfCheckedInAt?: string | null
+  leftAt?: string | null
 }
 export type WireWaitlistEntry = {
   id: string
@@ -492,6 +511,8 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
   presentChangedAt: msOf(entry.presentChangedAt),
   levelLockedAt: msOrNull(entry.levelLockedAt),
   confirmedAt: msOf(entry.confirmedAt),
+  selfCheckedInAt: msOrNull(entry.selfCheckedInAt ?? null),
+  leftAt: msOrNull(entry.leftAt ?? null),
 })
 
 export type WireRosterRead = {

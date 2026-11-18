@@ -55,14 +55,18 @@ A null component is **missing evidence**, not zero. The exact blend with no rece
 
 Do not materialize an unexplained rank with no source version. Store enough calculation evidence to reproduce it from immutable facts; a bounded historical calculation log can be added if required, not an unrestricted duplicate warehouse.
 
-## Refresh and public leaderboard
+## Skill rank refresh
 
-Trigger/coalesce rank projection work after accepted assessments, valid finalizations, approved identity changes where relevant, and configured ageing boundaries. Expiry of observations requires a timer or read-time freshness check even when no new games arrive.
+Accepted assessments, valid finalizations, confirmed identity changes and ageing boundaries can trigger skill-rank projection work. The recent three-month match count describes skill-rank progress. The period leaderboards use their own read below.
 
-The rolling leaderboard requires 10 eligible standard matches in three months by default, configurable in Admin. After three months without playing, preserve the visible old rank but hide leaderboard placement until a new valid session with fresh assessment and the match-count requirement are satisfied.
+## Period leaderboards
 
-An index on `(leaderboard_eligible, numeric_rank DESC, player_id)` may support the final leaderboard once numerical ordering is approved. Index `next_recheck_at` for stale projections. Public reads must not present known-expired eligibility simply because a worker is behind; check projection freshness. There is no index predicate containing the current time.
+The owner approved computing both periods from recorded matches on November 18, 2026 (#918). Use the existing tables without a migration or stored places.
 
-Global tie order and atomic visibility of a multi-player recalculation are undecided. Local session standings use their separate wins/losses/head-to-head/name rules.
+- Read `player_match_facts` for full participation in singles and doubles standard matches. Require a completed match decision and a committed finalization of a completed session. A win is agreement between the participant's team and the winning team. A score and a published session page are optional.
+- Use `played_at` for both periods. Bound each request to the beginning of the previous requested period through the request time. The earliest boundary needed for all three profile places is January 1 of the previous year. Late uploads change the previous standings on the next read.
+- Credit the identity recorded at finalization or a confirmed, unrevoked `player_history_attributions` link scoped by club and saved player. Count each participant fact once per identity. Include a global unclaimed player only when exactly one active `club_players` row links them to a club. Legacy club-only records have no shared identity until the identity work in #900.
+- Apply the same calendar and ordering function as mock mode. Periods start at midnight in Asia/Manila on January 1, the first of the month or Monday. Order by wins, exact win rate, nickname (full name fallback) and stable player ID. One qualifying match, including a loss, establishes a place.
+- Publish up to 50 rows. Movement compares with the previous top 50. Mask private names before search or serialization. Return other players' places only within the public top 50, subject to profile visibility. The verified owner's period read can also report their place below 50, their wins and the wins at place 50.
 
 Business source: [ranking](../../../../business_logic/product/player-information/modules/ranking/README.md).

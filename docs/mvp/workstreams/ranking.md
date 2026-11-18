@@ -23,6 +23,7 @@ and generation weights.
 
 | Capability | Status | Evidence | Tickets |
 |---|---|---|---|
+| Annual, monthly and weekly leaderboards | implemented in source, batch verification pending | #918 reads finalized game facts by playing date and recomputes previous top-50 places on read | #891 |
 | Saved ranking settings | implemented | `RankingPolicyVersion` (`db/prisma/schema/admin/configuration.prisma:29`), append-only versions | #402 closed |
 | Rank projection job on finalization | partially connected | `apps/queue/src/app/api/sessions/[sessionId]/finalization/route.ts:34,57` → `driveFinalizationJobs` (`db/src/player/projections.ts:343`) → `recomputeRank` (`:65`); `APPROVED_RANK_ALGORITHMS` empty (`:24`) → rank, level null, `leaderboardEligible: false` | #247 open |
 | Rank formula (blend, normalization, ties) | not implemented | Business doc says the engine is not specified (`ranking/README.md:3,39,70`) | #247 open (blocked) |
@@ -51,13 +52,13 @@ and generation weights.
 
 - None since November 11, 2026 ([D-2026-11-11-05](../decisions.md#d-2026-11-11-05)); #247 now carries only the constants and examples.
 - [Database open decisions](../../database_design/product/open-decisions.md) (numerical model, window length and timezone, award evidence) · [business open decisions](../../business_logic/product/open-decisions.md).
-- Hub open questions 11, 12.
+- Hub open question 11. Period leaderboard rules were settled in D-2026-11-16-05.
 
 ## Exit criteria
 
 **Proposed — owner to confirm.**
 
 - [ ] The owner approves the rank, award and fairness rules (#247 closed).
-- [ ] Finalization writes approved ranks; leaderboard eligibility follows the approved rules.
+- [ ] Finalization writes approved skill ranks. Period standings follow D-2026-11-16-05.
 - [ ] Saving ranking settings triggers recalculation per the approved rules.
 - [ ] Awards in MVP use an approved formula or are ruled out by the owner.

@@ -1057,7 +1057,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-05 — Three leaderboards: Top annual, Top monthly, Top weekly
 - **Decision status:** approved November 16, 2026. The owner confirmed the calendar boundaries, tie order, skill-rank progress and treatment of late results on November 18, 2026.
-- **Implementation status:** in progress, Player side. Shared components and the mock data contracts are implemented in #897 and #902. Batch verification is pending. [Mockup log](../mockup-changes/2026-11-16-player-leaderboard-periods.md).
+- **Implementation status:** in progress, Player side. The components, mock data and screens, profile places and real-mode match-fact reads are implemented in #897, #902, #906, #913 and #918. Batch verification is pending. [Mockup log](../mockup-changes/2026-11-16-player-leaderboard-periods.md).
 - **Ticket:** [#891](https://github.com/jose-codegourmet/rotra-v2/issues/891) (Epic P16)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Supersedes:** in part the November 11, 2026 rule that the one overall leaderboard is ordered by rating ([ranking module](../business_logic/product/player-information/modules/ranking/README.md#overall-leaderboard)).

@@ -74,6 +74,8 @@ A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08
 - Use the original playing date when a session syncs late. Recompute the preceding period from those facts so its final standings and movement marks include the result.
 - A profile, Compare and share cards may show public top-50 places. Only the signed-in player's own position card can show their place below 50, their wins and place 50's wins. Mention a better win rate only when place 50 actually won the win-rate tie-break.
 
+Mock and real-mode period reads share one standings function. The database reader uses finalized match facts, confirmed history links and active club saves. [Database design](../../../../../database_design/product/player-information/modules/ranking.md#period-leaderboards).
+
 Session standings follow their own wins/losses/head-to-head/name order.
 
 **Session awards** (Most Improved, Off Day) are separate from the rating: the prototype formula is approved **as is** for v1. **Generate matches** keeps the prototype's draft weights as the official v1 pairing rule (both decided November 11, 2026, [D-2026-11-11-05](../../../../../mvp/decisions.md#d-2026-11-11-05)).

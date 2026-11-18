@@ -69,7 +69,6 @@ export const PUBLIC_READS = [
   'player.public-profile',
   'player.match-history',
   'player.public-clubs',
-  'leaderboard.list',
   'ranking.settings',
   'profile-character.shown',
   'profile-banner.shown',
@@ -110,6 +109,8 @@ export const VISITOR_COMMANDS = [
   'player.password-reset',
   /** P-CLUB-PAGE / P-CLUB-MEMBERS: public, but masked per viewer, so private and no-store */
   'player.club-page',
+  'leaderboard.list',
+  'player.public-profile',
 ] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]

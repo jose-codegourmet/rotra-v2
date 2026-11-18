@@ -308,14 +308,12 @@ item); an edit sends the displayed `revision` and a stale one is a conflict; −
 no revision check, so quick taps never conflict. Inventory is online only in real mode (#245): offline,
 nothing is sent and the screen says so.
 
-**Leaderboard (#403).** In real mode the `@rotra/data/leaderboard` fetchers call the Player app's
-public `GET /api/leaderboard?offset=&limit=` and `GET /api/leaderboard/search?q=` (both
-`handlePublicRead('leaderboard.list')`) and the signed-in `GET /api/leaderboard/me`, backed by
-`@rotra/db/player/leaderboard`. Hooks, `leaderboardKeys` and the entry DTO are unchanged, and there is no
-mock fallback. The reads list only stored `player_rank_current` rows that are leaderboard-eligible and
-produced by an algorithm in `APPROVED_RANK_ALGORITHMS`. No rank formula is approved (#247), so the set
-is empty and every read is the empty state ("No players qualify for the leaderboard yet"; my position
-`null`); no fixture or computed position is ever shown. Tie precedence is also still #247.
+**Leaderboards (#918).** The Player app reads annual, monthly and weekly top-50 standings from
+`GET /api/leaderboard?period=&offset=&limit=` and `GET /api/leaderboard/search?period=&q=`. Both
+apply the viewer's privacy rules and send `private, no-store`. The account-only
+`GET /api/leaderboard/me?period=` also returns the player's place and wins below the cutoff. Profiles
+and Compare use the same top-50 places. The mock and Prisma readers apply the same ordering and
+calendar rules to recorded matches. Skill-rating constants remain open in #247.
 
 **Public session (#398).** In real mode the `@rotra/data/public-session` fetchers call Queue's
 `GET /api/public-sessions/[slug]` (`handlePublicRead('public-session.page')`), `POST …/join-request`

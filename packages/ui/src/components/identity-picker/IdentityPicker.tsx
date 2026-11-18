@@ -121,7 +121,7 @@ export function IdentityPicker({
                   <Avatar
                     name={record.name}
                     src={record.picture ?? undefined}
-                    size={48}
+                    size={52}
                     tone={record.picture ? 'neutral' : 'accent'}
                   />
                   <span className="flex min-w-0 flex-col gap-0.5 [overflow-wrap:anywhere]">

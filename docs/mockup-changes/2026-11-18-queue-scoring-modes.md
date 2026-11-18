@@ -42,8 +42,8 @@ Superseded by: none
   A winner-only result still confirms.
 - **Confirm match result** shows `31–24 (Team A–Team B)`, or `2–1 · 21–18, 15–21, 21–19 (Team A–Team B)`, or
   "No score entered".
-- **Match history** (console record and public finished-session page) shows the same: one score, or `2–1` with
-  every game score under it, or "No score". The public view flips every game score when the viewer played on
+- **Match history** (console record and public finished-session page) shows the same: one score, or `2–1` in the
+  score box with every game score in a small pill on its own line under the match-time pill, or "No score". The public view flips every game score when the viewer played on
   Team B.
 - Stored on the prototype match: `scoreA` / `scoreB` for one game; for best of 3 `games: [{ a, b }]` with
   `scoreA` / `scoreB` holding the games won. Old matches with only `scoreA` / `scoreB` still show.
@@ -83,7 +83,7 @@ Superseded by: none
 - Extends: confirm-result-sheet — the score line with game scores
 - Extends: session-setup-form — the Scoring field and its read-only state
 - Extends: session-setup-card, active-match-sheet, public-session-details — a Scoring row or line
-- Extends: match-history, public-match-history, game-row — game scores under `2–1`, flipped with the teams
+- Extends: match-history, public-match-history, game-row — game scores in the top-strip pill beside `2–1`, flipped with the teams
 - New: none
 - Shares work with: none
 

@@ -1147,8 +1147,11 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
 .gm-fmt { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: rgba(0, 0, 0, .72); color: rgba(255, 255, 255, .9); white-space: nowrap; }
 .gm-score { font-family: var(--mono); font-size: 22px; font-weight: 700; line-height: 1; white-space: nowrap; }
-.gm-games { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; max-width: 120px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, .85); }
-.gm-games span { white-space: nowrap; }
+.gm-top { position: absolute; z-index: 2; top: 8px; left: 8px; right: 8px; display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 4px; pointer-events: none; }
+.gm-top .gm-fmt { position: static; }
+.gm-top .gm-gpill { flex: 0 0 auto; margin: 0 auto; font-family: var(--mono); white-space: nowrap; }
+.gm-top:has(.gm-gpill) { flex-direction: column; align-items: flex-start; }
+.gm-court:has(.gm-gpill) { padding-top: 40px; min-height: 160px; }
 .gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
 .gm-who { font-size: 12px; font-weight: 800; color: var(--accent); white-space: nowrap; }
 .gm.partial .gm-court { filter: saturate(.4); }
@@ -1210,6 +1213,9 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .wiz-steps .num { font-family: var(--mono); font-size: 11px; }
 @media (max-width: 520px) { .wiz-steps .lbl { display: none; } .wiz-steps button { align-items: center; } }
 .score-fixed { display: flex; align-items: center; justify-content: center; border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); font-family: var(--mono); }
+.res-foot { align-items: flex-start; }
+.res-foot > .err, .res-foot > .hint { flex: 1; min-width: 0; }
+.res-foot > .btn { margin-left: auto; flex: none; }
 .res-deuce { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .res-deuce .small { color: var(--fg2); }
 .game-row { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); }
@@ -1693,6 +1699,7 @@ const SCORING = {
   '21x3': { label: '11/21 × 3', text: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 3, deuce: true },
   '21x3nd': { label: '21 × 3', text: 'Best of 3 games to 21. Change sides after each game. No deuce: the first to 21 wins.', target: 21, games: 3, deuce: false },
 };
+const SCORING_ORDER = ['31', '31nd', '21', '21x3', '21x3nd']; // integer-like keys would otherwise list first
 // Sessions saved in the browser before this change have no `scoring`: they read as 16/31.
 const scoringOf = (s) => (s && SCORING[s.scoring] ? s.scoring : '31');
 const scoringDef = (s) => SCORING[scoringOf(s)];
@@ -1704,8 +1711,10 @@ function scoreParts(m, flip) {
 }
 const gmScore = (m, flip) => {
   const p = scoreParts(m, flip);
-  return p ? `<span class="gm-score tnum">${p.main}</span>${p.games ? `<span class="gm-games tnum">${p.games.map((g) => `<span>${g}</span>`).join('')}</span>` : ''}` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
+  return p ? `<span class="gm-score tnum">${p.main}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
 };
+// Best of 3: the game scores sit in the card's top strip, after the match pill.
+const gmTop = (m, flip, pill) => { const p = scoreParts(m, flip); return `<div class="gm-top">${pill}${p && p.games ? `<span class="gm-fmt gm-gpill tnum" title="Game scores">${p.games.join(' · ')}</span>` : ''}</div>`; };
 // One game's score is valid when: no deuce, the winner has exactly the target and the loser 0 to target − 1; deuce, the winner has the target and the
 // loser at most target − 2, or the winner has more than the target and leads by exactly 2 (no cap).
 const gameValid = (T, deuce, w, l) => Number.isInteger(w) && Number.isInteger(l) && l >= 0 && (deuce ? (w === T && l <= T - 2) || (w > T && w - l === 2) : w === T && l <= T - 1);
@@ -3194,7 +3203,7 @@ function historyMatch(s, m) {
   const score = invalid ? '' : gmScore(m, false);
   const res = invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${m.id}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${m.teamA.map((x) => esc(nm(x))).join(' and ')} versus ${m.teamB.map((x) => esc(nm(x))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
-    <span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
+    ${gmTop(m, false, `<span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>`)}${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
     ${(m.subs || []).map((x) => `<p class="small muted">${esc(subLine(x, m))}</p>`).join('')}
   </article>`;
 }
@@ -3766,7 +3775,7 @@ function viewSetup() {
       <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>
       <div class="field"><span>Scoring</span>${(() => { const ex = d.id && S.sessions.find((x) => x.id === d.id), locked = !!ex && ex.status !== 'prepared', sel = SCORING[d.scoring] ? d.scoring : '31';
         return locked ? `<div class="choices"><div class="choice" aria-disabled="true" style="cursor:default"><b>${SCORING[sel].label}</b><span class="small muted">${SCORING[sel].text}</span></div></div><span class="hint">Scoring can't change after Start.</span>`
-          : `<div class="choices">${Object.entries(SCORING).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="scoring" data-v="${k}" aria-pressed="${sel === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div><span class="hint">How games are scored tonight. The match result dialog asks only for what this needs.</span>`; })()}</div>`,
+          : `<div class="choices">${SCORING_ORDER.map((k) => [k, SCORING[k]]).map(([k, m]) => `<button class="choice" data-act="setDraft" data-k="scoring" data-v="${k}" aria-pressed="${sel === k}"><b>${m.label}</b><span class="small muted">${m.text}</span></button>`).join('')}</div><span class="hint">How games are scored tonight. The match result dialog asks only for what this needs.</span>`; })()}</div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
       <div class="fgrid">
         ${rosterN ? `<div class="field"><span>Players</span><span>${rosterN} on the roster</span><span class="hint">Updates as you add or remove players.</span></div>`
@@ -4816,7 +4825,7 @@ function pubHistoryMatch(s, m, me) {
   const score = invalid ? '' : gmScore(m, flip);
   const res = invalid ? chip('Invalid', 'bad') : mine && wl != null ? chip(wl ? 'Won' : 'Lost', wl ? 'ok' : 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${esc(m.id)}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${L.map((x) => esc(x === me ? 'You' : pubNameText(P(x)))).join(' and ')} versus ${Rt.map((x) => esc(x === me ? 'You' : pubNameText(P(x)))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
-    <span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>${side(L, wl === true)}<div class="gm-res">${score}${res}</div>${side(Rt, wl === false)}</div></article>`;
+    ${gmTop(m, flip, `<span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>`)}${side(L, wl === true)}<div class="gm-res">${score}${res}</div>${side(Rt, wl === false)}</div></article>`;
 }
 // Owner, November 13, 2026: "since the match is finished it should show a tab called leaderboard · should show the leader board and your position".
 // The session's standings (the published Standings slide's order) with the viewer's position on top. Before the club shares the results,
@@ -5929,7 +5938,7 @@ const SHEETS = {
     const pick = `<span class="label">Pick the winner</span>
       <div class="choices">${['A', 'B'].map((t) => `<button class="choice" aria-pressed="${sh.winner === t}" data-act="resWinner" data-v="${t}"><span class="label">Team ${t}</span><b>${nmT(t)}</b></button>`).join('')}</div>`;
     const dsw = (on, attrs, label) => `<div class="res-deuce"><span><b>Went to deuce</b><br><span class="small">${T - 1}–${T - 1} and on: the first to lead by 2 wins.</span></span>${sw(on, 'resDeuce', attrs, label)}</div>`;
-    const foot = (hint) => `<div class="between">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : `<span class="hint">${hint}</span>`}${anyScore ? `<button class="btn xs ghost" data-act="clearScores">${best3 ? 'Clear scores' : 'Clear score'}</button>` : ''}</div>`;
+    const foot = (hint) => `<div class="between res-foot">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : `<span class="hint">${hint}</span>`}${anyScore ? `<button class="btn xs ghost" data-act="clearScores">${best3 ? 'Clear scores' : 'Clear score'}</button>` : ''}</div>`;
     let body;
     if (!best3) {
       body = `${pick}

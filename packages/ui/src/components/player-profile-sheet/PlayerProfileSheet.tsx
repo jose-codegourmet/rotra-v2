@@ -73,6 +73,13 @@ export type PlayerProfileSheetProps = {
   /** Opened from a dialog: the footer offers Back to that dialog instead of Close */
   backLabel?: 'suggestion' | 'match' | 'payments'
   onBack?: () => void
+  /**
+   * Registered players only: the club's own nickname for them. Passing it (null for none) adds the
+   * Club nickname row under In your club: “NICK” · only your club sees it, or "None".
+   */
+  clubNickname?: string | null
+  /** Registered players only: the Club nickname button; hidden when opened from another dialog */
+  onClubNickname?: () => void
   /** Shown for guests and unclaimed profiles */
   onInvite?: () => void
   /** Edit details, shown for guests and unclaimed profiles (a registered player owns their details) */
@@ -128,6 +135,8 @@ export function PlayerProfileSheet({
   joinedVia = null,
   backLabel,
   onBack,
+  clubNickname,
+  onClubNickname,
   onInvite,
   onEdit,
   onDelete,
@@ -178,6 +187,9 @@ export function PlayerProfileSheet({
             <Button variant="danger" onClick={onDelete} loading={deleting}>
               Delete player
             </Button>
+          ) : null}
+          {identity === 'registered' && onClubNickname && !backLabel ? (
+            <Button onClick={onClubNickname}>Club nickname</Button>
           ) : null}
           {canInvite && onEdit ? <Button onClick={onEdit}>Edit details</Button> : null}
           {canInvite && onInvite ? (
@@ -235,6 +247,14 @@ export function PlayerProfileSheet({
               { label: 'Added to club', value: addedLabel },
               { label: 'Sessions here', value: sessionsHere },
               { label: 'Phone', value: phone },
+              ...(identity === 'registered' && clubNickname !== undefined
+                ? [
+                    {
+                      label: 'Club nickname',
+                      value: clubNickname ? `“${clubNickname}” · only your club sees it` : 'None',
+                    },
+                  ]
+                : []),
               ...(identity === 'registered'
                 ? []
                 : [{ label: 'Email', value: emailOnFile ? 'On file and kept private' : 'None on file' }]),

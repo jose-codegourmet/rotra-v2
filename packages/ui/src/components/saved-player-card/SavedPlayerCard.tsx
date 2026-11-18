@@ -19,6 +19,8 @@ export const JOINED_VIA_TEXT: Record<'club' | 'session' | 'club-added', string> 
 export type SavedPlayerCardProps = {
   name: string
   nickname?: string | null
+  /** Registered players only: the club's nickname for them; shown in place of nickname with a mark */
+  clubNickname?: string | null
   photoUrl?: string
   identity: Identity
   /** An older unclaimed record with no email: the warn "Details required" chip replaces Unclaimed */
@@ -53,6 +55,7 @@ const DOT: Record<Identity, string> = {
 export function SavedPlayerCard({
   name,
   nickname,
+  clubNickname,
   photoUrl,
   identity,
   detailsRequired = false,
@@ -105,7 +108,15 @@ export function SavedPlayerCard({
           {name}
         </span>
         <span className="min-h-[18px] text-xs text-fg2 [overflow-wrap:anywhere]">
-          {nickname ? `“${nickname}”` : ' '}
+          {clubNickname ? (
+            <span title="Club nickname">
+              “{clubNickname}” <span className="text-fg3">· club nickname</span>
+            </span>
+          ) : nickname ? (
+            `“${nickname}”`
+          ) : (
+            ' '
+          )}
         </span>
         <span className="text-[13px] text-fg2">{JOINED_VIA_TEXT[joinedVia ?? 'club-added']}</span>
         <LevelPill level={level} className="mt-1" />

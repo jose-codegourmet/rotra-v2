@@ -16,6 +16,7 @@ export const playerProfileSheetMeta = {
     'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716). Initials never open anything.',
     'joinedVia ("club", "session" or null) sets the Joined row: "Joined via club link", "Joined via session link" or "Added by the club".',
     'Pass inviteUrl (the absolute ROTRA Player registration link) to show Invite to ROTRA for guests only: Copy invite link (toast; on clipboard failure the toast shows the link) and Share when the browser supports it. No auto-send, no identity linking. The text says games played here as a guest don\'t follow them; to keep them, add their email in Edit details first. Link to saved player… no longer exists (D-2026-11-16-04).',
+    'Registered players only: pass clubNickname (null for none) for the Club nickname row under In your club (“NICK” · only your club sees it, or "None") and onClubNickname for the Club nickname button (not shown when opened from another dialog). Guests and unclaimed players get neither.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -25,11 +26,13 @@ export const playerProfileSheetMeta = {
     'docs/screens/product/dialogs.md#d-participant-profile--participant-profile-card',
     'docs/screens/product/modules/queue/access-home.md',
     'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
+    'docs/mockup-changes/2026-11-18-queue-club-nickname.md',
     'docs/screens/product/experience-contract.md#sensitive-and-optional-information',
   ],
   related: [
     'ProfileBannerCard',
     'InviteSheet',
+    'ClubNicknameForm',
     'Avatar',
     'IdentityChip',
     'Sheet',

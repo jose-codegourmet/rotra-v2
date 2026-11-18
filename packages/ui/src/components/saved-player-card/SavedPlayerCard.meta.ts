@@ -10,6 +10,7 @@ export const savedPlayerCardMeta = {
     'An unclaimed player is not registered with ROTRA yet: pass registeredCity null and the pin line reads "Not registered", as the prototype\'s playerCard does.',
     'detailsRequired (an older unclaimed record with no email, D-2026-11-16-04) shows the warn "Details required" chip in place of the Unclaimed chip and names it in the button\'s label.',
     'joinedVia ("club", "session" or null) sets the caption: "Joined via club link", "Joined via session link" or "Added by the club".',
+    'clubNickname (registered players only, set by the Queue Master) replaces the nickname line with “NICK” · club nickname; without it the account nickname shows as before.',
     'registeredCity comes from the RTR ID\'s city code; when unknown the card says "Not registered", or "Lookup after sync" for a pending lookup.',
   ],
   prototype: {
@@ -18,6 +19,7 @@ export const savedPlayerCardMeta = {
   },
   docs: ['docs/screens/product/modules/queue/access-home.md',
     'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
+    'docs/mockup-changes/2026-11-18-queue-club-nickname.md',
   ],
   related: ['IdentityChip', 'LevelPill', 'LetterGroup', 'SavedPlayersFilterBar'],
 } satisfies ComponentMeta

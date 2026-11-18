@@ -77,6 +77,16 @@ export const PlayingNow: Story = { args: { live: { kind: 'playing', text: 'Playi
 export const AtTheSession: Story = { args: { live: { kind: 'waiting', text: 'At the session' } } }
 export const NoLevel: Story = { args: { level: null } }
 
+/** Registered with a club nickname: it replaces the account nickname, marked "· club nickname". */
+export const WithClubNickname: Story = {
+  args: { nickname: 'Migs', clubNickname: 'Kuya Migs' },
+}
+export const WithClubNicknameLight: Story = { ...WithClubNickname, globals: { theme: 'light' } }
+/** Registered with an account nickname and no club nickname: the account nickname, unmarked. */
+export const AccountNicknameOnly: Story = { args: { nickname: 'Migs', clubNickname: null } }
+/** Registered with neither nickname: the line stays empty. */
+export const NoNickname: Story = { args: { nickname: null, clubNickname: null } }
+
 export const LongNameAndNickname: Story = {
   args: {
     name: `${byIdentity('registered').fullName} Bautista Villareal`,

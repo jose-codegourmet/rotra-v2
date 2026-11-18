@@ -17,8 +17,8 @@ export type IdentityPickerRecord = {
   nickname: string | null
   /** The club's picture of them; initials show when missing */
   picture?: string | null
-  /** The level label ("Intermediate Low") */
-  levelLabel: string
+  /** The level label ("Intermediate Low"); null when the club set none: reads "Not added" */
+  levelLabel: string | null
   /** Already masked ("+63 918 ••• ••77"); the full number never arrives. Null: the club has none. */
   maskedPhone: string | null
   /** "2019" or "3 years"; null: not added */
@@ -109,7 +109,7 @@ export function IdentityPicker({
               <button
                 type="button"
                 onClick={() => onPick(record.id)}
-                aria-label={`${record.clubName}: ${record.name}${record.nickname ? `, ${record.nickname}` : ''}, ${record.levelLabel}. Use this identity`}
+                aria-label={`${record.clubName}: ${record.name}${record.nickname ? `, ${record.nickname}` : ''}${record.levelLabel ? `, ${record.levelLabel}` : ''}. Use this identity`}
                 style={{ width: CARD_WIDTH }}
                 className="flex cursor-pointer flex-col items-stretch gap-2.5 rounded-lg border border-border-strong bg-surface p-3.5 text-left font-[inherit] text-fg hover:border-accent hover:bg-elev focus-visible:border-accent focus-visible:bg-elev focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >

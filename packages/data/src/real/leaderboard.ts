@@ -1,31 +1,42 @@
-import type { LeaderboardEntry } from '../leaderboard/leaderboard.types'
+import type {
+  LeaderboardPage,
+  LeaderboardPeriod,
+  LeaderboardRow,
+  MyPeriodPosition,
+} from '../leaderboard/leaderboard.types'
 import { realRequest } from './client'
 
-/** A listed player with their overall position (public fields only). */
-export type RealLeaderboardEntry = LeaderboardEntry & { position: number }
+export type RealLeaderboardEntry = LeaderboardRow
 
-/**
- * P-LEADERBOARD over the Player app's `/api/leaderboard` Route Handlers. The server lists only
- * stored, approved ranks; with no formula approved (#247) every read is the empty state.
- */
 export function realGetLeaderboardPage(
-  { offset, limit }: { offset: number; limit: number },
+  { offset, limit, period }: { offset: number; limit: number; period?: LeaderboardPeriod },
   signal?: AbortSignal,
 ) {
-  return realRequest<{ entries: RealLeaderboardEntry[]; total: number }>(
-    `/api/leaderboard?offset=${offset}&limit=${limit}`,
+  return realRequest<LeaderboardPage>(
+    `/api/leaderboard?offset=${offset}&limit=${limit}${period ? `&period=${period}` : ''}`,
     { signal },
   )
 }
 
-export function realSearchLeaderboard(query: string, signal?: AbortSignal) {
+export function realSearchLeaderboard(
+  query: string,
+  signal?: AbortSignal,
+  period?: LeaderboardPeriod,
+) {
   return realRequest<{ hits: RealLeaderboardEntry[]; total: number }>(
-    `/api/leaderboard/search?q=${encodeURIComponent(query.trim())}`,
+    `/api/leaderboard/search?q=${encodeURIComponent(query.trim())}${period ? `&period=${period}` : ''}`,
     { signal },
   )
 }
 
-/** The signed-in player's own position, or null when they are not listed. */
+export async function realGetMyPeriodPosition(period: LeaderboardPeriod, signal?: AbortSignal) {
+  const { standing } = await realRequest<{ standing: MyPeriodPosition | null }>(
+    `/api/leaderboard/me?period=${period}`,
+    { signal },
+  )
+  return standing
+}
+
 export async function realGetMyLeaderboardPosition(signal?: AbortSignal) {
   const { position } = await realRequest<{ position: number | null }>('/api/leaderboard/me', {
     signal,

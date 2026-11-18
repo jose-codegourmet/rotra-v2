@@ -1,8 +1,11 @@
 import { emailField } from '@rotra/schema/email'
 import { passwordField } from '@rotra/schema/password'
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
+import { maskPhone, phoneField } from '@rotra/schema/phone'
 import { getSession, signIn } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
+import { isMockFlagOn } from '../feature-flag/mockFlagOverride'
 import { claimLinkScenarios } from '../fixtures/playerAccounts'
 import { playerRequest } from '../leaderboard/request'
 import { checkMockSave } from '../mock/bridge'
@@ -20,8 +23,8 @@ import {
   realResetPassword,
   realSetPhonePrivacy,
 } from '../real/player'
-import { maskPhone } from './playerAccount.rules'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
+import { joinClubRecords } from './unclaimedIdentity'
 import { myAccountOf } from './visibilitySettings'
 
 /** The signed-in player's own contacts; null when signed out. Never a public fetcher. */
@@ -32,8 +35,14 @@ export async function getMyAccount(signal?: AbortSignal): Promise<MyAccount | nu
   return session ? myAccountOf(readMockState(), session.account.id) : null
 }
 
-/** Same acknowledgement for known and unknown emails. No email is delivered in the mock. */
-export async function requestPasswordReset(email: string) {
+/**
+ * Same acknowledgement for known and unknown emails. No email is delivered in the mock. An account
+ * that signs in with Google and has no password (P12) answers `signsInWithGoogle` instead, and no
+ * Admin review request is made for it.
+ */
+export async function requestPasswordReset(
+  email: string,
+): Promise<{ acknowledged: boolean; signsInWithGoogle?: boolean }> {
   if (isRealDataMode()) return realRequestPasswordReset(emailField.parse(email))
   await delay(400)
   if (getConnectivity() === 'offline')
@@ -41,7 +50,18 @@ export async function requestPasswordReset(email: string) {
       'offline',
       "Couldn't send because you're offline. Try again when you're connected.",
     )
-  submitMockPasswordReset(emailField.parse(email))
+  const address = emailField.parse(email)
+  const googleOnly =
+    isMockFlagOn(PLAYER_GOOGLE_SIGN_IN_FLAG) &&
+    readMockState().playerAccounts.some(
+      (a) =>
+        a.claimed &&
+        a.email.toLowerCase() === address.toLowerCase() &&
+        !!a.googleEmail &&
+        a.hasPassword === false,
+    )
+  if (googleOnly) return { acknowledged: true, signsInWithGoogle: true }
+  submitMockPasswordReset(address)
   return { acknowledged: true }
 }
 /** Real mode can't check a recovery token without using it up, so the form opens and submit decides. */
@@ -103,7 +123,8 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
       nickname: profile.nickname,
       rtrId: profile.rtrId,
       picture: profile.picture,
-      maskedPhone: maskPhone(account.phone),
+      // An unclaimed player has no account phone: the form then asks for one.
+      maskedPhone: account.phone ? maskPhone(account.phone) : '',
     },
     preset: {
       fullName: profile.fullName,
@@ -122,14 +143,17 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
 
 export type CompleteClaimInput = {
   token: string
-  /** `phone` only when the profile has none on file (real mode); the mock profiles all have one. */
+  /** `phone` only when the profile has none on file: an unclaimed player a club saved by email. */
   values: PersonalProfileValues & { email: string; password: string; phone?: string }
 }
 /**
  * Registers the linked profile: sets email and personal details and marks it claimed. Without
  * changes it only closes the link, for a profile that is already registered.
  */
-function finishClaim(token: string, changes?: { email: string; personal: PersonalProfileValues }) {
+export function finishClaim(
+  token: string,
+  changes?: { email: string; personal: PersonalProfileValues; phone?: string },
+) {
   let result: CompleteClaimResult | undefined
   mockStore.update((draft) => {
     const record = draft.claimLinks[token]
@@ -146,7 +170,10 @@ function finishClaim(token: string, changes?: { email: string; personal: Persona
     if (changes) {
       applyPersonalProfile(profile, changes.personal)
       account.email = changes.email
+      if (changes.phone && !account.phone) account.phone = changes.phone
       account.claimed = true
+      // Every club's record of the person joins the account with it (D-2026-11-16-04).
+      joinClubRecords(draft, account.playerId)
     }
     record.status = 'valid'
     result = {
@@ -167,10 +194,16 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
   if (getConnectivity() === 'offline') throw new MockError('offline', CLAIM_OFFLINE)
-  const { email: rawEmail, password, phone: _phone, ...rest } = values
+  const { email: rawEmail, password, phone: rawPhone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const email = emailField.parse(rawEmail)
   passwordField.parse(password)
+  // Taken only when the profile has no phone on file (an unclaimed player a club saved by email).
+  const phone = rawPhone?.trim() ? phoneField.safeParse(rawPhone) : null
+  if (phone && !phone.success) {
+    const text = 'Enter a Philippine mobile number, like 0917 555 0142.'
+    throw new MockError('conflict', text, { phone: text })
+  }
   const state = readMockState()
   const record = state.claimLinks[token]
   const account = record && state.playerAccounts.find((a) => a.playerId === record.playerId)
@@ -195,6 +228,7 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   const result = finishClaim(token, {
     email: account.claimed ? account.email : email,
     personal,
+    phone: phone?.success ? phone.data : undefined,
   })
   const session = await signIn('player', { identifier: email, password })
   return { ...result, session }

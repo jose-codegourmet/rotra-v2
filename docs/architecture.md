@@ -277,11 +277,14 @@ Redux never holds server data and has no async thunks.
 In mock mode, sign-in is mocked like the prototypes (anything signs in) and `proxy.ts` only checks a
 mock session. In real mode, Queue (club), Admin and Player sign-in use Supabase Auth (below); Player
 registration (`/api/claim/[token]`) and Admin-reviewed password reset (`/api/auth/{password-reset,reset-password}`; #491)
-are real too (#483). **No Facebook or any social login.**
+are real too (#483). **No Facebook or any social login**, except Google sign-in for players behind the
+`player_google_sign_in` flag ([D-2026-11-16-01](mvp/decisions.md#d-2026-11-16-01)): written on Supabase Auth,
+not run against Google yet ([setup and design](backend/google-sign-in-setup.md)).
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
 no fallback from real to mock. `NEXT_PUBLIC_ROTRA_DATA_MODE` (F07.34) is its client mirror: set both
 to `real` in each app's own `.env.local` (Next reads env files from the app folder, not the repo root).
+Dev-only, mock mode: `NEXT_PUBLIC_ROTRA_MOCK_FLAGS=player_google_sign_in` (comma-separated keys) forces those feature flags on in an app, because Admin's and the Player app's mock stores are separate; ignored in real mode and in production builds. The Player app reads flags with `readPlayerGoogleSignInEnabled()` in the root layout and `usePlayerGoogleSignInEnabled()` (real mode: a fresh server read over `@rotra/db/player/feature-flags`, which makes Player pages dynamic).
 
 | Layer | Real mode |
 |---|---|
@@ -310,14 +313,12 @@ item); an edit sends the displayed `revision` and a stale one is a conflict; −
 no revision check, so quick taps never conflict. Inventory is online only in real mode (#245): offline,
 nothing is sent and the screen says so.
 
-**Leaderboard (#403).** In real mode the `@rotra/data/leaderboard` fetchers call the Player app's
-public `GET /api/leaderboard?offset=&limit=` and `GET /api/leaderboard/search?q=` (both
-`handlePublicRead('leaderboard.list')`) and the signed-in `GET /api/leaderboard/me`, backed by
-`@rotra/db/player/leaderboard`. Hooks, `leaderboardKeys` and the entry DTO are unchanged, and there is no
-mock fallback. The reads list only stored `player_rank_current` rows that are leaderboard-eligible and
-produced by an algorithm in `APPROVED_RANK_ALGORITHMS`. No rank formula is approved (#247), so the set
-is empty and every read is the empty state ("No players qualify for the leaderboard yet"; my position
-`null`); no fixture or computed position is ever shown. Tie precedence is also still #247.
+**Leaderboards (#918).** The Player app reads annual, monthly and weekly top-50 standings from
+`GET /api/leaderboard?period=&offset=&limit=` and `GET /api/leaderboard/search?period=&q=`. Both
+apply the viewer's privacy rules and send `private, no-store`. The account-only
+`GET /api/leaderboard/me?period=` also returns the player's place and wins below the cutoff. Profiles
+and Compare use the same top-50 places. The mock and Prisma readers apply the same ordering and
+calendar rules to recorded matches. Skill-rating constants remain open in #247.
 
 **Public session (#398).** In real mode the `@rotra/data/public-session` fetchers call Queue's
 `GET /api/public-sessions/[slug]` (`handlePublicRead('public-session.page')`), `POST …/join-request`

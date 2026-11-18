@@ -115,13 +115,24 @@ export function usePlayerShareSheet(playerId: string | null) {
                 ? null
                 : levelLabel(PLAYING_LEVELS[profileShare.levelIndex] ?? null)
             }
-            position={profileShare.position}
+            position={profileShare.annualPosition}
+            positionLabel="Top annual"
             wins={profileShare.wins}
             year={statsYear(Date.now())}
           />
         ) : (
           <Notice>No share card is available.</Notice>
         )
+      ) : value?.kind === 'rank' && value.rank.levelIndex !== null ? (
+        <RankShareCard
+          {...common}
+          level={value.rank.levelIndex}
+          levelLabel={levelLabel(PLAYING_LEVELS[value.rank.levelIndex] ?? null)}
+          position={
+            value.profile.leaderboardPlaces?.find((place) => place.period === 'year')?.position ??
+            null
+          }
+        />
       ) : value?.kind === 'session' ? (
         (() => {
           const session = {

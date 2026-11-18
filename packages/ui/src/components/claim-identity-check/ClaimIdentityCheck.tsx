@@ -6,8 +6,10 @@ import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 export type ClaimIdentityCheckProps = {
   clubName: string
-  /** The club-created identity; the phone arrives already masked and the full number never does */
+  /** The club-created identity (name, nickname, picture, RTR ID) */
   preview: ClaimLinkPreview
+  /** The email the club saved, already masked ("j•••••@example.com"); the full address never arrives */
+  maskedEmail: string
   onConfirm: () => void
   onReject: () => void
 }
@@ -15,6 +17,7 @@ export type ClaimIdentityCheckProps = {
 export function ClaimIdentityCheck({
   clubName,
   preview,
+  maskedEmail,
   onConfirm,
   onReject,
 }: ClaimIdentityCheckProps) {
@@ -49,7 +52,10 @@ export function ClaimIdentityCheck({
                     },
                   ]
                 : []),
-              { label: 'Phone', value: <span className="font-mono">{preview.maskedPhone}</span> },
+              {
+                label: 'Email',
+                value: <span className="font-mono [overflow-wrap:anywhere]">{maskedEmail}</span>,
+              },
             ]}
           />
           <div className="flex flex-wrap gap-2">

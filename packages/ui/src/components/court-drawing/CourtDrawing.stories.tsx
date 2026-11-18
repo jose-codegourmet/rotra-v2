@@ -2,7 +2,7 @@ import {
   consoleSessionFixture,
   mergedConsoleSessionFixture,
 } from '@rotra/data/fixtures/consoleSessions'
-import { countedGames, shortName } from '@rotra/data/match/match.rules'
+import { countedGames, queueMasterName } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
@@ -17,7 +17,7 @@ const playerOf = (id: string, source: Match[] = matches): CourtPlayer => {
   return {
     id: p.id,
     name: p.nameSnapshot,
-    shortName: shortName(p),
+    shortName: queueMasterName(p),
     level: p.level,
     games: countedGames(p.id, source),
   }

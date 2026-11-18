@@ -9,12 +9,14 @@ import { useContactRequests } from '@rotra/data/contact-change-request/useContac
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { ActivityLog } from '@rotra/ui/activity-log'
+import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { AdminPlayerIdentityCard } from '@rotra/ui/admin-player-identity-card'
 import { Avatar } from '@rotra/ui/avatar'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { Chip } from '@rotra/ui/chip'
 import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { DetailHero } from '@rotra/ui/detail-hero'
@@ -35,6 +37,7 @@ import { notFound, useRouter, useSearchParams } from 'next/navigation'
 import { useId, useMemo } from 'react'
 import { useDenyOnPermissionError } from '../../../../_components/admin-workspace-shell/AdminWorkspaceShell'
 import { PlayerManagementActions } from '../../../_components/player-management-actions/PlayerManagementActions'
+import { PlayerVerification } from '../player-verification/PlayerVerification'
 import { PlayerDetailSkeleton } from './PlayerDetailSkeleton'
 
 /** Grey bars while a card's read is still out. */
@@ -50,7 +53,7 @@ function LinesSkeleton({ label }: { label: string }) {
 
 /**
  * A-PLAYER-DETAIL: one player identity as Admin sees it. Identity, private contacts (the applied
- * values, never a pending request's), account, read-only rank, this player's contact-change requests
+ * values, never a pending request's), account, verification, read-only rank, contact-change requests
  * and the record of actions on them. Approved profile edits require review and a reason. Admin cannot change ranks,
  * winners or scores, rebuild sessions, overwrite contacts or merge players. `from` is the directory's
  * query, so Back restores its search, filter and shown count. Skeleton while the player loads,
@@ -174,7 +177,10 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         meta={
           <>
             <PlayerAccountChip claimed={player.claimed} />
-            <RankStatusChip status={player.rankStatus} />
+            {player.detailsRequired && !player.claimed ? (
+              <Chip tone="warn">Details required</Chip>
+            ) : null}
+            <RankStatusChip status={player.rankStatus} notOnLeaderboard={!!savedByClubs(player)} />
             {player.rtrId ? (
               <span className="font-mono text-[13px] text-fg2">{player.rtrId}</span>
             ) : (
@@ -217,7 +223,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         ]}
       >
         <TabsContent value="overview">
-          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 min-[1040px]:grid-cols-[minmax(0,1fr)_340px]">
             <div className="flex min-w-0 flex-col gap-5">
               <AdminPlayerIdentityCard
                 fullName={player.name}
@@ -225,8 +231,15 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                 rtrId={player.rtrId}
                 createdOn={player.createdOn}
                 createdBy={createdBy}
+                savedBy={savedByClubs(player) ?? undefined}
               />
-              <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
+              <PlayerAccountCard
+                claimed={player.claimed}
+                registeredOn={player.registeredOn}
+                detailsRequired={!!player.detailsRequired}
+                clubName={player.createdByClubId ? createdBy : undefined}
+              />
+              {player.claimed ? <PlayerVerification key={player.id} player={player} /> : null}
             </div>
             <div className="flex min-w-0 flex-col gap-5">
               {matchRequirement !== undefined ? (

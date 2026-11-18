@@ -3,11 +3,13 @@ import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
+import { loginHasPassword } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
 import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
+import { readLeaderboardPlaces } from './leaderboard'
 
 type Db = Prisma.TransactionClient | typeof prisma
 
@@ -25,6 +27,11 @@ const PUBLIC_PLAYER_SELECT = {
   bannerId: true,
   banner: { select: { id: true, image: true } },
   profileVisibility: true,
+  profileState: true,
+  clubPlayers: {
+    where: { removedAt: null, player: { profileState: 'unclaimed' } },
+    select: { displayName: true, nickname: true, club: { select: { name: true } } },
+  },
   showProfileStats: true,
   showWeeklyPerformance: true,
   experienceMonths: true,
@@ -85,15 +92,18 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
   const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
   for (const link of row.socialLinks) links[link.provider] = link.url
   const months = currentExperienceMonths(row.experienceMonths, row.experienceRecordedAt)
-  const masked = !own && row.profileVisibility === 'always_private'
+  const savingClub = row.clubPlayers.length === 1 ? row.clubPlayers[0] : undefined
+  const visibility = savingClub ? 'public' : row.profileVisibility
+  const masked = !own && visibility === 'always_private'
   return {
     playerId: row.id,
     rtrId: row.idAllocation.rtrId,
-    fullName: masked ? maskPublicName(row.fullName) : row.fullName,
-    nickname: masked ? null : row.nickname,
+    fullName: masked ? maskPublicName(row.fullName) : (savingClub?.displayName ?? row.fullName),
+    nickname: masked ? null : savingClub ? savingClub.nickname : row.nickname,
     picture: row.avatarRef,
     bannerId: row.bannerId,
-    profileVisibility: row.profileVisibility,
+    profileVisibility: visibility,
+    unclaimedSavedBy: savingClub?.club.name,
     // Stats on your profile: the flags only. The Player app hides Latest stats and the Weekly
     // performance chart from everyone but the player, like mock mode.
     showProfileStats: row.showProfileStats,
@@ -117,8 +127,8 @@ async function profileWithBanner(db: Db, row: PublicPlayerRow, own = false) {
   return { ...dto, ...(await resolvePlayerBanner(row.banner, db)) }
 }
 
-/** P-PROFILE public read (`player.public-profile`). Safe for shared caches. */
-export async function readPublicProfile(playerId: string, own = false) {
+/** Verify the audience before reading a profile's places or Compare statistics. */
+export async function readVisibleProfile(playerId: string, viewerId: string | null) {
   // A URL segment that is not a UUID can name no player.
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
     throw new ServiceError('not_found')
@@ -126,19 +136,33 @@ export async function readPublicProfile(playerId: string, own = false) {
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,
   })
-  const dto = row && (await profileWithBanner(prisma, row, own))
+  if (!row?.idAllocation) throw new ServiceError('not_found')
+  const own = viewerId === playerId
+  const singleClub = row.profileState === 'unclaimed' && row.clubPlayers.length === 1
+  if (!own && !singleClub) {
+    if (row.profileVisibility === 'always_private') throw new ServiceError('forbidden')
+    if (!viewerId && (row.profileVisibility === 'private' || row.profileState === 'unclaimed'))
+      throw new ServiceError('unauthenticated')
+  }
+  const dto = await profileWithBanner(prisma, row, own)
   if (!dto) throw new ServiceError('not_found')
   return dto
 }
 
+export async function readPublicProfile(playerId: string, viewerId: string | null = null) {
+  const profile = await readVisibleProfile(playerId, viewerId)
+  const places = await readLeaderboardPlaces([playerId])
+  return { ...profile, leaderboardPlaces: places.get(playerId) ?? [] }
+}
+
 /** Find a player by RTR ID (public). Identifies a profile; never authorizes claiming. */
-export async function findPublicProfileByRtrId(rtrId: string) {
+export async function findPublicProfileByRtrId(rtrId: string, viewerId: string | null) {
   const allocation = await prisma.playerIdAllocation.findUnique({
     where: { rtrId: rtrId.trim().toUpperCase() },
     select: { playerId: true },
   })
   if (!allocation) throw new ServiceError('not_found')
-  return readPublicProfile(allocation.playerId)
+  return readVisibleProfile(allocation.playerId, viewerId)
 }
 
 /** `MyAccount`: the signed-in player's own private contacts. Private, no-store. */
@@ -152,8 +176,10 @@ export async function readMyAccount(context: PlayerContext) {
       hiddenFromDirectory: true,
       revision: true,
       privateContact: true,
+      account: { select: { authSubject: true, googleEmail: true, googleLinkedAt: true } },
     },
   })
+  const google = player.account?.googleEmail ?? null
   return {
     playerId: player.id,
     phone: player.privateContact?.phoneE164 ?? '',
@@ -161,6 +187,12 @@ export async function readMyAccount(context: PlayerContext) {
     phoneHidden: player.hidePhoneFromClubs,
     profileVisibility: player.profileVisibility,
     hiddenFromDirectory: player.hiddenFromDirectory,
+    // Google identity (D-2026-11-16-01): ROTRA's own record. Null for every account until connected.
+    googleEmail: google,
+    googleLinkedAt: player.account?.googleLinkedAt?.toISOString() ?? null,
+    // Only an account made with Google can have no password, so the provider is asked only then.
+    hasPassword:
+      google && player.account ? await loginHasPassword(player.account.authSubject) : true,
     revision: toDecimalString(player.revision),
   }
 }
@@ -202,7 +234,7 @@ async function ownProfile(db: Db, profile: Awaited<ReturnType<typeof profileWith
 }
 
 export async function readMyProfile(context: PlayerContext) {
-  return ownProfile(prisma, await readPublicProfile(context.playerId, true))
+  return ownProfile(prisma, await readPublicProfile(context.playerId, context.playerId))
 }
 
 /**

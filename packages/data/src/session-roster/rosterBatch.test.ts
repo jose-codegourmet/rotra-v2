@@ -279,7 +279,6 @@ describe('overlayRoster', () => {
     sessionId,
     name: 'Tracy',
     nickname: null,
-    phoneE164: null,
     statedBand: 'unsure' as const,
     placement: 'slot' as const,
     status: 'pending' as const,

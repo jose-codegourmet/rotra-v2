@@ -7,7 +7,7 @@ import {
   autoQueuePlayerCounts,
   toggleBaggingGame,
 } from '@rotra/data/match/auto-queue-rules'
-import { activeMatchFor, allPlayers, shortName } from '@rotra/data/match/match.rules'
+import { activeMatchFor, allPlayers, queueMasterName } from '@rotra/data/match/match.rules'
 import { useAutoQueueDrafts } from '@rotra/data/match/useAutoQueueDrafts'
 import { useEditAutoQueueDrafts } from '@rotra/data/match/useEditAutoQueueDrafts'
 import { useGenerateAutoQueueDrafts } from '@rotra/data/match/useGenerateAutoQueueDrafts'
@@ -44,7 +44,7 @@ const errorMessage = (error: unknown) =>
 const baggingPlayer = (p: SessionPlayer | undefined, id: string): BaggingPlayer => ({
   id,
   name: p?.nameSnapshot ?? 'Player',
-  shortName: p ? shortName(p) : 'Player',
+  shortName: p ? queueMasterName(p) : 'Player',
   level: p?.level ?? null,
   levelLabel: p?.level ? levelLabel(p.level) : null,
 })
@@ -95,7 +95,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       const p = ctx.roster.find((p) => p.id === id)
       return {
         id,
-        name: p ? shortName(p) : 'Player',
+        name: p ? queueMasterName(p) : 'Player',
         fullName: p?.nameSnapshot,
         level: p?.level ?? null,
         photoUrl: photoOf(p),

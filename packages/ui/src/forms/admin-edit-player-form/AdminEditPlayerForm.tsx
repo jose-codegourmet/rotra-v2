@@ -1,24 +1,37 @@
 'use client'
 import type { AdminPlayerEdit } from '@rotra/data/admin-player/types'
 import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
+import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
+import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import {
   type AdminPlayerPictureCharacter,
   type AdminPlayerPictureChoice,
   AdminPlayerPictureSection,
 } from '@rotra/ui/admin-player-picture-section'
 import { Button } from '@rotra/ui/button'
+import { ChangeCompare } from '@rotra/ui/change-compare'
+import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
+import { DatePicker } from '@rotra/ui/date-picker'
+import { todayYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
 import { ExperienceFields, playingSinceOf } from '@rotra/ui/experience-fields'
 import { Field } from '@rotra/ui/field'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
+import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { Select } from '@rotra/ui/select'
 import { Switch } from '@rotra/ui/switch'
 import { TextInput, type TextInputProps } from '@rotra/ui/text-input'
 import { Textarea } from '@rotra/ui/textarea'
 import { Fragment, type ReactNode, useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 import { adminEditPlayerDefaultValues } from './AdminEditPlayerForm.defaultValues'
-import { adminEditPlayerChanged, adminEditPlayerResolver } from './AdminEditPlayerForm.schema'
+import { previewRtrId as rtrIdFor } from './AdminEditPlayerForm.rtrId'
+import {
+  adminEditPlayerChanged,
+  adminEditPlayerRegistrationChanged,
+  adminEditPlayerResolver,
+} from './AdminEditPlayerForm.schema'
 
 /** A form field a server error can name (MockError fieldErrors keys). */
 export type AdminEditPlayerField = keyof AdminPlayerEditValues
@@ -57,6 +70,21 @@ export type AdminEditPlayerFormProps = {
   onViewPicture?: (src: string) => void
   /** Shown with a stale-revision serverError ("… Reload before editing.") */
   onReload?: () => void
+  /**
+   * The founding cities for Registration place (code like 'PH-CEB', name like 'Cebu City'). Without
+   * them the place, date and RTR ID preview are left out and the RTR ID shows read-only.
+   */
+  places?: { code: string; name: string }[]
+  /**
+   * The RTR ID for a registration place code and date ('YYYY-MM-DD'), keeping its number at the end.
+   * Defaults to the same shape as the player's current RTR ID (RTR-<place>-<MMDDYY>-<number>).
+   */
+  previewRtrId?: (place: string, date: string) => string
+  /**
+   * An older unclaimed record with a phone and no email (D-2026-11-16-04): the Account hint says
+   * Admin can add the email here. Ignored for a registered player.
+   */
+  detailsRequired?: boolean
 }
 
 /** The prototype's order of errors (peErrors() + reason), which is also the order on screen. */
@@ -76,6 +104,8 @@ const ERROR_ORDER: AdminEditPlayerField[] = [
   'phone',
   'email',
   'password',
+  'registrationPlace',
+  'registrationDate',
   'reason',
 ]
 
@@ -141,6 +171,9 @@ export function AdminEditPlayerForm({
   fieldErrors,
   onReload,
   onViewPicture,
+  places,
+  previewRtrId,
+  detailsRequired = false,
 }: AdminEditPlayerFormProps) {
   const form = useForm({
     defaultValues: adminEditPlayerDefaultValues(p),
@@ -166,10 +199,24 @@ export function AdminEditPlayerForm({
     return ok
   }
   const errors = form.formState.errors
-  const [years, months, picture] = useWatch({
+  const [years, months, picture, place, date] = useWatch({
     control: form.control,
-    name: ['experienceYears', 'experienceMonths', 'picture'],
+    name: [
+      'experienceYears',
+      'experienceMonths',
+      'picture',
+      'registrationPlace',
+      'registrationDate',
+    ],
   })
+  // The RTR ID is a live preview of the place and date; it is never typed (D-2026-11-16-04).
+  const registrationFields = !!p.rtrId && !!places?.length
+  const rtrPreview = registrationFields
+    ? (previewRtrId ?? ((a: string, b: string) => rtrIdFor(p.rtrId, a, b)))(place ?? '', date ?? '')
+    : (p.rtrId ?? '')
+  // Change RTR ID? waits here with everything typed; Back returns to the panel as it was.
+  const [confirmValues, setConfirmValues] = useState<AdminPlayerEditValues | null>(null)
+  const savedBy = savedByClubs(p)
 
   // Focus the first field showing an error, in screen order, once it has rendered.
   useEffect(() => {
@@ -207,6 +254,8 @@ export function AdminEditPlayerForm({
     (values) => {
       if (!checkSinceYear()) return setFocusRequest((n) => n + 1)
       if (!adminEditPlayerChanged(p, values) && onNothingChanged) return onNothingChanged()
+      if (registrationFields && adminEditPlayerRegistrationChanged(p, values))
+        return setConfirmValues(values)
       onSubmit(values)
     },
     () => {
@@ -218,7 +267,13 @@ export function AdminEditPlayerForm({
   const text = (
     name: Exclude<
       AdminEditPlayerField,
-      'picture' | 'profilePrivate' | 'phoneHidden' | 'experienceYears' | 'experienceMonths'
+      | 'picture'
+      | 'profilePrivate'
+      | 'phoneHidden'
+      | 'experienceYears'
+      | 'experienceMonths'
+      | 'registrationPlace'
+      | 'registrationDate'
     >,
     label: string,
     input: TextInputProps & { hint?: ReactNode } = {},
@@ -353,18 +408,31 @@ export function AdminEditPlayerForm({
         </Section>
         <Section label="Account">
           <div className={GRID}>
-            {text('phone', 'Phone', {
-              type: 'tel',
-              inputMode: 'tel',
-              className: 'font-mono',
-              placeholder: '+63 9XX XXX XXXX',
-            })}
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field label="Phone" error={fieldState.error?.message}>
+                  <PhoneOrEmailInput
+                    {...field}
+                    mode="phone"
+                    type="tel"
+                    autoComplete="off"
+                    disabled={disabled}
+                    className="font-mono"
+                    placeholder="+63 9XX XXX XXXX"
+                  />
+                </Field>
+              )}
+            />
             {text('email', 'Email', { type: 'email', inputMode: 'email', className: 'font-mono' })}
           </div>
           <p className="text-xs text-fg2">
             {claimed
               ? 'The player signs in with these. Changing them here applies straight away, without a contact-change request.'
-              : "The club entered these. The player hasn't registered yet."}
+              : detailsRequired
+                ? 'Details required: this older record has no email. The club must add one or delete the record. You can add it here.'
+                : "The club entered these and can't change the email. You can. The player hasn't registered yet."}
           </p>
           <Controller
             name="password"
@@ -392,17 +460,89 @@ export function AdminEditPlayerForm({
               </Field>
             )}
           />
+          {registrationFields ? (
+            <>
+              <div className={GRID}>
+                <Controller
+                  name="registrationPlace"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field label="Registration place" error={fieldState.error?.message}>
+                      <Select
+                        value={field.value ?? ''}
+                        onChange={(next) => {
+                          field.onChange(next)
+                          form.clearErrors(['registrationPlace', 'registrationDate'])
+                        }}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                        disabled={disabled}
+                        invalid={!!fieldState.error}
+                        options={(places ?? []).map((c) => ({
+                          value: c.code,
+                          label: `${c.name} · ${c.code}`,
+                        }))}
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="registrationDate"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field label="Registration date" error={fieldState.error?.message}>
+                      <DatePicker
+                        value={field.value ?? ''}
+                        onChange={(next) => {
+                          field.onChange(next)
+                          form.clearErrors(['registrationPlace', 'registrationDate'])
+                        }}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                        max={todayYmd()}
+                        disabled={disabled}
+                        invalid={!!fieldState.error}
+                      />
+                    </Field>
+                  )}
+                />
+              </div>
+              <KeyValueList
+                items={[
+                  {
+                    label: 'RTR ID',
+                    value: (
+                      <span className="font-mono" aria-live="polite">
+                        {rtrPreview}
+                      </span>
+                    ),
+                  },
+                ]}
+              />
+              <p className="text-xs text-fg2">
+                The RTR ID follows the registration place and date, and keeps its number at the end.
+                It isn't typed by hand.
+              </p>
+            </>
+          ) : null}
           <KeyValueList
             items={[
+              ...(registrationFields
+                ? []
+                : [
+                    {
+                      label: 'RTR ID',
+                      value: p.rtrId ? (
+                        <span className="font-mono">{p.rtrId}</span>
+                      ) : (
+                        'Not registered yet'
+                      ),
+                    },
+                  ]),
               {
-                label: 'RTR ID',
-                value: p.rtrId ? (
-                  <span className="font-mono">{p.rtrId}</span>
-                ) : (
-                  'Not registered yet'
-                ),
+                label: 'Created by',
+                value: savedBy ? <AdminPlayerClubs clubs={p.clubs} savedBy={savedBy} /> : createdBy,
               },
-              { label: 'Created by', value: createdBy },
               {
                 label: 'Account',
                 value: claimed
@@ -422,9 +562,9 @@ export function AdminEditPlayerForm({
             ]}
           />
           <p className="text-sm text-fg2">
-            These stay read-only. The RTR ID never changes. Rank, level and match counts come from
-            finished club sessions, and Admin can't change ranks, winners or scores. A profile
-            becomes registered only when the player claims it.
+            These stay read-only. Rank, level and match history come from finished club sessions,
+            and Admin can't change ranks, winners or scores. A profile becomes registered only when
+            the player claims it.
           </p>
         </Section>
         <Section>
@@ -455,6 +595,31 @@ export function AdminEditPlayerForm({
           </Notice>
         ) : null}
       </form>
+      <ConfirmSheet
+        open={confirmValues !== null}
+        onOpenChange={(next) => {
+          if (!next) setConfirmValues(null)
+        }}
+        title="Change RTR ID?"
+        summary={
+          <ChangeCompare
+            fromLabel="Current"
+            from={p.rtrId ?? ''}
+            toLabel="New"
+            to={rtrPreview}
+            emphasis="mono"
+          />
+        }
+        consequence={`The old RTR ID is replaced with the new one on every record that holds it, in every club that saved ${p.name}.`}
+        note="QR codes and links the player already shared with the old RTR ID may stop working."
+        confirmLabel="Change RTR ID"
+        backLabel="Back"
+        onConfirm={() => {
+          const values = confirmValues
+          setConfirmValues(null)
+          if (values) onSubmit(values)
+        }}
+      />
     </FormProvider>
   )
 }

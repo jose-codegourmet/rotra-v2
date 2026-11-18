@@ -6,7 +6,7 @@ import {
   listNames,
   type MatchContext,
   matchStatus,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '../match/match.rules'
 import type { Match, MatchFormat, MatchStatus } from '../match/match.types'
@@ -67,7 +67,7 @@ export function createStartMatchFixtures(now = Date.now()) {
     return {
       id: p.id,
       name: p.nameSnapshot,
-      shortName: shortName(p),
+      shortName: queueMasterName(p),
       level: p.level,
       games: countedGames(p.id, ms),
     }
@@ -123,7 +123,7 @@ export function createStartMatchFixtures(now = Date.now()) {
     listNames(
       ids.map((id) => {
         const p = roster.find((x) => x.id === id)
-        return p ? shortName(p) : 'Player'
+        return p ? queueMasterName(p) : 'Player'
       }),
     )
   const chooseMatch = {

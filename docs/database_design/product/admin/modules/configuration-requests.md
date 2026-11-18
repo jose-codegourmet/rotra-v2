@@ -12,7 +12,7 @@ Versions are append-only so results explain which configuration produced them. W
 
 ## `feature_flags`
 
-Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026). The table starts with the flags ROTRA's own features ship with, added by a migration with value false: `player_google_sign_in` ([D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01), November 18, 2026; it used to start empty). The created-by admin of such a row is open. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
+Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026). The table starts with the flags ROTRA's own features ship with, added by a migration with value false: `player_google_sign_in` ([D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01), November 18, 2026; it used to start empty). Such a row has no created-by or updated-by admin (both columns are nullable; null until an admin changes it), and the migration inserts it only if it is missing. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
 
 Downloaded sessions need the relevant approved settings version. How flag changes affect an already-offline session is unresolved; a DB update cannot guarantee immediate remote application.
 
@@ -82,6 +82,9 @@ Admin Edit profile (email only, #564) is another entry point: it inserts a reque
 UUID PK; actor admin FK; action; target type/ID; source command ID; timestamp; redacted before/after metadata. Append-only application access. Index actor/time and target/time for review.
 
 Do not log passwords, raw claim/reset tokens, or unnecessary contact values. **Admin-set password (MVP or beta only, [D-2026-11-09-14](../../../../mvp/decisions.md#d-2026-11-09-14)):** the edit-player save may set a registered player's password through the auth provider; record only `player.password_set_by_admin` (actor, target, time), never the value, and remove the capability after the beta. This conflicts with [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01) and needs owner sign-off before any build. The same save records one `player.profile_updated` event listing every changed field (picture, profile fields, privacy switches, phone, email) with redacted before/after and the reason. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
+
+Setting or clearing **Verified by Admin** for a registered player records the actor, player, time,
+action and required reason using the existing audit metadata ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)).
 
 Business sources: [configuration](../../../../business_logic/product/admin/modules/configuration/README.md), [player management](../../../../business_logic/product/admin/modules/player-management/README.md).
 

@@ -2,10 +2,12 @@ import { AuthCard } from '@rotra/ui/auth-card'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Notice } from '@rotra/ui/notice'
+import { VerificationStatusChip } from '@rotra/ui/verification-status-chip'
 import { LinkPage } from './link-page/LinkPage'
 
 export type AccountLinkStatusVariant =
   | 'reset-sent'
+  | 'reset-google'
   | 'reset-invalid'
   | 'claim-claimed'
   | 'claim-expired'
@@ -14,7 +16,7 @@ export type AccountLinkStatusVariant =
   | 'claim-done'
 export type AccountLinkStatusProps = {
   variant: AccountLinkStatusVariant
-  /** reset-sent: the email the player just typed; nothing else ever shows contact data */
+  /** reset-sent, reset-google: the email the player just typed; nothing else ever shows contact data */
   email?: string
   /** reset-invalid: a failed redemption also needs a new reviewed link. */
   resetError?: string
@@ -26,6 +28,16 @@ export type AccountLinkStatusProps = {
   /** Newly registered through a guest invitation; no existing games or guest record were linked. */
   standalone?: boolean
   sessionTitle?: string | null
+  /** claim-done after Google (player_google_sign_in flag): "You sign in with Google (<email>)." */
+  googleEmail?: string
+  /**
+   * claim-done after a registration that claimed unclaimed records (D-2026-11-16-04): the clubs whose
+   * records joined the account. Shows "Your records from A and B are now on your account, with their
+   * games." and "Your player ID stays …".
+   */
+  joinedClubs?: string[]
+  /** All three verification checks passed on the registration that just finished. */
+  verificationComplete?: boolean
   onBackToSession?: () => void
   /** claim-processing: Check again is running */
   isPending?: boolean
@@ -37,6 +49,10 @@ export type AccountLinkStatusProps = {
   onCheckAgain?: () => void
   onOpenProfile?: () => void
 }
+/** "A", "A and B", "A, B and C" */
+const listClubs = (names: string[]) =>
+  names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+
 /** Every non-form outcome of a reset link or a registration link. */
 export function AccountLinkStatus({
   variant,
@@ -47,6 +63,9 @@ export function AccountLinkStatus({
   rtrId,
   standalone = false,
   sessionTitle,
+  googleEmail,
+  joinedClubs,
+  verificationComplete = false,
   onBackToSession,
   isPending = false,
   onBackToSignIn,
@@ -66,6 +85,23 @@ export function AccountLinkStatus({
           <Notice tone="success">
             If an account uses <b>{email}</b>, ROTRA Admin can review your request after verifying
             ownership.
+          </Notice>
+          <p className="text-[13px] text-fg2">
+            Contact ROTRA support through your usual channel to verify ownership. An Admin will
+            provide your reset link.
+          </p>
+          <p className="text-xs text-fg2">No automatic email is sent.</p>
+          <Button variant="ghost" block onClick={onBackToSignIn}>
+            Back to sign in
+          </Button>
+        </AuthCard>
+      )
+    case 'reset-google':
+      return (
+        <AuthCard showBrand={false} title="Request received">
+          <Notice tone="info">
+            <b>{email}</b> signs in with Google and has no password. Go back and choose{' '}
+            <b>Continue with Google</b>.
           </Notice>
           <p className="text-[13px] text-fg2">
             Contact ROTRA support through your usual channel to verify ownership. An Admin will
@@ -145,23 +181,43 @@ export function AccountLinkStatus({
     case 'claim-done':
       return (
         <LinkPage label="Registration complete" title={`Welcome, ${firstName ?? ''}`}>
-          <Notice tone="success">
-            {standalone
-              ? clubName !== 'your club'
-                ? `You're now in ${clubName}'s saved players.`
-                : 'Your ROTRA account is ready.'
-              : 'Your profile is registered. Sign in from now on with your email and your password.'}
-          </Notice>
+          {standalone && joinedClubs?.length ? (
+            <Notice tone="success">
+              Your records from {listClubs(joinedClubs)} are now on your account, with their games.
+            </Notice>
+          ) : null}
+          {standalone && joinedClubs?.length && clubName === 'your club' ? null : (
+            <Notice tone="success">
+              {standalone
+                ? clubName !== 'your club'
+                  ? `You're now in ${clubName}'s saved players.`
+                  : 'Your ROTRA account is ready.'
+                : googleEmail
+                  ? `Your profile is registered. Sign in from now on with Google (${googleEmail}).`
+                  : 'Your profile is registered. Sign in from now on with your email and your password.'}
+            </Notice>
+          )}
           {standalone && sessionTitle ? (
             <Notice>Your request to join {sessionTitle} is ready to send.</Notice>
           ) : null}
           <Card asChild>
             <section className="flex flex-col gap-1.5">
               <p className="m-0">
-                {standalone ? 'Your player ID is ' : 'Your player ID stays '}
+                {standalone && !joinedClubs?.length
+                  ? 'Your player ID is '
+                  : 'Your player ID stays '}
                 <span className="font-mono">{rtrId}</span>.
                 {standalone ? '' : ' Your games and rank carry over.'}
               </p>
+              {standalone && googleEmail ? (
+                <p className="m-0 text-[13px] text-fg2">You sign in with Google ({googleEmail}).</p>
+              ) : null}
+              {googleEmail && verificationComplete ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <VerificationStatusChip completedSteps={3} />
+                  <span className="text-[13px] text-fg2">Google, phone and email are all set.</span>
+                </div>
+              ) : null}
               <div className={actions}>
                 {onBackToSession ? (
                   <Button variant="primary" onClick={onBackToSession}>

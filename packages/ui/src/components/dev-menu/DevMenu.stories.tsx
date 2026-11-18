@@ -1,6 +1,8 @@
+import { accountVerificationFixtureOptions } from '@rotra/data/fixtures/account-verification'
 import {
   devMenuFixtures,
   leaderboardOptions,
+  leaderboardPlaceOptions,
   playerRankOptions,
 } from '@rotra/data/fixtures/dev-menu'
 import { players } from '@rotra/data/fixtures/players'
@@ -20,6 +22,7 @@ function Demo(args: DevMenuProps) {
   const [leaderboard, setLeaderboard] = useState(args.playerScenarios?.leaderboard ?? 'normal')
   const [accountName, setAccountName] = useState(args.playerAccount?.name ?? null)
   const [settings, setSettings] = useState(args.rankingSettings)
+  const [verification, setVerification] = useState(args.verificationScenarios?.value ?? '')
   return (
     <DevMenu
       {...args}
@@ -51,6 +54,11 @@ function Demo(args: DevMenuProps) {
       rankingSettings={
         settings
           ? { ...settings, onChange: (value) => setSettings({ ...settings, ...value }) }
+          : undefined
+      }
+      verificationScenarios={
+        args.verificationScenarios
+          ? { ...args.verificationScenarios, value: verification, onChange: setVerification }
           : undefined
       }
       onReset={() => {
@@ -90,6 +98,7 @@ const playerArgs = {
     leaderboard: 'normal',
     rankOptions: playerRankOptions,
     leaderboardOptions,
+    leaderboardPlaceOptions,
     onRankChange: () => {},
     onLeaderboardChange: () => {},
   },
@@ -99,6 +108,16 @@ const playerArgs = {
 export const PlayerScenarios: Story = { args: playerArgs }
 export const PlayerSignedIn: Story = {
   args: { ...playerArgs, playerAccount: { ...playerArgs.playerAccount, name: joseName } },
+}
+export const PlayerVerification: Story = {
+  args: {
+    ...PlayerSignedIn.args,
+    verificationScenarios: {
+      value: 'oneOfThree',
+      options: accountVerificationFixtureOptions,
+      onChange: () => {},
+    },
+  },
 }
 export const PlayerOffline: Story = { args: { ...playerArgs, toggles: devMenuFixtures.offline } }
 export const PlayerPhone: Story = { args: playerArgs, globals: { viewport: { value: 'phone' } } }

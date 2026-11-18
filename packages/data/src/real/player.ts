@@ -1,5 +1,6 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import type { MockSession, SignInInput } from '../auth/auth.types'
+import { MockError } from '../mock/errors'
 import type { PlayerPictureChoice } from '../player/picture'
 import type {
   PlayerProfile,
@@ -7,6 +8,7 @@ import type {
   PlayerSessionRecord,
   ProfileVisibility,
 } from '../player/player.types'
+import { PROFILE_LOGIN_MESSAGE, PROFILE_PRIVATE_MESSAGE } from '../player/visibility.rules'
 import type {
   ClaimLink,
   CompleteClaimResult,
@@ -85,10 +87,10 @@ export function realCompleteClaim({
   )
 }
 export function realRequestPasswordReset(email: string) {
-  return realRequest<{ acknowledged: boolean }>('/api/auth/password-reset', {
-    method: 'POST',
-    body: { email },
-  })
+  return realRequest<{ acknowledged: boolean; signsInWithGoogle?: boolean }>(
+    '/api/auth/password-reset',
+    { method: 'POST', body: { email } },
+  )
 }
 export function realResetPassword(input: { token: string; password: string }) {
   return realRequest<{ saved: boolean }>('/api/auth/reset-password', {
@@ -100,12 +102,20 @@ export function realResetPassword(input: { token: string; password: string }) {
 // ---------- Public reads (P-PUBLIC-PROFILE, P-RANK-DETAIL, P-MATCH-HISTORY, /find) ----------
 
 export async function realGetPlayerProfile(playerId: string, signal?: AbortSignal) {
-  const body = await orNull(
-    realRequest<{ profile: PlayerProfile }>(`/api/players/${encodeURIComponent(playerId)}`, {
-      signal,
-    }),
-  )
-  return body?.profile ?? null
+  try {
+    const body = await orNull(
+      realRequest<{ profile: PlayerProfile }>(`/api/players/${encodeURIComponent(playerId)}`, {
+        signal,
+      }),
+    )
+    return body?.profile ?? null
+  } catch (error) {
+    if (error instanceof RealRequestError && error.status === 401)
+      throw new MockError('permission', PROFILE_LOGIN_MESSAGE)
+    if (error instanceof RealRequestError && error.status === 403)
+      throw new MockError('permission', PROFILE_PRIVATE_MESSAGE)
+    throw error
+  }
 }
 
 /** The stored projection only; null is "no rank yet". No rank formula is approved (#247). */
@@ -131,6 +141,7 @@ export async function realFindPlayerByRtrId(rtrId: string, signal?: AbortSignal)
       `/api/rtr-ids/${encodeURIComponent(rtrId.trim().toUpperCase())}`,
       { signal },
     ),
+    [401, 403, 404],
   )
 }
 
@@ -154,6 +165,9 @@ function myAccountOf(account: WireMyAccount): MyAccount {
     phoneHidden: account.phoneHidden,
     profileVisibility: account.profileVisibility,
     hiddenFromDirectory: account.hiddenFromDirectory,
+    googleEmail: account.googleEmail ?? null,
+    googleLinkedAt: account.googleLinkedAt ?? null,
+    hasPassword: account.hasPassword ?? true,
   }
 }
 

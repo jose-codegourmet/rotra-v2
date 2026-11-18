@@ -1,8 +1,17 @@
-import { searchLeaderboard } from '@rotra/db/player/leaderboard'
-import { handlePublicRead } from '@rotra/db/service/handler'
+import { optionalPlayerId } from '@rotra/db/player/club-page'
+import { parseLeaderboardPeriod, readPeriodLeaderboard } from '@rotra/db/player/leaderboard'
+import { handleVisitorRequest } from '@rotra/db/service/handler'
+import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
+import { cookies } from 'next/headers'
 
-/** P-LEADERBOARD name search (`?q=`) over listed players: the first 50 hits and the full count. */
 export async function GET(request: Request) {
-  const q = (new URL(request.url).searchParams.get('q') ?? '').slice(0, 100)
-  return handlePublicRead('leaderboard.list', async () => ({ body: await searchLeaderboard(q) }))
+  return handleVisitorRequest('leaderboard.list', async () => {
+    const params = new URL(request.url).searchParams
+    const q = (params.get('q') ?? '').slice(0, 100)
+    const period = parseLeaderboardPeriod(params.get('period'))
+    if (!q.trim()) return { body: { hits: [], total: 0 } }
+    const viewerId = await optionalPlayerId(routeCookieAdapter(await cookies()))
+    const board = await readPeriodLeaderboard(period)
+    return { body: await board.search(q, viewerId) }
+  })
 }

@@ -1,11 +1,11 @@
-import { formatPhoneForDisplay } from '@rotra/schema/phone'
+import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import type { ReactNode, Ref } from 'react'
 
 export type ContactDetailsCardProps = {
-  /** E.164; shown grouped */
+  /** E.164; shown masked ("+63 917 ••• ••42") */
   phone: string
   email: string
   /** ContactRequestStatus (full) when there is a request */
@@ -34,7 +34,7 @@ export function ContactDetailsCard({
           items={[
             {
               label: 'Phone',
-              value: <span className="font-mono">{formatPhoneForDisplay(phone)}</span>,
+              value: <span className="font-mono">{maskPhone(phone)}</span>,
             },
             {
               label: 'Email',

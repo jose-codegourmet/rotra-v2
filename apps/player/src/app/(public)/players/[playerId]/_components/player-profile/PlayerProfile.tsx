@@ -1,11 +1,11 @@
 'use client'
+import { useMyAccountVerification } from '@rotra/data/account-verification/useMyAccountVerification'
 import { useSession } from '@rotra/data/auth/use-session'
 import { useSignOut } from '@rotra/data/auth/use-sign-out'
 import { OPEN_CONTACT_CHANGE_STATUSES } from '@rotra/data/contact-change-request/types'
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
-import { useLeaderboard } from '@rotra/data/leaderboard/useLeaderboard'
-import { manilaYear, rankDisplayStatus, weeklyPerformance } from '@rotra/data/player/rules'
+import { countYearCountedWins, manilaYear, weeklyPerformance } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useMySessions } from '@rotra/data/player/useMySessions'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
@@ -19,10 +19,11 @@ import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
-import { EligibilityCard, type RankStatusChip } from '@rotra/ui/eligibility-card'
+import type { RankStatusChip } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
 import type { GameRowPlayer } from '@rotra/ui/game-row'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { MySessionsCard } from '@rotra/ui/my-sessions-card'
 import { Notice } from '@rotra/ui/notice'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
@@ -58,14 +59,12 @@ import { selectDev } from '@/store/slices/devSlice'
 import Loading from '../../loading'
 
 /** The shared rank's status chip (the prototype's rankStatus chips). */
-const STATUS_CHIPS: Record<ReturnType<typeof rankDisplayStatus>, RankStatusChip> = {
+const STATUS_CHIPS = {
   'not-calculated': { label: 'Not calculated', tone: 'neutral' },
   'needs-reassessment': { label: 'Needs reassessment', tone: 'warn' },
-  'on-leaderboard': { label: 'On the leaderboard', tone: 'accent' },
   updating: { label: 'Updating', tone: 'warn' },
-  qualifies: { label: 'Qualifies', tone: 'accent' },
   provisional: { label: 'Provisional', tone: 'neutral' },
-}
+} satisfies Record<string, RankStatusChip>
 
 /** "yesterday", "3 days ago", measured from the fixtures' clock like the rest of the rank data. */
 function finishedAgo(finishedAt: string) {
@@ -80,9 +79,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const profile = usePlayerProfile(playerId),
     rank = usePlayerRank(playerId),
     games = usePlayerGames(playerId)
-  const settings = useRankingSettings(),
-    leaderboard = useLeaderboard(),
-    router = useRouter()
+  const settings = useRankingSettings()
+  const router = useRouter()
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev),
     dispatch = useAppDispatch()
@@ -92,6 +90,10 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
+  const verification = useMyAccountVerification(
+    session.data?.account.id === playerId ? playerId : null,
+  )
+  const openVerification = () => router.push('/profile/verification')
   // Clubs show on every readable profile (#766); the read applies the profile's access rule.
   const clubs = usePlayerClubs(playerId)
   // D-CLUB-PROFILE: a Clubs card row opens the club's profile card.
@@ -100,10 +102,10 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const [openSessionId, setOpenSessionId] = useState<string | null>(null)
   const [openPlayer, setOpenPlayer] = useState<GameRowPlayer | null>(null)
   const mySessions = useMySessions(isOwn ? playerId : null)
-  // Own profile only: pull down (or come back to the tab) refreshes My sessions, recent games and
+  // Own profile only: pull down (or come back to the tab) refreshes the profile, My sessions, recent games and
   // the rank, once every 10 seconds (mockup change 2026-11-12). A visitor's page has no pull.
   const refreshing = useThrottledRefresh(
-    () => Promise.all([mySessions.refetch(), games.refetch(), rank.refetch()]),
+    () => Promise.all([profile.refetch(), mySessions.refetch(), games.refetch(), rank.refetch()]),
     { refreshOnReturn: isOwn },
   )
   const player = profile.data,
@@ -172,57 +174,30 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     )
   }
   const firstName = player.nickname || player.fullName.split(' ')[0] || player.fullName
-  const subject = isOwn ? 'you' : firstName,
-    requirement = settings.data.matchRequirement
-  const status = rankDisplayStatus({
-    level: current.levelIndex,
-    state: current.state,
-    updatePending: current.updatePending,
-    position: current.position,
-    recentCount: current.recentCount,
-    matchRequirement: requirement,
-  })
-  const statusChip = STATUS_CHIPS[status]
-  const levelCode = current.levelIndex === null ? null : PLAYING_LEVELS[current.levelIndex]
-  const levelLabel = levelCode
-    ? levelCode
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-    : null
-  const total = leaderboard.data?.pages[0]?.total
-  const sentence =
-    status === 'not-calculated'
-      ? `ROTRA calculates a rank once a club has assessed ${subject} and a session with that assessment is done. Until then there is no rank to show.`
-      : status === 'needs-reassessment'
-        ? `Last played more than three months ago, so this rank is out of date and not on the leaderboard. To return, a club gives ${subject} a fresh assessment and ${subject} ${isOwn ? 'play' : 'plays'} ${requirement} standard matches within three months.`
-        : current.position !== null
-          ? `${current.position.toLocaleString('en-PH')}${total === undefined ? '' : ` of ${total.toLocaleString('en-PH')} players`} on the overall ROTRA leaderboard.`
-          : status === 'qualifies'
-            ? `${isOwn ? 'You now have' : `${firstName} now has`} enough recent matches. The position appears after the next leaderboard update.`
-            : `No overall position yet. ${current.recentCount} of ${requirement} standard matches in the last three months.`
-  const remaining = Math.max(0, requirement - current.recentCount)
-  const eligibility =
-    current.state === 'needs_reassessment'
-      ? `${isOwn ? 'You have' : `${firstName} has`} no standard matches in the last three months${current.olderCount ? `; ${current.olderCount} older matches no longer count` : ''}. A fresh club assessment plus ${requirement} new matches brings ${isOwn ? 'you' : 'them'} back.`
-      : current.recentCount >= requirement
-        ? `${isOwn ? 'You meet' : 'Meets'} the requirement of ${requirement} completed singles or doubles matches in the last three months. Falling below it removes the leaderboard position, though the rank stays visible.`
-        : `${remaining} more standard ${remaining === 1 ? 'match' : 'matches'} in the next few weeks would put ${subject} on the leaderboard. Older matches drop out of the count as they pass three months.`
-  // Leaderboard ranking replaces eligibility once the player qualifies with a position
-  // (2026-11-13-player-ranking-card); both carry the shared rank in their head.
-  const ranked =
-    current.recentCount >= requirement &&
-    current.state !== 'needs_reassessment' &&
-    current.position !== null
-  const rankHead = {
-    levelLabel,
-    status: statusChip,
-    onShare: isOwn && current.levelIndex !== null ? sharing.openRank : undefined,
-    onOpenRankDetail: () => router.push(`/players/${playerId}/rank`),
+  const subject = isOwn ? 'you' : firstName
+  const requirement = settings.data.matchRequirement
+  const levelCode =
+    current.levelIndex === null ? null : (PLAYING_LEVELS[current.levelIndex] ?? null)
+  const rankLevel = levelCode ? levelLabel(levelCode) : null
+  let status: RankStatusChip | undefined
+  let rankText: string | undefined
+  if (current.levelIndex === null) {
+    status = STATUS_CHIPS['not-calculated']
+    rankText = `ROTRA calculates a rank once a club has assessed ${subject} and a session with that assessment is done. Until then there is no rank to show.`
+  } else if (current.state === 'needs_reassessment') {
+    status = STATUS_CHIPS['needs-reassessment']
+    rankText = `Last played more than three months ago, so this rank is out of date. A club gives ${subject} a fresh assessment to bring it up to date.`
+  } else if (current.recentCount < requirement) {
+    status = STATUS_CHIPS.provisional
+    rankText = `This rank is still settling: ${current.recentCount} of ${requirement} standard matches in the last three months.`
+  } else if (current.updatePending) {
+    status = STATUS_CHIPS.updating
   }
   // Weekly Performance, read-only (2026-11-13-player-weekly-performance): hidden from others when the
   // player turned off Show my weekly performance; the owner always sees it with the visibility chip.
-  const year = manilaYear(Date.now())
+  const now = Date.now()
+  const year = manilaYear(now)
+  const unclaimedStats = player.unclaimedSavedBy ? countYearCountedWins(games.data, now) : null
   const weeklyShown = player.showWeeklyPerformance !== false
   const weeklyVisibility: WeeklyVisibility = !weeklyShown
     ? 'hidden'
@@ -271,6 +246,9 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             <PlayerIdentityCard
               profile={{ ...player, picture }}
               isOwn={isOwn}
+              unclaimedFacts={
+                unclaimedStats ? { ...unclaimedStats, year, levelLabel: rankLevel } : undefined
+              }
               bannerKey={player.bannerKey}
               bannerImageUrl={player.bannerImageUrl}
               idElementId={idElementId}
@@ -294,6 +272,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               }
               onEdit={() => router.push('/profile/edit')}
               onOpenPlayerId={() => router.push('/profile/player-id')}
+              verification={verification.data ?? undefined}
+              onOpenVerification={isOwn ? openVerification : undefined}
               onShare={sharing.openProfile}
             />
             {pictureEditor.sheet}
@@ -313,6 +293,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                   ) : null
                 }
                 onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
+                onOpenVerification={openVerification}
                 onSignOut={leaveSignedOut}
               />
             ) : null}
@@ -354,6 +335,12 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 last calculated rank until the update is ready.
               </Notice>
             ) : null}
+            {player.unclaimedSavedBy ? (
+              <Notice title="Not registered yet.">
+                {player.unclaimedSavedBy} saved this player, so this is the club&apos;s version of
+                them. The profile is public until they register with ROTRA.
+              </Notice>
+            ) : null}
             {missingDetails ? (
               <Notice
                 tone="info"
@@ -366,25 +353,17 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 Add your playing style and experience so clubs know your game. It's optional.
               </Notice>
             ) : null}
-            {ranked && current.position !== null ? (
-              <ProfileRankingCard
-                {...rankHead}
-                position={current.position}
-                total={total}
-                recentCount={current.recentCount}
-                matchRequirement={requirement}
-                onOpenLeaderboard={() => router.push(`/?player=${encodeURIComponent(playerId)}`)}
-              />
-            ) : (
-              <EligibilityCard
-                recentCount={current.recentCount}
-                matchRequirement={requirement}
-                needsReassessment={current.state === 'needs_reassessment'}
-                sentence={eligibility}
-                rank={rankHead}
-                rankText={sentence}
-              />
-            )}
+            <ProfileRankingCard
+              levelLabel={rankLevel}
+              status={status}
+              rankText={rankText}
+              onShare={isOwn && current.levelIndex !== null ? sharing.openRank : undefined}
+              onOpenRankDetail={() => router.push(`/players/${playerId}/rank`)}
+              leaderboardPlaces={player.leaderboardPlaces ?? []}
+              onOpenLeaderboard={(period) =>
+                router.push(`/?period=${period}&player=${encodeURIComponent(playerId)}`)
+              }
+            />
             {isOwn || weeklyShown ? (
               <WeeklyPerformanceChart
                 readOnly

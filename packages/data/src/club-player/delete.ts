@@ -2,6 +2,7 @@ import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { retireUnsavedPerson, syncUnclaimedProjection } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import { realDeleteClubPlayer, realGetDeleteImpact } from '../real/queue'
 import type { DeleteImpact } from './clubPlayer.types'
@@ -31,6 +32,11 @@ export async function getDeleteImpact(id: string): Promise<DeleteImpact> {
 /**
  * Soft-deletes a saved player. Active Session: Present off. Prepared and upcoming sessions: slot
  * and waitlist spot removed. Finished sessions keep them. On court refuses.
+ *
+ * An unclaimed player (D-2026-11-16-04): this is also how a mistyped email is fixed, since a club
+ * can never edit one. When no other club has saved that email, the shared entry goes with the
+ * record and its RTR ID is retired: never given again, and no longer found by lookup. Adding the
+ * right email afterwards makes a new unclaimed player with a new RTR ID.
  */
 export async function deleteClubPlayer(id: string) {
   if (isRealDataMode()) return realDeleteClubPlayer(id)
@@ -69,6 +75,10 @@ export async function deleteClubPlayer(id: string) {
       (w) => !(w.clubPlayerId === id && current.has(w.sessionId)),
     )
     row.removedAt = Date.now()
+    delete draft.privatePhones[row.id]
+    if (draft.pendingEmails) delete draft.pendingEmails[row.id]
+    const personId = row.playerId
+    if (!retireUnsavedPerson(draft, personId)) syncUnclaimedProjection(draft, personId)
   })
   return { clubPlayerId: id, name }
 }

@@ -54,3 +54,7 @@ export const Active: Story = {
   },
 }
 export const ActiveLight: Story = { ...Active, globals: { theme: 'light' } }
+
+/** The fourth account option: only older unclaimed records with a phone and no email. */
+export const DetailsRequired: Story = { args: { filters: { account: 'details' } } }
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }

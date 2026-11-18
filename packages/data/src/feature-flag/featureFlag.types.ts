@@ -15,7 +15,7 @@ export type FeatureFlag = {
   revision: number
   /** ISO time with the Manila offset when the flag was added */
   createdAt: string
-  /** Email of the Admin who added it */
+  /** Email of the Admin who added it; empty for a flag that ships with the product */
   createdByEmail: string
   /**
    * ISO time with the Manila offset of the last value change; absent when it never changed. Adding a

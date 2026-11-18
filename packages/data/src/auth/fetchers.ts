@@ -1,4 +1,6 @@
 import { getConnectivity } from '../connectivity/connectivity'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
+import { isMockFlagOn } from '../feature-flag/mockFlagOverride'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { players } from '../fixtures/players'
 import { requireOnline } from '../mock/bridge'
@@ -48,9 +50,13 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
     const account = readMockState().playerAccounts.find(
       (entry) => entry.claimed && entry.email?.toLowerCase() === email,
     )
-    player = account
-      ? readMockState().players.find((entry) => entry.id === account.playerId)
-      : undefined
+    // A Google-only account has no password (P12), so a password never signs it in. Only while the
+    // flag is on: with it off the mock signs in as it always did.
+    const googleOnly = account?.hasPassword === false && isMockFlagOn(PLAYER_GOOGLE_SIGN_IN_FLAG)
+    player =
+      account && !googleOnly
+        ? readMockState().players.find((entry) => entry.id === account.playerId)
+        : undefined
     if (!player)
       throw new MockError(
         'permission',
@@ -65,9 +71,23 @@ export async function signIn(audience: AuthAudience, input: SignInInput): Promis
         ? { id: player.id, name: player.fullName, audience }
         : { id: 'platform-owner', name: 'Platform owner', audience }
   const session = { account }
+  writeMockSession(audience, session)
+  if (audience !== 'player') passwords.set(audience, input.password)
+  return session
+}
+function writeMockSession(audience: AuthAudience, session: MockSession) {
   // biome-ignore lint/suspicious/noDocumentCookie: browser-readable mock marker explicitly required by F06.4
   document.cookie = `${mockCookieName(audience)}=${encodeURIComponent(JSON.stringify(session))}; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`
-  if (audience !== 'player') passwords.set(audience, input.password)
+}
+/**
+ * Mock only: starts a Player session without a password, for a Google sign-in, link, registration
+ * or claim (P12). Real mode signs in through Supabase and never calls this.
+ */
+export function startMockPlayerSession(playerId: string, name: string): MockSession {
+  if (typeof document === 'undefined')
+    throw new MockError('permission', 'Mock sign-in needs a browser.')
+  const session: MockSession = { account: { id: playerId, name, audience: 'player' } }
+  writeMockSession('player', session)
   return session
 }
 export async function signOut(audience: AuthAudience) {

@@ -171,3 +171,26 @@ export const OverfillGamesStay: Story = {
 }
 export const OverfillGamesDropLight: Story = { ...OverfillGamesDrop, globals: { theme: 'light' } }
 export const OverfillGamesStayLight: Story = { ...OverfillGamesStay, globals: { theme: 'light' } }
+
+// Same person confirmation (D-2026-11-16-04, rotra-queue.html SHEETS.sameEmail). Not yet confirmed by
+// the owner. A plain ConfirmSheet, no wrapper: when the email typed for a guest already belongs to a
+// saved player, Move to NAME moves the guest's record into that player's. It replaces the removed
+// Link to saved player… picker.
+const SAME_PERSON = {
+  title: 'Same person as Kiko Salazar?',
+  consequence: (
+    <>
+      That email is already <b>Kiko Salazar</b> in your saved players.
+    </>
+  ),
+  note: "Tin's slots, games and payments here move to that record, and Tin is removed from your saved players.",
+  backLabel: 'Back',
+  confirmLabel: 'Move to Kiko Salazar',
+  destructive: false,
+}
+export const SamePerson: Story = { render: () => <Demo {...SAME_PERSON} /> }
+export const SamePersonLight: Story = { ...SamePerson, globals: { theme: 'light' } }
+export const SamePersonPhone: Story = {
+  ...SamePerson,
+  globals: { viewport: { value: 'phone' } },
+}

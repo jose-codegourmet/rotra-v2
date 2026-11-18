@@ -18,5 +18,21 @@ export const leaderboardOptions = [
   { value: 'normal', label: 'Normal' },
   { value: 'loading', label: 'Loading' },
   { value: 'error', label: "Can't load" },
-  { value: 'empty', label: 'No one qualifies' },
+  { value: 'empty', label: 'Empty lists' },
+  { value: 'empty-week', label: 'Empty week' },
+]
+export const leaderboardPlaceOptions = [
+  { value: 'normal', label: 'As played' },
+  { value: 'in-top-50', label: 'In the top 50' },
+  { value: 'below-top-50', label: 'Not in the top 50' },
+]
+export const googleDeadlineOptions = [
+  { value: 'before', label: 'Before the deadline' },
+  { value: 'passed', label: 'Deadline passed' },
+]
+/** Where the signed-in player stands on the seeded Session invite (P-JOIN-SESSION states). */
+export const inviteStandingOptions = [
+  { value: 'none', label: 'Not on it' },
+  { value: 'in', label: 'Already in' },
+  { value: 'waitlist', label: 'Waitlisted' },
 ]

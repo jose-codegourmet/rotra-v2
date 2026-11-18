@@ -9,16 +9,29 @@ import { Field } from '@rotra/ui/field'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelSelect, levelLabel } from '@rotra/ui/level-select'
+import { TextInput } from '@rotra/ui/text-input'
 
 export type PlayerConfirmCardProps = {
   name: string
   photoUrl?: string
   /**
-   * Shown in monospace; null shows "Not registered yet" for an unclaimed profile (its RTR ID is
-   * given when they register) and "Guest" otherwise
+   * Shown in monospace; null shows "Details required" for an older unclaimed record with no RTR ID
+   * and "Guest" otherwise
    */
   rtrId: string | null
   identity: Identity
+  /** An older unclaimed record with no email: the chip reads "Details required" */
+  detailsRequired?: boolean
+  /**
+   * Another club's unclaimed player (D-2026-11-16-04): no name, picture or level comes back, so the
+   * card says "Not registered yet" and asks for this club's own name for them.
+   */
+  nameRequired?: boolean
+  /** The typed own name (nameRequired only) */
+  ownName?: string
+  onOwnNameChange?: (name: string) => void
+  /** "Enter a name." (nameRequired only) */
+  nameError?: string
   /** The player chose to hide their phone from clubs: "Phone hidden by player. …" */
   phoneHidden?: boolean
   /** Player Information suggestion; null shows "None yet" */
@@ -54,6 +67,11 @@ export function PlayerConfirmCard({
   photoUrl,
   rtrId,
   identity,
+  detailsRequired = false,
+  nameRequired = false,
+  ownName = '',
+  onOwnNameChange,
+  nameError,
   phoneHidden = false,
   suggestion,
   level,
@@ -74,21 +92,38 @@ export function PlayerConfirmCard({
     <div className={cn('flex flex-col gap-3.5', className)}>
       <Card className="flex flex-col gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar name={name} src={photoUrl} />
+          <Avatar
+            name={nameRequired ? 'Not registered' : name}
+            src={nameRequired ? undefined : photoUrl}
+          />
           <span className="flex min-w-0 flex-1 flex-col">
-            <b className="[overflow-wrap:anywhere]">{name}</b>
+            <b className="[overflow-wrap:anywhere]">{nameRequired ? 'Not registered yet' : name}</b>
             <span className="text-[13px] text-fg2">
               {rtrId ? (
                 <span className="font-mono text-[0.92em]">{rtrId}</span>
               ) : identity === 'unclaimed' ? (
-                'Not registered yet'
+                'Details required'
               ) : (
                 'Guest'
               )}
             </span>
           </span>
-          <IdentityChip identity={identity} />
+          <IdentityChip identity={identity} detailsRequired={detailsRequired} />
         </div>
+
+        {nameRequired ? (
+          <Field
+            label="Full or display name"
+            hint="Your club's own name for them. Other clubs keep theirs until the player registers."
+            error={nameError}
+          >
+            <TextInput
+              value={ownName}
+              onChange={(event) => onOwnNameChange?.(event.target.value)}
+              autoComplete="off"
+            />
+          </Field>
+        ) : null}
 
         {phoneHidden ? (
           <p className="m-0 text-[13px] text-fg2">

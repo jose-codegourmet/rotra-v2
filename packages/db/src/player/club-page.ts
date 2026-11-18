@@ -38,7 +38,7 @@ export type ClubPageDto = {
   }[]
 }
 
-function initials(name: string) {
+export function initials(name: string) {
   return name
     .split(/\s+/)
     .filter(Boolean)

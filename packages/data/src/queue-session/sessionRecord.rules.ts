@@ -1,6 +1,6 @@
 import type { Match } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { playerFacingName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SessionCourt } from './queueSession.types'
 
@@ -83,7 +83,7 @@ export function sessionRecordHistory(input: {
   const playerOf = (id: string): RecordPlayer => {
     const p = input.roster.find((x) => x.id === id)
     return p
-      ? { id, name: p.nameSnapshot, shortName: shortName(p), level: p.level }
+      ? { id, name: p.nameSnapshot, shortName: playerFacingName(p), level: p.level }
       : { id, name: 'Player', shortName: 'Player', level: null }
   }
   const replayEnd = (m: Match) => {

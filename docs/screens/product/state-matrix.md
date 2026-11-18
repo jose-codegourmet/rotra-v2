@@ -47,6 +47,12 @@
 | Change player personal fields | Requires accepted server save. Real mode (#400): saved under the last-read account revision, online only | Do not claim a local draft is saved remotely | Validate current account revision |
 | Admin activation/approval/configuration | Online | Unavailable | Recover request status before retrying |
 
+## Player Information screen states
+
+| Screen | Loading | Empty | Error | Signed out |
+|---|---|---|---|---|
+| [P-NOTIFICATIONS](modules/player-information/notifications.md) | Skeleton rows. The bell link remains available without a count while its query loads. | Bell icon and “No notifications yet” (All) or “No unread notifications” (Unread), followed by “Session updates, invites, club changes and messages from ROTRA show up here.” | “Couldn't load notifications.” with **Retry**. The bell link remains available without a count if its query fails. | Hide the bell. Redirect `/notifications` to P-LOGIN with `returnTo` and reopen Notifications after sign-in. |
+
 ## Club entitlement
 
 | License/session condition | Allowed screen access |
@@ -89,9 +95,9 @@
 
 ## Rank and award gates
 
-- Overall leaderboard: configured number of completed full standard games in the last three months, initially ten.
-- Real mode (#403): with no approved rank formula (#247) P-LEADERBOARD always shows its empty state and no own position; it never falls back to fixture positions.
-- Needs reassessment after three months without play: old label visible, no overall position. Return requires a fresh assessment/new completed session and the rolling count.
+- Top annual, Top monthly and Top weekly: at least one qualifying standard match in the current calendar period. The top 50 are ordered by wins and tie-breaks.
+- Real mode before #918: P-LEADERBOARD stays empty and has no own position. It never uses fixture positions.
+- Needs reassessment after three months without play applies to the shared rank. Return requires a fresh assessment, a new completed session and the rolling count.
 - Most Improved/Off Day: five **previous sessions at the same club** within three months, current session excluded. Returning guests can qualify.
 - MVP: no five-session history requirement; relative performance rather than just wins. Exact formula still pending.
 - No history or missing formula output is not zero performance; render an honest pending/insufficient-evidence state.

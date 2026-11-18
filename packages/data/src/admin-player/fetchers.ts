@@ -6,6 +6,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import type { Player } from '../player/player.types'
+import { isCurrentRecord } from '../player/unclaimed'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
 import {
@@ -16,7 +17,7 @@ import {
   realListAdminPlayers,
 } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
-import { createdOnFromRtrId, rankStatusOf } from './adminPlayer.rules'
+import { createdOnFromRtrId, isAdminDetailsRequired, rankStatusOf } from './adminPlayer.rules'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
@@ -34,6 +35,11 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
   const rank = state.playerRanks[player.id]
   const levelIndex = rank?.levelIndex ?? null
   const recentStandardMatches = rank?.recentCount ?? 0
+  const claimed = account?.claimed ?? !state.adminPlayerRecords[player.id]?.adminCreated
+  // An unclaimed player saved by more than one club: each club's own name for them shows, and they
+  // are not on the leaderboard until they register (D-2026-11-16-04).
+  const savedByClubs = claimed ? [] : clubRecords.filter(isCurrentRecord)
+  const manyClubs = new Set(savedByClubs.map((entry) => entry.clubId)).size > 1
   return {
     id: player.id,
     name: player.fullName,
@@ -54,10 +60,11 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
         player.rtrId.split('-')[2] ??
         '',
     },
-    clubs: clubRecords.map((c) => ({
+    clubs: (claimed ? clubRecords : savedByClubs).map((c) => ({
       clubId: c.clubId,
       name: state.clubs.find((club) => club.id === c.clubId)?.name ?? 'Unknown club',
       addedAt: c.addedAt ?? null,
+      ...(manyClubs ? { savedAs: c.fullName } : {}),
       identity: c.identity,
     })),
     archivedAt: state.adminPlayerRecords[player.id]?.archivedAt ?? null,
@@ -71,7 +78,12 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
           : null,
     phone: account?.phone,
     email: account?.email,
-    claimed: account?.claimed ?? !state.adminPlayerRecords[player.id]?.adminCreated,
+    claimed,
+    detailsRequired: isAdminDetailsRequired({
+      claimed,
+      phone: account?.phone,
+      email: account?.email,
+    }),
     phoneHidden: account?.phoneHidden ?? false,
     levelIndex,
     recentStandardMatches,
@@ -79,24 +91,28 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
       levelIndex,
       recentStandardMatches,
       effectiveRankingVersion(state.rankingPolicyVersions).recentStandardMatchThreshold,
+      manyClubs,
     ),
   }
 }
 
-/** A club's unclaimed record: saved with a phone, no global player yet (D-2026-11-11-03). */
+/**
+ * A club's record with no shared entry (D-2026-11-16-04): an older unclaimed record with a phone
+ * and no email (Details required), or a Lookup pending one whose email waits for the device's sync.
+ */
 export function isClubOnlyRecord(record: ClubPlayer) {
   return (
     !record.playerId &&
-    !record.removedAt &&
-    !record.linkedToClubPlayerId &&
+    isCurrentRecord(record) &&
     (record.identity === 'unclaimed' || record.identity === 'pending')
   )
 }
 
 /**
- * A-PLAYERS row for a club's unclaimed record (owner answer, November 12, 2026): listed under its
- * club as "Not registered yet", with no RTR ID. Its `id` is the club player id; the place is the
- * club's founding location, where the RTR ID would be allocated on registration.
+ * A-PLAYERS row for a club's record with no shared entry (owner answer, November 12, 2026): listed
+ * under its club as "Not registered yet", with no RTR ID, and Details required while it has a phone
+ * and no email. Its `id` is the club player id; the place is the club's founding location, where
+ * the RTR ID is given once the club adds the email.
  */
 export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): AdminPlayer {
   const club = state.clubs.find((club) => club.id === record.clubId)
@@ -128,8 +144,13 @@ export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): Adm
     revision: 1,
     removalReason: 'Saved by its club only; the club manages this record',
     phone: state.privatePhones[record.id],
-    email: undefined,
+    email: state.pendingEmails?.[record.id],
     claimed: false,
+    detailsRequired: isAdminDetailsRequired({
+      claimed: false,
+      phone: state.privatePhones[record.id],
+      email: state.pendingEmails?.[record.id],
+    }),
     phoneHidden: false,
     levelIndex: null,
     recentStandardMatches: 0,

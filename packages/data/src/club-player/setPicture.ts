@@ -4,6 +4,7 @@ import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { mockPhotoReference } from '../player/photo'
 import { characterPictureReference } from '../player/picture'
+import { syncUnclaimedProjection } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import type { ClubPlayerPicture, SetClubPlayerPictureInput } from './clubPlayer.types'
 import { clubPictureState, takesClubPicture } from './clubPlayerPicture.rules'
@@ -24,10 +25,8 @@ function pictureRow(s: MockState, id: string) {
   )
   if (!row) throw new MockError('permission', 'Player not available.')
   if (!takesClubPicture(row)) throw new MockError('permission', NOT_EDITABLE)
-  const profilePicture = row.playerId
-    ? (s.playerProfiles.find((p) => p.playerId === row.playerId)?.picture ?? null)
-    : null
-  return { row, current: clubPictureState(row, profilePicture) }
+  // The club's own picture only: an unclaimed player's shared entry may show another club's.
+  return { row, current: clubPictureState(row, null) }
 }
 
 /**
@@ -77,6 +76,7 @@ export async function setClubPlayerPicture(input: SetClubPlayerPictureInput) {
         ? { kind: 'photo', src: src ?? '' }
         : { kind: 'character', characterId: input.characterId }
     row.picture = withPrevious(next, nextPrevious(current))
+    syncUnclaimedProjection(s, row.playerId)
     return { data: { clubPlayerId: row.id }, text: `Picture updated · ${row.fullName}` }
   })
 }
@@ -87,6 +87,7 @@ export function removeClubPlayerPicture(input: { clubPlayerId: string }) {
   return changePicture((s) => {
     const { row, current } = pictureRow(s, input.clubPlayerId)
     row.picture = withPrevious({ kind: 'initials' }, nextPrevious(current))
+    syncUnclaimedProjection(s, row.playerId)
     return { data: { clubPlayerId: row.id }, text: `Using initials · ${row.fullName}` }
   })
 }
@@ -104,6 +105,7 @@ export function restorePreviousClubPlayerPicture(input: { clubPlayerId: string }
       { kind: 'photo', src: current.previousSrc },
       current.kind === 'photo' ? current.reference : null,
     )
+    syncUnclaimedProjection(s, row.playerId)
     return { data: { clubPlayerId: row.id }, text: `Previous picture restored · ${row.fullName}` }
   })
 }

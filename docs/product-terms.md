@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-12 · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -69,6 +69,9 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Always require a request | The Session link card switch under Accept join requests ([D-2026-11-12-02](mvp/decisions.md#d-2026-11-12-02)). Off (default): a **club member** (a registered ROTRA Player linked to one of the club's current saved player records) joins an upcoming session right away with **Join as NAME** / **Join the waitlist as NAME**, no join request; on: members send a join request like everyone else. Guests and non-members always request. Code `QueueSession.alwaysRequireRequest`, column `queue_sessions.always_require_request` |
 | Join a slot · Be waitlisted | The player's choice on a join request ([D-2026-11-11-02](mvp/decisions.md#d-2026-11-11-02)): a slot, or a waitlist place. Join a slot is unavailable before start while every slot is taken. Code value `placement`: `slot` · `waitlist` · `from_waitlist` |
 | Join from waitlist | A waitlisted signed-in Player's request for a slot while slots are open; the Queue Master confirms it (**Give slot** / **Admit player**) and it never overfills before start ([D-2026-11-11-02](mvp/decisions.md#d-2026-11-11-02)) |
+| Scoring mode | How games are scored in one Queue Session, picked in setup (mockup only, [D-2026-11-18-04](mvp/decisions.md#d-2026-11-18-04)): **16/31** (default), **16/31, no deuce**, **11/21**, **11/21 × 3**, **21 × 3**. Decides the valid game scores and whether a match is one game or a best of 3. Not the same as Session mode (Chill, Fair, Hard). Always "Scoring" in copy |
+| Deuce | A game tied one point short of the target (30–30 for 31, 20–20 for 21) goes on until one pair leads by 2 (32–30, 33–31). No cap. Only in 16/31, 11/21 and 11/21 × 3. Write "Deuce" or "no deuce"; "slide" for a game going past the target is not a ROTRA word |
+| Best of 3 | A match of up to 3 games to 21 in 11/21 × 3 and 21 × 3. The first pair to win 2 games wins; game 3 is played only at 1–1. Every game score is kept. Write "best of 3" |
 | Session mode | Pairing preset: **Chill** (≈30% easy games), **Fair** (mostly level-matched, ≈10% easy), **Hard** (allows 2–3 games in a row) |
 | Formats | Standard: singles, doubles. Fun: 1v2, 3v3, 4v4, 5v5 (5v5 uses two courts) |
 | Calculated minimum | Minimum-games target estimated from courts, length, players, formats; operator can override |
@@ -109,7 +112,7 @@ Rules: [Players](business_logic/product/queue/modules/players/README.md) ·
 | Public club page | A club's public page at `/clubs/[clubId]` in Player Information (epic P07): header, members, upcoming sessions and a calendar. Not the club's session page and not the invite link ([D-2026-11-11-11](mvp/decisions.md#d-2026-11-11-11)) |
 | Player ID / RTR ID | A person's ROTRA identifier, e.g. `RTR-PH-CEB-031526-0001`. Given when a club first saves their email (unclaimed) or when they register, and kept on registration. The place part comes from the first club that entered the email. No club or player can change it; Admin can, by changing the registration place or date, and the new ID replaces the old one on every record that holds it. A retired ID (a mistyped email's record, deleted) is never reused ([D-2026-11-16-04](mvp/decisions.md#d-2026-11-16-04)). Never a database key |
 | Display name | How a player is named: their **nickname**, or their **full name** when they have none. A profile card shows the display name in bold, the full name under it when there is a nickname, then a small **Copy RTR ID** button. Applied to profile cards first ([D-2026-11-13-04](mvp/decisions.md#d-2026-11-13-04)); other places follow in a later pass |
-| Club nickname | A nickname a club's Queue Master gives a **registered** player, kept by that club. Shown only on the Queue Master's screens (console, roster, Saved players). Players, results and leaderboards see the nickname on the player's ROTRA account. Guests and unclaimed players have one nickname, the club's ([D-2026-11-18-02](mvp/decisions.md#d-2026-11-18-02)) |
+| Club nickname | A nickname a club's Queue Master gives a **registered** player, kept by that club. Shown only on the Queue Master's screens (console, roster, Saved players). Players, results and leaderboards see the nickname on the player's ROTRA account. Guests and unclaimed players have one nickname, the club's ([D-2026-11-18-03](mvp/decisions.md#d-2026-11-18-03)) |
 | Invite (link) / Registration invite | Per-player link for a guest or unclaimed player to create or claim an account. Never books a session ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06)). A guest's games don't follow them through it; the club adds their email first ([D-2026-11-16-04](mvp/decisions.md#d-2026-11-16-04)) |
 | Club invite code | The secret `k` value of the club invite link (`/register/[clubId]?k=<code>`), stored in `clubs.invite_code`; every club has one, a plain link without a valid code is refused, and Regenerate link replaces it ([D-2026-11-12-01](mvp/decisions.md#d-2026-11-12-01)) |
 | Club invite link | One standing link per club (`/register/[clubId]`) with a share card; a new person registers through it and joins the club's Saved players (“Joined via club link”), a signed-in player taps once to join ([D-2026-11-09-06](mvp/decisions.md#d-2026-11-09-06), [D-2026-11-09-08](mvp/decisions.md#d-2026-11-09-08)) |
@@ -126,7 +129,7 @@ Phones and emails are **never public**, never in search results, participant car
 
 **Updated November 11, 2026 ([D-2026-11-11-03](mvp/decisions.md#d-2026-11-11-03)):** an unclaimed profile stays in its club and gets no RTR ID; the RTR ID is given on registration. On registration, every club's record with the same phone links to the account automatically, and the history rules above apply.
 
-**Updated November 16, 2026 ([D-2026-11-16-04](mvp/decisions.md#d-2026-11-16-04)):** this replaces the phone-based rules in the two notes above. The four statuses are **Guest**, **Unclaimed**, **Registered** and **Verified**. The email, not the phone, makes a record unclaimed and is what joins records to an account: on registration the person keeps the RTR ID and every club's record under that email joins the account with its games (original dates, each game once, permanent results unchanged). If more than one club saved the email, the person picks one club's version as their starting profile. The mockups follow this; the code (real mode, the P08 schema and services) still follows the November 11 rules until the decision is built. Still open: lookup by phone and by QR, QR codes and links already shared with an old RTR ID, the Confirm player step for another club's unclaimed player, whether a phone still links a record on registration, and which email is matched ([business open decisions](business_logic/product/open-decisions.md)).
+**Updated November 16, 2026 ([D-2026-11-16-04](mvp/decisions.md#d-2026-11-16-04)):** this replaces the phone-based rules in the two notes above. The four statuses are **Guest**, **Unclaimed**, **Registered** and **Verified**. The email, not the phone, makes a record unclaimed and is what joins records to an account: on registration the person keeps the RTR ID and every club's record under that email joins the account with its games (original dates, each game once, permanent results unchanged). If more than one club saved the email, the person picks one club's version as their starting profile. The mockups and the mock data (`packages/data`, #923) follow this; the app screens are not wired to it yet, and real mode (the P08 schema and services) still follows the November 11 rules until the decision is built there. Still open: lookup by phone and by QR, QR codes and links already shared with an old RTR ID, the Confirm player step for another club's unclaimed player, whether a phone still links a record on registration, and which email is matched ([business open decisions](business_logic/product/open-decisions.md)).
 
 ---
 
@@ -139,9 +142,9 @@ Rules: [Ranking](business_logic/product/player-information/modules/ranking/READM
 | Playing level | One of nine: Beginner, Intermediate, Advanced × Low, Mid, High (e.g. "Intermediate High") |
 | Club assessment | The latest of the nine levels one club assigned to a player |
 | Session playing level | The level the club set for this session; locks at Start session (late entries lock when added) |
-| Shared rank | Cross-club rank shown in Player Information: 70% club assessments, 30% performance, last three months |
-| Overall leaderboard | The one global ROTRA leaderboard. No city or club filters in v1 |
-| Needs reassessment | Rank still visible after three months without play; returning to the leaderboard needs reassessment |
+| Shared rank | Cross-club skill rank, based on wins weighted by opponent strength |
+| Top annual, Top monthly, Top weekly | ROTRA’s three cross-club leaderboards. Each shows the top 50 by wins in standard matches for the calendar period. Top annual replaces the overall list |
+| Needs reassessment | Skill rank remains visible after three months without play and needs a fresh assessment |
 
 ---
 
@@ -331,9 +334,11 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Substitution game credit | `SubstitutionCredit` (`creditTo` on a substitution) | `match_participations.credit_to`, on the incoming player's row | `none` (default) · `incoming` · `outgoing`; locks when the match is done or invalid |
 | Match format | `MatchFormat` | — | `singles` · `doubles` · `fun_1v2` · `fun_3v3` · `fun_4v4` · `fun_5v5` |
 | Session mode | `SessionMode` | — | `chill` · `fair` · `hard` |
+| Scoring mode | `ScoringMode` (`scoring`) | `queue_sessions.scoring_mode` (proposed) | Mockup keys `'31'` (default) · `'31nd'` · `'21'` · `'21x3'` · `'21x3nd'`, labels 16/31 · 16/31, no deuce · 11/21 · 11/21 × 3 · 21 × 3. A session with none reads as `'31'` |
+| Game score | `games: [{ a, b }]` on a match (mockup) | `match_decision_games` (proposed) | Every game of a best of 3; `scoreA` / `scoreB` then hold games won |
 | Player | `Player` | `players` | Global identity across clubs |
 | Ranking settings | `RankingPolicyVersion` | `ranking_policy_versions` | One append-only saved version: weights in basis points (sum 10000) and the recent-standard-match threshold (1–40); the newest is in effect. `RankingSettings` {assessmentWeightPercent, matchRequirement} is the effective version's reader shape |
-| Leaderboard entry | `LeaderboardEntry` | — | Public projection, no table; overall position comes from eligible fixture order |
+| Leaderboard entry | `LeaderboardEntry` | — | Public identity projection. Leaderboard rows add the period’s wins, losses, place and previous place |
 | Player session record / player game | `PlayerSessionRecord` / `PlayerGame` | `player_match_facts` | Public read projection of valid finalized games |
 | Player profile | `PlayerProfile` | — | Public identity, picture, and optional playing details; no contacts |
 | Profile visibility | `profileVisibility` | `players.profile_visibility` | `public` · `private` (default) · `always_private`; replaces `profile_private` ([D-2026-11-12-01](mvp/decisions.md#d-2026-11-12-01)) |

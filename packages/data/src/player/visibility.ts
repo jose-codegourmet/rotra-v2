@@ -1,4 +1,5 @@
 import { getSession } from '../auth/fetchers'
+import { unclaimedClubCount } from '../leaderboard/identity'
 import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
 import type { ProfileVisibility } from './player.types'
@@ -21,6 +22,7 @@ export function profileVisibility(playerId: string): ProfileVisibility {
 export function isPrivatePlayer(playerId: string) {
   const state = readMockState()
   const account = state.playerAccounts.find((a) => a.playerId === playerId)
+  if (unclaimedClubCount(state, playerId) === 1) return false
   return !!(
     profileVisibility(playerId) !== 'public' ||
     account?.claimed === false ||

@@ -9,6 +9,7 @@ import type {
   ResultSlide,
   SessionResultSnapshot,
 } from '../generated/prisma/client'
+import { writePlayerNotifications } from '../player/notification-events'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 import { derivedId, LIVE_ENTRY, lockSession, requireSessionAccess, type Tx } from './session-store'
@@ -209,7 +210,7 @@ export async function publishResults(
         revision: { increment: 1 },
       },
     })
-    await tx.sessionPublicationEvent.create({
+    const event = await tx.sessionPublicationEvent.create({
       data: {
         clubId: context.clubId,
         sessionId,
@@ -223,6 +224,35 @@ export async function publishResults(
         occurredAt: now,
       },
     })
+    const summaries = await tx.clubSessionPlayerSummary.findMany({
+      where: { sessionId },
+      select: {
+        playerIdSnapshot: true,
+        fullGames: true,
+        clubPlayer: {
+          select: { attributions: { where: { revokedAt: null }, select: { playerId: true } } },
+        },
+      },
+    })
+    const games = new Map<string, number>()
+    for (const row of summaries) {
+      const recipients = new Set(row.clubPlayer.attributions.map(({ playerId }) => playerId))
+      if (row.playerIdSnapshot) recipients.add(row.playerIdSnapshot)
+      for (const playerId of recipients)
+        games.set(playerId, (games.get(playerId) ?? 0) + row.fullGames)
+    }
+    await writePlayerNotifications(
+      tx,
+      Array.from(games, ([playerId, count]) => ({
+        playerId,
+        kind: 'session',
+        sourceType: 'session_publication_event',
+        sourceId: event.id,
+        title: `Results are up for ${session.title}`,
+        body: `You played ${count} ${count === 1 ? 'game' : 'games'}. See how they counted.`,
+        target: `/players/${playerId}/games`,
+      })),
+    )
     return { slides, includeOffDay, publishedAt: toIso(now) }
   })
 }

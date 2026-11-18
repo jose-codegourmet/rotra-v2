@@ -2,6 +2,12 @@ import 'server-only'
 import { MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import { consumeReviewedResetToken } from '../admin/password-resets'
 import { loadAccountContext, type PlayerContext } from '../auth/account-context'
+import {
+  type GoogleCookies,
+  type PendingGoogle,
+  promotePendingGoogle,
+  signOutPlayerHere,
+} from '../auth/google-oauth'
 import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from '../auth/supabase'
 import { supabaseProviderAdmin } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
@@ -65,6 +71,47 @@ export async function registerFromClaim(
   )
   if (!context || context.playerId !== result.playerId) {
     await supabase.auth.signOut({ scope: 'local' })
+    throw new ServiceError('conflict')
+  }
+  await saveDetails(context, input.details)
+  const player = await prisma.player.findUniqueOrThrow({
+    where: { id: result.playerId },
+    select: { fullName: true, nickname: true },
+  })
+  return {
+    ...result,
+    firstName: player.nickname || player.fullName.split(' ')[0] || player.fullName,
+    session: { account: { id: result.playerId, name: player.fullName, audience: 'player' } },
+  }
+}
+
+/**
+ * P-CLAIM submit with Google instead of a password (P12, #922), also the last step of Google
+ * registration. `pending` is the Google sign-in the callback held, already verified with the
+ * provider by the caller: its login becomes the account's login (`completeClaim` with
+ * `googleSubject`), the Google email becomes the confirmed ROTRA email, and Google is recorded as
+ * connected. Only then is the held session made the Player session on this device. A link another
+ * login already used maps to no account for this one, so it is signed out again and refused.
+ */
+export async function registerFromClaimWithGoogle(
+  jar: GoogleCookies,
+  token: string,
+  pending: PendingGoogle,
+  input: { phoneE164?: string; details: ClaimDetails },
+) {
+  const result = await completeClaim(supabaseProviderAdmin(), {
+    token,
+    email: pending.google.email,
+    googleSubject: pending.subject,
+    phoneE164: input.phoneE164,
+  })
+  if (!(await promotePendingGoogle(jar, pending))) throw new ServiceError('unavailable')
+  const context = await loadAccountContext(
+    { provider: AUTH_PROVIDER, subject: pending.subject, oauth: true },
+    'player',
+  )
+  if (!context || context.playerId !== result.playerId) {
+    await signOutPlayerHere(jar)
     throw new ServiceError('conflict')
   }
   await saveDetails(context, input.details)

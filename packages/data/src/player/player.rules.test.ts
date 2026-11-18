@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { daysAgo, genSessions, PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
-import {
-  countRecentStandardMatches,
-  isLeaderboardEligible,
-  orderLeaderboard,
-  rankDisplayStatus,
-  recentGameStats,
-} from './player.rules'
+import { countRecentStandardMatches, rankDisplayStatus, recentGameStats } from './player.rules'
 
 const now = PLAYER_FIXTURE_NOW
 const input = {
@@ -17,7 +11,7 @@ const input = {
   recentCount: 9,
   matchRequirement: 10,
 }
-describe('prototype ranking eligibility rules', () => {
+describe('skill-rank progress and status', () => {
   it('nine standard plus twenty fun games cannot meet ten', () => {
     const sessions = genSessions('nine', 9)
     const first = sessions[0]
@@ -34,7 +28,6 @@ describe('prototype ranking eligibility rules', () => {
     )
     const count = countRecentStandardMatches(sessions, now)
     expect(count).toBe(9)
-    expect(isLeaderboardEligible(count, 10, 'established')).toBe(false)
   })
   it('old games do not count', () => {
     expect(
@@ -54,25 +47,13 @@ describe('prototype ranking eligibility rules', () => {
     }))
     expect(countRecentStandardMatches(sessions, now)).toBe(0)
   })
-  it('reassessment removes placement even with old games and a stale position', () => {
-    expect(isLeaderboardEligible(0, 10, 'needs_reassessment')).toBe(false)
+  it('reassessment takes precedence on the skill card', () => {
     expect(rankDisplayStatus({ ...input, state: 'needs_reassessment', position: 128 })).toBe(
       'needs-reassessment',
     )
-    expect(
-      orderLeaderboard(
-        [{ ...input, levelIndex: 5, state: 'needs_reassessment', recentCount: 14 }],
-        10,
-      ),
-    ).toEqual([])
   })
   it('missing level is not calculated, never Beginner', () => {
     expect(rankDisplayStatus({ ...input, level: null, position: 1 })).toBe('not-calculated')
-  })
-  it('raising the requirement to twelve removes eleven', () => {
-    const e = { levelIndex: 5, state: 'established' as const, recentCount: 11 }
-    expect(orderLeaderboard([e], 10)).toEqual([e])
-    expect(orderLeaderboard([e], 12)).toEqual([])
   })
   it('preserves prototype status precedence', () => {
     expect(rankDisplayStatus({ ...input, position: 128, updatePending: {} })).toBe('updating')

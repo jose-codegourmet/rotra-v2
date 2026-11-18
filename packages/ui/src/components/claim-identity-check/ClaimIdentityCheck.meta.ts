@@ -2,10 +2,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const claimIdentityCheckMeta = {
   name: 'ClaimIdentityCheck',
   description:
-    "P-CLAIM step 1, 'Is this you?': the club-created identity with its player ID and a partly hidden phone, then Yes, this is me or This isn't me.",
+    "P-CLAIM step 1, 'Is this you?': the club-created identity with its player ID and a partly hidden email, then Yes, this is me or This isn't me.",
   usage: [
     'Only a registration link opens this; a public RTR ID or profile page never starts a claim.',
-    'The phone is passed already masked by the data layer; never pass the full number.',
+    'The email is passed already masked (maskEmail from @rotra/data/player-account/rules); never pass the full address. The record is found by its email (D-2026-11-16-04), so the card shows the email, not the phone.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

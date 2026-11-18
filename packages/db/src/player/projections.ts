@@ -9,6 +9,7 @@ import { settleFinalization } from '../queue/finalization'
 import { matchContext } from '../queue/match-store'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
+import { writePlayerNotifications } from './notification-events'
 
 type Tx = Prisma.TransactionClient
 
@@ -63,7 +64,7 @@ const counts = (f: PlayerMatchFact) => f.fullParticipation && f.standardMatch
  * decides the window, so ageing changes eligibility without new games. A stale run (lower input
  * watermark than stored) never overwrites a newer projection.
  */
-export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) {
+export async function recomputeRank(tx: Tx, playerId: string, now: Date, jobId: string) {
   const policy = await tx.rankingPolicyVersion.findFirst({
     where: { effectiveAt: { lte: now } },
     orderBy: [{ effectiveAt: 'desc' }, { version: 'desc' }],
@@ -107,12 +108,24 @@ export async function recomputeRank(tx: Tx, playerId: string, now = new Date()) 
   } as const
   const current = await tx.playerRankCurrent.findUnique({ where: { playerId } })
   if (current && current.inputWatermark > watermark) return current
-  return current
-    ? tx.playerRankCurrent.update({
+  const updated = current
+    ? await tx.playerRankCurrent.update({
         where: { playerId },
         data: { ...data, revision: { increment: 1 } },
       })
-    : tx.playerRankCurrent.create({ data: { playerId, ...data } })
+    : await tx.playerRankCurrent.create({ data: { playerId, ...data } })
+  await writePlayerNotifications(tx, [
+    {
+      playerId,
+      kind: 'rank',
+      sourceType: 'projection_job',
+      sourceId: jobId,
+      title: 'Your rank was updated',
+      body: 'Tap to see what changed.',
+      target: `/players/${playerId}/rank`,
+    },
+  ])
+  return updated
 }
 
 /** The private snapshot for a finalized session: standings, awards and Off Day in its own column. */
@@ -237,7 +250,7 @@ async function runJob(job: ProjectionJob, now: Date) {
             })
             if (a.playerIdAtAssessment) targets = [a.playerIdAtAssessment]
           }
-          for (const playerId of targets) await recomputeRank(tx, playerId, now)
+          for (const playerId of targets) await recomputeRank(tx, playerId, now, job.id)
           break
         }
         default:
@@ -720,10 +733,22 @@ export async function readLeaderboard(limit = 50) {
  * games. Always private (#715) has no column yet, so no profile is refused here.
  */
 export async function readRecentGameStatsByRtrId(rtrId: string) {
+  const id = rtrId.trim().toUpperCase()
   const allocation = await prisma.playerIdAllocation.findUnique({
-    where: { rtrId: rtrId.trim().toUpperCase() },
-    select: { playerId: true },
+    where: { rtrId: id },
+    select: { playerId: true, player: { select: { profileState: true } } },
   })
-  if (!allocation) throw new ServiceError('not_found')
-  return yearGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
+  if (allocation?.player.profileState === 'claimed')
+    return yearGameStats(await readPlayerMatchHistory(allocation.playerId), Date.now())
+  // An unclaimed player (D-2026-11-16-04): the games of every club record under their shared
+  // entry, which is public (no visibility setting until they register).
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { rtrId: id, claimedPlayerId: null, retiredAt: null },
+    select: { clubPlayers: { select: { id: true, clubId: true } } },
+  })
+  if (!entry) throw new ServiceError('not_found')
+  const sessions: Awaited<ReturnType<typeof readClubPlayerMatchHistory>> = []
+  for (const record of entry.clubPlayers)
+    sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+  return yearGameStats(sessions, Date.now())
 }

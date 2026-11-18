@@ -1,10 +1,12 @@
 import 'server-only'
 import { createHash, randomUUID } from 'node:crypto'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '@rotra/data/feature-flag/keys'
 import type { AccountContext } from '../auth/account-context'
 import { AUTH_PROVIDER } from '../auth/supabase'
-import { generatePlayerRecoveryToken } from '../auth/supabase-provider-admin'
+import { generatePlayerRecoveryToken, loginHasPassword } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import { Prisma } from '../generated/prisma/client'
+import { readPlayerFeatureFlag } from '../player/feature-flags'
 import { requireAdmin } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { recordAudit } from './audit'
@@ -18,7 +20,13 @@ const playerSelect = {
   idAllocation: { select: { rtrId: true } },
   privateContact: { select: { email: true } },
   account: {
-    select: { authSubject: true, authProvider: true, disabledAt: true, contactSyncStatus: true },
+    select: {
+      authSubject: true,
+      authProvider: true,
+      disabledAt: true,
+      contactSyncStatus: true,
+      googleEmail: true,
+    },
   },
 } satisfies Prisma.PlayerSelect
 
@@ -33,8 +41,15 @@ function eligible(player: ResetPlayer | null, email: string) {
   )
 }
 
-/** Generic acknowledgement; no provider calls, emails, account details or request IDs returned. */
-export async function submitPasswordResetRequest(email: string) {
+/**
+ * Generic acknowledgement; no provider calls, emails, account details or request IDs returned.
+ * With `player_google_sign_in` on (P12, #922), an account that signs in with Google and has no
+ * password answers `signsInWithGoogle` instead, and no Admin review request is made for it: there
+ * is no password to reset. With the flag off this is exactly the acknowledgement above.
+ */
+export async function submitPasswordResetRequest(
+  email: string,
+): Promise<{ acknowledged: boolean; signsInWithGoogle?: boolean }> {
   const address = email.trim().toLowerCase()
   if (address.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))
     throw new ServiceError('invalid', { email: 'Enter an email address, like name@example.com.' })
@@ -42,6 +57,14 @@ export async function submitPasswordResetRequest(email: string) {
     where: { email: address },
     select: { player: { select: playerSelect } },
   })
+  const account = contact?.player.account
+  if (
+    account?.googleEmail &&
+    !account.disabledAt &&
+    (await readPlayerFeatureFlag(PLAYER_GOOGLE_SIGN_IN_FLAG)) &&
+    !(await loginHasPassword(account.authSubject))
+  )
+    return { acknowledged: true, signsInWithGoogle: true }
   try {
     await prisma.playerPasswordResetRequest.create({
       data: {

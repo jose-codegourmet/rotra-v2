@@ -20,6 +20,13 @@ enum ProfileVisibility {
   @@map("profile_visibility")
 }
 
+/// The automatic verification result is derived from account facts. Only Admin can override it.
+enum PlayerVerificationOverride {
+  verified
+
+  @@map("player_verification_override")
+}
+
 model Player {
   id                    String             @id @default(uuid(7)) @db.Uuid
   fullName              String             @map("full_name")
@@ -53,14 +60,21 @@ model Player {
   updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision              BigInt             @default(1)
 
+  verificationOverride   PlayerVerificationOverride? @map("verification_override")
+  verificationOverrideBy String?                     @map("verification_override_by") @db.Uuid
+  verificationOverrideAt DateTime?                   @map("verification_override_at") @db.Timestamptz(6)
+
+  verificationAdmin     AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
   banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
   privateContact        PlayerPrivateContact?
   account               PlayerAccount?
   socialLinks           PlayerSocialLink[]
   claimLinks            PlayerClaimLink[]
   idAllocation          PlayerIdAllocation?
+  claimedSharedEntry    SharedPlayerEntry?
   passwordResetRequests PlayerPasswordResetRequest[]
   contactChanges        PlayerContactChangeRequest[]
+  notifications         PlayerNotification[]
   adminEmailEdits       AdminPlayerEmailEdit[]
   clubPlayers           ClubPlayer[]
   resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
@@ -76,6 +90,7 @@ model Player {
 
   @@index([fullName])
   @@index([bannerId])
+  @@index([verificationOverrideBy])
   @@map("players")
 }
 
@@ -115,6 +130,14 @@ model PlayerAccount {
   contactSyncVersion BigInt                  @map("contact_sync_version")
   contactSyncStatus  PlayerContactSyncStatus @default(in_sync) @map("contact_sync_status")
   disabledAt         DateTime?               @map("disabled_at") @db.Timestamptz(6)
+  /// The connected Google account's email (D-2026-11-16-01), trimmed + lowercased; null = no Google.
+  /// ROTRA's own record of "Google is connected": a provider identity alone never counts. It can
+  /// differ from the ROTRA email. Changed, never cleared. No Google token is ever stored.
+  googleEmail        String?                 @unique @map("google_email")
+  /// When Google was connected or last changed. Set together with `googleEmail` (SQL CHECK).
+  googleLinkedAt     DateTime?               @map("google_linked_at") @db.Timestamptz(6)
+  /// First read of the derived verification reminder. Its visibility still follows account verification.
+  verificationReminderReadAt DateTime?       @map("verification_reminder_read_at") @db.Timestamptz(6)
   createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision           BigInt                  @default(1)

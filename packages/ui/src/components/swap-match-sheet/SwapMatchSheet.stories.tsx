@@ -2,7 +2,7 @@ import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
 import {
   countedGames,
   courtNames,
-  shortName,
+  queueMasterName,
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
@@ -50,7 +50,7 @@ function lineup(m: Match, now: number): SwapMatchLineup {
     return {
       id: p.id,
       name: p.nameSnapshot,
-      shortName: shortName(p),
+      shortName: queueMasterName(p),
       games: countedGames(p.id, list),
       waitMinutes: waitMinutes(p, list, session.startedAt, now),
     }

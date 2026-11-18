@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const clubMemberProfileSheetMeta = {
   name: 'ClubMemberProfileSheet',
   description:
-    'The profile dialog in ROTRA Player (club page members, the leaderboard): a header-less ProfileBannerCard (banner strip, round picture, display name with a forward arrow, full name, Copy player ID, level, #N overall, You), About (Registered in) and Latest stats; footer Close, Share profile, Open ROTRA profile (same tab). Masked members get the private card with their own banner.',
+    'The profile dialog in ROTRA Player (club page members, the leaderboard): a header-less ProfileBannerCard (banner strip, round picture, display name with a forward arrow, full name, Copy player ID, level, top-50 leaderboard chips, You), About (Registered in) and Latest stats; footer Close, Share profile, Open ROTRA profile (same tab). Masked members get the private card with their own banner. A public unclaimed player shows their saving club.',
   usage: [
     'Open from ClubMemberGrid, ClubMemberList, the leaderboard rows and the podium; a tap opens this dialog and never leaves the page.',
     'Pass kind "private" for a masked member: picture and their own banner, the masked name, the Private profile chip and the explanation; Close only.',
@@ -20,6 +20,6 @@ export const clubMemberProfileSheetMeta = {
     'docs/screens/product/modules/player-information/profile.md',
     'docs/screens/product/modules/player-information/club-page.md',
   ],
-  variants: ['public', 'private', 'no-games', 'loading'],
+  variants: ['public', 'private', 'unclaimed', 'no-games', 'loading'],
   related: ['ProfileBannerCard', 'ClubMemberGrid', 'ClubMemberList', 'PhotoViewer'],
 } satisfies ComponentMeta

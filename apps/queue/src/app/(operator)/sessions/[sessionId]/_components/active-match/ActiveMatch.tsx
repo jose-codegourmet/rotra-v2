@@ -6,7 +6,7 @@ import {
   allPlayers,
   countedGames,
   courtNames,
-  shortName,
+  queueMasterName,
   substitutionCandidates,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
@@ -197,7 +197,7 @@ function OpenActiveMatch({
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, matches),
       photoUrl: photoOf(p),
@@ -205,7 +205,7 @@ function OpenActiveMatch({
   }
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({
     id: p.id,
-    name: p.nameSnapshot,
+    name: queueMasterName(p),
     photoUrl: photoOf(p),
     level: p.level,
     games: countedGames(p.id, matches),
@@ -218,9 +218,13 @@ function OpenActiveMatch({
     (id) => session.courts.find((c) => c.id === id)?.label ?? 'Court',
   )
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
+  const nameOf = (id: string) => {
+    const p = byId(id)
+    return p ? queueMasterName(p) : 'Player'
+  }
   const substitutions = match.substitutions.map((sub) => ({
-    outName: byId(sub.outId)?.nameSnapshot ?? 'Player',
-    inName: byId(sub.inId)?.nameSnapshot ?? 'Player',
+    outName: nameOf(sub.outId),
+    inName: nameOf(sub.inId),
     creditTo: !sub.creditTo || sub.creditTo === 'none' ? ('nobody' as const) : sub.creditTo,
   }))
 
@@ -363,7 +367,7 @@ function OpenActiveMatch({
       .map((p) => {
         const busy = activeMatchFor(p.id, matches)
         return pickerPlayer(
-          { ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p) },
+          { ...substitutionPlayer(p), shortName: queueMasterName(p), photoUrl: photoOf(p) },
           busy ? (busy.state === 'on_court' ? 'on-court' : 'playing') : 'away',
         )
       })
@@ -374,7 +378,7 @@ function OpenActiveMatch({
     ].map(({ id, team }) => {
       const p = byId(id)
       return p
-        ? { ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p), team }
+        ? { ...substitutionPlayer(p), shortName: queueMasterName(p), photoUrl: photoOf(p), team }
         : {
             id,
             name: 'Player',
@@ -385,7 +389,11 @@ function OpenActiveMatch({
           }
     })
   const pickerCandidates = (free: SessionPlayer[]) =>
-    free.map((p) => ({ ...substitutionPlayer(p), shortName: shortName(p), photoUrl: photoOf(p) }))
+    free.map((p) => ({
+      ...substitutionPlayer(p),
+      shortName: queueMasterName(p),
+      photoUrl: photoOf(p),
+    }))
 
   /** Review result passed validation: the confirm step, with what was entered kept for Back to result */
   const onReviewResult = (values: MatchResultFormValues) =>
@@ -512,7 +520,7 @@ function OpenActiveMatch({
         <PlayerActionSheet
           open
           onOpenChange={onOpenChange}
-          name={tapped?.nameSnapshot ?? 'Player'}
+          name={tapped ? queueMasterName(tapped) : 'Player'}
           photoUrl={photoOf(tapped)}
           team={team}
           matchNo={match.matchNo}

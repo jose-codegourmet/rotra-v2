@@ -1,8 +1,23 @@
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
 import type { FeatureFlag } from '../feature-flag/featureFlag.types'
 import { adminAccount } from './adminAccounts'
 
-/** The feature flag catalog starts empty: the platform owner adds every flag (no invented flags). */
-export const featureFlags: FeatureFlag[] = []
+/**
+ * The catalog starts with the flags ROTRA's own features ship with, all off (D-2026-11-18-01); the
+ * platform owner adds any other flag. A shipped flag has no adder, so `createdByEmail` is empty.
+ */
+export const featureFlags: FeatureFlag[] = [
+  {
+    key: PLAYER_GOOGLE_SIGN_IN_FLAG,
+    name: 'Google sign-in for players',
+    description:
+      'Players sign in and register with Continue with Google. While off, the Player app uses email and password as before.',
+    on: false,
+    revision: 1,
+    createdAt: '2026-11-18T09:00:00+08:00',
+    createdByEmail: '',
+  },
+]
 
 /**
  * Dev-only: shows how a defined flag looks in Admin (stories, the 'Show a placeholder flag' dev

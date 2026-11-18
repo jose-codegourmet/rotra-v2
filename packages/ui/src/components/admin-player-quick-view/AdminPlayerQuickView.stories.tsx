@@ -83,6 +83,59 @@ export const Unclaimed: Story = {
 /** A registered player with no games this year. */
 export const NoGamesThisYear: Story = { args: { stats: null } }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
+/** A registered player. */
+export const RegisteredPlayer: Story = { args: { player: { ...registered, claimed: true } } }
+/** An unclaimed player with an email. */
+export const UnclaimedWithEmail: Story = {
+  args: { player: { ...managementPlayer, email: 'alex.reyes@example.com' }, stats: null },
+}
+export const UnclaimedWithEmailLight: Story = { ...UnclaimedWithEmail, globals: { theme: 'light' } }
+/** An older record with a phone and no email: the warn chip and its notice. */
+export const DetailsRequired: Story = {
+  args: {
+    player: {
+      ...managementPlayer,
+      phone: '+639171234567',
+      clubs: [{ clubId: 'c1', name: 'Lahug Smash Club', addedAt: null, identity: 'unclaimed' }],
+    },
+    detailsRequired: true,
+    stats: null,
+  },
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
+/** Saved by two clubs: the Created by row lists each club's own name and the leaderboard line. */
+export const SavedByTwoClubs: Story = {
+  args: {
+    player: {
+      ...managementPlayer,
+      email: 'nina.ocampo@example.com',
+      name: 'Nina Ocampo',
+      levelIndex: 3,
+      rankStatus: {
+        kind: 'below',
+        text: 'Beginner High · not on the leaderboard until they register',
+      },
+      clubs: [
+        {
+          clubId: 'c1',
+          name: 'Talamban Racket Club',
+          addedAt: null,
+          savedAs: 'Nina Ocampo',
+          identity: 'unclaimed',
+        },
+        {
+          clubId: 'c2',
+          name: 'IT Park Badminton Club',
+          addedAt: null,
+          savedAs: 'Nina O.',
+          identity: 'unclaimed',
+        },
+      ],
+    },
+    stats: null,
+  },
+}
+export const SavedByTwoClubsLight: Story = { ...SavedByTwoClubs, globals: { theme: 'light' } }
 export const Edit: Story = { args: { initialMode: 'edit' } }
 export const EditLight: Story = { ...Edit, globals: { theme: 'light' } }
 export const EditUnclaimed: Story = {

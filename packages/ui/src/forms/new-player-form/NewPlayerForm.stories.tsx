@@ -41,9 +41,44 @@ export const Valid: Story = {
     defaultValues: {
       name: guest.fullName,
       nickname: guest.nickname ?? '',
-      phone: '0917 123 4567',
+      email: 'ivan.delarosa@example.com',
       level: 'intermediate_mid',
     },
+  },
+}
+
+/** No email: saved as a guest. Only the name and level are filled in. */
+export const NoEmail: Story = {
+  args: { defaultValues: { name: guest.fullName, level: 'intermediate_mid' } },
+}
+
+/** A new email: saved as an unclaimed player with an RTR ID. */
+export const NewEmail: Story = {
+  args: {
+    defaultValues: {
+      name: guest.fullName,
+      email: 'new.player@example.com',
+      level: 'intermediate_mid',
+    },
+  },
+}
+
+/** An email already on ROTRA links to that player; the form looks the same, the container decides. */
+export const EmailOnRotra: Story = {
+  args: {
+    defaultValues: {
+      name: guest.fullName,
+      email: 'ivan.delarosa@example.com',
+      level: 'intermediate_mid',
+    },
+  },
+}
+
+/** An email that is already a saved player is refused under the field. */
+export const EmailAlreadySaved: Story = {
+  args: {
+    emailSavedAs: 'Jomar Dela Cruz',
+    defaultValues: { name: guest.fullName, email: 'jomar@example.com', level: 'intermediate_mid' },
   },
 }
 
@@ -55,8 +90,9 @@ export const Invalid: Story = {
   },
 }
 
-export const InvalidPhone: Story = {
-  args: { defaultValues: { name: guest.fullName, phone: '123', level: 'beginner_mid' } },
+/** A bad email shows "Enter an email address, like name@example.com, or leave it empty." */
+export const BadEmail: Story = {
+  args: { defaultValues: { name: guest.fullName, email: 'not-an-email', level: 'beginner_mid' } },
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('button', { name: 'Confirm player slot' }))

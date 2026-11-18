@@ -7,9 +7,11 @@ import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
+import { allocateMockRtrId } from '../player/unclaimed'
 import { realRequest } from '../real/client'
 import { isRealDataMode } from '../real/mode'
 import type { CompleteClaimResult } from './playerAccount.types'
+import { claimUnclaimedPerson, linkPhoneRecords, unclaimedAccountFor } from './unclaimedIdentity'
 
 export type GuestRegistrationResult =
   | { status: 'account-match' }
@@ -19,6 +21,11 @@ export type GuestRegistrationResult =
       clubName: string | null
       sessionSlug: string | null
       sessionTitle: string | null
+      /**
+       * Set when the registration claimed an unclaimed player (D-2026-11-16-04): the clubs whose
+       * records joined the account; the RTR ID is the one the person already had.
+       */
+      joinedClubs?: string[]
     } & CompleteClaimResult)
 
 /**
@@ -66,8 +73,10 @@ export async function getGuestRegistrationClub(
 }
 
 /**
- * Mock registration joins the originating club and links every club's unclaimed record with the
- * same phone (D-2026-11-11-03); session requests remain unsent.
+ * Mock registration joins the originating club. An email that clubs already saved as an unclaimed
+ * player claims that player (D-2026-11-16-04): the person keeps the RTR ID and every club's record
+ * under the email joins the account. Older records with the same phone and no email still join too
+ * (D-2026-11-11-03). Session requests remain unsent.
  */
 export async function completeGuestRegistration(input: {
   clubId: string
@@ -90,46 +99,48 @@ export async function completeGuestRegistration(input: {
   const { values, attempt } = parsed
   const club = await getGuestRegistrationClub(input.clubId, undefined, input.sessionSlug)
   const city = input.clubId ? null : foundingCities.find((city) => city.code === values.cityCode)
-  if (!input.clubId && !city)
+  // An email clubs already saved keeps its RTR ID, so no city is needed for it.
+  if (!input.clubId && !city && !unclaimedAccountFor(readMockState(), [values.email]))
     throw new MockError('conflict', 'Pick your city or province.', {
       cityCode: 'Pick your city or province.',
     })
   let result: CompleteClaimResult | undefined
   let matched = false
+  let joinedClubs: string[] | undefined
   mockStore.update((draft) => {
     const key = `registration:${attempt}`
     const previous = draft.claimLinks[key]
     const account = previous && draft.playerAccounts.find((a) => a.playerId === previous.playerId)
     if (previous && (!account || account.phone !== values.phone || account.email !== values.email))
       throw new MockError('permission', 'Start a new registration with these details.')
+    // The email typed is the ROTRA email: the one a club saved claims that unclaimed player.
+    const unclaimed = previous ? undefined : unclaimedAccountFor(draft, [values.email])
     if (
       !previous &&
       draft.playerAccounts.some(
-        (a) => a.phone === values.phone || a.email.toLowerCase() === values.email,
+        (a) =>
+          a.playerId !== unclaimed?.playerId &&
+          (a.phone === values.phone || a.email.toLowerCase() === values.email),
       )
     ) {
       matched = true
       return
     }
-    const id = previous?.playerId ?? crypto.randomUUID()
-    if (!previous) {
+    const id = previous?.playerId ?? unclaimed?.playerId ?? crypto.randomUUID()
+    if (unclaimed) {
+      joinedClubs = claimUnclaimedPerson(draft, id, { phone: values.phone }).joinedClubs
+      unclaimed.email = values.email
+      unclaimed.emailConfirmedAt = null
+      draft.claimLinks[key] = {
+        playerId: id,
+        clubName: club.clubName ?? 'ROTRA',
+        status: 'valid',
+        checks: 0,
+      }
+    } else if (!previous) {
       const location = draft.clubs.find((c) => c.id === input.clubId)?.locationCode ?? city?.code
-      const day = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date())
-      const [year, month, date] = day.split('-')
-      const prefix = `RTR-${location}-${month}${date}${year?.slice(2)}-`
-      const serial =
-        Math.max(
-          0,
-          ...draft.players
-            .filter((p) => p.rtrId.startsWith(prefix))
-            .map((p) => Number(p.rtrId.split('-').at(-1)) || 0),
-        ) + 1
-      const rtrId = `${prefix}${String(serial).padStart(4, '0')}`
+      if (!location) throw new Error('Registration has no founding city.')
+      const rtrId = allocateMockRtrId(draft, location)
       draft.players.push({
         id,
         rtrId,
@@ -183,28 +194,9 @@ export async function completeGuestRegistration(input: {
         checks: 0,
       }
     }
-    // D-2026-11-11-03: every club's unclaimed record with this phone joins the new account
-    // automatically, with no Queue Master tap; one record per club, the earliest saved one.
-    if (!previous) {
-      const linkedClubs = new Set<string>()
-      for (const record of [...draft.clubPlayers].sort(
-        (a, b) => (a.addedAt ?? 0) - (b.addedAt ?? 0),
-      )) {
-        if (
-          record.playerId ||
-          record.removedAt ||
-          record.linkedToClubPlayerId ||
-          (record.identity !== 'unclaimed' && record.identity !== 'pending') ||
-          draft.privatePhones[record.id] !== values.phone ||
-          linkedClubs.has(record.clubId) ||
-          draft.clubPlayers.some((p) => p.clubId === record.clubId && p.playerId === id)
-        )
-          continue
-        record.playerId = id
-        record.identity = 'registered'
-        linkedClubs.add(record.clubId)
-      }
-    }
+    // D-2026-11-11-03, kept: every club's older record with this phone and no email joins the new
+    // account automatically, with no Queue Master tap; one record per club, the earliest saved one.
+    if (!previous) linkPhoneRecords(draft, id, values.phone)
     if (
       input.clubId &&
       !draft.clubPlayers.some((p) => p.clubId === input.clubId && p.playerId === id && !p.removedAt)
@@ -224,6 +216,11 @@ export async function completeGuestRegistration(input: {
     if (!profile) throw new Error('Registration produced no profile.')
     const { email: _email, phone: _phone, password: _password, ...personal } = values
     applyPersonalProfile(profile, personal)
+    const player = draft.players.find((p) => p.id === id)
+    if (player) {
+      player.fullName = profile.fullName
+      player.nickname = profile.nickname
+    }
     result = {
       playerId: id,
       rtrId: profile.rtrId,
@@ -240,5 +237,6 @@ export async function completeGuestRegistration(input: {
     clubName: club.clubName,
     sessionSlug: input.sessionSlug ?? null,
     sessionTitle: club.sessionTitle ?? null,
+    ...(joinedClubs ? { joinedClubs } : {}),
   }
 }

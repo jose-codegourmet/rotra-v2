@@ -76,6 +76,37 @@ export const QueuedTonight: Story = {
 export const AwayTonight: Story = {
   args: { tonightLevel: 'intermediate_high', tonight: { kind: 'away' } },
 }
+/** Registered with a club nickname and an account nickname: the row and the Club nickname button. */
+export const WithClubNickname: Story = {
+  args: { nickname: 'Migs', clubNickname: 'Kuya Migs', onClubNickname: fn() },
+}
+export const WithClubNicknameLight: Story = { ...WithClubNickname, globals: { theme: 'light' } }
+export const WithClubNicknamePhone: Story = {
+  ...WithClubNickname,
+  globals: { viewport: { value: 'phone' } },
+}
+/** Registered with an account nickname and no club nickname: the row reads "None". */
+export const NoClubNickname: Story = {
+  args: { nickname: 'Migs', clubNickname: null, onClubNickname: fn() },
+}
+/** Registered with a club nickname and no account nickname. */
+export const ClubNicknameNoAccountNickname: Story = {
+  args: { nickname: null, clubNickname: 'Kuya Migs', onClubNickname: fn() },
+}
+/** Registered with neither nickname. */
+export const NoNicknames: Story = {
+  args: { nickname: null, clubNickname: null, onClubNickname: fn() },
+}
+/** Opened from another dialog: the row stays, the Club nickname button is left out (Back to match). */
+export const ClubNicknameOpenedFromMatch: Story = {
+  args: {
+    nickname: 'Migs',
+    clubNickname: 'Kuya Migs',
+    onClubNickname: fn(),
+    backLabel: 'match',
+    onBack: fn(),
+  },
+}
 export const StatsHidden: Story = { args: { showStats: false } }
 export const NoLevelYet: Story = { args: { level: null, tonightLevel: null } }
 export const WithPhotoButton: Story = { args: { onPhotoClick: fn() } }
@@ -85,20 +116,56 @@ export const Light: Story = {
 }
 export const HiddenPhone: Story = { args: propsFor(byName('Jose'), { phoneHidden: true }) }
 /**
- * Unclaimed (club-only, D-2026-11-11-03): "Saved by your club with a phone. Not registered with
- * ROTRA yet", Registered in "Not registered yet", RTR ID "Given when they register".
+ * Unclaimed with an email (D-2026-11-16-04): "Saved by your club with their email. Not registered
+ * with ROTRA yet", Email "On file and kept private", no Details required notice.
  */
 export const Unclaimed: Story = {
   args: propsFor(storyIdentityPlayers.unclaimed, {
     sessionsHere: 5,
     rtrId: null,
     registeredCity: null,
+    emailOnFile: true,
   }),
 }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const UnclaimedPhone: Story = { ...Unclaimed, globals: { viewport: { value: 'phone' } } }
+/** An older record with a phone and no email: warn chip, the Details required notice, Email "None on file". */
+export const DetailsRequired: Story = {
+  args: propsFor(storyIdentityPlayers.unclaimed, {
+    sessionsHere: 5,
+    rtrId: null,
+    registeredCity: null,
+    detailsRequired: true,
+    emailOnFile: false,
+    onEdit: fn(),
+    onDelete: fn(),
+  }),
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
+export const DetailsRequiredPhone: Story = {
+  ...DetailsRequired,
+  globals: { viewport: { value: 'phone' } },
+}
 export const Guest: Story = { args: propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }) }
-/** Saved players footer: Delete player, Edit details and Invite. */
+/** Guests and unclaimed players get no Club nickname row and no button, even when both are passed. */
+export const GuestNoClubNickname: Story = {
+  args: propsFor(storyIdentityPlayers.guest, {
+    sessionsHere: 1,
+    clubNickname: null,
+    onClubNickname: fn(),
+  }),
+}
+export const UnclaimedNoClubNickname: Story = {
+  args: propsFor(storyIdentityPlayers.unclaimed, {
+    sessionsHere: 5,
+    rtrId: null,
+    registeredCity: null,
+    emailOnFile: true,
+    clubNickname: null,
+    onClubNickname: fn(),
+  }),
+}
+/** Saved players footer: Delete player, Edit details and Invite. A guest's Email row reads "None on file". */
 export const SavedPlayerActions: Story = {
   args: {
     ...propsFor(storyIdentityPlayers.guest, { sessionsHere: 1 }),
@@ -107,29 +174,17 @@ export const SavedPlayerActions: Story = {
     onInvite: () => {},
   },
 }
-/** Guest record: footer gains Link to saved player…. */
-export const GuestWithLink: Story = {
-  args: propsFor(storyIdentityPlayers.guest, {
-    sessionsHere: 1,
-    onLinkToSavedPlayer: fn(),
-    onDelete: fn(),
-  }),
-}
-/** Unclaimed profile: no Link to saved player… even if the handler were passed. */
-export const UnclaimedNoLink: Story = {
-  args: propsFor(storyIdentityPlayers.unclaimed, { sessionsHere: 5, onDelete: fn() }),
-}
-/** Guest opened from inside another dialog: Back to match, no Link to saved player…. */
+/** Guest opened from inside another dialog: Back to match, no Edit or Delete. */
 export const GuestOpenedFromMatch: Story = {
   args: propsFor(storyIdentityPlayers.guest, {
     sessionsHere: 1,
     backLabel: 'match',
     onBack: fn(),
-    onLinkToSavedPlayer: fn(),
   }),
 }
 export const JoinedViaClubLink: Story = { args: { joinedVia: 'club' } }
 export const JoinedViaSessionLink: Story = { args: { joinedVia: 'session' } }
+/** A guest with an invite link: the text says their games here don't follow them without an email. */
 export const GuestWithInvite: Story = {
   decorators: [
     (Story) => (

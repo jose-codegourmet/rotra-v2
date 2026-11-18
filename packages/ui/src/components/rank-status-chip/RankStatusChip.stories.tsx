@@ -14,12 +14,17 @@ type Story = StoryObj<typeof meta>
 export const None: Story = {}
 export const Below: Story = { args: { status: rankStatusExamples.below } }
 export const Board: Story = { args: { status: rankStatusExamples.board } }
+/** An unclaimed player saved by more than one club. */
+export const NotOnLeaderboard: Story = {
+  args: { status: rankStatusExamples.below, notOnLeaderboard: true },
+}
 
 const all = (
   <div className="flex flex-wrap gap-2">
     {Object.entries(rankStatusExamples).map(([key, status]) => (
       <RankStatusChip key={key} status={status} />
     ))}
+    <RankStatusChip status={rankStatusExamples.below} notOnLeaderboard />
   </div>
 )
 export const AllStates: Story = { render: () => all }

@@ -150,6 +150,7 @@ describe('Session done › real mode', () => {
       unplayedWaiting: 1,
       belowMinimum: [{ clubPlayerId: 'c-r2', name: 'Test Bea', completedGames: 1 }],
       minimum: 3,
+      unresolvedGuests: [],
     })
   })
 

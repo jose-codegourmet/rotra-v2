@@ -17,16 +17,25 @@ import { createContactChangeRequestFixtures } from '../fixtures/contactChangeReq
 import { featureFlags } from '../fixtures/featureFlags'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
+import { seedLeaderboardHistory } from '../fixtures/leaderboardHistory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
+import { createPlayerNotificationFixtures } from '../fixtures/playerNotifications'
 import { playerProfiles } from '../fixtures/playerProfiles'
 import { createPlayerRankFixtures } from '../fixtures/playerRanks'
-import { clubPlayers, GAB_CLUB_PLAYER_ID, GAB_PHONE_E164, players } from '../fixtures/players'
+import {
+  clubPlayers,
+  GAB_CLUB_PLAYER_ID,
+  GAB_PHONE_E164,
+  JOSE_PLAYER_ID,
+  players,
+} from '../fixtures/players'
 import { profileBanners } from '../fixtures/profileBanners'
 import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
+import { seedUnclaimedPlayers } from '../fixtures/unclaimedPlayers'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
@@ -36,6 +45,7 @@ import type { MatchRequest } from '../match-request/matchRequest.types'
 import type { PasswordResetRequest } from '../password-reset/passwordReset.types'
 import type { Player, PlayerProfile, PlayerRank, PlayerSessionRecord } from '../player/player.types'
 import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
+import type { PlayerNotification } from '../player-notifications/playerNotifications.types'
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
 import type {
@@ -74,6 +84,8 @@ export type MockState = {
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
   playerAccounts: typeof playerAccounts
+  playerNotifications: Record<string, PlayerNotification[]>
+  verificationReminderReads: Record<string, string>
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
   /** Player requests and their Admin review/application, in every state */
@@ -135,8 +147,31 @@ export type MockState = {
   publications: Record<string, SessionPublication>
   publicationEvents: SessionPublicationEvent[]
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
+  /**
+   * A club's own private phone for one of its saved players, by club player id: an unclaimed
+   * player's optional phone, or the phone of an older record with no email (Details required).
+   */
   privatePhones: Record<string, string>
+  /**
+   * Lookup pending (D-2026-11-16-04): the email typed for a new player while offline, by club
+   * player id, until the device syncs and ROTRA links them or gives them an RTR ID. Absent reads
+   * as none.
+   */
+  pendingEmails?: Record<string, string>
+  /**
+   * The highest RTR ID number given per place and day ('RTR-PH-CEB-102926-' → 12). It only goes
+   * up, so a retired RTR ID, or one Admin moved to another place or date, is never given again.
+   * Absent reads as no counters: the players' own RTR IDs still count.
+   */
+  rtrIdCounters?: Record<string, number>
   sampleRequestIndex: number
+  /** Development switch (P12): true once the Google deadline counts as passed; absent reads false */
+  googleDeadlinePassed?: boolean
+  /**
+   * Development stand-in (P12): puts a signed-in player on a session's roster or waitlist so every
+   * invite landing state is reachable; keyed `<playerId>:<sessionId>`. Used only when the saved roster and waitlist don't already place them.
+   */
+  inviteStandings?: Record<string, 'in' | 'waitlist'>
 }
 type DeepReadonly<T> = T extends object ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> } : T
 function freeze<T>(value: T): DeepReadonly<T> {
@@ -190,6 +225,8 @@ function seedState(): MockState {
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
+    playerNotifications: { [JOSE_PLAYER_ID]: createPlayerNotificationFixtures(now) },
+    verificationReminderReads: {},
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),
@@ -227,7 +264,9 @@ function seedState(): MockState {
     publications: publicationFixtures.publications,
     publicationEvents: publicationFixtures.events,
     operations: {},
-    privatePhones: { ...requests.privatePhones, [GAB_CLUB_PLAYER_ID]: GAB_PHONE_E164 },
+    privatePhones: {},
+    pendingEmails: {},
+    rtrIdCounters: {},
     sampleRequestIndex: 0,
     sync: {
       online: true,
@@ -239,6 +278,8 @@ function seedState(): MockState {
     },
   })
   seedAdminPlayerManagement(state)
+  seedLeaderboardHistory(state)
+  seedUnclaimedPlayers(state, now)
   return state
 }
 /**

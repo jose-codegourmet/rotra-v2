@@ -46,3 +46,59 @@ export const GuestRegistration: Story = {
 export const GuestAccountMatch: Story = {
   args: { standalone: true, maskedPhone: '', accountMatch: true, onDismissMatch: fn() },
 }
+
+/** Google mode: the Google row replaces Email and the password fields; the full name starts from Google. */
+export const GoogleRegistration: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Ana Reyes' },
+    google: { name: 'Ana Reyes', email: 'ana.reyes@gmail.com', onChange: fn() },
+  },
+}
+export const GoogleRegistrationAdminLink: Story = {
+  args: {
+    ...GoogleRegistration.args,
+    cities: [
+      { value: 'CEB', label: 'Cebu City' },
+      { value: 'MNL', label: 'Manila' },
+    ],
+  },
+}
+export const GoogleRegistrationLight: Story = {
+  ...GoogleRegistration,
+  globals: { theme: 'light' },
+}
+export const GoogleClaim: Story = {
+  args: {
+    google: { name: 'Raymark', email: 'raymark.plays@gmail.com', onChange: fn() },
+  },
+}
+/** Finish registering after a pick in IdentityPicker (two clubs saved the email). */
+export const GoogleAfterIdentityPick: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Paolo Mendoza', nickname: 'Pao' },
+    google: { name: 'Paolo Mendoza', email: 'paolo.mendoza@example.com', onChange: fn() },
+    pickedIdentity: { clubName: 'Lahug Smash Club', rtrId: 'RTR-PH-CEB-031526-0042' },
+  },
+}
+export const GoogleAfterIdentityPickLight: Story = {
+  ...GoogleAfterIdentityPick,
+  globals: { theme: 'light' },
+}
+/** Finish registering when exactly one club saved the email: its details are filled in. */
+export const GoogleOneClubEmailMatch: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Jomar dela Cruz', nickname: 'Jom' },
+    google: { name: 'Jomar dela Cruz', email: 'jomar.delacruz@example.com', onChange: fn() },
+    emailMatch: { clubName: 'Lahug Smash Club', rtrId: 'RTR-PH-CEB-031526-0057' },
+  },
+}
+export const GoogleOneClubEmailMatchLight: Story = {
+  ...GoogleOneClubEmailMatch,
+  globals: { theme: 'light' },
+}

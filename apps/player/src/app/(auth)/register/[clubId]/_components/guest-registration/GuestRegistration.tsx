@@ -19,21 +19,40 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
+import { GoogleInvite } from '../google-invite/GoogleInvite'
 
-export function GuestRegistration({
-  clubId,
-  returnTo,
-  sessionSlug,
-  inviteCode,
-}: {
+type GuestRegistrationProps = {
   clubId: string
   returnTo?: string
   sessionSlug?: string
   /** The club invite link's `k`; the server refuses a missing, wrong or regenerated code (#712) */
   inviteCode?: string
-}) {
+  /** The Session invite's `invite` (Google sign-in flag on) */
+  sessionInviteCode?: string
+}
+
+/**
+ * Flag on (`player_google_sign_in`): the Google invite landing, registration and join screens.
+ * Flag off: the email + password registration below, exactly as before.
+ */
+export function GuestRegistration({ sessionInviteCode, ...props }: GuestRegistrationProps) {
+  return usePlayerGoogleSignInEnabled() ? (
+    <GoogleInvite
+      clubId={props.clubId}
+      returnTo={props.returnTo}
+      sessionSlug={props.sessionSlug}
+      sessionInviteCode={sessionInviteCode}
+      clubInviteCode={props.inviteCode}
+    />
+  ) : (
+    <EmailRegistration {...props} />
+  )
+}
+
+function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestRegistrationProps) {
   useEffect(() => {
     rememberSessionReturn(returnTo)
   }, [returnTo])
@@ -59,6 +78,7 @@ export function GuestRegistration({
         }
         firstName={result.firstName}
         rtrId={result.rtrId}
+        joinedClubs={result.joinedClubs}
         onOpenProfile={() => router.push(`/players/${result.playerId}`)}
       />
     )

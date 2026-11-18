@@ -21,3 +21,16 @@ export function formatPhoneForDisplay(value: string): string {
   const digits = compact.replace(/^\+/, '').slice(2)
   return ['+63', digits.slice(0, 3), digits.slice(3, 6), digits.slice(6)].filter(Boolean).join(' ')
 }
+
+/**
+ * Masks a phone for display: '+639185550377' (or 0918 555 0377, 63 918 555 0377) → '+63 918 ••• ••77'.
+ * Enough for the person to recognise, not to reuse. Input with no digits is returned unchanged.
+ */
+export function maskPhone(value: string): string {
+  let digits = value.replace(/\D/g, '')
+  if (!digits) return value
+  if (/^0\d{10}$/.test(digits)) digits = `63${digits.slice(1)}`
+  const country = digits.length > 10 ? digits.slice(0, digits.length - 10) : digits.slice(0, 2)
+  const rest = digits.slice(country.length)
+  return `+${country} ${rest.slice(0, 3)} ••• ••${rest.slice(-2)}`
+}

@@ -24,6 +24,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const ResetSent: Story = {}
+export const ResetGoogle: Story = { args: { variant: 'reset-google' } }
+export const ResetGoogleLight: Story = {
+  args: { variant: 'reset-google' },
+  globals: { theme: 'light' },
+}
 export const ResetInvalid: Story = { args: { variant: 'reset-invalid' } }
 export const ClaimClaimed: Story = { args: { variant: 'claim-claimed' } }
 export const ClaimExpired: Story = { args: { variant: 'claim-expired' } }
@@ -47,5 +52,28 @@ export const GuestRegistrationDone: Story = {
     standalone: true,
     firstName: claimLinkScenarios.firstName,
     rtrId: claimLinkScenarios.rtrId,
+  },
+}
+
+export const GuestRegistrationDoneGoogle: Story = {
+  args: {
+    ...GuestRegistrationDone.args,
+    googleEmail: 'ana.reyes@gmail.com',
+    verificationComplete: true,
+  },
+}
+export const GuestRegistrationDoneJoinedRecords: Story = {
+  args: {
+    ...GuestRegistrationDone.args,
+    googleEmail: 'paolo.santos@gmail.com',
+    joinedClubs: ['Lahug Smash Club', 'Mandaue Shuttle Society'],
+  },
+}
+export const ClaimDoneGoogle: Story = {
+  args: {
+    variant: 'claim-done',
+    firstName: claimLinkScenarios.firstName,
+    rtrId: claimLinkScenarios.rtrId,
+    googleEmail: 'raymark.plays@gmail.com',
   },
 }

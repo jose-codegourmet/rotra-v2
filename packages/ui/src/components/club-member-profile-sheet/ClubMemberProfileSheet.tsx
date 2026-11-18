@@ -1,5 +1,6 @@
 'use client'
 
+import type { LeaderboardPlace } from '@rotra/data/leaderboard/types'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { Icon } from '@rotra/ui/icon'
@@ -10,6 +11,7 @@ import {
   ProfileStatsSection,
   profileStats,
 } from '@rotra/ui/profile-banner-card'
+import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
 import { Sheet } from '@rotra/ui/sheet'
 
 export type ClubMemberProfile =
@@ -20,8 +22,9 @@ export type ClubMemberProfile =
       picture?: string | null
       /** The level label, or null when the player has no rank yet ("Not ranked yet") */
       levelLabel: string | null
-      /** Overall leaderboard position, or null when not on the leaderboard */
-      position: number | null
+      leaderboardPlaces: readonly LeaderboardPlace[]
+      /** The one club that saved this unclaimed profile. */
+      unclaimedSavedBy?: string
       isYou: boolean
       /** City the profile was first registered in (from the RTR ID) */
       registeredCity: string | null
@@ -69,7 +72,7 @@ export type ClubMemberProfileSheetProps = {
 /**
  * The profile dialog in ROTRA Player (D-PARTICIPANT-PROFILE): club page members, the leaderboard.
  * A header-less banner card with the round picture, the name block (display name with a forward
- * arrow to the profile, full name, Copy player ID), level, #N overall and You, then About
+ * arrow to the profile, full name, Copy player ID), level, leaderboard places and You, then About
  * (Registered in) and Latest stats. Footer Close, Share profile and Open ROTRA profile (same tab).
  * A masked member opens the private card with their own banner.
  */
@@ -99,6 +102,7 @@ export function ClubMemberProfileSheet({
           photoUrl={profile.picture ?? undefined}
           bannerKey={profile.bannerKey}
           bannerImageUrl={profile.bannerImageUrl}
+          onPhotoClick={onViewPhoto}
           chips={<Chip>Private profile</Chip>}
         >
           <ProfileCardSection label="Private">
@@ -147,16 +151,27 @@ export function ClubMemberProfileSheet({
             <Chip tone={profile.levelLabel ? 'accent' : 'neutral'}>
               {profile.levelLabel ?? 'Not ranked yet'}
             </Chip>
-            {profile.position ? (
-              <Chip>#{profile.position.toLocaleString('en-US')} overall</Chip>
-            ) : null}
+            <ProfileLeaderboardChips places={profile.leaderboardPlaces} />
             {profile.isYou ? <Chip tone="accent">You</Chip> : null}
+            {profile.unclaimedSavedBy ? <Chip tone="warn">Not registered yet</Chip> : null}
           </>
         }
       >
+        {profile.unclaimedSavedBy ? (
+          <ProfileCardSection label="Unclaimed">
+            <p className="m-0 text-fg2">
+              {profile.unclaimedSavedBy} saved this player. This is the club&apos;s version of them,
+              public until they register with ROTRA.
+            </p>
+          </ProfileCardSection>
+        ) : null}
         <ProfileCardSection label="About">
           <KeyValueList
-            items={[{ label: 'Registered in', value: profile.registeredCity ?? '—' }]}
+            items={[
+              profile.unclaimedSavedBy
+                ? { label: 'Saved by', value: profile.unclaimedSavedBy }
+                : { label: 'Registered in', value: profile.registeredCity ?? '—' },
+            ]}
           />
         </ProfileCardSection>
         {showStats ? (

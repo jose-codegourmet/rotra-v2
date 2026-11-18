@@ -41,7 +41,27 @@ export function createSupabaseServer(cookies: CookieAdapter, audience: AccountAu
 /** Provider name stored in `*_accounts.auth_provider`. */
 export const AUTH_PROVIDER = 'supabase'
 
-export type VerifiedSubject = { provider: typeof AUTH_PROVIDER; subject: string }
+/**
+ * `oauth`: the session was started by an OAuth provider (Google) rather than a password. Such a
+ * session only counts where ROTRA's own record says Google is connected (`loadAccountContext`).
+ */
+export type VerifiedSubject = { provider: typeof AUTH_PROVIDER; subject: string; oauth?: boolean }
+
+/**
+ * Whether a verified JWT's `amr` claim names the OAuth method. Supabase keeps a session's methods
+ * for its whole life (a refresh adds `token_refresh`, it never drops `oauth`). Both claim formats
+ * are read: `['oauth']` and `[{ method: 'oauth', timestamp }]`.
+ */
+export function startedWithOAuth(amr: unknown): boolean {
+  return (
+    Array.isArray(amr) &&
+    amr.some(
+      (entry) =>
+        (typeof entry === 'string' ? entry : (entry as { method?: unknown } | null)?.method) ===
+        'oauth',
+    )
+  )
+}
 
 /**
  * Verifies the session JWT (signature checked against the project's JWKS by `getClaims`) and
@@ -55,5 +75,5 @@ export async function verifySubject(
   const { data, error } = await supabase.auth.getClaims()
   const subject = data?.claims?.sub
   if (error || typeof subject !== 'string' || !subject) return null
-  return { provider: AUTH_PROVIDER, subject }
+  return { provider: AUTH_PROVIDER, subject, oauth: startedWithOAuth(data?.claims?.amr) }
 }

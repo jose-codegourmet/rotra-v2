@@ -1,0 +1,44 @@
+// The thin shared entry of an unclaimed player (D-2026-11-16-04, P15.8 #927; owner answers of
+// November 18, 2026): one per person, keyed by the normalized email, holding the RTR ID allocation
+// and nothing a club typed (no name, picture, level or phone). Each club's `club_players` row for
+// the person points to it and keeps that club's own details. Never a public read on its own.
+
+/// One email = one person = one RTR ID across clubs. `email` is trimmed and lowercased (CHECK in
+/// SQL) and unique while the entry is open; it is cleared when the entry is claimed (the account's
+/// contact is the source from then on) or retired (a club deleted the last record of a mistyped
+/// email). The RTR ID is never reused: a retired entry keeps it, and counters are never rewound.
+/// Admin may change `email` (open entries only) and the place and date of the RTR ID; the new RTR ID
+/// replaces the old string on every record in one transaction, with no alias for the old one.
+model SharedPlayerEntry {
+  id              String    @id @db.Uuid
+  email           String?   @unique
+  /// Same format and uniqueness rules as `player_id_allocations.rtr_id` (CHECK in SQL).
+  rtrId           String    @unique @map("rtr_id")
+  /// The first club that saved the email; the RTR ID uses its founding location and that day.
+  creatingClubId  String    @map("creating_club_id") @db.Uuid
+  locationCodeId  String    @map("location_code_id") @db.Uuid
+  /// Frozen copies of the codes at allocation (or at the last Admin change).
+  countryCode     String    @map("country_code")
+  cityCode        String    @map("city_code")
+  syncDate        DateTime  @map("sync_date") @db.Date
+  sequence        Int
+  allocatedAt     DateTime  @default(now()) @map("allocated_at") @db.Timestamptz(6)
+  /// The registered player who claimed the entry (by the account email or Google email).
+  claimedPlayerId String?   @unique @map("claimed_player_id") @db.Uuid
+  claimedAt       DateTime? @map("claimed_at") @db.Timestamptz(6)
+  /// A club deleted the last current record pointing here before anyone registered.
+  retiredAt       DateTime? @map("retired_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision        BigInt    @default(1)
+
+  creatingClub  Club            @relation(fields: [creatingClubId], references: [id], onDelete: Restrict)
+  location      LocationCode    @relation(fields: [locationCodeId], references: [id], onDelete: Restrict)
+  counter       PlayerIdCounter @relation(fields: [locationCodeId, syncDate], references: [locationCodeId, syncDate], onDelete: Restrict)
+  claimedPlayer Player?         @relation(fields: [claimedPlayerId], references: [id], onDelete: Restrict)
+  clubPlayers   ClubPlayer[]
+
+  @@unique([locationCodeId, syncDate, sequence])
+  @@index([creatingClubId])
+  @@map("shared_player_entries")
+}

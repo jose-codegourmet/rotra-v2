@@ -38,7 +38,8 @@ export async function realSendJoinRequest(
       requestId: input.requestId ?? crypto.randomUUID(),
       name: input.name,
       nickname: input.nickname ?? null,
-      phone: input.phone ?? null,
+      // A guest request carries no phone (D-2026-11-16-04); the server still takes the field.
+      phone: null,
       statedBand: input.statedBand,
       placement: input.placement ?? 'slot',
     },

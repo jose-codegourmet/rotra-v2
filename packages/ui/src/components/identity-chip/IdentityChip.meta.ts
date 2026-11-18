@@ -7,6 +7,7 @@ export const identityChipMeta = {
   usage: [
     "Use wherever a Queue screen shows a player's identity: saved players, roster, add player, profile.",
     'The words are fixed; colour only reinforces them (Registered accent, Lookup pending warn).',
+    'detailsRequired (an older unclaimed record with no email) swaps the Unclaimed chip for the warn "Details required" chip (D-2026-11-16-04).',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

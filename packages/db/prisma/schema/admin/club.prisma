@@ -47,6 +47,7 @@ model Club {
   nameChanges      ClubNameChangeRequest[]
   claimLinks       PlayerClaimLink[]
   idAllocations    PlayerIdAllocation[]
+  sharedEntries    SharedPlayerEntry[]
   clubPlayers      ClubPlayer[]
   venues           ClubVenue[]
   queueSessions    QueueSession[]

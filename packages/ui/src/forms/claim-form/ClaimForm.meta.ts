@@ -9,6 +9,9 @@ export const claimFormMeta = {
     'The container owns useCompleteClaim, toasts and the next step; the form never mutates.',
     'Submitted values carry email, password and personal details, never the phone.',
     'No SMS step, Facebook authorization, age, gear, tournament or self-rating field.',
+    'google (player_google_sign_in flag): Google mode. The Google row (Email confirmed) replaces Email, Password and Confirm password, the full name starts from Google, and onChange is "← Other ways to sign up" (standalone) or "← Use another Google account" (claim). Submitted values carry no email or password.',
+    'The phone hints say only that it is never shown publicly (standalone) or that the profile has no phone yet; the phone no longer "identifies your ROTRA profile" (the email does, D-2026-11-16-04).',
+    'pickedIdentity (after a pick in IdentityPicker) and emailMatch (exactly one club saved the email) add the notice above the fields, with the kept player ID. The container passes the club’s details as defaultValues.',
     'Password has no minimum length until the auth specification sets one.',
   ],
   prototype: {
@@ -16,5 +19,5 @@ export const claimFormMeta = {
     screen: 'viewClaim › Finish registering (FORM.claim)',
   },
   docs: ['docs/screens/product/modules/player-information/access-registration.md'],
-  related: ['ClaimIdentityCheck', 'PersonalDetailsFields', 'AccountLinkStatus'],
+  related: ['ClaimIdentityCheck', 'IdentityPicker', 'PersonalDetailsFields', 'AccountLinkStatus'],
 } satisfies ComponentMeta

@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 
 export const compareStatsMeta = {
   name: 'CompareStats',
-  description: 'Side-by-side player values and the selected shared-game record.',
+  description: 'Side-by-side level, leaderboard places and the selected shared-game record.',
   usage: [
     'Use on P-COMPARE for counted singles and doubles; pass display data and callbacks from the container.',
   ],

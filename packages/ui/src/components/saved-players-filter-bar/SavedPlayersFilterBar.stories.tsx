@@ -58,3 +58,14 @@ export const WithActiveFilters: Story = {
     />
   ),
 }
+
+/** Account filter set to Details required (older unclaimed records with no email). */
+export const AccountDetailsRequired: Story = {
+  render: () => (
+    <Demo width={800} value={{ ...DEFAULT_SAVED_PLAYERS_FILTERS, status: 'details' }} />
+  ),
+}
+export const AccountDetailsRequiredLight: Story = {
+  ...AccountDetailsRequired,
+  globals: { theme: 'light' },
+}

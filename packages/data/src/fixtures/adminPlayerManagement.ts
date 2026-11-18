@@ -1,7 +1,12 @@
 import type { AdminPlayer } from '../admin-player/adminPlayer.types'
 import type { MockState } from '../mock/store'
 
-/** #336 authorizes management scenarios in addition to the shared demo pool. */
+/**
+ * #336 authorizes management scenarios in addition to the shared demo pool. Every generated player
+ * is unclaimed with an email and an RTR ID (D-2026-11-16-04), except the second Alex Reyes: an
+ * older record with a phone and no email, which reads as Details required. The two Alex Reyes share
+ * a phone and players 3 and 4 share an email, for the duplicate scenarios.
+ */
 export function seedAdminPlayerManagement(state: MockState) {
   for (let i = 0; i < 80; i++) {
     const id = `admin-demo-${i}`,
@@ -23,7 +28,12 @@ export function seedAdminPlayerManagement(state: MockState) {
     state.playerAccounts.push({
       playerId: id,
       phone: i < 2 ? '+639171234567' : '',
-      email: i === 2 || i === 3 ? 'duplicate@example.com' : '',
+      email:
+        i === 1
+          ? ''
+          : i === 2 || i === 3
+            ? 'duplicate@example.com'
+            : `demo.player.${String(i + 1).padStart(2, '0')}@example.com`,
       claimed: false,
       phoneHidden: false,
     })

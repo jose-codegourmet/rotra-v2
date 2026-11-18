@@ -24,8 +24,22 @@ export function bandMiddleLevel(
 ): PlayingLevel | null {
   return band === 'unsure' ? null : `${band}_mid`
 }
-export function shortName(player: { nameSnapshot: string; nicknameSnapshot: string | null }) {
+type NamedRow = { nameSnapshot: string; nicknameSnapshot: string | null }
+/**
+ * The name everyone but the Queue Master sees (D-2026-11-18-03): the player's account nickname,
+ * else their first name. Public session page, the player's own live view and match request, Match
+ * history, finished-session results, leaderboards, awards and share images. Never the club nickname.
+ */
+export function playerFacingName(player: NamedRow) {
   return player.nicknameSnapshot || player.nameSnapshot.split(' ')[0] || player.nameSnapshot
+}
+/**
+ * The name the Queue Master sees (D-2026-11-18-03): the club nickname, else the account nickname,
+ * else the first name. Court tiles, Main Queue and Auto Queue, pickers, bagging pairs, toasts, the
+ * roster and Saved players. `clubNickname` is set by the Queue Master reads, never by public reads.
+ */
+export function queueMasterName(player: NamedRow & { clubNickname?: string | null }) {
+  return player.clubNickname?.trim() || playerFacingName(player)
 }
 export function sessionLinkUrl(publicSlug: string, origin: string) {
   return new URL(`/s/${encodeURIComponent(publicSlug)}`, origin).href

@@ -4,9 +4,10 @@ import { LeaderboardRulesCard } from './LeaderboardRulesCard'
 const meta = {
   title: 'Player/LeaderboardRulesCard',
   component: LeaderboardRulesCard,
-  args: { matchRequirement: 10, onOpenRankDetail: () => undefined },
+  args: { onOpenRankDetail: () => undefined },
 } satisfies Meta<typeof LeaderboardRulesCard>
 export default meta
 type Story = StoryObj<typeof meta>
-export const TenMatches: Story = {}
-export const TwelveMatches: Story = { args: { matchRequirement: 12 } }
+export const Default: Story = {}
+export const Light: Story = { globals: { theme: 'light' } }
+export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

@@ -28,7 +28,8 @@ export type DevMenuProps = {
     rank: string
     leaderboard: string
     rankOptions: { value: string; label: string }[]
-    leaderboardOptions: { value: string; label: string }[]
+    leaderboardOptions?: { value: string; label: string }[]
+    leaderboardPlaceOptions?: { value: string; label: string }[]
     onRankChange: (value: string) => void
     onLeaderboardChange: (value: string) => void
   }
@@ -37,6 +38,26 @@ export type DevMenuProps = {
     pending?: boolean
     onSignIn: () => void
     onSignOut: () => void
+  }
+  /** P12, only while the Google sign-in flag is on: switches the Google deadline before / after. */
+  googleDeadline?: {
+    value: string
+    options: { value: string; label: string }[]
+    label: string
+    onChange: (value: string) => void
+  }
+  /** P12, only while the Google sign-in flag is on and a player is signed in: puts that player on the invited session's roster or waitlist. */
+  inviteStanding?: {
+    value: string
+    options: { value: string; label: string }[]
+    label: string
+    onChange: (value: string) => void
+  }
+  /** P13 verification fixtures, available to the mock Player demo account. */
+  verificationScenarios?: {
+    value: string
+    options: { value: string; label: string }[]
+    onChange: (value: string) => void
   }
   /** Optional until the registration and password-reset preview routes are implemented. */
   playerLinkPreviews?: {
@@ -76,6 +97,9 @@ export function DevMenu({
   rankingSettings,
   playerScenarios,
   playerAccount,
+  googleDeadline,
+  inviteStanding,
+  verificationScenarios,
   playerLinkPreviews,
   contactRequestSlot,
   extraToggles,
@@ -209,21 +233,84 @@ export function DevMenu({
                 />
               </div>
             </section>
-            <section className={SECTION}>
-              <h3 className={LABEL}>Leaderboard</h3>
-              <SegmentedControl
-                aria-label="Leaderboard"
-                value={playerScenarios.leaderboard}
-                options={playerScenarios.leaderboardOptions}
-                onChange={playerScenarios.onLeaderboardChange}
-              />
-            </section>
+            {googleDeadline ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>{googleDeadline.label}</h3>
+                <SegmentedControl
+                  aria-label="Google deadline"
+                  value={googleDeadline.value}
+                  options={googleDeadline.options}
+                  onChange={googleDeadline.onChange}
+                />
+                <p className="text-xs text-fg2">
+                  After the deadline, a password-only player sees only Connect Google to continue
+                  and the leaderboard.
+                </p>
+              </section>
+            ) : null}
+            {inviteStanding ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>{inviteStanding.label}</h3>
+                <SegmentedControl
+                  aria-label="Standing on the invited session"
+                  value={inviteStanding.value}
+                  options={inviteStanding.options}
+                  onChange={inviteStanding.onChange}
+                />
+                <p className="text-xs text-fg2">
+                  Applies to the signed-in player. Open the session invite link to see "already in"
+                  or "already on the waitlist".
+                </p>
+              </section>
+            ) : null}
+            {verificationScenarios ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>Verification (Jose)</h3>
+                <SegmentedControl aria-label="Verification (Jose)" {...verificationScenarios} />
+              </section>
+            ) : null}
+            {playerScenarios.leaderboardOptions ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>Leaderboard</h3>
+                <SegmentedControl
+                  aria-label="Leaderboard"
+                  value={
+                    playerScenarios.leaderboardOptions.some(
+                      ({ value }) => value === playerScenarios.leaderboard,
+                    )
+                      ? playerScenarios.leaderboard
+                      : 'normal'
+                  }
+                  options={playerScenarios.leaderboardOptions}
+                  onChange={playerScenarios.onLeaderboardChange}
+                />
+                {playerScenarios.leaderboardPlaceOptions ? (
+                  <>
+                    <p className="text-[13px] font-semibold text-fg2">
+                      My place on the leaderboard (signs in as Jose)
+                    </p>
+                    <SegmentedControl
+                      aria-label="My place on the leaderboard (signs in as Jose)"
+                      value={
+                        playerScenarios.leaderboardPlaceOptions.some(
+                          ({ value }) => value === playerScenarios.leaderboard,
+                        )
+                          ? playerScenarios.leaderboard
+                          : 'normal'
+                      }
+                      options={playerScenarios.leaderboardPlaceOptions}
+                      onChange={playerScenarios.onLeaderboardChange}
+                    />
+                  </>
+                ) : null}
+              </section>
+            ) : null}
             {rankingSettings ? (
               <section className={SECTION}>
                 <h3 className={LABEL}>Admin settings</h3>
                 {settingsFields}
                 <p className="text-xs text-fg2">
-                  Copy on the leaderboard, profiles and rank page follows these.
+                  Copy on profiles and the rank page follows these.
                 </p>
               </section>
             ) : null}

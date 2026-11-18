@@ -103,8 +103,12 @@ sign-in forms and the remaining screens arrive in their product tickets.
 P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions.md#d-2026-11-08-02)): it
 needs a signed-in player, so signed out it goes to `/login` and returns there.
 
+P-VERIFICATION is `/profile/verification` and requires a signed-in player. Signed-out players go to `/login` and return to Verification after signing in.
+
 Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
 sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.
+
+While the `player_google_sign_in` flag is on (#919), the same routes show the invite landing: `/register/[clubId]`, `/register/[clubId]?session=<slug>&invite=<code>` and `/register` start with the invite card (P-INVITE) and **Continue with Google**; a signed-in player gets P-JOIN-CLUB or P-JOIN-SESSION instead. The invite page links to `/login?returnTo=<this route>` (the Admin link to plain `/login`), and an existing player who picks Google goes through `/connect-google` and back to this route. A signed-in player on `/register` goes to their profile. With the flag off the email + password registration is unchanged.
 
 ### Player club routes (epic P07)
 

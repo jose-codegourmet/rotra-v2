@@ -2,8 +2,14 @@ import 'server-only'
 import { dataMode, MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
 import { clubLoginEmail } from '../admin/club-identity'
 import { prisma } from '../client/prisma'
+import { syncGoogleGateHint } from '../player/google-gate'
 import { loadAccountContext } from './account-context'
-import { AUTH_PROVIDER, type CookieAdapter, createSupabaseServer } from './supabase'
+import {
+  AUTH_PROVIDER,
+  type CookieAdapter,
+  createSupabaseServer,
+  startedWithOAuth,
+} from './supabase'
 
 /** The apps with a password sign-in: Queue (club), Player Information (player, email only) and Admin. */
 export type SignInAudience = 'club' | 'player' | 'admin'
@@ -34,9 +40,17 @@ function withoutMockCookies(cookies: CookieAdapter): CookieAdapter {
   }
 }
 
-/** The session body each app's existing hooks read: Queue/Player `MockSession`, Admin `AdminSession`. */
-async function sessionBody(audience: SignInAudience, subject: string, email: string | null) {
-  const context = await loadAccountContext({ provider: AUTH_PROVIDER, subject }, audience)
+/**
+ * The session body each app's existing hooks read: Queue/Player `MockSession`, Admin `AdminSession`.
+ * `oauth`: the session was started by Google, which only a player with Google connected may use.
+ */
+async function sessionBody(
+  audience: SignInAudience,
+  subject: string,
+  email: string | null,
+  oauth = false,
+) {
+  const context = await loadAccountContext({ provider: AUTH_PROVIDER, subject, oauth }, audience)
   if (audience === 'admin') {
     if (!context || context.kind !== 'admin')
       return { kind: 'denied', accountDescription: email ?? 'This account' }
@@ -96,6 +110,7 @@ export async function handleSignIn(
     await supabase.auth.signOut()
     return fail(401, 'unauthenticated', INVALID[audience])
   }
+  if (audience === 'player') await syncGoogleGateHint(cookies, data.user.id)
   return json(200, body)
 }
 
@@ -111,7 +126,10 @@ export async function handleSessionRead(
   const subject = data?.claims?.sub
   if (error || typeof subject !== 'string' || !subject) return json(200, signedOut)
   const email = typeof data?.claims?.email === 'string' ? data.claims.email : null
-  return json(200, (await sessionBody(audience, subject, email)) ?? signedOut)
+  const body = await sessionBody(audience, subject, email, startedWithOAuth(data?.claims?.amr))
+  // The deadline gate's navigation hint for `proxy.ts` (Player only; a no-op before the deadline).
+  if (audience === 'player') await syncGoogleGateHint(cookies, body ? subject : null)
+  return json(200, body ?? signedOut)
 }
 
 /** POST sign-out: ends the provider session on this device and clears its cookies. */

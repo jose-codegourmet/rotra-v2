@@ -1,10 +1,11 @@
-import { leaderboardEntries } from '@rotra/data/fixtures/leaderboard-players'
 import { genSessions, JOSE_SESSIONS, PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { playerProfileScenarios, playerProfiles } from '@rotra/data/fixtures/player-profiles'
 import { JOSE_PLAYER_ID, leaderboardLevels, players } from '@rotra/data/fixtures/players'
+import { profileLeaderboardStoryPlaces } from '@rotra/data/fixtures/rank-states'
 import { countRecentStandardMatches } from '@rotra/data/player/rules'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { CompareStatRow } from '@rotra/ui/compare-stats'
+import { LEADERBOARD_PERIOD_COPY } from '@rotra/ui/leaderboard-period-switch'
 import { levelLabel } from '@rotra/ui/level-pill'
 import type { SharedGame, SharedGamePlayer } from './SharedGameRow'
 
@@ -81,10 +82,6 @@ export const counts = {
 export const won = togetherGames.filter((game) => game.meWon).length
 export const winRate = Math.round((won / togetherGames.length) * 100)
 
-const position = (id: string) => {
-  const index = leaderboardEntries.findIndex((entry) => entry.id === id)
-  return index < 0 ? '—' : `#${index + 1}`
-}
 const otherSessions = genSessions(otherProfile.playerId, JOSE_SESSIONS.length)
 const counted = JOSE_SESSIONS.flatMap((session) => session.games).filter(
   (game) => game.counting === 'counted',
@@ -106,11 +103,11 @@ const overallRows: CompareStatRow[] = [
 ]
 const levelRows: CompareStatRow[] = [
   { label: 'Level', mine: levelLabel(me.level), theirs: levelLabel(them.level) },
-  {
-    label: 'Overall position',
-    mine: position(meProfile.playerId),
-    theirs: position(otherProfile.playerId),
-  },
+  ...profileLeaderboardStoryPlaces.map(({ period, position }) => ({
+    label: LEADERBOARD_PERIOD_COPY[period].label,
+    mine: `#${position}`,
+    theirs: period === 'month' ? '—' : `#${position - 1}`,
+  })),
 ]
 export function comparisonRows(filter: 'all' | 'h2h'): CompareStatRow[] {
   const games = filter === 'all' ? sharedGames : againstGames

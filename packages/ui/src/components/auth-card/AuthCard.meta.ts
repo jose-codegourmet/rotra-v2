@@ -10,6 +10,7 @@ export const authCardMeta = {
     'Pass offline to show "Signing in needs an internet connection." and disable submit in the form.',
     'No Facebook or social sign-in buttons, ever.',
     "Use below for a small centred line under the card, outside it: Player's Terms of Service and Privacy Policy note.",
+    'Player P-LOGIN (Google sign-in): pass google (a GoogleButton) to show it above the form with the divider "Signed up with a password?" (googleDivider overrides the text), and contextNotice for "Sign in to join <club>." or the "This Google account isn\'t connected to ROTRA." notice. All three are opt-in; without them the card is unchanged.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -20,6 +21,6 @@ export const authCardMeta = {
     'docs/screens/product/modules/player-information/access-registration.md',
     'docs/screens/product/modules/admin/access-navigation.md',
   ],
-  variants: ['tagline', 'product', 'recovery-without-brand', 'below'],
-  related: ['Card', 'Notice', 'Field'],
+  variants: ['tagline', 'product', 'recovery-without-brand', 'below', 'google', 'context-notice'],
+  related: ['Card', 'Notice', 'Field', 'GoogleButton'],
 } satisfies ComponentMeta

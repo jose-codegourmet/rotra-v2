@@ -139,11 +139,7 @@ export function PlayerDirectory() {
       <PageHeader
         title="Players"
         actions={<AddAdminPlayer onCreated={clear} />}
-        description={
-          data
-            ? `${data.total} player${data.total === 1 ? '' : 's'} · permanent RTR IDs`
-            : 'Players · permanent RTR IDs'
-        }
+        description={data ? `${data.total} player${data.total === 1 ? '' : 's'}` : 'Players'}
         className="flex-nowrap [&>div:last-child]:!flex [&>div:last-child]:!w-auto [&>div:last-child]:shrink-0"
       />
       {!list.isError ? (
@@ -221,6 +217,7 @@ export function PlayerDirectory() {
               }
               href={href(p.id)}
               onOpen={() => openPeek(p.id)}
+              detailsRequired={!!p.detailsRequired}
             />
           ))}
         </div>
@@ -297,6 +294,7 @@ export function PlayerDirectory() {
         socialLinks={profile.data?.socialLinks}
         onViewPhoto={photo.show}
         edit={playerQuery.data ? edit.edit : undefined}
+        detailsRequired={!!playerQuery.data?.detailsRequired}
         onInvite={
           !offline && playerQuery.data
             ? () => {

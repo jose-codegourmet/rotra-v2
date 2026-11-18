@@ -12,6 +12,7 @@ import { isStatsHidden, selfCheckInMark, visibleStats } from '@rotra/data/public
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
+import { queueMasterName } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
@@ -139,7 +140,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
     const mark = setPresence.pending.has(r.id) ? null : selfCheckInMark(r)
     return {
       id: r.id,
-      name: r.nameSnapshot,
+      name: queueMasterName(r),
       photoUrl: p
         ? profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName)
         : undefined,
@@ -297,6 +298,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           bannerImageUrl={profile.bannerImageUrl}
           identity={profile.identity}
           nickname={profile.nickname}
+          clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
           level={profile.suggestion}
           tonightLevel={profileEntry?.level}
           tonight={null}
@@ -310,6 +312,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           addedLabel={longDateLabel(profile.addedAt)}
           sessionsHere={profile.sessionsHere}
           phoneHidden={profile.phoneHidden}
+          phoneOnFile={profile.hasPhone}
+          emailOnFile={profile.emailOnFile}
+          detailsRequired={profile.detailsRequired}
           inviteUrl={clubInviteUrl(profile.clubId, club.data?.inviteCode)}
         />
       ) : null}

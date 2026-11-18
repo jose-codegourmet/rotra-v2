@@ -1,5 +1,5 @@
 import type { PlayerRank, PlayerSessionRecord } from './player.types'
-// Open decision: Window boundaries (calendar months and timezone). 90 days is prototype reference behaviour.
+// The rolling window applies to skill rank. Leaderboards use calendar periods.
 export const WINDOW_DAYS = 90
 export function countRecentStandardMatches(
   sessions: readonly PlayerSessionRecord[],
@@ -41,13 +41,6 @@ export function countRecentCountedWins(
   }
   return { games, wins }
 }
-export function isLeaderboardEligible(
-  recentCount: number,
-  matchRequirement: number,
-  rankState: PlayerRank['state'],
-): boolean {
-  return rankState !== 'needs_reassessment' && recentCount >= matchRequirement
-}
 export function rankDisplayStatus({
   level,
   state,
@@ -69,15 +62,6 @@ export function rankDisplayStatus({
   if (recentCount >= matchRequirement) return 'qualifies'
   return 'provisional'
 }
-/** Open decision: Numerical ranking. Retain fixture order, filtered by the current requirement; no rating math. */
-export function orderLeaderboard<
-  T extends { recentCount: number; state: PlayerRank['state']; levelIndex: number | null },
->(entries: readonly T[], matchRequirement: number): T[] {
-  return entries.filter(
-    (e) => e.levelIndex !== null && isLeaderboardEligible(e.recentCount, matchRequirement, e.state),
-  )
-}
-
 /** Games, wins, losses and win rate (whole percent) over the rank window; null without games. */
 export type RecentGameStats = { games: number; wins: number; losses: number; winRate: number }
 /**

@@ -72,6 +72,7 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         bannerImageUrl={profile.bannerImageUrl}
         identity={profile.identity}
         nickname={profile.nickname}
+        clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
         level={profile.suggestion}
         tonightLevel={live ? entry?.level : null}
         tonight={tonight}
@@ -85,6 +86,9 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         addedLabel={longDateLabel(profile.addedAt)}
         sessionsHere={profile.sessionsHere}
         phoneHidden={profile.phoneHidden}
+        phoneOnFile={profile.hasPhone}
+        emailOnFile={profile.emailOnFile}
+        detailsRequired={profile.detailsRequired}
         backLabel={backLabel}
         onBack={onBack}
       />

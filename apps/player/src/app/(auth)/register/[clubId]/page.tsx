@@ -44,6 +44,7 @@ export default async function RegisterPage(props: PageProps<'/register/[clubId]'
       clubId={clubId}
       sessionSlug={typeof search.session === 'string' ? search.session : undefined}
       inviteCode={typeof search.k === 'string' ? search.k : undefined}
+      sessionInviteCode={typeof search.invite === 'string' ? search.invite : undefined}
       returnTo={typeof search.next === 'string' ? search.next : undefined}
     />
   )

@@ -1,4 +1,9 @@
-import { FORMAT_LABELS, type MatchContext, matchStatus, shortName } from '../match/match.rules'
+import {
+  FORMAT_LABELS,
+  type MatchContext,
+  matchStatus,
+  queueMasterName,
+} from '../match/match.rules'
 import type { Match, MatchFormat, MatchStatus } from '../match/match.types'
 import type { MockState } from '../mock/store'
 import type { PlayingLevel } from '../player/player.types'
@@ -47,7 +52,7 @@ export function createMatchCardFixtures(now = Date.now()) {
   const player = (roster: SessionPlayer[]) => (id: string) => {
     const p = roster.find((x) => x.id === id)
     if (!p) throw new Error('Missing roster fixture.')
-    return { id: p.id, name: p.nameSnapshot, shortName: shortName(p), level: p.level }
+    return { id: p.id, name: p.nameSnapshot, shortName: queueMasterName(p), level: p.level }
   }
   const card = (match: Match, context: MatchContext = ctx): MatchCardFixture => ({
     match,

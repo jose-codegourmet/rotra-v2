@@ -1,4 +1,4 @@
-import { maskPhone } from '../player-account/playerAccount.rules'
+import { maskPhone } from '@rotra/schema/phone'
 import type { ClaimLinkRecord, PlayerAccountRecord } from '../player-account/playerAccount.types'
 import { playerProfiles } from './playerProfiles'
 
@@ -32,6 +32,9 @@ export const playerAccounts: PlayerAccountRecord[] = [
     phoneHidden: false,
     claimed: true,
     emailConfirmedAt: '2026-11-01T00:00:00Z',
+    // Google connected with a different email than the ROTRA one; the password still works (P12).
+    googleEmail: 'jasper.plays@gmail.com',
+    googleLinkedAt: '2026-11-17T09:00:00Z',
   },
   {
     playerId: 'd720c601-da89-5474-9351-00e2fb966e56', // Karl (prototype Paulo Garcia)
@@ -56,6 +59,10 @@ export const playerAccounts: PlayerAccountRecord[] = [
     phoneHidden: false,
     claimed: true,
     emailConfirmedAt: '2026-11-01T00:00:00Z',
+    // Signs in with Google only: no password (P12). Forgot password answers "signs in with Google".
+    googleEmail: 'emji@example.com',
+    googleLinkedAt: '2026-11-17T09:00:00Z',
+    hasPassword: false,
   },
   {
     playerId: '80861dfd-99c7-57bb-a46c-d8c76e9a8dcc', // Dalton (prototype Rafa Aquino)

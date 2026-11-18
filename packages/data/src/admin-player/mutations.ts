@@ -1,23 +1,34 @@
 import {
   ADMIN_PLAYER_REASON_REQUIRED,
+  ADMIN_PLAYER_RTR_ID_TAKEN,
   type AdminPlayerCreateValues,
   adminPlayerCreateSchema,
   adminPlayerEditSchemaFor,
 } from '@rotra/schema/admin-player'
+import type {
+  AdminAccountVerification,
+  SetAdminVerificationOverrideInput,
+} from '../account-verification/accountVerification.types'
+import { adminAccountVerificationIn } from '../account-verification/mockVerification'
+import { parseAdminSession, readAdminSessionMarker } from '../admin-account/cookie'
 import { getAdminSession } from '../admin-account/fetchers'
 import { adminMutation } from '../admin-account/mutation'
 import { appendAdminAudit } from '../admin-audit/fetchers'
 import { normalizeContact } from '../contact-change-request/contactChangeRequest.rules'
 import { supersedeOpenContactRequests } from '../contact-change-request/fetchers'
 import { adminAccount } from '../fixtures/adminAccounts'
+import { createAdminVerifiedNotification } from '../fixtures/playerNotifications'
 import { checkMockSave } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { ConflictError, MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
-import { realUpdateAdminPlayer } from '../real/admin-players'
+import { allocateMockRtrId, replaceRtrId } from '../player/unclaimed'
+import { realSetAdminVerificationOverride } from '../real/account-verification'
+import { realCreateAdminPlayer, realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
 import {
   adminPlayerChangedFields,
   adminPlayerEditedSummary,
+  adminPlayerRtrIdChange,
   adminPlayerSavedMessage,
 } from './adminPlayer.rules'
 import type {
@@ -53,6 +64,7 @@ function reason(value: string) {
 export async function createAdminPlayer(input: AdminPlayerCreateValues) {
   await owner()
   const values = adminPlayerCreateSchema.parse(input)
+  if (isRealDataMode()) return realCreateAdminPlayer(values)
   return adminMutation(400, (draft) => {
     checkMockSave()
     const matches = duplicateGroups([
@@ -69,23 +81,8 @@ export async function createAdminPlayer(input: AdminPlayerCreateValues) {
       )
     if (values.clubId && !draft.clubs.some((c) => c.id === values.clubId))
       throw new MockError('conflict', 'Choose an available club.')
-    const id = crypto.randomUUID(),
-      day = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date())
-    const [year, month, date] = day.split('-'),
-      prefix = `RTR-PH-${values.place}-${month}${date}${year?.slice(2)}-`
-    const serial =
-      Math.max(
-        0,
-        ...draft.players
-          .filter((p) => p.rtrId.startsWith(prefix))
-          .map((p) => Number(p.rtrId.split('-')[4]) || 0),
-      ) + 1
-    const rtrId = prefix + String(serial).padStart(4, '0')
+    const id = crypto.randomUUID()
+    const rtrId = allocateMockRtrId(draft, `PH-${values.place}`)
     const player = { id, fullName: values.name, nickname: values.nickname || null, rtrId }
     draft.players.push(player)
     draft.playerProfiles.push({
@@ -150,6 +147,8 @@ const EDIT_ERROR_ORDER = [
   'phone',
   'email',
   'password',
+  'registrationPlace',
+  'registrationDate',
   'reason',
 ] as const
 const NO_CONTACT_RECORD = 'This player has no contact record yet.'
@@ -171,8 +170,9 @@ const checkedForm = (
 /**
  * Validates one Save changes against a store snapshot or draft: the revision, the field rules, the
  * rules that depend on the player, uniqueness, the shown character and the reason. Throws every
- * field error at once; returns the parsed values (never logged: they include the password) and the
- * changed fields.
+ * field error at once; returns the parsed values (never logged: they include the password), the
+ * changed fields and, when the registration place or date changed it, the new RTR ID. A new RTR
+ * ID that another player already has is refused on the registration date (D-2026-11-16-04).
  */
 function planEdit(state: MockState, input: AdminPlayerEditInput) {
   const player = state.players.find((p) => p.id === input.id)
@@ -181,6 +181,12 @@ function planEdit(state: MockState, input: AdminPlayerEditInput) {
   if (edit.revision !== input.revision) throw new MockError('conflict', STALE_EDIT)
   const { id: _id, revision: _revision, ...form } = input
   const changed = adminPlayerChangedFields(edit, form)
+  // rotra-admin.html pmSave(): the RTR ID comes after the other fields and before the password.
+  const nextRtrId = adminPlayerRtrIdChange(edit, form)
+  if (nextRtrId) {
+    const password = changed.indexOf('password')
+    changed.splice(password < 0 ? changed.length : password, 0, 'RTR ID')
+  }
   const errors: Record<string, string> = {}
   const parsed = adminPlayerEditSchemaFor(edit).safeParse(checkedForm(form, changed))
   if (!parsed.success)
@@ -215,9 +221,11 @@ function planEdit(state: MockState, input: AdminPlayerEditInput) {
   }
   if (values && changed.includes('phone privacy') && !edit.hasAccount)
     errors.phoneHidden = NO_CONTACT_RECORD
+  if (nextRtrId && state.players.some((p) => p.id !== player.id && p.rtrId === nextRtrId))
+    errors.registrationDate ??= ADMIN_PLAYER_RTR_ID_TAKEN
   if (changed.length && !form.reason.trim()) errors.reason ??= ADMIN_PLAYER_REASON_REQUIRED
   if (Object.keys(errors).length || !values) throw editErrors(errors)
-  return { player, edit, values, changed }
+  return { player, edit, values, changed, nextRtrId }
 }
 
 const editResult = (
@@ -230,11 +238,69 @@ const editResult = (
   message: adminPlayerSavedMessage(player.name, changed),
 })
 
+/** Sets or clears Verified by Admin. Both changes need a reason and create one audit event. */
+export async function setAdminVerificationOverride(
+  input: SetAdminVerificationOverrideInput,
+): Promise<AdminAccountVerification> {
+  if (isRealDataMode()) return realSetAdminVerificationOverride(input)
+  await owner()
+  const overrideReason = reason(input.reason)
+  return adminMutation(400, (draft) => {
+    const session = parseAdminSession(readAdminSessionMarker())
+    if (session.kind !== 'owner')
+      throw new MockError('permission', 'Only ROTRA Admin can change player verification.')
+    const current = adminAccountVerificationIn(draft, input.playerId)
+    if (!current)
+      throw new MockError('permission', 'Verification is available only for registered players.')
+    if (current.revision !== input.revision) throw new ConflictError(current, STALE_EDIT)
+    if (current.verifiedByAdmin === input.verifiedByAdmin) return current
+
+    checkMockSave()
+    const { player, record: management } = record(draft, input.playerId)
+    const at = new Date().toISOString()
+    management.verificationOverride = input.verifiedByAdmin
+      ? { status: 'verified', adminId: session.account.id, at }
+      : null
+    management.revision++
+    if (input.verifiedByAdmin) {
+      const notifications = draft.playerNotifications[player.id] ?? []
+      draft.playerNotifications[player.id] = notifications
+      notifications.push(
+        createAdminVerifiedNotification(`admin-verified-${management.revision}`, at),
+      )
+    }
+    const action = input.verifiedByAdmin
+      ? 'player_verification_override_set'
+      : 'player_verification_override_cleared'
+    const description = input.verifiedByAdmin
+      ? `Set ${player.fullName} to Verified by Admin.`
+      : `Cleared Verified by Admin for ${player.fullName}.`
+    appendAdminAudit(draft, {
+      action,
+      targetType: 'player',
+      targetId: player.id,
+      summary: `${description} Reason: ${overrideReason}`,
+    })
+    return {
+      ...current,
+      verified: input.verifiedByAdmin || current.completedSteps === 3,
+      verifiedByAdmin: input.verifiedByAdmin,
+      revision: management.revision,
+    }
+  })
+}
+
 /**
  * Admin › Players › Edit › Save changes (A07.6, D-2026-11-09-14): every field the player can change,
  * plus phone and email (applied directly; no contact-change request) and the beta-only password.
  * Revision-checked. "Nothing changed." saves nothing, logs nothing and keeps the revision, offline
  * too (as the prototype). Otherwise one Activity log entry "Edited <name>: <fields>. Reason: …".
+ *
+ * RTR ID (D-2026-11-16-04): a changed registration place or date changes the RTR ID, which keeps
+ * its number at the end. The change cascades to every record and snapshot that holds the old RTR
+ * ID, in every club that saved the player; there is no alias, so the old one no longer finds them.
+ * The entry then reads "Edited <name>: RTR ID. RTR ID <old> replaced with <new> on every record.
+ * Reason: …" and the toast "Saved <name>: RTR ID.". The screen confirms first (Change RTR ID?).
  *
  * Password *(for MVP or beta only)* — beta only, end date not set (D-2026-11-09-14): never stored,
  * returned, logged or put in the audit summary; only that Admin set it, by whom and when.
@@ -249,7 +315,7 @@ export async function updateAdminPlayer(
   return adminMutation(400, (draft) => {
     checkMockSave()
     // Rechecked on the draft: another save may have landed during the round trip.
-    const { player, edit, values, changed } = planEdit(draft, input)
+    const { player, edit, values, changed, nextRtrId } = planEdit(draft, input)
     const current = record(draft, player.id)
     if (!changed.length) return editResult(edit, [])
     const has = (field: AdminPlayerChangedField) => changed.includes(field)
@@ -311,13 +377,20 @@ export async function updateAdminPlayer(
       current.record.passwordSetAt = new Date().toISOString()
       current.record.passwordSetBy = adminAccount.email
     }
+    const rtrIdFrom = player.rtrId
+    if (nextRtrId) replaceRtrId(draft, rtrIdFrom, nextRtrId)
     if (current.view.claimed) profile.adminChangeNote = values.reason
     current.record.revision++
     appendAdminAudit(draft, {
       action: 'player_updated',
       targetType: 'player',
       targetId: player.id,
-      summary: adminPlayerEditedSummary(values.name, changed, values.reason),
+      summary: adminPlayerEditedSummary(
+        values.name,
+        changed,
+        values.reason,
+        nextRtrId ? { from: rtrIdFrom, to: nextRtrId } : null,
+      ),
     })
     // Owner answer on #649 (Option A): a stale open request for the same field can't be approved later.
     if (has('phone')) supersedeOpenContactRequests(draft, player.id, 'phone')
@@ -335,7 +408,11 @@ async function realEditAdminPlayer(input: AdminPlayerEditInput): Promise<AdminPl
   if (!edit) throw new MockError('conflict', 'Player not found. Reload the list.')
   if (edit.revision !== input.revision) throw new MockError('conflict', STALE_EDIT)
   const { id: _id, revision: _revision, ...form } = input
+  // A changed registration place or date reissues the RTR ID on the server (P15.8): it replaces
+  // the old one on every record, and a taken one is refused on the registration date.
+  const rtrIdChanged = !!adminPlayerRtrIdChange(edit, form)
   const changed = adminPlayerChangedFields(edit, form)
+  if (rtrIdChanged) changed.push('RTR ID')
   const parsed = adminPlayerEditSchemaFor(edit).safeParse(checkedForm(form, changed))
   const errors: Record<string, string> = {}
   if (!parsed.success)

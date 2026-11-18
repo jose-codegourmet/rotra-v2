@@ -4,7 +4,6 @@ import { countYearCountedWins, statsYear } from '@rotra/data/player/rules'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
-import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
 import { type ClubMemberProfile, ClubMemberProfileSheet } from '@rotra/ui/club-member-profile-sheet'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
@@ -33,7 +32,7 @@ export type ProfileCardPerson = {
 
 /**
  * The profile card in ROTRA Player (D-PARTICIPANT-PROFILE), opened from club members and the
- * leaderboard: ClubMemberProfileSheet with the profile (banner, RTR ID), rank (#N overall) and the
+ * leaderboard: ClubMemberProfileSheet with the profile (banner, RTR ID), leaderboard places and the
  * counted games this calendar year. Inside Player the profile opens in the same tab (the name arrow
  * and Open ROTRA profile); Share profile opens the share dialog for this player. A masked row opens
  * the private card with their own banner.
@@ -49,7 +48,6 @@ export function ProfileCard({
   const named = !!person && !person.masked && !!person.playerId
   const playerId = named ? (person?.playerId ?? '') : ''
   const profile = usePlayerProfile(playerId)
-  const rank = usePlayerRank(playerId)
   const games = usePlayerGames(playerId)
   const share = usePlayerShareSheet(named ? playerId : null)
   const photo = usePhotoViewer()
@@ -76,7 +74,8 @@ export function ProfileCard({
       bannerKey: profile.data?.bannerKey,
       bannerImageUrl: profile.data?.bannerImageUrl,
       levelLabel: person.level ? levelLabel(person.level) : null,
-      position: rank.data?.position ?? null,
+      leaderboardPlaces: profile.data?.leaderboardPlaces ?? [],
+      unclaimedSavedBy: profile.data?.unclaimedSavedBy,
       isYou: person.isYou,
       registeredCity: registeredCity(rtrId),
       rtrId,

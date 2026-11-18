@@ -13,6 +13,7 @@ import type {
 import { requireAdmin } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
+import { notifyContactReview } from './notification-events'
 
 type Tx = Prisma.TransactionClient
 
@@ -415,6 +416,7 @@ export async function reviewContactChange(
           targetId: request.playerId,
           metadata: { requestId: request.id, field: request.field },
         })
+        await notifyContactReview(tx, rejected, 'declined')
         return adminRequestDto(rejected)
       }
       // Serialize approval with an Admin email edit before either may contact the provider.
@@ -465,6 +467,7 @@ export async function reviewContactChange(
         targetId: request.playerId,
         metadata: { requestId: request.id, field: request.field },
       })
+      await notifyContactReview(tx, approved, 'approved')
       return adminRequestDto(approved)
     })
   } catch (error) {

@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 and D-2026-11-18-02 added; amendment note on D-2026-11-17-01); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -52,16 +52,17 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-13-08](#d-2026-11-13-08) | Which rules are shared, which move to Go, and deleting the TypeScript copies | approved 2026-11-13 | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-01](#d-2026-11-14-01) | Shared queue rules: one Go copy, run on the device as WebAssembly (spike first) | approved 2026-11-14 (spike first; B-21 to B-23) | not started | needed | [Backend](workstreams/backend.md) |
 | [D-2026-11-14-02](#d-2026-11-14-02) | No show (cancelled): no fee, club-only, after Start only | approved 2026-11-14 | in progress | #839 | [Queue](workstreams/queue.md) |
-| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and details open) | mockup only | #892 | [Player](workstreams/player.md) |
+| [D-2026-11-16-01](#d-2026-11-16-01) | Google sign-in is mandatory for players; password players connect Google by a deadline | approved 2026-11-16 (deadline and password questions settled 2026-11-18; details open) | mock app behind the flag; real mode written, not run against Google (#922, pending #896) | #892 | [Player](workstreams/player.md) |
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
-| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | #891 | [Player](workstreams/player.md) |
-| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mock and real modes in source | #890 | [Player](workstreams/player.md) |
+| [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open; storage answered 2026-11-18) | mock data built (#923); real mode written (#927), migration applied locally only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
+| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
+| [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mock app (Player #904, Admin #911) | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
-| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-18-02](#d-2026-11-18-02) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | mockup only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | in progress | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
+| [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
 
 ## Status conventions
 
@@ -546,7 +547,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Ticket:** [#749](https://github.com/jose-codegourmet/rotra-v2/issues/749), [#757](https://github.com/jose-codegourmet/rotra-v2/issues/757) (epic #748)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
 - **Supersedes:** in part the October 28, 2026 owner decision that a phone-linked profile and its permanent RTR ID are created on the first entry sync, and the rule "the same phone number identifies the same profile across clubs" for unclaimed profiles.
-- **Superseded in part by:** [D-2026-11-16-04](#d-2026-11-16-04) (an unclaimed player needs an email, gets an RTR ID when the club saves them, and is found by other clubs). The mockups and docs follow the new decision; the mock app and real mode still follow the rules below until it is built.
+- **Superseded in part by:** [D-2026-11-16-04](#d-2026-11-16-04) (an unclaimed player needs an email, gets an RTR ID when the club saves them, and is found by other clubs). The mockups, docs and mock data (`packages/data`, #923) follow the new decision; the mock app's screens and real mode still follow the rules below until it is built there.
 - **Decision:**
   - **In the owner's words:** "guest should stay in the club's saved players and registered players live in rotra's saved players", and "Unclaimed profiles should never be found in other clubs. they should only live in club".
   - **Player Information search** (Queue › Add player and Saved players › Add player) shows **registered (claimed) players only**. Guests and unclaimed profiles are never found by another club, by name, nickname or RTR ID.
@@ -705,7 +706,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Share image:** the Post image stays 1080 × 1350. The question of MVP timing for the club page and Bagging mode is moot: both shipped on 2026-11-12 (#747).
 - **Still open:**
   - A real-mode marker for a club-only record whose phone lookup found nobody: “Lookup pending” versus “Unclaimed” in Saved players.
-  - Admin › Add player still creates an unclaimed `players` row with an RTR ID, which contradicts “RTR ID only on registration”.
+  - Admin › Add player still creates an unclaimed `players` row with an RTR ID, which contradicts “RTR ID only on registration”. Answered for real mode on November 18, 2026: it saves a club-only unclaimed record with no RTR ID (club and phone required). The mock app and the mockup still show the old behavior; Created by Admin with no club is still open.
   - The public club page's Join button sends the current invite code to anyone who opens the page.
   - The Edit profile banner swatches cannot show a banner Admin later hid.
   - Drop-out notices are not closed at Start.
@@ -956,8 +957,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [Players module](../business_logic/product/queue/modules/players/README.md), [sessions-roster design](../database_design/product/queue/modules/sessions-roster.md), `packages/db/src/queue/session-roster.ts` (`markNoShow`, `undoNoShow`), `apps/queue/src/app/api/sessions/[sessionId]/roster/[rosterId]/no-show/route.ts`.
 
 ### D-2026-11-16-01 — Google sign-in is mandatory for players
-- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the open items below are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-google-sign-in.md)).
+- **Decision status:** approved (owner, November 16, 2026, on the Player Google sign-in artifact); the deadline date and the first questions were settled on November 18, 2026; the open item below is not decided.
+- **Implementation status:** in the mock app behind the flag; real mode is **written but not run against Google** (#922, November 18, 2026): the Google Cloud OAuth client and the Supabase provider (#896) are not set up, and migration `20261118000200_player_google_sign_in` is not applied. Not in real mode: registration from the Admin link, and the inviting player on a session invite. [Setup and design](../backend/google-sign-in-setup.md); [log](../mockup-changes/2026-11-16-player-google-sign-in.md).
 - **Ticket:** [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892) (Epic P12)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Amended by:** [D-2026-11-18-01](#d-2026-11-18-01): everything below ships behind the feature flag `player_google_sign_in`, which starts off.
@@ -969,18 +970,19 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **No Google account.** "I don't have a Google account" explains making a free Google account with the email they already use.
   - **Invites.** Club and session invites open an invite card first (P-INVITE). A signed-in player on a session invite gets P-JOIN-SESSION, which hands over to the Queue session page to send the request. An existing player who picks Google on an invite goes through the same link step, then on to the join step.
   - **Announcements are yellow** (`--ann-bg`, `--ann-border`, `--ann-tag`), distinct from the amber warnings.
-- **Open (placeholders in the mockup):**
-  - The deadline date (the mockup says December 31, 2026).
-  - Whether the password stops working after the deadline once Google is connected (the mockup keeps it as a backup until then).
-  - Whether Google sign-in on `/login` with no ROTRA account may ever create one (the mockup: no, invites only).
-  - Whether a signed-in player confirmed for a session at a club they aren't in joins that club's saved players.
+- **Settled by the owner, November 18, 2026 (build on the mockup's answers):**
+  - The deadline is **December 31, 2026**, one swappable mock value in `packages/data` (not an Admin setting yet).
+  - The password stays a backup until the deadline once Google is connected.
+  - Google sign-in on `/login` with no ROTRA account never creates one (invites and the Admin link only).
+  - A signed-in player confirmed for a session at a club they aren't in does **not** join that club's saved players.
+- **Open:**
   - Supabase links identities with the same verified email automatically; the "ask first" step needs that turned off or handled in the callback (backend).
 - **Amends:** [D-2026-11-07-01](#d-2026-11-07-01) (password recovery applies only to password accounts; Google accounts are told to use Google), [D-2026-11-09-06](#d-2026-11-09-06) (registration sources unchanged; the form becomes Google), identity rule "No Facebook/social login" (Google is now required; no other social login).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [access and registration screens](../screens/product/modules/player-information/access-registration.md), [identity database design](../database_design/product/player-information/modules/identity.md#private-contacts-and-account-mapping), artifact https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN.
 
 ### D-2026-11-16-02 — Player account verification with an Admin override
 - **Decision status:** approved (owner, November 16, 2026); what an unverified player can't do is not decided.
-- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-account-verification.md)); the Admin control is not designed yet.
+- **Implementation status:** #915 implements the private Player and Admin reads and the audited override in real-mode source. Migration and batch verification are pending. [Player verification mockup](../mockup-changes/2026-11-16-player-account-verification.md) and [Admin verification mockup](../mockup-changes/2026-11-18-admin-player-verification.md).
 - **Ticket:** [#889](https://github.com/jose-codegourmet/rotra-v2/issues/889) (Epic P13)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -993,12 +995,12 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - What an unverified player can't do (the mockup blocks nothing).
   - Whether the phone must be confirmed (no SMS exists; "on file" means present).
   - Whether other players and clubs see the badge (the mockup shows it only to the player).
-  - Whether Admin can also set **Not verified**, and whether a reason is required and kept in the audit log.
+- **Owner amendment, November 18, 2026 (#907):** Admin can set **Verified by Admin** or clear it to restore the automatic checks; no forced **Not verified** override. Both actions require a reason recorded in the Admin audit log. Admin › Player detail gets a **Verification** card showing the status, all three checks and the set/clear action. #915 may use the existing Google account fields without waiting for #922's separate OAuth/registration acceptance work; the owner approved proceeding on that basis.
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#account-verification), [identity and privacy screens](../screens/product/modules/player-information/identity-privacy.md#p-verification--account-verification), [identity database design](../database_design/product/player-information/modules/identity.md#account-verification-d-2026-11-16-02).
 
 ### D-2026-11-16-03 — Player notifications page
-- **Decision status:** approved (owner, November 16, 2026); delivery and the event list are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-16-player-notifications.md)).
+- **Decision status:** approved (owner, November 16, 2026; event scope, visibility window and states settled November 18, 2026).
+- **Implementation status:** mock and real modes implemented in source ([log](../mockup-changes/2026-11-16-player-notifications.md)).
 - **Ticket:** [#890](https://github.com/jose-codegourmet/rotra-v2/issues/890) (Epic P14)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Decision:**
@@ -1007,14 +1009,15 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - The mockup's events are ones ROTRA already has: spot confirmed, waitlist place, session invite, results published, rank updated, added to a club's saved players, contact change approved, Admin verified the account.
 - **Open:**
   - Delivery outside the app (push or email would need a backend decision and likely a new dependency).
-  - The final event list.
-  - How long notifications are kept (the mockup says 90 days).
-  - Who writes ROTRA announcements (likely a new Admin screen).
+  - Per-kind opt-out, automatic deletion, and future free-text announcement publishing.
+- **Owner amendment, November 18, 2026:** seven documented events are approved; the session-invite notification is deferred because current shareable links have no recipient and real invite-code creation is absent. The mock invite sample remains. The remaining events are approved (contact-change review includes approved and declined); notifications remain visible for 90 days, with automatic database deletion deferred. Only the derived verification reminder is in scope; free-text publishing is deferred. Use standard Player loading/error states; the bell remains a link with no count while loading or failed. The reminder uses account verification from #889.
 - **References:** [notifications module](../business_logic/product/player-information/modules/notifications/README.md), [notifications screen](../screens/product/modules/player-information/notifications.md), [notifications database design](../database_design/product/player-information/modules/notifications.md).
 
 ### D-2026-11-16-04 — Player statuses: unclaimed needs an email and gets an RTR ID
 - **Decision status:** approved (owner discussion, November 16, 2026); lookup by phone and already-shared QR codes with an old RTR ID are not decided.
-- **Implementation status:** mockup only: [Queue](../mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md), [Player](../mockup-changes/2026-11-16-player-unclaimed-identity.md) and [Admin](../mockup-changes/2026-11-16-admin-unclaimed-rtr-id-edit.md) logs. The mock app and real mode still follow [D-2026-11-11-03](#d-2026-11-11-03).
+- **Implementation status:** in progress (Epic P15). Mockups: [Queue](../mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md), [Player](../mockup-changes/2026-11-16-player-unclaimed-identity.md) and [Admin](../mockup-changes/2026-11-16-admin-unclaimed-rtr-id-edit.md) logs. Components: #910, #917, #920. **Mock data built (#923, not run in a browser yet):** `packages/data` has the four statuses, the required email and RTR ID on save, lookup by exact RTR ID or email, the Same person move, Details required, claiming by email on registration with the identity cards, and Admin's RTR ID change that cascades; Link, Link to saved player… and the join-request phone are removed. The screens are wired in the mock app (P15.5 Queue, P15.6 Player, P15.7 Admin). **Real mode written in P15.8 (#927, November 18, 2026):** a new thin table `shared_player_entries` (normalized email + RTR ID) that `club_players.shared_entry_id` points to, the Same person redirect `club_players.linked_to_club_player_id`, Admin's RTR ID change on `shared_player_entries` and `player_id_allocations` in one transaction, and the services and Route Handlers behind the existing hooks. Migration `20261118000500_shared_player_entries` is applied to a local disposable database only, **not yet to the shared database**; nothing was run against Supabase Auth or in a browser.
+  - **Owner answers, November 18, 2026 (built in P15.8):** the shared entry is a new thin table, not a `players` row; no alias for an old RTR ID (the cascade replaces the string on every record, a taken one is refused); registration matches the ROTRA email or the Google email; the phone linking on registration stays; existing phone-only records stay and read as Details required (no move, no deletion); one history attribution per joined record stays open (none is written); Admin's own Add player is unchanged.
+  - **What the mock data does on the open points below** (owner answers relayed with #923): lookup is by exact RTR ID or exact email only, with no phone lookup, and QR scanning is left as it is; after Admin changes an RTR ID there is no alias, so the old RTR ID no longer finds the player, and its number is never given to someone else; the Same person move is built as the mockup shows; a returning guest's new join request makes a second guest record; a record is claimed when the registering person's ROTRA email or Google email equals the saved email, and the phone linking of D-2026-11-11-03 still joins older phone-only records; picking an identity card prefills the name, nickname, picture and level only; Admin's own Add player is unchanged.
 - **Ticket:** [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900) (Epic P15)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
@@ -1056,33 +1059,32 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [product terms](../product-terms.md) (Guest, Unclaimed profile, Player ID / RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [identity database design](../database_design/product/player-information/modules/identity.md).
 
 ### D-2026-11-16-05 — Three leaderboards: Top annual, Top monthly, Top weekly
-- **Decision status:** approved (owner, November 16, 2026); the meaning of "calendars roll" is to be confirmed.
-- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-leaderboard-periods.md)). The mock app, real mode and rank calculation still have one overall list ordered by rating.
+- **Decision status:** approved November 16, 2026. The owner confirmed the calendar boundaries, tie order, skill-rank progress and treatment of late results on November 18, 2026.
+- **Implementation status:** in progress, Player side. The components, mock data and screens, profile places and real-mode match-fact reads are implemented in #897, #902, #906, #913 and #918. Batch verification is pending. [Mockup log](../mockup-changes/2026-11-16-player-leaderboard-periods.md).
 - **Ticket:** [#891](https://github.com/jose-codegourmet/rotra-v2/issues/891) (Epic P16)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Supersedes:** in part the November 11, 2026 rule that the one overall leaderboard is ordered by rating ([ranking module](../business_logic/product/player-information/modules/ranking/README.md#overall-leaderboard)).
 - **Decision:**
   - In the owner's words: "leaderboards should be top annual, top monthly, top weekly".
-  - **Order:** each list is ordered by wins in standard matches in that year, month or week (owner choice). Win rate breaks a tie.
+  - **Order:** each list is ordered by wins in standard matches in that year, month or week (owner choice). Higher win rate breaks a tie, then the account nickname in alphabetical order (full name when there is no nickname), then stable player ID for equal display names.
   - **Top annual replaces the overall list** (owner choice). A profile's leaderboard position is its annual place.
   - **Top 50 only, wins only** (owner, later the same day): each list shows the top 50. A row shows the number of wins and not the skill level, "for now".
   - **Movement mark:** beside each place, an up or down mark when the player moved, or **New**; in the owner's words, "top or bottom icons if player has recently ranked up or ranked down or show \"new\"". Hovering shows where the player was before.
   - **Compared with the previous period** (owner choice): weekly with last week's final place, monthly with last month, annual with last year. **New** means the player wasn't on that list in the previous period.
   - **Below the top 50:** a signed-in player sees "You're not in the top 50 this year" with their own wins and the wins of place 50. The Player mockup has a Prototype control for it (owner request).
   - **Just by wins** (owner, later the same day: "it is just by wins"): nothing but wins in the period decides who is on a list. The earlier requirement of 10 standard matches in the last three months no longer applies to the leaderboards.
-  - **Calendar periods** (owner: "calendars roll"), read as: the lists follow the calendar year, month and week, and each starts again when a new one begins.
+  - The calendar year starts on January 1, the month on its first day and the week on Monday. Every boundary is at 00:00 Asia/Manila.
+  - Previous places are recomputed from valid results using their original playing dates. A late sync can change last period's places and the current movement marks. The owner approved computing these from recorded matches without a snapshot or migration.
+  - The rating and the “N of 10 standard matches” progress describe the skill rank only.
   - **Profiles** (owner: "profile should not say it if it doesnt qualify for top 50. and should show if 3 boxes if qualified for each category"): a profile names no overall position. It shows one box for each list the player is in the top 50 of (the place and the wins), and nothing about a position when they are in none.
 - **Open:**
-  - The owner's "calendars roll" is recorded as calendar periods that start again; to confirm it does not mean rolling windows (the last 7, 30 and 365 days).
-  - What the rating and the "N of 10 standard matches" count are still used for. In the mockup they only describe the skill rank ("This rank is still settling").
-  - A further tie-break after win rate.
   - The Admin mockup still marks players "On leaderboard" or "Not on leaderboard" by the old rule.
   - Whether the Queue session page and the club's share images are affected. They are not changed.
 - **References:** [ranking module](../business_logic/product/player-information/modules/ranking/README.md), [ranking and history screens](../screens/product/modules/player-information/ranking-history.md).
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
-- **Implementation status:** mockup only: [Player](../mockup-changes/2026-11-16-player-phone-mask-format.md) and [Admin](../mockup-changes/2026-11-16-admin-phone-format.md) logs. The real app already stores E.164 (`phoneField` in `packages/schema`) and has `maskPhone` and `formatPhoneForDisplay`; where it still shows a player their full phone is to be checked when ticketed.
+- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part in the mock app (#911): every phone Admin shows as text is full and grouped, and the Edit player and Add player phone fields group while typing and save E.164 ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The Admin Verification card's “On file” row shows the full number too (owner, November 18, 2026: “Yes, show full”; [log](../mockup-changes/2026-11-18-admin-verification-full-phone.md)). The real app already stores E.164 (`phoneField`).
 - **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1093,7 +1095,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Admin always sees the full number** (owner, later the same day: "admin should always see it"), grouped as "+63 917 555 0142".
 - **Open:**
   - Whether a player may reveal their own full number anywhere.
-- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/data/src/player-account/playerAccount.rules.ts`.
+- **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md), `packages/schema/src/phone.ts`, `packages/schema/src/phone.ts` (`maskPhone`).
 
 <a id="d-2026-11-17-01"></a>
 ### D-2026-11-17-01 — Privacy Policy and Terms of Service pages on the Player app
@@ -1119,7 +1121,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-18-01 — Google sign-in ships behind a feature flag that starts off
 - **Decision status:** approved (owner, November 18, 2026); the open items below are not decided.
-- **Implementation status:** not started.
+- **Implementation status:** in progress: the flag is seeded off (mock fixture and migration `20261118000100_seed_player_google_sign_in_flag`) and the Player app can read it (#938); no Google screen consumes it yet.
 - **Ticket:** [#938](https://github.com/jose-codegourmet/rotra-v2/issues/938) (Epic P12, [#892](https://github.com/jose-codegourmet/rotra-v2/issues/892))
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**
@@ -1131,8 +1133,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Open:**
   - Whether the invite card (P-INVITE) and the signed-in join steps (P-JOIN-CLUB, P-JOIN-SESSION) also wait for the flag, or show while it is off with the email + password registration behind them. Until answered: they wait for the flag.
   - Turning the flag off again after players registered with Google only: they have no password. Until answered: a connected Google account keeps working when the flag is off; only new Google registration and the prompts are hidden.
-  - Who a flag that ships with the product is "added by" in Admin (the row shows the Admin who added it).
-  - How the Player app reads the flag in real mode (it is needed signed out, on `/login`): through the Go API or a Player Route Handler, and for how long a value may be cached.
+- **Settled (owner, November 18, 2026):** a flag that ships with the product has no "added by" (`created_by_admin_id` and `updated_by_admin_id` are nullable; the migration inserts the row only if it is missing, so an existing value is never overwritten). In real mode the Player app reads the flag server-side over `packages/db` (`@rotra/db/player/feature-flags`), uncached, so it is always fresh; it moves to the Go API with B-04. A missing flag or a failed read is off. Mock mode: off, unless `NEXT_PUBLIC_ROTRA_MOCK_FLAGS=player_google_sign_in` (dev only) forces it on, because Admin's and the Player app's mock stores are separate.
 - **Amends:** [D-2026-11-16-01](#d-2026-11-16-01) (ships behind the flag); the October 27, 2026 rule "the feature flag catalog starts empty" ([configuration module](../business_logic/product/admin/modules/configuration/README.md)).
 - **References:** [identity module](../business_logic/product/player-information/modules/identity/README.md#login-and-recovery), [configuration module](../business_logic/product/admin/modules/configuration/README.md), [feature flag screens](../screens/product/modules/admin/configuration.md), [`feature_flags` design](../database_design/product/admin/modules/configuration-requests.md).
 
@@ -1145,15 +1146,15 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Amends:** [D-2026-11-17-01](#d-2026-11-17-01) (operator naming, effective date, the text, where it is shown).
 - **Decision:**
   - **Fuller text.** Both pages are rewritten into a more complete version in the same plain-language voice: the Privacy Policy covers the Data Privacy Act of 2012 (legal basis per use, automated ranks, named service providers, storage outside the Philippines, breach notice, cookies, rights, children, links); the Terms add who can use ROTRA, club accounts and licenses, playing at your own risk, ROTRA's property, other companies' services, limits on liability, claims caused by the user, events outside our control, disputes and general terms.
-  - **Operator:** placeholders for now, exactly `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes), so they can be found and filled. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
+  - **Operator:** first shipped as the placeholders `[OPERATOR LEGAL NAME]`, `[OPERATOR ADDRESS]` and `[OPERATOR CITY]` (the city whose courts hear disputes). Filled on November 18, 2026 (owner): the operator is “Jose Adrian Buctuanon (doing business as CodeGourmet IO)”, because CodeGourmet IO is not a registered business; the address is “Lapu-Lapu City, Cebu, Philippines”; the courts are those of Lapu-Lapu City. Revisit the name if the business is registered. A Data Protection Officer is named as a role, reached at `support@rotra.club`.
   - **Age:** you must be 18 to register on your own. Anyone under 18 may use ROTRA only with a parent's or guardian's consent. A club that adds a minor confirms it has that consent.
   - **Club licenses and refunds:** the license, fees, period, payment and refunds are the ones in the club's accepted quotation. A quotation request on rotra.club is not a contract until a quotation is accepted. Nothing overrides rights the law gives.
   - **Google sign-in:** every statement about Google is true whether the `player_google_sign_in` flag ([D-2026-11-18-01](#d-2026-11-18-01)) is on or off ("If you sign in with Google", "or with Google where it is offered").
-  - **rotra.club** gets `#privacy` and `#terms` with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
+  - **rotra.club** gets `/privacy` and `/terms` (first built as the hash routes `#privacy` and `#terms`; moved to pages of their own on November 18, 2026 so each has a URL Google's sign-in branding check can fetch) with the same text (`apps/landingpage/src/app/_components/legal-page/privacy-content.ts` and `terms-content.ts`), built in the same round. The Terms therefore also cover clubs that request a quotation there.
   - **Effective date** on both, everywhere: November 18, 2026.
 - **Open:**
   - The text is still a plain-language draft that a lawyer has not reviewed.
-  - Filling the three placeholders.
+  - ~~Filling the three placeholders.~~ Done November 18, 2026 (see “Operator” above).
   - Designating a Data Protection Officer, and checking whether ROTRA must register with the National Privacy Commission.
   - The `support@rotra.club` mailbox must exist before launch.
   - Retention periods: the pages give none. (The [clubs and licenses module](../business_logic/product/admin/modules/clubs-licenses/README.md#public-pages-and-retention) already has six months for public pages after expiry and 90 days for join requests, server request logs and exports, not yet enforced by a job.)
@@ -1161,9 +1162,10 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the Queue and Admin apps link to the same pages (carried over from D-2026-11-17-01).
 - **References:** [legal screens](../screens/product/modules/player-information/legal.md), [identity module](../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages), `apps/player/src/app/(public)/privacy/content.ts`, `apps/player/src/app/(public)/terms/content.ts`, `apps/mockup/player-app/rotra-player.html` › `LEGAL`.
 
-### D-2026-11-18-02 — Club nickname: set by the Queue Master, shown on Queue Master screens only
+<a id="d-2026-11-18-03"></a>
+### D-2026-11-18-03 — Club nickname: set by the Queue Master, shown on Queue Master screens only
 - **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
+- **Implementation status:** in the mock app (#941 components, #942 data and wiring); real mode written in #927 (stored in `club_players.nickname` of a registered player's record, returned to that club's Queue Master reads only; migration `20261118000500_shared_player_entries` applied to the shared database on November 18, 2026 (38 copied nicknames cleared)) ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
 - **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -1176,6 +1178,31 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - The length limit of a club nickname (the mockup has none).
   - Whether the player can see or remove the nickname a club gave them.
   - Results the Queue Master reads on their own screens after Session done (the mockup: account nickname there too).
-  - Nicknames already copied onto linked saved-player rows before this rule (database).
+  - ~~Nicknames already copied onto linked saved-player rows before this rule (database).~~ Answered November 18, 2026: the migration clears them only where they equal the linked player's account nickname after trimming (exact match).
 - **Amends:** the November 11, 2026 rule (#705) that Saved players always show a registered player's own nickname; “Registered players have no Edit details” still holds, the club nickname is the one exception.
 - **References:** [players module](../business_logic/product/queue/modules/players/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Club nickname](../product-terms.md).
+
+<a id="d-2026-11-18-04"></a>
+### D-2026-11-18-04 — Scoring modes: a scoring mode per Queue Session and a match result that follows it
+- **Decision status:** approved in part (owner, November 18, 2026: “you can have a play on how you want to display it here”; the four answers below). The open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-scoring-modes.md)).
+- **Ticket:** [#944](https://github.com/jose-codegourmet/rotra-v2/issues/944) ([#955](https://github.com/jose-codegourmet/rotra-v2/issues/955) mockup, [#956](https://github.com/jose-codegourmet/rotra-v2/issues/956) docs)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Mockup first;** the real app follows in a later batch.
+  - **A scoring mode per Queue Session**, picked in setup: 16/31 (default), 16/31 no deuce, 11/21, 11/21 × 3, 21 × 3. The match result dialog asks only for what the mode needs: the winner is picked, the winner's score is fixed at the target, and the losing score is typed.
+  - **Best of 3 keeps every game score** (owner's go-ahead for the stored shape). The games decide the match winner; the pair's games won is the match score.
+  - **Deuce:** 16/31, 11/21 and 11/21 × 3 have deuce; 16/31 no deuce and 21 × 3 do not. There is no cap: deuce runs until one pair leads by 2.
+  - **Scores the mode cannot produce are refused,** not just warned. A winner-only result still confirms.
+  - Permanence is unchanged and now covers every game score.
+- **Open:** (the mockup shows a placeholder for each)
+  - Whether the readings of “16/31” (to 31, change sides at 16) and “11/21” are right.
+  - Changing the mode after Start (mockup: fixed after Start), and a different mode for one match.
+  - A club default in Club settings (mockup: none; every session starts on 16/31).
+  - Whether scores stay optional in every mode (mockup: optional), and a best of 3 with game winners but no scores (mockup: stored as the winner only).
+  - Whether game scores show on share images and the Facebook post (mockup: no).
+  - Whether the mode changes the expected match length (courts and time) or the minimum games estimate (mockup: no).
+  - In a deuce mode a normal finish uses the short losing-score entry with Went to deuce for the rest (mockup: yes).
+  - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
+- **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
+- **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.

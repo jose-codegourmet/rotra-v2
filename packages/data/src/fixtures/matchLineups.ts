@@ -5,7 +5,7 @@ import type { MatchFormat } from '../match/match.types'
 import { generateMatches, regenerateScope } from '../match/queue.rules'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
-import { levelLabel, shortName } from '../session-roster/sessionRoster.rules'
+import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'
 
@@ -47,7 +47,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
       return {
         id: p.id,
         name: p.nameSnapshot,
-        shortName: shortName(p),
+        shortName: queueMasterName(p),
         level: p.level,
         games: countedGames(p.id, matches),
       }
@@ -171,7 +171,7 @@ export function createMatchLineupFixtures(now = Date.now()) {
     .map((p) => ({
       id: p.id,
       name: p.nameSnapshot,
-      shortName: shortName(p),
+      shortName: queueMasterName(p),
       level: p.level,
       levelLabel: p.level ? levelLabel(p.level) : null,
     }))

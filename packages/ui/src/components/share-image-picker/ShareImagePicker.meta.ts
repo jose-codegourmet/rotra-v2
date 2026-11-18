@@ -7,7 +7,7 @@ export const shareImagePickerMeta = {
   usage: [
     'Put it inside ShareDialog. Pass one item per image: id, label, hint, format, fileName and a ShareImage.',
     'For the three sizes use SHARE_FORMATS from @rotra/ui/share-card/helpers (Story, Facebook post, Square with their hints).',
-    'Carousel: mouse drag or touch swipe, snapping to the centre; a drag never counts as a click; fade masks only on a side with hidden images; dots mark the centred image. Native scroll-snap (no carousel dependency).',
+    'Carousel: mouse drag or touch swipe, snapping to the centre; a drag never counts as a click; fade masks only on a side with hidden images; dots mark the centred image. The strip is SnapCarousel; native scroll-snap (no carousel dependency).',
     'Tapping an image picks or unpicks it (accent border, check badge); every image starts picked; “N of M picked · Pick all / Clear”. Download and Share are disabled with nothing picked.',
     'The eye (on hover; always on touch) opens ShareImageViewer with Download for that one image.',
     'Share shows only where the system share sheet takes files (webShare overrides the check in stories).',
@@ -27,5 +27,5 @@ export const shareImagePickerMeta = {
     'docs/mockup-changes/2026-11-15-share-save-to-photos.md',
   ],
   variants: ['all-picked', 'some-picked', 'none-picked', 'toolbar', 'no-link', 'save-to-photos'],
-  related: ['ShareDialog', 'ShareImage', 'ShareImageViewer', 'CopyField'],
+  related: ['ShareDialog', 'ShareImage', 'ShareImageViewer', 'CopyField', 'SnapCarousel'],
 } satisfies ComponentMeta

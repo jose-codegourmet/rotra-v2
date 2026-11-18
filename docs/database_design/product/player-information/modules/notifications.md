@@ -1,6 +1,6 @@
-# Player notifications (proposal)
+# Player notifications
 
-**Status:** proposed for [D-2026-11-16-03](../../../../mvp/decisions.md#d-2026-11-16-03); nothing is built. Prisma file when built: the Player Information entity group, not a shared schema file.
+**Status:** Migration `20261118000400_player_notifications` and real-mode services implemented in source for [D-2026-11-16-03](../../../../mvp/decisions.md#d-2026-11-16-03). Prisma models live in the Player entity group.
 
 ## `player_notifications`
 
@@ -16,12 +16,14 @@
 | `created_at` | timestamptz | |
 | `read_at` | timestamptz, nullable | |
 
-Written by the server services that already handle each event (join request decisions, publishing results, rank recompute, contact-change review, club saved-player adds). No Realtime channel: the page reads on open and on focus, like other Player reads.
+The source type and UUID must be present or absent together. All seven event writers supply both values and insert inside the event transaction. The source identifies the admission assessment, waitlist entry, publication event, rank job, club add operation, contact-change request or Admin verification audit event. The unique index deduplicates concurrent delivery. The recipient FK restricts player deletion.
+
+RLS is enabled and table privileges are revoked from `anon`, `authenticated` and `PUBLIC`. The authenticated Player Route Handlers scope every read and read-state change to the signed-in player. The page refreshes on open and focus.
 
 ## Announcements
 
-Pinned ROTRA announcements that depend on the player's state (verification) are **derived on read**, not stored per player. Free-text announcements from Admin, if approved, would be one `announcements` row (title, body, target, audience, starts and ends) read by every matching player, with a per-player dismissal table. Not designed until the Admin screen is decided.
+The pinned verification reminder is derived from #889. Its first read time uses the nullable `player_accounts.verification_reminder_read_at` timestamp. The reminder disappears when verification succeeds. Free-text announcements from Admin, if approved, would be one `announcements` row (title, body, target, audience, starts and ends) read by every matching player, with a per-player dismissal table. Not designed until the Admin screen is decided.
 
 ## Retention
 
-Open. The mockup says 90 days; a scheduled delete would need the jobs decision in [backend open decisions](../../../../backend/open-decisions.md).
+Owner decision, November 18, 2026: list visibility is 90 days. Filter reads by creation time; automatic database deletion is deferred and would need the jobs decision in [backend open decisions](../../../../backend/open-decisions.md). Free-text announcements remain out of scope; only the derived verification reminder is approved.

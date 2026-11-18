@@ -2,10 +2,13 @@
 import type { AdminPlayer } from '@rotra/data/admin-player/types'
 import type { PlayerProfile, PlayerSessionRecord } from '@rotra/data/player/types'
 import type { ParticipantStats } from '@rotra/data/public-session/types'
+import { formatPhoneForDisplay } from '@rotra/schema/phone'
 import {
   AdminEditPlayerForm,
   type AdminEditPlayerFormProps,
 } from '@rotra/ui/admin-edit-player-form'
+import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
+import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
@@ -71,6 +74,11 @@ export type AdminPlayerQuickViewProps = {
   rotraProfileHref?: string | null
   /** Share profile in the footer (between Full history and Full profile); registered players only */
   onShare?: () => void
+  /**
+   * An older unclaimed record with a phone and no email (D-2026-11-16-04): the warn Details
+   * required chip next to Unclaimed and its notice. Ignored for a registered player.
+   */
+  detailsRequired?: boolean
 }
 
 export function AdminPlayerQuickView(props: AdminPlayerQuickViewProps) {
@@ -105,7 +113,11 @@ function QuickViewPanel({
   statsLoading = false,
   rotraProfileHref,
   onShare,
+  detailsRequired: detailsRequiredProp = false,
 }: AdminPlayerQuickViewProps) {
+  const detailsRequired = detailsRequiredProp && !!p && !p.claimed
+  const savedBy = p ? savedByClubs(p) : null
+  const firstClub = p?.clubs[0]?.name ?? 'The club'
   const [mode, setMode] = useState(initialMode)
   const level =
     p?.levelIndex == null
@@ -156,6 +168,7 @@ function QuickViewPanel({
           <div className="flex flex-wrap gap-1.5">
             <Chip tone={level ? 'accent' : 'neutral'}>{level ?? 'No rank yet'}</Chip>
             <Chip>{p.claimed ? 'Registered' : 'Unclaimed'}</Chip>
+            {detailsRequired ? <Chip tone="warn">Details required</Chip> : null}
           </div>
         ) : (
           <span className={cn('text-sm text-fg2', mode === 'edit' && 'font-mono')}>
@@ -310,9 +323,16 @@ function QuickViewPanel({
                 <>
                   <Chip tone={level ? 'accent' : 'neutral'}>{level ?? 'No rank yet'}</Chip>
                   <Chip>{p.claimed ? 'Registered' : 'Unclaimed'}</Chip>
+                  {detailsRequired ? <Chip tone="warn">Details required</Chip> : null}
                 </>
               }
             >
+              {detailsRequired ? (
+                <Notice tone="warn" title="Details required.">
+                  This older record has a phone and no email. {firstClub} must add an email or
+                  delete the record.
+                </Notice>
+              ) : null}
               {!p.claimed ? (
                 <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-lg border border-dashed border-border-strong px-3 py-2.5">
                   <div className="flex min-w-0 flex-col gap-0.5">
@@ -336,7 +356,9 @@ function QuickViewPanel({
               ) : null}
               <dl className="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm max-[420px]:grid-cols-1 max-[420px]:gap-y-0 [&>dt]:text-fg2 [&>dd]:min-w-0 [&>dd]:[overflow-wrap:anywhere] max-[420px]:[&>dd]:mb-2">
                 <dt>Phone</dt>
-                <dd className="font-mono">{p.phone || 'Not given'}</dd>
+                <dd className="font-mono">
+                  {p.phone ? formatPhoneForDisplay(p.phone) : 'Not given'}
+                </dd>
                 <dt>Email</dt>
                 <dd className="font-mono">{p.email || 'Not given'}</dd>
                 <dt>Socials</dt>
@@ -357,6 +379,14 @@ function QuickViewPanel({
                     <span className="text-fg2">None added</span>
                   )}
                 </dd>
+                {savedBy ? (
+                  <>
+                    <dt>Created by</dt>
+                    <dd>
+                      <AdminPlayerClubs clubs={p.clubs} savedBy={savedBy} />
+                    </dd>
+                  </>
+                ) : null}
               </dl>
               {year !== undefined ? (
                 <ProfileStatsSection year={year} stats={stats} loading={statsLoading} />

@@ -10,7 +10,7 @@ import type {
   SessionWaitlistEntry,
 } from '../generated/prisma/client'
 import { toDecimalString, toIso, toIsoOrNull } from '../service/serialize'
-import { levelCodeFor } from './session-store'
+import { levelCodeFor, type RosterNames } from './session-store'
 
 /** The stored Players can request list as the `RequestFormats` switches every format has. */
 export const requestFormatsRecord = (formats: readonly MatchFormat[]) =>
@@ -86,13 +86,19 @@ export function courtDto(court: SessionCourt) {
   }
 }
 
-export function rosterEntryDto(entry: SessionPlayer, nickname: string | null) {
+/**
+ * A Queue Master roster row (Q-ROSTER): club-scoped, never a public or player read. `names` from
+ * `rosterNamesOf`: the nickname players see, and the club nickname of a registered player
+ * (D-2026-11-18-03), which only this club's Queue Master reads carry.
+ */
+export function rosterEntryDto(entry: SessionPlayer, names: RosterNames | null) {
   return {
     id: entry.id,
     sessionId: entry.sessionId,
     clubPlayerId: entry.clubPlayerId,
     nameSnapshot: entry.nameSnapshot,
-    nicknameSnapshot: nickname,
+    nicknameSnapshot: names?.nickname ?? null,
+    clubNickname: names?.clubNickname ?? null,
     present: entry.present,
     presentChangedAt: toIso(entry.presentChangedAt),
     level: levelCodeFor(entry.skillLevelId),

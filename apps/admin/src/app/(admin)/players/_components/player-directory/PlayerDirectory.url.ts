@@ -7,7 +7,10 @@ export function directoryFilters(search: URLSearchParams): AdminPlayerListParams
   const size = Number(search.get('size') ?? search.get('shown') ?? 25)
   return {
     q: search.get('q') ?? '',
-    account: account === 'registered' || account === 'unclaimed' ? account : 'all',
+    account:
+      account === 'registered' || account === 'unclaimed' || account === 'details'
+        ? account
+        : 'all',
     level:
       level === 'beginner' || level === 'intermediate' || level === 'advanced' || level === 'none'
         ? level

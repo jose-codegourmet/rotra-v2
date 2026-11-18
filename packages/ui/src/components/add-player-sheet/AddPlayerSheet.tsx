@@ -21,7 +21,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { TextInput } from '@rotra/ui/text-input'
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
-/** A saved player or a Player Information result the Queue Master can add. Never carries a phone. */
+/** A saved player or a Player Information result the Queue Master can add. Never carries a phone or an email. */
 export type AddPlayerCandidate = {
   /** Club player id (saved) or public player id (Player Information) */
   id: string
@@ -36,6 +36,13 @@ export type AddPlayerCandidate = {
   phoneHidden?: boolean
   /** Player Information rows only: "Rank 214" or "Not ranked yet" */
   rankLabel?: string
+  /** An older unclaimed record with no email: the warn "Details required" chip and line */
+  detailsRequired?: boolean
+  /**
+   * Another club's unclaimed player from Player Information (D-2026-11-16-04): "Not registered
+   * yet" with the RTR ID and no name, picture or level; picking one asks for this club's own name.
+   */
+  ownNameRequired?: boolean
 }
 
 export type AddPlayerSource = 'saved' | 'directory'
@@ -45,6 +52,8 @@ export type AddPlayerConfirmInput = {
   candidate: AddPlayerCandidate
   source: AddPlayerSource
   level: PlayingLevel
+  /** This club's own name for another club's unclaimed player (ownNameRequired); trimmed, never empty */
+  name?: string
 }
 
 /** Saving to the saved players with no session: the level may stay empty (no level yet). */
@@ -93,6 +102,11 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   onDirectorySearch?: (query: string) => void
   /** Player Information results for the current query */
   directoryResults?: AddPlayerCandidate[]
+  /**
+   * The exact RTR ID or email typed belongs to a saved player: the list says "NAME is already in
+   * your saved players." instead of "No ROTRA player has that RTR ID or email."
+   */
+  directorySavedName?: string
   /** Player Information lookup running: Skeleton rows (the container must end it, it never spins forever) */
   directoryLoading?: boolean
   /** An add is running: primaries show a spinner and nothing fires twice */
@@ -109,6 +123,8 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   lastAdded?: string | null
   /** Adds so far while this sheet has been open; a change clears the tab and refocuses it */
   addedCount?: number
+  /** New player: the email typed already belongs to this saved player's name (the form refuses it) */
+  newPlayerEmailSavedAs?: string
   /** Tab shown when the sheet opens; Saved players (Player Information in the club context) unless a story or container says otherwise */
   initialTab?: AddPlayerTab
 }
@@ -120,6 +136,7 @@ const TABS: { value: AddPlayerTab; label: string }[] = [
 ]
 
 const LEVEL_ERROR = 'Choose a level for this club before adding.'
+const NAME_ERROR = 'Enter a name.'
 
 const matches = (candidate: AddPlayerCandidate, query: string) =>
   !query ||
@@ -149,12 +166,17 @@ function CandidateRow({
         'hover:not-disabled:bg-elev disabled:cursor-not-allowed disabled:opacity-45 touch:min-h-12',
       )}
     >
-      <Avatar name={candidate.name} src={candidate.photoUrl} />
+      <Avatar
+        name={candidate.ownNameRequired ? 'Not registered' : candidate.name}
+        src={candidate.ownNameRequired ? undefined : candidate.photoUrl}
+      />
       <span className="flex min-w-0 flex-1 flex-col">
-        <b className="[overflow-wrap:anywhere]">{candidate.name}</b>
+        <b className="[overflow-wrap:anywhere]">
+          {candidate.ownNameRequired ? 'Not registered yet' : candidate.name}
+        </b>
         <span className="text-[13px] text-fg2">{subtitle}</span>
       </span>
-      <IdentityChip identity={candidate.identity} />
+      <IdentityChip identity={candidate.identity} detailsRequired={candidate.detailsRequired} />
     </button>
   )
 }
@@ -175,6 +197,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     onDirectorySearch,
     directoryResults = [],
     directoryLoading = false,
+    directorySavedName,
+    newPlayerEmailSavedAs,
     isPending = false,
     serverError,
     serverErrorReturnsToList = false,
@@ -197,6 +221,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   } | null>(null)
   const [level, setLevel] = useState<PlayingLevel | null>(null)
   const [levelError, setLevelError] = useState('')
+  const [ownName, setOwnName] = useState('')
+  const [nameError, setNameError] = useState('')
   // Remounts the search field or the form so it starts empty after an add.
   const [round, setRound] = useState(0)
 
@@ -205,6 +231,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     setPick(null)
     setLevel(null)
     setLevelError('')
+    setOwnName('')
+    setNameError('')
     setRound((r) => r + 1)
   }
 
@@ -260,25 +288,36 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   }
 
   // Any pick with a level is added in one tap at that level (it can still change on the roster
-  // before Start); without one, the level step opens.
+  // before Start); without one, the level step opens. Another club's unclaimed player always opens
+  // the card: this club's own name for them is needed first.
   const pickCandidate = (candidate: AddPlayerCandidate, source: AddPlayerSource) => {
-    if (candidate.suggestion) {
+    if (candidate.suggestion && !candidate.ownNameRequired) {
       confirm({ candidate, source, level: candidate.suggestion })
       return
     }
     setPick({ candidate, source })
     setLevel(candidate.suggestion)
     setLevelError('')
+    setOwnName('')
+    setNameError('')
   }
 
   const confirmPick = () => {
     if (!pick || isPending) return
+    const nameMissing = pick.candidate.ownNameRequired && !ownName.trim()
     // Saving with no session may leave the level empty; adding to a session needs one.
-    if (!level && !club) {
-      setLevelError(LEVEL_ERROR)
+    const levelMissing = !level && !club
+    if (nameMissing || levelMissing) {
+      setNameError(nameMissing ? NAME_ERROR : '')
+      setLevelError(levelMissing ? LEVEL_ERROR : '')
       return
     }
-    confirm({ candidate: pick.candidate, source: pick.source, level })
+    confirm({
+      candidate: pick.candidate,
+      source: pick.source,
+      level,
+      ...(pick.candidate.ownNameRequired ? { name: ownName.trim() } : {}),
+    })
   }
 
   const full = session !== null && !live && session.openSlots <= 0
@@ -358,6 +397,14 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
           photoUrl={pick.candidate.photoUrl}
           rtrId={pick.candidate.rtrId}
           identity={pick.candidate.identity}
+          detailsRequired={pick.candidate.detailsRequired}
+          nameRequired={pick.candidate.ownNameRequired}
+          ownName={ownName}
+          onOwnNameChange={(next) => {
+            setOwnName(next)
+            setNameError('')
+          }}
+          nameError={nameError}
           phoneHidden={pick.candidate.phoneHidden}
           suggestion={pick.candidate.suggestion}
           level={level}
@@ -407,7 +454,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                       candidate={candidate}
                       subtitle={
                         candidate.rtrId ??
-                        (candidate.identity === 'unclaimed' ? 'Not registered yet' : 'Guest')
+                        (candidate.identity === 'unclaimed' ? 'Details required' : 'Guest')
                       }
                       onPick={() => pickCandidate(candidate, 'saved')}
                       disabled={isPending}
@@ -427,18 +474,21 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
           {tab === 'directory' ? (
             offline ? (
               <Notice tone="warn">
-                Player Information search needs internet. Add them as a new player now; their
-                profile can be linked after you reconnect.
+                Player Information search needs internet. Add them as a new player with their email
+                now; ROTRA looks them up after you reconnect.
               </Notice>
             ) : (
               <>
-                <Field label="Search Player Information">
+                <Field
+                  label="Search Player Information"
+                  hint="Enter the full RTR ID or email. Names are searched in your saved players only."
+                >
                   <TextInput
                     key={round}
                     type="search"
                     value={query}
                     onChange={(event) => changeQuery(event.target.value)}
-                    placeholder="Name or RTR ID"
+                    placeholder="Full RTR ID or email"
                     autoComplete="off"
                   />
                 </Field>
@@ -481,12 +531,18 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                         />
                       ))
                     ) : (
-                      <EmptyState>No match in Player Information.</EmptyState>
+                      <EmptyState>
+                        {q && directorySavedName
+                          ? `${directorySavedName} is already in your saved players.`
+                          : q
+                            ? 'No ROTRA player has that RTR ID or email.'
+                            : 'Enter an RTR ID or email to find a ROTRA player.'}
+                      </EmptyState>
                     )}
                   </div>
                 )}
                 <p className="m-0 text-[13px] text-fg2">
-                  Results only suggest people. Confirm with the player before linking.
+                  Confirm with the player before adding them.
                 </p>
               </>
             )
@@ -501,6 +557,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 context="club"
                 isPending={isPending}
                 serverError={serverError}
+                emailSavedAs={newPlayerEmailSavedAs}
                 onSubmit={props.onSubmitNewPlayer}
               />
             ) : (
@@ -512,6 +569,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 full={full}
                 isPending={isPending}
                 serverError={serverError}
+                emailSavedAs={newPlayerEmailSavedAs}
                 onSubmit={props.onSubmitNewPlayer}
               />
             )

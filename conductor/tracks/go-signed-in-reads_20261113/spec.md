@@ -11,11 +11,12 @@ Moves every remaining GET once sign-in exists, so screens read from Go before wr
 
 ### R1: Player reads
 
-`/api/me/*`, account, my clubs, my sessions, player compare, signed-in public-session access (#569).
+`/api/me/*`, account, my clubs, my sessions, player compare, signed-in public-session access (#569), and the signed-in match history of a finished session (`GET /api/public-sessions/{slug}/match-history`, `readPublicMatchHistory`, added to the Player app in #850 after this track was written).
 
 **Accepted when:**
 
 - [ ] Characterization tests pass; own-data rules enforced
+- [ ] Match history: `null` until the session is completed; only the Player's own matches until the club shares the results; only the paired Queue origin may call it
 
 ### R2: Admin reads
 
@@ -42,6 +43,26 @@ Fixes to the public reads, decided on November 18, 2026 ([backend decisions](../
 - **B-55:** the public club read sends no invite code; masked members carry no level and no stable key. The Join button change starts in the mockup first.
 - **B-56:** published results on the public session page mask private and always-private players.
 - **B-60:** list `/api/leaderboard`, `/api/players` and `/api/rtr-ids` in `ROTRA_GO_MOVED_AREAS` once their signed-in siblings are in Go.
+
+## Carried in from main (merged November 18, 2026)
+
+The TypeScript reads changed on `main` after go-public-reads was completed (Epics P12 to P15 and the period leaderboards). The Go reads in `apps/api/internal/publicreads` still follow the older behavior. Each item ports the new behavior and updates the golden cases in `apps/api/internal/publicreads/testdata/`.
+
+Already-ported reads that changed:
+
+- **Leaderboard ([D-2026-11-16-05](../../../docs/mvp/decisions.md#d-2026-11-16-05)):** `/api/leaderboard` and `/api/leaderboard/search` take `period` (annual, monthly, weekly) and rank by wins from recorded match facts (`readPeriodLeaderboard`). Search is now per viewer. `/api/leaderboard/me` is a signed-in read.
+- **Profile and RTR ID ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04)):** `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}` read the viewer (`readVisibleProfile`). An unclaimed player saved by one club shows that club's name and nickname for them and `unclaimedSavedBy`. The profile carries `leaderboardPlaces`.
+- **Public session page:** an unclaimed player with an open shared entry is shown in full, with the club's own name and nickname.
+- **Year game stats by RTR ID** (`GET /api/rtr-ids/{rtrId}/stats`, not in Go yet): an unclaimed player's games come from every club record under their shared entry.
+
+New signed-in reads:
+
+- `GET /api/me/notifications`, `GET /api/me/notifications/unread-count` ([D-2026-11-16-03](../../../docs/mvp/decisions.md#d-2026-11-16-03)).
+- `GET /api/me/verification` and Admin `GET /api/players/{playerId}/verification` ([D-2026-11-16-02](../../../docs/mvp/decisions.md#d-2026-11-16-02)); `/api/me/account` now carries the Google identity fields.
+- `GET /api/invites/{clubId}` (P-INVITE and where a signed-in player stands on a session).
+- Queue and Admin player lists: lookup by exact RTR ID or email, the four player statuses, club nickname.
+
+**Stop and ask before porting:** the new profile read (`readVisibleProfile`, behind both `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}`) refuses instead of masking, which differs from B-53 and B-54 above. Always-private: `forbidden` for every caller but the owner (B-54: a masked profile; B-53: 404 on the RTR ID route for a caller who is not signed in). Private, or unclaimed under more than one club, and not signed in: `unauthenticated` (B-54: a masked profile; B-53: 404 on the RTR ID route). The owner decides which rule both stacks follow.
 
 ## Scope
 

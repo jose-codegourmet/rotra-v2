@@ -75,6 +75,16 @@ Each write appends its live-update event in the same transaction (used by the li
 - [ ] Every write that changes the session snapshot appends an event, so the snapshot version moves
 - [ ] The session row keeps its latest event id; events older than 7 days are deleted by the housekeeping loop ([B-34](../../../docs/backend/open-decisions.md#settled)) and the snapshot version is unchanged
 
+## Carried in from main (merged November 18, 2026)
+
+Queue writes added or changed on `main` after this track was written. They are in scope for R2.
+
+- **Replace player on a Playing match** (#840, `match-control.ts`).
+- **No show (cancelled)** ([D-2026-11-14-02](../../../docs/mvp/decisions.md#d-2026-11-14-02)): no fee, club-only, after Start only.
+- **Shared player entries** ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04), migration `20261118000500_shared_player_entries`): saving an unclaimed player needs an email and allocates an RTR ID; a second club entering the same email gets the same entry; a guest becomes unclaimed when an email is added.
+- **New routes:** `/api/club/players/{clubPlayerId}/move` (same person) and `/club-nickname`.
+- **Join request:** a guest request no longer carries a phone.
+
 ## Scope
 
 **In:** All Queue write routes.

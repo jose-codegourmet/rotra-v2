@@ -7,7 +7,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 ## Phase 1: Player
 
 - [ ] **1.1** Characterize + port me/account/clubs/sessions
-- [ ] **1.2** Compare and #569 access
+- [ ] **1.2** Compare, #569 access and the signed-in match history read (#850)
 
 ## Phase 2: Admin
 

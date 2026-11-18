@@ -23,6 +23,7 @@ import type { QueueSession } from '../generated/prisma/client'
 import { requireOwnPlayer } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { openDropOutNotices } from './drop-out-notices'
 import { requestFormatsRecord } from './dto'
 import {
   type AutoFillOptions,
@@ -30,7 +31,6 @@ import {
   autoFillCourts,
   withAutoPlaced,
 } from './match-control'
-import { openDropOutNotices } from './drop-out-notices'
 import { appendMatch } from './match-queue'
 import {
   closeStaleMatchRequests,

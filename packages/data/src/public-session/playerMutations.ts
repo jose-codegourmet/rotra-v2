@@ -7,9 +7,9 @@ import { type MockState, mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import {
   realCancelMyJoinRequest,
+  realGetSessionInviteCode,
   realJoinAsPlayer,
   realLeaveSession,
-  realGetSessionInviteCode,
   realMoveMeToWaitlist,
   realSelfCheckIn,
   realSendDropOutNotice,

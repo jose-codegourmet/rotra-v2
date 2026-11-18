@@ -9,11 +9,11 @@ import {
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import {
+  makeInviteCode,
   maskPublicName,
   myMatchLabel,
   publicFirstName,
   publicLevel,
-  makeInviteCode,
   publicSkillMix,
   selfCheckInMark,
 } from '@rotra/data/public-session/rules'

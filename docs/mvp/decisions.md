@@ -1165,7 +1165,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-18-03"></a>
 ### D-2026-11-18-03 — Club nickname: set by the Queue Master, shown on Queue Master screens only
 - **Decision status:** approved (owner, November 18, 2026: “in a session they can have their own nickname set by the QM but in the leaderboards and results it will pickup their Account Nicknames”; how long it lasts: “Club nickname .. I like it”; where it shows: Queue Master screens only). The open items below are not decided.
-- **Implementation status:** in the mock app (#941 components, #942 data and wiring); real mode written in #927 (stored in `club_players.nickname` of a registered player's record, returned to that club's Queue Master reads only; migration `20261118000500_shared_player_entries` applied locally only, not yet to the shared database) ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
+- **Implementation status:** in the mock app (#941 components, #942 data and wiring); real mode written in #927 (stored in `club_players.nickname` of a registered player's record, returned to that club's Queue Master reads only; migration `20261118000500_shared_player_entries` applied to the shared database on November 18, 2026 (38 copied nicknames cleared)) ([log](../mockup-changes/2026-11-18-queue-club-nickname.md)).
 - **Ticket:** [#941](https://github.com/jose-codegourmet/rotra-v2/issues/941), [#942](https://github.com/jose-codegourmet/rotra-v2/issues/942); real mode in [#927](https://github.com/jose-codegourmet/rotra-v2/issues/927) (Epic P15, [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900))
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**

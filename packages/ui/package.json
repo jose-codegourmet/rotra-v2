@@ -467,6 +467,8 @@
     "./share-card/helpers": "./src/components/share-card/ShareCard.helpers.ts",
     "./share-image": "./src/components/share-image/ShareImage.tsx",
     "./share-image-picker": "./src/components/share-image-picker/ShareImagePicker.tsx",
+    "./snap-carousel": "./src/components/snap-carousel/SnapCarousel.tsx",
+    "./identity-picker": "./src/components/identity-picker/IdentityPicker.tsx",
     "./share-image-viewer": "./src/components/share-image-viewer/ShareImageViewer.tsx",
     "./share-dialog": "./src/components/share-dialog/ShareDialog.tsx",
     "./session-title-link": "./src/components/session-title-link/SessionTitleLink.tsx",

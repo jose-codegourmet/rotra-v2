@@ -6,6 +6,7 @@ export const playerClubsCardMeta = {
   usage: [
     'Use on P-OWN-PROFILE and P-PUBLIC-PROFILE whenever the profile is readable.',
     'isOwn shows the "Your clubs" heading and the muted joined-via line; another player\'s rows never carry joinedVia.',
+    'An unclaimed player\'s card lists the one club that saved them (no joinedVia), instead of "No clubs yet.".',
     'Leave club lives on the club page hero; there is no Report a problem.',
   ],
   prototype: {
@@ -18,6 +19,8 @@ export const playerClubsCardMeta = {
     'OtherPlayer',
     'Empty',
     'OtherPlayerEmpty',
+    'UnclaimedSavedByOneClub',
+    'UnclaimedSavedByOneClubLight',
     'LongName',
     'TwoClubsLight',
     'OtherPlayerLight',

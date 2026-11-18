@@ -20,6 +20,6 @@ export const clubMemberProfileSheetMeta = {
     'docs/screens/product/modules/player-information/profile.md',
     'docs/screens/product/modules/player-information/club-page.md',
   ],
-  variants: ['public', 'private', 'no-games', 'loading'],
+  variants: ['public', 'private', 'unclaimed', 'no-games', 'loading'],
   related: ['ProfileBannerCard', 'ClubMemberGrid', 'ClubMemberList', 'PhotoViewer'],
 } satisfies ComponentMeta

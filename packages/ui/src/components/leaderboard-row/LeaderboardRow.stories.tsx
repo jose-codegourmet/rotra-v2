@@ -89,3 +89,19 @@ export const Unclaimed: Story = {
     unclaimed: true,
   },
 }
+export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
+/** A name search result: no period columns, the level on the right, the chip after the name. */
+export const UnclaimedSearchResult: Story = {
+  args: {
+    ...Unclaimed.args,
+    period: undefined,
+    previousPosition: undefined,
+    wins: undefined,
+    position: 18,
+    levelLabel: 'Intermediate Low',
+  },
+}
+export const UnclaimedPhone: Story = {
+  ...Unclaimed,
+  globals: { viewport: { value: 'phone' } },
+}

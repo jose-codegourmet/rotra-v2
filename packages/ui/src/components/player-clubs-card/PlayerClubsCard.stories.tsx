@@ -36,6 +36,17 @@ export const OtherPlayer: Story = {
     ],
   },
 }
+/** An unclaimed player: the one club that saved them, in place of "No clubs yet." */
+export const UnclaimedSavedByOneClub: Story = {
+  args: {
+    isOwn: false,
+    clubs: [{ id: 'c1', name: 'Lahug Smash Club', initials: 'LS', clubPageHref: '#' }],
+  },
+}
+export const UnclaimedSavedByOneClubLight: Story = {
+  ...UnclaimedSavedByOneClub,
+  globals: { theme: 'light' },
+}
 export const Empty: Story = { args: { clubs: [] } }
 export const OtherPlayerEmpty: Story = { args: { isOwn: false, clubs: [] } }
 export const LongName: Story = {

@@ -11,14 +11,8 @@ import {
   type ShareFormat,
 } from '@rotra/ui/share-card/helpers'
 import { ShareImageViewer } from '@rotra/ui/share-image-viewer'
-import {
-  type ReactNode,
-  type PointerEvent as ReactPointerEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { SnapCarousel } from '@rotra/ui/snap-carousel'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 export type ShareImagePickerItem = {
   /** Stable id: the format ('story' | 'post' | 'square') or a page number */
@@ -72,8 +66,8 @@ export type ShareImagePickerProps = {
 
 /**
  * The share dialog body (2026-11-13 share dialog logs): every image at full size in a compact
- * carousel (drag with the mouse, swipe on touch, snapping to the centre; a drag never counts as a
- * click; fade masks only on a side with hidden images; dots under it). Tapping an image picks or
+ * carousel (SnapCarousel: drag with the mouse, swipe on touch, snapping to the centre; a drag never
+ * counts as a click; fade masks only on a side with hidden images; dots under it). Tapping an image picks or
  * unpicks it; all start picked. The eye opens it full screen. Download N images and Share act on the
  * picked images. Then the big OR and the link field with the copy icon inside.
  */
@@ -109,12 +103,7 @@ export function ShareImagePicker({
   const [detected, setDetected] = useState(false)
   const [apple, setApple] = useState(false)
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement | null>>({})
-  const [edges, setEdges] = useState({ left: false, right: false, active: 0 })
-  const [dragging, setDragging] = useState(false)
-  const stripRef = useRef<HTMLDivElement>(null)
   const cards = useRef(new Map<string, HTMLElement>())
-  const drag = useRef<{ x: number; left: number } | null>(null)
-  const moved = useRef(false)
 
   const chosen = items.filter((item) => picked.includes(item.id))
   const n = chosen.length
@@ -145,77 +134,6 @@ export function ShareImagePicker({
     }
     setApple(isAppleMobile())
   }, [])
-
-  // The prototypes' shCarSync: masks on the sides with hidden images, the dot of the centred image.
-  const sync = useCallback(() => {
-    const el = stripRef.current
-    if (!el) return
-    const max = el.scrollWidth - el.clientWidth - 2
-    const mid = el.scrollLeft + el.clientWidth / 2
-    let active = 0
-    let best = Number.POSITIVE_INFINITY
-    Array.from(el.children).forEach((child, index) => {
-      const item = child as HTMLElement
-      const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - mid)
-      if (distance < best) {
-        best = distance
-        active = index
-      }
-    })
-    setEdges({ left: el.scrollLeft > 2, right: el.scrollLeft < max, active })
-  }, [])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when the set of images changes
-  useEffect(() => {
-    const el = stripRef.current
-    if (!el) return
-    sync()
-    const observer = new ResizeObserver(sync)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [sync, idsKey])
-
-  // Opens centred on `startAt` (once per set of images).
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only when the set of images changes
-  useEffect(() => {
-    const el = stripRef.current
-    const index = startAt ? items.findIndex((item) => item.id === startAt) : -1
-    const child = index > 0 ? (el?.children[index] as HTMLElement | undefined) : undefined
-    if (!el || !child) return
-    el.scrollLeft = child.offsetLeft + child.offsetWidth / 2 - el.clientWidth / 2
-    sync()
-  }, [idsKey, startAt])
-
-  // Mouse drag scrolls the strip; touch scrolls natively.
-  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const el = stripRef.current
-    if (!el || event.pointerType !== 'mouse' || event.button !== 0) return
-    if ((event.target as Element).closest('[data-share-eye]')) return
-    drag.current = { x: event.clientX, left: el.scrollLeft }
-    moved.current = false
-    const move = (e: PointerEvent) => {
-      const d = drag.current
-      if (!d) return
-      const dx = e.clientX - d.x
-      if (!moved.current && Math.abs(dx) > 6) {
-        moved.current = true
-        setDragging(true)
-      }
-      if (moved.current) el.scrollLeft = d.left - dx
-    }
-    const up = () => {
-      drag.current = null
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-      if (moved.current) {
-        setDragging(false)
-        setTimeout(() => {
-          moved.current = false
-        }, 0)
-      }
-    }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-  }
 
   const toggle = (id: string) =>
     setPicked((current) =>
@@ -287,16 +205,6 @@ export function ShareImagePicker({
   const viewed = items.find((item) => item.id === viewing) ?? null
   const disabled = busy || loading || n === 0
   const count = `${n} of ${items.length}${countUnit ? ` ${items.length === 1 ? countUnit.one : countUnit.other}` : ''} picked`
-  // Masks are alpha only: the gradient colour never shows.
-  const mask =
-    edges.left && edges.right
-      ? '[mask-image:linear-gradient(90deg,transparent,black_64px,black_calc(100%-64px),transparent)]'
-      : edges.left
-        ? '[mask-image:linear-gradient(90deg,transparent,black_64px)]'
-        : edges.right
-          ? '[mask-image:linear-gradient(270deg,transparent,black_64px)]'
-          : ''
-
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <div
@@ -318,94 +226,66 @@ export function ShareImagePicker({
           </button>
         </span>
       </div>
-      {/* biome-ignore lint/a11y/useSemanticElements: an ARIA carousel group is not a form fieldset. */}
-      <div
-        ref={stripRef}
-        role="group"
-        aria-label="Images"
-        onScroll={sync}
-        onPointerDown={onPointerDown}
-        onClickCapture={(event) => {
-          if (moved.current) {
-            event.preventDefault()
-            event.stopPropagation()
-            moved.current = false
-          }
-        }}
-        className={cn(
-          'flex w-full cursor-grab snap-x snap-mandatory scroll-px-6 items-start gap-5 overflow-x-auto overscroll-x-contain px-6 pt-3 pb-1.5 select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&_img]:[-webkit-user-drag:none] [&_svg]:[-webkit-user-drag:none]',
-          dragging && 'cursor-grabbing snap-none [&_*]:pointer-events-none',
-          mask,
-        )}
-      >
-        {items.map((item) => {
+      <SnapCarousel
+        label="Images"
+        startAt={startAt}
+        dragIgnore="[data-share-eye]"
+        itemClassName="group relative flex flex-col items-center gap-2"
+        items={items.map((item) => {
           const on = picked.includes(item.id)
-          return (
-            <div
-              key={item.id}
-              className="group relative flex flex-none snap-center flex-col items-center gap-2"
-            >
-              <button
-                type="button"
-                aria-pressed={on}
-                aria-label={`${item.label}${item.hint ? `, ${item.hint}` : ''}. ${on ? 'Picked' : 'Not picked'}`}
-                onClick={() => toggle(item.id)}
-                className={cn(
-                  'relative block cursor-pointer rounded-[23px] border-3 bg-transparent p-0 text-left leading-normal focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent',
-                  on ? 'border-accent' : 'border-transparent',
-                )}
-              >
-                <span
-                  ref={(el) => {
-                    const card = el?.firstElementChild as HTMLElement | null | undefined
-                    if (card) cards.current.set(item.id, card)
-                    else cards.current.delete(item.id)
-                  }}
-                  className="block"
-                >
-                  {item.image}
-                </span>
-                <i
-                  aria-hidden="true"
+          return {
+            id: item.id,
+            node: (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  aria-label={`${item.label}${item.hint ? `, ${item.hint}` : ''}. ${on ? 'Picked' : 'Not picked'}`}
+                  onClick={() => toggle(item.id)}
                   className={cn(
-                    'absolute -top-[11px] -left-[11px] z-2 grid size-[30px] place-items-center rounded-full border-3 border-surface not-italic',
-                    on ? 'bg-accent text-on-accent' : 'bg-overlay text-transparent',
+                    'relative block cursor-pointer rounded-[23px] border-3 bg-transparent p-0 text-left leading-normal focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent',
+                    on ? 'border-accent' : 'border-transparent',
                   )}
                 >
-                  <Icon name="check" size={15} />
-                </i>
-              </button>
-              <button
-                type="button"
-                data-share-eye
-                onClick={() => setViewing(item.id)}
-                aria-label={`View ${item.label} full screen`}
-                title="View full screen"
-                className="absolute top-[15px] right-[15px] z-3 grid size-10 cursor-pointer place-items-center rounded-full border-0 bg-share-eye p-0 text-photo-fg opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
-              >
-                <Icon name="eye" size={20} />
-              </button>
-              <span className="flex flex-col items-center">
-                <b className="text-sm">{item.label}</b>
-                {item.hint ? <span className="text-xs text-fg2">{item.hint}</span> : null}
-              </span>
-            </div>
-          )
+                  <span
+                    ref={(el) => {
+                      const card = el?.firstElementChild as HTMLElement | null | undefined
+                      if (card) cards.current.set(item.id, card)
+                      else cards.current.delete(item.id)
+                    }}
+                    className="block"
+                  >
+                    {item.image}
+                  </span>
+                  <i
+                    aria-hidden="true"
+                    className={cn(
+                      'absolute -top-[11px] -left-[11px] z-2 grid size-[30px] place-items-center rounded-full border-3 border-surface not-italic',
+                      on ? 'bg-accent text-on-accent' : 'bg-overlay text-transparent',
+                    )}
+                  >
+                    <Icon name="check" size={15} />
+                  </i>
+                </button>
+                <button
+                  type="button"
+                  data-share-eye
+                  onClick={() => setViewing(item.id)}
+                  aria-label={`View ${item.label} full screen`}
+                  title="View full screen"
+                  className="absolute top-[15px] right-[15px] z-3 grid size-10 cursor-pointer place-items-center rounded-full border-0 bg-share-eye p-0 text-photo-fg opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+                >
+                  <Icon name="eye" size={20} />
+                </button>
+                <span className="flex flex-col items-center">
+                  <b className="text-sm">{item.label}</b>
+                  {item.hint ? <span className="text-xs text-fg2">{item.hint}</span> : null}
+                </span>
+              </>
+            ),
+          }
         })}
-      </div>
-      {items.length > 1 ? (
-        <div aria-hidden="true" className="flex justify-center gap-1.5">
-          {items.map((item, index) => (
-            <i
-              key={item.id}
-              className={cn(
-                'block h-[7px] rounded-full',
-                index === edges.active ? 'w-[18px] bg-accent' : 'w-[7px] bg-border-strong',
-              )}
-            />
-          ))}
-        </div>
-      ) : null}
+      />
       <div className="flex flex-wrap justify-center gap-2">
         {photos ? (
           <Button disabled={disabled} onClick={() => void share(chosen, true)}>

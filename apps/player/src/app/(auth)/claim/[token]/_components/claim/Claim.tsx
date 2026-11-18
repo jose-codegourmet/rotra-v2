@@ -2,6 +2,7 @@
 import type { GoogleIdentity } from '@rotra/data/google-sign-in/types'
 import { useCompleteClaimWithGoogle } from '@rotra/data/google-sign-in/useCompleteClaimWithGoogle'
 import { MockError } from '@rotra/data/mock/errors'
+import { maskEmail } from '@rotra/data/player-account/rules'
 import { useCheckClaimStatus } from '@rotra/data/player-account/useCheckClaimStatus'
 import { useClaimLink } from '@rotra/data/player-account/useClaimLink'
 import { useCompleteClaim } from '@rotra/data/player-account/useCompleteClaim'
@@ -136,6 +137,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
       <ClaimIdentityCheck
         clubName={data.clubName}
         preview={data.preview}
+        maskedEmail={maskEmail(data.preset.email)}
         onReject={() => setStep('wrong')}
         onConfirm={() => {
           setStep(googleOn ? 'method' : 'form')

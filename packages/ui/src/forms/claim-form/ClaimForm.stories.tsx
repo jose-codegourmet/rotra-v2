@@ -74,3 +74,31 @@ export const GoogleClaim: Story = {
     google: { name: 'Raymark', email: 'raymark.plays@gmail.com', onChange: fn() },
   },
 }
+/** Finish registering after a pick in IdentityPicker (two clubs saved the email). */
+export const GoogleAfterIdentityPick: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Paolo Mendoza', nickname: 'Pao' },
+    google: { name: 'Paolo Mendoza', email: 'paolo.mendoza@example.com', onChange: fn() },
+    pickedIdentity: { clubName: 'Lahug Smash Club', rtrId: 'RTR-PH-CEB-031526-0042' },
+  },
+}
+export const GoogleAfterIdentityPickLight: Story = {
+  ...GoogleAfterIdentityPick,
+  globals: { theme: 'light' },
+}
+/** Finish registering when exactly one club saved the email: its details are filled in. */
+export const GoogleOneClubEmailMatch: Story = {
+  args: {
+    standalone: true,
+    maskedPhone: '',
+    defaultValues: { fullName: 'Jomar dela Cruz', nickname: 'Jom' },
+    google: { name: 'Jomar dela Cruz', email: 'jomar.delacruz@example.com', onChange: fn() },
+    emailMatch: { clubName: 'Lahug Smash Club', rtrId: 'RTR-PH-CEB-031526-0057' },
+  },
+}
+export const GoogleOneClubEmailMatchLight: Story = {
+  ...GoogleOneClubEmailMatch,
+  globals: { theme: 'light' },
+}

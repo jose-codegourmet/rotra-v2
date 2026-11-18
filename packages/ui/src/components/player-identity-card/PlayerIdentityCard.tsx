@@ -14,8 +14,20 @@ import { ProfileHero } from '@rotra/ui/profile-hero'
 import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
 export type PlayerIdentityCardProps = {
   profile: PlayerProfile
-  /** The level and current-year stats in the public card of a player saved by one club. */
-  unclaimedFacts?: { levelLabel: string | null; games: number; wins: number; year: number }
+  /**
+   * The level, standing and current-year stats in the public card of a player saved by one club
+   * (the profile dialog's Latest stats block). Registered players' cards never show it.
+   */
+  unclaimedFacts?: {
+    levelLabel: string | null
+    games: number
+    wins: number
+    year: number
+    /** Overall position: “#18 overall” chip and “#18 of 1,284 overall”; or what is still missing */
+    standing?:
+      | { kind: 'ranked'; position: number; total: number }
+      | { kind: 'unranked'; standardMatches: number; required: number }
+  }
   isOwn?: boolean
   idElementId: string
   onCopyId: () => void
@@ -38,6 +50,13 @@ export type PlayerIdentityCardProps = {
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
+}
+function standingText(
+  standing: NonNullable<NonNullable<PlayerIdentityCardProps['unclaimedFacts']>['standing']>,
+) {
+  return standing.kind === 'ranked'
+    ? `#${standing.position.toLocaleString('en-PH')} of ${standing.total.toLocaleString('en-PH')} overall`
+    : `No overall position yet. ${standing.standardMatches} of ${standing.required} standard matches in the last three months`
 }
 export function PlayerIdentityCard({
   profile,
@@ -84,9 +103,23 @@ export function PlayerIdentityCard({
                 {unclaimedFacts.levelLabel ?? 'Not ranked yet'}
               </Chip>
               <ProfileLeaderboardChips places={profile.leaderboardPlaces ?? []} />
+              {unclaimedFacts.standing ? (
+                <Chip>
+                  {unclaimedFacts.standing.kind === 'ranked'
+                    ? `#${unclaimedFacts.standing.position.toLocaleString('en-PH')} overall`
+                    : 'Not on the leaderboard yet'}
+                </Chip>
+              ) : null}
             </div>
             <ProfileCardSection label="About">
-              <KeyValueList items={[{ label: 'Saved by', value: savedBy }]} />
+              <KeyValueList
+                items={[
+                  { label: 'Saved by', value: savedBy },
+                  ...(unclaimedFacts.standing
+                    ? [{ label: 'Standing', value: standingText(unclaimedFacts.standing) }]
+                    : []),
+                ]}
+              />
             </ProfileCardSection>
             {profile.showProfileStats !== false ? (
               <ProfileStatsSection

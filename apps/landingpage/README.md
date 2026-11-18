@@ -186,7 +186,7 @@ greens, one mint `#00FF88`).
   cannot scroll (`html.booting`, Lenis stopped until the `rotra:ready` event): on desktop all the art of the view being
   opened, on phones and touch the stills within two screens of its top and the
   Rive files within one. The screen leaves when all are in: at least
-  1.4 s, at most 25 s; failed files count as done. Without scripts it is hidden (`noscript`), and a CSS timer lifts it after 30 s.
+  1.4 s, at most 25 s; failed files count as done. Without scripts it is hidden (`noscript`), and a CSS timer lifts it after 30 s. An automated browser (a crawler, a link checker, a headless test: `navigator.webdriver` or a bot user agent) never sees it: an inline script in `SiteBoot.tsx` sets `html.no-boot` before the first paint, the screen is hidden and `boot.js` leaves the page unlocked and fires `rotra:ready` at once. The page under it is the same for everyone (added November 18, 2026, after Google's sign-in branding check reported the home page as unresponsive).
 - Light-first loading (`src/scripts/boot.js` “what to load”, `rive.js` `fullLayers`, `site.js` character stills):
   - The three scene layers load as 960 px copies in `public/art/lite/` (about 20 KB each; rebuild one with
     `cwebp -resize 960 0 -q 55 -alpha_q 70 public/art/<scene>-<layer>.webp -o public/art/lite/<scene>-<layer>.webp`

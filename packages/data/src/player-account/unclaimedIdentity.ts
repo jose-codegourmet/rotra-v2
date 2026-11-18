@@ -1,3 +1,4 @@
+import { maskPhone } from '@rotra/schema/phone'
 import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { identityPlayedSeeds } from '../fixtures/unclaimedPlayers'
 import { MockError } from '../mock/errors'
@@ -7,7 +8,6 @@ import type { PlayingLevel } from '../player/player.types'
 import { clubRecordsOf, emailKey, isCurrentRecord } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
-import { maskPhone } from '@rotra/schema/phone'
 
 /**
  * Registration with an email clubs already saved (D-2026-11-16-04): the person keeps the RTR ID and

@@ -1,6 +1,6 @@
 # Shared queue, matches, and substitutions
 
-**Status:** Proposed data model implementing confirmed business outcomes. Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the On court step and substitution game credit ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)): column names settled by Jose the same day and drafted, unapplied, in migration `20261106000100`; the commands that use them are later tickets.
+**Status:** Proposed data model implementing confirmed business outcomes. Updated November 18, 2026 for the proposed game scores ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md)). Updated October 26, 2026 for the [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the On court step and substitution game credit ([log](../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)): column names settled by Jose the same day and drafted, unapplied, in migration `20261106000100`; the commands that use them are later tickets.
 
 ## `matches`
 
@@ -65,11 +65,29 @@ Offline devices enforce the same checks locally. Concurrent disconnected starts 
 | `club_id`, `session_id` | Scope |
 | `kind` | Completed or invalid |
 | `winning_team` | Required A/B for completed; null for invalid |
-| `team_a_score`, `team_b_score` | Both null or both nonnegative integers for completed; null for invalid |
+| `team_a_score`, `team_b_score` | Both null or both nonnegative integers for completed; null for invalid. For a one-game scoring mode they are the game's score. For a best of 3 they are the **games won** (proposed, November 18, 2026) |
 | `source_operation_id` | Unique FK to accepted confirmation operation |
 | `confirmed_at`, `accepted_at`, actor/device | Source and server evidence |
 
-If scores exist, they must identify the selected winner; no tied-score completion or invented target of 21. Winner-only completion is valid.
+If scores exist, they must identify the selected winner; no tied-score completion. Winner-only completion is valid. The valid scores per game now depend on the session's scoring mode (proposed below); the earlier "no invented target" rule is replaced by the mode's target.
+
+### Game scores and the scoring mode (proposed, November 18, 2026)
+
+**Proposed; owner go-ahead November 18, 2026 for keeping every game score; no migration yet.** Not in Prisma. The prototype keeps `scoreA` / `scoreB` for one game and `games: [{ a, b }]` for a best of 3 ([log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md)).
+
+A new table, additive to `match_decisions` (today's two score fields stay):
+
+| `match_decision_games` | Type / rule |
+|---|---|
+| `match_id`, `game_no` | Composite PK; `game_no` 1 to 3; `match_id` is the FK to `match_decisions` |
+| `club_id`, `session_id` | Scope, with the composite FKs from the [conventions](../../conventions.md) |
+| `team_a_score`, `team_b_score` | Nonnegative integers, both required on a row |
+
+Rows exist only for a best-of-3 result that has game scores, one per game played, and are frozen with the decision (same no UPDATE/DELETE rule). A one-game mode has no rows. Scores are all or none across the games played: a result has either every game played as a row, or none. A best of 3 with game winners but no scores has no rows (placeholder; open).
+
+A CHECK row can test only nonnegative integers. The rest of the rule (the mode's target, deuce on a 2-point lead, no tie, the winner of each game, 2 games to win, game 3 only when 1–1, and the match winner following the games) spans rows and the session, so the confirm command enforces it using `queue_sessions.scoring_mode`; see [Constraints versus commands](../../conventions.md#constraints-versus-commands). The scoring mode enum is on the session ([sessions and roster](sessions-roster.md)).
+
+Open: [database open decisions](../../open-decisions.md#owner-decision-recorded-november-18-2026).
 
 Use explicit null-safe checks for each decision kind. Ordinary app roles cannot UPDATE/DELETE a terminal decision or its frozen participant/score evidence. The same applies to Admin's application privileges. A database superuser is not physically incapable of modification; the application must not expose a correction route.
 

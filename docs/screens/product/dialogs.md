@@ -54,7 +54,7 @@ Owner comment, November 11, 2026 ([log](../mockup-changes/2026-11-11-queue-court
 
 ## D-WINNER — Permanent winner
 
-Title **Confirm match result**. Show winner and participant names, both scores if supplied, and court(s). Copy: **“This result cannot be changed after confirmation. The court will become available.”** Adapt plural courts for 5v5.
+Title **Confirm match result**. Show winner and participant names, the score if supplied (one game “31–24 (Team A–Team B)”; best of 3 “2–1 · 21–18, 15–21, 21–19 (Team A–Team B)”; otherwise “No score entered”; November 18, 2026, mockup only), and court(s). Copy: **“This result cannot be changed after confirmation. The court will become available.”** Adapt plural courts for 5v5.
 
 Primary names the winning team; secondary Back to result. Do not use a neutral Save button whose permanence is unclear. After durable success there is no Undo, Change score, Add score later, or Admin correction.
 

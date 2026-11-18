@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -26,12 +26,12 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 |---|---|
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). The end is on the session date or the next day, chosen with day buttons (never guessed), after the start and at most 24 hours later. The duration is shown |
 | 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
-| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard |
+| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup only, November 18, 2026): one of five scoring modes, default 16/31 |
 | 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
 | 3 · Notes and review | Optional notes shown on the public page, plus a summary with an Edit link per section |
 
-A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, and expected players = the slot budget (courts × players per court) until the operator changes it.
+A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, 16/31 scoring, and expected players = the slot budget (courts × players per court) until the operator changes it.
 
 The venue may differ from the club's fixed founding address and never changes it.
 
@@ -73,6 +73,10 @@ The club keeps a list of venues it books: name (required, unique within the club
 - Singles, Doubles, or both can be on. Automatic generation uses only the formats that are on.
 - With both off, the session can still be saved. The operator is warned that Generate matches (formerly called Auto Queue) has nothing to generate and only manual fun games are possible.
 - A standard format that is off **cannot** be added manually either. Fun formats (1v2, 3v3, 4v4, 5v5) are always available for manual matches.
+
+### Scoring mode
+
+**Owner, November 18, 2026 ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).** One session-wide setting that says how games are scored tonight. Five modes: **16/31** (default), **16/31, no deuce**, **11/21**, **11/21 × 3** and **21 × 3**. The valid scores, deuce and best of 3 are in [Matches](../matches/README.md#scoring-modes-owner-november-18-2026-mockup-only). A session saved before this setting reads as 16/31. In the prototype the mode is fixed after Start (a placeholder: whether it can change is open). It shows on Preparation, the console, the playing-match view, the Start session summary and the public Details.
 
 ### Minimum games
 

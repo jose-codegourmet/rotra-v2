@@ -22,7 +22,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** The guest text says their games here don't follow them; add their email in Edit details first. */
+/** The guest text says this record becomes theirs when they register: their games here stay with them. */
 export const InviteGuest: Story = {}
 /** "Your club saved them with their email. This link lets them turn that record into a ROTRA account …" */
 export const InviteUnclaimed: Story = { args: { name: unclaimed.fullName, identity: 'unclaimed' } }

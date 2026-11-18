@@ -11,7 +11,11 @@ export type InviteSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   name: string
-  /** Guests are invited to make an account; an unclaimed player (saved by this club with their email) to turn that record into one */
+  /**
+   * Both get their own link, and registering through it claims that record (D-2026-11-18-07). The
+   * words differ: a guest makes an account, an unclaimed player (saved by this club with their
+   * email) turns that record into one.
+   */
   identity: 'guest' | 'unclaimed'
   /** The invite link; undefined while it is being made */
   link?: string
@@ -50,7 +54,10 @@ export function InviteSheet({
       {offline ? (
         <Notice tone="warn">Making an invite link needs an internet connection.</Notice>
       ) : (
-        <Field label="Invite link" hint="Send it any way you like, such as Messenger or SMS.">
+        <Field
+          label="Invite link"
+          hint="Send it any way you like, such as Messenger or SMS. Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one."
+        >
           {link ? (
             <div className="flex items-center gap-2">
               <TextInput
@@ -82,7 +89,7 @@ export function InviteSheet({
       )}
       <p className="m-0 text-[13px] text-fg2">
         {!claim
-          ? "Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first. "
+          ? 'This record becomes theirs when they register: their games here stay with them. '
           : ''}
         The link only sets up their account. It doesn't book them into a session; you still add
         players to each session yourself.

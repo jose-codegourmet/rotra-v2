@@ -9,7 +9,6 @@ import type {
   DeleteImpact,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
-import { clubInviteUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import {
   deviceDownloadOf,
@@ -665,14 +664,11 @@ export function playerAppOrigin() {
 }
 
 /**
- * Invite: a registration link for an unclaimed profile; a guest gets independent registration with
- * no guest identity attached, through the club invite link and its current code (#712).
+ * Invite: the player's own registration link, for an unclaimed profile and for a guest alike
+ * (D-2026-11-18-07). Registering through it claims that club record, so its games stay with the
+ * person. Works once, lasts 7 days; a new link cancels the earlier one.
  */
 export async function realCreatePlayerInvite(player: ClubPlayerView) {
-  if (player.identity !== 'unclaimed') {
-    const { inviteCode } = await realRequest<{ inviteCode: string }>('/api/club/invite')
-    return { url: clubInviteUrl(player.clubId, inviteCode), message: 'Invite link ready' }
-  }
   const { token } = await realRequest<{ token: string; expiresAt: string }>(
     `/api/club/players/${encodeURIComponent(player.id)}/registration-link`,
     { method: 'POST' },

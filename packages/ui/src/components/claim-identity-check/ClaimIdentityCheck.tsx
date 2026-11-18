@@ -8,7 +8,10 @@ export type ClaimIdentityCheckProps = {
   clubName: string
   /** The club-created identity (name, nickname, picture, RTR ID) */
   preview: ClaimLinkPreview
-  /** The email the club saved, already masked ("j•••••@example.com"); the full address never arrives */
+  /**
+   * The email the club saved, already masked ("j•••••@example.com"); the full address never arrives.
+   * Empty for a guest's record (a name only, D-2026-11-18-07): the Email row is left out.
+   */
   maskedEmail: string
   onConfirm: () => void
   onReject: () => void
@@ -21,6 +24,21 @@ export function ClaimIdentityCheck({
   onConfirm,
   onReject,
 }: ClaimIdentityCheckProps) {
+  const rows = [
+    // A club's own record has no RTR ID yet: it is given when they register.
+    ...(preview.rtrId
+      ? [{ label: 'Player ID', value: <span className="font-mono">{preview.rtrId}</span> }]
+      : []),
+    // A guest's record has no email: they type their own on the next step.
+    ...(maskedEmail
+      ? [
+          {
+            label: 'Email',
+            value: <span className="font-mono [overflow-wrap:anywhere]">{maskedEmail}</span>,
+          },
+        ]
+      : []),
+  ]
   return (
     <LinkPage
       label={`Registration link from ${clubName}`}
@@ -41,23 +59,7 @@ export function ClaimIdentityCheck({
               {preview.nickname ? <p className="m-0 text-fg2">“{preview.nickname}”</p> : null}
             </div>
           </div>
-          <KeyValueList
-            items={[
-              // A club's own record has no RTR ID yet: it is given when they register.
-              ...(preview.rtrId
-                ? [
-                    {
-                      label: 'Player ID',
-                      value: <span className="font-mono">{preview.rtrId}</span>,
-                    },
-                  ]
-                : []),
-              {
-                label: 'Email',
-                value: <span className="font-mono [overflow-wrap:anywhere]">{maskedEmail}</span>,
-              },
-            ]}
-          />
+          {rows.length ? <KeyValueList items={rows} /> : null}
           <div className="flex flex-wrap gap-2">
             <Button variant="primary" onClick={onConfirm}>
               Yes, this is me

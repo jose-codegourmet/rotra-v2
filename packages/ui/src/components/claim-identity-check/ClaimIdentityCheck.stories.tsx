@@ -19,6 +19,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const LongClubName: Story = { args: { clubName: claimLinkScenarios.longClubName } }
+/** A guest's own invite link (D-2026-11-18-07): a name only, so no Player ID and no Email row. */
+const guestRecord = {
+  preview: { ...claimLinkScenarios.preview, rtrId: null, picture: null, maskedPhone: '' },
+  maskedEmail: '',
+}
+export const GuestRecord: Story = { args: guestRecord }
+export const GuestRecordLight: Story = { args: guestRecord, globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Light: Story = { globals: { theme: 'light' } }
 export const PhoneLight: Story = { globals: { theme: 'light', viewport: { value: 'phone' } } }

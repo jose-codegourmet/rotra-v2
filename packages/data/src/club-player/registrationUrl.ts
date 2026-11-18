@@ -11,9 +11,10 @@ export function guestRegistrationUrl(clubId: string) {
 
 /**
  * The club invite link a Queue Master shares: `/register/<clubId>?k=<code>` (Queue invite card, Club
- * settings › Copy link, Share club invite › Copy invite link, the QR and a guest's invite). The
- * server checks `k` against the club's current code (#712). Every club has a code, so a missing
- * one prints the plain link (refused), never an empty `?k=`.
+ * settings › Copy link, Share club invite › Copy invite link and the QR). The server checks `k`
+ * against the club's current code (#712). Every club has a code, so a missing one prints the plain
+ * link (refused), never an empty `?k=`. A guest's own invite is not this link: it is their claim
+ * link (`createPlayerInvite`, D-2026-11-18-07).
  */
 export function clubInviteUrl(clubId: string, code?: string | null) {
   const base = guestRegistrationUrl(clubId)

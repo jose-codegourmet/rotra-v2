@@ -1959,6 +1959,8 @@ const HAIR = ['#1b1817', '#2e211b', '#4a3021', '#6d4a2c', '#8f6b48', '#2a2a31'];
 const BACKDROP = ['#2f6f5e', '#3b4f8a', '#74488a', '#8a5a2f', '#2f6a85', '#7d3b4a', '#4d6b2f', '#5b4a8a'];
 const SHIRT = ['#00cc6a', '#e6e6ec', '#ffb800', '#4a90e2', '#ff6b6b', '#9b6bff', '#24242a'];
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+// A guest's or unclaimed player's own invite link: registering through it claims that record (D-2026-11-18-07). Sample link.
+function playerInviteLink(p) { return `https://player.rotra.club/claim/${(hashStr(`${p.id}${p.name}`) >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7)}`; }
 function faceSVG(p, seed = 0) {
   const h = hashStr(p.id + p.name + (seed ? `#${seed}` : ''));
   const pick = (arr, k) => arr[(h >>> k) % arr.length];
@@ -5473,7 +5475,7 @@ const SHEETS = {
               <dt>Phone</dt><dd>${p.phoneHidden ? 'Hidden by player' : p.identity === 'guest' || p.noPhone ? 'None on file' : 'Kept private; confirmed in person when adding them to a session'}</dd>
               ${p.identity === 'registered' ? '' : `<dt>Email</dt><dd>${p.email ? 'On file and kept private' : 'None on file'}</dd>`}
             </dl></div>
-      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
+      ${p.identity === 'guest' ? `<section class="stack tight" aria-labelledby="guest-invite-h"><h3 id="guest-invite-h" style="margin:0;font-size:14px">Invite to ROTRA</h3><p class="small muted">Send this link so they can register for ROTRA Player. This record becomes theirs when they register: their games here stay with them. The link works once and lasts 7 days.</p><div class="row"><button class="btn" data-act="copyGuestInvite">Copy invite link</button>${navigator.share ? '<button class="btn" data-act="shareGuestInvite">Share</button>' : ''}</div></section>` : ''}
       <p class="small muted" style="margin:0">Levels are set per session while preparing a roster, not here.</p>
         </div>
       </div>`,
@@ -5685,13 +5687,13 @@ const SHEETS = {
   invite(sh) {
     const p = P(sh.id);
     const claim = p.identity === 'unclaimed';
-    const code = (hashStr(`${p.id}${p.name}`) >>> 0).toString(36).toUpperCase().padStart(7, 'X').slice(0, 7);
-    const link = claim ? `https://player.rotra.club/claim/${code}` : 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
+    // A guest's link is their own too: registering through it claims this record (D-2026-11-18-07).
+    const link = playerInviteLink(p);
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
       <p>${claim ? 'Your club saved them with their email. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
-      ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. ${claim ? 'Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one.' : ''} Sample link in this prototype.</span></div>`
+      ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one. Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
-      <p class="small muted">${claim ? '' : "Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first. "}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
+      <p class="small muted">${claim ? '' : 'This record becomes theirs when they register: their games here stay with them. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
       `<button class="btn" data-act="closeSheet">Done</button>`);
   },
   sync() {
@@ -6683,11 +6685,11 @@ const ACT = {
     const b = document.querySelector(`.sheet [data-act="openProfile"][data-id="${id}"]`); if (b) b.focus();
   },
   copyGuestInvite: () => {
-    const url = 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714';
+    const url = playerInviteLink(P(S.ui.sheet.id));
     const fail = () => toast(`Copy this link: ${url}`);
     try { navigator.clipboard.writeText(url).then(() => toast('Invite link copied'), fail); } catch (e) { fail(); }
   },
-  shareGuestInvite: () => { try { navigator.share({ title: 'Register for ROTRA Player', url: 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714' }).catch(() => {}); } catch (e) { /* share unavailable */ } },
+  shareGuestInvite: () => { try { navigator.share({ title: 'Register for ROTRA Player', url: playerInviteLink(P(S.ui.sheet.id)) }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   openInvite: (d) => openSheet({ type: 'invite', id: d.id }),
   deletePlayer: (d) => {
     const inActive = S.sessions.some((x) => x.status === 'active' && R(x, d.id));

@@ -24,8 +24,9 @@ registration service still stages one there for a few seconds before the account
 ## How the services use it
 
 - `issueClaimLink` (Queue › Saved players › Invite): a club record with a phone and no `players` row
-  gets a `club_player_claim_links` row (its earlier active one is revoked in the same write); a
-  record without a phone is refused ("Add this player’s phone before inviting them.").
+  gets a `club_player_claim_links` row (its earlier active one is revoked in the same write)). Since
+  D-2026-11-18-07 a guest with no phone, email or shared entry gets a link too: the record was made
+  for them, and registering through its link claims it.
 - `readClaimLink` looks the token digest up in `player_claim_links`, then here. A record link shows
   the club's name, nickname and masked intake phone, no RTR ID and no picture; `claimed` once the
   record has a `player_id` (registered through this link or independently with the same phone).

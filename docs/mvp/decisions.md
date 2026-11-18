@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -63,6 +63,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -1020,6 +1021,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **What the mock data does on the open points below** (owner answers relayed with #923): lookup is by exact RTR ID or exact email only, with no phone lookup, and QR scanning is left as it is; after Admin changes an RTR ID there is no alias, so the old RTR ID no longer finds the player, and its number is never given to someone else; the Same person move is built as the mockup shows; a returning guest's new join request makes a second guest record; a record is claimed when the registering person's ROTRA email or Google email equals the saved email, and the phone linking of D-2026-11-11-03 still joins older phone-only records; picking an identity card prefills the name, nickname, picture and level only; Admin's own Add player is unchanged.
 - **Ticket:** [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900) (Epic P15)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Amended by:** [D-2026-11-18-07](#d-2026-11-18-07) (“A guest's games never join an account by themselves” no longer holds for a guest who registers through their own invite link: that claims the guest's record).
 - **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
 - **Decision:**
   - **Four statuses.** **Guest**, **Unclaimed**, **Registered**, **Verified**. Verified sits on top of Registered ([D-2026-11-16-02](#d-2026-11-16-02)).
@@ -1206,3 +1208,23 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
 - **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.
+
+### D-2026-11-18-07 — A guest's invite link claims that guest's record
+- **Decision status:** approved (owner, November 18, 2026: “As a QM, I created an Account for them, that guest account was intended for them until they feel ready to use that account. So if they enter their details. and they register. That ACCOUNT WAS FOR THEM”). The open items are not decided.
+- **Implementation status:** mockup, mock app and real mode written in one change ([log](../mockup-changes/2026-11-18-queue-guest-invite-claims-record.md)); not run in a browser or against a database yet. No migration: `club_player_claim_links` already exists.
+- **Ticket:** [#966](https://github.com/jose-codegourmet/rotra-v2/issues/966) (epic Q24)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Problem it fixes:** a guest's **Copy invite link** copied the generic club invite link, so a guest who registered got a second club player record and their own record, games and session slots stayed behind.
+- **Decision:**
+  - **The invite link made from a guest's own profile belongs to that guest.** Invite to ROTRA › **Copy invite link** and **Share** on the guest's profile, and **Invite** in Saved players, make that guest's own registration link (`/claim/<token>`), the kind an unclaimed player already gets: it works once, lasts 7 days, and a new link cancels the earlier one.
+  - **Registering through it claims that club player record.** The name and nickname prefill the form; the person types their own email and phone and sets a password (or uses Google). The new account is attached to that same record, so their games and session slots stay with them. No second record is made. They get their RTR ID then, from the inviting club's place, as any club record does.
+  - **The link is the proof.** Nobody is matched or merged by name alone.
+  - **Every existing guard stays:** an email that already has an account or a login is refused, a phone that belongs to another profile is refused, and an expired, used or replaced link doesn't work. A person who already has an account cannot attach a guest record through the link; nothing is merged.
+  - **Unchanged:** the generic club invite link (Club settings, the invite card and its QR) and guest join requests on the public session page.
+- **Open:**
+  - A returning guest's new join request on the public session page still makes a second guest record.
+  - A guest who registers through the generic club link or the session page's register link, instead of their own link, still starts a new record. The Queue Master's **Same person** move remains the remedy for both.
+  - A person who already has a ROTRA account and played as a guest: their own link refuses their email and phone (mockup and app: no merge).
+  - History attribution for the claimed record's earlier games (one attribution per joined record) stays open, as in [D-2026-11-16-04](#d-2026-11-16-04).
+- **Amends:** [D-2026-11-16-04](#d-2026-11-16-04) (“A guest's games never join an account by themselves. They come along only after the club makes the guest unclaimed by adding an email.”) and the guest invitation note of November 8, 2026 (#490: “Registration keeps the guest record unlinked”) for a guest's own link.
+- **References:** [players module](../business_logic/product/queue/modules/players/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [registration screens](../screens/product/modules/player-information/access-registration.md), [product terms](../product-terms.md), `packages/db/src/player/claim.ts` › `issueClaimLink`, `completeRecordClaim`.

@@ -6,6 +6,7 @@ import { LinkPage } from './link-page/LinkPage'
 
 export type AccountLinkStatusVariant =
   | 'reset-sent'
+  | 'reset-google'
   | 'reset-invalid'
   | 'claim-claimed'
   | 'claim-expired'
@@ -14,7 +15,7 @@ export type AccountLinkStatusVariant =
   | 'claim-done'
 export type AccountLinkStatusProps = {
   variant: AccountLinkStatusVariant
-  /** reset-sent: the email the player just typed; nothing else ever shows contact data */
+  /** reset-sent, reset-google: the email the player just typed; nothing else ever shows contact data */
   email?: string
   /** reset-invalid: a failed redemption also needs a new reviewed link. */
   resetError?: string
@@ -66,6 +67,23 @@ export function AccountLinkStatus({
           <Notice tone="success">
             If an account uses <b>{email}</b>, ROTRA Admin can review your request after verifying
             ownership.
+          </Notice>
+          <p className="text-[13px] text-fg2">
+            Contact ROTRA support through your usual channel to verify ownership. An Admin will
+            provide your reset link.
+          </p>
+          <p className="text-xs text-fg2">No automatic email is sent.</p>
+          <Button variant="ghost" block onClick={onBackToSignIn}>
+            Back to sign in
+          </Button>
+        </AuthCard>
+      )
+    case 'reset-google':
+      return (
+        <AuthCard showBrand={false} title="Request received">
+          <Notice tone="info">
+            <b>{email}</b> signs in with Google and has no password. Go back and choose{' '}
+            <b>Continue with Google</b>.
           </Notice>
           <p className="text-[13px] text-fg2">
             Contact ROTRA support through your usual channel to verify ownership. An Admin will

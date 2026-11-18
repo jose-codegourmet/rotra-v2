@@ -24,6 +24,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const ResetSent: Story = {}
+export const ResetGoogle: Story = { args: { variant: 'reset-google' } }
+export const ResetGoogleLight: Story = {
+  args: { variant: 'reset-google' },
+  globals: { theme: 'light' },
+}
 export const ResetInvalid: Story = { args: { variant: 'reset-invalid' } }
 export const ClaimClaimed: Story = { args: { variant: 'claim-claimed' } }
 export const ClaimExpired: Story = { args: { variant: 'claim-expired' } }

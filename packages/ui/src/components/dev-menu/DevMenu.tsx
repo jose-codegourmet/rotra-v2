@@ -39,6 +39,13 @@ export type DevMenuProps = {
     onSignIn: () => void
     onSignOut: () => void
   }
+  /** P12, only while the Google sign-in flag is on: switches the Google deadline before / after. */
+  googleDeadline?: {
+    value: string
+    options: { value: string; label: string }[]
+    label: string
+    onChange: (value: string) => void
+  }
   /** Optional until the registration and password-reset preview routes are implemented. */
   playerLinkPreviews?: {
     onRegistration?: (state: 'valid' | 'processing' | 'expired') => void
@@ -77,6 +84,7 @@ export function DevMenu({
   rankingSettings,
   playerScenarios,
   playerAccount,
+  googleDeadline,
   playerLinkPreviews,
   contactRequestSlot,
   extraToggles,
@@ -210,6 +218,21 @@ export function DevMenu({
                 />
               </div>
             </section>
+            {googleDeadline ? (
+              <section className={SECTION}>
+                <h3 className={LABEL}>{googleDeadline.label}</h3>
+                <SegmentedControl
+                  aria-label="Google deadline"
+                  value={googleDeadline.value}
+                  options={googleDeadline.options}
+                  onChange={googleDeadline.onChange}
+                />
+                <p className="text-xs text-fg2">
+                  After the deadline, a password-only player sees only Connect Google to continue
+                  and the leaderboard.
+                </p>
+              </section>
+            ) : null}
             {playerScenarios.leaderboardOptions ? (
               <section className={SECTION}>
                 <h3 className={LABEL}>Leaderboard</h3>

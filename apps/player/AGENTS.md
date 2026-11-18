@@ -20,7 +20,7 @@ Foundation's existing `/login` and protected `/me/*` paths take precedence over 
 `/sign-in` and `/profile/*` aliases in P01.10. Public routes: `/`, `/rank`, `/find/[rtrId]`,
 `/players/[playerId]`, `/players/[playerId]/rank`, `/players/[playerId]/games`. The comparison route
 `/players/[playerId]/compare` requires a signed-in player.
-Auth screens use `/login`, `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`, and independent guest registration `/register/[clubId]` (#490).
+Auth screens use `/login`, `/connect-google` (only while the `player_google_sign_in` flag is on), `/forgot-password`, `/reset-password/[token]`, `/claim/[token]`, and independent guest registration `/register/[clubId]` (#490).
 Account screens will use `/me/edit`, `/me/player-id`, `/me/privacy-and-contact` under the existing
 proxy boundary. The public profile destination now exists for leaderboard and RTR ID navigation.
 Sign-in at `/login`, Admin-reviewed recovery at `/forgot-password`, and mock reset links at

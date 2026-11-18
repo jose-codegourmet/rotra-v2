@@ -484,7 +484,12 @@
     "./invite-card": "./src/components/invite-card/InviteCard.tsx",
     "./google-identity-row": "./src/components/google-identity-row/GoogleIdentityRow.tsx",
     "./announcement-band": "./src/components/announcement-band/AnnouncementBand.tsx",
-    "./sign-in-methods-card": "./src/components/sign-in-methods-card/SignInMethodsCard.tsx"
+    "./sign-in-methods-card": "./src/components/sign-in-methods-card/SignInMethodsCard.tsx",
+    "./no-google-account-sheet": "./src/components/no-google-account-sheet/NoGoogleAccountSheet.tsx",
+    "./google-account-picker-sheet": "./src/components/google-account-picker-sheet/GoogleAccountPickerSheet.tsx",
+    "./player-account-row": "./src/components/player-account-row/PlayerAccountRow.tsx",
+    "./google-link-card": "./src/components/google-link-card/GoogleLinkCard.tsx",
+    "./google-required-card": "./src/components/google-required-card/GoogleRequiredCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

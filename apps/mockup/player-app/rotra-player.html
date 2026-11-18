@@ -2647,7 +2647,7 @@ function viewGoogleLink() {
     <p class="muted" style="margin:0">You already have a ROTRA account with this email. You signed up with a password.</p>
     <div class="gid">${avatar(p, 'lg')}<div class="main"><b>${esc(p.name)}</b><span class="small muted mono">${esc(p.rtr)}</span></div></div>
     <div class="gid">${G_MARK}<div class="main"><b>${esc(L.name)}</b><span class="small muted">${esc(L.email)}</span></div>${chip(`${I.check} Same email`, 'ok')}</div>
-    <p class="small muted" style="margin:0">After this you can sign in with Google or with your password. Nothing else on your account changes. You can disconnect Google in Privacy and contact.</p>
+    <p class="small muted" style="margin:0">After this you can sign in with Google or with your password. Nothing else on your account changes. You can change your Google account in Privacy and contact.</p>
     <button class="btn primary block" data-act="gLinkYes">Connect Google and sign in</button>
     <button class="btn block" data-act="gLinkNo">Use my password instead</button>
   </div></main>`;
@@ -3944,7 +3944,6 @@ const ACT = {
     S.ui.sheet = null; S.ui.gPending = true; render();
     later(700, () => { S.ui.gPending = false; googleDone(ctx, g); });
   },
-  gDisconnect: () => { const a = S.accounts[S.me]; a.google = null; toast('Google disconnected'); },
   setPassword: () => { const a = S.accounts[S.me]; a.hasPassword = true; toast('Prototype: a password form opens here'); render(); },
   joinClub: () => {
     const a = S.accounts[S.me], id = S.ui.regCtx.club;

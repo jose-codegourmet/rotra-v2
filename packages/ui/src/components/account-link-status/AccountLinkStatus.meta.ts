@@ -20,6 +20,7 @@ export const accountLinkStatusMeta = {
   ],
   variants: [
     'reset-sent',
+    'reset-google',
     'reset-invalid',
     'claim-claimed',
     'claim-expired',

@@ -5,11 +5,14 @@ import type { ContactChangeStatus } from '@rotra/data/contact-change-request/typ
 import { useAdvanceContactChangeRequest } from '@rotra/data/contact-change-request/useAdvanceContactChangeRequest'
 import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/useMyContactChangeRequest'
 import {
+  googleDeadlineOptions,
   leaderboardOptions,
   leaderboardPlaceOptions,
   playerRankOptions,
 } from '@rotra/data/fixtures/dev-menu'
 import { JOSE_PLAYER_ID } from '@rotra/data/fixtures/players'
+import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
+import { useSetMockGoogleDeadline } from '@rotra/data/google-sign-in/useSetMockGoogleDeadline'
 import {
   connectMockBridge,
   type LeaderboardScenario,
@@ -23,11 +26,12 @@ import { useRankingSettings, useSetRankingSettings } from '@rotra/data/ranking-s
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { Button } from '@rotra/ui/button'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
-import { DevMenu } from '@rotra/ui/dev-menu'
+import { DevMenu, type DevMenuProps } from '@rotra/ui/dev-menu'
 import { toast } from '@rotra/ui/toaster'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector, useAppStore } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import {
@@ -38,6 +42,28 @@ import {
   setPlayerRankScenario,
 } from '@/store/slices/devSlice'
 export function DevTools() {
+  return usePlayerGoogleSignInEnabled() ? <DevToolsWithGoogle /> : <DevToolsBase />
+}
+/** Mock mode only, flag on: the Before / After the Google deadline switch. */
+function DevToolsWithGoogle() {
+  const deadline = useGoogleDeadline().data,
+    setDeadline = useSetMockGoogleDeadline()
+  return (
+    <DevToolsBase
+      googleDeadline={
+        deadline
+          ? {
+              value: deadline.passed ? 'passed' : 'before',
+              options: googleDeadlineOptions,
+              label: `Google deadline (${deadline.label})`,
+              onChange: (value) => setDeadline.mutate(value === 'passed'),
+            }
+          : undefined
+      }
+    />
+  )
+}
+function DevToolsBase({ googleDeadline }: { googleDeadline?: DevMenuProps['googleDeadline'] }) {
   const settings = useRankingSettings(),
     setSettings = useSetRankingSettings()
   const signIn = useSignIn('player'),
@@ -187,6 +213,7 @@ export function DevTools() {
             onError: (error) => toast.error(error.message),
           }),
       }}
+      googleDeadline={googleDeadline}
       contactRequestSlot={contactRequestSlot}
       open={open}
       onOpenChange={setOpen}

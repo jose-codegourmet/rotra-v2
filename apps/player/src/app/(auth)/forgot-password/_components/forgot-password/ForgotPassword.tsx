@@ -12,10 +12,11 @@ export function ForgotPassword() {
     router = useRouter(),
     { offline } = useAppSelector(selectDev)
   const [sentEmail, setSentEmail] = useState<string | null>(null)
+  const [signsInWithGoogle, setSignsInWithGoogle] = useState(false)
   if (sentEmail !== null)
     return (
       <AccountLinkStatus
-        variant="reset-sent"
+        variant={signsInWithGoogle ? 'reset-google' : 'reset-sent'}
         email={sentEmail}
         onBackToSignIn={() => router.push('/login')}
       />
@@ -28,7 +29,8 @@ export function ForgotPassword() {
       serverError={mutation.error?.message}
       onSubmit={({ email }) =>
         mutation.mutate(email, {
-          onSuccess: () => {
+          onSuccess: (result) => {
+            setSignsInWithGoogle(result.signsInWithGoogle === true)
             setSentEmail(email)
             toast('Reset link requested')
           },

@@ -1,6 +1,6 @@
 # Player app: three leaderboards (Top annual, Top monthly, Top weekly) with movement marks
 
-Status: IN PROGRESS — #891; #897 components implemented, batch verification pending
+Status: IN PROGRESS — #891; #897 components and #902 data implemented, batch verification pending
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › viewBoard, `periodList`, `lbMove`, `lbRow`, `lbHead`, `podium`, `meCard`, `.lb-move`, `.lb-wins`, `.lb-tabs`
@@ -66,4 +66,4 @@ Superseded by: none
 
 ## Real app work
 - apps/player and packages/ui: the period switch, row, podium and position card as above.
-- packages/data and packages/db: wins per period and the previous period's place for each list. This is ranking math: the open items in D-2026-11-16-05 need answers first.
+- packages/data and packages/db: wins per period and the previous period's place for each list. The owner confirmed the calendar boundaries and tie order on November 18, 2026. Previous standings are computed from the original playing dates, including late-synced results. Skill-rank progress is separate.

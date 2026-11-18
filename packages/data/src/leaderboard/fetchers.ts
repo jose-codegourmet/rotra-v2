@@ -1,84 +1,67 @@
 import { getSession } from '../auth/fetchers'
 import { readMockState } from '../mock/store'
-import { playerProjection } from '../player/projection'
-import { isAlwaysPrivatePlayer, isPrivatePlayer } from '../player/visibility'
-import { resolveMockProfileBanner } from '../profile-banner/fetchers'
-import { maskPublicName } from '../public-session/publicSession.rules'
 import {
   realGetLeaderboardPage,
   realGetMyLeaderboardPosition,
+  realGetMyPeriodPosition,
   realSearchLeaderboard,
 } from '../real/leaderboard'
 import { isRealDataMode } from '../real/mode'
+import { leaderboardPeriodStart, ownPeriodPosition } from './leaderboard.rules'
+import type { LeaderboardPage, LeaderboardPeriod, MyPeriodPosition } from './leaderboard.types'
+import { mockLeaderboard } from './projection'
 import { playerRequest } from './request'
 
 export async function getLeaderboardPage(
-  { offset, limit = 25 }: { offset: number; limit?: 25 },
+  input: { offset: number; limit?: 25; period?: LeaderboardPeriod },
   signal?: AbortSignal,
-) {
-  if (isRealDataMode()) return realGetLeaderboardPage({ offset, limit }, signal)
+): Promise<LeaderboardPage> {
+  const { offset, limit = 25, period = 'year' } = input
+  if (isRealDataMode()) return realGetLeaderboardPage({ ...input, limit }, signal)
   await playerRequest(signal)
-  const { entries } = playerProjection()
-  const viewerId = (await getSession('player'))?.account.id ?? null
+  const board = mockLeaderboard(readMockState())
+  const entries = board.entries(period, (await getSession('player'))?.account.id ?? null)
   return {
-    entries: entries.slice(offset, offset + limit).map((e) => maskedEntry(withBanner(e), viewerId)),
+    entries: entries.slice(offset, offset + limit),
     total: entries.length,
+    periodStart: new Date(leaderboardPeriodStart(period, board.now)).toISOString(),
   }
 }
-/**
- * The entry's own Profile banner: public, like the picture, so masked rows keep it and their
- * private card draws it (as in real mode).
- */
-function withBanner<T extends { playerId: string }>(entry: T) {
-  const profile = readMockState().playerProfiles.find((p) => p.playerId === entry.playerId)
-  return { ...entry, ...resolveMockProfileBanner(profile?.bannerId) }
-}
-/**
- * D-2026-11-12-01: a visitor sees a private player's name masked with no picture; an always-private
- * player is masked for everyone but themselves, keeps their picture and position, and hides their
- * level.
- */
-function maskedEntry<T extends { playerId: string; fullName: string }>(
-  entry: T,
-  viewerId: string | null,
+
+/** Search only public rows in the selected top 50. A masked entry never matches even its initials. */
+export async function searchLeaderboard(
+  query: string,
+  signal?: AbortSignal,
+  period?: LeaderboardPeriod,
 ) {
-  if (entry.playerId === viewerId) return { ...entry, masked: false as const }
-  if (isAlwaysPrivatePlayer(entry.playerId))
-    return {
-      ...entry,
-      fullName: maskPublicName(entry.fullName),
-      nickname: null,
-      masked: true as const,
-      levelHidden: true as const,
-    }
-  if (!viewerId && isPrivatePlayer(entry.playerId))
-    return {
-      ...entry,
-      fullName: maskPublicName(entry.fullName),
-      nickname: null,
-      pictureUrl: null,
-      masked: true as const,
-    }
-  return { ...entry, masked: false as const }
-}
-export async function searchLeaderboard(query: string, signal?: AbortSignal) {
-  if (isRealDataMode()) return realSearchLeaderboard(query, signal)
+  if (isRealDataMode()) return realSearchLeaderboard(query, signal, period)
   await playerRequest(signal)
   const q = query.trim().toLowerCase()
   const viewerId = (await getSession('player'))?.account.id ?? null
-  // Masked names never match a search: private ones for a visitor, always private for everyone else.
-  const hits = playerProjection().entries.filter(
+  const entries = mockLeaderboard(readMockState()).entries(period ?? 'year', viewerId)
+  const hits = entries.filter(
     (e) =>
-      (e.playerId === viewerId ||
-        (!isAlwaysPrivatePlayer(e.playerId) && (viewerId || !isPrivatePlayer(e.playerId)))) &&
-      !readMockState().adminPlayerRecords[e.playerId]?.archivedAt &&
+      q &&
+      !e.masked &&
       (e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q)),
   )
-  return { hits: hits.slice(0, 50).map(withBanner), total: hits.length }
+  return { hits, total: hits.length }
 }
-export async function getMyLeaderboardPosition(signal?: AbortSignal) {
-  if (isRealDataMode()) return realGetMyLeaderboardPosition(signal)
+
+export async function getMyPeriodPosition(
+  period: LeaderboardPeriod,
+  signal?: AbortSignal,
+): Promise<MyPeriodPosition | null> {
+  if (isRealDataMode()) return realGetMyPeriodPosition(period, signal)
   await playerRequest(signal)
   const session = await getSession('player')
-  return session ? (playerProjection().ranks[session.account.id]?.position ?? null) : null
+  if (!session) return null
+  return ownPeriodPosition(mockLeaderboard(readMockState()).standings(period), session.account.id)
+}
+
+/** Existing consumers use the public annual place; only the owner-specific period read includes the cutoff. */
+export async function getMyLeaderboardPosition(signal?: AbortSignal) {
+  if (isRealDataMode()) return realGetMyLeaderboardPosition(signal)
+  const own = await getMyPeriodPosition('year', signal)
+  return own && own.cutoffWins === undefined ? own.position : null
 }

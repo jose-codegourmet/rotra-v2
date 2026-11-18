@@ -1,14 +1,11 @@
-import { leaderboardEntries } from '../fixtures/leaderboardPlayers'
 import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
 import { JOSE_PLAYER_ID } from '../fixtures/players'
 import { getMockDevState } from '../mock/bridge'
 import { readMockState } from '../mock/store'
-import { effectiveRankingVersion } from '../ranking-settings/rankingSettings.rules'
-import { countRecentStandardMatches, orderLeaderboard } from './player.rules'
+import { countRecentStandardMatches } from './player.rules'
 
 /** Public fixture projection; applies only the already-approved mock eligibility rules. */
-export function playerProjection() {
-  const store = readMockState()
+export function playerProjection(store = readMockState()) {
   const scenario = getMockDevState().playerRankScenario
   let sessions = store.playerGames[JOSE_PLAYER_ID] ?? []
   if (scenario === 'below-threshold') sessions = sessions.slice(0, 2)
@@ -54,31 +51,5 @@ export function playerProjection() {
     const name = names.get(id)
     if (name) Object.assign(rank, name)
   }
-  const profiles = new Map(store.playerProfiles.map((profile) => [profile.playerId, profile]))
-  const candidates = leaderboardEntries.flatMap((entry) => {
-    const rank = store.playerRanks[entry.id]
-    const profile = profiles.get(entry.id)
-    return rank
-      ? [
-          {
-            ...entry,
-            ...rank,
-            ...names.get(entry.id),
-            pictureUrl: profile ? profile.picture : entry.pictureUrl,
-          },
-        ]
-      : []
-  })
-  const entries =
-    getMockDevState().leaderboardScenario === 'empty'
-      ? []
-      : orderLeaderboard(
-          candidates,
-          effectiveRankingVersion(store.rankingPolicyVersions).recentStandardMatchThreshold,
-        ).map((entry, index) => ({ ...entry, position: index + 1 }))
-  for (const entry of entries) {
-    const rank = store.playerRanks[entry.id]
-    if (rank) rank.position = entry.position
-  }
-  return { ranks: store.playerRanks, games: store.playerGames, players: store.players, entries }
+  return { ranks: store.playerRanks, games: store.playerGames, players: store.players }
 }

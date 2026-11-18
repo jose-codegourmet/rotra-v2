@@ -56,7 +56,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-16-02](#d-2026-11-16-02) | Player account verification (Google, phone, matching email) with an Admin override | approved 2026-11-16 (consequences open) | mockup only | #889 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-16-03](#d-2026-11-16-03) | Player notifications page | approved 2026-11-16 (delivery open) | mockup only | #890 | [Player](workstreams/player.md) |
 | [D-2026-11-16-04](#d-2026-11-16-04) | Player statuses: unclaimed needs an email and gets an RTR ID; lookup by RTR ID or email only | approved 2026-11-16 (phone lookup and old QR codes open) | mockup only | #900 | [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
-| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16 (calendar reading to confirm) | mockup only | #891 | [Player](workstreams/player.md) |
+| [D-2026-11-16-05](#d-2026-11-16-05) | Three leaderboards: Top annual, Top monthly, Top weekly | approved 2026-11-16, clarified 2026-11-18 | in progress | #891 | [Player](workstreams/player.md) |
 | [D-2026-11-16-06](#d-2026-11-16-06) | Phones: stored as E.164, shown masked and in one format | approved 2026-11-16 | mockup only | #893 | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
 | [D-2026-11-17-01](#d-2026-11-17-01) | Privacy Policy and Terms of Service pages on the Player app | approved 2026-11-17 (legal review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-01](#d-2026-11-18-01) | Google sign-in ships behind a feature flag that starts off | approved 2026-11-18 (details open) | not started | #938 (epic #892) | [Player](workstreams/player.md), [Admin](workstreams/admin.md) |
@@ -1056,26 +1056,25 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **References:** [product terms](../product-terms.md) (Guest, Unclaimed profile, Player ID / RTR ID), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players module](../business_logic/product/queue/modules/players/README.md), [identity database design](../database_design/product/player-information/modules/identity.md).
 
 ### D-2026-11-16-05 — Three leaderboards: Top annual, Top monthly, Top weekly
-- **Decision status:** approved (owner, November 16, 2026); the meaning of "calendars roll" is to be confirmed.
-- **Implementation status:** mockup only, Player side ([log](../mockup-changes/2026-11-16-player-leaderboard-periods.md)). The mock app, real mode and rank calculation still have one overall list ordered by rating.
+- **Decision status:** approved November 16, 2026. The owner confirmed the calendar boundaries, tie order, skill-rank progress and treatment of late results on November 18, 2026.
+- **Implementation status:** in progress, Player side. Shared components and the mock data contracts are implemented in #897 and #902. Batch verification is pending. [Mockup log](../mockup-changes/2026-11-16-player-leaderboard-periods.md).
 - **Ticket:** [#891](https://github.com/jose-codegourmet/rotra-v2/issues/891) (Epic P16)
 - **Roadmap:** MVP — [Player](workstreams/player.md)
 - **Supersedes:** in part the November 11, 2026 rule that the one overall leaderboard is ordered by rating ([ranking module](../business_logic/product/player-information/modules/ranking/README.md#overall-leaderboard)).
 - **Decision:**
   - In the owner's words: "leaderboards should be top annual, top monthly, top weekly".
-  - **Order:** each list is ordered by wins in standard matches in that year, month or week (owner choice). Win rate breaks a tie.
+  - **Order:** each list is ordered by wins in standard matches in that year, month or week (owner choice). Higher win rate breaks a tie, then the account nickname in alphabetical order (full name when there is no nickname), then stable player ID for equal display names.
   - **Top annual replaces the overall list** (owner choice). A profile's leaderboard position is its annual place.
   - **Top 50 only, wins only** (owner, later the same day): each list shows the top 50. A row shows the number of wins and not the skill level, "for now".
   - **Movement mark:** beside each place, an up or down mark when the player moved, or **New**; in the owner's words, "top or bottom icons if player has recently ranked up or ranked down or show \"new\"". Hovering shows where the player was before.
   - **Compared with the previous period** (owner choice): weekly with last week's final place, monthly with last month, annual with last year. **New** means the player wasn't on that list in the previous period.
   - **Below the top 50:** a signed-in player sees "You're not in the top 50 this year" with their own wins and the wins of place 50. The Player mockup has a Prototype control for it (owner request).
   - **Just by wins** (owner, later the same day: "it is just by wins"): nothing but wins in the period decides who is on a list. The earlier requirement of 10 standard matches in the last three months no longer applies to the leaderboards.
-  - **Calendar periods** (owner: "calendars roll"), read as: the lists follow the calendar year, month and week, and each starts again when a new one begins.
+  - The calendar year starts on January 1, the month on its first day and the week on Monday. Every boundary is at 00:00 Asia/Manila.
+  - Previous places are recomputed from valid results using their original playing dates. A late sync can change last period's places and the current movement marks. The owner approved computing these from recorded matches without a snapshot or migration.
+  - The rating and the “N of 10 standard matches” progress describe the skill rank only.
   - **Profiles** (owner: "profile should not say it if it doesnt qualify for top 50. and should show if 3 boxes if qualified for each category"): a profile names no overall position. It shows one box for each list the player is in the top 50 of (the place and the wins), and nothing about a position when they are in none.
 - **Open:**
-  - The owner's "calendars roll" is recorded as calendar periods that start again; to confirm it does not mean rolling windows (the last 7, 30 and 365 days).
-  - What the rating and the "N of 10 standard matches" count are still used for. In the mockup they only describe the skill rank ("This rank is still settling").
-  - A further tie-break after win rate.
   - The Admin mockup still marks players "On leaderboard" or "Not on leaderboard" by the old rule.
   - Whether the Queue session page and the club's share images are affected. They are not changed.
 - **References:** [ranking module](../business_logic/product/player-information/modules/ranking/README.md), [ranking and history screens](../screens/product/modules/player-information/ranking-history.md).

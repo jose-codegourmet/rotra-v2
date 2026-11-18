@@ -38,6 +38,7 @@ export async function getPlayerCompare(
         fullName: profile.fullName,
         nickname: profile.nickname,
         picture: profile.picture,
+        leaderboardPlaces: profile.leaderboardPlaces,
       },
       rank,
       overallWinRate: overallCompareWinRate(games),

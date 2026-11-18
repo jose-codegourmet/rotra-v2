@@ -45,7 +45,14 @@ export type PlayerRankScenario =
   | 'needs-reassessment'
   | 'updating'
   | 'no-rank'
-export type LeaderboardScenario = 'normal' | 'loading' | 'error' | 'empty'
+export type LeaderboardScenario =
+  | 'normal'
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'empty-week'
+  | 'in-top-50'
+  | 'below-top-50'
 export type PlayerMockDevState = MockDevState & {
   playerRankScenario?: PlayerRankScenario
   leaderboardScenario?: LeaderboardScenario

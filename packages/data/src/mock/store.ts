@@ -17,6 +17,7 @@ import { createContactChangeRequestFixtures } from '../fixtures/contactChangeReq
 import { featureFlags } from '../fixtures/featureFlags'
 import { createFinancialFixtures } from '../fixtures/financials'
 import { inventoryItems } from '../fixtures/inventory'
+import { seedLeaderboardHistory } from '../fixtures/leaderboardHistory'
 import { claimLinks, playerAccounts } from '../fixtures/playerAccounts'
 import { playerAwardHistory } from '../fixtures/playerAwardHistory'
 import { playerProfiles } from '../fixtures/playerProfiles'
@@ -239,6 +240,7 @@ function seedState(): MockState {
     },
   })
   seedAdminPlayerManagement(state)
+  seedLeaderboardHistory(state)
   return state
 }
 /**

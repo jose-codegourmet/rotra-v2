@@ -1,5 +1,7 @@
 # Shared rank and overall leaderboard
 
+**Last verified:** 2026-11-18 (Player leaderboard rules).
+
 **Status:** Engine decided November 11, 2026 ([D-2026-11-11-05](../../../../../mvp/decisions.md#d-2026-11-11-05), from the [ranking-by-wins proposal](../../../../../decisions/2026-11-11-ranking-by-wins/01-proposal.md)): rank comes from **wins, weighted by who you beat**. The constants (band edges, step sizes) and the worked examples are chosen in #247; do not pick them from this document alone.
 
 ## Visible skill ladder
@@ -14,7 +16,7 @@ Operators assign one of **nine levels** (decided October 26, 2026; the earlier I
 
 The nine are ordered; a difference between two levels is counted in whole levels (e.g. “2 levels below suggestion”). The nine levels are **bands on the hidden rating** (below): a player's shown level is read off their rating, nobody assigns it globally. The band edges are chosen in #247.
 
-City/National/World competition categories are deferred. A player has a skill label and, when eligible, an overall ROTRA leaderboard position. Singles and doubles share one rank.
+City/National/World competition categories are deferred. A player has a skill label and can place on the annual, monthly and weekly leaderboards. Singles and doubles share one rank.
 
 ## Club assessment authority: the level for the night
 
@@ -35,7 +37,7 @@ Decided November 11, 2026 ([D-2026-11-11-05](../../../../../mvp/decisions.md#d-2
 - After the game, each player moves up or down by a **step**: beat a stronger team → up a lot; beat a weaker team → up a little; lose to a stronger team → almost nothing; lose to a weaker team → down a lot.
 - **Score does not change the step** in v1. A game with only a winner counts the same as a game with a score.
 - **What counts:** only full participation in valid singles/doubles games from valid finished sessions. Fun games, invalid games or sessions, and both outgoing/incoming participants in a mid-game substitution are excluded, even when the Queue Master gave one of them the game for the session (owner decision, November 6, 2026).
-- **New players are Provisional** until about 10 counted games, with a bigger step so the number settles fast. The starting rating is seeded from the Queue Master's **first level for the night**. The rank card says "Provisional"; no leaderboard position yet.
+- **New players are Provisional** until about 10 counted games, with a bigger step so the number settles fast. The starting rating is seeded from the Queue Master's **first level for the night**. The rank card says "Provisional". Players at any stage of skill-rank progress can place on the leaderboards.
 - **Window and clock:** three months means **90 rolling days**; the day boundary is **Asia/Manila midnight**.
 - **Admin settings** (replacing the 70/30 weights): normal step size, Provisional step size, Provisional game count, leaderboard game count, window length. Saving new settings **recomputes everyone** from the stored game facts; rank is a projection and the facts never change.
 - **Constants** (band edges, step sizes) and the worked examples (a level-matched night, an upset, a padded win, a returning player, a Provisional newcomer, a substituted game, an invalid session) are chosen in #247.
@@ -48,11 +50,9 @@ Years/months of experience is optional context, not rating points.
 After 90 rolling days without a counted game:
 
 - Keep the old rank visible as **Needs reassessment**.
-- Remove the player from the overall leaderboard.
 - On return, the player is **Provisional** again for a few games, with the bigger step, so the rating catches up. The Queue Master still sets a level for the night as usual; it does not feed the rating.
-- The rolling game-count requirement below still applies to the leaderboard.
 
-Do not silently reset old visible ranks to Beginner. Without a daily job (jobs are parked for MVP, [D-2026-11-11-10](../../../../../mvp/decisions.md#d-2026-11-11-10)), "Needs reassessment" and leaderboard eligibility are computed when a page is read.
+Do not silently reset old visible ranks to Beginner. Without a daily job (jobs are parked for MVP, [D-2026-11-11-10](../../../../../mvp/decisions.md#d-2026-11-11-10)), the skill-rank reassessment state is computed when a page is read.
 
 ## What a player may share
 
@@ -65,21 +65,16 @@ A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08
 
 ## Overall leaderboard
 
-**Decided November 16, 2026, mockup only ([D-2026-11-16-05](../../../../../mvp/decisions.md#d-2026-11-16-05)):** there are three leaderboards, **Top annual**, **Top monthly** and **Top weekly**. Each is ordered by wins in standard matches in that period, with win rate as the tie-break, and each place carries a mark for the move since the previous period (up, down, or New). Top annual replaces the single overall list, so a profile's position is its annual place. Each list shows the top 50 only, and a row shows the number of wins, not the skill level. The lists are just by wins: the 10-game requirement below no longer decides who is listed. They follow the calendar year, month and week and start again with each new one. A profile names no overall position; it shows a box for each list the player is in the top 50 of. What the rating and the 10-game count are still used for is open. The rules below describe the one overall list that the code and rank calculation still follow.
+**Top annual**, **Top monthly** and **Top weekly** each show the first 50 players across clubs. The year begins on January 1, the month on its first day and the week on Monday. All three start at 00:00 Asia/Manila. These rules were approved November 16 and clarified November 18, 2026. [Decision D-2026-11-16-05](../../../../../mvp/decisions.md#d-2026-11-16-05).
 
-A newcomer can have a public profile and provisional rank before qualifying for a leaderboard position.
+- Count wins and losses from full participation in valid standard matches (singles or doubles) in valid finished sessions. A match with a confirmed winner counts even without a score or published standings. Exclude fun games, either side of a mid-game substitution for the affected slot, and invalid matches or sessions.
+- A player enters the period's standings with their first qualifying match, including a loss. Sort by most wins, then higher win rate, then the account nickname alphabetically (full name fallback). Equal display names use the stable ROTRA player identity as the final tie-break. Skill rating, rank state and recent 10-match progress only describe the skill rank.
+- A single-club unclaimed player is public. When more than one club saves them, they leave all lists until they register. Private players retain their places. Visitor rows mask private names and searches omit them. Always private names are masked for other viewers, with their picture and banner still visible. [Visibility decision](../../../../../mvp/decisions.md#d-2026-11-09-07).
+- Compare each public place with the same player's top-50 place in the previous calendar period. A player who was outside the top 50 or had no qualifying matches then shows **New**. Otherwise show the change in places, including no change.
+- Use the original playing date when a session syncs late. Recompute the preceding period from those facts so its final standings and movement marks include the result.
+- A profile, Compare and share cards may show public top-50 places. Only the signed-in player's own position card can show their place below 50, their wins and place 50's wins. Mention a better win rate only when place 50 actually won the win-rate tie-break.
 
-- Public, overall ROTRA only; no city/club filters in v1.
-- Require **10 counted singles/doubles games within the last 90 days**.
-- The threshold is adjustable in Admin.
-- Ordered by rating. **Ties:** more counted games in the window first, then name (decided November 11, 2026).
-- Private players keep their position with a masked name ([D-2026-11-09-07](../../../../../mvp/decisions.md#d-2026-11-09-07)); an Always private player's name is masked for everyone but themselves, and their picture stays visible ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)).
-- Exclude fun games, invalid matches, and partial games from that count.
-- Ten is a rolling requirement, not a lifetime milestone. Falling below it removes eligibility even if a profile/rank remains visible.
-- The fresh-assessment rule does not waive the match-count requirement.
-- Valid Session done updates performance/eligibility automatically; publishing club slides is irrelevant to this update.
-
-Session standings use wins/losses/head-to-head/name; they are a different ranking from this global rating leaderboard.
+Session standings follow their own wins/losses/head-to-head/name order.
 
 **Session awards** (Most Improved, Off Day) are separate from the rating: the prototype formula is approved **as is** for v1. **Generate matches** keeps the prototype's draft weights as the official v1 pairing rule (both decided November 11, 2026, [D-2026-11-11-05](../../../../../mvp/decisions.md#d-2026-11-11-05)).
 

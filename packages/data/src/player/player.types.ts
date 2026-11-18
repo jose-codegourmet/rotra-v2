@@ -1,3 +1,5 @@
+import type { LeaderboardPlace } from '../leaderboard/leaderboard.types'
+
 /** The nine playing levels, ordered from Beginner Low to Advanced High. */
 export const PLAYING_LEVELS = [
   'beginner_low',
@@ -84,6 +86,7 @@ export type ProfileVisibility = 'public' | 'private' | 'always_private'
 
 /** Public profile only; private account and contact fields are deliberately excluded. */
 export type PlayerProfile = {
+  leaderboardPlaces?: LeaderboardPlace[]
   /** Unset on an identity without a stored level reads as `public` (existing fixture identities). */
   profileVisibility?: ProfileVisibility
   /**

@@ -2,6 +2,8 @@ import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
+import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
+import { mockLeaderboard } from '../leaderboard/projection'
 import { playerRequest } from '../leaderboard/request'
 import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -39,7 +41,13 @@ export async function getPlayerRank(
   if (isRealDataMode()) return realGetPlayerRank(playerId, signal)
   await playerRequest(signal)
   await requireProfileAccess(playerId)
-  return playerProjection().ranks[playerId] ?? null
+  const state = readMockState()
+  const annual = mockLeaderboard(state)
+    .standings('year')
+    .slice(0, LEADERBOARD_LIMIT)
+    .find((row) => row.id === playerId)
+  const rank = playerProjection(state).ranks[playerId]
+  return rank ? { ...rank, position: annual?.position ?? null } : null
 }
 export async function getPlayerGames(
   playerId: string,
@@ -66,7 +74,8 @@ export async function getPlayerGames(
   }
   await playerRequest(signal)
   await requireProfileAccess(playerId)
-  return (playerProjection().games[playerId] ?? []).map((session) => ({
+  const state = readMockState()
+  return (playerProjection(state).games[playerId] ?? []).map((session) => ({
     ...session,
     // Games are stored oldest first; each face counts that person's games so far, this one included.
     games: session.games.map((game, index) => {
@@ -75,7 +84,7 @@ export async function getPlayerGames(
           .slice(0, index + 1)
           .filter((g) => g.partners.includes(name) || g.opponents.includes(name)).length
       const face = (name: string): PlayerGamePlayer => ({
-        ...gamePlayer(name),
+        ...gamePlayer(name, state.playerProfiles),
         sessionGameNumber: played(name),
       })
       return {
@@ -88,10 +97,8 @@ export async function getPlayerGames(
   }))
 }
 /** A face on a game court: a ROTRA profile by full name or nickname, else a guest (no playerId). */
-function gamePlayer(name: string): PlayerGamePlayer {
-  const profile = readMockState().playerProfiles.find(
-    (p) => p.fullName === name || p.nickname === name,
-  )
+function gamePlayer(name: string, profiles: PlayerProfile[]): PlayerGamePlayer {
+  const profile = profiles.find((p) => p.fullName === name || p.nickname === name)
   if (!profile) return { name, picture: null, playerId: null }
   return {
     name,
@@ -128,11 +135,12 @@ export async function getPlayerProfile(
   }
   await playerRequest(signal)
   await requireProfileAccess(playerId)
-  const profile = readMockState().playerProfiles.find((player) => player.playerId === playerId)
+  const state = readMockState()
+  const profile = state.playerProfiles.find((player) => player.playerId === playerId)
   if (!profile) return null
   if (profile.adminChangeNote && (await getSession('player'))?.account.id !== playerId)
     delete profile.adminChangeNote
-  return withBanner(profile)
+  return withBanner({ ...profile, leaderboardPlaces: mockLeaderboard(state).places(playerId) })
 }
 
 /** Mock mode: the profile with its resolved banner (bannerKey, bannerImageUrl), like the server's. */

@@ -111,6 +111,23 @@ export const realSelfCheckIn = (slug: string) => presenceWrite(slug, 'check-in')
 export const realLeaveSession = (slug: string) => presenceWrite(slug, 'leave')
 
 /**
+ * **I can't make it** (D-2026-11-09-03): the signed-in Player's own drop-out notice for the Queue
+ * Master, on the Player origin like I'm here. Before the start only; a 409 carries “Told the QM you
+ * can't make it” when a notice is already open.
+ */
+export async function realSendDropOutNotice(slug: string) {
+  const done = await playerPost<{ noticeId: string; message: string }>(slug, 'drop-out', {})
+  return { savedOffline: false, message: done.message, data: { noticeId: done.noticeId } }
+}
+
+/**
+ * **Session invite** (D-2026-11-09-08): this Player's code, made on the first call and the same
+ * after. A POST on the Player origin because the first call writes.
+ */
+export const realGetSessionInviteCode = (slug: string) =>
+  playerPost<{ code: string }>(slug, 'invite-code', {})
+
+/**
  * **Sign out** from the session page's account bar (#693): signs the Player out of ROTRA Player on
  * this device. A credentialed call to the Player app, like Request to join.
  */

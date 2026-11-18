@@ -20,6 +20,7 @@ import { autoFillCourts } from './match-control'
 import { liveOpenRequests } from './match-request-store'
 import {
   derivedId,
+  LIVE_ENTRY,
   liveCourts,
   liveRoster,
   lockSession,
@@ -910,6 +911,16 @@ export async function readQueueSession(context: ClubContext, sessionId: string) 
   await requireSessionAccess(context, session)
   return prisma.$transaction(async (tx) => {
     const summary = await sessionSummaryDto(tx, session)
+    // Prepared: Requests · N, pending join requests + open drop-out notices (D-2026-11-09-03).
+    if (session.state === 'prepared') {
+      const [joining, notices] = await Promise.all([
+        tx.sessionJoinRequest.count({ where: { sessionId: session.id, status: 'pending' } }),
+        tx.sessionDropOutNotice.count({
+          where: { sessionId: session.id, status: 'open', entry: LIVE_ENTRY },
+        }),
+      ])
+      return { ...summary, requestCount: joining + notices }
+    }
     // Live: Match requests · N, the open match requests whose named players are all present.
     if (session.state !== 'active') return summary
     return { ...summary, requestCount: (await liveOpenRequests(tx, session.id)).length }

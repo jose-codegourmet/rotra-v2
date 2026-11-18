@@ -69,6 +69,8 @@ model SessionPlayer {
 
   paymentMark SessionPaymentMark?
 
+  dropOutNotices SessionDropOutNotice[]
+
   facts   PlayerMatchFact[]
   summary ClubSessionPlayerSummary?
 
@@ -163,16 +165,85 @@ model SessionJoinRequest {
   /// The signed-in Player who sent it (D-2026-11-09-02); null for a guest. One pending per Player
   /// and session (partial unique index in the migration).
   playerId          String?              @map("player_id") @db.Uuid
+  /// The Session invite the link carried (`?invite=`), read as “Invited by NAME”
+  /// (D-2026-11-09-08); null when it carried none.
+  inviteCodeId      String?              @map("invite_code_id") @db.Uuid
   createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision          BigInt               @default(1)
 
-  session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
-  clubPlayer ClubPlayer?  @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
-  decidedBy  Device?      @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
-  player     Player?      @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  session    QueueSession       @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  clubPlayer ClubPlayer?        @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+  decidedBy  Device?            @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
+  player     Player?            @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  inviteCode SessionInviteCode? @relation(fields: [inviteCodeId], references: [id], onDelete: Restrict)
 
   @@index([sessionId, status, requestedAt])
   @@index([playerId])
+  @@index([inviteCodeId])
   @@map("session_join_requests")
+}
+
+enum DropOutNoticeStatus {
+  open
+  closed
+
+  @@map("drop_out_notice_status")
+}
+
+enum DropOutNoticeDecision {
+  kept
+  removed
+
+  @@map("drop_out_notice_decision")
+}
+
+/// I can't make it (D-2026-11-09-03): a confirmed signed-in Player tells the Queue Master before the
+/// start. The slot stays until the Queue Master acts: Keep closes it as `kept`, Remove from roster
+/// closes it as `removed` and releases the roster entry in one transaction. Finishing or cancelling
+/// the session closes it with no decision. One open notice per roster entry (partial unique index in
+/// the migration); `decision` is set only on a notice closed by Keep or Remove (CHECK in SQL).
+model SessionDropOutNotice {
+  id               String                 @id @db.Uuid
+  clubId           String                 @map("club_id") @db.Uuid
+  sessionId        String                 @map("session_id") @db.Uuid
+  sessionPlayerId  String                 @map("session_player_id") @db.Uuid
+  /// The authenticated Player who sent it; linked to the roster entry's club player.
+  playerId         String                 @map("player_id") @db.Uuid
+  status           DropOutNoticeStatus    @default(open)
+  decision         DropOutNoticeDecision?
+  createdAt        DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  closedAt         DateTime?              @map("closed_at") @db.Timestamptz(6)
+  /// Device that decided it, from the same club; null when decided online in real mode or closed by
+  /// the session ending.
+  closedByDeviceId String?                @map("closed_by_device_id") @db.Uuid
+
+  session  QueueSession  @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  entry    SessionPlayer @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  player   Player        @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  closedBy Device?       @relation(fields: [clubId, closedByDeviceId], references: [clubId, id], onDelete: Restrict)
+
+  @@index([sessionId, status, createdAt])
+  @@index([clubId, sessionId, sessionPlayerId])
+  @@index([playerId])
+  @@map("session_drop_out_notices")
+}
+
+/// Session invite (D-2026-11-09-08): one random code per Player and session, made the first time a
+/// confirmed or waitlisted Player opens the invite card while the session is Prepared. Never the RTR
+/// ID. Read by the public join flow to resolve `?invite=` into `session_join_requests.invite_code_id`.
+model SessionInviteCode {
+  id        String   @id @db.Uuid
+  clubId    String   @map("club_id") @db.Uuid
+  sessionId String   @map("session_id") @db.Uuid
+  playerId  String   @map("player_id") @db.Uuid
+  code      String   @unique
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  session      QueueSession         @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  player       Player               @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  joinRequests SessionJoinRequest[]
+
+  @@unique([sessionId, playerId])
+  @@map("session_invite_codes")
 }

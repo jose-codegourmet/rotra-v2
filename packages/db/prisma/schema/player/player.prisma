@@ -82,6 +82,8 @@ model Player {
   assessments           ClubAssessment[]             @relation("AssessmentPlayer")
   activeHold            ActivePlayerHold?            @relation("ActivePlayerHold")
   joinRequests          SessionJoinRequest[]
+  dropOutNotices        SessionDropOutNotice[]
+  sessionInviteCodes    SessionInviteCode[]
 
   facts          PlayerMatchFact[]          @relation("FactPlayer")
   rankCurrent    PlayerRankCurrent?
@@ -122,25 +124,25 @@ enum PlayerContactSyncStatus {
 
 /// A claimed player's sign-in mapping. The provider owns passwords, sessions and reset tokens.
 model PlayerAccount {
-  playerId           String                  @id @map("player_id") @db.Uuid
-  authProvider       String                  @map("auth_provider")
-  authSubject        String                  @map("auth_subject") @db.Uuid
-  claimedAt          DateTime                @map("claimed_at") @db.Timestamptz(6)
+  playerId                   String                  @id @map("player_id") @db.Uuid
+  authProvider               String                  @map("auth_provider")
+  authSubject                String                  @map("auth_subject") @db.Uuid
+  claimedAt                  DateTime                @map("claimed_at") @db.Timestamptz(6)
   /// The private-contact revision the provider login identifiers last matched.
-  contactSyncVersion BigInt                  @map("contact_sync_version")
-  contactSyncStatus  PlayerContactSyncStatus @default(in_sync) @map("contact_sync_status")
-  disabledAt         DateTime?               @map("disabled_at") @db.Timestamptz(6)
+  contactSyncVersion         BigInt                  @map("contact_sync_version")
+  contactSyncStatus          PlayerContactSyncStatus @default(in_sync) @map("contact_sync_status")
+  disabledAt                 DateTime?               @map("disabled_at") @db.Timestamptz(6)
   /// The connected Google account's email (D-2026-11-16-01), trimmed + lowercased; null = no Google.
   /// ROTRA's own record of "Google is connected": a provider identity alone never counts. It can
   /// differ from the ROTRA email. Changed, never cleared. No Google token is ever stored.
-  googleEmail        String?                 @unique @map("google_email")
+  googleEmail                String?                 @unique @map("google_email")
   /// When Google was connected or last changed. Set together with `googleEmail` (SQL CHECK).
-  googleLinkedAt     DateTime?               @map("google_linked_at") @db.Timestamptz(6)
+  googleLinkedAt             DateTime?               @map("google_linked_at") @db.Timestamptz(6)
   /// First read of the derived verification reminder. Its visibility still follows account verification.
-  verificationReminderReadAt DateTime?       @map("verification_reminder_read_at") @db.Timestamptz(6)
-  createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision           BigInt                  @default(1)
+  verificationReminderReadAt DateTime?               @map("verification_reminder_read_at") @db.Timestamptz(6)
+  createdAt                  DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision                   BigInt                  @default(1)
 
   player Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
 

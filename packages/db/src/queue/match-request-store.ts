@@ -85,8 +85,15 @@ export async function closeStaleMatchRequests(tx: Tx, sessionId: string, now = n
   return done.count
 }
 
-/** Finishing, invalidating or cancelling a session closes every open match request (kept, hidden). */
+/**
+ * Finishing, invalidating or cancelling a session closes every open match request (kept, hidden)
+ * and every open drop-out notice (D-2026-11-09-03: closed with no decision).
+ */
 export async function closeSessionMatchRequests(tx: Tx, sessionId: string, now = new Date()) {
+  await tx.sessionDropOutNotice.updateMany({
+    where: { sessionId, status: 'open' },
+    data: { status: 'closed', closedAt: now },
+  })
   const done = await tx.sessionMatchRequest.updateMany({
     where: { sessionId, status: 'open' },
     data: { status: 'closed', decidedAt: now, revision: { increment: 1 } },

@@ -484,7 +484,7 @@ export async function removeRosterPlayer(
     removeRosterPlayerIn(tx, session, rosterId),
   )
 }
-async function removeRosterPlayerIn(tx: Tx, session: QueueSession, rosterId: string) {
+export async function removeRosterPlayerIn(tx: Tx, session: QueueSession, rosterId: string) {
   requireState(session, ['prepared'], 'Only a prepared roster can remove players.')
   const entry = await tx.sessionPlayer.findUnique({ where: { id: rosterId } })
   if (!entry || entry.sessionId !== session.id) throw new ServiceError('not_found')

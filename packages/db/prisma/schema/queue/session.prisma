@@ -91,6 +91,8 @@ model QueueSession {
   rosterEntries        SessionPlayer[]
   waitlistEntries      SessionWaitlistEntry[]
   joinRequests         SessionJoinRequest[]
+  dropOutNotices       SessionDropOutNotice[]
+  inviteCodes          SessionInviteCode[]
   assessments          ClubAssessment[]
   deviceSessionStreams DeviceSessionStream[]
   syncConflicts        SyncConflict[]

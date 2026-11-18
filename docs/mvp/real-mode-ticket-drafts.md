@@ -129,6 +129,14 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   roster marks and the club's switch (migration `20261118000600_self_check_in`, **not applied to the
   shared database**). Written and type-checked; not run against a database. Still open here: the
   drop-out notice (**I can't make it**) and the Session invite code.
+- **Update, November 19, 2026 (Q24.6, #968; owner approved the migration for the batch):**
+  **I can't make it** and the Session invite code are real (`sendDropOutNotice`,
+  `getSessionInviteCode`; Player app routes `drop-out` and `invite-code`). The Queue Master's Requests
+  read returns the open drop-out notices; **Keep** and **Remove from roster** are Queue app routes
+  under `requests/drop-outs/[noticeId]`; finishing, invalidating or cancelling closes open notices;
+  My night reads `cantMakeItSent`, `canInvite` and `inviteCode`. Migration
+  `20261118000700_drop_out_notices_session_invites`, **not applied to the shared database**; not run
+  against a database. Still open: resolving `?invite=` on a join request (“Invited by NAME”).
 
 ---
 

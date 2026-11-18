@@ -22,12 +22,12 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | in progress (mock app; real mode: join only) | #585, #687 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626 | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626, #964, #968 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | in progress | #622, #625, #627 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | in progress (three levels and the hide switch built in P08.5, #753; always-private rules in the services) | #753 | [Player](workstreams/player.md) |
-| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress (club invite code checked on the server in real mode, #755; Post image stays 1080 × 1350) | #620, #621, #624, #626, #755 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress (club invite code checked on the server in real mode, #755; Post image stays 1080 × 1350) | #620, #621, #624, #626, #755, #968 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
@@ -287,8 +287,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-03"></a>
 ### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) and the club setting Players can check themselves in (Club settings › Session defaults, #619, #624, #626) are in the mock app. Real mode does not persist it.
-- **Ticket:** #617, #619, #624, #626
+- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) and the club setting Players can check themselves in (Club settings › Session defaults, #619, #624, #626) are in the mock app. Real mode: I'm here and I'm leaving are written (#964, migration `20261118000600_self_check_in`); I can't make it with Keep and Remove from roster is written November 19, 2026 (#968, migration `20261118000700_drop_out_notices_session_invites`). Neither migration is applied to the shared database; not run against a database.
+- **Ticket:** #617, #619, #624, #626, #964, #968
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
   - **Self check-in.** During a live session, a confirmed signed-in player who isn't present sees a large **I'm here** button. Tapping it sets Present directly. The QM's roster shows a small "checked in themselves" mark and the QM can undo it. The club can turn self check-in off. Check-in is a tap only, with no location check and no venue QR scan.
@@ -386,8 +386,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-08"></a>
 ### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it, except the club invite code: `?k=` is checked on the server and Regenerate link replaces it (P08.7, #712).
-- **Ticket:** #620, #621, #624, #626
+- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it, except the club invite code: `?k=` is checked on the server and Regenerate link replaces it (P08.7, #712), and the Session invite code (a player's own code per session, `POST /api/public-sessions/[slug]/invite-code`, written November 19, 2026, #968, migration `20261118000700_drop_out_notices_session_invites`, not applied to the shared database; “Invited by NAME” from `?invite=` is not in real mode).
+- **Ticket:** #620, #621, #624, #626, #968
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Decision:**
   - **What every share offers**, in the owner's words: "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Images reuse the Session QR share card's **Post | Story** switch: 4:5 (1080 × 1350) and 9:16 (1080 × 1920), on the fixed dark brand card. Every invitation image has a QR ("anything invitation is always a QR"). Info images also carry a small corner QR that opens the player's profile, which follows the privacy setting.

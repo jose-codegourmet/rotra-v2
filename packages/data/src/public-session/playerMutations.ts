@@ -9,8 +9,10 @@ import {
   realCancelMyJoinRequest,
   realJoinAsPlayer,
   realLeaveSession,
+  realGetSessionInviteCode,
   realMoveMeToWaitlist,
   realSelfCheckIn,
+  realSendDropOutNotice,
 } from '../real/public-session'
 import {
   JOIN_REQUESTS_STARTED_ERROR,
@@ -34,8 +36,8 @@ import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.type
  * Player-side writes from a signed-in ROTRA Player on the session page (Q17.2, mock only). They go
  * straight to the server, never through the club device's sync log, so the Queue Master sees them
  * with their next refresh. In real mode Request to join, Cancel request (#687), Move me to the
- * waitlist (#735), I'm here and I'm leaving go to the Player app; I can't make it and the Session
- * invite have no route yet (`delay` refuses with NotConnectedError).
+ * waitlist (#735), I'm here, I'm leaving, I can't make it and the Session invite go to the Player app
+ * (`delay` still refuses with NotConnectedError).
  * Identity (`playerId`) comes from the Player session; the server checks the roster link.
  */
 function fail(text: string, kind: 'permission' | 'conflict' = 'permission'): never {
@@ -295,6 +297,7 @@ export function moveMeToWaitlist(slug: string, input: PlayerSessionInput) {
  * until the QM acts. One open notice per player.
  */
 export function sendDropOutNotice(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realSendDropOutNotice(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -325,6 +328,7 @@ export function sendDropOutNotice(slug: string, input: PlayerSessionInput) {
  * is Prepared (refused once it is live, finished or cancelled).
  */
 export async function getSessionInviteCode(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realGetSessionInviteCode(slug)
   const check = (s: MockState, session: MockState['sessions'][number]) => {
     if (session.state !== 'prepared') fail('Invites close when the session starts.')
     const slot = playerSlot(s, session, input.playerId)

@@ -1,6 +1,7 @@
 import { queueMasterName } from '../match/match.rules'
 import type { MatchFormat } from '../match/match.types'
 import type {
+  DropOutNoticeView,
   MatchRequestView,
   SendMatchRequestInput,
   SessionRequests,
@@ -25,13 +26,51 @@ const sessionPath = (sessionId: string) => `/api/sessions/${encodeURIComponent(s
 // ---------- Queue Master (Q18.12) ----------
 
 type WireRequestView = Omit<MatchRequestView, 'at'> & { at: string }
-type WireSessionRequests = Omit<SessionRequests, 'match'> & { match: WireRequestView[] }
+type WireDropOutNotice = Omit<DropOutNoticeView, 'at' | 'closedAt'> & {
+  at: string
+  closedAt: string | null
+}
+type WireSessionRequests = Omit<SessionRequests, 'match' | 'dropOuts'> & {
+  match: WireRequestView[]
+  /** Missing on a server from before I can't make it was connected */
+  dropOuts?: WireDropOutNotice[]
+}
 
-/** Q-REQUESTS: open match requests with ms times; join requests stay on the roster read. */
+/**
+ * Q-REQUESTS: open match requests and the open drop-out notices (I can't make it, D-2026-11-09-03)
+ * with ms times; join requests stay on the roster read.
+ */
 export async function realGetSessionRequests(sessionId: string): Promise<SessionRequests> {
   const wire = await realRequest<WireSessionRequests>(`${sessionPath(sessionId)}/requests`)
-  return { ...wire, match: wire.match.map((m) => ({ ...m, at: msOf(m.at) })) }
+  return {
+    ...wire,
+    match: wire.match.map((m) => ({ ...m, at: msOf(m.at) })),
+    dropOuts: (wire.dropOuts ?? []).map((d) => ({
+      ...d,
+      at: msOf(d.at),
+      closedAt: d.closedAt === null ? null : msOf(d.closedAt),
+    })),
+  }
 }
+
+/** Can't make it › **Keep** / **Remove from roster** (D-2026-11-09-03): toast “NAME stays on the roster” / “NAME removed from the roster”. */
+async function dropOutDecision(
+  input: { sessionId: string; noticeId: string },
+  action: 'keep' | 'remove',
+) {
+  const done = await realRequest<{ noticeId: string; name: string }>(
+    `${sessionPath(input.sessionId)}/requests/drop-outs/${encodeURIComponent(input.noticeId)}/${action}`,
+    { method: 'POST', body: {} },
+  )
+  return accepted(
+    null,
+    action === 'keep' ? `${done.name} stays on the roster` : `${done.name} removed from the roster`,
+  )
+}
+export const realKeepDropOut = (input: { sessionId: string; noticeId: string }) =>
+  dropOutDecision(input, 'keep')
+export const realRemoveDropOut = (input: { sessionId: string; noticeId: string }) =>
+  dropOutDecision(input, 'remove')
 
 /** Add to queue: toast “Match added to the queue”, plus any Auto Queue placement. */
 export async function realAddMatchRequestToQueue(input: { sessionId: string; requestId: string }) {

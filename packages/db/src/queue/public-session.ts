@@ -13,6 +13,7 @@ import {
   myMatchLabel,
   publicFirstName,
   publicLevel,
+  makeInviteCode,
   publicSkillMix,
   selfCheckInMark,
 } from '@rotra/data/public-session/rules'
@@ -671,8 +672,10 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
  * them in it and the match holding a court with them in it (faces by the signed-in name rule, first
  * name only), their latest join request and open match request, club membership, and their own
  * I'm here / I'm leaving marks (`checkedIn`, `hasLeft`: the Queue Master's last action wins, like
- * the roster's mark). Drop-out notices and Session invites are not real yet, so `cantMakeItSent`
- * and `canInvite` read false and `inviteCode` null. Never another player's results
+ * the roster's mark), whether they have an open I can't make it notice (`cantMakeItSent`), whether
+ * the Session invite is open to them (`canInvite`: confirmed or waitlisted, Prepared, join requests
+ * on) and their existing invite code (`inviteCode`, null until they first open the card). Never
+ * another player's results
  * or positions, presence of others, contacts or operator notes.
  */
 export async function readMyNight(context: PlayerContext, slug: string) {
@@ -714,6 +717,17 @@ export async function readMyNight(context: PlayerContext, slug: string) {
         })
       : null
     const waitlisted = !row && standing.waitlistPosition !== null
+    // Own drop-out notice and Session invite (D-2026-11-09-03, D-2026-11-09-08).
+    const openNotice =
+      !!row &&
+      !!(await tx.sessionDropOutNotice.findFirst({
+        where: { sessionPlayerId: row.id, status: 'open' },
+        select: { id: true },
+      }))
+    const invite = await tx.sessionInviteCode.findUnique({
+      where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
+      select: { code: true },
+    })
     const takesPart =
       session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
     const isLive = session.state === 'active' || session.state === 'finalizing'
@@ -773,7 +787,7 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       present: row?.present ?? false,
       checkedIn: mark?.kind === 'checked-in',
       hasLeft: mark?.kind === 'left',
-      cantMakeItSent: false,
+      cantMakeItSent: openNotice,
       offline: false,
       games: result?.games ?? 0,
       won: result?.wins ?? 0,
@@ -791,8 +805,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
           : null,
       joinRequest: standing.joinRequest,
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
-      canInvite: false,
-      inviteCode: null,
+      canInvite:
+        session.state === 'prepared' && session.acceptJoinRequests && (!!row || waitlisted),
+      inviteCode: invite?.code ?? null,
     }
   })
   const { matchRequest } = await readMyMatchRequest(context, slug)
@@ -1220,4 +1235,118 @@ export async function leaveSessionAsPlayer(context: PlayerContext, slug: string)
   } catch (error) {
     mapDatabaseError(error)
   }
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I can't make it** (D-2026-11-09-03) from the Queue session page, before the
+ * start only: the signed-in Player's own roster entry gets an open drop-out notice for the Queue
+ * Master. The slot stays until the Queue Master acts (Keep or Remove from roster, in Requests).
+ * 409 when the Player already has an open notice; refused for anyone without a live entry in this
+ * session and once the session has started.
+ */
+export async function sendDropOutNotice(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      if (session.state !== 'prepared')
+        throw new ServiceError('invalid', { state: 'The session has already started.' })
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      const open = await tx.sessionDropOutNotice.findFirst({
+        where: { sessionPlayerId: entry.id, status: 'open' },
+        select: { id: true },
+      })
+      if (open) throw new ServiceError('conflict', { player: "Told the QM you can't make it" })
+      const notice = await tx.sessionDropOutNotice.create({
+        data: {
+          id: crypto.randomUUID(),
+          clubId: session.clubId,
+          sessionId: session.id,
+          sessionPlayerId: entry.id,
+          playerId: context.playerId,
+        },
+        select: { id: true },
+      })
+      await touchSession(tx, session)
+      return { noticeId: notice.id, message: "Told the QM you can't make it" }
+    })
+  } catch (error) {
+    if (error instanceof ServiceError) throw error
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Session invite (D-2026-11-09-08): the signed-in Player's code for this session, made the first
+ * time and the same on every later call. Only a confirmed or waitlisted Player, only while the
+ * session is Prepared and takes join requests. The code is short and random, never the RTR ID; a
+ * collision (or a parallel first call) is retried, each try in its own transaction.
+ */
+export async function getSessionInviteCode(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
+        if (session.state !== 'prepared')
+          throw new ServiceError('invalid', { state: 'Invites close when the session starts.' })
+        if (!session.acceptJoinRequests)
+          throw new ServiceError('invalid', { state: 'This session is not taking requests.' })
+        const [entry, waiting] = await Promise.all([
+          tx.sessionPlayer.findFirst({
+            where: {
+              sessionId: session.id,
+              ...LIVE_ENTRY,
+              clubPlayer: { playerId: context.playerId },
+            },
+            select: { id: true },
+          }),
+          tx.sessionWaitlistEntry.findFirst({
+            where: { sessionId: session.id, clubPlayer: { playerId: context.playerId } },
+            select: { id: true },
+          }),
+        ])
+        if (!entry && !waiting)
+          throw new ServiceError('invalid', {
+            player: 'Only confirmed or waitlisted players can invite.',
+          })
+        const saved = await tx.sessionInviteCode.findUnique({
+          where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
+          select: { code: true },
+        })
+        if (saved) return { code: saved.code }
+        const created = await tx.sessionInviteCode.create({
+          data: {
+            id: crypto.randomUUID(),
+            clubId: session.clubId,
+            sessionId: session.id,
+            playerId: context.playerId,
+            code: makeInviteCode(),
+          },
+          select: { code: true },
+        })
+        return { code: created.code }
+      })
+    } catch (error) {
+      if (error instanceof ServiceError) throw error
+      // A taken code or a parallel first call: try again (the retry reads the saved code).
+      const failure = error as {
+        code?: string
+        meta?: { code?: string }
+        cause?: { code?: string }
+      }
+      if (failure?.code === 'P2002' || (failure?.meta?.code ?? failure?.cause?.code) === '23505')
+        continue
+      mapDatabaseError(error)
+    }
+  }
+  throw new ServiceError('conflict')
 }

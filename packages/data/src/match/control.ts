@@ -1,8 +1,10 @@
+import { withClubNickname } from '../club-player/clubNickname.rules'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
+import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SyncArea } from '../sync/sync.types'
 import {
   canMoveCourt,
@@ -11,9 +13,9 @@ import {
   canSendBack,
   canStart,
   courtNames,
+  queueMasterName,
   replacedLineup,
   SUBSTITUTION_CREDITS,
-  shortName,
   substitutionCandidates,
   substitutionSlots,
   swapTarget,
@@ -161,7 +163,8 @@ export function replacePlayer(input: {
       m.teamB = lineup.teamB
       m.origin = 'manual'
       m.manualProtected = true
-      return `Match ${m.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · ${m.state === 'active' ? 'replaced (mistake fixed)' : 'lineup changed'}`
+      const nameOf = (p: SessionPlayer) => queueMasterName(withClubNickname(s, p))
+      return `Match ${m.matchNo}: ${nameOf(incoming)} in for ${nameOf(out)} · ${m.state === 'active' ? 'replaced (mistake fixed)' : 'lineup changed'}`
     }),
   )
 }
@@ -292,9 +295,10 @@ export function substitutePlayer(input: {
             sub.creditTo = 'none'
         })
       }
-      const who = creditTo === 'incoming' ? incoming : creditTo === 'outgoing' ? out : null,
-        gets = who ? ` · ${shortName(who)} gets the game` : ''
-      return `${shortName(incoming)} in for ${shortName(out)}${gets}`
+      const nameOf = (p: SessionPlayer) => queueMasterName(withClubNickname(s, p)),
+        who = creditTo === 'incoming' ? incoming : creditTo === 'outgoing' ? out : null,
+        gets = who ? ` · ${nameOf(who)} gets the game` : ''
+      return `${nameOf(incoming)} in for ${nameOf(out)}${gets}`
     }),
   )
 }

@@ -35,6 +35,7 @@ import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
+import { seedUnclaimedPlayers } from '../fixtures/unclaimedPlayers'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubLicenseTerm, ClubRetentionRecord } from '../license/license.types'
@@ -146,7 +147,23 @@ export type MockState = {
   publications: Record<string, SessionPublication>
   publicationEvents: SessionPublicationEvent[]
   operations: Record<string, { fingerprint: string; outcome: SaveOutcome & { data: unknown } }>
+  /**
+   * A club's own private phone for one of its saved players, by club player id: an unclaimed
+   * player's optional phone, or the phone of an older record with no email (Details required).
+   */
   privatePhones: Record<string, string>
+  /**
+   * Lookup pending (D-2026-11-16-04): the email typed for a new player while offline, by club
+   * player id, until the device syncs and ROTRA links them or gives them an RTR ID. Absent reads
+   * as none.
+   */
+  pendingEmails?: Record<string, string>
+  /**
+   * The highest RTR ID number given per place and day ('RTR-PH-CEB-102926-' → 12). It only goes
+   * up, so a retired RTR ID, or one Admin moved to another place or date, is never given again.
+   * Absent reads as no counters: the players' own RTR IDs still count.
+   */
+  rtrIdCounters?: Record<string, number>
   sampleRequestIndex: number
   /** Development switch (P12): true once the Google deadline counts as passed; absent reads false */
   googleDeadlinePassed?: boolean
@@ -247,7 +264,9 @@ function seedState(): MockState {
     publications: publicationFixtures.publications,
     publicationEvents: publicationFixtures.events,
     operations: {},
-    privatePhones: { ...requests.privatePhones, [GAB_CLUB_PLAYER_ID]: GAB_PHONE_E164 },
+    privatePhones: {},
+    pendingEmails: {},
+    rtrIdCounters: {},
     sampleRequestIndex: 0,
     sync: {
       online: true,
@@ -260,6 +279,7 @@ function seedState(): MockState {
   })
   seedAdminPlayerManagement(state)
   seedLeaderboardHistory(state)
+  seedUnclaimedPlayers(state, now)
   return state
 }
 /**

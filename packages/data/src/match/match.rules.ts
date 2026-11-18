@@ -1,5 +1,5 @@
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type {
   Match,
@@ -9,7 +9,7 @@ import type {
   SubstitutionCredit,
 } from './match.types'
 
-export { shortName } from '../session-roster/sessionRoster.rules'
+export { playerFacingName, queueMasterName } from '../session-roster/sessionRoster.rules'
 export const FORMAT_TEAM_SIZES: Record<MatchFormat, readonly [number, number]> = {
   singles: [1, 1],
   doubles: [2, 2],
@@ -94,7 +94,7 @@ export function matchStatus(m: MatchLineup, ctx: MatchContext): MatchStatus {
     listNames(
       ids.map((id) => {
         const p = ctx.roster.find((p) => p.id === id)
-        return p ? shortName(p) : 'Player'
+        return p ? queueMasterName(p) : 'Player'
       }),
     )
   const absent = allPlayers(m).filter((id) => !ctx.roster.find((p) => p.id === id)?.present)

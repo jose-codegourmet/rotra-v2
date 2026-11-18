@@ -1,4 +1,5 @@
 import { personalProfileSchema } from '@rotra/schema/personal-details'
+import { phoneField } from '@rotra/schema/phone'
 import { getSession, startMockPlayerSession } from '../auth/fetchers'
 import { readClubInviteCode } from '../club/inviteCode'
 import { getConnectivity } from '../connectivity/connectivity'
@@ -9,8 +10,15 @@ import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
 import { queueSessionUrl } from '../player/mySessions'
+import { allocateMockRtrId } from '../player/unclaimed'
 import { finishClaim } from '../player-account/fetchers'
 import { getGuestRegistrationClub } from '../player-account/guestRegistration'
+import {
+  claimUnclaimedPerson,
+  linkPhoneRecords,
+  unclaimedAccountFor,
+  unclaimedIdentitiesOf,
+} from '../player-account/unclaimedIdentity'
 import { myAccountOf } from '../player-account/visibilitySettings'
 import {
   realCompleteClaimWithGoogle,
@@ -100,7 +108,13 @@ export async function signInWithGoogle(input: {
       playerName: nameOf(state, owner.playerId),
     }
   if (input.context === 'login') return { outcome: 'not-connected', triedEmail: email }
-  return { outcome: 'new-account', google }
+  // An email clubs saved as an unclaimed player (D-2026-11-16-04): registering with it claims it.
+  const saved = unclaimedAccountFor(state, [email])
+  return {
+    outcome: 'new-account',
+    google,
+    unclaimed: saved ? unclaimedIdentitiesOf(state, saved.playerId) : null,
+  }
 }
 
 /** P-GOOGLE-LINK "Connect Google and sign in": the one confirmation, then connected and signed in. */
@@ -161,7 +175,12 @@ export async function connectGoogle(google: GoogleIdentity): Promise<ConnectGoog
   return { outcome: 'connected', account }
 }
 
-/** Mock rules for registration from an invite: a Google email, a phone, and the invite's club. */
+/**
+ * Mock rules for registration from an invite: a Google email, a phone, and the invite's club. When
+ * clubs already saved that email as an unclaimed player (D-2026-11-16-04) no new player is made:
+ * the person keeps the RTR ID, every club's record under the email joins the account
+ * (`joinedClubs`), and the profile starts from the picked club's version (`identityRecordId`).
+ */
 export async function registerWithGoogle(
   input: GoogleRegistrationInput,
 ): Promise<GoogleRegistrationResult> {
@@ -180,111 +199,103 @@ export async function registerWithGoogle(
   const values = googleRegistrationSchema.parse(input.values)
   const clubId = input.clubId ?? ''
   const club = await getGuestRegistrationClub(clubId, undefined, input.sessionSlug)
+  // An email clubs already saved keeps its RTR ID, so no city is asked for (D-2026-11-16-04).
+  const saved = unclaimedAccountFor(readMockState(), [email])
   const city = clubId ? null : foundingCities.find((entry) => entry.code === values.cityCode)
-  if (!clubId && !city)
+  if (!clubId && !city && !saved)
     throw new MockError('conflict', 'Pick your city or province.', {
       cityCode: 'Pick your city or province.',
     })
   checkMockSave()
   let result: { playerId: string; rtrId: string; firstName: string } | undefined
   let matched = false
+  let joinedClubs: string[] | undefined
   mockStore.update((draft) => {
+    // The Google email is the ROTRA email here, so one match covers both (D-2026-11-16-04).
+    const unclaimed = unclaimedAccountFor(draft, [email])
     if (
       draft.playerAccounts.some(
         (a) =>
-          a.phone === values.phone || lower(a.email) === email || lower(a.googleEmail) === email,
+          a.playerId !== unclaimed?.playerId &&
+          (a.phone === values.phone || lower(a.email) === email || lower(a.googleEmail) === email),
       )
     ) {
       matched = true
       return
     }
-    const id = crypto.randomUUID()
-    const location = draft.clubs.find((c) => c.id === clubId)?.locationCode ?? city?.code
-    const day = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Manila',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date())
-    const [year, month, date] = day.split('-')
-    const prefix = `RTR-${location}-${month}${date}${year?.slice(2)}-`
-    const serial =
-      Math.max(
-        0,
-        ...draft.players
-          .filter((p) => p.rtrId.startsWith(prefix))
-          .map((p) => Number(p.rtrId.split('-').at(-1)) || 0),
-      ) + 1
-    const rtrId = `${prefix}${String(serial).padStart(4, '0')}`
-    draft.players.push({
-      id,
-      rtrId,
-      fullName: values.fullName,
-      nickname: values.nickname || null,
-    })
-    draft.playerProfiles.push({
-      playerId: id,
-      rtrId,
-      fullName: values.fullName,
-      nickname: values.nickname || null,
-      // New registrations default to Private (D-2026-11-12-01).
-      profileVisibility: 'private',
-      hiddenFromDirectory: false,
-      picture: null,
-      playingStyle: '',
-      experienceYears: null,
-      experienceMonths: null,
-      socialLinks: { facebook: '', instagram: '', youtube: '', linkedin: '' },
-    })
-    draft.playerRanks[id] = {
-      playerId: id,
-      fullName: values.fullName,
-      nickname: values.nickname || null,
-      levelIndex: null,
-      state: 'provisional',
-      updatePending: null,
-      position: null,
-      recentCount: 0,
-      olderCount: 0,
-    }
-    draft.playerGames[id] = []
     const now = new Date().toISOString()
-    // The Google email is the ROTRA email, confirmed at once; there is no password.
-    draft.playerAccounts.push({
-      playerId: id,
-      phone: values.phone,
-      email,
-      phoneHidden: false,
-      claimed: true,
-      emailConfirmedAt: now,
-      googleEmail: email,
-      googleLinkedAt: now,
-      hasPassword: false,
-    })
-    draft.adminPlayerRecords[id] = {
-      archivedAt: null,
-      revision: 1,
-      createdByClubId: clubId || null,
-      adminCreated: !clubId,
+    let id: string
+    if (unclaimed) {
+      // A club already saved this email: the person keeps that RTR ID and every club's record
+      // under the email joins the account. No new player is made.
+      id = unclaimed.playerId
+      joinedClubs = claimUnclaimedPerson(draft, id, {
+        phone: values.phone,
+        identityRecordId: input.identityRecordId,
+      }).joinedClubs
+      unclaimed.email = email
+      unclaimed.emailConfirmedAt = now
+      unclaimed.googleEmail = email
+      unclaimed.googleLinkedAt = now
+      unclaimed.hasPassword = false
+    } else {
+      id = crypto.randomUUID()
+      const location = draft.clubs.find((c) => c.id === clubId)?.locationCode ?? city?.code
+      if (!location) throw new Error('Registration has no founding city.')
+      const rtrId = allocateMockRtrId(draft, location)
+      draft.players.push({
+        id,
+        rtrId,
+        fullName: values.fullName,
+        nickname: values.nickname || null,
+      })
+      draft.playerProfiles.push({
+        playerId: id,
+        rtrId,
+        fullName: values.fullName,
+        nickname: values.nickname || null,
+        // New registrations default to Private (D-2026-11-12-01).
+        profileVisibility: 'private',
+        hiddenFromDirectory: false,
+        picture: null,
+        playingStyle: '',
+        experienceYears: null,
+        experienceMonths: null,
+        socialLinks: { facebook: '', instagram: '', youtube: '', linkedin: '' },
+      })
+      draft.playerRanks[id] = {
+        playerId: id,
+        fullName: values.fullName,
+        nickname: values.nickname || null,
+        levelIndex: null,
+        state: 'provisional',
+        updatePending: null,
+        position: null,
+        recentCount: 0,
+        olderCount: 0,
+      }
+      draft.playerGames[id] = []
+      // The Google email is the ROTRA email, confirmed at once; there is no password.
+      draft.playerAccounts.push({
+        playerId: id,
+        phone: values.phone,
+        email,
+        phoneHidden: false,
+        claimed: true,
+        emailConfirmedAt: now,
+        googleEmail: email,
+        googleLinkedAt: now,
+        hasPassword: false,
+      })
+      draft.adminPlayerRecords[id] = {
+        archivedAt: null,
+        revision: 1,
+        createdByClubId: clubId || null,
+        adminCreated: !clubId,
+      }
     }
-    // D-2026-11-11-03: every club's unclaimed record with this phone joins the new account.
-    const linkedClubs = new Set<string>()
-    for (const record of [...draft.clubPlayers].sort(
-      (a, b) => (a.addedAt ?? 0) - (b.addedAt ?? 0),
-    )) {
-      if (
-        record.playerId ||
-        record.removedAt ||
-        record.linkedToClubPlayerId ||
-        (record.identity !== 'unclaimed' && record.identity !== 'pending') ||
-        draft.privatePhones[record.id] !== values.phone ||
-        linkedClubs.has(record.clubId)
-      )
-        continue
-      record.playerId = id
-      record.identity = 'registered'
-      linkedClubs.add(record.clubId)
-    }
+    // D-2026-11-11-03, kept: every club's older record with this phone joins the account too.
+    linkPhoneRecords(draft, id, values.phone)
     if (clubId && !draft.clubPlayers.some((p) => p.clubId === clubId && p.playerId === id)) {
       draft.clubPlayers.push({
         id: crypto.randomUUID(),
@@ -301,6 +312,11 @@ export async function registerWithGoogle(
     if (!profile) throw new Error('Registration produced no profile.')
     const { phone: _phone, cityCode: _cityCode, ...personal } = values
     applyPersonalProfile(profile, personal)
+    const player = draft.players.find((p) => p.id === id)
+    if (player) {
+      player.fullName = profile.fullName
+      player.nickname = profile.nickname
+    }
     result = {
       playerId: id,
       rtrId: profile.rtrId,
@@ -316,6 +332,7 @@ export async function registerWithGoogle(
     clubName: club.clubName,
     sessionSlug: input.sessionSlug ?? null,
     sessionTitle: club.sessionTitle ?? null,
+    ...(joinedClubs ? { joinedClubs } : {}),
   }
 }
 
@@ -342,8 +359,10 @@ export async function completeClaimWithGoogle(input: {
       'offline',
       "You're offline, so registration wasn't sent. Your details are still here; try again when you're connected.",
     )
-  const { phone: _phone, ...rest } = input.values
+  const { phone: rawPhone, ...rest } = input.values
   const personal = personalProfileSchema.parse(rest)
+  // Taken only when the profile has no phone on file (an unclaimed player a club saved by email).
+  const phone = rawPhone?.trim() ? phoneField.safeParse(rawPhone) : null
   const email = normalizeGoogleEmail(input.google.email)
   const state = readMockState()
   const record = state.claimLinks[input.token]
@@ -363,7 +382,10 @@ export async function completeClaimWithGoogle(input: {
   if (takenByOther) return { outcome: 'taken', email }
   checkMockSave()
   const wasClaimed = account.claimed
-  const result = finishClaim(input.token, wasClaimed ? undefined : { email, personal })
+  const result = finishClaim(
+    input.token,
+    wasClaimed ? undefined : { email, personal, phone: phone?.success ? phone.data : undefined },
+  )
   const now = new Date().toISOString()
   mockStore.update((draft) => {
     const stored = draft.playerAccounts.find((a) => a.playerId === account.playerId)

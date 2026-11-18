@@ -11,7 +11,7 @@ export type InviteSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   name: string
-  /** Guests are invited to make an account; an unclaimed player (saved by this club with a phone) to turn that record into one */
+  /** Guests are invited to make an account; an unclaimed player (saved by this club with their email) to turn that record into one */
   identity: 'guest' | 'unclaimed'
   /** The invite link; undefined while it is being made */
   link?: string
@@ -43,7 +43,7 @@ export function InviteSheet({
     >
       <p className="m-0">
         {claim
-          ? 'Your club saved them with a phone. This link lets them turn that record into a ROTRA account'
+          ? 'Your club saved them with their email. This link lets them turn that record into a ROTRA account'
           : 'This link lets them create a ROTRA account'}{' '}
         with their phone and email, so their games and rank follow them to every club.
       </p>
@@ -82,7 +82,7 @@ export function InviteSheet({
       )}
       <p className="m-0 text-[13px] text-fg2">
         {!claim
-          ? 'Their guest record stays unlinked until they accept a separate linking invitation. '
+          ? "Games they played here as a guest don't follow them. To keep those games, add their email in Edit details first. "
           : ''}
         The link only sets up their account. It doesn't book them into a session; you still add
         players to each session yourself.

@@ -3,6 +3,13 @@ import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
 import { notifySavedPlayer, notifyWaitlistPlace } from '../player/notification-events'
+import {
+  emailWords,
+  normalizeEmail,
+  pointRecordAt,
+  resolveEmail,
+  savedRecordFor,
+} from '../player/shared-entry'
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
@@ -23,11 +30,14 @@ import {
   recomputeMinimum,
   requireSessionAccess,
   requireState,
+  rosterNamesFor,
+  rosterNamesOf,
   type Tx,
   touchSession,
 } from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
+const NEW_PLAYER_EMAIL_ERROR = 'Enter an email address, like name@example.com, or leave it empty.'
 
 /**
  * Runs a roster command on a locked session. Every roster change bumps the session revision and
@@ -90,7 +100,10 @@ async function place(
     const entry = await tx.sessionPlayer.findUniqueOrThrow({
       where: { id: admitted.sessionPlayerId },
     })
-    return { rosterEntry: rosterEntryDto(entry, clubPlayer.nickname), waitlist: null }
+    return {
+      rosterEntry: rosterEntryDto(entry, await rosterNamesFor(tx, clubPlayer.id)),
+      waitlist: null,
+    }
   }
   const waiting = await tx.sessionWaitlistEntry.findUnique({
     where: { sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: clubPlayer.id } },
@@ -125,7 +138,10 @@ async function place(
     return { rosterEntry: null, waitlist: waitlistDto(waiter, position) }
   }
   const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
-  return { rosterEntry: rosterEntryDto(entry, clubPlayer.nickname), waitlist: null }
+  return {
+    rosterEntry: rosterEntryDto(entry, await rosterNamesFor(tx, clubPlayer.id)),
+    waitlist: null,
+  }
 }
 
 /**
@@ -201,20 +217,33 @@ export async function createClubPlayer(
   tx: Tx,
   context: ClubContext,
   operationId: string,
-  input: { name: string; nickname?: string | null; phone?: string | null },
+  input: { name: string; nickname?: string | null; phone?: string | null; email?: string | null },
   now: Date,
 ) {
   const id = await derivedId(operationId, 'club-player')
   const existing = await tx.clubPlayer.findUnique({
     where: { clubId_id: { clubId: context.clubId, id } },
   })
-  if (existing) return existing
+  if (existing) return { clubPlayer: existing, words: null }
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter a name.' })
   const phone = input.phone?.trim() || null
   if (phone && !E164.test(phone))
     throw new ServiceError('invalid', { phone: 'Enter a full mobile number, or leave it empty.' })
-  const clubPlayer = await tx.clubPlayer.create({
+  const typedEmail = input.email?.trim() || ''
+  const email = typedEmail ? normalizeEmail(typedEmail) : null
+  if (typedEmail && !email) throw new ServiceError('invalid', { email: NEW_PLAYER_EMAIL_ERROR })
+  // D-2026-11-16-04: an email makes the record unclaimed (or links a registered player); one the
+  // club already saved is refused, naming that player.
+  const resolution = email ? await resolveEmail(tx, context.clubId, email, now, false) : null
+  if (resolution) {
+    const same = await savedRecordFor(tx, context.clubId, resolution)
+    if (same) {
+      const text = `That email is already ${same.player?.fullName || same.displayName} in your saved players.`
+      throw new ServiceError('conflict', { email: text })
+    }
+  }
+  let clubPlayer = await tx.clubPlayer.create({
     data: {
       id,
       clubId: context.clubId,
@@ -227,49 +256,84 @@ export async function createClubPlayer(
     await tx.clubPlayerPrivateInput.create({
       data: { clubPlayerId: id, clubId: context.clubId, phoneE164: phone, capturedAt: now },
     })
-  return clubPlayer
+  if (!email) return { clubPlayer, words: null }
+  const resolved = resolution ?? (await resolveEmail(tx, context.clubId, email, now))
+  if (!resolved) throw new Error('Email resolution failed')
+  await pointRecordAt(tx, context.clubId, id, resolved)
+  clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+    where: { clubId_id: { clubId: context.clubId, id } },
+  })
+  return { clubPlayer, words: emailWords(resolved) }
 }
 
+const OWN_NAME_ERROR = 'Enter a name.'
+
 /**
- * The club's saved player for a Player Information profile, created when the club has not saved
- * them yet (`club_players` is unique per club and player). Archived or unknown profiles are refused.
+ * The club's saved player for a Player lookup match (D-2026-11-16-04), created when the club has
+ * not saved them yet. `profileId` is a registered player's id, or the id of an unclaimed person's
+ * shared entry: then the club's own record is made with `ownName` (another club's name, picture
+ * and level are never shown) and no nickname. A deleted saved player is restored rather than
+ * duplicated (one row per person per club). A registered player's row keeps no nickname: the
+ * account's shows, and the club nickname is set on its own (D-2026-11-18-03).
  */
 export async function clubPlayerForProfile(
   tx: Tx,
   context: ClubContext,
   operationId: string,
-  playerId: string,
+  profileId: string,
   now: Date,
+  ownName?: string | null,
 ) {
-  const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, playerId } })
-  // A deleted saved player is restored rather than duplicated (one saved row per profile per club).
-  if (saved?.removedAt) {
+  const player = await tx.player.findUnique({
+    where: { id: profileId },
+    select: {
+      fullName: true,
+      profileState: true,
+      idAllocation: { select: { rtrId: true } },
+    },
+  })
+  const entry = player
+    ? null
+    : await tx.sharedPlayerEntry.findFirst({
+        where: { id: profileId, claimedPlayerId: null, retiredAt: null },
+        select: { id: true },
+      })
+  if (!(player?.idAllocation && player.profileState === 'claimed') && !entry)
+    throw new ServiceError('not_found', { player: 'Player not available.' })
+  const key = entry ? { sharedEntryId: entry.id } : { playerId: profileId }
+  const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, ...key } })
+  if (saved && !saved.removedAt) return { clubPlayer: saved, created: false }
+  const name = entry ? (ownName?.trim() ?? '') : (player?.fullName ?? '')
+  if (!name) throw new ServiceError('invalid', { name: OWN_NAME_ERROR })
+  // A deleted saved player is restored rather than duplicated (one saved row per person per club).
+  // The guarded write restores once, so a replayed operation tells a registered player once.
+  if (saved) {
     const restored = await tx.clubPlayer.updateMany({
       where: { clubId: context.clubId, id: saved.id, removedAt: { not: null } },
-      data: { removedAt: null, revision: { increment: 1 } },
+      data: {
+        removedAt: null,
+        linkedToClubPlayerId: null,
+        ...(entry ? { displayName: name } : {}),
+        revision: { increment: 1 },
+      },
     })
-    if (restored.count) await notifySavedPlayer(tx, context.clubId, playerId, operationId)
+    if (restored.count && !entry)
+      await notifySavedPlayer(tx, context.clubId, profileId, operationId)
     const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({ where: { id: saved.id } })
     return { clubPlayer, created: restored.count > 0 }
   }
-  if (saved) return { clubPlayer: saved, created: false }
-  const player = await tx.player.findUnique({
-    where: { id: playerId },
-    select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
-  })
-  if (!player?.idAllocation)
-    throw new ServiceError('not_found', { player: 'Player not available.' })
   const clubPlayer = await tx.clubPlayer.create({
     data: {
       id: await derivedId(operationId, 'club-player'),
       clubId: context.clubId,
-      playerId,
-      displayName: player.fullName,
-      nickname: player.nickname,
+      ...key,
+      displayName: name,
+      nickname: null,
       addedAt: now,
     },
   })
-  await notifySavedPlayer(tx, context.clubId, playerId, operationId)
+  // Only a registered player has an inbox; an unclaimed person's shared entry has no account.
+  if (!entry) await notifySavedPlayer(tx, context.clubId, profileId, operationId)
   return { clubPlayer, created: true }
 }
 
@@ -280,6 +344,8 @@ export async function addDirectoryPlayerToSession(
   input: AddPlacement & {
     operationId: string
     playerId: string
+    /** This club's own name for another club's unclaimed player (required for one) */
+    name?: string | null
     level: string
   },
 ) {
@@ -294,6 +360,7 @@ async function addDirectoryPlayerIn(
   input: AddPlacement & {
     operationId: string
     playerId: string
+    name?: string | null
     level: string
   },
 ) {
@@ -305,6 +372,7 @@ async function addDirectoryPlayerIn(
     input.operationId,
     input.playerId,
     now,
+    input.name,
   )
   return place(
     tx,
@@ -328,6 +396,8 @@ export async function addNewPlayerToSession(
     name: string
     nickname?: string
     phone?: string
+    /** D-2026-11-16-04: no email adds a guest; an email adds an unclaimed player or links one */
+    email?: string | null
     level: string
   },
 ) {
@@ -344,13 +414,14 @@ async function addNewPlayerIn(
     name: string
     nickname?: string
     phone?: string
+    email?: string | null
     level: string
   },
 ) {
   const skillLevelId = levelIdFor(input.level)
   const now = new Date()
-  const clubPlayer = await createClubPlayer(tx, context, input.operationId, input, now)
-  return place(
+  const { clubPlayer, words } = await createClubPlayer(tx, context, input.operationId, input, now)
+  const placed = await place(
     tx,
     context,
     session,
@@ -361,6 +432,8 @@ async function addNewPlayerIn(
     input.toWaitlist,
     input.allowOverfill,
   )
+  // What the email did, for the toast ("unclaimed · RTR-…"); null for a guest.
+  return { ...placed, emailWords: words }
 }
 
 async function liveEntry(tx: Tx, sessionId: string, rosterId: string) {
@@ -393,7 +466,7 @@ export async function setRosterLevel(
     await assessEntry(tx, context, entry, skillLevelId, input.operationId, new Date())
     const updated = await tx.sessionPlayer.findUniqueOrThrow({ where: { id: entry.id } })
     const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({ where: { id: entry.clubPlayerId } })
-    return rosterEntryDto(updated, clubPlayer.nickname)
+    return rosterEntryDto(updated, await rosterNamesFor(tx, clubPlayer.id))
   })
 }
 
@@ -503,11 +576,11 @@ export async function stepDownIn(
 
 /** The short name the roster toasts use: the club nickname, else the first word of the name. */
 async function shortNameOf(tx: Tx, entry: { clubPlayerId: string; nameSnapshot: string }) {
-  const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
-    where: { id: entry.clubPlayerId },
-    select: { nickname: true },
-  })
-  return clubPlayer.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot
+  // queueMasterName: the club nickname, else the nickname, else the first name (D-2026-11-18-03).
+  const names = await rosterNamesFor(tx, entry.clubPlayerId)
+  return (
+    names?.clubNickname || names?.nickname || entry.nameSnapshot.split(' ')[0] || entry.nameSnapshot
+  )
 }
 
 /** Live roster count and slot capacity, for the No show toasts ("· 23/24"). */
@@ -707,7 +780,7 @@ export async function giveSlot(
     const clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
       where: { id: promoted.clubPlayerId },
     })
-    return rosterEntryDto(promoted, clubPlayer.nickname)
+    return rosterEntryDto(promoted, await rosterNamesFor(tx, clubPlayer.id))
   })
 }
 
@@ -844,19 +917,23 @@ async function confirmJoinRequestIn(
     })
     return {
       request: joinRequestDto(decided),
-      rosterEntry: rosterEntryDto(promoted, clubPlayer.nickname),
+      rosterEntry: rosterEntryDto(promoted, await rosterNamesFor(tx, clubPlayer.id)),
       waitlist: null,
     }
   }
   const clubPlayer = current.playerId
     ? (await clubPlayerForProfile(tx, context, input.operationId, current.playerId, now)).clubPlayer
-    : await createClubPlayer(
-        tx,
-        context,
-        input.operationId,
-        { name: current.name, nickname: current.nickname, phone: current.phoneE164 },
-        now,
-      )
+    : // A guest's request saves a guest: a name only (D-2026-11-16-04 removed the request phone
+      // and its phone linking, reversing part of P08.9).
+      (
+        await createClubPlayer(
+          tx,
+          context,
+          input.operationId,
+          { name: current.name, nickname: current.nickname },
+          now,
+        )
+      ).clubPlayer
   const placed = await place(
     tx,
     context,
@@ -936,16 +1013,9 @@ async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueS
     orderBy: [{ noShowAt: 'asc' }, { id: 'asc' }],
   })
   const waitlist = await orderedWaitlist(tx, sessionId)
-  const nicknames = new Map(
-    (
-      await tx.clubPlayer.findMany({
-        where: {
-          clubId: context.clubId,
-          id: { in: [...roster, ...noShows].map((r) => r.clubPlayerId) },
-        },
-        select: { id: true, nickname: true },
-      })
-    ).map((p) => [p.id, p.nickname]),
+  const nicknames = await rosterNamesOf(
+    tx,
+    [...roster, ...noShows].map((r) => r.clubPlayerId),
   )
   const clubPlayerIds = [...new Set(roster.map((entry) => entry.clubPlayerId))]
   const prior = clubPlayerIds.length
@@ -997,6 +1067,7 @@ export type RosterBatchOperation =
       operationId: string
       source: 'directory'
       playerId: string
+      name?: string | null
       level: string
     })
   | (AddPlacement & {
@@ -1006,6 +1077,7 @@ export type RosterBatchOperation =
       name: string
       nickname?: string
       phone?: string
+      email?: string | null
       level: string
     })
   | { op: 'remove'; operationId: string; rosterId: string }

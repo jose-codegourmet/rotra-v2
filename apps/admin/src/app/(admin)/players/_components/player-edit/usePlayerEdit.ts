@@ -2,7 +2,9 @@
 import { useAdminPlayerEdit } from '@rotra/data/admin-player/useAdminPlayerEdit'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { useAdminClubs } from '@rotra/data/club/useAdminClubs'
+import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { MockError } from '@rotra/data/mock/errors'
+import { rtrIdWith } from '@rotra/data/player/rtr-id'
 import { cropProfileCharacterToSquare } from '@rotra/data/profile-character/crop'
 import { profileCharacterImage } from '@rotra/data/profile-character/images'
 import { useShownProfileCharacters } from '@rotra/data/profile-character/useShownProfileCharacters'
@@ -47,6 +49,11 @@ export function usePlayerEdit(
         cropPhoto: cropProfileCharacterToSquare,
         createdBy:
           clubs.data?.clubs.find((club) => club.id === player.createdByClubId)?.name ?? 'Admin',
+        // The founding cities ('PH-CEB') and the shared RTR ID shape drive the place, date and the
+        // live RTR ID preview. A taken RTR ID comes back as fieldErrors.registrationDate.
+        places: foundingCities,
+        previewRtrId: (place: string, date: string) => rtrIdWith(player.rtrId, place, date),
+        detailsRequired: !!player.detailsRequired,
         isPending: update.isPending,
         // Offline is a toast, not a notice; field errors are inline.
         serverError: error && !fieldErrors && !offline ? error.message : undefined,

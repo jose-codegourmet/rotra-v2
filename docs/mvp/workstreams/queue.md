@@ -113,7 +113,7 @@ payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downlo
 signed-in player to a join request; guest registration now exists through club invitations (#490);
 whether published results and profile pictures on the public page should also be masked.
 Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
-[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club; superseded in part by [D-2026-11-16-04](../decisions.md#d-2026-11-16-04): four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups only, not built (the code below still follows D-2026-11-11-03)), [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) (answers to the November 11 leftovers).
+[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club; superseded in part by [D-2026-11-16-04](../decisions.md#d-2026-11-16-04): four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database; not run in a browser), which also stores the club nickname of [D-2026-11-18-03](../decisions.md#d-2026-11-18-03)), [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) (answers to the November 11 leftovers).
 
 ## Remaining work
 

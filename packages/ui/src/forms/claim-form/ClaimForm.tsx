@@ -37,6 +37,16 @@ export type ClaimFormProps = {
    * or "← Use another Google account" (claim).
    */
   google?: { name: string; email: string; onChange: () => void }
+  /**
+   * Google registration after the person picked one club's version in IdentityPicker
+   * (D-2026-11-16-04): the notice “You picked CLUB's version of you…” shows above the fields.
+   */
+  pickedIdentity?: { clubName: string; rtrId: string }
+  /**
+   * Google registration with an email exactly one club saved: the notice “CLUB already saved a
+   * profile with this email.” shows above the fields; its details are the form's defaultValues.
+   */
+  emailMatch?: { clubName: string; rtrId: string }
 }
 const sectionLabel = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 function Required({ children }: { children: string }) {
@@ -63,6 +73,8 @@ export function ClaimForm({
   accountMatch = false,
   onDismissMatch,
   google,
+  pickedIdentity,
+  emailMatch,
 }: ClaimFormProps) {
   const [showPasswords, setShowPasswords] = useState(false)
   const form = useForm<ClaimValues>({
@@ -161,6 +173,19 @@ export function ClaimForm({
             {serverError && !serverError.field ? (
               <Notice tone="error">{serverError.message}</Notice>
             ) : null}
+            {pickedIdentity ? (
+              <Notice>
+                You picked <b>{pickedIdentity.clubName}</b>&apos;s version of you as your starting
+                profile. Change anything that&apos;s wrong. Your player ID stays{' '}
+                <span className="font-mono">{pickedIdentity.rtrId}</span>.
+              </Notice>
+            ) : null}
+            {emailMatch ? (
+              <Notice title={`${emailMatch.clubName} already saved a profile with this email.`}>
+                Its details are filled in below. Your player ID stays{' '}
+                <span className="font-mono">{emailMatch.rtrId}</span> and your games carry over.
+              </Notice>
+            ) : null}
             {cities ? (
               <Field
                 label={<Required>City or province</Required>}
@@ -197,11 +222,9 @@ export function ClaimForm({
                   hint={
                     errors.phone
                       ? undefined
-                      : google && standalone
+                      : standalone
                         ? 'Your mobile number. It is never shown publicly.'
-                        : standalone
-                          ? 'Your mobile number identifies your ROTRA profile. Never shown publicly.'
-                          : 'This profile has no phone yet. Add your mobile number; it identifies your ROTRA profile.'
+                        : 'This profile has no phone yet. Add your mobile number.'
                   }
                   error={errors.phone?.message}
                 >

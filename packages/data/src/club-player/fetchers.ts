@@ -5,6 +5,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
+import { isCurrentRecord, isDetailsRequired } from '../player/unclaimed'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { isRealDataMode } from '../real/mode'
 import { realCreatePlayerInvite, realGetClubPlayers } from '../real/queue'
@@ -17,7 +18,8 @@ export type ClubPlayerFilters = {
   band?: string
   city?: string
   added?: 'any' | '7' | '30' | '90' | 'older'
-  account?: 'all' | 'registered' | 'unclaimed' | 'guest' | 'pending'
+  /** `details` = Details required: an older unclaimed record with a phone and no email */
+  account?: 'all' | 'registered' | 'unclaimed' | 'details' | 'guest' | 'pending'
   rightNow?: 'all' | 'playing' | 'waiting' | 'session'
 }
 export function registeredCity(rtrId: string | null) {
@@ -40,27 +42,33 @@ function addedAt(player: ClubPlayer) {
 }
 export function clubPlayerView(state: MockState, player: ClubPlayer) {
   const index = fixturePlayers.findIndex((p) => p.id === player.id),
+    // The shared entry: a registered player's, or an unclaimed player's (the RTR ID only).
     profile = state.players.find((p) => p.id === player.playerId),
-    // A linked profile's own name wins over the club's saved copy, so a claim or profile edit
-    // shows on every card (#705). Guests have no profile and keep what the club entered.
-    own = player.playerId
-      ? state.playerProfiles.find((p) => p.playerId === player.playerId)
-      : undefined,
+    registered = player.identity === 'registered',
+    // A registered player's own name wins over the club's saved copy, so a claim or profile edit
+    // shows on every card (#705). Guests and unclaimed players keep what this club entered: an
+    // unclaimed player's shared entry may carry another club's version (D-2026-11-16-04).
+    own =
+      registered && player.playerId
+        ? state.playerProfiles.find((p) => p.playerId === player.playerId)
+        : undefined,
     fullName = own?.fullName || player.fullName,
     // The banner is public, like the picture; only a registered player has chosen one. Everyone else
     // (and a player with no pick) draws the default Admin sets (D-2026-11-13-03).
-    banner = resolveMockProfileBanner(own && player.identity === 'registered' ? own.bannerId : null)
+    banner = resolveMockProfileBanner(own ? own.bannerId : null),
+    account = player.playerId
+      ? state.playerAccounts.find((a) => a.playerId === player.playerId)
+      : undefined
   return {
     ...player,
     fullName,
     nickname: own ? own.nickname : player.nickname,
+    /** The club's own nickname for a registered player (D-2026-11-18-03); null when none */
+    clubNickname: registered ? player.clubNickname?.trim() || null : null,
     /** Avatar reference: the club-set picture for a guest or unclaimed player, else their own. */
-    picture: clubPictureState(
-      player,
-      state.playerProfiles.find((p) => p.playerId === player.playerId)?.picture ?? null,
-    ).reference,
+    picture: clubPictureState(player, own?.picture ?? null).reference,
     joinedVia: joinedViaOf(player),
-    pictureName: profile?.fullName ?? null,
+    pictureName: own ? (profile?.fullName ?? null) : null,
     /** The resolved Profile banner the card draws (the default for guests, unclaimed and no pick) */
     bannerKey: banner.bannerKey as string | null,
     bannerImageUrl: banner.bannerImageUrl,
@@ -68,7 +76,12 @@ export function clubPlayerView(state: MockState, player: ClubPlayer) {
     rtrId: profile?.rtrId ?? null,
     suggestion: player.playingLevel,
     phoneHidden: index === 0 || index === 3,
-    hasPhone: player.identity !== 'guest',
+    /** A registered player's phone, or the club's own phone for an unclaimed player */
+    hasPhone: registered || Boolean(state.privatePhones[player.id]),
+    /** The club has an email for a guest-made-unclaimed or Lookup pending player; never the email itself */
+    emailOnFile: !registered && Boolean(account?.email.trim() || state.pendingEmails?.[player.id]),
+    /** An older unclaimed record with a phone and no email (D-2026-11-16-04) */
+    detailsRequired: isDetailsRequired(player),
     sessionsHere: [6, 7, 5, 8, 6, 2, 5, 1, 6, 5, 9, 3, 5, 4, 0, 6, 1, 5, 6, 0][index] ?? 0,
     addedAt: addedAt(player),
   }
@@ -89,7 +102,10 @@ function filterAndGroup(
       const now = rightNowOf(p)
       const age = Date.now() - p.addedAt
       return (
-        (!q || [p.fullName, p.nickname, p.rtrId].some((v) => v?.toLocaleLowerCase().includes(q))) &&
+        (!q ||
+          [p.fullName, p.nickname, p.clubNickname, p.rtrId].some((v) =>
+            v?.toLocaleLowerCase().includes(q),
+          )) &&
         (!filters.band ||
           filters.band === 'all' ||
           (p.suggestion?.split('_')[0] ?? 'none') === filters.band) &&
@@ -98,7 +114,9 @@ function filterAndGroup(
           (registeredCity(p.rtrId) ?? 'none') === filters.city) &&
         (!filters.account ||
           filters.account === 'all' ||
-          (p.identity === 'pending' ? 'guest' : p.identity) === filters.account) &&
+          (filters.account === 'details'
+            ? p.detailsRequired
+            : (p.identity === 'pending' ? 'guest' : p.identity) === filters.account)) &&
         (!filters.added ||
           filters.added === 'any' ||
           (filters.added === 'older'
@@ -133,8 +151,7 @@ export async function getClubPlayers(filters: ClubPlayerFilters = {}) {
     .filter(
       (p) =>
         p.clubId === DEMO_CLUB_ID &&
-        !p.removedAt &&
-        !p.linkedToClubPlayerId &&
+        isCurrentRecord(p) &&
         (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     )
     .map((p) => clubPlayerView(state, p))
@@ -177,9 +194,7 @@ export async function getSavedPlayerStats() {
   return deriveSavedPlayerStats(
     state.clubPlayers.filter(
       (p) =>
-        !p.removedAt &&
-        !p.linkedToClubPlayerId &&
-        (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
+        isCurrentRecord(p) && (!p.playerId || !state.adminPlayerRecords[p.playerId]?.archivedAt),
     ),
     DEMO_CLUB_ID,
     Date.now(),

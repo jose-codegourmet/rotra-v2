@@ -1,5 +1,5 @@
 import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
-import { countedGames, shortName } from '@rotra/data/match/match.rules'
+import { countedGames, queueMasterName } from '@rotra/data/match/match.rules'
 import type { MatchFormat } from '@rotra/data/match/types'
 import { REQUEST_FORMAT_ORDER, requestSpots } from '@rotra/data/match-request/rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -15,7 +15,7 @@ const viewer = { name: viewerRow.nameSnapshot }
 const players = others.map((p) => ({
   id: p.id,
   name: p.nameSnapshot,
-  shortName: shortName(p),
+  shortName: queueMasterName(p),
   level: p.level,
   games: countedGames(p.id, matches),
 }))

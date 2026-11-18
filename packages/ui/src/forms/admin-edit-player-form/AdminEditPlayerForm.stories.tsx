@@ -1,8 +1,9 @@
 import type { AdminPlayerEdit } from '@rotra/data/admin-player/types'
 import { managementPlayer } from '@rotra/data/fixtures/admin-player-management'
+import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { profileCharacters } from '@rotra/data/fixtures/profile-characters'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn, within } from 'storybook/test'
+import { fn, screen, within } from 'storybook/test'
 import { AdminEditPlayerForm } from './AdminEditPlayerForm'
 
 const characters = profileCharacters
@@ -13,6 +14,7 @@ const characters = profileCharacters
 const unclaimed: AdminPlayerEdit = {
   ...managementPlayer,
   phone: '+639171234567',
+  email: 'alex.reyes@example.com',
   playingStyle: '',
   experienceYears: null,
   experienceMonths: null,
@@ -22,6 +24,9 @@ const unclaimed: AdminPlayerEdit = {
   hasAccount: true,
   passwordSetAt: null,
 }
+
+/** An older unclaimed record: a phone and no email (D-2026-11-16-04). */
+const detailsRequired: AdminPlayerEdit = { ...unclaimed, email: undefined }
 
 /** A registered player with a character picture, a previous photo and an Admin-set password. */
 const registered: AdminPlayerEdit = {
@@ -55,6 +60,7 @@ const meta = {
   args: {
     player: registered,
     characters,
+    places: foundingCities,
     createdBy: 'Admin',
     // The container crops; the story answers with a library image.
     cropPhoto: fn(async () => characters[0]?.image ?? ''),
@@ -79,6 +85,111 @@ export const RegisteredLight: Story = { globals: { theme: 'light' } }
 /** Password is off with "This player hasn't registered, so there's no password to replace." */
 export const Unclaimed: Story = { args: { player: unclaimed, createdBy: 'Smash Club Cebu' } }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
+
+/** Details required: the Account hint says Admin can add the email here. */
+export const DetailsRequired: Story = {
+  args: { player: detailsRequired, detailsRequired: true, createdBy: 'Lahug Smash Club' },
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
+
+/** An unclaimed player who has an email can't be saved without one. */
+export const UnclaimedEmailRequired: Story = {
+  args: { player: unclaimed, createdBy: 'Smash Club Cebu' },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement)
+    await userEvent.clear(canvas.getByRole('textbox', { name: 'Email' }))
+    canvasElement.querySelector('form')?.requestSubmit()
+  },
+}
+
+/** Saved by two clubs: each club's own name and the not-on-the-leaderboard line. */
+export const SavedByTwoClubs: Story = {
+  args: {
+    player: {
+      ...unclaimed,
+      name: 'Nina Ocampo',
+      clubs: [
+        {
+          clubId: 'c1',
+          name: 'Talamban Racket Club',
+          addedAt: null,
+          savedAs: 'Nina Ocampo',
+          identity: 'unclaimed',
+        },
+        {
+          clubId: 'c2',
+          name: 'IT Park Badminton Club',
+          addedAt: null,
+          savedAs: 'Nina O.',
+          identity: 'unclaimed',
+        },
+      ],
+    },
+  },
+}
+export const SavedByTwoClubsLight: Story = { ...SavedByTwoClubs, globals: { theme: 'light' } }
+
+/** The RTR ID preview before any change: it is the player's RTR ID. */
+export const RtrIdPreview: Story = { args: { player: registered } }
+
+/** Choosing Manila: the preview follows and keeps its number at the end. Never typed by hand. */
+type Play = NonNullable<Story['play']>
+const chooseManila: Play = async ({ canvasElement, userEvent }) => {
+  const canvas = within(canvasElement)
+  await userEvent.click(canvas.getByRole('combobox', { name: 'Registration place' }))
+  await userEvent.click(await screen.findByRole('option', { name: /Manila/ }))
+}
+export const RtrIdPreviewChanged: Story = { args: { player: registered }, play: chooseManila }
+export const RtrIdPreviewChangedLight: Story = {
+  ...RtrIdPreviewChanged,
+  globals: { theme: 'light' },
+}
+
+/** The registration date was cleared. */
+export const RegistrationDateMissing: Story = {
+  args: { player: registered, fieldErrors: { registrationDate: 'Enter the registration date.' } },
+}
+export const RegistrationDateMissingLight: Story = {
+  ...RegistrationDateMissing,
+  globals: { theme: 'light' },
+}
+
+/** The data layer found the RTR ID on another player. */
+export const RtrIdAlreadyUsed: Story = {
+  args: {
+    player: registered,
+    fieldErrors: {
+      registrationDate: 'Another player already has this RTR ID. Choose another place or date.',
+    },
+  },
+}
+export const RtrIdAlreadyUsedLight: Story = { ...RtrIdAlreadyUsed, globals: { theme: 'light' } }
+
+/** Save changes with a changed place opens Change RTR ID? (Current → New) before anything is saved. */
+const openChangeRtrId: Play = async (context) => {
+  const { canvasElement, userEvent } = context
+  await chooseManila(context)
+  const canvas = within(canvasElement)
+  await userEvent.type(canvas.getByRole('textbox', { name: 'Reason for the change' }), 'Wrong city')
+  canvasElement.querySelector('form')?.requestSubmit()
+}
+export const ChangeRtrIdConfirmation: Story = {
+  args: { player: registered },
+  play: openChangeRtrId,
+}
+export const ChangeRtrIdConfirmationLight: Story = {
+  ...ChangeRtrIdConfirmation,
+  globals: { theme: 'light' },
+}
+
+/** Back from the confirmation: the panel is as it was, with everything typed kept. */
+export const ChangeRtrIdBack: Story = {
+  args: { player: registered },
+  play: async (context) => {
+    await openChangeRtrId(context)
+    await context.userEvent.click(await screen.findByRole('button', { name: 'Back' }))
+  },
+}
 
 /** The data layer's field errors, inline; the first one is focused. */
 export const FieldErrors: Story = {

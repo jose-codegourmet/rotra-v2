@@ -1,5 +1,6 @@
 import type { MockSession } from '../auth/auth.types'
 import type { MyAccount } from '../player-account/playerAccount.types'
+import type { UnclaimedIdentities } from '../player-account/unclaimedIdentity'
 
 /** What Google tells ROTRA after the player picks an account: a name and an email, nothing else. */
 export type GoogleIdentity = { email: string; name: string }
@@ -22,12 +23,16 @@ export type GoogleSignInContext = 'login' | 'register'
  *   "This Google account isn't connected to ROTRA." Never creates an account. The tried email is held
  *   for **Connect <email>** after the password sign-in (`useGoogleTriedEmail`).
  * - `new-account` (register only): no account uses it; open the Google registration form with it.
+ *   `unclaimed` is set when clubs saved this email as an unclaimed player (D-2026-11-16-04): the
+ *   person keeps its RTR ID. One record: Finish registering opens with that club's details filled
+ *   in. More than one: "Which identity is correct?" first, then pass the pick as `identityRecordId`.
+ *   Null or missing: an ordinary new registration.
  */
 export type GoogleSignInOutcome =
   | { outcome: 'signed-in'; session: MockSession; google: GoogleIdentity }
   | { outcome: 'ask-to-connect'; google: GoogleIdentity; playerId: string; playerName: string }
   | { outcome: 'not-connected'; triedEmail: string }
-  | { outcome: 'new-account'; google: GoogleIdentity }
+  | { outcome: 'new-account'; google: GoogleIdentity; unclaimed?: UnclaimedIdentities | null }
 
 /**
  * Connect or Change Google while signed in. `taken`: another ROTRA account already uses this Google
@@ -61,6 +66,12 @@ export type GoogleRegistrationInput = {
   sessionSlug?: string | null
   /** The club invite link's `k`; the server checks it in real mode, like the password registration */
   clubInviteCode?: string | null
+  /**
+   * The identity card the person picked (`UnclaimedIdentityRecord.id`) when more than one club saved
+   * their email: that club's picture becomes the starting picture. Every record joins the account
+   * whichever is picked. Leave out when no club or one club saved the email.
+   */
+  identityRecordId?: string | null
   values: GoogleRegistrationValues
 }
 
@@ -80,6 +91,12 @@ export type GoogleRegistrationResult =
       clubName: string | null
       sessionSlug: string | null
       sessionTitle: string | null
+      /**
+       * Set when the registration claimed an unclaimed player: the clubs whose records joined the
+       * account ("Your records from A and B are now on your account, with their games."), and the
+       * RTR ID is the one the person already had ("Your player ID stays …").
+       */
+      joinedClubs?: string[]
     }
   | { outcome: 'account-match' }
 

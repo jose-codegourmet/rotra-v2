@@ -19,8 +19,8 @@ const CAPACITY = 3 * tonight.playersPerCourt
 const ROSTER_IDS = queueSessionFixtures.roster.map((r) => r.clubPlayerId)
 
 // Saved players as the mock store's clubPlayerView() presents them: RTR ID from the public profile
-// (none for an unclaimed player until they register, D-2026-11-11-03), the club level as the
-// suggestion, and the first and fourth players hiding their phone.
+// (an older unclaimed record has none and shows Details required, D-2026-11-16-04), the club level
+// as the suggestion, and the first and fourth players hiding their phone.
 const savedCandidates: AddPlayerCandidate[] = clubPlayers.map((p: ClubPlayer, i) => ({
   id: p.id,
   name: p.fullName,
@@ -30,6 +30,7 @@ const savedCandidates: AddPlayerCandidate[] = clubPlayers.map((p: ClubPlayer, i)
   identity: p.identity,
   suggestion: p.playingLevel,
   phoneHidden: i === 0 || i === 3,
+  detailsRequired: p.identity === 'unclaimed' && !players.find((x) => x.id === p.playerId)?.rtrId,
 }))
 
 // Directory suggestions: registered players, with their leaderboard level and position.
@@ -43,17 +44,41 @@ const directoryCandidates: AddPlayerCandidate[] = directoryPlayers.map((p) => ({
   rankLabel: `Rank ${leaderboardPlayers.findIndex((entry) => entry.id === p.id) + 1}`,
 }))
 
+// Another club's unclaimed player: Player Information returns an RTR ID and nothing else.
+const OTHER_CLUB_RTR = 'RTR-PH-MNL-020326-0231'
+const OTHER_CLUB_EMAIL = 'maria.santos@example.com'
+const otherClubUnclaimed: AddPlayerCandidate = {
+  id: 'other-club-unclaimed',
+  name: '',
+  rtrId: OTHER_CLUB_RTR,
+  identity: 'unclaimed',
+  suggestion: null,
+  ownNameRequired: true,
+}
+const firstDirectory = directoryCandidates[0]
+if (!firstDirectory?.rtrId) throw new Error('Directory fixture missing')
+const savedWithRtr = savedCandidates.find((p) => p.rtrId)
+if (!savedWithRtr?.rtrId) throw new Error('Saved player with an RTR ID missing')
+
 type SessionSheetProps = Extract<AddPlayerSheetProps, { sessionTitle: string }>
 /** The session sheet's args, plus `club` to render the Saved players (no session) context. */
 type DemoProps = SessionSheetProps & { club?: boolean }
 
-/** Answers Player Information searches from the fixtures, like the mock store does. */
+/**
+ * Answers Player Information searches like the mock store does: the exact RTR ID or email only, empty
+ * until one matches, and a saved player's own RTR ID answers "already in your saved players".
+ */
 function Demo({ club, ...props }: DemoProps) {
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
-  const results = directoryCandidates.filter(
-    (p) => !q || [p.name, p.rtrId].some((v) => v?.toLowerCase().includes(q)),
-  )
+  const saved = savedCandidates.find((p) => q && p.rtrId?.toLowerCase() === q)
+  const results = saved
+    ? []
+    : q === OTHER_CLUB_EMAIL
+      ? [otherClubUnclaimed]
+      : directoryCandidates
+          .filter((p) => q && p.rtrId?.toLowerCase() === q)
+          .concat(q === OTHER_CLUB_RTR ? [otherClubUnclaimed] : [])
   if (club)
     return (
       <AddPlayerSheet
@@ -72,6 +97,8 @@ function Demo({ club, ...props }: DemoProps) {
         onSubmitNewPlayer={props.onSubmitNewPlayer as never}
         onDirectorySearch={setQuery}
         directoryResults={props.directoryResults ?? results}
+        directorySavedName={saved?.name}
+        newPlayerEmailSavedAs={props.newPlayerEmailSavedAs}
       />
     )
   return (
@@ -79,9 +106,21 @@ function Demo({ club, ...props }: DemoProps) {
       {...props}
       onDirectorySearch={setQuery}
       directoryResults={props.directoryResults ?? results}
+      directorySavedName={saved?.name}
     />
   )
 }
+
+/** Types into the Player Information search, as the Queue Master would. */
+const searchFor =
+  (value: string): Story['play'] =>
+  async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.type(
+      await body.findByRole('searchbox', { name: /Search Player Information/ }),
+      value,
+    )
+  }
 
 const meta = {
   title: 'Queue/AddPlayerSheet',
@@ -111,8 +150,50 @@ export const AllInSession: Story = {
   args: { inSessionIds: savedCandidates.map((p) => p.id) },
 }
 
-/** The online search answers from the four fixture profiles. */
+/** Player Information search empty: "Full RTR ID or email", the hint, and nothing listed until one matches. */
 export const PlayerInformation: Story = { args: { initialTab: 'directory' } }
+export const PlayerInformationLight: Story = {
+  ...PlayerInformation,
+  globals: { theme: 'light' },
+}
+
+/** One registered match for the exact RTR ID. */
+export const PlayerInformationRegisteredMatch: Story = {
+  args: { initialTab: 'directory' },
+  play: searchFor(firstDirectory.rtrId),
+}
+
+/** Another club's unclaimed player: "Not registered yet", the RTR ID, no name, picture or level. */
+export const PlayerInformationOtherClubUnclaimed: Story = {
+  args: { initialTab: 'directory' },
+  play: searchFor(OTHER_CLUB_RTR),
+}
+
+/** Picking it asks for this club's own name for them ("Enter a name." if it stays empty). */
+export const OtherClubUnclaimedNameField: Story = {
+  args: { initialTab: 'directory' },
+  play: async (context) => {
+    await searchFor(OTHER_CLUB_EMAIL)?.(context)
+    const body = within(context.canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('button', { name: /Not registered yet/ }))
+  },
+}
+export const OtherClubUnclaimedNameFieldLight: Story = {
+  ...OtherClubUnclaimedNameField,
+  globals: { theme: 'light' },
+}
+
+/** An RTR ID or email nobody has: "No ROTRA player has that RTR ID or email." */
+export const PlayerInformationNoMatch: Story = {
+  args: { initialTab: 'directory' },
+  play: searchFor('RTR-PH-MNL-000000-0000'),
+}
+
+/** The RTR ID belongs to a saved player: "NAME is already in your saved players." */
+export const PlayerInformationAlreadySaved: Story = {
+  args: { initialTab: 'directory' },
+  play: searchFor(savedWithRtr.rtrId),
+}
 
 export const PlayerInformationOffline: Story = {
   args: { initialTab: 'directory', offline: true },
@@ -122,7 +203,13 @@ export const PlayerInformationLoading: Story = {
   args: { initialTab: 'directory', directoryLoading: true },
 }
 
+/** New player: Email (optional) with its hint, no phone. */
 export const NewPlayer: Story = { args: { initialTab: 'new' } }
+
+/** New player: the email typed is already a saved player; nothing is saved. */
+export const NewPlayerEmailAlreadySaved: Story = {
+  args: { initialTab: 'new', newPlayerEmailSavedAs: savedCandidates[0]?.name ?? 'Jomar Dela Cruz' },
+}
 
 export const NewPlayerFull: Story = {
   args: {
@@ -200,14 +287,14 @@ export const SavedPlayersClubPhone: Story = {
 const notInSession = savedCandidates.filter((p) => !ROSTER_IDS.includes(p.id))
 const noLevel = notInSession.find((p) => !p.suggestion) ?? notInSession[0]
 const withLevel = notInSession.find((p) => p.suggestion)
-const unclaimedSaved = notInSession.find((p) => p.identity === 'unclaimed')
+const unclaimedSaved = notInSession.find((p) => p.detailsRequired)
 
-/** An unclaimed saved player lists "Not registered yet" under the name (guests still read Guest). */
-export const UnclaimedNotRegistered: Story = {
+/** An older unclaimed record lists "Details required" with the warn chip (guests still read Guest). */
+export const DetailsRequiredRow: Story = {
   args: { savedPlayers: unclaimedSaved ? [unclaimedSaved, ...savedCandidates] : savedCandidates },
 }
-export const UnclaimedNotRegisteredLight: Story = {
-  ...UnclaimedNotRegistered,
+export const DetailsRequiredRowLight: Story = {
+  ...DetailsRequiredRow,
   globals: { theme: 'light' },
 }
 

@@ -5,7 +5,7 @@ import {
   courtOpen,
   type MatchContext,
   matchStatus,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import { queueSearchHitCount } from '@rotra/data/match/queueSearch.rules'
@@ -145,7 +145,7 @@ export function QueueView({
           )
         : undefined,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
     }
   }

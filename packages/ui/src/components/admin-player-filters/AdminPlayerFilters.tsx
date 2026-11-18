@@ -48,6 +48,7 @@ export function AdminPlayerFilters({
             { value: 'all', label: 'All' },
             { value: 'registered', label: 'Registered' },
             { value: 'unclaimed', label: 'Unclaimed' },
+            { value: 'details', label: 'Details required' },
           ]}
           onChange={(account) => onChange({ account: account as AdminPlayerListParams['account'] })}
         />

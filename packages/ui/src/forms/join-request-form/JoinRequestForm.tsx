@@ -45,8 +45,6 @@ export type JoinRequestFormProps = {
   className?: string
 }
 
-export const PHONE_HINT =
-  'Helps the club recognise you and link your ROTRA profile. Only the club sees it.'
 export const LEVEL_HINT = 'Your best guess. The Queue Master sets your level for the night.'
 export const SIGN_UP_NOTE =
   'New to ROTRA? Ask your club for a registration invite, or continue as a guest.'
@@ -60,8 +58,8 @@ export const PLACEMENT_FULL_HINT =
   'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.'
 
 /**
- * Q-PUBLIC-JOIN › Request to join: the guest's name, optional nickname and phone, and their
- * self-declared level. The container owns the mutation, the "Request sent" toast and serverError;
+ * Q-PUBLIC-JOIN › Request to join: the guest's name, optional nickname, and their
+ * self-declared level (no phone, D-2026-11-16-04). The container owns the mutation, the "Request sent" toast and serverError;
  * a failed send keeps what was typed.
  */
 export function JoinRequestForm({
@@ -138,20 +136,6 @@ export function JoinRequestForm({
             name="nickname"
             render={({ field }) => (
               <TextInput {...field} maxLength={NICKNAME_MAX} autoComplete="nickname" />
-            )}
-          />
-        </Field>
-        <Field
-          label="Phone"
-          optional
-          hint={errors.phone ? undefined : PHONE_HINT}
-          error={errors.phone?.message}
-        >
-          <Controller
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <TextInput {...field} type="tel" inputMode="tel" autoComplete="tel" />
             )}
           />
         </Field>

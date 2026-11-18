@@ -37,6 +37,7 @@ import { type ClaimDetails, registerFromClaimWithGoogle } from './account-access
 import { readPlayerFeatureFlag } from './feature-flags'
 import { clearGoogleGateHint } from './google-gate'
 import { registerGuestWithGoogle } from './guest-registration'
+import { readUnclaimedIdentities } from './unclaimed-identities'
 
 /**
  * Google sign-in for players, real mode (D-2026-11-16-01, #922), behind `player_google_sign_in`.
@@ -309,7 +310,13 @@ export async function readGoogleOutcome(jar: GoogleCookies) {
       const account = await accountOf(pending.subject)
       if (!account) {
         if (!(await isNewGoogle(pending))) throw failed()
-        return { outcome: 'new-account', google: pending.google }
+        // Clubs saved this verified Google email as an unclaimed player (D-2026-11-16-04): the
+        // identity cards, so registering keeps the RTR ID and joins every club's record.
+        return {
+          outcome: 'new-account',
+          google: pending.google,
+          unclaimed: await readUnclaimedIdentities(pending.google.email),
+        }
       }
       if (account.disabled || account.rotraEmail !== pending.google.email) throw failed()
       return {
@@ -369,7 +376,7 @@ export async function confirmGoogleLink(
 export async function registerWithGoogle(
   jar: GoogleCookies,
   clubId: string,
-  input: { phoneE164: string; details: ClaimDetails },
+  input: { phoneE164: string; details: ClaimDetails; identityRecordId?: string | null },
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {
@@ -379,6 +386,19 @@ export async function registerWithGoogle(
   const result = await registerGuestWithGoogle(jar, clubId, pending, input, sessionSlug, inviteCode)
   if (result.status === 'registered') clearGoogleResult(jar)
   return result
+}
+
+/**
+ * The identity cards for the held Google sign-in's verified email (`getUnclaimedIdentities`,
+ * D-2026-11-16-04): only for the Google account the callback verified, never an email from the
+ * request, and only while that login has no ROTRA account. Null when no club saved the email.
+ */
+export async function readHeldUnclaimedIdentities(jar: GoogleCookies, typed: string) {
+  await requireGoogleSignIn()
+  const pending = await readPendingGoogle(jar)
+  if (!pending || pending.google.email !== typed.trim().toLowerCase()) return null
+  if (await accountOf(pending.subject)) return null
+  return readUnclaimedIdentities(pending.google.email)
 }
 
 /**

@@ -1,5 +1,5 @@
 import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
-import { shortName } from '@rotra/data/match/match.rules'
+import { queueMasterName } from '@rotra/data/match/match.rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { PlayerFaceButton, type PlayerFaceButtonProps } from './PlayerFaceButton'
@@ -9,7 +9,7 @@ const faceAt = (i: number, team: 'A' | 'B' = 'A'): PlayerFaceButtonProps => {
   if (!p) throw new Error('Roster fixture missing')
   return {
     name: p.nameSnapshot,
-    shortName: shortName(p),
+    shortName: queueMasterName(p),
     level: p.level,
     label: `${p.nameSnapshot}, Team ${team}. View profile`,
     onClick: fn(),

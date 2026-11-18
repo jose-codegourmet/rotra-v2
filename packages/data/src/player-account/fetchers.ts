@@ -1,7 +1,7 @@
 import { emailField } from '@rotra/schema/email'
 import { passwordField } from '@rotra/schema/password'
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
-import { maskPhone } from '@rotra/schema/phone'
+import { maskPhone, phoneField } from '@rotra/schema/phone'
 import { getSession, signIn } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
 import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
@@ -24,6 +24,7 @@ import {
   realSetPhonePrivacy,
 } from '../real/player'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
+import { joinClubRecords } from './unclaimedIdentity'
 import { myAccountOf } from './visibilitySettings'
 
 /** The signed-in player's own contacts; null when signed out. Never a public fetcher. */
@@ -122,7 +123,8 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
       nickname: profile.nickname,
       rtrId: profile.rtrId,
       picture: profile.picture,
-      maskedPhone: maskPhone(account.phone),
+      // An unclaimed player has no account phone: the form then asks for one.
+      maskedPhone: account.phone ? maskPhone(account.phone) : '',
     },
     preset: {
       fullName: profile.fullName,
@@ -141,7 +143,7 @@ export async function getClaimLink(token: string, signal?: AbortSignal): Promise
 
 export type CompleteClaimInput = {
   token: string
-  /** `phone` only when the profile has none on file (real mode); the mock profiles all have one. */
+  /** `phone` only when the profile has none on file: an unclaimed player a club saved by email. */
   values: PersonalProfileValues & { email: string; password: string; phone?: string }
 }
 /**
@@ -150,7 +152,7 @@ export type CompleteClaimInput = {
  */
 export function finishClaim(
   token: string,
-  changes?: { email: string; personal: PersonalProfileValues },
+  changes?: { email: string; personal: PersonalProfileValues; phone?: string },
 ) {
   let result: CompleteClaimResult | undefined
   mockStore.update((draft) => {
@@ -168,7 +170,10 @@ export function finishClaim(
     if (changes) {
       applyPersonalProfile(profile, changes.personal)
       account.email = changes.email
+      if (changes.phone && !account.phone) account.phone = changes.phone
       account.claimed = true
+      // Every club's record of the person joins the account with it (D-2026-11-16-04).
+      joinClubRecords(draft, account.playerId)
     }
     record.status = 'valid'
     result = {
@@ -189,10 +194,16 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   if (isRealDataMode()) return realCompleteClaim({ token, values })
   await delay(1100)
   if (getConnectivity() === 'offline') throw new MockError('offline', CLAIM_OFFLINE)
-  const { email: rawEmail, password, phone: _phone, ...rest } = values
+  const { email: rawEmail, password, phone: rawPhone, ...rest } = values
   const personal = personalProfileSchema.parse(rest)
   const email = emailField.parse(rawEmail)
   passwordField.parse(password)
+  // Taken only when the profile has no phone on file (an unclaimed player a club saved by email).
+  const phone = rawPhone?.trim() ? phoneField.safeParse(rawPhone) : null
+  if (phone && !phone.success) {
+    const text = 'Enter a Philippine mobile number, like 0917 555 0142.'
+    throw new MockError('conflict', text, { phone: text })
+  }
   const state = readMockState()
   const record = state.claimLinks[token]
   const account = record && state.playerAccounts.find((a) => a.playerId === record.playerId)
@@ -217,6 +228,7 @@ export async function completeClaim({ token, values }: CompleteClaimInput) {
   const result = finishClaim(token, {
     email: account.claimed ? account.email : email,
     personal,
+    phone: phone?.success ? phone.data : undefined,
   })
   const session = await signIn('player', { identifier: email, password })
   return { ...result, session }

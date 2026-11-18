@@ -85,6 +85,39 @@ export function liveCourts(tx: Tx, sessionId: string) {
  */
 export const LIVE_ENTRY = { releasedAt: null, noShowAt: null } as const
 
+/**
+ * The names a Queue Master read shows for a saved player (D-2026-11-18-03): `nickname` is the one
+ * players see (a registered player's account nickname; for a guest or unclaimed player, the club's,
+ * their only one) and `clubNickname` the club's own nickname for a registered player, stored in
+ * `club_players.nickname` and returned to that club's Queue Master reads only.
+ */
+export type RosterNames = { nickname: string | null; clubNickname: string | null }
+
+export async function rosterNamesOf(tx: Tx, clubPlayerIds: string[]) {
+  const rows = clubPlayerIds.length
+    ? await tx.clubPlayer.findMany({
+        where: { id: { in: [...new Set(clubPlayerIds)] } },
+        select: {
+          id: true,
+          nickname: true,
+          player: { select: { nickname: true, profileState: true } },
+        },
+      })
+    : []
+  return new Map<string, RosterNames>(
+    rows.map((row) => [
+      row.id,
+      row.player?.profileState === 'claimed'
+        ? { nickname: row.player.nickname, clubNickname: row.nickname?.trim() || null }
+        : { nickname: row.nickname, clubNickname: null },
+    ]),
+  )
+}
+
+export async function rosterNamesFor(tx: Tx, clubPlayerId: string) {
+  return (await rosterNamesOf(tx, [clubPlayerId])).get(clubPlayerId) ?? null
+}
+
 /** True when an entry read by id is off the live roster (released, or a no show). */
 export function isOffRoster(entry: { releasedAt: Date | null; noShowAt: Date | null }) {
   return entry.releasedAt != null || entry.noShowAt != null

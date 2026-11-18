@@ -30,6 +30,12 @@ export type AccountLinkStatusProps = {
   sessionTitle?: string | null
   /** claim-done after Google (player_google_sign_in flag): "You sign in with Google (<email>)." */
   googleEmail?: string
+  /**
+   * claim-done after a registration that claimed unclaimed records (D-2026-11-16-04): the clubs whose
+   * records joined the account. Shows "Your records from A and B are now on your account, with their
+   * games." and "Your player ID stays …".
+   */
+  joinedClubs?: string[]
   /** All three verification checks passed on the registration that just finished. */
   verificationComplete?: boolean
   onBackToSession?: () => void
@@ -43,6 +49,10 @@ export type AccountLinkStatusProps = {
   onCheckAgain?: () => void
   onOpenProfile?: () => void
 }
+/** "A", "A and B", "A, B and C" */
+const listClubs = (names: string[]) =>
+  names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+
 /** Every non-form outcome of a reset link or a registration link. */
 export function AccountLinkStatus({
   variant,
@@ -54,6 +64,7 @@ export function AccountLinkStatus({
   standalone = false,
   sessionTitle,
   googleEmail,
+  joinedClubs,
   verificationComplete = false,
   onBackToSession,
   isPending = false,
@@ -170,22 +181,31 @@ export function AccountLinkStatus({
     case 'claim-done':
       return (
         <LinkPage label="Registration complete" title={`Welcome, ${firstName ?? ''}`}>
-          <Notice tone="success">
-            {standalone
-              ? clubName !== 'your club'
-                ? `You're now in ${clubName}'s saved players.`
-                : 'Your ROTRA account is ready.'
-              : googleEmail
-                ? `Your profile is registered. Sign in from now on with Google (${googleEmail}).`
-                : 'Your profile is registered. Sign in from now on with your email and your password.'}
-          </Notice>
+          {standalone && joinedClubs?.length ? (
+            <Notice tone="success">
+              Your records from {listClubs(joinedClubs)} are now on your account, with their games.
+            </Notice>
+          ) : null}
+          {standalone && joinedClubs?.length && clubName === 'your club' ? null : (
+            <Notice tone="success">
+              {standalone
+                ? clubName !== 'your club'
+                  ? `You're now in ${clubName}'s saved players.`
+                  : 'Your ROTRA account is ready.'
+                : googleEmail
+                  ? `Your profile is registered. Sign in from now on with Google (${googleEmail}).`
+                  : 'Your profile is registered. Sign in from now on with your email and your password.'}
+            </Notice>
+          )}
           {standalone && sessionTitle ? (
             <Notice>Your request to join {sessionTitle} is ready to send.</Notice>
           ) : null}
           <Card asChild>
             <section className="flex flex-col gap-1.5">
               <p className="m-0">
-                {standalone ? 'Your player ID is ' : 'Your player ID stays '}
+                {standalone && !joinedClubs?.length
+                  ? 'Your player ID is '
+                  : 'Your player ID stays '}
                 <span className="font-mono">{rtrId}</span>.
                 {standalone ? '' : ' Your games and rank carry over.'}
               </p>

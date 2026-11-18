@@ -2,8 +2,8 @@ import {
   computeStandings,
   courtNames,
   FORMAT_LABELS,
+  queueMasterName,
   SUBSTITUTION_CREDITS,
-  shortName,
 } from '../match/match.rules'
 import type { Match, MatchLineup, SubstitutionCredit } from '../match/match.types'
 import { MockError } from '../mock/errors'
@@ -345,7 +345,7 @@ export async function realSwapPlayers(input: {
   await saveLineup(input.sessionId, m.id, lineup, read.queueRevision, input.operationId)
   return accepted(
     null,
-    `Match ${m.matchNo}: ${shortName(pa)} and ${shortName(pb)} switched sides · protected from regeneration`,
+    `Match ${m.matchNo}: ${queueMasterName(pa)} and ${queueMasterName(pb)} switched sides · protected from regeneration`,
   )
 }
 
@@ -486,7 +486,7 @@ export async function realReplacePlayer(input: {
   )
   return accepted(
     null,
-    `Match ${match.matchNo}: ${shortName(incoming)} in for ${shortName(out)} · lineup changed`,
+    `Match ${match.matchNo}: ${queueMasterName(incoming)} in for ${queueMasterName(out)} · lineup changed`,
   )
 }
 
@@ -587,8 +587,8 @@ export async function realSubstitutePlayer(input: {
     { body: { operationId: input.operationId, outId: input.outId, inId: input.inId, creditTo } },
   )
   const who = creditTo === 'incoming' ? incoming : creditTo === 'outgoing' ? out : null,
-    gets = who ? ` · ${shortName(who)} gets the game` : ''
-  return accepted(null, `${shortName(incoming)} in for ${shortName(out)}${gets}`)
+    gets = who ? ` · ${queueMasterName(who)} gets the game` : ''
+  return accepted(null, `${queueMasterName(incoming)} in for ${queueMasterName(out)}${gets}`)
 }
 
 // ---------- Results and publication (Q-RESULTS, Q-PUBLISH) ----------

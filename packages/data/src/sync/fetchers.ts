@@ -1,3 +1,4 @@
+import { resolvePendingEmails } from '../club-player/email'
 import { getConnectivity, subscribeConnectivity } from '../connectivity/connectivity'
 import { getMockDevState, subscribeMockSaveFailure } from '../mock/bridge'
 import { delay } from '../mock/latency'
@@ -89,6 +90,8 @@ async function reconcile() {
     state.sync.syncing = false
     state.sync.lastSyncedAt = now
     if (state.sync.problem === 'retry') state.sync.problem = undefined
+    // Lookup pending (D-2026-11-16-04): players entered with an email while offline are looked up now.
+    resolvePendingEmails(state)
   })
 }
 /**

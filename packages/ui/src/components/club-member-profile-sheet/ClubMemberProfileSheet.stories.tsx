@@ -75,6 +75,11 @@ export const Unclaimed: Story = {
     },
   },
 }
+export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
+export const UnclaimedPhone: Story = {
+  ...Unclaimed,
+  globals: { viewport: { value: 'phone' } },
+}
 export const Loading: Story = { args: { loading: true } }
 /** The player turned off Show my profile stats: no Latest stats for others */
 export const StatsHidden: Story = { args: { showStats: false } }

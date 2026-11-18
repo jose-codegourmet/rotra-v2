@@ -10,7 +10,7 @@ import {
   listNames,
   type MatchContext,
   matchStatus,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
@@ -47,7 +47,7 @@ const playerOf =
     return {
       id: p.id,
       name: p.nameSnapshot,
-      shortName: shortName(p),
+      shortName: queueMasterName(p),
       level: p.level,
       games: countedGames(p.id, list),
     }
@@ -56,7 +56,7 @@ const names = (ids: string[]) =>
   listNames(
     ids.map((id) => {
       const p = roster.find((x) => x.id === id)
-      return p ? shortName(p) : 'Player'
+      return p ? queueMasterName(p) : 'Player'
     }),
   )
 

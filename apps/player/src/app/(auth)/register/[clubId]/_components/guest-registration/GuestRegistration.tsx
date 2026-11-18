@@ -78,6 +78,7 @@ function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestR
         }
         firstName={result.firstName}
         rtrId={result.rtrId}
+        joinedClubs={result.joinedClubs}
         onOpenProfile={() => router.push(`/players/${result.playerId}`)}
       />
     )

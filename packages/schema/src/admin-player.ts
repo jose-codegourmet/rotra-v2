@@ -130,11 +130,37 @@ export const adminPlayerEditSchema = z.object({
     ),
   /** Required when anything changed (checked against the loaded values, not here); up to 300 */
   reason: z.string().trim().max(300),
+  /**
+   * The founding city code in the RTR ID ('PH-CEB'). With the registration date it decides the RTR ID
+   * (D-2026-11-16-04); the ID is never typed. Absent for a player with no RTR ID.
+   */
+  registrationPlace: z.string().optional(),
+  /** 'YYYY-MM-DD'; '' when the field was cleared. Absent for a player with no RTR ID. */
+  registrationDate: z.string().optional(),
 })
 
 /** The rules that depend on the player being edited (rotra-admin.html peErrors()). */
-export function adminPlayerEditSchemaFor(player: { claimed: boolean; hasAccount: boolean }) {
+export function adminPlayerEditSchemaFor(player: {
+  claimed: boolean
+  hasAccount: boolean
+  /** The player's RTR ID; the registration date is required only when there is one */
+  rtrId?: string | null
+  /** The email on file; an unclaimed player who has one can't be saved without one */
+  email?: string
+}) {
   return adminPlayerEditSchema.superRefine((values, ctx) => {
+    if (!player.claimed && player.email && !values.email)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['email'],
+        message: ADMIN_PLAYER_UNCLAIMED_EMAIL_REQUIRED,
+      })
+    if (player.rtrId && values.registrationDate !== undefined && !values.registrationDate.trim())
+      ctx.addIssue({
+        code: 'custom',
+        path: ['registrationDate'],
+        message: ADMIN_PLAYER_REGISTRATION_DATE_REQUIRED,
+      })
     // A player without a contact record keeps an empty email; there is nothing to sign in with yet.
     if (player.claimed && player.hasAccount && !values.email)
       ctx.addIssue({
@@ -150,6 +176,14 @@ export function adminPlayerEditSchemaFor(player: { claimed: boolean; hasAccount:
       })
   })
 }
+
+/** An unclaimed player who has an email can't be saved without one (D-2026-11-16-04). */
+export const ADMIN_PLAYER_UNCLAIMED_EMAIL_REQUIRED =
+  'An unclaimed player needs an email. Enter one.'
+export const ADMIN_PLAYER_REGISTRATION_DATE_REQUIRED = 'Enter the registration date.'
+/** Supplied by the data layer as a field error on the registration date or place. */
+export const ADMIN_PLAYER_RTR_ID_TAKEN =
+  'Another player already has this RTR ID. Choose another place or date.'
 
 /** rotra-admin.html pmSave(): asked for only when something changed. */
 export const ADMIN_PLAYER_REASON_REQUIRED = 'Say why you are making this change.'

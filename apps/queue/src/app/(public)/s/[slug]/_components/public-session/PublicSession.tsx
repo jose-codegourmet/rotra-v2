@@ -2,7 +2,7 @@
 
 import { useSession } from '@rotra/data/auth/use-session'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
-import { freeCourtMinutes } from '@rotra/data/match/match.rules'
+import { freeCourtMinutes, playerFacingName } from '@rotra/data/match/match.rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
@@ -410,7 +410,10 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
         barAccount
           ? {
               name: barAccount.name,
-              shortName: barAccount.nickname || barAccount.name.split(/\s+/)[0] || barAccount.name,
+              shortName: playerFacingName({
+                nameSnapshot: barAccount.name,
+                nicknameSnapshot: barAccount.nickname ?? null,
+              }),
               pictureUrl: barAccount.pictureUrl ?? undefined,
               rtrId: barRtrId,
             }

@@ -10,7 +10,7 @@ import {
   gamesPlayed,
   isFunFormat,
   queuedCount,
-  shortName,
+  queueMasterName,
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
@@ -128,7 +128,11 @@ function setGamesTarget(target: string | 'all', rows: PoolRow[]): SetGamesTarget
   if (target === 'all')
     return { kind: 'all', count: rows.length, median: medianGames(rows.map((r) => r.games)) }
   const row = rows.find((r) => r.player.id === target)
-  return { kind: 'one', name: row?.player.nameSnapshot ?? 'Player', current: row?.games ?? 0 }
+  return {
+    kind: 'one',
+    name: row ? queueMasterName(row.player) : 'Player',
+    current: row?.games ?? 0,
+  }
 }
 
 export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps) {
@@ -285,7 +289,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   /** Move to waitlist (#735): blocked with a toast while the player is in any unfinished match. */
   const stepDownPlayer = (player: SessionPlayer) => {
     if (inUnfinishedMatch(player.id, all)) {
-      toast(stepDownBlockedText(shortName(player)))
+      toast(stepDownBlockedText(queueMasterName(player)))
       return
     }
     if (steppingDown.current.has(player.id)) return
@@ -379,7 +383,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             return (
               <PlayerPoolCard
                 key={row.player.id}
-                name={row.player.nameSnapshot}
+                name={queueMasterName(row.player)}
                 photoUrl={photoFor(row.player)}
                 level={row.player.level}
                 games={row.games}
@@ -432,7 +436,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       )}
       {selection.length ? (
         <SelectionBar
-          players={selected.map((p) => ({ id: p.id, name: p.nameSnapshot }))}
+          players={selected.map((p) => ({ id: p.id, name: queueMasterName(p) }))}
           label={planLabel}
           valid={!!plan.format}
           onClear={() => setPicked([])}
@@ -448,7 +452,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       <NoShowPanel
         entries={noShowList.map((x) => ({
           id: x.id,
-          name: x.nameSnapshot,
+          name: queueMasterName(x),
           photoUrl: photoFor(x),
           markedLabel: time(x.noShowAt),
         }))}
@@ -491,8 +495,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             const p = rosterList.find((player) => player.id === id)
             return {
               id,
-              name: p?.nameSnapshot ?? 'Player',
-              shortName: p ? shortName(p) : 'Player',
+              name: p ? queueMasterName(p) : 'Player',
+              shortName: p ? queueMasterName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),
@@ -502,8 +506,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             const p = rosterList.find((player) => player.id === id)
             return {
               id,
-              name: p?.nameSnapshot ?? 'Player',
-              shortName: p ? shortName(p) : 'Player',
+              name: p ? queueMasterName(p) : 'Player',
+              shortName: p ? queueMasterName(p) : 'Player',
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),
@@ -597,12 +601,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           onOpenChange={(open) => {
             if (!open) setNoShowFor(null)
           }}
-          title={`Mark ${noShowTarget.nameSnapshot} as No show?`}
+          title={`Mark ${queueMasterName(noShowTarget)} as No show?`}
           summary={
             <div className="flex flex-nowrap items-center gap-3">
-              <Avatar name={noShowTarget.nameSnapshot} src={photoFor(noShowTarget)} />
+              <Avatar name={queueMasterName(noShowTarget)} src={photoFor(noShowTarget)} />
               <div>
-                <b>{noShowTarget.nameSnapshot}</b>
+                <b>{queueMasterName(noShowTarget)}</b>
                 <p className="text-[13px] text-fg2">Away · no games tonight</p>
               </div>
             </div>

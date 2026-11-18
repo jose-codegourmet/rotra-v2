@@ -15,6 +15,8 @@ import { clubs, DEMO_CLUB_ID } from './clubs'
 // - Ana               login → not connected; register → new account; connect → connected; claim → claimed
 // - Jose's Gmail      connect as Jose → connected with a different email; login → not connected
 // - Raymark's Gmail   claim → claimed
+// - Jomar             register → one club saved this email (unclaimed): its details prefill, no picker
+// - Paolo Mendoza     register → two clubs saved this email (unclaimed): the identity picker
 export const googlePickerAccounts: GooglePickerAccount[] = [
   { email: 'ana.reyes@gmail.com', name: 'Ana Reyes', hint: 'New to ROTRA' },
   {
@@ -44,6 +46,16 @@ export const googlePickerAccounts: GooglePickerAccount[] = [
     name: 'Raymark',
     hint: "Raymark's Gmail, for the club-created profile link",
   },
+  {
+    email: 'jomar.delacruz@example.com',
+    name: 'Jomar Dela Cruz',
+    hint: 'One club saved this email (unclaimed)',
+  },
+  {
+    email: 'paolo.mendoza@example.com',
+    name: 'Paolo Mendoza',
+    hint: 'Two clubs saved this email (unclaimed)',
+  },
 ]
 
 /** Sign-in examples for Google, beside `signInExamples` for the password form. */
@@ -63,6 +75,10 @@ export const googleSignInExamples = {
   taken: 'emji@example.com',
   /** Forgot password for a Google-only account */
   forgotGoogleOnly: 'emji@example.com',
+  /** An email one club saved as an unclaimed player: registering claims that record */
+  unclaimedOneClub: 'jomar.delacruz@example.com',
+  /** An email two clubs saved as an unclaimed player: registering opens the identity picker */
+  unclaimedTwoClubs: 'paolo.mendoza@example.com',
   /** A password player with no Google yet (the deadline gate) */
   passwordOnly: { email: 'jose@example.com', password: 'prototype' },
 }

@@ -56,7 +56,7 @@ export function selectAdminPlayers(all: AdminPlayer[], params: AdminPlayerListPa
   const matches = all
     .filter(
       (p) =>
-        matchesAccountFilter(p.claimed, params.account) &&
+        matchesAccountFilter(p.claimed, params.account, p.detailsRequired) &&
         matchesAdminPlayerSearch(p, params.q) &&
         (!params.level ||
           (params.level === 'none' ? p.levelBand === null : p.levelBand === params.level)) &&

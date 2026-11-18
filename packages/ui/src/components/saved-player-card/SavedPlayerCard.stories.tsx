@@ -55,10 +55,15 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Registered: Story = {}
-/** Unclaimed: the club's own record with no RTR ID until they register, so "Not registered". */
+/** Unclaimed with an email and an RTR ID: the neutral Unclaimed chip; "Not registered" until they register. */
 export const Unclaimed: Story = {
   args: { ...propsFor(byIdentity('unclaimed'), 5), registeredCity: null },
 }
+/** An older record with no email: the warn "Details required" chip takes the Unclaimed chip's place. */
+export const DetailsRequired: Story = {
+  args: { ...propsFor(byIdentity('unclaimed'), 5), registeredCity: null, detailsRequired: true },
+}
+export const DetailsRequiredLight: Story = { ...DetailsRequired, globals: { theme: 'light' } }
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const Guest: Story = { args: propsFor(byIdentity('guest'), 1) }
 export const LookupPending: Story = {
@@ -71,6 +76,16 @@ export const AddedByTheClub: Story = { args: { joinedVia: null } }
 export const PlayingNow: Story = { args: { live: { kind: 'playing', text: 'Playing · Court 1' } } }
 export const AtTheSession: Story = { args: { live: { kind: 'waiting', text: 'At the session' } } }
 export const NoLevel: Story = { args: { level: null } }
+
+/** Registered with a club nickname: it replaces the account nickname, marked "· club nickname". */
+export const WithClubNickname: Story = {
+  args: { nickname: 'Migs', clubNickname: 'Kuya Migs' },
+}
+export const WithClubNicknameLight: Story = { ...WithClubNickname, globals: { theme: 'light' } }
+/** Registered with an account nickname and no club nickname: the account nickname, unmarked. */
+export const AccountNicknameOnly: Story = { args: { nickname: 'Migs', clubNickname: null } }
+/** Registered with neither nickname: the line stays empty. */
+export const NoNickname: Story = { args: { nickname: null, clubNickname: null } }
 
 export const LongNameAndNickname: Story = {
   args: {

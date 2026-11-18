@@ -11,7 +11,7 @@ import {
   listNames,
   type MatchContext,
   matchStatus,
-  shortName,
+  queueMasterName,
   substitutionCandidates,
   swapTarget,
   waitMinutes,
@@ -181,7 +181,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       photoUrl: photoOf(p),
@@ -321,7 +321,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       restMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       photoUrl: photoOf(p),
     }
   }
@@ -348,7 +348,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       photoUrl: photoOf(p),
       games: countedGames(id, ctx.matches),
       waitMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,

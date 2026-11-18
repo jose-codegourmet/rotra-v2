@@ -9,7 +9,13 @@ import { ServiceError } from '../service/errors'
 import { recordAudit } from './audit'
 import { saveAdminPlayerCore } from './player-edit-core'
 import { saveAdminPlayerEmail } from './player-edit-email'
-import { readAdminPlayerDirectory } from './players'
+import {
+  plannedRtrId,
+  refuseTakenRtrId,
+  saveAdminSharedEntry,
+  saveRegisteredRtrId,
+} from './player-rtr-id'
+import { readAdminPlayerDirectory, readAdminPlayerEdit } from './players'
 
 /** Save the profile and contacts, then report each Auth outcome without dropping the saved fields. */
 export async function saveAdminPlayer(
@@ -21,13 +27,45 @@ export async function saveAdminPlayer(
   },
 ) {
   requireAdmin(context)
+  // An unclaimed person saved with an email: the shared entry's email and RTR ID (P15.8).
+  const entry = await prisma.sharedPlayerEntry.findUnique({
+    where: { id: input.playerId },
+    select: { id: true },
+  })
+  if (entry) return saveAdminSharedEntry(context, input)
   const operationId = crypto.randomUUID()
+  // D-2026-11-16-04: a changed registration place or date reissues the RTR ID (checked first).
+  const before = await readAdminPlayerEdit(context, input.playerId)
+  const rtrPlan = before.claimed ? plannedRtrId(before, input.values) : null
+  if (rtrPlan && !input.values.reason.trim())
+    throw new ServiceError('invalid', { reason: 'Say why you are making this change.' })
+  if (rtrPlan) await refuseTakenRtrId(rtrPlan)
   const { changed, coreChanged, revision } = await saveAdminPlayerCore(context, {
     ...input,
     operationId,
   })
   const saved: AdminPlayerChangedField[] = [...coreChanged]
   const warnings: string[] = []
+  if (rtrPlan) {
+    try {
+      await saveRegisteredRtrId(context, {
+        playerId: input.playerId,
+        plan: rtrPlan,
+        reason: input.values.reason.trim(),
+        name: input.values.name.trim(),
+        operationId,
+      })
+      saved.push('RTR ID')
+    } catch (error) {
+      // Nothing was saved yet: a taken RTR ID refuses the whole save, as in mock mode.
+      if (!coreChanged.length) throw error
+      warnings.push(
+        error instanceof ServiceError && error.fields?.registrationDate
+          ? error.fields.registrationDate
+          : 'RTR ID change could not be applied. Reload and retry.',
+      )
+    }
+  }
   if (changed.includes('email')) {
     try {
       if (

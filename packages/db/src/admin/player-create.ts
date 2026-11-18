@@ -13,6 +13,11 @@ import { readAdminPlayerDirectory } from './players'
  * player and no RTR ID: both come at registration, when the phone links the record
  * (D-2026-11-11-03, D-2026-11-12-01). So a club and a phone are required here, and the place is the
  * club's founding location. "Created by Admin" (no club) has nowhere to be saved yet.
+ *
+ * Beside P15.8 (D-2026-11-16-04, #927) this path is unchanged: it makes no shared entry and
+ * allocates no RTR ID, even when an email is typed (the email stays in the private intake). So
+ * the record has a phone and no shared entry, which Queue and Admin read as Details required
+ * until the club saves an email on it. Whether Add player should make the shared entry is open.
  */
 export async function createAdminPlayer(context: AdminContext, input: unknown) {
   requireAdmin(context)

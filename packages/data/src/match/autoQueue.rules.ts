@@ -16,7 +16,7 @@ import {
   gamesPlayedFor,
   type MatchContext,
   queuedCount,
-  shortName,
+  queueMasterName,
   waitMinutes,
 } from './match.rules'
 import type { MatchLineup } from './match.types'
@@ -174,7 +174,7 @@ export function editBagging(bagging: BaggingSettings, edit: BaggingEdit): Baggin
 export function baggingReason(pairs: BaggingPair[], roster: SessionPlayer[]) {
   const name = (id: string) => {
     const player = roster.find((p) => p.id === id)
-    return player ? shortName(player) : 'Player'
+    return player ? queueMasterName(player) : 'Player'
   }
   return `Bagging pair: ${pairs.map((pair) => `${name(pair.a)} and ${name(pair.b)}`).join(', ')} are partners`
 }
@@ -405,9 +405,9 @@ export function autoQueueDraftConflict(
   for (const id of allPlayers(draft)) {
     const player = ctx.roster.find((p) => p.id === id && p.sessionId === session.id)
     if (!player || !player.present)
-      return `${player ? shortName(player) : 'A player'} is not present. Restore presence or regenerate the draft.`
+      return `${player ? queueMasterName(player) : 'A player'} is not present. Restore presence or regenerate the draft.`
     if (draft.mode !== 'ahead' && activeMatchFor(id, ctx.matches))
-      return `${shortName(player)} is now playing. This draft needs attention; use Plan Ahead or regenerate when they are free.`
+      return `${queueMasterName(player)} is now playing. This draft needs attention; use Plan Ahead or regenerate when they are free.`
   }
   return null
 }

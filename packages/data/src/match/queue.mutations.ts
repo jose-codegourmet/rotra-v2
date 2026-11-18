@@ -1,15 +1,23 @@
+import { withClubNickname } from '../club-player/clubNickname.rules'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import { isRealDataMode } from '../real/mode'
-import { allPlayers, completeLineup, FORMAT_LABELS, matchStatus, shortName } from './match.rules'
+import {
+  allPlayers,
+  completeLineup,
+  FORMAT_LABELS,
+  matchStatus,
+  queueMasterName,
+} from './match.rules'
 import type { Match, MatchLineup, MatchOrigin } from './match.types'
 import { balanceTeams, formatForSelection, generateMatches } from './queue.rules'
 export function matchContext(s: MockState, sessionId: string) {
   return {
-    roster: s.roster.filter((r) => r.sessionId === sessionId),
+    // Rows carry the club nickname so every message names players as the Queue Master sees them.
+    roster: s.roster.filter((r) => r.sessionId === sessionId).map((r) => withClubNickname(s, r)),
     matches: s.matches.filter((m) => m.sessionId === sessionId),
     courts: s.courts.filter((c) => c.sessionId === sessionId && !c.removedAt),
   }
@@ -299,9 +307,11 @@ export function swapPlayers(input: { sessionId: string; matchId: string; a: stri
       validate(s, input.sessionId, m, true)
       m.origin = 'manual'
       m.manualProtected = true
+      const nameA = queueMasterName(withClubNickname(s, pa)),
+        nameB = queueMasterName(withClubNickname(s, pb))
       return {
         data: null,
-        text: `Match ${m.matchNo}: ${shortName(pa)} and ${shortName(pb)} switched sides · protected from regeneration`,
+        text: `Match ${m.matchNo}: ${nameA} and ${nameB} switched sides · protected from regeneration`,
       }
     }),
   )

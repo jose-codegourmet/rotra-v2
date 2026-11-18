@@ -19,6 +19,11 @@ import {
   editPlayerDetailsSchema,
 } from './EditPlayerDetailsForm.schema'
 
+const EMAIL_HINT_GUEST =
+  "Add an email to save them as an unclaimed player. They get an RTR ID, and their games here follow them when they register. It can't be changed after you save. Never shown publicly."
+const EMAIL_HINT_OLDER =
+  "Check it with the player. It can't be changed after you save. Never shown publicly."
+
 export type EditPlayerDetailsFormProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -42,7 +47,8 @@ export type EditPlayerDetailsFormProps = {
 
 /**
  * Q-SAVED-PLAYERS › Edit details for a guest or unclaimed profile. The club fills in what it knows so
- * the player's registration starts prefilled. A phone on file is shown, never edited.
+ * the player's registration starts prefilled. An email on file is shown read-only; adding one to a
+ * guest makes them unclaimed. Phone shows for unclaimed players only; one on file is never edited.
  */
 export function EditPlayerDetailsForm({
   open,
@@ -66,6 +72,10 @@ export function EditPlayerDetailsForm({
   })
   const errors = form.formState.errors
   const claim = details.identity === 'unclaimed'
+  // D-2026-11-16-04: a saved email is read-only. An older unclaimed record has none: its Email field
+  // looks required and the Details required notice shows.
+  const emailOnFile = Boolean(details.profile?.email.trim())
+  const detailsRequired = claim && !emailOnFile
   useEffect(() => {
     if (serverError?.field)
       form.setError(serverError.field, { type: 'server', message: serverError.message })
@@ -113,39 +123,41 @@ export function EditPlayerDetailsForm({
               pending={picturePending || isPending}
             />
           ) : null}
-          {claim ? (
+          {detailsRequired ? (
+            <Notice tone="warn" title="Details required.">
+              An unclaimed player needs an email. Add their email here, or delete the player.
+            </Notice>
+          ) : claim ? (
             <Notice>
               What you fill in here is filled in for them when they open their invite link. They can
               still change it and only need to choose a password.
             </Notice>
           ) : null}
           <PersonalDetailsFields sections={['name']} disabled={isPending} />
-          {details.phoneOnFile ? (
-            <Field label="Phone">
+          {emailOnFile ? (
+            <Field label="Email">
               <p className="m-0 text-sm">
-                On file and kept private. Not their number? Ask ROTRA to change it.
+                On file and kept private. It can't be changed here. Wrong email? Delete this player
+                and add them again.
               </p>
             </Field>
           ) : (
             <Field
-              label="Phone (optional)"
-              error={errors.phone?.message}
-              hint={
-                errors.phone
-                  ? undefined
-                  : claim
-                    ? 'This profile has no phone yet. They need one to register.'
-                    : "With a phone, ROTRA can link them to their account if they're registered, when it syncs."
-              }
+              label={claim ? 'Email' : 'Email (optional)'}
+              error={errors.email?.message}
+              hint={errors.email ? undefined : claim ? EMAIL_HINT_OLDER : EMAIL_HINT_GUEST}
             >
               <Controller
                 control={form.control}
-                name="phone"
+                name="email"
                 render={({ field }) => (
-                  <PhoneOrEmailInput
+                  <TextInput
                     {...field}
-                    mode="phone"
-                    placeholder="0917 555 0142"
+                    type="email"
+                    inputMode="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    placeholder="name@example.com"
                     disabled={isPending}
                   />
                 )}
@@ -154,29 +166,32 @@ export function EditPlayerDetailsForm({
           )}
           {claim ? (
             <>
-              <Field
-                label="Email (optional)"
-                error={errors.email?.message}
-                hint={
-                  errors.email ? undefined : 'Fills in their registration. Never shown publicly.'
-                }
-              >
-                <Controller
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <TextInput
-                      {...field}
-                      type="email"
-                      inputMode="email"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      placeholder="name@example.com"
-                      disabled={isPending}
-                    />
-                  )}
-                />
-              </Field>
+              {details.phoneOnFile ? (
+                <Field label="Phone">
+                  <p className="m-0 text-sm">
+                    On file and kept private. Not their number? Ask ROTRA to change it.
+                  </p>
+                </Field>
+              ) : (
+                <Field
+                  label="Phone (optional)"
+                  error={errors.phone?.message}
+                  hint={errors.phone ? undefined : 'Kept private. Only your club sees it.'}
+                >
+                  <Controller
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <PhoneOrEmailInput
+                        {...field}
+                        mode="phone"
+                        placeholder="0917 555 0142"
+                        disabled={isPending}
+                      />
+                    )}
+                  />
+                </Field>
+              )}
               <PersonalDetailsFields sections={['playing-style', 'links']} disabled={isPending} />
             </>
           ) : null}

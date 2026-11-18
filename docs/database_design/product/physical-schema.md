@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-07.
+**Last verified:** 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -391,3 +391,19 @@ The separate Go sign-in migration remains outside this batch.
 ## P14.5 — Player notifications
 
 Migration `20261118000400_player_notifications` adds `player_notifications` with a recipient FK, a unique source key, a CHECK for paired source fields, and a recipient / newest-first index. It enables RLS and revokes all table privileges from `anon`, `authenticated` and `PUBLIC`. `player_accounts.verification_reminder_read_at` stores the first read of the state-derived reminder. See [Player notifications](player-information/modules/notifications.md).
+
+## P15.8 — Shared entries of unclaimed players, Same person redirect, club nickname (D-2026-11-16-04)
+
+`20261118000500_shared_player_entries` (#927; owner answers of November 18, 2026). Additive except one
+data step and one trigger function swap; nothing dropped, moved or deleted.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `shared_player_entries` | PK `id`; unique `email`, `rtr_id`, `claimed_player_id`, `(location_code_id, sync_date, sequence)`; index `creating_club_id` | email trimmed + lowercased and `x@y`; claimed ⇔ `claimed_at`; never claimed and retired; email set ⇔ open (not claimed, not retired); `sequence > 0`; codes; RTR format with the frozen codes | `creating_club_id` → `clubs`; `location_code_id` → `location_codes`; `(location_code_id, sync_date)` → `player_id_counters`; `claimed_player_id` → `players` (all RESTRICT) |
+| `club_players` (added) | `shared_entry_id`: unique `(club_id, shared_entry_id)`, index; `linked_to_club_player_id`: index `(club_id, linked_to_club_player_id)` | `linked_to_club_player_id` only on a removed row, never the row itself | `shared_entry_id` → `shared_player_entries`; `(club_id, linked_to_club_player_id)` → `club_players(club_id, id)` (RESTRICT) |
+| `player_id_allocations` (changed) | unchanged | the append-only trigger now runs `player_id_allocations_guard()`: DELETE refused; UPDATE refused unless the transaction set `rotra.rtr_id_change = 'on'` and `player_id`, `creating_club_id`, `sequence`, `allocated_at` are unchanged (Admin's RTR ID change) | unchanged |
+
+`shared_player_entries`: RLS enabled; no anon/authenticated/PUBLIC grants; the guard function is
+revoked from PUBLIC. Data step: `club_players.nickname` set to null on linked rows where it equals the
+linked player's `players.nickname` after `btrim` (case-sensitive). Checked on a disposable database
+(`rotra_disposable_p15`: rebuild with no drift, seed, 74/74 checks); not applied to the shared one.

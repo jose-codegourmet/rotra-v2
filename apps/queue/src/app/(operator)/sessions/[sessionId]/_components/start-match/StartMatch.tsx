@@ -10,7 +10,7 @@ import {
   listNames,
   type MatchContext,
   matchStatus,
-  shortName,
+  queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
@@ -172,7 +172,7 @@ function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt }: ChooseMatchPro
     listNames(
       ids.map((id) => {
         const p = ctx.roster.find((p) => p.id === id)
-        return p ? shortName(p) : 'Player'
+        return p ? queueMasterName(p) : 'Player'
       }),
     )
   const rows: ChooseMatchRow[] = waitingMatches(ctx.matches).map((m, i) => ({
@@ -257,7 +257,7 @@ function OpenStartMatch({
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       photoUrl: photoOf(p),

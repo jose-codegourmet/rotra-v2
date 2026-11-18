@@ -19,8 +19,12 @@ export const JOINED_VIA_TEXT: Record<'club' | 'session' | 'club-added', string> 
 export type SavedPlayerCardProps = {
   name: string
   nickname?: string | null
+  /** Registered players only: the club's nickname for them; shown in place of nickname with a mark */
+  clubNickname?: string | null
   photoUrl?: string
   identity: Identity
+  /** An older unclaimed record with no email: the warn "Details required" chip replaces Unclaimed */
+  detailsRequired?: boolean
   level: PlayingLevel | null
   /** Where the player is in the live session: "Playing · Court 1" or "At the session" */
   live?: { kind: 'playing' | 'waiting'; text: string }
@@ -51,8 +55,10 @@ const DOT: Record<Identity, string> = {
 export function SavedPlayerCard({
   name,
   nickname,
+  clubNickname,
   photoUrl,
   identity,
+  detailsRequired = false,
   level,
   live,
   registeredCity,
@@ -63,6 +69,8 @@ export function SavedPlayerCard({
   onInvite,
 }: SavedPlayerCardProps) {
   const canInvite = identity === 'guest' || identity === 'unclaimed'
+  const statusLabel =
+    detailsRequired && identity === 'unclaimed' ? 'Details required' : IDENTITY_LABEL[identity]
   return (
     <article
       className={cn(
@@ -74,7 +82,7 @@ export function SavedPlayerCard({
       <button
         type="button"
         onClick={onOpenProfile}
-        aria-label={`${name}, ${levelLabel(level)}, ${IDENTITY_LABEL[identity]}. Open profile`}
+        aria-label={`${name}, ${levelLabel(level)}, ${statusLabel}. Open profile`}
         className="flex flex-col items-center gap-[3px] border-0 bg-[linear-gradient(180deg,var(--accent-subtle),transparent_70px)] px-3 pt-[18px] text-center"
       >
         <span className="relative mb-1.5">
@@ -100,7 +108,15 @@ export function SavedPlayerCard({
           {name}
         </span>
         <span className="min-h-[18px] text-xs text-fg2 [overflow-wrap:anywhere]">
-          {nickname ? `“${nickname}”` : ' '}
+          {clubNickname ? (
+            <span title="Club nickname">
+              “{clubNickname}” <span className="text-fg3">· club nickname</span>
+            </span>
+          ) : nickname ? (
+            `“${nickname}”`
+          ) : (
+            ' '
+          )}
         </span>
         <span className="text-[13px] text-fg2">{JOINED_VIA_TEXT[joinedVia ?? 'club-added']}</span>
         <LevelPill level={level} className="mt-1" />
@@ -133,7 +149,7 @@ export function SavedPlayerCard({
         <span>Added {addedLabel}</span>
       </div>
       <div className="mt-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 px-3.5">
-        <IdentityChip identity={identity} />
+        <IdentityChip identity={identity} detailsRequired={detailsRequired} />
         {canInvite && onInvite ? (
           <Button size="xs" variant="primary" onClick={onInvite} aria-label={`Invite ${name}`}>
             Invite

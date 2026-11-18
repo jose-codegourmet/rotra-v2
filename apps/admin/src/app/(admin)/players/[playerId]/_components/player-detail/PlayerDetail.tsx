@@ -9,12 +9,14 @@ import { useContactRequests } from '@rotra/data/contact-change-request/useContac
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { useRankingSettings } from '@rotra/data/ranking-settings'
 import { ActivityLog } from '@rotra/ui/activity-log'
+import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import { AdminPlayerHistory } from '@rotra/ui/admin-player-history'
 import { AdminPlayerIdentityCard } from '@rotra/ui/admin-player-identity-card'
 import { Avatar } from '@rotra/ui/avatar'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { Chip } from '@rotra/ui/chip'
 import { ContactRequestList } from '@rotra/ui/contact-request-list'
 import { ContactRequestStatusChip } from '@rotra/ui/contact-request-status-chip'
 import { DetailHero } from '@rotra/ui/detail-hero'
@@ -175,7 +177,10 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         meta={
           <>
             <PlayerAccountChip claimed={player.claimed} />
-            <RankStatusChip status={player.rankStatus} />
+            {player.detailsRequired && !player.claimed ? (
+              <Chip tone="warn">Details required</Chip>
+            ) : null}
+            <RankStatusChip status={player.rankStatus} notOnLeaderboard={!!savedByClubs(player)} />
             {player.rtrId ? (
               <span className="font-mono text-[13px] text-fg2">{player.rtrId}</span>
             ) : (
@@ -226,8 +231,14 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
                 rtrId={player.rtrId}
                 createdOn={player.createdOn}
                 createdBy={createdBy}
+                savedBy={savedByClubs(player) ?? undefined}
               />
-              <PlayerAccountCard claimed={player.claimed} registeredOn={player.registeredOn} />
+              <PlayerAccountCard
+                claimed={player.claimed}
+                registeredOn={player.registeredOn}
+                detailsRequired={!!player.detailsRequired}
+                clubName={player.createdByClubId ? createdBy : undefined}
+              />
               {player.claimed ? <PlayerVerification key={player.id} player={player} /> : null}
             </div>
             <div className="flex min-w-0 flex-col gap-5">

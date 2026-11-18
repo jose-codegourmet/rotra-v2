@@ -62,6 +62,13 @@ export const GuestRegistrationDoneGoogle: Story = {
     verificationComplete: true,
   },
 }
+export const GuestRegistrationDoneJoinedRecords: Story = {
+  args: {
+    ...GuestRegistrationDone.args,
+    googleEmail: 'paolo.santos@gmail.com',
+    joinedClubs: ['Lahug Smash Club', 'Mandaue Shuttle Society'],
+  },
+}
 export const ClaimDoneGoogle: Story = {
   args: {
     variant: 'claim-done',

@@ -8,8 +8,9 @@ model PlayerIdCounter {
   syncDate       DateTime @map("sync_date") @db.Date
   lastSequence   Int      @map("last_sequence")
 
-  location    LocationCode         @relation(fields: [locationCodeId], references: [id], onDelete: Restrict)
-  allocations PlayerIdAllocation[]
+  location      LocationCode         @relation(fields: [locationCodeId], references: [id], onDelete: Restrict)
+  allocations   PlayerIdAllocation[]
+  sharedEntries SharedPlayerEntry[]
 
   @@id([locationCodeId, syncDate])
   @@map("player_id_counters")

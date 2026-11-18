@@ -1,3 +1,4 @@
+import { clubNicknameOf } from '../club-player/clubNickname.rules'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
@@ -36,6 +37,8 @@ export async function getSessionRoster(sessionId: string) {
       .map((r) => ({
         ...r,
         hasPlayedAtClubBefore: returning.has(r.clubPlayerId),
+        // The Queue Master's own read only: public and player reads never get the club nickname.
+        clubNickname: clubNicknameOf(state, r.clubPlayerId),
       })),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === sessionId)

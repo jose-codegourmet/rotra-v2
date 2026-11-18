@@ -10,6 +10,7 @@ import type {
   InviteLink,
 } from '../google-sign-in/googleSignIn.types'
 import { MockError } from '../mock/errors'
+import type { UnclaimedIdentities } from '../player-account/unclaimedIdentity'
 import { realRequest } from './client'
 
 // Google sign-in in real mode (#922): the Player app's own Route Handlers over Supabase Auth. The
@@ -22,7 +23,12 @@ export type RealGoogleOutcome =
   | { outcome: 'signed-in'; session: MockSession; google: GoogleIdentity }
   | { outcome: 'ask-to-connect'; google: GoogleIdentity; playerId: string; playerName: string }
   | { outcome: 'not-connected'; triedEmail: string }
-  | { outcome: 'new-account'; google: GoogleIdentity }
+  | {
+      outcome: 'new-account'
+      google: GoogleIdentity
+      /** Clubs saved this verified Google email (D-2026-11-16-04, P15.8); null when none did */
+      unclaimed?: UnclaimedIdentities | null
+    }
   | { outcome: 'taken'; email: string }
   | { outcome: 'connected' }
 
@@ -99,7 +105,7 @@ export async function realRegisterWithGoogle(
       >)
   >(`/api/register/${encodeURIComponent(input.clubId)}/google${query ? `?${query}` : ''}`, {
     method: 'POST',
-    body: { values: input.values },
+    body: { values: input.values, identityRecordId: input.identityRecordId ?? null },
     fields: { experience: 'experienceYears' },
   })
   if (result.status === 'account-match') return { outcome: 'account-match' }
@@ -153,4 +159,15 @@ export function realGetInviteLanding(link: InviteLink & { clubId: string }, sign
     `/api/invites/${encodeURIComponent(link.clubId)}${query ? `?${query}` : ''}`,
     { signal },
   )
+}
+
+/**
+ * `getUnclaimedIdentities` in real mode (P15.8): the identity cards for the Google account the
+ * callback verified and holds; the server answers null for any other email.
+ */
+export async function realGetUnclaimedIdentities(googleEmail: string, signal?: AbortSignal) {
+  const { unclaimed } = await realRequest<{
+    unclaimed: UnclaimedIdentities | null
+  }>(`/api/auth/google/unclaimed?email=${encodeURIComponent(googleEmail)}`, { signal })
+  return unclaimed
 }

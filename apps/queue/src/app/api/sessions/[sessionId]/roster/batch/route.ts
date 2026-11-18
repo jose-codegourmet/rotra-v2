@@ -39,6 +39,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
           operationId,
           source: 'directory',
           playerId: text(body.playerId),
+          name: text(body.name) || null,
           level,
           ...placementOf(body),
         }
@@ -53,6 +54,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         name: text(body.name),
         nickname: text(body.nickname) || undefined,
         phone: phone?.success ? phone.data : undefined,
+        email: text(body.email) || null,
         level,
         ...placementOf(body),
       }

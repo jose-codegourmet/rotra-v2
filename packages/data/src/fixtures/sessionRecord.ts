@@ -1,7 +1,7 @@
 import { computeStandings, courtFreeSince, freeCourtMinutes } from '../match/match.rules'
 import type { Match } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
-import { shortName } from '../session-roster/sessionRoster.rules'
+import { playerFacingName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createSessionHistoryFixtures } from './sessionHistory'
 
@@ -78,7 +78,7 @@ export function createSessionRecordFixtures(now = Date.now()) {
   const playerOf = (id: string): ReplayPlayer => {
     const p = roster.find((x) => x.id === id)
     if (!p) throw new Error('A history match references a missing roster player.')
-    return { id, name: p.nameSnapshot, shortName: shortName(p), level: p.level }
+    return { id, name: p.nameSnapshot, shortName: playerFacingName(p), level: p.level }
   }
 
   const courtsAt = (t: number): ReplayCourtMoment[] =>

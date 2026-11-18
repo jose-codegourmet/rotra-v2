@@ -29,6 +29,8 @@ export async function POST(request: Request, ctx: RouteContext<'/api/register/[c
       clubId,
       {
         phoneE164: values.phone,
+        // The identity card picked when several clubs saved the Google email (D-2026-11-16-04)
+        identityRecordId: typeof body.identityRecordId === 'string' ? body.identityRecordId : null,
         details: {
           fullName: values.fullName,
           nickname: values.nickname || null,

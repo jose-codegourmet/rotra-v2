@@ -1,3 +1,4 @@
+import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { getConnectivity } from '../connectivity/connectivity'
 import { PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
 import portraits from '../fixtures/playerPortraits.json'
@@ -198,8 +199,11 @@ function publishedResults(
 
 /**
  * One person as the page shows them. Visitor: every name masked. Signed-in (D-2026-11-09-02):
- * registered players' full name + nickname and their RTR ID for the profile link; guests and
- * unclaimed profiles stay masked and never carry an RTR ID. `isViewer` only on the signed-in side.
+ * registered players' full name + nickname and their RTR ID for the profile link. An unclaimed
+ * player (saved with an email, so they have an RTR ID) is public and shows like a registered player
+ * who chose Public, with the club's own name, nickname and picture for them (D-2026-11-16-04).
+ * Guests, and older records with no email, stay masked and never carry an RTR ID. `isViewer` only
+ * on the signed-in side.
  */
 function publicPerson(
   state: MockState,
@@ -208,8 +212,8 @@ function publicPerson(
   viewer: Viewer | null,
 ) {
   const p = state.clubPlayers.find((x) => x.id === clubPlayerId)
-  const hasRotraProfile = p?.identity === 'registered' || p?.identity === 'unclaimed'
   const registered = p?.identity === 'registered' && !!p.playerId
+  const unclaimed = p?.identity === 'unclaimed' && !!p.playerId
   const isViewer = !!viewer && !!p?.playerId && p.playerId === viewer.playerId
   // D-2026-11-12-01 for #731: always private is masked for everyone but the player themselves (the
   // Queue Master sees the roster name on their own screens); their picture stays public.
@@ -218,15 +222,19 @@ function publicPerson(
     !!p?.playerId &&
     state.playerProfiles.find((x) => x.playerId === p.playerId)?.profileVisibility ===
       'always_private'
-  const showFull = !!viewer && registered && (!alwaysPrivate || isViewer)
+  const showFull = !!viewer && (unclaimed || (registered && (!alwaysPrivate || isViewer)))
   // Guests and unclaimed profiles draw the default banner Admin picks (2026-11-13-queue-profile-stats-banner).
   const banner = resolveMockProfileBanner(
     registered && p?.playerId
       ? state.playerProfiles.find((x) => x.playerId === p.playerId)?.bannerId
       : null,
   )
+  // A photo only: the page draws picture URLs, and a chosen character is not one.
+  const clubPicture = unclaimed && p ? clubPictureState(p, null) : null
   const profile: ParticipantProfileKind = showFull
-    ? 'registered'
+    ? unclaimed
+      ? 'unclaimed'
+      : 'registered'
     : registered && alwaysPrivate
       ? 'private'
       : 'guest'
@@ -235,7 +243,13 @@ function publicPerson(
     masked: !showFull,
     nickname: showFull ? names.nickname : null,
     rtrId: showFull ? (state.players.find((x) => x.id === p?.playerId)?.rtrId ?? null) : null,
-    pictureUrl: hasRotraProfile && p?.playerId ? (pictures[p.playerId] ?? null) : null,
+    // A registered player's own picture; an unclaimed player's is the one this club set, if any.
+    pictureUrl:
+      registered && p?.playerId
+        ? (pictures[p.playerId] ?? null)
+        : clubPicture?.kind === 'photo'
+          ? clubPicture.reference
+          : null,
     isViewer,
     profile,
     bannerKey: banner.bannerKey,
@@ -279,7 +293,9 @@ function participantOf(
         bannerKey: person.bannerKey,
         bannerImageUrl: person.bannerImageUrl,
         // Always-private and guest cards show no status; only the full profile card does.
-        ...(tonight && person.profile === 'registered' ? { tonight } : {}),
+        ...(tonight && (person.profile === 'registered' || person.profile === 'unclaimed')
+          ? { tonight }
+          : {}),
       }
     : base
 }
@@ -804,7 +820,6 @@ export async function sendJoinRequest(slug: string, input: SendJoinRequestInput)
     sessionId: session.id,
     name: input.name,
     nickname: input.nickname ?? undefined,
-    phone: input.phone ?? undefined,
     statedBand: input.statedBand,
     placement: input.placement,
   })

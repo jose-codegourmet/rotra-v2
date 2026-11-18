@@ -12,7 +12,7 @@ import { ROSTER_DUPLICATE_ERROR } from '@rotra/data/session-roster/sessionRoster
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
 import { useAddNewPlayerToSession } from '@rotra/data/session-roster/useAddNewPlayerToSession'
 import { useAddSavedPlayerToSession } from '@rotra/data/session-roster/useAddSavedPlayerToSession'
-import { usePlayerDirectorySearch } from '@rotra/data/session-roster/usePlayerDirectorySearch'
+import { usePlayerLookup } from '@rotra/data/session-roster/usePlayerLookup'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import {
   type AddPlayerCandidate,
@@ -39,24 +39,37 @@ export type AddPlayerProps = {
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
-/** "#214" from the mock directory reads "Rank 214" on the sheet; "Not ranked" reads "Not ranked yet". */
+/** "#214" from the mock lookup reads "Rank 214" on the sheet; "Not ranked" reads "Not ranked yet". */
 const rankLabel = (label: string) =>
   label.startsWith('#') ? `Rank ${Number(label.slice(1)).toLocaleString()}` : 'Not ranked yet'
 
+const EMAIL_SAVED = /^That email is already (.+) in your saved players\.$/
+
 /**
- * What both contexts share: the Player Information search, the status line, addedCount and the
- * refusal. A conflict for which `returnsToList` says so is final for that pick: the sheet returns to
- * the list. A failed save (retryable, offline) keeps the card or form with what was typed.
+ * "That email is already NAME in your saved players." refuses a new player's email: NAME shows under
+ * the email field (the form's emailSavedAs), not as a second notice or toast.
+ */
+const emailSavedName = (error: unknown) =>
+  error instanceof MockError && error.fieldErrors?.email
+    ? EMAIL_SAVED.exec(error.fieldErrors.email)?.[1]
+    : undefined
+
+/**
+ * What both contexts share: the Player Information lookup (exact RTR ID or email), the status line,
+ * addedCount and the refusal. A conflict for which `returnsToList` says so is final for that pick:
+ * the sheet returns to the list. A failed save (retryable, offline) keeps the card or form with what
+ * was typed.
  */
 function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) {
   const submitting = useRef(false)
   const offline = !useConnectivity().online
   const [query, setQuery] = useState('')
-  const directory = usePlayerDirectorySearch(query)
+  const lookup = usePlayerLookup(query)
   const [lastAdded, setLastAdded] = useState<string | null>(null)
   const [addedCount, setAddedCount] = useState(0)
   const [serverError, setServerError] = useState<string | undefined>()
   const [errorReturnsToList, setErrorReturnsToList] = useState(false)
+  const [emailSavedAs, setEmailSavedAs] = useState<string | undefined>()
 
   // A fresh sheet each time it opens: Cancel until someone is added, no stale status line.
   const [prevOpen, setPrevOpen] = useState(open)
@@ -66,20 +79,32 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       setLastAdded(null)
       setAddedCount(0)
       setServerError(undefined)
+      setEmailSavedAs(undefined)
       setQuery('')
     }
   }
 
-  const directoryResults: AddPlayerCandidate[] = (directory.data ?? []).map((p) => ({
-    id: p.id,
-    name: p.fullName,
-    nickname: p.nickname,
-    photoUrl: profilePictureSrc(p.picture, p.id, p.fullName),
-    rtrId: p.rtrId,
-    identity: p.identity,
-    suggestion: p.suggestion,
-    rankLabel: rankLabel(p.rankLabel),
-  }))
+  // The one exact match, or none. Another club's unclaimed player (ownNameRequired) has no name,
+  // picture, level or rank to show: the sheet reads "Not registered yet" and asks for this club's name.
+  const found = lookup.data?.player
+  const directoryResults: AddPlayerCandidate[] = found
+    ? [
+        {
+          id: found.id,
+          name: found.fullName,
+          nickname: found.nickname,
+          photoUrl: found.ownNameRequired
+            ? undefined
+            : profilePictureSrc(found.picture, found.id, found.fullName),
+          rtrId: found.rtrId,
+          identity: found.identity,
+          suggestion: found.suggestion,
+          phoneHidden: found.phoneHidden,
+          ownNameRequired: found.ownNameRequired,
+          rankLabel: found.ownNameRequired ? undefined : rankLabel(found.rankLabel),
+        },
+      ]
+    : []
 
   const options = {
     onSettled: () => {
@@ -92,6 +117,12 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       toast(result.message)
     },
     onError: (error: unknown) => {
+      const savedAs = emailSavedName(error)
+      if (savedAs) {
+        setEmailSavedAs(savedAs)
+        setErrorReturnsToList(false)
+        return
+      }
       const message = errorMessage(error)
       setErrorReturnsToList(returnsToList(error))
       setServerError(message)
@@ -103,6 +134,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
     if (submitting.current) return false
     submitting.current = true
     setServerError(undefined)
+    setEmailSavedAs(undefined)
     return true
   }
 
@@ -114,7 +146,9 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       offline,
       onDirectorySearch: setQuery,
       directoryResults,
-      directoryLoading: !offline && directory.isFetching && !directory.data,
+      directorySavedName: lookup.data?.savedName ?? undefined,
+      newPlayerEmailSavedAs: emailSavedAs,
+      directoryLoading: !offline && lookup.isFetching && !lookup.data,
       serverErrorReturnsToList: errorReturnsToList,
       lastAdded,
       addedCount,
@@ -173,6 +207,7 @@ function SessionAddPlayer({
     identity: p.identity,
     suggestion: p.suggestion,
     phoneHidden: p.phoneHidden,
+    detailsRequired: p.detailsRequired,
   }))
 
   const isPending = addSaved.isPending || addDirectory.isPending || addNew.isPending
@@ -187,7 +222,7 @@ function SessionAddPlayer({
     else run({})
   }
 
-  const confirm = ({ candidate, source, level }: AddPlayerConfirmInput) => {
+  const confirm = ({ candidate, source, level, name }: AddPlayerConfirmInput) => {
     if (!s || !roster.data || !clubPlayers.data) return
     placeOrAsk(candidate.name, (placement) => {
       if (!add.begin()) return
@@ -207,6 +242,7 @@ function SessionAddPlayer({
             sessionId,
             playerId: candidate.id,
             level,
+            name,
             ...placement,
           },
           add.options,
@@ -223,7 +259,7 @@ function SessionAddPlayer({
           sessionId,
           name: values.name,
           nickname: values.nickname ?? undefined,
-          phone: values.phone ?? undefined,
+          email: values.email ?? undefined,
           level: values.level,
           ...placement,
         },
@@ -282,15 +318,15 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
   // "NAME is already in your saved players" is final for that pick: back to the list.
   const add = useAddSheet(open, (error) => error instanceof MockError && error.kind === 'conflict')
 
-  const confirm = ({ candidate, level }: AddPlayerClubConfirmInput) => {
+  const confirm = ({ candidate, level, name }: AddPlayerClubConfirmInput) => {
     if (!add.begin()) return
-    addDirectory.mutate({ playerId: candidate.id, level }, add.options)
+    addDirectory.mutate({ playerId: candidate.id, level, name }, add.options)
   }
 
   const submitNewPlayer = (values: NewSavedPlayerFormValues) => {
     if (!add.begin()) return
     addNew.mutate(
-      { name: values.name, nickname: values.nickname, phone: values.phone, level: values.level },
+      { name: values.name, nickname: values.nickname, email: values.email, level: values.level },
       add.options,
     )
   }

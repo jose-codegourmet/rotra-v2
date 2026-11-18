@@ -14,6 +14,7 @@ export const confirmSheetMeta = {
     'Place a form in children and pass its ID as formId so the primary button submits it (Admin verification).',
     'Pass isPending from the mutation: the primary shows a spinner and its optional pendingLabel. Dismissal and footer actions are blocked.',
     'Pass error when the commit fails; keep the sheet open and never toast success.',
+    'Same person as NAME? (D-2026-11-16-04, not yet owner-confirmed) is this sheet as is, no wrapper: the consequence names the saved player in bold, the note says the guest\'s slots, games and payments move to that record and the guest is removed, Back and "Move to NAME" (primary, not destructive); the container toasts "Moved to NAME".',
     'destructive for actions like Confirm invalid match. Focus starts on the title, so the primary is never preselected.',
   ],
   prototype: {

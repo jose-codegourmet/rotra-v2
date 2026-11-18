@@ -1,7 +1,7 @@
 'use client'
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
-import { countedGames, shortName } from '@rotra/data/match/match.rules'
+import { countedGames, queueMasterName } from '@rotra/data/match/match.rules'
 import { generateMatches } from '@rotra/data/match/queue.rules'
 import type { Match, MatchLineup } from '@rotra/data/match/types'
 import { useAddSuggestedMatch } from '@rotra/data/match/useAddSuggestedMatch'
@@ -115,7 +115,7 @@ function OpenSuggestMatch({
     return {
       id,
       name: p?.nameSnapshot ?? 'Player',
-      shortName: p ? shortName(p) : 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
       games: countedGames(id, matches),
       photoUrl: photoOf(p),

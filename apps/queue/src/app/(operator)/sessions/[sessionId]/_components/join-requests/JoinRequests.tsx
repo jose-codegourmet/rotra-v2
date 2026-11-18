@@ -11,10 +11,8 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { useConfirmRequest } from '@rotra/data/session-roster/useConfirmRequest'
 import { useDeclineJoinRequest } from '@rotra/data/session-roster/useDeclineJoinRequest'
-import { useDismissJoinRequestLink } from '@rotra/data/session-roster/useDismissJoinRequestLink'
 import { useJoinRequestHints } from '@rotra/data/session-roster/useJoinRequestHints'
 import { useKeepDropOut } from '@rotra/data/session-roster/useKeepDropOut'
-import { useLinkJoinRequest } from '@rotra/data/session-roster/useLinkJoinRequest'
 import { useRemoveDropOut } from '@rotra/data/session-roster/useRemoveDropOut'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { type JoinRequestDetails, JoinRequestsPanel } from '@rotra/ui/join-requests-panel'
@@ -50,9 +48,9 @@ function whereLabel(where: RequestSpot['where']) {
  * Requests from the session page (Q18.12): JoinRequestsPanel without tabs. Before Start it lists
  * drop-out notices, then join requests; once live, match requests only (join requests close at
  * Start). Join requests come from useSessionRoster; the ROTRA-player
- * hints, drop-out notices and match requests from useSessionRequests, and the shared rank and
- * phone-match prompt from useJoinRequestHints. Every decision toasts its result or its error; a
- * refused decision leaves the request waiting.
+ * hints, drop-out notices and match requests from useSessionRequests, and the shared rank from
+ * useJoinRequestHints. Every decision toasts its result or its error; a refused decision leaves
+ * the request waiting.
  */
 export function JoinRequests({ sessionId, variant = 'card', className }: JoinRequestsProps) {
   const submitting = useRef(false)
@@ -63,8 +61,6 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const clubPlayers = useClubPlayers()
   const confirm = useConfirmRequest()
   const decline = useDeclineJoinRequest()
-  const link = useLinkJoinRequest()
-  const notThem = useDismissJoinRequestLink()
   const keep = useKeepDropOut()
   const remove = useRemoveDropOut()
   const addMatch = useAddMatchRequestToQueue()
@@ -119,20 +115,11 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
       requestDetails[r.id] = { waitlistPosition: waitlistPositionOf(r.clubPlayerId) }
   for (const r of view?.join ?? []) {
     const hint = hints.data?.[r.id]
-    const match = hint?.linked ?? hint?.phoneMatch
     requestDetails[r.id] = {
       ...requestDetails[r.id],
       account: r.account ? (r.account.inClub ? 'in-club' : 'new-to-club') : undefined,
       sharedRank: hint?.sharedRank ? levelLabel(hint.sharedRank) : null,
       invitedBy: r.invitedByName ?? undefined,
-      phoneMatch: match
-        ? {
-            name: match.name,
-            linked: Boolean(hint?.linked),
-            onLink: () => run(link.mutate, { requestId: r.id, clubPlayerId: match.clubPlayerId }),
-            onNotThem: () => run(notThem.mutate, r.id, true),
-          }
-        : undefined,
     }
   }
 
@@ -175,8 +162,6 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const isPending =
     confirm.isPending ||
     decline.isPending ||
-    link.isPending ||
-    notThem.isPending ||
     keep.isPending ||
     remove.isPending ||
     addMatch.isPending ||

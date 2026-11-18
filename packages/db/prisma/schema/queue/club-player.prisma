@@ -3,22 +3,36 @@
 // read private contacts. Names are not unique.
 
 model ClubPlayer {
-  id          String    @id @db.Uuid
-  clubId      String    @map("club_id") @db.Uuid
+  id                   String    @id @db.Uuid
+  clubId               String    @map("club_id") @db.Uuid
   /// Null for guests. Unique per club when set.
-  playerId    String?   @map("player_id") @db.Uuid
-  displayName String    @map("display_name")
-  nickname    String?
+  playerId             String?   @map("player_id") @db.Uuid
+  /// The shared entry (email + RTR ID) of an unclaimed person this record is for (D-2026-11-16-04).
+  /// Kept after registration, when `player_id` is set too. Unique per club. Null: a guest, an older
+  /// record with a phone and no email (Details required), or a registered player saved directly.
+  sharedEntryId        String?   @map("shared_entry_id") @db.Uuid
+  displayName          String    @map("display_name")
+  /// The club's own nickname. For a guest or unclaimed player it is their nickname; for a
+  /// registered player it is the club nickname (D-2026-11-18-03), returned to that club's Queue
+  /// Master reads only, never to public, player, results or leaderboard reads.
+  nickname             String?
   /// When the club first saved this player (Saved players "Added" sort/filter).
-  addedAt     DateTime  @map("added_at") @db.Timestamptz(6)
+  addedAt              DateTime  @map("added_at") @db.Timestamptz(6)
   /// The club deleted this saved player (soft delete; history keeps the row). Null = current.
-  removedAt   DateTime? @map("removed_at") @db.Timestamptz(6)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-  revision    BigInt    @default(1)
+  removedAt            DateTime? @map("removed_at") @db.Timestamptz(6)
+  /// Set with `removed_at` when the Queue Master confirmed "Same person as NAME?" (D-2026-11-16-04):
+  /// this record moved into that saved player of the same club. Its finished history stays here and
+  /// is reached through this redirect; live slots, waitlist spots and pending requests moved.
+  linkedToClubPlayerId String?   @map("linked_to_club_player_id") @db.Uuid
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision             BigInt    @default(1)
 
   club            Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
   player          Player?                 @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  sharedEntry     SharedPlayerEntry?      @relation(fields: [sharedEntryId], references: [id], onDelete: Restrict)
+  linkedTo        ClubPlayer?             @relation("ClubPlayerMovedInto", fields: [clubId, linkedToClubPlayerId], references: [clubId, id], onDelete: Restrict)
+  movedIn         ClubPlayer[]            @relation("ClubPlayerMovedInto")
   privateInput    ClubPlayerPrivateInput?
   rosterEntries   SessionPlayer[]
   waitlistEntries SessionWaitlistEntry[]
@@ -32,8 +46,11 @@ model ClubPlayer {
 
   @@unique([clubId, id])
   @@unique([clubId, playerId])
+  @@unique([clubId, sharedEntryId])
   @@index([clubId, displayName, id])
   @@index([playerId])
+  @@index([sharedEntryId])
+  @@index([clubId, linkedToClubPlayerId])
   @@map("club_players")
 }
 

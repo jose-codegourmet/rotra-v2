@@ -96,10 +96,11 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
 ### 402 · F07.61 · Chore: Q18 Queue Master Requests in real mode
 **Product:** queue · **Depends on:** 401
 - **Gap:** `getSessionRequests` (`match-request/fetchers.ts:229`), `addMatchRequestToQueue`,
-  `declineMatchRequest` (`match/matchRequestDecisions.ts:63,100`), `keepDropOut`, `removeDropOut`,
-  `linkJoinRequest`, `dismissJoinRequestLink` (`session-roster/requestDecisions.ts:112–213`);
+  `declineMatchRequest` (`match/matchRequestDecisions.ts:63,100`), `keepDropOut`, `removeDropOut`
+  (`session-roster/requestDecisions.ts`; `linkJoinRequest` and `dismissJoinRequestLink` were removed
+  by D-2026-11-16-04, #923);
   `requestFormats` on create/update/get Queue Session.
-- **Acceptance:** Requests · N tabs list, add to queue, decline, keep/remove drop-outs, link join requests;
+- **Acceptance:** Requests · N tabs list, add to queue, decline, keep/remove drop-outs;
   request formats save with the session.
 
 ---

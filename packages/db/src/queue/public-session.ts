@@ -46,7 +46,6 @@ import {
   touchSession,
 } from './session-store'
 
-const E164 = /^\+[1-9][0-9]{7,14}$/
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -299,7 +298,6 @@ export async function sendJoinRequest(
     requestId: string
     name: string
     nickname?: string | null
-    phone?: string | null
     statedBand: StatedBand
     /** Join a slot (default) or Be waitlisted (D-2026-11-11-02) */
     placement?: JoinRequestPlacement | null
@@ -311,9 +309,6 @@ export async function sendJoinRequest(
     throw new ServiceError('invalid', { placement: 'Pick Join a slot or Be waitlisted.' })
   const name = input.name.trim()
   if (!name) throw new ServiceError('invalid', { name: 'Enter your name.' })
-  const phone = input.phone?.trim() || null
-  if (phone && !E164.test(phone))
-    throw new ServiceError('invalid', { phone: 'Enter a full mobile number, or leave it empty.' })
   if (!BANDS.includes(input.statedBand))
     throw new ServiceError('invalid', { statedBand: 'Choose a level.' })
   const session = await prisma.queueSession.findUnique({ where: { publicSlug: slug } })
@@ -323,11 +318,7 @@ export async function sendJoinRequest(
     const request = await prisma.$transaction(async (tx) => {
       const existing = await tx.sessionJoinRequest.findUnique({ where: { id: input.requestId } })
       if (existing) {
-        if (
-          existing.sessionId !== session.id ||
-          existing.name !== name ||
-          existing.phoneE164 !== phone
-        )
+        if (existing.sessionId !== session.id || existing.name !== name)
           throw new ServiceError('conflict')
         return existing
       }
@@ -352,16 +343,6 @@ export async function sendJoinRequest(
         throw new ServiceError('unavailable', {
           request: 'Too many requests are waiting. Try again later.',
         })
-      if (phone) {
-        const duplicate = await tx.sessionJoinRequest.findFirst({
-          where: { sessionId: session.id, status: 'pending', phoneE164: phone },
-          select: { id: true },
-        })
-        if (duplicate)
-          throw new ServiceError('conflict', {
-            request: 'A request with this number is already waiting.',
-          })
-      }
       return tx.sessionJoinRequest.create({
         data: {
           id: input.requestId,
@@ -369,7 +350,8 @@ export async function sendJoinRequest(
           sessionId: session.id,
           name,
           nickname: input.nickname?.trim() || null,
-          phoneE164: phone,
+          // A guest request carries no phone since D-2026-11-16-04 (reverses part of P08.9).
+          phoneE164: null,
           statedBand: input.statedBand,
           placement,
           requestedAt: new Date(),
@@ -512,6 +494,8 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       select: {
         id: true,
         playerId: true,
+        nickname: true,
+        sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
         player: {
           select: {
             avatarRef: true,
@@ -539,7 +523,11 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       const registered = !!club?.playerId && club.player?.profileState === 'claimed'
       const isViewer = !!club?.playerId && club.playerId === context.playerId
       const alwaysPrivate = registered && club?.player?.profileVisibility === 'always_private'
-      const showFull = registered && (!alwaysPrivate || isViewer)
+      // D-2026-11-16-04: an unclaimed player (saved with an email, so an RTR ID) is public, with
+      // this club's own name and nickname for them. Older records with no email stay masked.
+      const shared = club?.sharedEntry
+      const unclaimed = !registered && !!shared && !shared.claimedPlayerId && !shared.retiredAt
+      const showFull = unclaimed || (registered && (!alwaysPrivate || isViewer))
       // The banner is public, like the picture: a registered (or always-private) player's own pick;
       // guests and unclaimed profiles draw the default Admin sets (D-2026-11-13-03), as in mock mode.
       const chosen = registered ? (club?.player?.banner ?? undefined) : undefined
@@ -549,14 +537,24 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         bannerImageUrl: banner.bannerImageUrl,
         name: showFull ? entry.nameSnapshot : maskPublicName(entry.nameSnapshot),
         masked: !showFull,
-        nickname: showFull ? (club?.player?.nickname ?? null) : null,
-        rtrId: showFull ? (club?.player?.idAllocation?.rtrId ?? null) : null,
+        nickname: unclaimed
+          ? (club?.nickname ?? null)
+          : showFull
+            ? (club?.player?.nickname ?? null)
+            : null,
+        rtrId: unclaimed
+          ? (shared?.rtrId ?? null)
+          : showFull
+            ? (club?.player?.idAllocation?.rtrId ?? null)
+            : null,
         isViewer,
-        profile: showFull
-          ? ('registered' as const)
-          : alwaysPrivate
-            ? ('private' as const)
-            : ('guest' as const),
+        profile: unclaimed
+          ? ('unclaimed' as const)
+          : showFull
+            ? ('registered' as const)
+            : alwaysPrivate
+              ? ('private' as const)
+              : ('guest' as const),
       }
     }
     const byId = new Map(roster.map((entry) => [entry.id, entry]))

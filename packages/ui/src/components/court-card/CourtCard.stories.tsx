@@ -9,7 +9,7 @@ import {
   type MatchContext,
   matchStatus,
   nextEligibleForCourt,
-  shortName,
+  queueMasterName,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
@@ -42,7 +42,7 @@ const matchAt = (i: number, list: Match[] = matches): Match => {
 const playerOf = (id: string): CourtPlayer => {
   const p = roster.find((x) => x.id === id)
   if (!p) throw new Error('Roster fixture missing')
-  return { id: p.id, name: p.nameSnapshot, shortName: shortName(p), level: p.level }
+  return { id: p.id, name: p.nameSnapshot, shortName: queueMasterName(p), level: p.level }
 }
 const untilOf = (c: SessionCourt) => fmtTime(c.openUntil ?? session.scheduledEndAt)
 

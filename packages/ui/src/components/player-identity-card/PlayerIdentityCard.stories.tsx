@@ -36,8 +36,37 @@ export const Unclaimed: Story = {
       unclaimedSavedBy: clubs[1]?.name,
       leaderboardPlaces: profileLeaderboardStoryPlaces.slice(0, 2),
     },
-    unclaimedFacts: { levelLabel: 'Intermediate Low', year: 2026, games: 32, wins: 24 },
+    unclaimedFacts: {
+      levelLabel: 'Intermediate Low',
+      year: 2026,
+      games: 32,
+      wins: 24,
+      standing: { kind: 'ranked', position: 18, total: 1284 },
+    },
   },
+}
+/** Saved by one club but short of the leaderboard: "Not on the leaderboard yet" and what is missing. */
+export const UnclaimedNotOnLeaderboard: Story = {
+  args: {
+    profile: { ...unclaimed, unclaimedSavedBy: clubs[1]?.name, leaderboardPlaces: [] },
+    unclaimedFacts: {
+      levelLabel: null,
+      year: 2026,
+      games: 7,
+      wins: 3,
+      standing: { kind: 'unranked', standardMatches: 7, required: 10 },
+    },
+  },
+}
+export const UnclaimedLight: Story = {
+  args: {
+    ...Unclaimed.args,
+  },
+  globals: { theme: 'light' },
+}
+export const UnclaimedPhone: Story = {
+  args: { ...Unclaimed.args },
+  globals: { viewport: { value: 'phone' } },
 }
 export const Initials: Story = { args: { profile: initials } }
 export const OwnIdentity: Story = { args: { isOwn: true } }

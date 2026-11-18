@@ -29,9 +29,9 @@ const placementOf = (body: Record<string, unknown>) => ({
 
 /**
  * Q-ROSTER › Add player. `source` picks the tab: `saved` (a saved club player), `directory` (a
- * Player Information profile, saved to the club on the way), or a new player (the default; a guest
- * until identity resolves after sync). No identity check: an unclaimed profile is the club's own
- * record (D-2026-11-11-03). `allowOverfill` (Add anyway) and `toWaitlist` (Add to waitlist) are the
+ * Player lookup match, saved to the club on the way; `name` is this club's own name for another
+ * club's unclaimed player), or a new player (the default; no email adds a guest, an email adds an
+ * unclaimed player or links a registered one, D-2026-11-16-04). `allowOverfill` (Add anyway) and `toWaitlist` (Add to waitlist) are the
  * Queue Master's D-OVERFILL choice on a full roster (#735).
  */
 export async function POST(
@@ -56,6 +56,8 @@ export async function POST(
           : await addDirectoryPlayerToSession(club, sessionId, {
               ...common,
               playerId: text(body.playerId),
+              // This club's own name for another club's unclaimed player (D-2026-11-16-04)
+              name: text(body.name) || null,
             })
       return { status: 201, body: entry }
     }
@@ -68,6 +70,7 @@ export async function POST(
       name: text(body.name),
       nickname: text(body.nickname) || undefined,
       phone: phone?.success ? phone.data : undefined,
+      email: text(body.email) || null,
       level: text(body.level),
       ...placementOf(body),
     })

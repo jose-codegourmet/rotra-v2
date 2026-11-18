@@ -14,11 +14,14 @@ export const fullNameField = z
   .min(1, 'Enter your full name.')
   .max(60, 'Keep your name to 60 characters or fewer.')
 
+/** The longest a nickname can be (prototype limit); a club nickname uses the same limit. */
+export const NICKNAME_MAX = 24
+
 /** Accepts an optional nickname, trimmed, at most 24 characters (prototype limit); empty stays empty. */
 export const nicknameField = z
   .string()
   .trim()
-  .max(24, 'Keep your nickname to 24 characters or fewer.')
+  .max(NICKNAME_MAX, 'Keep your nickname to 24 characters or fewer.')
 
 /** Accepts optional free-text playing style, trimmed, at most 280 characters (prototype limit). */
 export const playingStyleField = z.string().trim().max(280)

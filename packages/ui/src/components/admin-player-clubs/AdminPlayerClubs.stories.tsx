@@ -10,3 +10,14 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 export const Light: Story = { globals: { theme: 'light' } }
+
+/** An unclaimed player saved by two clubs, each with its own name for them. */
+export const SavedByTwoClubs: Story = {
+  args: {
+    savedBy: [
+      { club: 'Talamban Racket Club', name: 'Nina Ocampo' },
+      { club: 'IT Park Badminton Club', name: 'Nina O.' },
+    ],
+  },
+}
+export const SavedByTwoClubsLight: Story = { ...SavedByTwoClubs, globals: { theme: 'light' } }

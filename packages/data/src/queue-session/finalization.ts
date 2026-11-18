@@ -16,8 +16,10 @@ import { recordChange } from '../sync/fetchers'
 import { integrityIn } from '../sync/integrity'
 import type { SaveOutcome } from '../sync/sync.types'
 import {
-  FINALIZATION_STAGES,
   type FinalizationStage,
+  finalizationStagesFor,
+  type QueueSession,
+  recordsGames,
   type SessionDoneBlocker,
   type SessionFinalization,
 } from './queueSession.types'
@@ -107,7 +109,11 @@ function setFinalization(sessionId: string, patch: Partial<SessionFinalization>)
     if (current) draft.finalizations[sessionId] = { ...current, ...patch }
   })
 }
-/** Session done: active → finalizing → completed through four staged steps; one finalization per command. */
+/**
+ * Session done: active → finalizing → completed through four staged steps; one finalization per
+ * command. An unrecorded session (Record games off) runs only the first two: it completes, and no
+ * player records, ranking, standings, awards or result slides are written.
+ */
 export async function finalizeSession(
   input: FinalizeSessionInput,
 ): Promise<SaveOutcome & { data: SessionFinalization }> {
@@ -139,9 +145,9 @@ export async function finalizeSession(
   // Idempotency: a replay never starts a second finalization, whatever state the first is in.
   if (existing && existing.commandId === commandId) {
     if (existing.state === 'running' || existing.state === 'done')
-      return { savedOffline: false, message: DONE_TOAST, data: { ...existing } }
+      return { savedOffline: false, message: doneToast(session), data: { ...existing } }
     if (existing.state === 'committed')
-      return run(sessionId, commandId, session.title, existing.failedStage ?? 'slides', input)
+      return run(session, commandId, existing.failedStage ?? 'slides', input)
   } else if (existing && existing.state !== 'failed') {
     throw new MockError('conflict', 'This session is already being finished on another device.')
   }
@@ -149,26 +155,36 @@ export async function finalizeSession(
     throw new MockError('permission', 'Only a running session can be finished.')
   const blocked = sessionDoneBlocker(snapshot, sessionId)
   if (blocked) throw blocked
-  return run(sessionId, commandId, session.title, 'checking', input)
+  return run(session, commandId, 'checking', input)
 }
-const DONE_TOAST = 'Session finished · player records updated'
-const doneLogText = (title: string) => `${title} finished · player records updated`
+type FinishedSession = Pick<QueueSession, 'id' | 'title' | 'recordGames'>
+const doneNote = (session: Pick<QueueSession, 'recordGames'>) =>
+  recordsGames(session) ? 'player records updated' : 'games not recorded'
+const doneToast = (session: Pick<QueueSession, 'recordGames'>) =>
+  `Session finished · ${doneNote(session)}`
+const doneLogText = (session: FinishedSession) =>
+  `${session.title} finished · ${doneNote(session)}`
 async function run(
-  sessionId: string,
+  session: FinishedSession,
   commandId: string,
-  title: string,
   from: FinalizationStage,
   input: FinalizeSessionInput,
 ): Promise<SaveOutcome & { data: SessionFinalization }> {
-  const generation = mockStore.getGeneration(),
+  // The flag is fixed once the session starts, so the stages are decided once, up front. An
+  // unrecorded session never reaches `player_records` or `slides`: those two writes cannot run.
+  const sessionId = session.id,
+    all = finalizationStagesFor(session),
+    last = all[all.length - 1] ?? 'slides',
+    generation = mockStore.getGeneration(),
     failAt = input.failAtStage ?? 'checking',
-    stages = FINALIZATION_STAGES.slice(FINALIZATION_STAGES.indexOf(from))
+    // A stage this session does not run (a replay after an unrecorded commit) leaves nothing to do.
+    stages = all.includes(from) ? all.slice(all.indexOf(from)) : []
   mockStore.update((draft) => {
     const s = sessionIn(draft, sessionId)
     if (s.state === 'active') s.state = 'finalizing'
     draft.finalizations[sessionId] = { sessionId, commandId, state: 'running', stage: from }
   })
-  let outcome: SaveOutcome = { savedOffline: false, message: DONE_TOAST }
+  let outcome: SaveOutcome = { savedOffline: false, message: doneToast(session) }
   for (const stage of stages) {
     setFinalization(sessionId, { stage, state: 'running' })
     await delay(STAGE_DELAY)
@@ -223,12 +239,12 @@ async function run(
       })
   }
   mockStore.update((draft) => {
-    draft.finalizations[sessionId] = { sessionId, commandId, state: 'done', stage: 'slides' }
-    outcome = recordChange(draft, { text: doneLogText(title), area: 'Session done' })
+    draft.finalizations[sessionId] = { sessionId, commandId, state: 'done', stage: last }
+    outcome = recordChange(draft, { text: doneLogText(session), area: 'Session done' })
   })
   const data = readMockState().finalizations[sessionId]
   if (!data) throw new Error('Finalization produced no record.')
-  return { ...outcome, message: DONE_TOAST, data }
+  return { ...outcome, message: doneToast(session), data }
 }
 /**
  * Marks the session invalid: no official result, no result facts, no slides.

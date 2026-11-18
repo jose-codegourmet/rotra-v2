@@ -25,6 +25,7 @@ import {
 } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
+import { recordsGames } from '../queue-session/queueSession.types'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
@@ -126,8 +127,10 @@ function publishedResults(
   viewerClubPlayerIds?: ReadonlySet<string>,
 ): PublicSessionResults | null {
   const publication = state.publications[sessionId],
-    snapshot = state.resultSnapshots[sessionId]
-  if (!publication || !snapshot) return null
+    snapshot = state.resultSnapshots[sessionId],
+    session = state.sessions.find((s) => s.id === sessionId)
+  // An unrecorded session has no results, whatever rows exist for it.
+  if (!publication || !snapshot || (session && !recordsGames(session))) return null
   const roster = state.roster
     .filter((r) => r.sessionId === sessionId)
     .sort((a, b) => a.confirmedAt - b.confirmedAt)
@@ -469,8 +472,11 @@ function project(
     amountDuePerPlayer: sessionCostIn(state, s.id)?.estimate.perHead ?? null,
     lastSyncedAt: sync.lastSyncedAt,
     hasPendingChanges: sync.hasPendingChanges,
+    recordGames: recordsGames(s),
     results: status === 'completed' ? publishedResults(state, s.id, viewer, viewerIds) : null,
-    ...(status === 'completed' ? { resultsPublished: state.publications[s.id] !== undefined } : {}),
+    ...(status === 'completed'
+      ? { resultsPublished: recordsGames(s) && state.publications[s.id] !== undefined }
+      : {}),
   }
 }
 
@@ -548,21 +554,23 @@ export async function getSignedInSession(
 /**
  * A finished session's Match history (2026-11-13 finished session and match history courts logs):
  * every finished or invalid match, newest first, with the replay bounds. Until the club shares the
- * results, only the viewer's own matches (the same rule as their own standing only).
+ * results, only the viewer's own matches (the same rule as their own standing only). An unrecorded
+ * session has no match history: no matches, `total` 0 and never `shared`.
  */
 function projectHistory(
   state: MockState,
   session: MockState['sessions'][number],
   viewer: Viewer,
 ): PublicMatchHistory {
-  const matches = state.matches.filter((m) => m.sessionId === session.id)
+  const recorded = recordsGames(session)
+  const matches = recorded ? state.matches.filter((m) => m.sessionId === session.id) : []
   const record = sessionRecordHistory({
     fallbackStart: session.startedAt ?? session.scheduledStartAt,
     courts: state.courts.filter((c) => c.sessionId === session.id),
     roster: state.roster.filter((r) => r.sessionId === session.id),
     matches,
   })
-  const shared = state.publications[session.id] !== undefined
+  const shared = recorded && state.publications[session.id] !== undefined
   const all = record.matches
     .map((m) => ({
       id: m.id,

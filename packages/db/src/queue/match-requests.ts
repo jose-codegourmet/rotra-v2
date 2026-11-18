@@ -374,7 +374,7 @@ export async function readMatchRequestOptions(context: PlayerContext, slug: stri
  * games, level and where the player is now (`{ kind: 'court', courtLabels }` / `{ kind: 'queue',
  * position }` / null). Stale requests are closed first, like the mock's sweep. Join requests and
  * drop-out notices stay on the roster read in real mode, so `join` and `dropOuts` are empty and
- * their counts 0; `selfCheckIn` is empty (self check-in is not real yet). Finished, invalid and
+ * their counts 0; `selfCheckIn` is empty here (the roster read carries each entry's own marks). Finished, invalid and
  * cancelled sessions return empty lists.
  */
 export async function readSessionRequests(context: ClubContext, sessionId: string) {

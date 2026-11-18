@@ -2223,6 +2223,7 @@ type Club struct {
 	UpdatedAt               pgtype.Timestamptz
 	Revision                int64
 	InviteCode              pgtype.Text
+	SelfCheckInEnabled      bool
 }
 
 type ClubAccount struct {
@@ -2989,6 +2990,8 @@ type SessionPlayer struct {
 	Revision         int64
 	GamesAdjustment  int32
 	NoShowAt         pgtype.Timestamptz
+	SelfCheckedInAt  pgtype.Timestamptz
+	LeftAt           pgtype.Timestamptz
 }
 
 type SessionPublication struct {

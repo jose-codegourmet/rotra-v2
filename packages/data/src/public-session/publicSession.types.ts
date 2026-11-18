@@ -413,6 +413,11 @@ export type PlayerSessionAccess = {
   joinRequest: MyJoinRequest | null
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /**
+   * Real mode: **Courts now** for the signed-in Player (live sessions; empty otherwise). Missing in
+   * mock mode, where the signed-in read carries it, and on a server from before it was connected.
+   */
+  courtsNow?: PublicCourtNow[]
   queue: {
     matchNo: number
     format: MatchFormat

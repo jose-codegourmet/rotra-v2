@@ -99,6 +99,18 @@ export async function realMoveMeToWaitlist(slug: string) {
 }
 
 /**
+ * **I'm here** / **I'm leaving** (D-2026-11-09-03): the signed-in Player's own presence, on the
+ * Player origin like Request to join. A 409 carries “You're already marked present.” or “You're not
+ * marked present.” for the toast.
+ */
+async function presenceWrite(slug: string, action: 'check-in' | 'leave') {
+  const done = await playerPost<{ rosterId: string; message: string }>(slug, action, {})
+  return { savedOffline: false, message: done.message, data: { rosterId: done.rosterId } }
+}
+export const realSelfCheckIn = (slug: string) => presenceWrite(slug, 'check-in')
+export const realLeaveSession = (slug: string) => presenceWrite(slug, 'leave')
+
+/**
  * **Sign out** from the session page's account bar (#693): signs the Player out of ROTRA Player on
  * this device. A credentialed call to the Player app, like Request to join.
  */

@@ -72,6 +72,7 @@ export function clubSettingsDto(club: Club) {
     description: club.description ?? '',
     courtRules: club.courtRules ?? '',
     postTemplate: club.postTemplate,
+    selfCheckInEnabled: club.selfCheckInEnabled,
     revision: toDecimalString(club.revision),
   }
 }
@@ -411,6 +412,8 @@ export async function updateClubSettings(
     description?: string
     courtRules?: string
     postTemplate?: string | null
+    /** Players can check themselves in (D-2026-11-09-03) */
+    selfCheckInEnabled?: boolean
   },
 ) {
   await requireClubEntitlement(context)
@@ -440,6 +443,7 @@ export async function updateClubSettings(
         description: input.description?.trim(),
         courtRules: input.courtRules?.trim(),
         postTemplate: input.postTemplate,
+        selfCheckInEnabled: input.selfCheckInEnabled,
         revision: { increment: 1 },
       },
     })

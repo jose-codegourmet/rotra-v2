@@ -56,7 +56,7 @@ export function LeaderboardMove({
         movement.direction === 'up' && 'text-accent',
         movement.direction === 'down' && 'text-error',
       )}
-      role={rowIsTrigger ? undefined : 'img'}
+      role="img"
       // biome-ignore lint/a11y/noNoninteractiveTabindex: Makes the tooltip available to keyboard users without a row button.
       tabIndex={rowIsTrigger ? undefined : 0}
       aria-label={rowIsTrigger ? undefined : movement.sentence}

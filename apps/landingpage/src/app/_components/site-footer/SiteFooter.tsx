@@ -46,8 +46,8 @@ export function SiteFooter() {
             <div>
               <span className="h-cap">ROTRA</span>
               <a href="#home">Contact</a>
-              <a href="#privacy">Privacy</a>
-              <a href="#terms">Terms</a>
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
             </div>
             <div>
               <span className="h-cap">Sign in</span>

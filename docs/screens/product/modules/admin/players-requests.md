@@ -45,7 +45,7 @@ The **Verification** card sits below **Account** on **Overview** for registered 
 | Check | Details |
 |---|---|
 | **Google account** | “Connected · <Google email>” or “Not connected” |
-| **Mobile number** | “On file · <masked phone>” or “Not on file” |
+| **Mobile number** | “On file · <full phone, grouped>” (“On file · +63 917 555 0142”; Admin never sees it masked, [D-2026-11-16-06](../../../../mvp/decisions.md#d-2026-11-16-06)) or “Not on file” |
 | **ROTRA email matches Google** | “Both are <email>”, “Google must be connected first.”, or “ROTRA email: <ROTRA email>. Google email: <Google email>.” An open request to change to the Google email adds **Change sent for Admin review**. |
 
 **Set Verified by Admin** opens a confirmation sheet; while the override is active the card offers **Clear override**. The sheet shows the player, RTR ID, current status, and status after saving. Both actions require **Reason for the change**. Cancel closes the sheet. A failed save preserves the reason and leaves the status and audit record as they were. A successful save closes the sheet, refreshes the card, and adds the action and reason to **Activity** › **Record of actions**.

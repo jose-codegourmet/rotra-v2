@@ -6,7 +6,7 @@ import type {
 import { ConflictError, MockError } from '../mock/errors'
 import { RealRequestError, realRequest } from './client'
 
-type WireAdminVerification = AccountVerification & { revision: string }
+type WireAdminVerification = AccountVerification & { revision: string; phone: string | null }
 const adminPath = (id: string) => `/api/players/${encodeURIComponent(id)}/verification`
 const adminVerificationOf = (wire: WireAdminVerification): AdminAccountVerification => ({
   ...wire,

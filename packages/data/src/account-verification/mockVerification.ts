@@ -17,5 +17,7 @@ export function adminAccountVerificationIn(state: MockState, playerId: string) {
   const verification = accountVerificationIn(state, playerId)
   if (!verification) return null
 
-  return { ...verification, revision: state.adminPlayerRecords[playerId]?.revision ?? 1 }
+  const phone =
+    state.playerAccounts.find((entry) => entry.playerId === playerId)?.phone.trim() || null
+  return { ...verification, phone, revision: state.adminPlayerRecords[playerId]?.revision ?? 1 }
 }

@@ -9,7 +9,7 @@ import { ServiceError } from '../service/errors'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** Private facts shared by the owner's page and Admin's card. Only the masked phone leaves here. */
+/** Private facts shared by the owner's page and Admin's card. The owner gets the masked phone only; Admin also gets the full one. */
 async function readVerification(db: Prisma.TransactionClient, playerId: string) {
   const player = await db.player.findUnique({
     where: { id: playerId, profileState: 'claimed' },
@@ -40,7 +40,11 @@ async function readVerification(db: Prisma.TransactionClient, playerId: string) 
     })),
     player.verificationOverride === 'verified',
   )
-  return { verification, revision: player.revision }
+  return {
+    verification,
+    revision: player.revision,
+    phone: player.privateContact?.phoneE164?.trim() || null,
+  }
 }
 
 export async function readMyAccountVerification(context: PlayerContext) {
@@ -53,7 +57,9 @@ export async function readAdminAccountVerification(context: AdminContext, player
   requireAdmin(context)
   if (!UUID.test(playerId)) return null
   const current = await readVerification(prisma, playerId)
-  return current ? { ...current.verification, revision: current.revision.toString() } : null
+  return current
+    ? { ...current.verification, phone: current.phone, revision: current.revision.toString() }
+    : null
 }
 
 /** Lock the same revision used by Admin player edits. The appended audit and override commit together. */
@@ -75,7 +81,11 @@ export async function setAdminVerificationOverride(
     if (!current) throw new ServiceError('not_found')
     requireRevision(current.revision, revision)
     if (current.verification.verifiedByAdmin === verifiedByAdmin)
-      return { ...current.verification, revision: current.revision.toString() }
+      return {
+        ...current.verification,
+        phone: current.phone,
+        revision: current.revision.toString(),
+      }
 
     const updated = await tx.player.update({
       where: { id: playerId },
@@ -97,6 +107,7 @@ export async function setAdminVerificationOverride(
     })
     return {
       ...current.verification,
+      phone: current.phone,
       verified: verifiedByAdmin || current.verification.completedSteps === 3,
       verifiedByAdmin,
       revision: updated.revision.toString(),

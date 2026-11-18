@@ -1,5 +1,5 @@
 import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
-import type { AccountVerification } from '@rotra/data/account-verification/types'
+import type { AdminAccountVerification } from '@rotra/data/account-verification/types'
 import {
   accountVerificationFixtures,
   verificationFixturePlayerId,
@@ -9,14 +9,19 @@ import { adminPlayerDetailExamples } from '@rotra/data/fixtures/admin-players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AdminPlayerVerificationCard } from './AdminPlayerVerificationCard'
 
-function verification(scenario: keyof typeof accountVerificationFixtures): AccountVerification {
+type CardVerification = Omit<AdminAccountVerification, 'revision'>
+
+function verification(scenario: keyof typeof accountVerificationFixtures): CardVerification {
   const fixture = accountVerificationFixtures[scenario]
   const account = {
     playerId: verificationFixturePlayerId,
     email: adminPlayerDetailExamples.contact.hidden.email,
     ...fixture,
   }
-  const result = deriveAccountVerification(account, [], 'adminOverrideReason' in fixture)
+  const result = {
+    ...deriveAccountVerification(account, [], 'adminOverrideReason' in fixture),
+    phone: account.phone || null,
+  }
   if ('pendingEmailRequest' in fixture && result.email.kind === 'mismatch') {
     return { ...result, email: { ...result.email, pendingEmailRequest: true } }
   }
@@ -47,16 +52,19 @@ export const MatchRequestPending: Story = {
 }
 export const LongGoogleEmail: Story = {
   args: {
-    verification: deriveAccountVerification(
-      {
-        playerId: verificationFixturePlayerId,
-        email: '',
-        phone: accountVerificationFixtures.oneOfThree.phone,
-        googleEmail: adminAccessExamples.longEmail,
-      },
-      [],
-      false,
-    ),
+    verification: {
+      ...deriveAccountVerification(
+        {
+          playerId: verificationFixturePlayerId,
+          email: '',
+          phone: accountVerificationFixtures.oneOfThree.phone,
+          googleEmail: adminAccessExamples.longEmail,
+        },
+        [],
+        false,
+      ),
+      phone: accountVerificationFixtures.oneOfThree.phone,
+    },
   },
 }
 export const NoPhone: Story = { args: { verification: verification('noPhone') } }

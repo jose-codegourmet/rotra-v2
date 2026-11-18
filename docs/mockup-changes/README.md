@@ -373,5 +373,6 @@ TICKETED: 9 · IN PROGRESS: 1 · IN MOCK APP: 178 · CANCELLED: 3 · MOCKUP ONLY
 | [2026-11-16-queue-unclaimed-email-lookup](2026-11-16-queue-unclaimed-email-lookup.md) | Queue app: unclaimed players need an email and get an RTR ID; lookup by RTR ID or email only; guest linking removed | add-player-sheet, saved-player-card, player-profile-sheet, edit-player-form, invite-sheet, join-request-row, join-request-form, participant-profile-card, chip | TICKETED — #900 |
 | [2026-11-17-player-legal-pages](2026-11-17-player-legal-pages.md) | Player app: Privacy Policy and Terms of Service pages | legal-document, auth-card, sign-in-form, page-header | IN MOCK APP — PR #928 |
 | [2026-11-18-admin-player-verification](2026-11-18-admin-player-verification.md) | Admin player detail shows verification checks and the Admin override | card, verification-step, verification-status-chip, confirm-sheet, textarea, button, toaster | IN MOCK APP — #889 |
+| [2026-11-18-admin-verification-full-phone](2026-11-18-admin-verification-full-phone.md) | Admin Verification card: “On file” shows the full phone, grouped | admin-player-verification-card | IN MOCK APP — PR #957 |
 | [2026-11-18-player-google-link-copy](2026-11-18-player-google-link-copy.md) | Player app: P-GOOGLE-LINK says Google can be changed, not disconnected | google-link-card | IN MOCK APP — #916 |
 <!-- status-index:end -->

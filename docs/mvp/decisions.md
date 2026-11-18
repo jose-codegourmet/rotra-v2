@@ -1082,7 +1082,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-16-06 — Phones: stored as E.164, shown masked and in one format
 - **Decision status:** approved (owner, November 16, 2026).
-- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part in the mock app (#911): every phone Admin shows as text is full and grouped, and the Edit player and Add player phone fields group while typing and save E.164 ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The Verification card's “On file” row still shows a masked phone, as its own mockup and screen doc say. The real app already stores E.164 (`phoneField`).
+- **Implementation status:** Player part in the mock app (#904): one `maskPhone` in `packages/schema/src/phone.ts`, and every phone the Player app shows as text is masked ([log](../mockup-changes/2026-11-16-player-phone-mask-format.md)). Admin part in the mock app (#911): every phone Admin shows as text is full and grouped, and the Edit player and Add player phone fields group while typing and save E.164 ([log](../mockup-changes/2026-11-16-admin-phone-format.md)). The Admin Verification card's “On file” row shows the full number too (owner, November 18, 2026: “Yes, show full”; [log](../mockup-changes/2026-11-18-admin-verification-full-phone.md)). The real app already stores E.164 (`phoneField`).
 - **Ticket:** [#893](https://github.com/jose-codegourmet/rotra-v2/issues/893) (Epic P17)
 - **Roadmap:** MVP — [Player](workstreams/player.md), [Admin](workstreams/admin.md)
 - **Decision:**

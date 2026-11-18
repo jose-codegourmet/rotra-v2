@@ -14,7 +14,11 @@ export type AccountVerification = {
   email: VerificationEmail
 }
 
-export type AdminAccountVerification = AccountVerification & { revision: number }
+/** Admin always sees the full phone (D-2026-11-16-06): `phone` is E.164, or null when none is on file. */
+export type AdminAccountVerification = AccountVerification & {
+  revision: number
+  phone: string | null
+}
 
 export type SetAdminVerificationOverrideInput = {
   playerId: string

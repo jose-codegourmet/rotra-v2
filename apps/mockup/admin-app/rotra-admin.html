@@ -1620,7 +1620,7 @@ function playerVerification(p) {
     && ['submitted', 'applying'].includes(r.status) && r.to.trim().toLowerCase() === google);
   const steps = [
     { title: 'Google account', done: !!google, detail: google ? `Connected · ${esc(google)}` : 'Not connected' },
-    { title: 'Mobile number', done: !!phone, detail: phone ? `On file · +${phone.slice(0, 2)} ${phone.slice(2, 5)} ••• ••${phone.slice(-2)}` : 'Not on file' },
+    { title: 'Mobile number', done: !!phone, detail: phone ? `On file · ${esc(showPhone(p.phone))}` : 'Not on file' },
     { title: 'ROTRA email matches Google', done: matches, detail: matches ? `Both are ${esc(email)}`
       : google ? `ROTRA email: ${esc(email || 'Not given')}. Google email: ${esc(google)}.` : 'Google must be connected first.',
       extra: pending ? chip('Change sent for Admin review', 'warn') : '' },

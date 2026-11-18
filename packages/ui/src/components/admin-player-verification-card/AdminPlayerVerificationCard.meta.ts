@@ -6,7 +6,7 @@ export const adminPlayerVerificationCardMeta = {
     "The registered player's status and three automatic checks, with one action to set or clear Verified by Admin.",
   usage: [
     'Place directly below Account in the Admin player Overview tab.',
-    'Pass the normalized email and masked phone from account verification. All three steps stay visible during an override.',
+    'Pass the normalized email and the full phone from Admin account verification; the card shows it grouped, never masked. All three steps stay visible during an override.',
     'Open AdminVerificationOverrideForm from the card action and preserve the action button as the focus target.',
   ],
   prototype: {

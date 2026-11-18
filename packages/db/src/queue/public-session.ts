@@ -1,6 +1,11 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { computeStandings, courtNames, holdsCourt } from '@rotra/data/match/match.rules'
+import {
+  computeStandings,
+  courtFreeSince,
+  courtNames,
+  holdsCourt,
+} from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import {
@@ -13,6 +18,7 @@ import {
 } from '@rotra/data/public-session/rules'
 import type {
   MyNightStage,
+  PublicCourtNow,
   PublicHistoryMatch,
   PublicMatchHistory,
   PublicMatchPlayer,
@@ -573,16 +579,64 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         },
       },
     })
+    // The participants this read returns (capped at 12 unless the Player is in the session); a
+    // face points at its entry there so it can open the same profile card.
+    const listed = fullRoster ? roster.length : Math.min(roster.length, 12)
+    /** A face on a Courts now tile or a queued match: first name by the signed-in name rule. */
+    const faceOf = (sessionPlayerId: string) => {
+      const entry = byId.get(sessionPlayerId)
+      const who = entry ? person(entry) : null
+      const index = entry ? roster.indexOf(entry) : -1
+      return {
+        name: publicFirstName(who?.name ?? maskPublicName(entry?.nameSnapshot ?? '')),
+        level: levelCodeFor(entry?.skillLevelId ?? null),
+        pictureUrl: entry ? (pictures.get(entry.clubPlayerId) ?? null) : null,
+        masked: who?.masked ?? true,
+        isViewer: who?.isViewer ?? false,
+        ...(index >= 0 && index < listed ? { participant: index } : {}),
+      }
+    }
     const team = (members: { team: string; sessionPlayerId: string }[], side: string) =>
-      members
-        .filter((member) => member.team === side)
-        .map((member) => {
-          const entry = byId.get(member.sessionPlayerId)
-          return {
-            name: maskPublicName(entry?.nameSnapshot ?? ''),
-            level: levelCodeFor(entry?.skillLevelId ?? null),
-          }
+      members.filter((member) => member.team === side).map((m) => faceOf(m.sessionPlayerId))
+    // Courts now (the live feed): one entry per court, or per match on merged courts. Live
+    // sessions only. Who is on which court and since when; never a score or a running result.
+    const full = await tx.queueSession.findUniqueOrThrow({ where: { id: session.id } })
+    const courtsNow: PublicCourtNow[] = []
+    if (full.state === 'active' || full.state === 'finalizing') {
+      const { ctx } = await matchContext(tx, full)
+      const held = ctx.matches.filter(holdsCourt)
+      const seen = new Set<string>()
+      for (const court of ctx.courts) {
+        if (seen.has(court.id)) continue
+        const match = held.find((m) => m.courtIds.includes(court.id))
+        if (!match) {
+          courtsNow.push({
+            id: court.id,
+            label: court.label,
+            courtLabels: [court.label],
+            merged: false,
+            status: 'free',
+            teamA: [],
+            teamB: [],
+            startedAt: null,
+            freeSince: courtFreeSince(court.id, ctx.matches) ?? full.startedAt?.getTime() ?? null,
+          })
+          continue
+        }
+        for (const id of match.courtIds) seen.add(id)
+        courtsNow.push({
+          id: court.id,
+          label: courtNames(match, ctx.courts),
+          courtLabels: ctx.courts.filter((c) => match.courtIds.includes(c.id)).map((c) => c.label),
+          merged: match.courtIds.length > 1,
+          status: match.state === 'active' ? 'playing' : 'getting-ready',
+          teamA: match.teamA.map(faceOf),
+          teamB: match.teamB.map(faceOf),
+          startedAt: match.state === 'active' ? (match.startedAt ?? null) : null,
+          freeSince: null,
         })
+      }
+    }
     const { waitlistClubPlayerId: _, ...standing } = await playerStanding(
       tx,
       context.playerId,
@@ -599,6 +653,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),
+      courtsNow,
       queue: matches.map((match) => ({
         matchNo: match.matchNo,
         format: match.format,

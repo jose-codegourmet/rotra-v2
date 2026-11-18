@@ -112,6 +112,10 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
 - **Gap:** `getSignedInSession`, `getMyNight`, `getMatchRequestOptions`
   (`public-session/fetchers.ts:384,424,541`) have no route.
 - **Acceptance:** a signed-in Player sees their night and match request options on the session page.
+- **Update, November 18, 2026:** **Courts now** is real: the Player app's access read
+  (`readPlayerSessionAccess`) returns `courtsNow` for a live session, and the queue faces follow the
+  signed-in name rule and open the profile card. The page's Refresh reloads that read too. Written
+  and type-checked; not run against a database.
 
 ### 404 · F07.63 · Chore: Signed-in Player writes in real mode
 **Product:** queue, player · **Depends on:** 398, 401, 403

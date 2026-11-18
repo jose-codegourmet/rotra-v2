@@ -19,9 +19,11 @@ export function useRefreshSession(slug: string) {
     () =>
       client.refetchQueries({
         predicate: (query) =>
-          query.queryKey[0] === 'public-session' &&
-          query.queryKey[2] === slug &&
-          query.queryKey[1] !== 'invite-code',
+          // Real mode: the Player app's access read carries Courts now and the Queue.
+          (query.queryKey[0] === 'player-session-access' && query.queryKey[1] === slug) ||
+          (query.queryKey[0] === 'public-session' &&
+            query.queryKey[2] === slug &&
+            query.queryKey[1] !== 'invite-code'),
       }),
     [client, slug],
   )

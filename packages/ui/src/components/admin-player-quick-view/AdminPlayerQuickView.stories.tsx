@@ -96,9 +96,7 @@ export const DetailsRequired: Story = {
     player: {
       ...managementPlayer,
       phone: '+639171234567',
-      clubs: [
-        { clubId: 'c1', name: 'Lahug Smash Club', addedAt: null, identity: 'unclaimed' },
-      ],
+      clubs: [{ clubId: 'c1', name: 'Lahug Smash Club', addedAt: null, identity: 'unclaimed' }],
     },
     detailsRequired: true,
     stats: null,
@@ -113,7 +111,10 @@ export const SavedByTwoClubs: Story = {
       email: 'nina.ocampo@example.com',
       name: 'Nina Ocampo',
       levelIndex: 3,
-      rankStatus: { kind: 'below', text: 'Beginner High · not on the leaderboard until they register' },
+      rankStatus: {
+        kind: 'below',
+        text: 'Beginner High · not on the leaderboard until they register',
+      },
       clubs: [
         {
           clubId: 'c1',

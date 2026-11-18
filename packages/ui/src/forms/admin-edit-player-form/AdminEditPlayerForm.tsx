@@ -1,13 +1,13 @@
 'use client'
 import type { AdminPlayerEdit } from '@rotra/data/admin-player/types'
 import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
+import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
+import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import {
   type AdminPlayerPictureCharacter,
   type AdminPlayerPictureChoice,
   AdminPlayerPictureSection,
 } from '@rotra/ui/admin-player-picture-section'
-import { AdminPlayerClubs } from '@rotra/ui/admin-player-clubs'
-import { savedByClubs } from '@rotra/ui/admin-player-clubs/helpers'
 import { Button } from '@rotra/ui/button'
 import { ChangeCompare } from '@rotra/ui/change-compare'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -200,7 +200,13 @@ export function AdminEditPlayerForm({
   const errors = form.formState.errors
   const [years, months, picture, place, date] = useWatch({
     control: form.control,
-    name: ['experienceYears', 'experienceMonths', 'picture', 'registrationPlace', 'registrationDate'],
+    name: [
+      'experienceYears',
+      'experienceMonths',
+      'picture',
+      'registrationPlace',
+      'registrationDate',
+    ],
   })
   // The RTR ID is a live preview of the place and date; it is never typed (D-2026-11-16-04).
   const registrationFields = !!p.rtrId && !!places?.length
@@ -544,9 +550,9 @@ export function AdminEditPlayerForm({
             ]}
           />
           <p className="text-sm text-fg2">
-            These stay read-only. Rank, level and match history come from finished club sessions, and
-            Admin can't change ranks, winners or scores. A profile becomes registered only when the
-            player claims it.
+            These stay read-only. Rank, level and match history come from finished club sessions,
+            and Admin can't change ranks, winners or scores. A profile becomes registered only when
+            the player claims it.
           </p>
         </Section>
         <Section>

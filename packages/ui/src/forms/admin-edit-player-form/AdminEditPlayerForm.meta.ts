@@ -30,7 +30,7 @@ export const adminEditPlayerFormMeta = {
     'Registration place and Registration date (Select, DatePicker) show when you pass places and the player has an RTR ID; the RTR ID under them is a live read-only preview that follows both and keeps its number at the end. It is never typed (D-2026-11-16-04). Pass previewRtrId to supply the value (the default keeps the current RTR ID shape, RTR-<place>-<MMDDYY>-<number>).',
     'Save changes with a changed place or date opens Change RTR ID? (ConfirmSheet with ChangeCompare, Current -> New) before onSubmit; Back returns to the panel with everything typed kept.',
     'Pass the RTR ID collision as fieldErrors.registrationDate ("Another player already has this RTR ID. Choose another place or date."); it is not computed here.',
-    'detailsRequired swaps the Account hint for the Details required one; an unclaimed player who has an email can\'t be saved without one.',
+    "detailsRequired swaps the Account hint for the Details required one; an unclaimed player who has an email can't be saved without one.",
     'The password field is for MVP or beta only (D-2026-11-09-14, end date not set) and is off for unclaimed players.',
   ],
   prototype: { file: 'apps/mockup/admin-app/rotra-admin.html', screen: 'Players' },

@@ -328,8 +328,8 @@ function QuickViewPanel({
             >
               {detailsRequired ? (
                 <Notice tone="warn" title="Details required.">
-                  This older record has a phone and no email. {firstClub} must add an email or delete
-                  the record.
+                  This older record has a phone and no email. {firstClub} must add an email or
+                  delete the record.
                 </Notice>
               ) : null}
               {!p.claimed ? (

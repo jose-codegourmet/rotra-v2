@@ -1,7 +1,7 @@
 import { Card } from '@rotra/ui/card'
-import { Notice } from '@rotra/ui/notice'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { formatYmd } from '@rotra/ui/license-access-chip/variants'
+import { Notice } from '@rotra/ui/notice'
 import { useId } from 'react'
 
 export type PlayerAccountCardProps = {
@@ -38,8 +38,8 @@ export function PlayerAccountCard({
         <KeyValueList items={[{ label: 'Status', value: status }]} />
         {detailsRequired && !claimed ? (
           <Notice tone="warn" title="Details required.">
-            This older record has a phone and no email. {clubName || 'The club'} must add an email or
-            delete the record.
+            This older record has a phone and no email. {clubName || 'The club'} must add an email
+            or delete the record.
           </Notice>
         ) : null}
       </section>

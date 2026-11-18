@@ -1,6 +1,6 @@
 import type { AdminPlayerEdit } from '@rotra/data/admin-player/types'
-import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { managementPlayer } from '@rotra/data/fixtures/admin-player-management'
+import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { profileCharacters } from '@rotra/data/fixtures/profile-characters'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, screen, within } from 'storybook/test'

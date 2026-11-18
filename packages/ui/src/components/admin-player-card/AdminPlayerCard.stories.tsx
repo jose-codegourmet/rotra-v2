@@ -65,7 +65,10 @@ export const GridDetailsRequired: Story = {
   args: { player: managementPlayer, detailsRequired: true, view: 'grid' },
 }
 export const GridSavedByTwoClubs: Story = { args: { player: savedByTwo, view: 'grid' } }
-export const GridSavedByTwoClubsLight: Story = { ...GridSavedByTwoClubs, globals: { theme: 'light' } }
+export const GridSavedByTwoClubsLight: Story = {
+  ...GridSavedByTwoClubs,
+  globals: { theme: 'light' },
+}
 export const Archived: Story = {
   args: { player: { ...managementPlayer, archivedAt: '2026-10-31' } },
 }

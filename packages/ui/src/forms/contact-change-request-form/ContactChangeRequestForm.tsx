@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { formatPhoneForDisplay } from '@rotra/schema/phone'
+import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { REQUEST_FIELD_LABEL } from '@rotra/ui/contact-request-status/variants'
 import { Field } from '@rotra/ui/field'
@@ -105,7 +105,7 @@ export function ContactChangeRequestForm({
                 label: 'Current',
                 value: (
                   <span className="font-mono [overflow-wrap:anywhere]">
-                    {field === 'phone' ? formatPhoneForDisplay(currentPhone) : currentEmail}
+                    {field === 'phone' ? maskPhone(currentPhone) : currentEmail}
                   </span>
                 ),
               },

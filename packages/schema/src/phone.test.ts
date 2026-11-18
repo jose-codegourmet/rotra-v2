@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatPhoneForDisplay, phoneField } from './phone'
+import { formatPhoneForDisplay, maskPhone, phoneField } from './phone'
 
 describe('PH mobile parsing', () => {
   it.each([
@@ -22,5 +22,20 @@ describe('PH mobile parsing', () => {
     expect(formatPhoneForDisplay('+639175550142')).toBe('+63 917 555 0142')
     expect(phoneField.parse(formatPhoneForDisplay('09175550142'))).toBe('+639175550142')
     expect(formatPhoneForDisplay('jose@example.com')).toBe('jose@example.com')
+  })
+})
+
+describe('maskPhone', () => {
+  it.each([
+    '+639175550142',
+    '+63 917 555 0142',
+    '0917 555 0142',
+    '09175550142',
+    '63 917 555 0142',
+  ])('masks %s as the same grouped form', (value) =>
+    expect(maskPhone(value)).toBe('+63 917 ••• ••42'))
+  it('returns input without digits unchanged', () => {
+    expect(maskPhone('')).toBe('')
+    expect(maskPhone('jose@example.com')).toBe('jose@example.com')
   })
 })

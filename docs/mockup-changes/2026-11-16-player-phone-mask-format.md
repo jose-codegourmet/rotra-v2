@@ -1,6 +1,6 @@
 # Player app: every phone shown is masked and grouped; phones are kept as the database holds them
 
-Status: TICKETED — #893
+Status: IN MOCK APP — #904
 Date: 2026-11-16
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `toE164`, `maskPhone`; account fixtures; viewAccount, viewEdit (Privacy and contact), the contact-change sheet and `requestCard`, viewClaim, the identity cards
@@ -27,14 +27,15 @@ Superseded by: none
 - Known differences: none.
 
 ## Reuse plan
-- Reuses as is: `maskPhone` (packages/data), `phoneField` and `formatPhoneForDisplay` (packages/schema).
+- Reuses as is: `phoneField` and `formatPhoneForDisplay` (packages/schema).
+- Moves: `maskPhone` into `packages/schema/src/phone.ts` as the one masking rule (the copies in `packages/data` and `packages/db` are removed).
 - Extends: contact-details-card and the contact-change status text — show the masked phone where they show the full one.
 - Shares work with: [2026-11-16-admin-phone-format](2026-11-16-admin-phone-format.md).
 
 ## Docs updated
 - Business logic: none needed (phones are already private and stored as E.164).
 - Database design: none needed.
-- Screen docs: none changed; to check when ticketed, for any line that shows a player their full phone.
+- Screen docs: checked; no line showed a player their full phone. `profile.md` now says the read-only phone is shown masked.
 
 ## Real app work
-- apps/player and packages/ui: mask the player's own phone wherever it is shown as text.
+- apps/player and packages/ui: mask the player's own phone wherever it is shown as text. Done in #904: ContactDetailsCard, AccountPanel, EditProfileForm, ContactChangeRequestForm and ContactRequestStatus (Player-only components; Admin keeps the full number through its own components).

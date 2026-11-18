@@ -1,6 +1,7 @@
 import { emailField } from '@rotra/schema/email'
 import { passwordField } from '@rotra/schema/password'
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
+import { maskPhone } from '@rotra/schema/phone'
 import { getSession, signIn } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
 import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
@@ -22,7 +23,6 @@ import {
   realResetPassword,
   realSetPhonePrivacy,
 } from '../real/player'
-import { maskPhone } from './playerAccount.rules'
 import type { ClaimLink, CompleteClaimResult, MyAccount } from './playerAccount.types'
 import { myAccountOf } from './visibilitySettings'
 

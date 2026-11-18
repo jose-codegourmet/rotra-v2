@@ -1,6 +1,6 @@
+import { maskPhone } from '@rotra/schema/phone'
 import type { ContactChangeRequest } from '../contact-change-request/contactChangeRequest.types'
 import { normalizeGoogleEmail } from '../google-sign-in/googleSignIn.rules'
-import { maskPhone } from '../player-account/playerAccount.rules'
 import type { MyAccount } from '../player-account/playerAccount.types'
 import type { AccountVerification, VerificationEmail } from './accountVerification.types'
 

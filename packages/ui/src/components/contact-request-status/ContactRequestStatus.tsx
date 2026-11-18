@@ -1,4 +1,5 @@
 import type { ContactChangeRequest } from '@rotra/data/contact-change-request/types'
+import { maskPhone } from '@rotra/schema/phone'
 import { Chip } from '@rotra/ui/chip'
 import { Notice } from '@rotra/ui/notice'
 import type { ReactNode } from 'react'
@@ -13,7 +14,15 @@ export type ContactRequestStatusProps = {
   variant?: 'full' | 'compact'
 }
 
-function statusText({ field, fromValue, toValue, status }: ContactRequestStatusProps['request']) {
+/** The Player app never shows a full phone (D-2026-11-16-06); Admin reads the same values through its own components. */
+function statusText({
+  field,
+  fromValue: fromRaw,
+  toValue: toRaw,
+  status,
+}: ContactRequestStatusProps['request']) {
+  const fromValue = field === 'phone' ? maskPhone(fromRaw) : fromRaw
+  const toValue = field === 'phone' ? maskPhone(toRaw) : toRaw
   const f = REQUEST_FIELD_LABEL[field].toLowerCase()
   const from = <span className="font-mono [overflow-wrap:anywhere]">{fromValue}</span>
   const texts: Record<typeof status, ReactNode> = {

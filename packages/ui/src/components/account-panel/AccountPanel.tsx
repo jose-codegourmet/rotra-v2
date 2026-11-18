@@ -1,4 +1,4 @@
-import { formatPhoneForDisplay } from '@rotra/schema/phone'
+import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Icon } from '@rotra/ui/icon'
@@ -38,7 +38,7 @@ export function AccountPanel({
           items={[
             {
               label: 'Phone',
-              value: <span className="font-mono">{formatPhoneForDisplay(phone)}</span>,
+              value: <span className="font-mono">{maskPhone(phone)}</span>,
             },
             { label: 'Email', value: email || <span className="text-fg2">Not added</span> },
             {

@@ -72,6 +72,7 @@ const UI_ACTION: Record<string, string> = {
   'player.contact_change_approved': 'contact_change_approved',
   'player.contact_change_rejected': 'contact_change_declined',
   'player.contact_change_applied': 'contact_change_applied',
+  'player.created': 'player_created',
   'player.profile_updated': 'player_updated',
   'player.password_set': 'player_updated',
   'player.verification_override_set': 'player_verification_override_set',
@@ -341,6 +342,10 @@ async function summarizer(events: ReadEvent[]) {
         return event.action === 'player.verification_override_set'
           ? `Set ${name} to Verified by Admin. Reason: ${reason}`
           : `Cleared Verified by Admin for ${name}. Reason: ${reason}`
+      }
+      case 'player.created': {
+        const name = str(metadata.name)
+        return name ? `Created ${name} by ROTRA Admin.` : null
       }
       case 'player.password_set': {
         const reason = str(metadata.reason)

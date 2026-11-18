@@ -21,7 +21,7 @@ import { checkMockSave } from '../mock/bridge'
 import { ConflictError, MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { realSetAdminVerificationOverride } from '../real/account-verification'
-import { realUpdateAdminPlayer } from '../real/admin-players'
+import { realCreateAdminPlayer, realUpdateAdminPlayer } from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
 import {
   adminPlayerChangedFields,
@@ -61,6 +61,7 @@ function reason(value: string) {
 export async function createAdminPlayer(input: AdminPlayerCreateValues) {
   await owner()
   const values = adminPlayerCreateSchema.parse(input)
+  if (isRealDataMode()) return realCreateAdminPlayer(values)
   return adminMutation(400, (draft) => {
     checkMockSave()
     const matches = duplicateGroups([

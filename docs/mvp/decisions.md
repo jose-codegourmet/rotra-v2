@@ -706,7 +706,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **Share image:** the Post image stays 1080 × 1350. The question of MVP timing for the club page and Bagging mode is moot: both shipped on 2026-11-12 (#747).
 - **Still open:**
   - A real-mode marker for a club-only record whose phone lookup found nobody: “Lookup pending” versus “Unclaimed” in Saved players.
-  - Admin › Add player still creates an unclaimed `players` row with an RTR ID, which contradicts “RTR ID only on registration”.
+  - Admin › Add player still creates an unclaimed `players` row with an RTR ID, which contradicts “RTR ID only on registration”. Answered for real mode on November 18, 2026: it saves a club-only unclaimed record with no RTR ID (club and phone required). The mock app and the mockup still show the old behavior; Created by Admin with no club is still open.
   - The public club page's Join button sends the current invite code to anyone who opens the page.
   - The Edit profile banner swatches cannot show a banner Admin later hid.
   - Drop-out notices are not closed at Start.

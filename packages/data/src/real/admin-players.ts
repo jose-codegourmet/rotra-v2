@@ -1,4 +1,4 @@
-import type { AdminPlayerEditValues } from '@rotra/schema/admin-player'
+import type { AdminPlayerCreateValues, AdminPlayerEditValues } from '@rotra/schema/admin-player'
 import type {
   AdminPlayer,
   AdminPlayerDetail,
@@ -6,7 +6,7 @@ import type {
   AdminPlayerEditResult,
   AdminPlayerListParams,
 } from '../admin-player/adminPlayer.types'
-import { selectAdminPlayers } from '../admin-player/management.rules'
+import { duplicateGroups, selectAdminPlayers } from '../admin-player/management.rules'
 import { MockError } from '../mock/errors'
 import type { PlayerSessionRecord } from '../player/player.types'
 import { RealRequestError, realRequest } from './client'
@@ -92,4 +92,32 @@ export async function realUpdateAdminPlayer(
       )
     throw error
   }
+}
+
+/**
+ * Add player: the same "Review matches, then Create anyway" check as mock mode against the real
+ * directory, then the save. Real mode saves the club's unclaimed record (no RTR ID yet).
+ */
+export async function realCreateAdminPlayer(values: AdminPlayerCreateValues): Promise<AdminPlayer> {
+  if (!values.allowDuplicate) {
+    const players = await directory()
+    const match = duplicateGroups([
+      ...players,
+      { id: 'new', name: values.name, phone: values.phone, email: values.email },
+    ]).find((group) => group.ids.includes('new'))
+    if (match)
+      throw new MockError(
+        'conflict',
+        `${match.reasons.join(', ')}: ${match.ids
+          .filter((id) => id !== 'new')
+          .map((id) => players.find((p) => p.id === id))
+          .map((p) => p?.rtrId ?? p?.name)
+          .join(', ')}. Review matches, then Create anyway.`,
+      )
+  }
+  const { player } = await realRequest<{ player: WireAdminPlayer }>('/api/players', {
+    method: 'POST',
+    body: values,
+  })
+  return playerOf(player)
 }

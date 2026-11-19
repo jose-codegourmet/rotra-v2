@@ -155,9 +155,11 @@ console says so honestly:
 
 ## Attention and regeneration
 
-When a player is no longer available, affected queued matches show **Needs attention** with the reason, using text and icon as well as color. The operator edits the lineup to swap the player, or regenerates.
+When a player is no longer available, affected queued matches show **Needs attention** with the reason, using text and icon as well as color. The operator edits the lineup to swap the player.
 
-Regenerate:
+**Regenerate is removed from the Main Queue** (owner artifact comment, November 19, 2026; [log](../../../../../mockup-changes/2026-11-19-queue-remove-regenerate.md)). The rules below describe the old action. They stay only until the owner confirms whether anything else (Clear queue, then Generate Queue) replaces it.
+
+Regenerate (removed from the mockup):
 
 1. Never changes On court or Playing matches.
 2. Rebuilds automatic and suggested (unprotected) waiting matches.

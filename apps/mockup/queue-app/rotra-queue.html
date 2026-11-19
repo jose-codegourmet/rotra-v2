@@ -330,6 +330,10 @@ body.court-dragging { cursor: grabbing; }
 .cp-dot svg { width: 12px; height: 12px; }
 .ex-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 3px; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg); font-size: 13px; }
 .ex-chip .avatar { width: 26px; height: 26px; font-size: 10px; }
+.lv-ring { --ring: var(--border-strong); display: inline-flex; border-radius: 50%; }
+.lv-ring.lv-beginner { --ring: var(--lv-beg); } .lv-ring.lv-intermediate { --ring: var(--lv-int); } .lv-ring.lv-advanced { --ring: var(--lv-adv); }
+.lv-ring .avatar { outline: 2px solid var(--ring); outline-offset: 1px; }
+.sel-faces .lv-ring + .lv-ring { margin-left: 4px; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4678,6 +4682,8 @@ function autoWorkspace(s) {
     ${batch.cards.length ? `<div class="qgrid" style="grid-template-columns:repeat(${queueCols(DRAFT_TILE_MIN)}, minmax(0, 1fr))">${batch.cards.map((m) => draftTile(s, m, batch, a.selected)).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
     ${a.selected.length || batch.cards.length ? autoSelectionBar(s, a, batch) : ''}`;
 }
+// A picture with the level ring (Beginner, Intermediate, Advanced; grey with no level). Owner artifact comment, November 19, 2026.
+const ringAvatar = (s, pid) => { const r = R(s, pid); return `<span class="lv-ring lv-${r ? rvBand(r) : 'none'}" title="${esc(lvLabel(r ? r.level : null))}">${avatar(P(pid))}</span>`; };
 // Exemption list (owner artifact comment, November 19, 2026): players Generate Queue leaves out. They stay on the roster and can
 // still be put in matches by hand (Add match, Make match, Suggest). Kept per session.
 const exemptOf = (s) => (s.exempt || []).filter((pid) => R(s, pid));
@@ -4686,7 +4692,7 @@ function exemptCard(s) {
   return `<section class="card stack" aria-labelledby="ex-h"><div class="between"><h3 id="ex-h" style="margin:0;font-size:16px">Exemption list${list.length ? ` · ${list.length}` : ''}</h3>
       <label class="sr-only" for="ex-add">Add a player to the exemption list</label><select class="input inline" id="ex-add" data-act-change="exemptAdd"><option value="">Add a player…</option>${open.map((r) => `<option value="${r.pid}">${esc(nm(r.pid))}</option>`).join('')}</select></div>
     <p class="small muted">Generate Queue leaves these players out. They stay on the roster, and you can still put them in a match yourself.</p>
-    ${list.length ? `<div class="row" style="gap:8px">${list.map((pid) => `<span class="ex-chip">${avatar(P(pid))}<b>${esc(short(pid))}</b><button type="button" class="btn xs ghost icon-btn" data-act="exemptRemove" data-pid="${pid}" aria-label="Take ${esc(nm(pid))} off the exemption list" title="Remove">${I.x}</button></span>`).join('')}</div>` : '<p class="small muted">No one is exempt.</p>'}
+    ${list.length ? `<div class="row" style="gap:8px">${list.map((pid) => `<span class="ex-chip">${ringAvatar(s, pid)}<b>${esc(short(pid))}</b><button type="button" class="btn xs ghost icon-btn" data-act="exemptRemove" data-pid="${pid}" aria-label="Take ${esc(nm(pid))} off the exemption list" title="Remove">${I.x}</button></span>`).join('')}</div>` : '<p class="small muted">No one is exempt.</p>'}
   </section>`;
 }
 // #739 (proposed): the bagging pairs list, a guide for Generate matches.
@@ -4694,7 +4700,7 @@ function baggingCard(s) {
   const pairs = s.bagging.pairs || [];
   return `<section class="card stack" aria-label="Bagging pairs"><div class="between"><h3 style="margin:0;font-size:16px">Bagging pairs${pairs.length ? ` · ${pairs.length}` : ''}</h3><button class="btn sm primary" data-act="bagOpenAdd">Add pair</button></div>
     <p class="small muted">Pairs guide Generate matches. Auto Queue and matches you build by hand are not affected.</p>
-    ${pairs.length ? `<div class="list">${pairs.map((pr) => `<div class="li" style="flex-wrap:wrap"><span class="sel-faces">${avatar(P(pr.a))}${avatar(P(pr.b))}</span><div class="main"><b>${esc(short(pr.a))} and ${esc(short(pr.b))}</b></div>
+    ${pairs.length ? `<div class="list">${pairs.map((pr) => `<div class="li" style="flex-wrap:wrap"><span class="sel-faces">${ringAvatar(s, pr.a)}${ringAvatar(s, pr.b)}</span><div class="main"><b>${esc(short(pr.a))} and ${esc(short(pr.b))}</b></div>
       ${bagSeg(s, pr.pattern, (v) => `data-act="bagPattern" data-id="${pr.id}" data-v="${v}"`, `Games for ${esc(short(pr.a))} and ${esc(short(pr.b))}`)}
       <button class="btn xs ghost" data-act="bagRemove" data-id="${pr.id}" aria-label="Remove pair ${esc(short(pr.a))} and ${esc(short(pr.b))}">Remove</button></div>`).join('')}</div>` : '<p class="small muted">No pairs yet. Add a pair to keep two players as partners.</p>'}</section>`;
 }

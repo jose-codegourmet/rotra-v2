@@ -91,7 +91,7 @@ When no lineup is possible, the sheet shows the reason (both formats off, or “
 
 ## Q-AUTO — Generate matches workspace
 
-**Exemption list (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-generate-exemption-list.md)):** a card under the heading (after Bagging pairs when on): “Exemption list · N”, an **Add a player…** menu of roster players not yet on it, the line “Generate Queue leaves these players out. They stay on the roster, and you can still put them in a match yourself.”, and a chip per player (picture, short name, × to take them off; empty: “No one is exempt.”). Toasts “NAME added to the exemption list” / “NAME taken off the exemption list”.
+**Exemption list (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-generate-exemption-list.md)):** a card under the heading (after Bagging pairs when on): “Exemption list · N”, an **Add a player…** menu of roster players not yet on it, the line “Generate Queue leaves these players out. They stay on the roster, and you can still put them in a match yourself.”, and a chip per player (picture, short name, × to take them off; empty: “No one is exempt.”). Toasts “NAME added to the exemption list” / “NAME taken off the exemption list”. The pictures in **Bagging pairs** and on these chips carry the level ring (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-bagging-exempt-rings.md)).
 
 Formerly called Auto Queue; renamed 2026-11-06.
 

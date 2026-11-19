@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 33 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 34 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -384,6 +384,7 @@ NEW: 33 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
 | [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | NEW |
+| [2026-11-19-queue-bagging-exempt-rings](2026-11-19-queue-bagging-exempt-rings.md) | Queue app: Bagging pairs and exemption chips show the level ring | picture with level ring (shared helper) | NEW |
 | [2026-11-19-queue-bigger-court-buttons](2026-11-19-queue-bigger-court-buttons.md) | Queue app: bigger court buttons in Put on court and Move match | court pick tile (new) | NEW |
 | [2026-11-19-queue-card-faces-ring-games](2026-11-19-queue-card-faces-ring-games.md) | Queue app: Main Queue card pictures show the level ring and games played | queue card face (reuse the level ring and the court card's games badge) | NEW |
 | [2026-11-19-queue-card-min-300](2026-11-19-queue-card-min-300.md) | Queue app: queued match cards are at least 450 px wide | queue match card grid (no new component) | NEW |

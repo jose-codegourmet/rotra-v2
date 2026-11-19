@@ -4242,17 +4242,29 @@ function viewConsole() {
           </div>` : ''}</div></div>`; })()}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
-    <div class="tabs" role="tablist" aria-label="Console views">
-      ${[
-        ['live', `Session <span class="chip">${courtMatches(s).reduce((t, m) => t + m.courts.length, 0)}/${s.courts.length}<span class="tw"> courts in use</span></span>`],
-        ['queue', `Queue <span class="chip">${waiting(s).length}<span class="tw"> waiting</span></span>${att ? ` <span class="chip warn">${att}<span class="tw"> need attention</span></span>` : ''}`],
-        ['roster', `Players <span class="chip">${s.roster.filter((r) => r.present).length}/${s.roster.length}<span class="tw"> present</span></span>`],
-        recordedOf(s) && ['board', `<span class="tw-long">Leaderboard</span><span class="tw-short">Board</span>${s.matches.some((m) => m.status === 'done') ? ` <span class="chip">${(() => { const top = standGroups(standings(s))[0]; return !top ? '' : top.rows.length > 1 ? `${top.rows.length} tied` : `${esc(short(top.rows[0].pid))} leads`; })()}</span>` : ''}`],
-      ].filter(Boolean).map(([k, l]) => `<button role="tab" aria-selected="${(['queue', 'roster', 'board'].includes(pane) ? pane : 'live') === k}" data-act="pane" data-k="${k}">${l}</button>`).join('')}
-    </div>
+    ${(() => {
+      // Owner artifact comment, November 19, 2026: "Court (Sessions), Main Queue, Generate Queue, Players, Leaderboard, Settings".
+      // Main Queue and Generate Queue are their own tabs (no switch inside the queue); Settings shows the session settings in place.
+      const lead = (() => { const top = s.matches.some((m) => m.status === 'done') && standGroups(standings(s))[0]; return !top ? null : top.rows.length > 1 ? `${top.rows.length} tied` : `${short(top.rows[0].pid)} leads`; })();
+      const tabs = [
+        ['live', 'Courts', `${courtMatches(s).reduce((t, m) => t + m.courts.length, 0)}/${s.courts.length}`, ' courts in use'],
+        ['queue', 'Main Queue', waiting(s).length, ' waiting'],
+        ['generate', 'Generate Queue', null, ''],
+        ['roster', 'Players', `${s.roster.filter((r) => r.present).length}/${s.roster.length}`, ' present'],
+        recordedOf(s) && ['board', 'Leaderboard', lead, ''],
+        ['settings', 'Settings', null, ''],
+      ].filter(Boolean);
+      const on = tabs.some(([k]) => k === pane) ? pane : 'live';
+      return `${tabMenu('dd-console', 'Console view', tabs.map(([k, l, n]) => [k, l, n]), on)}
+    <div class="tabs has-dd" role="tablist" aria-label="Console views">
+      ${tabs.map(([k, l, n, tw]) => `<button role="tab" aria-selected="${on === k}" data-act="pane" data-k="${k}">${l}${n != null ? ` <span class="chip">${esc(n)}<span class="tw">${tw}</span></span>` : ''}${k === 'queue' && att ? ` <span class="chip warn">${att}<span class="tw"> need attention</span></span>` : ''}</button>`).join('')}
+    </div>`;
+    })()}
     ${pane === 'roster' ? `<section class="stack" aria-label="Players">${playersPane(s)}</section>`
-      : pane === 'queue' ? `<section class="stack" aria-label="Queued matches">${queuePane(s)}</section>`
-      : pane === 'board' ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
+      : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section>`
+      : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
+      : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
+      : pane === 'settings' ? `<section class="stack" aria-label="Settings">${prepOverview(s)}<div><button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button></div></section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
       <section class="stack live-sec" aria-label="Courts">${courtsPane(s)}</section>
@@ -4380,8 +4392,7 @@ function courtsPane(s) {
 function queuePane(s) {
   const list = waiting(s);
   const att = attention(s).length;
-  if (S.ui.queueWorkspace === 'auto') return autoWorkspace(s);
-  return `<div class="seg" role="group" aria-label="Queue workspace"><button aria-pressed="true">Main Queue</button><button data-act="queueWorkspace" data-k="auto">Generate matches</button></div><div class="between"><h2>Queued matches</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="queueWorkspace" data-k="auto">Generate matches</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button><button class="btn sm danger fill" data-act="openClearQueue" ${list.length ? '' : 'disabled'}>Clear queue</button></div></div>
+  return `<div class="between"><h2>Main Queue</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="pane" data-k="generate">Generate Queue</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button><button class="btn sm danger fill" data-act="openClearQueue" ${list.length ? '' : 'disabled'}>Clear queue</button></div></div>
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
     ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
@@ -4413,8 +4424,7 @@ function autoWorkspace(s) {
   const disabled = (reason, id) => reason ? `disabled title="${esc(reason)}" aria-describedby="${id}"` : '';
   const eligible = s.roster.some((r) => r.present && (tab === 'ahead' || !busyOf(s, r.pid)));
   const empty = !eligible ? (tab === 'ahead' ? 'No present players. Mark arrivals present in Players.' : 'No one is free to play right now. Try Plan Ahead to include players who are mid-game.') : tab === 'catchup' && !validTarget ? 'Choose a game target, then Generate.' : !a.count ? 'Choose how many matches, then Generate.' : 'Generate matches to see suggestions here.';
-  return `<div class="seg" role="group" aria-label="Queue workspace"><button data-act="queueWorkspace" data-k="main">Main Queue</button><button aria-pressed="true">Generate matches</button></div>
-    <div class="between"><h2>Generate matches</h2>${s.doubles ? `<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="small"><b>Bagging mode</b></span>${sw(baggingOn(s), 'toggleBagging', '', 'Bagging mode')}</label>` : ''}</div>
+  return `<div class="between"><h2>Generate Queue</h2>${s.doubles ? `<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="small"><b>Bagging mode</b></span>${sw(baggingOn(s), 'toggleBagging', '', 'Bagging mode')}</label>` : ''}</div>
     <p class="small muted">Drafts are suggestions. Nothing joins the Main Queue until you add it.</p>
     ${baggingOn(s) ? baggingCard(s) : ''}
     <div class="seg" role="group" aria-label="Generation strategy">${Object.entries(AUTO_MODES).map(([k, label]) => `<button id="auto-tab-${k}" data-act="autoTab" data-k="${k}" aria-pressed="${tab === k}">${label}</button>`).join('')}</div>
@@ -4565,7 +4575,7 @@ function upcomingPane(s) {
   return `<div class="between"><h2>Upcoming queued matches</h2><span class="small muted">${list.length} waiting${att ? ` · <span style="color:var(--warn)">${att} need attention</span>` : ''}</span></div>
     <div class="qgrid" style="grid-template-columns:repeat(${cols}, minmax(0, 1fr))">
       ${shown.length ? shown.map((m, i) => queueCard(s, m, i, list.length, cols)).join('') : `<div class="card empty" style="grid-column:span ${Math.max(1, cols - 1)}">No matches queued yet.</div>`}
-      <button class="qtile qmore" data-act="pane" data-k="queue" aria-label="More queues: open the Queue tab"><span class="plus" aria-hidden="true">→</span><b>More queues</b><span class="small muted">${rest > 0 ? `+${rest} more waiting` : list.length ? 'Reorder, add or regenerate' : 'Add or generate matches'}</span></button>
+      <button class="qtile qmore" data-act="pane" data-k="queue" aria-label="More queues: open the Main Queue tab"><span class="plus" aria-hidden="true">→</span><b>More queues</b><span class="small muted">${rest > 0 ? `+${rest} more waiting` : list.length ? 'Reorder, add or regenerate' : 'Add or generate matches'}</span></button>
     </div>`;
 }
 // Queue grid columns from the content width (window − rail − side padding): tiles of 220 px or more, 10 px gaps, no upper limit.
@@ -6439,7 +6449,7 @@ const ACT = {
   useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
   openSessionQr: () => openSheet({ type: 'sessionQr', fmt: 'post' }),
   qrFmt: (d) => { if (S.ui.sheet?.type === 'sessionQr') { S.ui.sheet.fmt = d.k; render(); } },
-  ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
+  ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else if (d.menu === 'dd-console') ACT.pane({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
   downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
   copyRtr: (d) => { try { navigator.clipboard.writeText(d.v); } catch (e) { /* clipboard unavailable */ } toast('RTR ID copied'); },
   copyLink: () => { const v = sessionLink(cur()); try { navigator.clipboard.writeText(v); } catch (e) { /* clipboard unavailable */ } toast('Session link copied'); },
@@ -7335,7 +7345,7 @@ const ACT = {
   skipSuggest: () => { const r = generate(cur(), 1); S.ui.sheet.lineup = r.matches ? r.matches[0] : null; S.ui.sheet.error = r.error; render(); },
   editSuggest: () => { const m = S.ui.sheet.lineup; openSheet({ type: 'editor', id: null, format: m.format, teamA: m.teamA.slice(), teamB: m.teamB.slice() }); },
   addSuggest: () => { const s = cur(); addMatch(s, S.ui.sheet.lineup, 'suggested', !!S.ui.sheet.edited); S.ui.sheet = null; S.ui.pane = 'queue'; commit(`Suggestion added to the queue${autoNote(s, autoFill(s))}`); render(); },
-  queueWorkspace: (d) => { S.ui.queueWorkspace = d.k; S.ui.pane = 'queue'; render(); },
+  queueWorkspace: (d) => { S.ui.pane = d.k === 'auto' ? 'generate' : 'queue'; render(); },
   autoTab: (d) => { autoState(cur()).tab = d.k; autoState(cur()).error = ''; render(); },
   autoCount: (d) => { autoState(cur()).count = +d.n; render(); },
   autoSelect: (d, el) => { const a = autoState(cur()); a.selected = a.selected.filter((id) => id !== d.id); if (el.checked) a.selected.push(d.id); render(); },
@@ -7349,8 +7359,8 @@ const ACT = {
   autoBuild: (keep) => { const s = cur(), a = autoState(s), old = a.batches[a.tab] || { cards: [] }; const fixed = keep ? old.cards.filter((m) => a.selected.includes(m.draftId)) : []; const r = generateDrafts(s, a.tab, Math.max(0, a.count-fixed.length), a.target, fixed); if (r.error) { a.error = r.error; render(); return; } const removed = old.cards.filter((m) => !fixed.includes(m)).map((m) => m.draftId); a.selected = a.selected.filter((id) => !removed.includes(id)); a.batches[a.tab] = { cards: [...fixed, ...r.matches.map((m) => ({ ...m, draftId: `d${a.next++}`, strategy: a.tab }))], fingerprint: fixed.length && old.fingerprint !== queueFingerprint(s) ? old.fingerprint : queueFingerprint(s), stop: r.stop }; a.error = ''; render(); },
   autoAddTab: () => { const a = autoState(cur()); openSheet({ type: 'autoReview', ids: (a.batches[a.tab]?.cards || []).map((m) => m.draftId) }); },
   autoReview: () => openSheet({ type: 'autoReview', ids: autoState(cur()).selected.slice() }),
-  autoCommit: () => { const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards); const ids = S.ui.sheet.ids, selected = ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean); if (!selected.length || selected.length !== ids.length || new Set(ids).size !== ids.length) { S.ui.sheet.error = 'Drafts changed. Review them again.'; render(); return; } const invalid = selected.find((m) => !FORMATS[m.format] || (m.format === 'singles' && !s.singles) || (m.format === 'doubles' && !s.doubles) || m.teamA.length !== FORMATS[m.format][0] || m.teamB.length !== FORMATS[m.format][1] || all(m).some((p) => !R(s,p) || !R(s,p).present || (m.strategy !== 'ahead' && busyOf(s,p))) || new Set(all(m)).size !== all(m).length); if (invalid) { S.ui.sheet.error = 'A selected draft needs attention: check player presence, playing dependencies and lineups, then regenerate.'; render(); return; } selected.forEach((m) => addMatch(s,m,'auto',false)); Object.values(a.batches).forEach((b) => { b.cards = b.cards.filter((m) => !ids.includes(m.draftId)); }); a.selected = a.selected.filter((id) => !ids.includes(id)); S.ui.sheet = null; S.ui.queueWorkspace = 'main'; commit(`${selected.length} drafts added to Main Queue${autoNote(s, autoFill(s))}`); render(); },
-  openAuto: () => { S.ui.queueWorkspace = 'auto'; S.ui.pane = 'queue'; render(); },
+  autoCommit: () => { const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards); const ids = S.ui.sheet.ids, selected = ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean); if (!selected.length || selected.length !== ids.length || new Set(ids).size !== ids.length) { S.ui.sheet.error = 'Drafts changed. Review them again.'; render(); return; } const invalid = selected.find((m) => !FORMATS[m.format] || (m.format === 'singles' && !s.singles) || (m.format === 'doubles' && !s.doubles) || m.teamA.length !== FORMATS[m.format][0] || m.teamB.length !== FORMATS[m.format][1] || all(m).some((p) => !R(s,p) || !R(s,p).present || (m.strategy !== 'ahead' && busyOf(s,p))) || new Set(all(m)).size !== all(m).length); if (invalid) { S.ui.sheet.error = 'A selected draft needs attention: check player presence, playing dependencies and lineups, then regenerate.'; render(); return; } selected.forEach((m) => addMatch(s,m,'auto',false)); Object.values(a.batches).forEach((b) => { b.cards = b.cards.filter((m) => !ids.includes(m.draftId)); }); a.selected = a.selected.filter((id) => !ids.includes(id)); S.ui.sheet = null; S.ui.pane = 'queue'; commit(`${selected.length} drafts added to Main Queue${autoNote(s, autoFill(s))}`); render(); },
+  openAuto: () => { S.ui.pane = 'generate'; render(); },
   openRegen: () => openSheet({ type: 'regen' }),
   confirmRegen: () => {
     const s = cur();
@@ -7867,7 +7877,7 @@ function prototypePath() {
   if (S.screen === 'setup') path = S.ui.draft?.id ? `/sessions/${encodeURIComponent(S.ui.draft.id)}/edit` : '/sessions/new';
   if (S.screen in sessionSuffixes) path = `/sessions/${encodeURIComponent(S.currentId)}${sessionSuffixes[S.screen]}`;
   if (S.screen === 'prepare') tab = S.ui.prepTab && S.ui.prepTab !== 'overview' ? S.ui.prepTab : null;
-  if (S.screen === 'console') tab = ['queue', 'roster', 'board'].includes(S.ui.pane) ? S.ui.pane : null;
+  if (S.screen === 'console') tab = ['queue', 'generate', 'roster', 'board', 'settings'].includes(S.ui.pane) ? S.ui.pane : null;
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
@@ -7907,7 +7917,7 @@ function applyPrototypeRoute(url) {
   S.screen = screen; S.ui.sheet = null; S.ui.navOpen = false; S.ui.setOpen = false;
   if (screen !== 'public') S.ui.guest = false;
   S.ui.prepTab = ['roster', 'waitlist', 'payments'].includes(tab) ? tab : 'overview';
-  S.ui.pane = ['queue', 'roster', 'board'].includes(tab) ? tab : 'live';
+  S.ui.pane = ['queue', 'generate', 'roster', 'board', 'settings'].includes(tab) ? tab : 'live';
   S.ui.histTab = HIST_TABS.some(([key]) => key === tab) ? tab : 'results';
   S.ui.slide = ['1', '2'].includes(tab) ? Number(tab) : 0;
   S.ui.pubTab = tab === 'participants' ? tab : 'details';

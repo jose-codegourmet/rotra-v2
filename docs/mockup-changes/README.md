@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 8 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 1 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -378,7 +378,9 @@ TICKETED: 8 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 | [2026-11-18-player-google-link-copy](2026-11-18-player-google-link-copy.md) | Player app: P-GOOGLE-LINK says Google can be changed, not disconnected | google-link-card | IN MOCK APP — #916 |
 | [2026-11-18-player-legal-text-rewrite](2026-11-18-player-legal-text-rewrite.md) | Player app: fuller Privacy Policy and Terms of Service text | legal-document | IN MOCK APP — PR #940 |
 | [2026-11-18-queue-club-nickname](2026-11-18-queue-club-nickname.md) | Queue app: a club nickname the Queue Master sets for a registered player, shown on Queue Master screens only | player-profile-sheet, saved-player-card, club-nickname-form (new) | TICKETED — #900 |
+| [2026-11-18-queue-guest-invite-claims-record](2026-11-18-queue-guest-invite-claims-record.md) | Queue app: a guest's invite link is their own, and registering through it claims that guest's record | player-profile-sheet, invite-sheet, claim-identity-check | IN PROGRESS — #966 |
 | [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 |
 | [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | TICKETED — #944 |
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
+| [2026-11-19-queue-console-tabs](2026-11-19-queue-console-tabs.md) | Queue app: the live console has six tabs: Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings | tab row and phone tab menu (as on preparation), match queue, generate matches workspace, session setup card | NEW |
 <!-- status-index:end -->

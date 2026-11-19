@@ -18,17 +18,20 @@
 
 Offline notice: “Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.”
 
-**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** The header shows a warn **Not recorded** chip after “Min N games”. The Leaderboard tab is gone, so the console has Session, Queue, Players and Payments; a stale `leaderboard` view is never shown. [Match done](match-control.md#q-match-done--two-completion-paths) opens “Finish match N?” with no winner or score. The footer line “G games recorded” still counts finished matches (open: whether it should read differently when nothing is recorded). Everything else on the console is unchanged. A recorded session shows none of this.
+**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** The header shows a warn **Not recorded** chip after “Min N games”. The Leaderboard tab is gone, so the console has Courts, Main Queue, Generate Queue, Players and Settings; a stale `leaderboard` view is never shown. [Match done](match-control.md#q-match-done--two-completion-paths) opens “Finish match N?” with no winner or score. The footer line “G games recorded” still counts finished matches (open: whether it should read differently when nothing is recorded). Everything else on the console is unchanged. A recorded session shows none of this.
 
-**Views (tabs), each with a live count chip:**
+**Views (tabs)** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-console-tabs.md); mockup only). Six tabs, in this order; on phones they collapse into one menu button like the preparation tabs:
 
 | Tab | Chip | Content |
 |---|---|---|
-| Session | “X/Y courts in use” | Q-COURTS, then one row of upcoming queued matches |
-| Queue | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md) |
+| Courts (was Session) | “X/Y courts in use” | Q-COURTS, then one row of upcoming queued matches |
+| Main Queue (was Queue › Main Queue) | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md) |
+| Generate Queue (was Queue › Generate matches) | none | [Q-AUTO](match-queue.md#q-auto--generate-matches-workspace) |
 | Players | “P/R present” | Q-POOL |
 | Leaderboard | “NAME leads” (or “N tied”) once a game is done; **no tab at all when Record games is off** | Q-LEADERBOARD |
-| Payments | “P/N paid” | The session's payments checklist ([financials](financials-inventory.md)) |
+| Settings | none | The session settings summary (Setup card with Courts and time, Add player, Match requests and Payments, and the session link), plus **All session settings**, which opens Q-PREPARE |
+
+Main Queue and Generate Queue no longer have a Main Queue | Generate matches switch above them: the tabs replace it. Main Queue's **Generate Queue** button opens the Generate Queue tab. Payments stays a header button, not a tab.
 
 These are operator workspace views. They do not reintroduce the prohibited public Matches tab.
 
@@ -63,7 +66,7 @@ Footer copy: “A match never starts by itself when a court frees up. You start 
 
 Removing an occupied court (Getting ready or Playing) is refused with “Only a free court can be removed”. Editing is not blocked (owner comment, November 11, 2026): while a match is on the court its ⋯ menu item reads **Change time** instead of **Edit**, always enabled, and opens the court sheet where the start stays fixed and the end and label can change; the match is not touched ([D-COURTS-TIME](../../dialogs.md#d-courts-time--courts-and-time)). Every court's ⋯ menu also starts with **Change court label** (owner comment, November 13, 2026; [log](../../../../mockup-changes/2026-11-13-queue-change-court-label.md)), free or busy: a small dialog “Change COURT label?” with one **Court label** field (prefilled; required, up to 20 characters, unique within the session, case-insensitive; errors “Enter a court label.”, “Use 20 characters or fewer.”, “Another court already has this label.”), the hint “Shows on the console, the public page and match history after sync.”, **Cancel** and **Save label** (toast “OLD is now NEW”). Only the name changes; matches and times are untouched.
 
-**Upcoming queued matches (Session tab):** header with “N waiting” and attention count; the first few queue cards (one row: as many 220 px+ tiles as fit the content width, minus one for More queues, so wider screens show more); a last tile **More queues** (“+N more waiting”, or “Reorder, add or regenerate”) that opens the Queue tab. Empty: “No matches queued yet.”
+**Upcoming queued matches (Courts tab):** header with “N waiting” and attention count; the first few queue cards (one row: as many 220 px+ tiles as fit the content width, minus one for More queues, so wider screens show more); a last tile **More queues** (“+N more waiting”, or “Reorder, add or regenerate”) that opens the Main Queue tab. Empty: “No matches queued yet.”
 
 ## Q-POOL — Players view
 

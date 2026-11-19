@@ -59,6 +59,13 @@ type Step struct {
 	// Redact lists the dotted paths in the response body whose value is generated ("a.b", "list.*.id"). On a
 	// parallel step it applies to every answer that has the path, and each path must be in at least one answer.
 	Redact []string `json:"redact"`
+	// RedactOptional lets Redact name paths an answer may not have: a route that answers a success or a refusal to
+	// the same request (registration). A path an answer has is still redacted.
+	RedactOptional bool `json:"redactOptional"`
+	// IgnoreHeaders lists response headers that are not compared, by name: the ones only Go sets, with a generated
+	// value (the session cookies of a registration, which the Route Handler sets through Supabase). The capture
+	// drops them from the golden too, and a test of its own asserts them.
+	IgnoreHeaders []string `json:"ignoreHeaders"`
 	// GoExpects is where Go answers differently from the Route Handler on purpose.
 	GoExpects *GoExpects `json:"goExpects"`
 	// Allow500 lets the capture record a crash of the TypeScript (it fails on a 500 otherwise).

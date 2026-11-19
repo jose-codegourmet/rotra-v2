@@ -15,12 +15,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/clubjoin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
@@ -97,31 +97,8 @@ func (s *server) player(cmd writes.Command) http.Handler {
 	return s.auth.Require(store.AudiencePlayer, session.ModeWrite)(writes.Handle(s.log, gated))
 }
 
-// parseUUID is the TypeScript's UUID test (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i): 36 characters,
-// hyphens in their places, hex digits of either case, and nothing else (no braces, no spaces).
-func parseUUID(s string) (pgtype.UUID, bool) {
-	var out pgtype.UUID
-	if len(s) != 36 {
-		return out, false
-	}
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		switch {
-		case i == 8 || i == 13 || i == 18 || i == 23:
-			if c != '-' {
-				return out, false
-			}
-		case c >= '0' && c <= '9', c >= 'a' && c <= 'f', c >= 'A' && c <= 'F':
-		default:
-			return out, false
-		}
-	}
-	id, err := uuid.Parse(s)
-	if err != nil {
-		return out, false
-	}
-	return pgtype.UUID{Bytes: id, Valid: true}, true
-}
+// parseUUID is the TypeScript's UUID test (see clubjoin.ParseUUID).
+func parseUUID(s string) (pgtype.UUID, bool) { return clubjoin.ParseUUID(s) }
 
 // account is the revision half of the answers that carry `revision`: readMyAccount after the commit, on its own read.
 func (s *server) account(ctx context.Context, id pgtype.UUID) (signedin.MyAccount, error) {

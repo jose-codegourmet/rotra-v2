@@ -3,13 +3,20 @@ package writetest
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"slices"
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 )
 
@@ -19,6 +26,14 @@ import (
 // Every case starts from the seed: the seed file is also the reset, so a case never sees what an earlier one
 // wrote. The seed must start by deleting what it inserts. A scenario's statements run after it.
 func Replay(t *testing.T, dir, name string, build Build) {
+	t.Helper()
+	ReplayFull(t, dir, name, func(pool *pgxpool.Pool, svc *session.Service, _ *store.Store, log *slog.Logger, now func() time.Time) func(*http.ServeMux) {
+		return build(pool, svc.Authenticator(), log, now)
+	})
+}
+
+// ReplayFull is Replay for routes built from the whole sign-in service (see BuildFull).
+func ReplayFull(t *testing.T, dir, name string, build BuildFull) {
 	t.Helper()
 	var cf CaseFile
 	ReadJSON(t, dir, name+".cases.json", &cf)
@@ -31,7 +46,7 @@ func Replay(t *testing.T, dir, name string, build Build) {
 		t.Fatal(`the cases file needs the scenario "base"`)
 	}
 	seed := ReadSeed(t, dir, cf.Seed)
-	e := NewEnv(t, cf.Now, build)
+	e := NewEnvFull(t, cf.Now, build)
 	e.Players = cf.App == "player"
 	for _, c := range cf.Cases {
 		t.Run(c.Name, func(t *testing.T) {
@@ -121,13 +136,17 @@ func (e *Env) runStep(t *testing.T, app string, s Step) stepAnswer {
 }
 
 // normalize redacts a body and returns it decoded; the golden body is decoded the same way.
-func normalize(t *testing.T, label string, body []byte, redact []string) any {
+func normalize(t *testing.T, label string, body []byte, redact []string, optional bool) any {
 	t.Helper()
 	v, err := decode(body)
 	if err != nil {
 		t.Fatalf("%s: body is not JSON: %q (%v)", label, body, err)
 	}
-	if err := RedactPaths(v, redact); err != nil {
+	redactor := RedactPaths
+	if optional {
+		redactor = RedactPathsOptional
+	}
+	if err := redactor(v, redact); err != nil {
 		t.Errorf("%s: %v", label, err)
 	}
 	return v
@@ -159,13 +178,25 @@ func compareOne(t *testing.T, label string, got answer, want GoldenStep, s Step)
 	if got.status != want.Status {
 		t.Errorf("%s: status %d, want %d (%s)", label, got.status, want.Status, got.body)
 	}
-	if !reflect.DeepEqual(got.headers, want.Headers) {
-		t.Errorf("%s: headers %v, want %v", label, got.headers, want.Headers)
+	gotHeaders, wantHeaders := withoutHeaders(got.headers, s.IgnoreHeaders), withoutHeaders(want.Headers, s.IgnoreHeaders)
+	if !reflect.DeepEqual(gotHeaders, wantHeaders) {
+		t.Errorf("%s: headers %v, want %v", label, gotHeaders, wantHeaders)
 	}
-	g, w := normalize(t, label, got.body, s.Redact), normalize(t, label+" (golden)", want.Body, nil)
+	g, w := normalize(t, label, got.body, s.Redact, s.RedactOptional), normalize(t, label+" (golden)", want.Body, nil, false)
 	if !reflect.DeepEqual(g, w) {
 		t.Errorf("%s: body\n got %s\nwant %s", label, canonical(g), canonical(w))
 	}
+}
+
+// withoutHeaders is the headers without the named ones (Step.IgnoreHeaders).
+func withoutHeaders(h map[string]string, ignore []string) map[string]string {
+	out := map[string]string{}
+	for k, v := range h {
+		if !slices.ContainsFunc(ignore, func(n string) bool { return strings.EqualFold(n, k) }) {
+			out[k] = v
+		}
+	}
+	return out
 }
 
 // compareParallel compares the answers of requests sent together as a set: which request got which answer is not
@@ -201,7 +232,7 @@ func compareParallel(t *testing.T, label string, got []answer, want []GoldenStep
 		}
 	}
 	for _, a := range want {
-		w = append(w, item{a.Status, canonical(normalize(t, label+" (golden)", a.Body, nil))})
+		w = append(w, item{a.Status, canonical(normalize(t, label+" (golden)", a.Body, nil, false))})
 	}
 	less := func(x []item) func(i, j int) bool {
 		return func(i, j int) bool {

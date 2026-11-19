@@ -44,7 +44,18 @@ func (h *handlers) submit(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, prob)
 		return
 	}
-	digest := digestOf(r.PathValue("token"))
+	h.finish(w, r, s, digestOf(r.PathValue("token")), func(w http.ResponseWriter, r *http.Request, ident store.Identity, playerID uuid.UUID, _ bool) {
+		h.signIn(w, r, ident, playerID)
+	})
+}
+
+// signedIn is what happens once the link is finished: the claim just committed (retried false), or the link was used
+// before and this request proved the password of its account (retried true). It answers the request.
+type signedIn func(w http.ResponseWriter, r *http.Request, ident store.Identity, playerID uuid.UUID, retried bool)
+
+// finish is steps 3 to 6 of submit, from the link read to the answer: it claims the link, or finds it used and checks the
+// password, and hands the account to then, which answers. Anything else it answers itself.
+func (h *handlers) finish(w http.ResponseWriter, r *http.Request, s submission, digest []byte, then signedIn) {
 	now := h.now()
 
 	// A concurrent identical claim (a double tap, a retry, two tabs) can win while this one is between its reads
@@ -53,12 +64,12 @@ func (h *handlers) submit(w http.ResponseWriter, r *http.Request) {
 	// the consumed link and signs in with the right password; if it still conflicts, it was a different claimant.
 	var hash string
 	for pass := 0; ; pass++ {
-		done, replied := h.attempt(w, r, s, digest, now, &hash, pass == 0)
+		done, replied := h.attempt(w, r, s, digest, now, &hash, pass == 0, then)
 		if replied {
 			return
 		}
 		if done != nil {
-			h.signIn(w, r, done.ident, done.playerID)
+			then(w, r, done.ident, done.playerID, false)
 			return
 		}
 	}
@@ -67,7 +78,7 @@ func (h *handlers) submit(w http.ResponseWriter, r *http.Request) {
 // attempt is one pass over the link: it answers the request itself and reports replied, or returns the claim to
 // sign in. A conflict on the first pass (canRerun) answers nothing and returns (nil, false): the caller runs the
 // pass again. The password hash is computed once and kept in *hash.
-func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission, digest []byte, now time.Time, hash *string, canRerun bool) (done *claimed, replied bool) {
+func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission, digest []byte, now time.Time, hash *string, canRerun bool, then signedIn) (done *claimed, replied bool) {
 	ctx := r.Context()
 	// Only a field conflict (the email or phone is taken) can be the work of a concurrent identical claim. The
 	// field-less conflict of the transaction's own re-checks means the club changed the link since it was read:
@@ -81,7 +92,7 @@ func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission,
 		return nil, true
 	}
 	if l == nil {
-		writeProblem(w, refuse(httpapi.ErrForbidden, "link", msgExpired))
+		s.write(w, refuse(httpapi.ErrForbidden, "link", msgExpired))
 		return nil, true
 	}
 	if afterLinkRead != nil {
@@ -96,17 +107,17 @@ func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission,
 		return nil, false
 	}
 	if dec.problem != nil {
-		writeProblem(w, dec.problem)
+		s.write(w, dec.problem)
 		return nil, true
 	}
 	if dec.retry != uuid.Nil {
-		h.retry(w, r, s, dec.retry)
+		h.retry(w, r, s, dec.retry, then)
 		return nil, true
 	}
 
 	details, ferr := profile.Parse(s.input)
 	if ferr != nil {
-		writeProblem(w, refuse(httpapi.ErrInvalid, ferr.Field, ferr.Message))
+		s.write(w, refuse(httpapi.ErrInvalid, ferr.Field, ferr.Message))
 		return nil, true
 	}
 	if *hash == "" {
@@ -126,7 +137,7 @@ func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission,
 		if canRerun && p.code == httpapi.ErrConflict {
 			return nil, false
 		}
-		writeProblem(w, p)
+		s.write(w, p)
 		return nil, true
 	}
 	switch {
@@ -135,9 +146,9 @@ func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission,
 	case conflict(out.problem):
 		return nil, false
 	case out.problem != nil:
-		writeProblem(w, out.problem)
+		s.write(w, out.problem)
 	case out.retry != uuid.Nil: // the link was used while this request waited for it
-		h.retry(w, r, s, out.retry)
+		h.retry(w, r, s, out.retry, then)
 	default:
 		return out.done, false
 	}
@@ -152,7 +163,7 @@ var afterLinkRead func(stage string)
 // sign-in, and only the right password for the account's own login gets a session. The answer never says which of
 // the email and password was wrong, or whether the email has an account. The sign-in limiter bounds guessing the
 // way it does on the sign-in route.
-func (h *handlers) retry(w http.ResponseWriter, r *http.Request, s submission, playerID uuid.UUID) {
+func (h *handlers) retry(w http.ResponseWriter, r *http.Request, s submission, playerID uuid.UUID, then signedIn) {
 	ctx := r.Context()
 	limiter := h.svc.Limiter()
 	attempt := session.SignInAttempt{Audience: store.AudiencePlayer, LoginKey: s.email, IP: httpapi.ClientIPFrom(ctx)}
@@ -170,10 +181,10 @@ func (h *handlers) retry(w http.ResponseWriter, r *http.Request, s submission, p
 			h.limited(w, r, err)
 			return
 		}
-		writeProblem(w, refuse(httpapi.ErrInvalid, "email", msgCredentials))
+		s.write(w, refuse(httpapi.ErrInvalid, "email", msgCredentials))
 		return
 	}
-	h.signIn(w, r, ident, playerID)
+	then(w, r, ident, playerID, true)
 }
 
 // prove checks the email and password against the identity of the player's account. Whatever is missing or
@@ -242,20 +253,9 @@ func (h *handlers) signIn(w http.ResponseWriter, r *http.Request, ident store.Id
 		h.unexpected(w, r, "reading a claimed player failed", err)
 		return
 	}
-	var ip *netip.Addr
-	if a, err := netip.ParseAddr(httpapi.ClientIPFrom(ctx)); err == nil {
-		ip = &a
-	}
-	issued, err := h.svc.Issue(ctx, session.IssueInput{Identity: ident, AccountID: playerID, IP: ip})
-	if err != nil {
-		h.unavailable(w, r, "signing in after a claim failed", err)
+	if !h.issue(w, r, ident, playerID) {
 		return
 	}
-	now := h.now()
-	session.SetCookies(w, r, store.AudiencePlayer, session.Cookies{
-		Access: issued.AccessPass, AccessMaxAge: issued.RefreshExpiresAt.Sub(now), // as long as the session (B-62 amendment)
-		Refresh: issued.RefreshPass, RefreshMaxAge: issued.RefreshExpiresAt.Sub(now),
-	})
 	var nick *string
 	if row.Nickname.Valid {
 		nick = &row.Nickname.String
@@ -264,6 +264,26 @@ func (h *handlers) signIn(w http.ResponseWriter, r *http.Request, ident store.Id
 	b.PlayerID, b.RTRID, b.FirstName = playerID, orEmpty(row.RtrID), fields.FirstName(row.FullName, nick)
 	b.Session.Account.ID, b.Session.Account.Name, b.Session.Account.Audience = playerID, row.FullName, string(store.AudiencePlayer)
 	httpapi.WriteJSON(w, http.StatusOK, b, httpapi.Private)
+}
+
+// issue makes the session of the account and sets its cookies. A failure is answered (503) and reported as false.
+func (h *handlers) issue(w http.ResponseWriter, r *http.Request, ident store.Identity, playerID uuid.UUID) bool {
+	ctx := r.Context()
+	var ip *netip.Addr
+	if a, err := netip.ParseAddr(httpapi.ClientIPFrom(ctx)); err == nil {
+		ip = &a
+	}
+	issued, err := h.svc.Issue(ctx, session.IssueInput{Identity: ident, AccountID: playerID, IP: ip})
+	if err != nil {
+		h.unavailable(w, r, "signing in after a claim failed", err)
+		return false
+	}
+	now := h.now()
+	session.SetCookies(w, r, store.AudiencePlayer, session.Cookies{
+		Access: issued.AccessPass, AccessMaxAge: issued.RefreshExpiresAt.Sub(now), // as long as the session (B-62 amendment)
+		Refresh: issued.RefreshPass, RefreshMaxAge: issued.RefreshExpiresAt.Sub(now),
+	})
+	return true
 }
 
 func writeProblem(w http.ResponseWriter, p *problem) { httpapi.WriteError(w, p.code, p.fields) }

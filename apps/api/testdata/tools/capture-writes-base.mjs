@@ -102,7 +102,7 @@ async function send(apiDir, step) {
   return handler(new Request(url, init), { params: Promise.resolve(params) })
 }
 
-async function answer(apiDir, step, subject, label, { redact = step.redact ?? [], optional = false } = {}) {
+async function answer(apiDir, step, subject, label, { redact = step.redact ?? [], optional = step.redactOptional ?? false } = {}) {
   const res = await subjects.run(subject ?? null, () => send(apiDir, step))
   const text = await res.text()
   let body
@@ -118,7 +118,9 @@ async function answer(apiDir, step, subject, label, { redact = step.redact ?? []
   } catch (error) {
     throw new Error(`${label}: ${error.message} (status ${res.status}, body ${text.slice(0, 200)})`)
   }
-  return { status: res.status, headers: Object.fromEntries([...res.headers.entries()].sort()), body, hits }
+  const ignored = (step.ignoreHeaders ?? []).map((h) => h.toLowerCase())
+  const headers = Object.fromEntries([...res.headers.entries()].filter(([k]) => !ignored.includes(k.toLowerCase())).sort())
+  return { status: res.status, headers, body, hits }
 }
 
 /** The same rules as writetest.RedactPaths: dotted path, "*" for array elements, a path with no value is an error. */

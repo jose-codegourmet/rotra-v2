@@ -52,6 +52,10 @@ func (c *Clock) Set(t time.Time) {
 // of the sign-in service, a logger (it writes to stderr when ROTRA_TEST_LOG is set) and the shared clock.
 type Build func(pool *pgxpool.Pool, auth *session.Authenticator, log *slog.Logger, now func() time.Time) func(*http.ServeMux)
 
+// BuildFull is Build for routes that need the whole sign-in service (a public route that signs a player in), not only
+// the authenticator.
+type BuildFull func(pool *pgxpool.Pool, svc *session.Service, st *store.Store, log *slog.Logger, now func() time.Time) func(*http.ServeMux)
+
 // Env is the routes behind the real proxy guard, on a migrated database, with a sign-in service on the same clock.
 type Env struct {
 	Ctx     context.Context
@@ -72,6 +76,14 @@ var appHosts = map[string]string{"club": "localhost:9000", "player": "localhost:
 
 // NewEnv makes a migrated database, a sign-in service and the routes build registers.
 func NewEnv(t *testing.T, now time.Time, build Build) *Env {
+	t.Helper()
+	return NewEnvFull(t, now, func(pool *pgxpool.Pool, svc *session.Service, _ *store.Store, log *slog.Logger, now func() time.Time) func(*http.ServeMux) {
+		return build(pool, svc.Authenticator(), log, now)
+	})
+}
+
+// NewEnvFull is NewEnv for a build that takes the sign-in service and its store.
+func NewEnvFull(t *testing.T, now time.Time, build BuildFull) *Env {
 	t.Helper()
 	pool := testpg.NewMigratedPool(t, 20)
 	key, err := pass.GenerateKey(nil)
@@ -107,7 +119,7 @@ func NewEnv(t *testing.T, now time.Time, build Build) *Env {
 	if err != nil {
 		t.Fatal(err)
 	}
-	register := build(pool, e.Service.Authenticator(), log, e.Clock.Now)
+	register := build(pool, e.Service, e.Store, log, e.Clock.Now)
 	e.Handler = httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: httpapi.NewReadiness(), ProxySecret: ProxySecret}, register)
 	return e
 }
@@ -314,6 +326,8 @@ func (e *Env) DoAll(reqs []Request) []*httptest.ResponseRecorder {
 func (e *Env) Reseed(t testing.TB, seed string, scenario []string) {
 	t.Helper()
 	e.Exec(t, seed)
+	// The sign-in rate limits count per client address and hour: every case starts with a clean count.
+	e.Exec(t, `DELETE FROM auth_rate_limits`)
 	e.RelinkAdmins(t)
 	if e.Players {
 		e.RelinkPlayers(t)

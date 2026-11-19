@@ -12,7 +12,8 @@ DELETE FROM player_contact_change_requests; DELETE FROM club_players; DELETE FRO
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters;
 DELETE FROM players; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM profile_banners; DELETE FROM feature_flags;
 DELETE FROM admin_accounts;
-DELETE FROM auth_events WHERE audience = 'player'; DELETE FROM auth_sessions WHERE audience = 'player'; DELETE FROM auth_identities WHERE audience = 'player';
+DELETE FROM player_claim_links; DELETE FROM club_player_claim_links; DELETE FROM club_player_private_inputs; DELETE FROM session_publications; DELETE FROM queue_sessions;
+DELETE FROM auth_events WHERE audience = 'player'; DELETE FROM auth_sessions WHERE audience = 'player'; DELETE FROM auth_identities WHERE audience = 'player' OR id IN ('f5000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000002');
 
 INSERT INTO admin_accounts (id, auth_provider, auth_subject, active, display_name, updated_at) VALUES
   ('ad000000-0000-4000-8000-000000000001', 'supabase', 'ad100000-0000-4000-8000-000000000001', true, 'Owner', TIMESTAMPTZ '2026-11-01 00:00:00+00');

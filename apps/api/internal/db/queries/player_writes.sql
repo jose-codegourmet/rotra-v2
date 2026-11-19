@@ -52,10 +52,6 @@ WHERE player_id = @player_id AND created_at > @since AND id = @id;
 UPDATE player_accounts SET verification_reminder_read_at = @now, updated_at = @now
 WHERE player_id = @player_id AND verification_reminder_read_at IS NULL;
 
--- name: FindClubWithInvite :one
--- requireClubInvite: the club whose current code this is.
-SELECT id FROM clubs WHERE id = @id AND invite_code = @code LIMIT 1;
-
 -- name: ClubExists :one
 SELECT id FROM clubs WHERE id = @id;
 

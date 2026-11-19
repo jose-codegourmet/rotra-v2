@@ -24,6 +24,16 @@ func RedactPaths(v any, paths []string) error {
 	return nil
 }
 
+// RedactPathsOptional is RedactPaths where a path that matches nothing is not an error (Step.RedactOptional).
+func RedactPathsOptional(v any, paths []string) error {
+	for _, p := range paths {
+		if _, err := redactAt(v, strings.Split(p, ".")); err != nil {
+			return fmt.Errorf("redacting %q: %w", p, err)
+		}
+	}
+	return nil
+}
+
 func redactAt(v any, path []string) (int, error) {
 	head, rest := path[0], path[1:]
 	switch node := v.(type) {

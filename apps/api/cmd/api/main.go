@@ -18,6 +18,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/recovery"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/register"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/signin"
 	authstore "github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
@@ -113,6 +114,13 @@ func run() error {
 			return err
 		}
 		routes = append(routes, claimRoutes)
+		// Guest registration through a club or session link (POST only; its page read stays in Next.js). It finishes a claim,
+		// so it takes the claim's dependencies and counts against the claim's per-address limit.
+		registerRoutes, err := register.Register(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, registerRoutes)
 		// Admin-reviewed password recovery: the two public Player routes. The Admin list (signedin) and review
 		// (adminwrites) routes call the same service.
 		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})

@@ -21,23 +21,6 @@ func (q *Queries) ClubExists(ctx context.Context, id pgtype.UUID) (pgtype.UUID, 
 	return id, err
 }
 
-const findClubWithInvite = `-- name: FindClubWithInvite :one
-SELECT id FROM clubs WHERE id = $1 AND invite_code = $2 LIMIT 1
-`
-
-type FindClubWithInviteParams struct {
-	ID   pgtype.UUID
-	Code pgtype.Text
-}
-
-// requireClubInvite: the club whose current code this is.
-func (q *Queries) FindClubWithInvite(ctx context.Context, arg FindClubWithInviteParams) (pgtype.UUID, error) {
-	row := q.db.QueryRow(ctx, findClubWithInvite, arg.ID, arg.Code)
-	var id pgtype.UUID
-	err := row.Scan(&id)
-	return id, err
-}
-
 const findVisibleNotification = `-- name: FindVisibleNotification :one
 SELECT id FROM player_notifications
 WHERE player_id = $1 AND created_at > $2 AND id = $3

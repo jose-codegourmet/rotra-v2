@@ -8,6 +8,7 @@
 # generated here. Edit this file, run `python3 apps/api/testdata/tools/gen-writes-player-cases.py`, then rerun the capture.
 import json
 import os
+from urllib.parse import quote
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "../../internal/playerwrites/testdata")
@@ -42,7 +43,8 @@ DELETE FROM player_contact_change_requests; DELETE FROM club_players; DELETE FRO
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters;
 DELETE FROM players; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM profile_banners; DELETE FROM feature_flags;
 DELETE FROM admin_accounts;
-DELETE FROM auth_events WHERE audience = 'player'; DELETE FROM auth_sessions WHERE audience = 'player'; DELETE FROM auth_identities WHERE audience = 'player';
+DELETE FROM player_claim_links; DELETE FROM club_player_claim_links; DELETE FROM club_player_private_inputs; DELETE FROM session_publications; DELETE FROM queue_sessions;
+DELETE FROM auth_events WHERE audience = 'player'; DELETE FROM auth_sessions WHERE audience = 'player'; DELETE FROM auth_identities WHERE audience = 'player' OR id IN ('f5000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000002');
 
 INSERT INTO admin_accounts (id, auth_provider, auth_subject, active, display_name, updated_at) VALUES
   ('%(admin)s', 'supabase', 'ad100000-0000-4000-8000-000000000001', true, 'Owner', %(ts)s);
@@ -595,4 +597,251 @@ case("google_gate", [ask(B_S, CMD(55), "email", "bob.new@example.test")], scenar
 case("google_gate_lets_google_in", [ask(A_S, CMD(56), "email", "alice.new@example.test", ok=True)], scenario="gate_on", now=AFTER_DEADLINE)
 case("race_of_two_different_commands_for_one_player", [par(ask(B_S, CMD(58), "email", "bob.one@example.test"), ask(B_S, CMD(59), "phone", "+639175550099"), redact=["request.id", "request.field", "request.proposedValue", "request.originalValue"])], redact={"player_contact_change_requests": ["source_command_id", "proposed_value", "field", "original_value"]})
 write("contact", [REQUESTS, CONTACTS, LOGINS, NOTES, AUDIT, PLAYERS, ACCOUNTS], contact_cases)
+
+# ---------------------------------------------------------------- registration
+# POST /api/register/{clubId}: a visitor registers through a club link (?k=) or a session link (?session=). The visitor is signed
+# out (who is null). The TypeScript capture replaces only the Supabase calls (see capture-writes-player.test.mjs).
+reg_cases = []
+case = mk(reg_cases)
+ATT = lambda n: "%064x" % n
+NEWBIE = "newbie@example.test"
+SMASH_K, BIRDIE_K = "SMASHSS123", "BIRDIE2026"
+S_SMASH, S_BIRDIE, S_DELETED, S_NOPUB = "e8000000-0000-4000-8000-000000000001", "e8000000-0000-4000-8000-000000000002", "e8000000-0000-4000-8000-000000000003", "e8000000-0000-4000-8000-000000000004"
+REG_SCENARIOS = dict(SCENARIOS)
+REG_SCENARIOS["sessions"] = [
+    "INSERT INTO queue_sessions (id, club_id, title, state, scheduled_start_at, scheduled_end_at, players_per_court, public_slug, source_command_id, updated_at) VALUES "
+    "('%s', '%s', 'Friday Night', 'prepared', TIMESTAMPTZ '2026-11-27 09:00:00+00', TIMESTAMPTZ '2026-11-27 15:00:00+00', 8, 'friday-night', 'e9000000-0000-4000-8000-000000000001', %s), "
+    "('%s', '%s', 'Birdie Sunday', 'prepared', TIMESTAMPTZ '2026-11-29 09:00:00+00', TIMESTAMPTZ '2026-11-29 15:00:00+00', 8, 'birdie-sunday', 'e9000000-0000-4000-8000-000000000002', %s), "
+    "('%s', '%s', 'Old Night', 'prepared', TIMESTAMPTZ '2026-10-27 09:00:00+00', TIMESTAMPTZ '2026-10-27 15:00:00+00', 8, 'old-night', 'e9000000-0000-4000-8000-000000000003', %s), "
+    "('%s', '%s', 'Quiet Night', 'prepared', TIMESTAMPTZ '2026-12-04 09:00:00+00', TIMESTAMPTZ '2026-12-04 15:00:00+00', 8, 'quiet-night', 'e9000000-0000-4000-8000-000000000004', %s)"
+    % (S_SMASH, SMASH, TS, S_BIRDIE, BIRDIE, TS, S_DELETED, SMASH, TS, S_NOPUB, SMASH, TS),
+    "INSERT INTO session_publications (id, club_id, session_id, public_key, state, details_projection, participants_projection, last_synced_at, deleted_at, updated_at) VALUES "
+    "('ea000000-0000-4000-8000-000000000001', '%s', '%s', 'page-friday-000001', 'details', '{}', '[]', %s, NULL, %s), "
+    "('ea000000-0000-4000-8000-000000000002', '%s', '%s', 'page-birdie-000001', 'details', '{}', '[]', %s, NULL, %s), "
+    "('ea000000-0000-4000-8000-000000000003', '%s', '%s', 'page-old-00000001', 'deleted', '{}', '[]', %s, %s, %s)"
+    % (SMASH, S_SMASH, TS, TS, BIRDIE, S_BIRDIE, TS, TS, SMASH, S_DELETED, TS, TS, TS),
+]
+REC = lambda n: "e7000000-0000-4000-8000-0000000000%02x" % n
+REG_SCENARIOS["unclaimed_records"] = [
+    "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES "
+    "('%s', '%s', NULL, 'Newbie Tan', 'Newb', TIMESTAMPTZ '2026-10-01 00:00:00+00', %s), "
+    "('%s', '%s', NULL, 'N. Tan', NULL, TIMESTAMPTZ '2026-10-02 00:00:00+00', %s), "
+    "('%s', '%s', NULL, 'Other Person', NULL, TIMESTAMPTZ '2026-10-03 00:00:00+00', %s), "
+    "('%s', '%s', NULL, 'Resolved Before', NULL, TIMESTAMPTZ '2026-10-04 00:00:00+00', %s)"
+    % (REC(0xa1), SMASH, TS, REC(0xa2), BIRDIE, TS, REC(0xa3), NINJA, TS, REC(0xa4), NINJA, TS),
+    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES "
+    "('%s', '%s', '+639175550301', 'pending', %s, %s), "
+    "('%s', '%s', '+639175550301', 'conflicted', %s, %s), "
+    "('%s', '%s', '+639175550399', 'pending', %s, %s), "
+    "('%s', '%s', '+639175550301', 'discarded', %s, %s)"
+    % (REC(0xa1), SMASH, TS, TS, REC(0xa2), BIRDIE, TS, TS, REC(0xa3), NINJA, TS, TS, REC(0xa4), NINJA, TS, TS),
+]
+ENTRY = "5e000000-0000-4000-8000-000000000001"
+REG_SCENARIOS["shared_entry"] = [
+    "UPDATE player_id_counters SET last_sequence = 41",
+    "INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, allocated_at, created_at, updated_at) VALUES "
+    "('%s', 'shared@example.test', 'RTR-PH-CEB-102926-0041', '%s', %s, 'PH', 'CEB', DATE '2026-10-29', 41, %s, %s, %s)" % (ENTRY, SMASH, LOC("CEB"), TS, TS, TS),
+    "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, updated_at) VALUES "
+    "('%s', '%s', NULL, 'Shared Person', 'Shary', '%s', TIMESTAMPTZ '2026-10-05 00:00:00+00', %s), "
+    "('%s', '%s', NULL, 'Shared P.', 'SP', '%s', TIMESTAMPTZ '2026-10-06 00:00:00+00', %s)" % (REC(0xb1), SMASH, ENTRY, TS, REC(0xb2), NINJA, ENTRY, TS),
+]
+REG_SCENARIOS["shared_entry_taken_id"] = REG_SCENARIOS["shared_entry"] + [
+    "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES "
+    "('%s', 'RTR-PH-CEB-102926-0041', '%s', %s, 'PH', 'CEB', DATE '2026-10-29', 41)" % (P(20), SMASH, LOC("CEB")),
+]
+REG_SCENARIOS["shared_entry_retired"] = REG_SCENARIOS["shared_entry"] + [
+    "UPDATE shared_player_entries SET retired_at = TIMESTAMPTZ '2026-11-01 00:00:00+00', email = NULL",
+]
+REG_SCENARIOS["club_login_holds_email"] = [
+    "INSERT INTO auth_identities (id, audience, login_key, password_hash, password_scheme, password_changed_at, created_at, updated_at, revision) VALUES "
+    "('f5000000-0000-4000-8000-000000000001', 'club', 'owner@example.test', 'x', 'argon2id', %s, %s, %s, 1), "
+    "('f5000000-0000-4000-8000-000000000002', 'admin', 'adm@example.test', 'x', 'argon2id', %s, %s, %s, 1)" % (TS, TS, TS, TS, TS, TS),
+]
+REG_SCENARIOS["ben_the_unclaimed"] = [
+    "INSERT INTO players (id, full_name, profile_state, updated_at) VALUES ('%s', 'Ben Unclaimed', 'unclaimed', %s)" % (P(21), TS),
+    "INSERT INTO player_private_contacts (player_id, phone_e164, email, updated_at) VALUES ('%s', '+639175550311', NULL, %s)" % (P(21), TS),
+]
+REG = lambda club, k=BIRDIE_K, session=None: "/api/register/%s?%s" % (club, "&".join(x for x in [("k=" + quote(k, safe="")) if k is not None else "", ("session=" + quote(session, safe="")) if session is not None else ""] if x))
+def values(**over):
+    v = {"fullName": "Newbie Tan", "nickname": "Newb", "playingStyle": "Net player", "experienceYears": "3", "experienceMonths": "4",
+         "facebook": "https://facebook.com/newbie", "instagram": "", "youtube": "", "linkedin": "",
+         "email": NEWBIE, "phone": "0917 555 0301", "password": "correct horse"}
+    v.update(over)
+    return {k: x for k, x in v.items() if x is not None or k in over and False}
+def reg(attempt=1, club=BIRDIE, path=None, body=None, vals=None, redact="ok", **kw):
+    b = body if body is not None else {"attempt": ATT(attempt), "values": vals if vals is not None else values()}
+    r = None
+    if redact == "ok":
+        r = ["playerId", "session.account.id"]
+    elif redact:
+        r = redact
+    out = step("POST", path or REG(club), None, b, redact=r, **kw)
+    # The answer is a success or a refusal: the ids are redacted where the answer has them. The session cookies are Go's own.
+    out["redactOptional"] = True
+    out["ignoreHeaders"] = ["set-cookie"]
+    return out
+def regraw(raw, club=BIRDIE, path=None, **kw):
+    return step("POST", path or REG(club), None, raw=raw, **kw)
+def V(**over):
+    v = values()
+    for k, x in over.items():
+        if x is MISSING:
+            v.pop(k, None)
+        else:
+            v[k] = x
+    return v
+MISSING = object()
+# The happy paths.
+case("register_through_a_club_link", [reg()])
+case("register_through_a_club_link_with_a_counter", [reg(club=SMASH, path=REG(SMASH, SMASH_K))])
+case("register_with_the_club_code_in_lower_case", [reg(path=REG(BIRDIE, "  birdie2026"))])
+case("register_with_only_a_name_phone_email_and_password", [reg(vals=V(nickname="", playingStyle="", experienceYears="", experienceMonths="", facebook="", instagram="", youtube="", linkedin=""))])
+case("register_with_every_link", [reg(vals=V(facebook="https://m.facebook.com/n", instagram="https://instagram.com/n", youtube="https://youtu.be/n", linkedin="https://www.linkedin.com/in/n"))])
+case("register_with_the_details_untrimmed", [reg(vals=V(fullName="  Newbie  Tan  ", nickname=" Newb ", playingStyle="  Net  player ", experienceYears=" 5 ", experienceMonths=" 11 "))])
+case("register_with_years_only", [reg(vals=V(experienceYears="2", experienceMonths=""))])
+case("register_with_months_only", [reg(vals=V(experienceYears="", experienceMonths="7"))])
+case("register_with_zero_experience", [reg(vals=V(experienceYears="0", experienceMonths="0"))])
+case("register_with_zero_years_only_is_kept", [reg(vals=V(experienceYears="0", experienceMonths=""))])
+case("register_with_the_email_in_capitals_and_spaces", [reg(vals=V(email="  Newbie@Example.TEST \t"))])
+for label, phone, e164 in [("plus_63", "+63 917 555 0301", None), ("63_no_plus", "639175550301", None), ("hyphens", "0917-555-0301", None), ("leading_spaces", "  09175550301  ", None)]:
+    case("register_with_the_phone_as_%s" % label, [reg(vals=V(phone=phone))])
+case("register_with_a_city_code_is_ignored", [reg(vals=V(cityCode="CEB"))])
+case("register_with_unknown_fields_is_ignored", [reg(body={"attempt": ATT(1), "values": V(role="admin"), "playerId": BOB, "extra": 1})])
+case("register_with_a_password_with_spaces", [reg(vals=V(password="  six  "))])
+case("register_with_the_shortest_password", [reg(vals=V(password="abcdef"))])
+case("register_with_a_long_password", [reg(vals=V(password="p" * 200))])
+# Session links.
+case("register_through_a_session_link", [reg(path=REG(SMASH, None, "friday-night"), club=SMASH)], scenario="sessions")
+case("register_through_a_session_link_ignores_the_code", [reg(path=REG(SMASH, "WRONGCODE9", "friday-night"), club=SMASH)], scenario="sessions")
+case("register_through_a_session_link_with_a_published_page", [reg(path=REG(BIRDIE, None, "birdie-sunday"))], scenario="sessions")
+case("register_through_a_session_link_with_no_publication", [reg(path=REG(SMASH, None, "quiet-night"), club=SMASH)], scenario="sessions")
+case("register_through_a_session_link_of_a_deleted_page", [reg(path=REG(SMASH, None, "old-night"), club=SMASH)], scenario="sessions")
+case("register_through_the_session_link_of_another_club", [reg(path=REG(BIRDIE, None, "friday-night"))], scenario="sessions")
+case("register_through_an_unknown_session_link", [reg(path=REG(SMASH, None, "no-such-night"), club=SMASH)], scenario="sessions")
+case("register_through_a_session_link_for_an_unknown_club", [reg(path=REG(C(99), None, "friday-night"))], scenario="sessions")
+case("register_through_a_session_link_for_a_club_id_that_is_not_a_uuid", [reg(path=REG("smash", None, "friday-night"))], scenario="sessions")
+case("register_through_a_session_link_in_capitals_is_unknown", [reg(path=REG(SMASH, None, "FRIDAY-NIGHT"), club=SMASH)], scenario="sessions")
+case("register_through_a_session_link_with_the_club_id_in_capitals_is_not_this_clubs", [reg(path=REG(SMASH.upper(), None, "friday-night"), club=SMASH)], scenario="sessions")
+case("register_with_an_empty_session_uses_the_club_code", [reg(path="/api/register/%s?k=%s&session=" % (BIRDIE, BIRDIE_K))])
+case("register_with_an_empty_session_and_a_wrong_code", [reg(path="/api/register/%s?k=WRONGCODE9&session=" % BIRDIE)], scenario="sessions")
+# The club link.
+case("register_with_a_wrong_code", [reg(path=REG(BIRDIE, "WRONGCODE9"))])
+case("register_with_another_clubs_code", [reg(path=REG(BIRDIE, SMASH_K))])
+case("register_with_no_code", [reg(path=REG(BIRDIE, None))])
+case("register_with_an_empty_code", [reg(path=REG(BIRDIE, ""))])
+case("register_with_a_short_code", [reg(path=REG(BIRDIE, "BIRDIE2"))])
+case("register_with_a_code_with_a_dash", [reg(path=REG(BIRDIE, "BIRDIE-2026"))])
+case("register_with_a_club_with_no_code", [reg(club=NOCODE, path=REG(NOCODE, "ANYCODE123"))])
+case("register_with_an_unknown_club", [reg(path=REG(C(99)))])
+case("register_with_a_club_id_that_is_not_a_uuid", [reg(path=REG("birdie"))])
+case("register_with_the_club_id_in_capitals", [reg(path=REG(BIRDIE.upper()))])
+case("register_the_link_is_checked_after_the_body_but_before_it_is_used", [reg(path=REG(BIRDIE, "WRONGCODE9"), vals=V(email="nope"))])
+case("register_the_link_is_refused_after_the_attempt_is_checked", [reg(path=REG(C(99)), body={"attempt": "short", "values": V()})])
+# The body.
+case("body_not_json", [regraw("not json")])
+case("body_empty", [regraw("")])
+case("body_array", [regraw("[]")])
+case("body_null", [regraw("null")])
+case("body_string", [regraw('"x"')])
+case("body_with_the_link_wrong_is_checked_first", [regraw("x", path=REG(BIRDIE, "WRONGCODE9"))])
+case("body_with_nothing_in_it", [reg(body={})])
+case("body_without_values", [reg(body={"attempt": ATT(1)})])
+case("body_without_an_attempt", [reg(body={"values": V()})])
+case("body_values_not_an_object", [reg(body={"attempt": ATT(1), "values": "x"})])
+case("body_values_null", [reg(body={"attempt": ATT(1), "values": None})])
+case("body_values_an_array", [reg(body={"attempt": ATT(1), "values": []})])
+for label, att in [("short", "abc"), ("empty", ""), ("upper_case_hex", "A" * 64), ("not_hex", "g" * 64), ("long", "a" * 65), ("with_a_newline", "a" * 63 + "\n"), ("number", 5), ("null", None), ("array", ["a"])]:
+    case("attempt_%s_is_invalid" % label, [reg(body={"attempt": att, "values": V()})])
+case("attempt_and_values_both_invalid", [reg(body={"attempt": "x", "values": V(email="nope", fullName="")})])
+for label, field, val in [
+    ("full_name_empty", "fullName", ""), ("full_name_blank", "fullName", "   \t"), ("full_name_missing", "fullName", MISSING), ("full_name_a_number", "fullName", 7),
+    ("full_name_61_characters", "fullName", "N" * 61), ("full_name_60_characters", "fullName", "N" * 60), ("full_name_61_emoji_units", "fullName", "\U0001F3F8" * 31),
+    ("nickname_25_characters", "nickname", "n" * 25), ("nickname_24_characters", "nickname", "n" * 24), ("nickname_a_number", "nickname", 5), ("nickname_missing", "nickname", MISSING),
+    ("style_281_characters", "playingStyle", "s" * 281), ("style_280_characters", "playingStyle", "s" * 280), ("style_a_number", "playingStyle", 5), ("style_missing", "playingStyle", MISSING),
+    ("years_text", "experienceYears", "abc"), ("years_81", "experienceYears", "81"), ("years_80", "experienceYears", "80"), ("years_negative", "experienceYears", "-1"), ("years_fraction", "experienceYears", "1.5"),
+    ("years_a_number", "experienceYears", 3), ("years_missing", "experienceYears", MISSING), ("years_leading_zeros", "experienceYears", "007"), ("years_arabic_digits", "experienceYears", "\u0663"),
+    ("months_12", "experienceMonths", "12"), ("months_11", "experienceMonths", "11"), ("months_text", "experienceMonths", "x"), ("months_a_number", "experienceMonths", 3), ("months_missing", "experienceMonths", MISSING),
+    ("facebook_other_host", "facebook", "https://example.com/n"), ("facebook_look_alike_host", "facebook", "https://facebook.com.evil.example/n"), ("facebook_no_scheme", "facebook", "facebook.com/n"),
+    ("facebook_ftp", "facebook", "ftp://facebook.com/n"), ("facebook_a_number", "facebook", 5), ("facebook_missing", "facebook", MISSING), ("facebook_fb_com", "facebook", "https://fb.com/n"),
+    ("instagram_other_host", "instagram", "https://facebook.com/n"), ("youtube_other_host", "youtube", "https://vimeo.com/n"), ("linkedin_other_host", "linkedin", "https://twitter.com/n"),
+    ("email_without_an_at", "email", "newbie.example.test"), ("email_two_ats", "email", "a@b@c.test"), ("email_empty", "email", ""), ("email_missing", "email", MISSING), ("email_a_number", "email", 5),
+    ("email_dotless_domain", "email", "newbie@localhost"), ("email_with_a_space", "email", "new bie@example.test"), ("email_one_letter_tld", "email", "a@b.c"), ("email_with_a_plus", "email", "new+tag@example.test"),
+    ("email_with_a_dot_run", "email", "a..b@example.test"), ("email_leading_dot", "email", ".a@example.test"), ("email_unicode_local", "email", "ñandú@example.test"), ("email_unicode_domain", "email", "a@exämple.test"),
+    ("email_quoted_local", "email", "\"a b\"@example.test"), ("email_ip_domain", "email", "a@[127.0.0.1]"), ("email_hyphen_domain_start", "email", "a@-example.test"), ("email_numeric_tld", "email", "a@example.123"),
+    ("email_apostrophe", "email", "o'neil@example.test"), ("email_underscore_domain", "email", "a@ex_ample.test"),
+    ("phone_missing", "phone", MISSING), ("phone_empty", "phone", ""), ("phone_letters", "phone", "abc"), ("phone_landline", "phone", "0322550142"), ("phone_not_a_mobile", "phone", "0817 555 0301"),
+    ("phone_too_short", "phone", "0917 555 030"), ("phone_too_long", "phone", "0917 555 03011"), ("phone_a_number", "phone", 9175550301), ("phone_with_a_dot", "phone", "0917.555.0301"),
+    ("phone_plus_in_the_middle", "phone", "0917+5550301"), ("phone_63_with_a_zero", "phone", "+63 0917 555 0301"), ("phone_with_brackets", "phone", "(0917) 555 0301"),
+    ("password_missing", "password", MISSING), ("password_empty", "password", ""), ("password_a_number", "password", 123456),
+    ("city_code_a_number", "cityCode", 5), ("city_code_null", "cityCode", None)]:
+    case("field_%s" % label, [reg(vals=V(**{field: val}))])
+case("many_fields_invalid_at_once", [reg(vals=V(fullName="", nickname="n" * 30, playingStyle="s" * 300, experienceYears="x", experienceMonths="y", facebook="z", instagram="z", youtube="z", linkedin="z", email="q", phone="p", password=""))])
+case("many_fields_missing_at_once", [reg(vals={})])
+# Contacts that belong to someone: the answer does not say which.
+case("phone_of_a_registered_player_is_a_match", [reg(vals=V(phone="0917 555 0002"))])
+case("email_of_a_registered_player_is_a_match", [reg(vals=V(email="bob@example.test"))])
+case("email_of_a_registered_player_in_capitals_is_a_match", [reg(vals=V(email="  BOB@Example.test "))])
+case("phone_and_email_of_two_players_is_a_match", [reg(vals=V(phone="0917 555 0002", email="dan@example.test"))])
+case("phone_of_an_unclaimed_contact_is_a_match", [reg(vals=V(phone="0917 555 0311"))], scenario="ben_the_unclaimed")
+case("email_of_a_club_login_is_a_match", [reg(vals=V(email="owner@example.test"))], scenario="club_login_holds_email")
+case("email_of_an_admin_login_is_a_match", [reg(vals=V(email="adm@example.test"))], scenario="club_login_holds_email")
+case("a_match_creates_nothing_and_signs_nobody_in", [reg(vals=V(phone="0917 555 0002")), reg(attempt=2, vals=V(email="dan@example.test"))])
+case("a_match_is_checked_after_the_details_are_valid", [reg(vals=V(phone="0917 555 0002", fullName=""))])
+# A second try.
+case("the_same_attempt_again_signs_in_again", [reg(), reg()])
+case("the_same_attempt_again_three_times", [reg(), reg(), reg()])
+case("the_same_attempt_again_saves_the_details_again", [reg(), reg(vals=V(fullName="Newbie T. Tan", nickname="", experienceYears="9", experienceMonths="0", facebook="", instagram="https://instagram.com/n"))])
+case("the_same_attempt_again_with_another_password_is_refused", [reg(), reg(vals=V(password="another horse"))])
+case("the_same_attempt_again_with_another_password_changes_nothing", [reg(), reg(vals=V(password="another horse", fullName="Changed"))])
+case("the_same_attempt_again_with_another_phone_is_refused", [reg(), reg(vals=V(phone="0917 555 0399"))])
+case("the_same_attempt_again_with_another_email_is_refused", [reg(), reg(vals=V(email="other@example.test"))])
+case("the_same_attempt_again_with_the_email_in_capitals_is_the_same", [reg(), reg(vals=V(email="NEWBIE@example.test"))])
+case("the_same_attempt_again_for_another_club_is_refused", [reg(), reg(club=SMASH, path=REG(SMASH, SMASH_K))])
+case("the_same_attempt_again_through_a_session_link_of_the_same_club", [reg(path=REG(BIRDIE)), reg(path=REG(BIRDIE, None, "birdie-sunday"))], scenario="sessions")
+case("the_same_attempt_again_with_the_club_id_in_capitals_is_another_registration", [reg(path=REG(BIRDIE.upper())), reg(path=REG(BIRDIE.upper()))])
+case("a_new_attempt_with_the_same_details_is_a_match", [reg(), reg(attempt=2)])
+case("a_new_attempt_with_another_email_and_the_same_phone_is_a_match", [reg(), reg(attempt=2, vals=V(email="other@example.test"))])
+case("two_different_players_in_one_club", [reg(), reg(attempt=2, vals=V(fullName="Second Person", email="second@example.test", phone="0917 555 0302"))])
+case("two_different_players_in_two_clubs", [reg(), reg(attempt=2, club=SMASH, path=REG(SMASH, SMASH_K), vals=V(fullName="Second Person", email="second@example.test", phone="0917 555 0302"))])
+# Other clubs' records and the shared entry.
+case("registering_links_the_clubs_records_with_the_same_phone", [reg()], scenario="unclaimed_records")
+case("registering_links_only_the_phone_of_the_player", [reg(vals=V(phone="0917 555 0399", email="other@example.test"))], scenario="unclaimed_records")
+case("registering_through_a_club_that_already_lists_the_record_keeps_that_row", [reg(club=SMASH, path=REG(SMASH, SMASH_K))], scenario="unclaimed_records")
+case("registering_through_the_club_of_a_linked_record_with_a_new_member_row", [reg(club=NINJA, path=REG(NINJA, "NINJA2026X"))], scenario="unclaimed_records")
+case("registering_with_a_shared_email_keeps_its_rtr_id", [reg(vals=V(email="shared@example.test"))], scenario="shared_entry")
+case("registering_with_a_shared_email_in_capitals_keeps_its_rtr_id", [reg(vals=V(email="Shared@Example.test"))], scenario="shared_entry")
+case("registering_with_a_shared_email_through_the_club_that_saved_it", [reg(club=SMASH, path=REG(SMASH, SMASH_K), vals=V(email="shared@example.test"))], scenario="shared_entry")
+case("registering_with_another_email_leaves_the_shared_entry_open", [reg()], scenario="shared_entry")
+case("registering_with_a_shared_email_and_a_matching_phone_record", [reg(vals=V(email="shared@example.test"))], scenario="shared_and_phone")
+case("registering_with_a_shared_email_whose_rtr_id_is_taken_allocates_a_new_one", [reg(vals=V(email="shared@example.test"))], scenario="shared_entry_taken_id")
+case("registering_with_the_email_of_a_retired_entry_allocates_a_new_one", [reg(vals=V(email="shared@example.test"))], scenario="shared_entry_retired")
+# Races. Which request wins is not decided, so a race is pinned only where the rows it leaves do not say who won: the winner's own
+# columns are redacted by name. Two taps of one attempt and two attempts for one email are Go-only tests (apps/api/internal/auth/register).
+WIN = ["playerId", "session.account.id"]
+case("race_two_attempts_for_the_same_phone", [par(reg(), reg(attempt=2, vals=V(email="other@example.test")), redact=WIN)],
+     redact={"player_private_contacts": ["email"], "player_claim_links": ["token_digest"]})
+case("race_two_players_for_one_club", [par(reg(), reg(attempt=2, vals=V(fullName="Second Person", email="second@example.test", phone="0917 555 0302")), redact=WIN + ["rtrId"])],
+     redact={"player_id_allocations": ["rtr_id", "sequence"]})
+case("race_registering_and_the_same_phone_record", [par(reg(), reg(attempt=2, vals=V(email="second@example.test")), redact=WIN)], scenario="unclaimed_records",
+     redact={"player_private_contacts": ["email"], "player_claim_links": ["token_digest"]})
+
+# The tables a registration writes, keyed by what is not generated.
+ID = lambda col: col
+R_PLAYERS = {"name": "players", "sql": "SELECT p.id, p.full_name, p.nickname, p.avatar_ref, p.avatar_previous_ref, p.banner_id, p.profile_visibility, p.profile_state, p.hide_phone_from_clubs, p.hidden_from_directory, p.show_profile_stats, p.show_weekly_performance, p.experience_months, p.experience_recorded_at, p.personal_details, p.details_version, p.verification_override, p.verification_override_by, p.verification_override_at, p.revision::text AS revision, p.created_at, p.updated_at, c.phone_e164 AS contact_phone FROM players p LEFT JOIN player_private_contacts c ON c.player_id = p.id ORDER BY c.phone_e164 NULLS LAST, p.id", "redact": ["id", "created_at"]}
+R_CONTACTS = {"name": "player_private_contacts", "sql": "SELECT c.*, p.full_name FROM player_private_contacts c JOIN players p ON p.id = c.player_id ORDER BY c.phone_e164", "redact": ["player_id", "created_at"]}
+R_ALLOC = {"name": "player_id_allocations", "sql": "SELECT a.*, c.phone_e164 AS contact_phone FROM player_id_allocations a LEFT JOIN player_private_contacts c ON c.player_id = a.player_id ORDER BY c.phone_e164 NULLS LAST, a.rtr_id", "redact": ["player_id", "allocated_at"]}
+R_COUNTERS = {"name": "player_id_counters", "sql": "SELECT * FROM player_id_counters ORDER BY location_code_id, sync_date", "redact": []}
+R_ACCOUNTS = {"name": "player_accounts", "sql": "SELECT a.*, c.phone_e164 AS contact_phone FROM player_accounts a LEFT JOIN player_private_contacts c ON c.player_id = a.player_id ORDER BY c.phone_e164 NULLS LAST, a.player_id", "redact": ["player_id", "auth_subject", "created_at"]}
+R_LINKS = {"name": "player_claim_links", "sql": "SELECT l.*, c.phone_e164 AS contact_phone FROM player_claim_links l LEFT JOIN player_private_contacts c ON c.player_id = l.player_id ORDER BY l.token_digest", "redact": ["id", "player_id", "created_at"]}
+R_MEMBERS = {"name": "club_players", "sql": "SELECT cp.*, c.phone_e164 AS contact_phone FROM club_players cp LEFT JOIN player_private_contacts c ON c.player_id = cp.player_id ORDER BY cp.club_id, cp.display_name, cp.added_at, cp.id", "redact": ["id", "player_id", "created_at"]}
+R_INPUTS = {"name": "club_player_private_inputs", "sql": "SELECT * FROM club_player_private_inputs ORDER BY club_player_id", "redact": ["resolved_player_id", "created_at"]}
+R_ENTRIES = {"name": "shared_player_entries", "sql": "SELECT * FROM shared_player_entries ORDER BY rtr_id", "redact": ["claimed_player_id", "created_at"]}
+R_SOCIAL = {"name": "player_social_links", "sql": "SELECT s.*, c.phone_e164 AS contact_phone FROM player_social_links s LEFT JOIN player_private_contacts c ON c.player_id = s.player_id ORDER BY c.phone_e164 NULLS LAST, s.player_id, s.provider", "redact": ["id", "player_id", "created_at"]}
+doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": dict(REG_SCENARIOS, shared_and_phone=REG_SCENARIOS["shared_entry"] + REG_SCENARIOS["unclaimed_records"]),
+       "snapshot": [R_PLAYERS, R_CONTACTS, R_ALLOC, R_COUNTERS, R_ACCOUNTS, R_LINKS, R_MEMBERS, R_INPUTS, R_ENTRIES, R_SOCIAL, NOTES, AUDIT], "cases": reg_cases}
+names = [c["name"] for c in reg_cases]
+assert len(names) == len(set(names)), "duplicate case names in register"
+with open(os.path.join(OUT, "register.cases.json"), "w") as f:
+    json.dump(doc, f, indent=1, ensure_ascii=False)
+    f.write("\n")
 print("ok")

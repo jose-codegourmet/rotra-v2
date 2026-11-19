@@ -4,7 +4,6 @@ import (
 	"math"
 	"net/url"
 	"strings"
-	"unicode/utf16"
 	"unicode/utf8"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
@@ -71,7 +70,7 @@ const (
 // the form's: name, nickname, playing style, experience, then the links.
 //
 // The rules are updateMyProfile's (a name is required; years and months are whole, months 0-11) and the
-// @rotra/schema field limits (60, 24 and 280 characters counted in UTF-16 units as zod counts them, years 0-80,
+// @rotra/schema field limits (60, 24 and 280 characters counted in code points as zod 4 counts them, years 0-80,
 // links on the provider's host). Two TypeScript gaps that would be a database error (a 500) are closed here: a
 // link must start with https:// (the table CHECK), and text may not hold a NUL character.
 func Parse(in Input) (Details, *FieldError) {
@@ -80,21 +79,21 @@ func Parse(in Input) (Details, *FieldError) {
 	switch {
 	case d.FullName == "":
 		return d, &FieldError{"fullName", msgFullNameEmpty}
-	case utf16Len(d.FullName) > maxFullName:
+	case CodePoints(d.FullName) > maxFullName:
 		return d, &FieldError{"fullName", msgFullNameLong}
 	case hasNUL(d.FullName):
 		return d, &FieldError{"fullName", msgUnsupportedText}
 	}
 	d.Nickname = fields.JSTrim(in.Nickname)
 	switch {
-	case utf16Len(d.Nickname) > maxNickname:
+	case CodePoints(d.Nickname) > maxNickname:
 		return d, &FieldError{"nickname", msgNicknameLong}
 	case hasNUL(d.Nickname):
 		return d, &FieldError{"nickname", msgUnsupportedText}
 	}
 	d.PlayingStyle = fields.JSTrim(in.PlayingStyle)
 	switch {
-	case utf16Len(d.PlayingStyle) > maxPlayingStyle:
+	case CodePoints(d.PlayingStyle) > maxPlayingStyle:
 		return d, &FieldError{"playingStyle", msgPlayingStyle}
 	case hasNUL(d.PlayingStyle):
 		return d, &FieldError{"playingStyle", msgUnsupportedText}
@@ -121,13 +120,9 @@ func Parse(in Input) (Details, *FieldError) {
 	return d, nil
 }
 
-func utf16Len(s string) int {
-	n := 0
-	for _, r := range s {
-		n += utf16.RuneLen(r)
-	}
-	return n
-}
+// CodePoints is a string's length the way zod 4 counts it for min and max: in code points, a surrogate pair once
+// (zod 4.6.7, codePointLength in v4/core/util.js; zod 3 counted UTF-16 units).
+func CodePoints(s string) int { return utf8.RuneCountInString(s) }
 
 func hasNUL(s string) bool { return strings.ContainsRune(s, 0) }
 
@@ -157,14 +152,40 @@ func experienceMonths(years, months *float64) (*int32, bool) {
 // matchesProvider is matchesProvider in social-link.ts, with the table's extra rule: an https:// link (lower
 // case, as the CHECK is) whose host is the provider's or a subdomain of it. JavaScript's URL lowercases the host,
 // url.Parse does not, so it is lowered here. A link with userinfo, a control character or a space is refused.
-func matchesProvider(link string, hosts []string) bool {
-	if !strings.HasPrefix(link, "https://") || strings.ContainsFunc(link, func(r rune) bool {
+func matchesProvider(link string, hosts []string) bool { return matchesHost(link, hosts, false) }
+
+// FormLinkOK is socialLinkField in social-link.ts as the registration form applies it: an http or https link whose host is
+// the provider's or a subdomain of it (provider is facebook, instagram, youtube or linkedin). An empty link is the caller's to
+// accept. Parse is stricter (https only, as the table's CHECK is): a link that passes here and not there is the form's 422
+// where the TypeScript saved the account and then failed with a 500.
+func FormLinkOK(provider, link string) bool {
+	for _, p := range providers {
+		if p.key == provider {
+			return matchesHost(link, p.hosts, true)
+		}
+	}
+	return false
+}
+
+func matchesHost(link string, hosts []string, allowHTTP bool) bool {
+	scheme := "https"
+	hasPrefix := func(p string) bool { return len(link) >= len(p) && link[:len(p)] == p }
+	if allowHTTP { // new URL() lower-cases the scheme
+		hasPrefix = func(p string) bool { return len(link) >= len(p) && strings.EqualFold(link[:len(p)], p) }
+	}
+	if !hasPrefix("https://") {
+		if !allowHTTP || !hasPrefix("http://") {
+			return false
+		}
+		scheme = "http"
+	}
+	if strings.ContainsFunc(link, func(r rune) bool {
 		return r <= ' ' || r == 0x7f || fields.IsJSSpace(r) || r == utf8.RuneError
 	}) {
 		return false
 	}
 	u, err := url.Parse(link)
-	if err != nil || u.User != nil || u.Scheme != "https" {
+	if err != nil || u.User != nil || u.Scheme != scheme {
 		return false
 	}
 	host := strings.ToLower(u.Hostname())

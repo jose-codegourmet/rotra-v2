@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 48 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 49 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -422,6 +422,7 @@ NEW: 48 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-set-games-compare](2026-11-19-queue-set-games-compare.md) | Queue app: Set games played shows Now and To side by side | comparison box (new): two panels with an arrow between, the right one holding the stepper | NEW |
 | [2026-11-19-queue-settings-court-cards](2026-11-19-queue-settings-court-cards.md) | Queue app: Settings › Courts shows court cards with editable times | small court card (reuse the court drawing and status chips), time inputs, checkbox | NEW |
 | [2026-11-19-queue-settings-court-widths](2026-11-19-queue-settings-court-widths.md) | Queue app: Settings court cards fill the width, 350 px minimum on wide boxes, two a row on small ones | settings court cards | NEW (superseded by 2026-11-19-queue-settings-courts-slider.md (phones only)) |
+| [2026-11-19-queue-settings-courts-add-extend](2026-11-19-queue-settings-courts-add-extend.md) | Queue app: the Settings Courts box gets Add court and Extend buttons instead of Courts and time | settings court cards, Add court tile | NEW |
 | [2026-11-19-queue-settings-courts-slider](2026-11-19-queue-settings-courts-slider.md) | Queue app: Settings courts are a one-court slider on phones (Embla Carousel) | settings court cards; a court slider (Embla Carousel) | NEW |
 | [2026-11-19-queue-settings-layout](2026-11-19-queue-settings-layout.md) | Queue app: the live Settings tab is rearranged into an even grid | settings cards (also used by the preparation Settings tab) | NEW |
 | [2026-11-19-queue-settings-until-editable](2026-11-19-queue-settings-until-editable.md) | Queue app: Settings court Until is always editable and drives Follows session end; time fields fill the card | settings court cards, time field | NEW |

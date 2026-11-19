@@ -1550,6 +1550,15 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .qtile.pqc .qf .avatar { width: 34px; height: 34px; font-size: 11px; outline-width: 2px; outline-offset: 0; box-shadow: 0 0 0 2px var(--surface); }
 .qm-pitch { position: relative; display: grid; gap: 12px; }
 .qm-pitch .side { gap: 16px 26px; align-content: space-evenly; padding: 10px 14px; }
+.pub-details { gap: 12px; }
+.pf-lead { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.pf-big { display: flex; flex-direction: column; gap: 4px; }
+.pf-big b { font-size: 18px; }
+.pf-l { font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--fg3); }
+.pf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); gap: 10px; }
+.pf-tile { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--border); min-width: 0; }
+.pf-tile b { font-size: 15px; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .pf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pqc .pq-eye { position: absolute; top: 6px; right: 6px; }
 @media (max-width: 640px) { .qtile.pq-row.pqc { grid-template-columns: 34px auto auto auto; } .pqc .qt-head { grid-row: auto; align-self: center; } .pqc .vs { text-align: center; } .pqc .pq-team { flex-wrap: wrap; row-gap: 4px; } }
 .pq-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
@@ -5580,18 +5589,25 @@ function viewPublic() {
     ${S.ui.guest ? refreshBar(s) : ''}
     ${side ? `<aside class="pub-side">${side}</aside>` : ''}<div class="pub-main">${night}
     <div class="tabs" role="tablist" style="display:flex">${[['details', 'Details'], ['participants', `Participants · ${s.roster.length}`], ...(s.status === 'finalized' && pub && pub.slides.includes(0) ? [['leaderboard', 'Leaderboard']] : [])].map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-act="pubTab" data-k="${k}">${l}</button>`).join('')}</div>
-    ${tab === 'details' ? `<section class="card stack"><dl class="kv">
-      <dt>When</dt><dd>${fmtDate(s.start)}, ${fmtRange(s.start, s.end)} (${fmtDur(s.start, s.end)})</dd>
-      <dt>Venue</dt><dd>${esc(s.venue)}${s.address ? `<br><span class="muted small">${esc(s.address)}</span>` : ''}</dd>
-      <dt>Courts</dt><dd>${s.courts.length} · ${s.courts.map((c) => esc(c.label)).join(', ')}</dd>
-      <dt>Formats</dt><dd>${fmtFormats(s)}</dd>
-      <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span></dd>
-      <dt>Levels</dt><dd>${restrictText(s)}</dd>
-      <dt>Scoring</dt><dd>${scoringDef(s).label} · <span class="muted">${scoringDef(s).text}</span></dd>${recordedOf(s) ? '' : '<dt>Results</dt><dd>Not recorded · <span class="muted">No results, standings or awards for this session.</span></dd>'}
-      <dt>Minimum</dt><dd>${s.minimum} games per player</dd>
-      ${(() => { const due = duePerHead(s); return due == null ? '' : `<dt>Payment</dt><dd>${due ? `${peso(due)} per player` : 'Free'}${due ? ' <span class="muted small">· paid at the venue</span>' : ''}</dd>`; })()}</dl>
-      ${s.notes ? `<p>${esc(s.notes)}</p>` : ''}
-      <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`
+    ${tab === 'details' ? (() => {
+      // Owner artifact comment, November 19, 2026, on the Details list: "should be cards or layout them better". When and Where lead as
+      // two cards; the rest are fact tiles (label, value, one muted line).
+      const due = duePerHead(s), tile = (l, v, sub) => `<div class="pf-tile"><span class="pf-l">${l}</span><b>${v}</b>${sub ? `<span class="small muted">${sub}</span>` : ''}</div>`;
+      return `<section class="stack pub-details">
+      <div class="pf-lead"><div class="card pf-big"><span class="pf-l">When</span><b>${fmtDate(s.start)}</b><span>${fmtRange(s.start, s.end)} · ${fmtDur(s.start, s.end)}</span></div>
+        <div class="card pf-big"><span class="pf-l">Where</span><b>${esc(s.venue)}</b>${s.address ? `<span class="muted">${esc(s.address)}</span>` : ''}</div></div>
+      <div class="pf-grid">
+        ${tile('Courts', `${s.courts.length} court${s.courts.length === 1 ? '' : 's'}`, s.courts.map((c) => esc(c.label)).join(', '))}
+        ${tile('Formats', fmtFormats(s))}
+        ${tile('Mode', MODES[s.mode].label, MODES[s.mode].text)}
+        ${tile('Levels', restrictText(s), restrictOf(s).k === 'all' ? '' : RESTRICT[restrictOf(s).k].text)}
+        ${tile('Scoring', scoringDef(s).label, scoringDef(s).text)}
+        ${tile('Minimum', `${s.minimum} games`, 'per player')}
+        ${due == null ? '' : tile('Payment', due ? `${peso(due)}` : 'Free', due ? 'per player · paid at the venue' : '')}
+        ${recordedOf(s) ? '' : tile('Results', 'Not recorded', 'No results, standings or awards for this session.')}
+      </div>
+      ${s.notes ? `<div class="card stack tight"><span class="pf-l">Notes</span><p style="margin:0">${esc(s.notes)}</p></div>` : ''}
+      <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`; })()
     : tab === 'leaderboard' && pub && pub.slides.includes(0) ? pubLeaderboard(s, pub) : tab === 'leaderboard' ? '' : `<section class="stack">${fullRoster && s.roster.length ? '<p class="small muted">Tap a player to see their profile and stats.</p>' : ''}${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
     ${tab === 'details' && s.status === 'finalized' ? pubHistory(s, pub) : ''}${tab === 'details' && s.status !== 'finalized' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p>${(() => {

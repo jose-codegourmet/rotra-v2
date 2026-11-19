@@ -20,7 +20,7 @@ import (
 )
 
 // AppHeader names the app a request is for: "club", "player" or "admin".
-const AppHeader = "X-Rotra-App"
+const AppHeader = session.AppHeader
 
 // Deps is what the routes are built from.
 type Deps struct {
@@ -66,12 +66,12 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 // is guessed.
 func (h *handlers) forApp(next func(http.ResponseWriter, *http.Request, store.Audience)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch aud := store.Audience(r.Header.Get(AppHeader)); aud {
-		case store.AudienceClub, store.AudiencePlayer, store.AudienceAdmin:
-			next(w, r, aud)
-		default:
+		aud, ok := session.AudienceOf(r)
+		if !ok {
 			httpapi.WriteError(w, httpapi.ErrNotFound, nil)
+			return
 		}
+		next(w, r, aud)
 	})
 }
 

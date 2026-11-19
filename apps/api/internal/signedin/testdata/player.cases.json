@@ -1,0 +1,557 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "subjects": {
+    "alice": "f2000000-0000-4000-8000-000000000001",
+    "bob": "f2000000-0000-4000-8000-000000000002",
+    "carla": "f2000000-0000-4000-8000-000000000003",
+    "dan": "f2000000-0000-4000-8000-000000000004",
+    "eve": "f2000000-0000-4000-8000-000000000005"
+  },
+  "passwordless": [
+    "f2000000-0000-4000-8000-000000000003"
+  ],
+  "reset": [
+    "UPDATE player_private_contacts SET phone_e164 = '+639175550004', email = 'dan@example.test' WHERE player_id = 'd2000000-0000-4000-8000-000000000004'",
+    "DELETE FROM player_contact_change_requests WHERE id = 'c1000000-0000-4000-8000-000000000009'",
+    "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'",
+    "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd2000000-0000-4000-8000-000000000004'",
+    "UPDATE players SET profile_state = 'claimed' WHERE id = 'd2000000-0000-4000-8000-000000000004'",
+    "INSERT INTO player_notifications (id, player_id, kind, title, body, target, created_at, read_at) VALUES ('a1000000-0000-4000-8000-00000000000a', 'd2000000-0000-4000-8000-000000000001', 'club', 'Upper case target', 'Id in capitals', '/clubs/E5000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-18 10:00:00+00', NULL) ON CONFLICT DO NOTHING"
+  ],
+  "scenarios": {
+    "base": [],
+    "flag_on": [
+      "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+    ],
+    "dan_phone_us": [
+      "UPDATE player_private_contacts SET phone_e164 = '+14155550123' WHERE player_id = 'd2000000-0000-4000-8000-000000000004'"
+    ],
+    "dan_phone_short": [
+      "UPDATE player_private_contacts SET phone_e164 = '+12345678' WHERE player_id = 'd2000000-0000-4000-8000-000000000004'"
+    ],
+    "dan_google_match": [
+      "UPDATE player_accounts SET google_email = 'dan@example.test', google_linked_at = TIMESTAMPTZ '2026-11-18 00:00:00+00' WHERE player_id = 'd2000000-0000-4000-8000-000000000004'"
+    ],
+    "dan_unverified_with_pending": [
+      "UPDATE player_accounts SET google_email = 'dan@gmail.test', google_linked_at = TIMESTAMPTZ '2026-11-18 00:00:00+00' WHERE player_id = 'd2000000-0000-4000-8000-000000000004'",
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, submitted_by_admin_id, reviewed_by_admin_id, reviewed_at, approved_at, rejected_at, superseded_at, provider_operation_ref, provider_applied_at, applied_at, failure_code, source_command_id, updated_at) VALUES ('c1000000-0000-4000-8000-000000000009', 'd2000000-0000-4000-8000-000000000004', 'email', 'app', 'dan@gmail.test', NULL, 1, 'applying', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, 'ad000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-14 00:00:00+00', TIMESTAMPTZ '2026-11-14 00:00:00+00', NULL, NULL, 'c3000000-0000-4000-8000-000000000009', NULL, NULL, NULL, 'c2000000-0000-4000-8000-000000000009', now())"
+    ],
+    "dan_unclaimed": [
+      "UPDATE players SET profile_state = 'unclaimed' WHERE id = 'd2000000-0000-4000-8000-000000000004'"
+    ],
+    "alice_notes_removed": [
+      "DELETE FROM player_notifications WHERE player_id = 'd2000000-0000-4000-8000-000000000001'"
+    ]
+  },
+  "cases": [
+    {
+      "name": "account_alice",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs_alice",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "notifications_alice",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "unread_alice",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_alice",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_alice",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "account_bob",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs_bob",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "notifications_bob",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "unread_bob",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_bob",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_bob",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "account_carla",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs_carla",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "notifications_carla",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "unread_carla",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_carla",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_carla",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "account_dan",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs_dan",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "notifications_dan",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "unread_dan",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_dan",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_dan",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "account_eve",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs_eve",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "notifications_eve",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "unread_eve",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_eve",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_eve",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000005",
+      "scenario": "base"
+    },
+    {
+      "name": "account_dan_gated",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "account_dan_deadline_flag_off",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "account_dan_before_deadline_flag_on",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "account_alice_google_after_deadline",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "clubs_dan_gated",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "clubs_dan_deadline_flag_off",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "clubs_dan_before_deadline_flag_on",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "clubs_alice_google_after_deadline",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "notifications_dan_gated",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "notifications_dan_deadline_flag_off",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "notifications_dan_before_deadline_flag_on",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "notifications_alice_google_after_deadline",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "unread_dan_gated",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "unread_dan_deadline_flag_off",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "unread_dan_before_deadline_flag_on",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "unread_alice_google_after_deadline",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "verification_dan_gated",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "verification_dan_deadline_flag_off",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "verification_dan_before_deadline_flag_on",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "verification_alice_google_after_deadline",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "contact_dan_gated",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "contact_dan_deadline_flag_off",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "contact_dan_before_deadline_flag_on",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "contact_alice_google_after_deadline",
+      "path": "/api/account/contact-change",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "clubs_dan_one_ms_before_deadline",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-12-31T15:59:59.999Z"
+    },
+    {
+      "name": "clubs_dan_at_deadline",
+      "path": "/api/me/clubs",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "flag_on",
+      "now": "2026-12-31T16:00:00.000Z"
+    },
+    {
+      "name": "verification_dan_phone_us",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_us"
+    },
+    {
+      "name": "account_dan_phone_us",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_us"
+    },
+    {
+      "name": "notifications_dan_phone_us",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_us"
+    },
+    {
+      "name": "unread_dan_phone_us",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_us"
+    },
+    {
+      "name": "verification_dan_phone_short",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_short"
+    },
+    {
+      "name": "account_dan_phone_short",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_short"
+    },
+    {
+      "name": "notifications_dan_phone_short",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_short"
+    },
+    {
+      "name": "unread_dan_phone_short",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_phone_short"
+    },
+    {
+      "name": "verification_dan_google_match",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_google_match"
+    },
+    {
+      "name": "account_dan_google_match",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_google_match"
+    },
+    {
+      "name": "notifications_dan_google_match",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_google_match"
+    },
+    {
+      "name": "unread_dan_google_match",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_google_match"
+    },
+    {
+      "name": "verification_dan_unverified_with_pending",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unverified_with_pending"
+    },
+    {
+      "name": "account_dan_unverified_with_pending",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unverified_with_pending"
+    },
+    {
+      "name": "notifications_dan_unverified_with_pending",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unverified_with_pending"
+    },
+    {
+      "name": "unread_dan_unverified_with_pending",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unverified_with_pending"
+    },
+    {
+      "name": "verification_dan_unclaimed",
+      "path": "/api/me/verification",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unclaimed"
+    },
+    {
+      "name": "account_dan_unclaimed",
+      "path": "/api/me/account",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unclaimed"
+    },
+    {
+      "name": "notifications_dan_unclaimed",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unclaimed"
+    },
+    {
+      "name": "unread_dan_unclaimed",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "dan_unclaimed"
+    },
+    {
+      "name": "notifications_alice_no_notes",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000001",
+      "scenario": "alice_notes_removed"
+    },
+    {
+      "name": "notifications_dan_later",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2026-11-20T04:00:00.000Z"
+    },
+    {
+      "name": "unread_dan_later",
+      "path": "/api/me/notifications/unread-count",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2026-11-20T04:00:00.000Z"
+    },
+    {
+      "name": "notifications_dan_window_edge",
+      "path": "/api/me/notifications",
+      "player": "f2000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "now": "2026-11-19T04:00:00.000Z"
+    }
+  ]
+}

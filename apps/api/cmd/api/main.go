@@ -25,6 +25,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
 
@@ -115,6 +116,13 @@ func run() error {
 			return err
 		}
 		routes = append(routes, recoveryService.Routes())
+		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
+		// they are served only where sign-in is.
+		signedInRoutes, err := signedin.Register(signedin.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, signedInRoutes)
 		log.Info("auth signing key loaded", slog.String("kid", pass.KeyID(current)), slog.Int("published_keys", len(keys.JWKS())))
 	}
 	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{

@@ -34,7 +34,7 @@ Superseded by: none
 - Owner, November 18, 2026: "As a QM, I created an Account for them, that guest account was intended for
   them until they feel ready to use that account. So if they enter their details. and they register. That
   ACCOUNT WAS FOR THEM".
-- Decision: [D-2026-11-18-07](../mvp/decisions.md#d-2026-11-18-07). The link is the proof; nobody is
+- Decision: [D-2026-11-18-07](../mvp/decisions/2026-11-18.md#d-2026-11-18-07). The link is the proof; nobody is
   merged by name alone.
 
 ## Like for like
@@ -74,7 +74,7 @@ Superseded by: none
 - Screen docs: docs/screens/product/modules/queue/players-roster.md — Invite to ROTRA and the Invite
   dialog. docs/screens/product/modules/player-information/access-registration.md — P-CLAIM for a guest's
   record.
-- Also: docs/product-terms.md (Guest, Invite), docs/mvp/decisions.md (D-2026-11-18-07, amendment note on
+- Also: docs/product-terms.md (Guest, Invite), docs/mvp/decisions/README.md (D-2026-11-18-07, amendment note on
   D-2026-11-16-04), docs/mvp/workstreams/player.md (claim-link issuance row).
 
 ## Real app work

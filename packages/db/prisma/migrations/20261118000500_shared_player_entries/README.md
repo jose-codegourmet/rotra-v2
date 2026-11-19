@@ -1,7 +1,7 @@
 # Shared entries of unclaimed players, the Same person redirect and the club nickname
 
-Ticket P15.8 (#927). Decisions [D-2026-11-16-04](../../../../../docs/mvp/decisions.md#d-2026-11-16-04)
-and [D-2026-11-18-03](../../../../../docs/mvp/decisions.md#d-2026-11-18-03) (club nickname). The owner
+Ticket P15.8 (#927). Decisions [D-2026-11-16-04](../../../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-04)
+and [D-2026-11-18-03](../../../../../docs/mvp/decisions/2026-11-18.md#d-2026-11-18-03) (club nickname). The owner
 answered the ticket's open points and approved this migration on November 18, 2026. `migration.sql`
 is the `prisma migrate diff` shape followed by hand-written CHECKs, RLS, REVOKEs, the trigger swap and
 the one data step.

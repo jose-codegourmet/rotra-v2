@@ -51,7 +51,7 @@ Superseded by: 2026-11-09-queue-next-match-slider.md
 - Business logic: docs/business_logic/product/queue/modules/queueing/README.md — court-filling rule and the picker; docs/business_logic/product/queue/modules/matches/README.md — what happens after a result
 - Database design: none needed (no new stored data)
 - Screen docs: docs/screens/product/modules/queue/match-control.md (new Q-NEXT-MATCH section, Surfaces and Q-DISPATCH entry text), docs/screens/product/dialogs.md, docs/screens/product/state-matrix.md, docs/screens/product/navigation.md
-- Decision register: docs/mvp/decisions.md — D-2026-11-09-01
+- Decision register: docs/mvp/decisions/README.md — D-2026-11-09-01
 
 ## Real app work
 - Ships in the same PR as #579: `next-match-sheet` in `@rotra/ui`, wired from the Queue console after Confirm result.

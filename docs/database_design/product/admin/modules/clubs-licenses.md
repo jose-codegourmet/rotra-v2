@@ -79,9 +79,9 @@ Provision a Supabase Storage bucket named `club-logos` with public reads, `image
 club authorization; do not grant browser insert/update/delete policies. Paths are generated on the
 server as `<club UUID>/<random UUID>.png`. No application schema migration is required.
 
-**Superseded in part by [D-2026-11-09-10](../../../../mvp/decisions.md#d-2026-11-09-10):** only the current and the previous logo are kept, not every logo. A small migration adds `clubs.logo_previous_ref` next to `logo_ref`. After saving a new logo the server deletes every other file in the club's folder. **Use previous logo** swaps the two references; **Remove** moves the current reference to `logo_previous_ref`. A result snapshot whose logo file is gone shows the club's current logo, or its initials.
+**Superseded in part by [D-2026-11-09-10](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-10):** only the current and the previous logo are kept, not every logo. A small migration adds `clubs.logo_previous_ref` next to `logo_ref`. After saving a new logo the server deletes every other file in the club's folder. **Use previous logo** swaps the two references; **Remove** moves the current reference to `logo_previous_ref`. A result snapshot whose logo file is gone shows the club's current logo, or its initials.
 
-### Club invite code ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08))
+### Club invite code ([D-2026-11-09-08](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-08))
 
 **Self check-in switch** (migration `20261118000600_self_check_in`, written November 18, 2026; applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off)): `clubs.self_check_in_enabled` (Prisma `Club.selfCheckInEnabled`), boolean, default true. Off refuses the Player's **I'm here** (“Your club has turned self check-in off.”); **I'm leaving** still works. Saved through the club settings PATCH with the club's revision.
 

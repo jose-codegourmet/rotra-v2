@@ -27,7 +27,7 @@ Proposed navigation:
 - Ranking configuration.
 - Feature flags.
 - Profile characters (A-CHARACTERS, owner request, November 9, 2026; `/settings/profile-characters`).
-- Profile banners (A-BANNERS, November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11); `/settings/profile-banners`; the rail badge counts shown banners).
+- Profile banners (A-BANNERS, November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11); `/settings/profile-banners`; the rail badge counts shown banners).
 
 The initial view can be the clubs list rather than a speculative analytics dashboard. Counts shown in navigation are actual records, not mock revenue, churn, active-user, moderation, or platform-health metrics.
 
@@ -66,7 +66,7 @@ links show the Admin not-found state with no placeholder records or counts.
 Invalid-credential copy from ticket #186 is **“Email or password is incorrect.”** (Q-LOGIN's mirror
 “Username or password is incorrect.” was confirmed November 11, 2026.) On A-ADD-CLUB, a provider
 rejection of the initial club password shows **“Password incorrect. Try another password.”** under the
-field, with no policy text up front ([D-2026-11-11-07](../../../../mvp/decisions.md#d-2026-11-11-07)). Offline sign-in uses **“Signing in needs an internet connection.”**
+field, with no policy text up front ([D-2026-11-11-07](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-07)). Offline sign-in uses **“Signing in needs an internet connection.”**
 The final Admin auth/provider/session policy remains open.
 
 The product owner requested no lint, type-check, or build checks. The #183 follow-up was

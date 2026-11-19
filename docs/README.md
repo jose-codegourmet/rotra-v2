@@ -23,7 +23,7 @@ default, with an opt-in real mode for parts of each app; current build status is
 | [Business logic](business_logic/product/README.md) | What each product does: rules per module, plus `flow/` journeys |
 | [Screens](screens/product/README.md) | What each screen shows: layout, controls, states, dialogs, by screen ID |
 | [Database design](database_design/product/README.md) | Proposed tables and fields per module |
-| [MVP](mvp/README.md) | MVP scope, status board, workstreams and the [decision register](mvp/decisions.md) |
+| [MVP](mvp/README.md) | MVP scope, status board, workstreams and the [decision register](mvp/decisions/README.md) |
 | Open decisions: [business](business_logic/product/open-decisions.md) · [screens](screens/product/open-decisions.md) · [database](database_design/product/open-decisions.md) | What is still undecided. Never fill these in by guessing |
 
 ## Design

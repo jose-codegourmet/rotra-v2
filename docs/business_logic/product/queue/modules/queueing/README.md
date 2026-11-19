@@ -1,6 +1,6 @@
 # Queue generation and dispatch
 
-**Last verified:** 2026-11-11 for Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), #739); 2026-11-06 for the rest.
+**Last verified:** 2026-11-11 for Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), #739); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and the Auto Queue / Manual Queue court switch ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
 
@@ -89,7 +89,7 @@ The suggestion explains why: who is below the minimum (with games/target), or th
 
 ### Generate matches workspace
 
-Formerly called Auto Queue; renamed 2026-11-06. The Main Queue is the shared accepted waiting list. Generate matches holds separate alternative drafts in five tabs: Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up. Generate on request after choosing 2, 3, 4 or 6 matches; no count is preselected. Available means present, not in play at generation and **not already in any waiting match in the Main Queue**; only Plan Ahead initially includes players in play, identified as dependencies. A player who is already queued is never available in any tab ([D-2026-11-13-07](../../../../../mvp/decisions.md#d-2026-11-13-07)). When too few players are free, Generate makes only as many matches as they allow and says how many players were left out because they are already in the Main Queue. Repeated appearances across drafts in the same batch are allowed; a player cannot be in two On court or Playing matches at once.
+Formerly called Auto Queue; renamed 2026-11-06. The Main Queue is the shared accepted waiting list. Generate matches holds separate alternative drafts in five tabs: Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up. Generate on request after choosing 2, 3, 4 or 6 matches; no count is preselected. Available means present, not in play at generation and **not already in any waiting match in the Main Queue**; only Plan Ahead initially includes players in play, identified as dependencies. A player who is already queued is never available in any tab ([D-2026-11-13-07](../../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-07)). When too few players are free, Generate makes only as many matches as they allow and says how many players were left out because they are already in the Main Queue. Repeated appearances across drafts in the same batch are allowed; a player cannot be in two On court or Playing matches at once.
 
 Generation accounts for earlier drafts within its batch as planned load (players in the Main Queue are left out, so their queued matches add no load to the drafts). Longest Wait and Fewest Games use that load with longest wait and stable player order for ties. Catch Up uses an explicitly chosen target for completed games, prioritizes players below it, and fills from eligible players with the lowest planned load. It stops when the target is met in the plan, the chosen batch limit is reached, or no valid match can make progress; show the reason. This target is not the session minimum. Played counts follow existing completed-match rules plus the Queue Master's games played adjustment ([players › Games played override](../players/README.md#games-played-override-717), #717); queued counts derive from current Main Queue waiting matches. A draft is not a completed result and alternative tabs do not increase the Main Queue count. Existing team-balancing heuristics are prototype references, not newly approved pairing weights.
 
@@ -97,7 +97,7 @@ Selections persist across tabs in selection order. Review that order before addi
 
 ### Bagging mode and bagging pairs
 
-**Owner decisions, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11), #739; [log](../../../../../mockup-changes/2026-11-11-queue-bagging-mode.md)).** Bagging mode lets the Queue Master keep two players together as partners when Generate matches drafts doubles.
+**Owner decisions, November 11, 2026 ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), #739; [log](../../../../../mockup-changes/2026-11-11-queue-bagging-mode.md)).** Bagging mode lets the Queue Master keep two players together as partners when Generate matches drafts doubles.
 
 - **One switch for the session.** **Bagging mode** is a session-wide switch in the Generate matches workspace, off by default. It exists for **doubles only**: with no doubles in the session the switch is not offered. Only the Queue Master uses it. Switching it off keeps the pairs list; Generate matches then ignores it.
 - **Bagging pairs list.** While the switch is on, the Queue Master keeps a list of pairs. A pair is two **present** roster players. A player is in **one pair at a time**: choosing someone already paired offers to replace that pair. There is no limit on the number of pairs. A pair can be removed at any time.

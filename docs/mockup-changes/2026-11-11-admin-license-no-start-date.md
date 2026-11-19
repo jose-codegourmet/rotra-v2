@@ -16,7 +16,7 @@ Superseded by: none
 - After: the field is gone. The period is computed: a club with a current term starts **the day after it ends**; any other club starts **today**. Step 1 shows it read-only as **Covers** (“Dec 1, 2026 – Dec 31, 2026”), with the hint “A renewal starts the day after the current term ends.” when there is a current term. The overlap warning and the undecided notice are removed. Payment history shows **Reference** as the generated `LIC-####` number and, under it, the owner-typed **Note** when there is one.
 
 ## Why
-- Owner answers of November 11, 2026 ([D-2026-11-11-06](../mvp/decisions.md#d-2026-11-11-06)): remove the Starts on field (“a license starts when you activate it”); renewals stack after the current term; payment history shows both the auto number and the typed note.
+- Owner answers of November 11, 2026 ([D-2026-11-11-06](../mvp/decisions/2026-11-11.md#d-2026-11-11-06)): remove the Starts on field (“a license starts when you activate it”); renewals stack after the current term; payment history shows both the auto number and the typed note.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

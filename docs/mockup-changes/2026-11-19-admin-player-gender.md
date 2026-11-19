@@ -16,7 +16,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 19, 2026: accounts say Male or Female (optional for now), public.
-  [D-2026-11-19-01](../mvp/decisions.md#d-2026-11-19-01).
+  [D-2026-11-19-01](../mvp/decisions/2026-11-19.md#d-2026-11-19-01).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light; a player with and without a gender.

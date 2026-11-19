@@ -1,8 +1,8 @@
 # Round 2: visibility, hide flag, profile banners, club invite code, club-only unclaimed profiles
 
-Ticket P08.1. Decisions [D-2026-11-11-11](../../../../../docs/mvp/decisions.md#d-2026-11-11-11)
-(three-level visibility, hide from Player Information, banners), [D-2026-11-09-08](../../../../../docs/mvp/decisions.md#d-2026-11-09-08)
-(club invite code) and [D-2026-11-11-03](../../../../../docs/mvp/decisions.md#d-2026-11-11-03)
+Ticket P08.1. Decisions [D-2026-11-11-11](../../../../../docs/mvp/decisions/2026-11-11.md#d-2026-11-11-11)
+(three-level visibility, hide from Player Information, banners), [D-2026-11-09-08](../../../../../docs/mvp/decisions/2026-11-09.md#d-2026-11-09-08)
+(club invite code) and [D-2026-11-11-03](../../../../../docs/mvp/decisions/2026-11-11.md#d-2026-11-11-03)
 (unclaimed profiles stay in their club). The owner signed off the migration on November 12, 2026.
 `migration.sql` is the `prisma migrate diff` output followed by hand-written CHECKs, seeds, grants
 and the data backfill.

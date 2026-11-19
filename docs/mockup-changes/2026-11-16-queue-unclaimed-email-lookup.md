@@ -25,7 +25,7 @@ Superseded by: none
 - The prototype's saved demo data restarts once (store key `rotra-queue-prototype-v4`).
 
 ## Why
-- Decision: [D-2026-11-16-04](../mvp/decisions.md#d-2026-11-16-04).
+- Decision: [D-2026-11-16-04](../mvp/decisions/2026-11-16.md#d-2026-11-16-04).
 - Owner, November 16, 2026: "we just make unclaimed require EMAIL when the QM can know that eventually this person will come back"; "guest. will be a non existing account. no email. no phone."; "I think unclaimed should have a rtr id"; "make the player look up to be RTR ID or Email only. no more name search in player lookup. have player look up ONLY for saved players"; "they can never edit the email"; "it should just show a tag called .. details required or needs attention"; "yes remove it" (Link and Link to saved player…).
 
 ## Like for like
@@ -73,5 +73,5 @@ Superseded by: none
 ## Open for the owner
 - The **Same person** confirmation is new; the decision only says adding an email replaces Link.
 - A returning guest who sends a new join request now gets a second guest record, because nothing links the two.
-- The edit sheet still says the invited player "only need to choose a password"; Google sign-in ([D-2026-11-16-01](../mvp/decisions.md#d-2026-11-16-01)) makes that untrue, and it was left for that change.
+- The edit sheet still says the invited player "only need to choose a password"; Google sign-in ([D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01)) makes that untrue, and it was left for that change.
 - Lookup by phone and by QR code, and the Confirm player step for another club's unclaimed player, are not decided.

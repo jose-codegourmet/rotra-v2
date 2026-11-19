@@ -24,7 +24,7 @@ Superseded by: none
 - The Results section moves: Standings → the Leaderboard tab; Awards and Off Day stay on Details under the heading **Awards**; “Results for this session have not been shared.” stays on Details.
 
 ## Why
-- Owner, November 13, 2026, with a screenshot of a finished session: “I dont think Queue should be in there since it is already Finished · it should show the Match history Instead”; then: “since the match is finished it should show a tab called leaderboard · should show the leader board and your position”. Decision [D-2026-11-13-05](../mvp/decisions.md#d-2026-11-13-05).
+- Owner, November 13, 2026, with a screenshot of a finished session: “I dont think Queue should be in there since it is already Finished · it should show the Match history Instead”; then: “since the match is finished it should show a tab called leaderboard · should show the leader board and your position”. Decision [D-2026-11-13-05](../mvp/decisions/2026-11-13.md#d-2026-11-13-05).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

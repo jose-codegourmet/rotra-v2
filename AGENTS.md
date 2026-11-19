@@ -3,7 +3,7 @@
 > **Entry point for AI coding agents.** Read this file completely; it is deliberately short. Everything
 > else is loaded **on demand** through the routing table in §3. Don't read the whole `docs/` tree.
 
-**Last verified:** 2026-11-13 · **Budget:** under 200 lines.
+**Last verified:** 2026-11-19 · **Budget:** under 200 lines.
 
 ---
 
@@ -118,7 +118,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | A confirmation dialog (`D-…`) | [dialogs.md](docs/screens/product/dialogs.md) |
 | **Product behavior** (what a rule is) | [business_logic/product/README.md](docs/business_logic/product/README.md) → that product's `modules/<module>/README.md` |
 | Is something still undecided? | [business open decisions](docs/business_logic/product/open-decisions.md) · [screen open decisions](docs/screens/product/open-decisions.md) · [database open decisions](docs/database_design/product/open-decisions.md) |
-| Changing a **shared queue rule** (court fill, match checks, courts and time, game counts, roster) | [architecture.md](docs/architecture.md#shared-queue-rules-go-and-webassembly) §3 → [D-2026-11-14-01](docs/mvp/decisions.md#d-2026-11-14-01) |
+| Changing a **shared queue rule** (court fill, match checks, courts and time, game counts, roster) | [architecture.md](docs/architecture.md#shared-queue-rules-go-and-webassembly) §3 → [D-2026-11-14-01](docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01) |
 | **Domain math** (cost, minimum games, queue generation, rank, awards) | The business module → [coding-conventions.md](docs/coding-conventions.md) §14 → ask |
 | **Prisma / tables** (database epic) | [database_design/product/README.md](docs/database_design/product/README.md) → [conventions](docs/database_design/product/conventions.md) → [coding-conventions.md](docs/coding-conventions.md) §13 |
 | **Offline** (Queue) | [architecture.md](docs/architecture.md) §9 → [offline module](docs/business_logic/product/queue/modules/offline/README.md) |
@@ -126,7 +126,7 @@ email-templates/          auth email HTML, pasted into the Supabase dashboard by
 | **Observability** (OpenTelemetry, Grafana, tracing) | [observability.md](docs/observability.md) |
 | A **layout / UI change** request | [mockup-changes/README.md](docs/mockup-changes/README.md) → the app's mockup → its business module + database design |
 | Turning **mockup changes into tickets** | [mockup-changes/README.md](docs/mockup-changes/README.md) → [ways-of-working.md](docs/ways-of-working.md) §3 |
-| **MVP scope, status, or decisions** | [mvp/README.md](docs/mvp/README.md) → the workstream page → [mvp/decisions.md](docs/mvp/decisions.md) |
+| **MVP scope, status, or decisions** | [mvp/README.md](docs/mvp/README.md) → the workstream page → [mvp/decisions/](docs/mvp/decisions/README.md) (index → that day's file) |
 | **Backend runtime, hosting, sign-in, storage or jobs** | [backend/README.md](docs/backend/README.md) → [backend open decisions](docs/backend/open-decisions.md) → ask |
 | **Regression / e2e suite** | [regression.md](docs/regression.md) |
 | **Two docs disagree** | [ways-of-working.md](docs/ways-of-working.md) §2 |

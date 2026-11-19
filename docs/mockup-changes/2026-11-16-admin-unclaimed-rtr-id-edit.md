@@ -39,7 +39,7 @@ Superseded by: none
 - Search is unchanged: name, RTR ID, phone or email.
 
 ## Why
-- [D-2026-11-16-04](../mvp/decisions.md#d-2026-11-16-04), approved by the owner on November 16, 2026:
+- [D-2026-11-16-04](../mvp/decisions/2026-11-16.md#d-2026-11-16-04), approved by the owner on November 16, 2026:
   an unclaimed player needs an email and gets an RTR ID; one email is one person and one RTR ID; “Admin
   can edit the email and the RTR ID”; a changed RTR ID cascades.
 - Owner, on older records with a phone and no email: “it should just show a tag called .. details required

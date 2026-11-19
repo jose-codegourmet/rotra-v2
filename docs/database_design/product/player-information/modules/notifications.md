@@ -1,6 +1,6 @@
 # Player notifications
 
-**Status:** Migration `20261118000400_player_notifications` and real-mode services implemented in source for [D-2026-11-16-03](../../../../mvp/decisions.md#d-2026-11-16-03). Prisma models live in the Player entity group.
+**Status:** Migration `20261118000400_player_notifications` and real-mode services implemented in source for [D-2026-11-16-03](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-03). Prisma models live in the Player entity group.
 
 ## `player_notifications`
 

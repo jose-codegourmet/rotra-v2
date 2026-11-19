@@ -33,7 +33,7 @@ Components: compare-filter-bar
   both pictures, Games / Won / Lost tiles, a team win rate and a bar (owner comment, same day).
 
 ## Open questions for the owner
-- **Decided in [D-2026-11-08-02](../mvp/decisions.md#d-2026-11-08-02) (owner delegated, 2026-11-08): signed-in players only, any profile, no opt-out; only counted singles and doubles; read on request from final match rows with one SQL function, no cron or Edge Function; route `/players/[playerId]/compare`.** The questions below are kept for history.
+- **Decided in [D-2026-11-08-02](../mvp/decisions/2026-11-08.md#d-2026-11-08-02) (owner delegated, 2026-11-08): signed-in players only, any profile, no opt-out; only counted singles and doubles; read on request from final match rows with one SQL function, no cron or Edge Function; route `/players/[playerId]/compare`.** The questions below are kept for history.
 - Assumed: only signed-in players can compare, and any profile can be compared. Should a player be able to
   turn this off for their own profile? (These are results already shown on profiles.)
 - Assumed: fun and partial games are left out. Should they appear as their own line?

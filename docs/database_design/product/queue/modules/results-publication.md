@@ -1,6 +1,6 @@
 # Finalized facts, awards, and publication
 
-**Last verified:** 2026-11-19 for sessions with Record games off ([D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06), Q23.8 #976); 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-19 for sessions with Record games off ([D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06), Q23.8 #976); 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed data structures, not proposed new award formulas.
 
@@ -31,7 +31,7 @@ Index `(player_id_at_finalization, played_at DESC, match_id)` for player history
 
 `session_result_snapshots`: one immutable generated snapshot per session/version, containing standings, MVP evidence, improvement/off-day eligibility and output, calculation version, exact prior-session IDs/baseline window, and generated time. It is private by default. Versioning supports reviewed algorithm changes, not result correction.
 
-Compute local standings from wins, then losses; players with the same wins and losses share a position and the next position skips the shared places ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05), mockup only; the code still breaks ties by head-to-head, then name). Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
+Compute local standings from wins, then losses; players with the same wins and losses share a position and the next position skips the shared places ([D-2026-11-18-05](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05), mockup only; the code still breaks ties by head-to-head, then name). Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
 
 The live console leaderboard uses the same ordering over the provisional projection and adds win % (wins ÷ games). It is a read model only.
 
@@ -41,7 +41,7 @@ Most Improved/Off Day need five **previous** qualifying sessions at that same cl
 
 ## A session with Record games off
 
-Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
+Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
 
 | Table | What Session done and later commands write |
 |---|---|
@@ -58,7 +58,7 @@ Reads: the private results read returns nothing (as for an invalid session); the
 
 `session_publications`: unique session FK; opaque public page key; safe Details/Participants projection; nullable published result snapshot ID; `published_slides` (subset of standings/awards); explicit `include_off_day`; publication actor/time; publication state; expiry-cycle FK and last synced time. The public details page may exist before result publication.
 
-The public Details projection includes the minimum games per player; Participants include name, permitted picture, and a "has a ROTRA profile" flag only — no level, presence, contact, or cost data. The signed-in viewer's **participant profile card** (November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11), #731) stores nothing on the session: it reads the player's Player Information profile (name, level, 90-day stats, banner, visibility) and tonight's status from the live session, and the full-photo viewer is UI only.
+The public Details projection includes the minimum games per player; Participants include name, permitted picture, and a "has a ROTRA profile" flag only — no level, presence, contact, or cost data. The signed-in viewer's **participant profile card** (November 11, 2026, [D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), #731) stores nothing on the session: it reads the player's Player Information profile (name, level, 90-day stats, banner, visibility) and tonight's status from the live session, and the full-photo viewer is UI only.
 
 Re-publication is allowed: each publish command replaces `published_slides` and **must supply `include_off_day` explicitly** (the UI always starts it unchecked); never carry it over from the previous row. Keep an append-only `session_publication_events` log (selection, Off Day choice, actor, time) so earlier consent is auditable. Full withdrawal is not specified.
 

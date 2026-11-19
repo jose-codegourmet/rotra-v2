@@ -1,7 +1,7 @@
 # Product — ROTRA backend
 
 > Conductor here covers the **backend only**: the Go API on Railway decided in
-> [D-2026-11-13-01](../docs/mvp/decisions.md#d-2026-11-13-01). The product itself is described in
+> [D-2026-11-13-01](../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01). The product itself is described in
 > [AGENTS.md](../AGENTS.md) §1 and [business logic](../docs/business_logic/product/README.md); those win
 > over this page.
 

@@ -24,7 +24,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 | Operator adds and confirms all slots | [Roster](modules/queue/players-roster.md) | No public Request to join/Cancel attendance controls |
 | Club remembers returning players and guests | [Saved players](modules/queue/players-roster.md) | Club list searched first; no formal membership workflow implied |
 | Name lookup suggests global identity | [Identity confirmation](modules/queue/players-roster.md) | Name match does not auto-link two different people |
-| One email is one person and one RTR ID across clubs, registered or unclaimed ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | [Add player](modules/queue/players-roster.md) | Lookup by exact RTR ID or exact email only; another club's unclaimed player shows no name, picture or level |
+| One email is one person and one RTR ID across clubs, registered or unclaimed ([D-2026-11-16-04](../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)) | [Add player](modules/queue/players-roster.md) | Lookup by exact RTR ID or exact email only; another club's unclaimed player shows no name, picture or level |
 | No email means guest; account not needed to play | [Add player](modules/queue/players-roster.md) | Slot can be confirmed without email/phone; no RTR ID for a guest |
 | Incomplete profile enrichment or operator-issued registration link | [Roster](modules/queue/players-roster.md), [claim](modules/player-information/access-registration.md) | Missing socials do not block participation; no offline fake claim link |
 | Offline late arrival allowed | [Roster](modules/queue/players-roster.md), [sync](modules/queue/offline-recovery.md) | Name/level/optional phone saved locally; link waits for connection |

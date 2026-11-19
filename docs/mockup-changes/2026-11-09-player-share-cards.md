@@ -22,7 +22,7 @@ Superseded by: none
   - Other players' names on the images are masked for private players and guests (first letter plus `***` per word) and shown in full for public players, whoever is signed in.
 
 ## Why
-- Decision [D-2026-11-09-08](../mvp/decisions.md#d-2026-11-09-08): "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Masking follows [D-2026-11-09-07](../mvp/decisions.md#d-2026-11-09-07).
+- Decision [D-2026-11-09-08](../mvp/decisions/2026-11-09.md#d-2026-11-09-08): "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Masking follows [D-2026-11-09-07](../mvp/decisions/2026-11-09.md#d-2026-11-09-07).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

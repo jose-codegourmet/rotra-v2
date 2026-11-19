@@ -1,6 +1,6 @@
 # Conductor — ROTRA backend
 
-Planning for the **Go API on Railway** only ([D-2026-11-13-01](../docs/mvp/decisions.md#d-2026-11-13-01)).
+Planning for the **Go API on Railway** only ([D-2026-11-13-01](../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01)).
 Frontend work keeps the v2 process in [AGENTS.md](../AGENTS.md) (mockup first, GitHub tickets).
 
 - [Product](./product.md) · [Guidelines](./product-guidelines.md) · [Tech stack](./tech-stack.md)

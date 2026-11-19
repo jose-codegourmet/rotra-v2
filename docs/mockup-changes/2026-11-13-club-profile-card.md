@@ -20,7 +20,7 @@ One change across the three apps; logged under `player`.
 - Admin Clubs and licenses: a row or its name opened the club detail → opens the card in the right-hand panel; **Open club** goes on. The logo is round in the card (square in the list).
 
 ## Why
-- Owner, November 13, 2026: “since players have player profile dialogs · clubs should also have Club Profile Dialogs · same style too”. Asked: banner strip → “Same banner strip”; where → Queue session page, Players profile Clubs card, Admin Clubs list. Decision [D-2026-11-13-05](../mvp/decisions.md#d-2026-11-13-05).
+- Owner, November 13, 2026: “since players have player profile dialogs · clubs should also have Club Profile Dialogs · same style too”. Asked: banner strip → “Same banner strip”; where → Queue session page, Players profile Clubs card, Admin Clubs list. Decision [D-2026-11-13-05](../mvp/decisions/2026-11-13.md#d-2026-11-13-05).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

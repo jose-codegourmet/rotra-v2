@@ -25,9 +25,9 @@ Superseded by: none
 - States: shared positions at the top, middle and bottom; no ties.
 
 ## Decided math
-- This amends [D-2026-11-18-05](../mvp/decisions.md#d-2026-11-18-05). The real app (Q23.4, merged November 19) numbers
+- This amends [D-2026-11-18-05](../mvp/decisions/2026-11-18.md#d-2026-11-18-05). The real app (Q23.4, merged November 19) numbers
   1, 1, 3 in `computeStandings` (TypeScript and the Go rule with its rule cases and wasm); it needs a ticket.
 
 ## Docs updated
-- docs/business_logic/product/queue/modules/results/README.md, docs/mvp/decisions.md (D-2026-11-18-05),
+- docs/business_logic/product/queue/modules/results/README.md, docs/mvp/decisions/README.md (D-2026-11-18-05),
   docs/screens/product/modules/queue/results-sharing.md

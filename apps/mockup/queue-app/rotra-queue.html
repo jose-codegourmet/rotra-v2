@@ -271,8 +271,9 @@ textarea.input { min-height: 80px; resize: vertical; }
 .lh-stack { display: flex; flex-direction: column; gap: 18px; }
 .lh-court { display: flex; flex-direction: column; gap: 10px; }
 .lh-court h3 { margin: 0; font-size: 15px; }
-.lh-rows { list-style: none; margin: 0; padding: 0 0 8px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; }
-.lh-row { flex: 0 0 min(380px, 86%); display: flex; flex-direction: column; gap: 6px; scroll-snap-align: start; }
+/* Owner artifact comment, November 19, 2026: latest on top, earlier ones below (one column per court). */
+.lh-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
+.lh-row { display: flex; flex-direction: column; gap: 6px; }
 .lh-time { display: flex; align-items: baseline; gap: 6px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
 .lh-time b { font-size: 14px; }
 .lh-time .chip { margin-left: auto; }
@@ -3439,7 +3440,7 @@ function liveHistoryPane(s) {
   const inv = played.filter((m) => m.status === 'invalid').length;
   // Owner artifact comment, November 19, 2026: "the tabs with counts here look bad". Pill filters with the count in a badge.
   const seg = `<div class="cfilter" role="group" aria-label="Court">${[['all', 'All courts', played.length], ...s.courts.map((c) => [c.id, esc(c.label), played.filter((m) => m.courts.includes(c.id)).length])].map(([k, l, n]) => `<button type="button" aria-pressed="${f === k}" data-act="lhCourt" data-v="${k}"><span>${l}</span><span class="cf-n tnum">${n}</span></button>`).join('')}</div>`;
-  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, court by court. Each court's row starts with the latest match on the left; scroll sideways for earlier ones. Start time and length sit on top of each match. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
+  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, court by court. In each court the latest match is on top and earlier ones are below. Start time and length sit on top of each match. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
     ${seg}
     ${list.length ? lhTimeline(s, list, f) : `<div class="card empty">${played.length ? 'No finished matches on this court yet.' : 'No finished matches yet. They show here after Match done.'}</div>`}`;
 }
@@ -3449,7 +3450,7 @@ function liveHistoryPane(s) {
 function lhTimeline(s, list, f) {
   const cols = f === 'all' ? s.courts : s.courts.filter((c) => c.id === f);
   return `<div class="lh-stack">${cols.map((c) => {
-    const ms = list.filter((m) => m.courts.includes(c.id)).sort((a, b) => b.startedAt - a.startedAt); // newest on the left
+    const ms = list.filter((m) => m.courts.includes(c.id)).sort((a, b) => b.startedAt - a.startedAt); // newest on top
     return `<section class="lh-court" aria-labelledby="lh-${esc(c.id)}"><div class="between"><h3 id="lh-${esc(c.id)}">${esc(c.label)}</h3><span class="small muted">${ms.length} match${ms.length === 1 ? '' : 'es'}</span></div>
       ${ms.length ? `<ol class="lh-rows">${ms.map((m) => `<li class="lh-row"><div class="lh-time"><b class="tnum">${fmtTime(m.startedAt)}</b><span class="small muted">· ${queueTime(Math.max(0, Math.round(((m.endedAt || m.startedAt) - m.startedAt) / 60000)))}</span>${m === ms[0] ? '<span class="chip ok">Latest</span>' : ''}</div>${historyMatch(s, m)}</li>`).join('')}</ol>` : '<p class="small muted">No finished matches on this court yet.</p>'}</section>`;
   }).join('')}</div>`;

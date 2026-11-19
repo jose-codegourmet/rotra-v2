@@ -70,6 +70,7 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) — answers to the leftover questions of the November 11 round.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
+- [D-2026-11-19-10](../decisions.md#d-2026-11-19-10) — Home for signed-in players (current session, upcoming sessions, clubs, stats).
 
 ## Blocking open decisions
 

@@ -74,6 +74,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-19-07](#d-2026-11-19-07) | Generate Queue exemption list | approved 2026-11-19 (details open) | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-08](#d-2026-11-19-08) | Regenerate is removed from the Main Queue | approved 2026-11-19 (rules cleanup open) | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-09](#d-2026-11-19-09) | Embla Carousel for sliders | approved 2026-11-19 by the owner naming it (scope open) | mockup only (loaded from a CDN) | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-10](#d-2026-11-19-10) | Player Home for signed-in players | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1383,3 +1384,13 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Decision:** on phones (640 px and narrower) the Settings courts are an Embla carousel, one court a slide with the next peeking and dots. The real app adds `embla-carousel-react` in `@rotra/ui`.
 - **Open:** whether the Main Queue slide mode and other sliders (Next match, share dialogs) move to Embla too.
 - **References:** [architecture](../architecture.md) (dependencies), [console screens](../screens/product/modules/queue/session-console.md)
+
+<a id="d-2026-11-19-10"></a>
+### D-2026-11-19-10 — Player Home for signed-in players
+- **Decision status:** approved by the owner, November 19, 2026: “the home page for Rotra Players should be the current session, upcoming sessions and access to clubs and current player stats”; then, asked: signed-in players only, top bar Home · Leaderboard · My profile, and My sessions and Your clubs move off the own profile.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-player-home.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:** P-HOME at `/home`, protected. Sign-in lands there unless sent from another page; the ROTRA logo opens it for signed-in players. It shows the current (live) session, upcoming sessions (with Finished), the player's clubs and their stats (shared rank card, weekly performance). Visitors keep the leaderboard at `/` as the public home. The own profile drops My sessions and Your clubs; other profiles keep Clubs.
+- **Open:** none.
+- **References:** [profile screens](../screens/product/modules/player-information/profile.md#p-home--signed-in-home), [navigation](../screens/product/navigation.md)

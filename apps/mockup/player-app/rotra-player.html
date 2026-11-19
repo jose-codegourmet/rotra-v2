@@ -197,6 +197,12 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; font-size: 14px; margin: 0; }
 .kv dt { color: var(--fg2); }
 .kv dd { margin: 0; min-width: 0; }
+.home-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (min-width: 900px) { .home-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.home-label { margin-bottom: -8px; }
+.home-now-body { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.home-now-title { font-size: 20px; }
+.home-now .btn { text-decoration: none; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
 .empty { padding: 24px 12px; text-align: center; color: var(--fg2); font-size: 14px; }
 
@@ -1621,8 +1627,9 @@ function topBar() {
   const me = S.me && S.accounts[S.me];
   const mine = me && ((['profile', 'rank', 'history', 'sessions'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account', 'verify'].includes(S.screen));
   return `<header class="top"><div class="top-in">
-    <button class="brand" data-act="go" data-to="board" aria-label="ROTRA Players, open the leaderboard">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
+    <button class="brand" data-act="go" data-to="${me ? 'home' : 'board'}" aria-label="ROTRA Players, open ${me ? 'Home' : 'the leaderboard'}">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
     <nav class="nav" aria-label="Main">
+      ${me ? `<button data-act="go" data-to="home" ${S.screen === 'home' ? 'aria-current="page"' : ''}>Home</button>` : ''}
       <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>Leaderboard</button>
       ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
     </nav>
@@ -1885,7 +1892,7 @@ function viewProfile() {
           <span class="hint">Shows the city and date this profile was first created. It isn't where ${own ? 'you live or which club you play for' : 'this player lives or which club they play for'}.</span></div>
         ${own ? `<div class="acts"><button class="btn sm" data-act="openEdit">${I.edit} Edit profile</button><button class="btn sm" data-act="go" data-to="id">${I.qr} My player ID</button><button class="btn sm" data-act="go" data-to="verify">${NI.shield} Verification</button><button class="btn sm" data-act="openShare" data-kind="profile">${I.share} Share profile</button></div>` : `<div class="acts"><button class="btn sm primary" data-act="openCompare" data-id="${p.id}">${I.versus} Compare with ${S.me ? 'me' : 'my results'}</button><button class="btn sm" data-act="openShare" data-kind="profile" data-pid="${p.id}">${I.share} Share profile</button></div>`}
       </section>
-      ${own ? privatePanel(p) : ''}${clubsPanel(p, own)}
+      ${own ? privatePanel(p) : clubsPanel(p, false)}
     </aside>
     <div class="stack" style="gap:20px">
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
@@ -1895,7 +1902,6 @@ function viewProfile() {
       ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
       ${eligibility(p, own, st)}
       ${weeklyPerf(p, true)}
-      ${own ? mySessionsCard() : ''}
       ${latestSessionsCard(p)}
       ${recentGamesCard(p)}
       <section class="card stack"><h2>About</h2>
@@ -1947,14 +1953,40 @@ function privatePanel(p) {
 
 // My sessions: the player's upcoming and live sessions (requested, confirmed or waitlisted). Loads once when the profile opens; no live updates.
 function mySessionsCard() {
-  const list = S.me === 'u1' ? MY_SESSIONS : [];
+  const list = S.me === 'u1' ? MY_SESSIONS.filter((m) => m.status !== 'live') : [];
   const done = S.me === 'u1' ? MY_FINISHED.map((id) => migsSessions().find((x) => x.id === id)).filter(Boolean) : [];
   const stat = (m) => (m.status === 'live' ? chip('Happening now', 'ok') : m.status === 'confirmed' ? chip('Confirmed', 'solid') : m.status === 'waitlist' ? chip(`Waitlist #${m.n}`, 'warn') : chip('Requested', 'warn'));
-  return `<section class="card stack"><h2>My sessions</h2>${list.length ? `<div>${list.map((m) => {
+  return `<section class="card stack"><h2>Upcoming sessions</h2>${list.length ? `<div>${list.map((m) => {
     const d = SESSION_DIR[m.slug];
     return `<a class="srow" href="/queue/s/${encodeURIComponent(m.slug)}"><span class="main"><b>${esc(d.title)}</b><span class="small muted">${fmtDay(-m.day)} · ${m.time} · ${esc(CLUB_DIR[d.club].name)}</span></span>${stat(m)}</a>`;
   }).join('')}</div>` : '<div class="empty">No upcoming sessions. Sessions you join from a club\'s session link show here.</div>'}
     ${done.length ? `<span class="label">Finished</span><div>${done.map((s) => `<div class="srow"><span class="main"><b>${esc(s.title)}</b><span class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</span></span>${s.published ? `<button class="btn xs" data-act="openShare" data-kind="result" data-sid="${s.id}">${I.share} Share result</button>` : '<span class="small muted srow-note">Results not shared yet by the club.</span>'}</div>`).join('')}</div>` : ''}</section>`;
+}
+// ---------- P-HOME (signed-in home, owner, November 19, 2026) ----------
+// "the home page for Rotra Players should be: the current session, upcoming sessions, access to clubs and current player stats".
+// Signed-in players land here; visitors keep the Leaderboard as the public home. My sessions and Your clubs moved here from
+// the own profile; other players' profiles keep their Clubs card.
+function currentSessionCard() {
+  const live = S.me === 'u1' ? MY_SESSIONS.find((m) => m.status === 'live') : null;
+  if (!live) return `<section class="card stack"><h2>Current session</h2><div class="empty">No session right now. When a session you're in starts, it shows here.</div></section>`;
+  const d = SESSION_DIR[live.slug];
+  return `<section class="card hl stack home-now"><div class="between"><h2>Current session</h2>${chip('Happening now', 'ok')}</div>
+    <div class="home-now-body"><div class="stack tight" style="min-width:0"><b class="home-now-title">${esc(d.title)}</b><span class="small muted">${fmtDay(-live.day)} · ${live.time} · ${esc(CLUB_DIR[d.club].name)}</span></div>
+    <a class="btn primary" href="/queue/s/${encodeURIComponent(live.slug)}">Open session page</a></div></section>`;
+}
+function viewHome() {
+  const p = profileOf(S.me);
+  if (!p) return viewBoard();
+  const st = rankStatus(p, positionOf(p.id));
+  return `<main class="wrap"><div class="stack" style="gap:20px">
+    <div class="stack tight"><h1>Hi, ${esc(p.nick || p.name.split(' ')[0])}</h1><span class="muted">Your sessions, clubs and stats.</span></div>
+    ${!S.online ? notice('warn', 'Saved copy. Your sessions, rank and games may have changed since this device was last online.') : ''}
+    ${currentSessionCard()}
+    <div class="home-grid">
+      <div class="stack" style="gap:20px">${mySessionsCard()}${clubsPanel(p, true)}</div>
+      <div class="stack" style="gap:20px"><span class="label home-label">Your stats</span>${eligibility(p, true, st)}${weeklyPerf(p, true)}</div>
+    </div>
+  </div></main>`;
 }
 // Clubs card (#766, November 12, 2026): on every readable profile. "Your clubs" on the own profile, "Clubs" on another player's.
 // Each club is one row that opens the club page: logo, then name; the joined-via line shows on the own profile only.
@@ -3648,7 +3680,7 @@ function go(to, id) {
 function signIn(uid) {
   S.me = uid;
   S.ui.login = { id: '', pass: '', show: false, err: '', pending: false, note: '' };
-  const to = S.ui.after || { to: 'profile', id: uid };
+  const to = S.ui.after || { to: 'home' };
   S.ui.after = null;
   go(to.to, to.id);
 }
@@ -4292,7 +4324,7 @@ document.addEventListener('keydown', (ev) => {
 // ---------- Prototype routes (same paths as apps/player, under /player) ----------
 let prototypeRouter;
 let prototypeToken = 'demo';
-const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact', privacy: '/privacy', terms: '/terms' };
+const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', home: '/home', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact', privacy: '/privacy', terms: '/terms' };
 function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
@@ -4343,12 +4375,12 @@ function applyPrototypeRoute(url) {
   if (!screen) return false;
   if (screen === 'login') {
     const next = url.searchParams.get('next');
-    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account', 'verify'].includes(key) && next === '/player' + value);
+    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account', 'verify', 'home'].includes(key) && next === '/player' + value);
     S.ui.after = target ? { to: target[0] } : null;
   }
   S.ui.hist = url.searchParams.get('tab') === 'other' ? 'other' : 'counted';
   S.ui.editTab = EDIT_TABS.some((t) => t.id === url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'basics';
-  if (['edit', 'id', 'account', 'verify'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
+  if (['edit', 'id', 'account', 'verify', 'home'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
   S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.pendingGo = null;
   if (screen !== 'edit') { S.ui.edit = null; S.ui.editOrig = null; }
   return true;
@@ -4362,7 +4394,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;

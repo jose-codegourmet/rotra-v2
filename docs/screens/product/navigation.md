@@ -40,7 +40,7 @@ flowchart TD
 ## Product navigation
 
 - **Queue:** top bar with sync status and a light/dark mode switch on every operator screen. A collapsible left nav on every operator screen (burger in the top bar on wide screens, icon rail when collapsed; on phones a bottom dock with Menu, a highlighted Create/Continue session, and Settings): Live session (while live), Dashboard, Saved players, Venues, Inventory, Club settings, License, This device. Sign out is in Club settings. Home dashboard: club header with Create session, now card, calendar. Club settings has its own left-hand menu (on phones a button that opens it as a left drawer, closing the main menu first) and is unavailable offline. Each session's public page is also its session link; guests reach it from wherever the club shares it, never from the operator app's navigation. The live console has Session / Queue / Players / Leaderboard views and a footer with Session done. License gates remain global. Public session pages are a separate audience.
-- **Player Information:** overall leaderboard and public profile reading; sign-in adds own profile, ID/QR, privacy, and contact requests. No World discovery entry.
+- **Player Information:** overall leaderboard and public profile reading; sign-in adds Home (`/home`: current session, upcoming sessions, clubs and stats), own profile, ID/QR, privacy, and contact requests. No World discovery entry.
 - **Admin:** clubs/licenses, players/contact requests, ranking configuration, feature flags. No speculative analytics dashboard is required.
 
 ## Surface inventory
@@ -97,7 +97,7 @@ Inventory total: **86 surfaces across 19 module specifications**, plus the share
 
 All apps use `/login`. Queue public session links use `/s/[slug]`; the rest of Queue is protected. The operator preview `/sessions/[sessionId]/public-page` is the one exception to the sign-in redirect: anyone but the owning club is sent to that session's `/s/[slug]` instead of `/login`.
 Admin routes except `/login` are protected. Player `/` (leaderboard) and `/players/[playerId]` are
-public; `/me` and its children are protected. The Foundation proxy wires these boundaries only;
+public; `/home` (P-HOME, November 19, 2026), `/me` and their children are protected. The Foundation proxy wires these boundaries only;
 sign-in forms and the remaining screens arrive in their product tickets.
 
 P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions.md#d-2026-11-08-02)): it

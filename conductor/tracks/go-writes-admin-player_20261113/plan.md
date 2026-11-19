@@ -106,3 +106,21 @@ Vitest cases ported into Go tests under `apps/api/internal/rules/<area>` (a Vite
 | 2026-11-20 | 2.1 register | **Gap in `claim` (not fixed here):** the TypeScript `completeRecordClaim` allocates the RTR ID with the record's and the registering email (`allocateRtrId(..., [record.sharedEntry?.email, input.email])`, adopting an open shared entry's RTR ID) and calls `claimSharedEntry`; `internal/auth/claim` allocates with no emails and never claims a shared entry. A club record claimed through its link while a shared entry holds the same email therefore gets a new RTR ID in Go and leaves the entry open. `identity.AllocateRTRIDFor` and `ClaimSharedEntry` are what claim needs | Found while porting registration | Owner decision on a follow-up to `claim` (a change to a committed route, so not made in this slice) |
 | 2026-11-20 | 2.1 register | A club id written in capitals works through a club link but not through a session link (`session.clubId !== clubId` compares text) and a retry of an attempt with it is `Start a new registration with these details.` (`previous.issuingClubId !== clubId`); ported as is. A `?session=` or `?k=` that is empty counts as absent; the first of a repeated query key wins | The TypeScript | Pinned (`..._with_the_club_id_in_capitals_...`) |
 | 2026-11-20 | 2.1 register | Not pinned by a golden case (the capture has no Supabase): the identity, its argon2id hash, the account's `auth_subject`, the session and the cookies (`TestRegistrationMakesTheLoginAndSignsTheNewPlayerIn`), the wrong-password retry, the two taps of one attempt (the TypeScript answers the second 409 or 200 by timing) and two attempts for one email (races: `TestTwoTapsOf...`, `TestTwoAttemptsFor...`). `writetest` got `Step.redactOptional`, `Step.ignoreHeaders`, `BuildFull`/`NewEnvFull`/`ReplayFull` (a route built from the whole sign-in service), and `Reseed` clears `auth_rate_limits` | Harness | none |
+
+## Local check, 2026-11-20 (3.1)
+
+Throwaway `postgres:16-alpine` with all 41 Prisma migrations (the Supabase roles `anon`, `authenticated`, `service_role` created first) and the player write seed, the Go API built from this branch (commit `e29d9288`) on 8089, Admin (9002) and Player (9001) `next dev` in real mode with `ROTRA_GO_API_URL=http://127.0.0.1:8089` and the lists from [architecture.md](../../../docs/architecture.md). Passes came from Go sign-in and were sent as a Bearer. curl only; no browser click-through.
+
+| Check | Result |
+|---|---|
+| Admin `POST /api/feature-flags`, `PATCH /api/feature-flags/{key}` | 201 and 200 from Go (Go `x-request-id`, Go log line); flag row (revision 2) and `flag.created`, `flag.changed` audit rows exist |
+| Admin `POST /api/ranking-settings`, `POST /api/clubs/{id}/licenses` | 201 from Go; policy version 2 and `ranking.policy_saved`; term `LIC-0001` and `club.license_activated` |
+| The same writes without a pass | 401 `unauthenticated` from Go; nothing written |
+| Unlisted Admin prefixes `/api/players`, `/api/profile-banners` | Answered by Next (no Go request id): they are not forwarded |
+| Player `POST /api/account/contact-change` (listed) | 201 from Go; request row pending; 401 without a pass |
+| Player `/api/me/profile-visibility` (not listed) | Answered by Next, no Go log line, row unchanged |
+| Direct to Go: `PATCH /api/me/notifications` | 200, notification read; 401 without a Bearer |
+| Direct to Go: `POST /api/register/{clubId}?k=...` (seeded invite) | 200 `registered`, RTR ID allocated |
+| Not covered | Browser click-through, Vercel and Railway, Queue, the other write routes through the apps (admin players, contact-change decisions, password-reset review, banners, characters), `/api/register` through the apps (Go only) |
+
+Noted: an expired pass answers 401 `expired` after 15 minutes (sign in again); the ranking save needs `expectedVersion` 1 (the migrations seed version 1); a first launch with `localhost` as the Go address failed with 503 while `127.0.0.1` worked (cause not found, likely the machine). The dev server printed a Next.js security-upgrade prompt for Next 16.4.3; it was not acted on.

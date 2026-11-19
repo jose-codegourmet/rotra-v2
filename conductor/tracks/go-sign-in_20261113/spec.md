@@ -86,6 +86,10 @@ Google sign-in for players ([D-2026-11-16-01](../../../docs/mvp/decisions.md#d-2
 - **Claim:** `completeClaim` accepts a Google subject in place of a password, and registration adopts the RTR ID of an open shared entry with the same email ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04)).
 - **Open in the decision:** the deadline date, and whether the password still works after it.
 
+## Carried in from main (merged November 19, 2026)
+
+- **A guest's invite link claims that guest's record** ([D-2026-11-18-07](../../../docs/mvp/decisions.md#d-2026-11-18-07), #966; approved, details open). `issueClaimLink` now issues a link for a guest (a club record with no email, phone or shared entry), no longer only for a record with a phone or an email. Registering through it sets `club_players.player_id` on that same row, so the record with its roster entries and games becomes the player's; the person types their own email and phone. This changes the claim flow in R5. On `main` it is written but was not run against a database when it merged.
+
 ## Scope
 
 **In:** The above.

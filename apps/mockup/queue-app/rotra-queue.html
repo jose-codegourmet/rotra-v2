@@ -1544,6 +1544,9 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .qtile.pqc { position: relative; grid-template-columns: 44px auto auto auto; justify-content: start; align-items: center; gap: 6px 14px; padding: 10px 44px 10px 12px; }
 .pqc .pq-team { display: flex; flex-direction: row; align-items: center; min-width: 0; padding-left: 10px; }
 .pqc .qf { width: auto; min-width: 0; margin-left: -10px; }
+/* Owner artifact comment, November 19, 2026: "should be like a 2 on the back 1 in the front": the first picture sits on top, each next one tucks behind. */
+.pqc .qf { position: relative; }
+.pqc .qf:nth-child(1) { z-index: 5; } .pqc .qf:nth-child(2) { z-index: 4; } .pqc .qf:nth-child(3) { z-index: 3; } .pqc .qf:nth-child(4) { z-index: 2; } .pqc .qf:nth-child(5) { z-index: 1; }
 .qtile.pqc .qf .avatar { width: 34px; height: 34px; font-size: 11px; outline-width: 2px; outline-offset: 0; box-shadow: 0 0 0 2px var(--surface); }
 .pqc .pq-eye { position: absolute; top: 6px; right: 6px; }
 @media (max-width: 640px) { .qtile.pq-row.pqc { grid-template-columns: 34px auto auto auto; } .pqc .qt-head { grid-row: auto; align-self: center; } .pqc .vs { text-align: center; } .pqc .pq-team { flex-wrap: wrap; row-gap: 4px; } }

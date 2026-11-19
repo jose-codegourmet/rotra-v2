@@ -15,7 +15,8 @@ Superseded by: none
 - Before: each Queue tile laid the players side by side, as 36 px pictures with the names under them.
 - After:
   - **Tile:** one compact row. Each team is an overlapping stack of 34 px pictures with their level rings, and no names
-    (owner follow-up the same day: “no I mean avatars should be like ( ) ) ) ) and the names are not displayed”). Names
+    (owner follow-up the same day: “no I mean avatars should be like ( ) ) ) ) and the names are not displayed”). The first
+    picture sits on top and each next one tucks behind it (owner: “should be like a 2 on the back 1 in the front”). Names
     stay in each face's label and in the dialog. “VS” sits between the teams. On phones, a big team wraps onto a second
     row.
   - **Eye button:** at the top right (“View match”), it opens a dialog:

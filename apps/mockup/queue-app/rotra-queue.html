@@ -431,6 +431,8 @@ body.court-dragging { cursor: grabbing; }
 .pay-card.partial .switch[aria-checked="true"] { background: var(--warn); }
 .check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); }
 .check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+.choice.share-pick { flex-direction: row; align-items: flex-start; gap: 12px; }
+.choice.share-pick > svg { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--accent); }
 .choice { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; min-width: 0; }
 .choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
 .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 10px; }
@@ -4536,7 +4538,7 @@ function viewPrepare() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><div class="title-row">${sessTitle(s)}${live ? '' : prepDangerMenu()}</div><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
-      <div class="row acts">${live ? `<button class="btn sm" data-act="go" data-to="console" aria-label="Back to live session">${I.back} <span class="lbl-long">Back to live session</span><span class="lbl-short">Live session</span></button>` : ''}<button class="btn sm" data-act="copyLink" aria-label="Copy invite link">${I.link} <span class="lbl-long">Copy invite link</span><span class="lbl-short">Invite link</span></button><button class="btn sm" data-act="openSessionQr">${I.qr} Session QR</button><button class="btn sm" data-act="openPost" aria-label="Copy Facebook post">${I.post} <span class="lbl-long">Copy Facebook post</span><span class="lbl-short">Facebook post</span></button></div></div>
+      <div class="row acts">${live ? `<button class="btn sm" data-act="go" data-to="console" aria-label="Back to live session">${I.back} <span class="lbl-long">Back to live session</span><span class="lbl-short">Live session</span></button>` : ''}<button class="btn sm" data-act="openShare" aria-haspopup="dialog">${I.share} Share</button></div></div>
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : reqCount(s) ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments', ...(live ? [] : ['settings'])].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
@@ -5780,6 +5782,17 @@ const SHEETS = {
       ${chosen.length ? `<div class="stack tight">${spots.filter(([k, i]) => at(k, i)).map(([k, i, l]) => spot(k, i, l)).join('')}</div>` : ''}`,
       '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendMatchReq">Send request</button>');
   },
+  // Owner artifact comment, November 19, 2026: one Share button on the session header opens this. Pick the photos
+  // (the Session QR post or story image) or the link; the Facebook post text stays as a third, smaller option.
+  share() {
+    const s = cur(), link = sessionLink(s);
+    return sheetShell('Share this session', `<div class="stack">
+        <button type="button" class="choice share-pick" data-act="openSessionQr">${I.qr}<span class="stack tight" style="gap:2px"><b>Share photos</b><span class="small muted">A post or story image with the session QR. Download it or share it to Facebook and Instagram.</span></span></button>
+        <div class="choice share-pick" style="cursor:default">${I.link}<span class="stack tight" style="gap:8px;min-width:0;flex:1"><span class="stack tight" style="gap:2px"><b>Share the link</b><span class="small muted">Anyone with it sees the public page and can ask to join.</span></span>
+          <span class="invite-link"><input class="input" id="share-link-in" readonly value="${esc(link)}" aria-label="Session link"><button class="btn sm primary" data-act="copyLink">Copy link</button></span></span></div>
+        <button type="button" class="choice share-pick" data-act="openPost">${I.post}<span class="stack tight" style="gap:2px"><b>Facebook post</b><span class="small muted">The club's post text for this session, ready to paste.</span></span></button>
+      </div>`, '<button class="btn" data-act="closeSheet">Close</button>');
+  },
   sessionQr(sh) {
     const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
     // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
@@ -6872,6 +6885,7 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
+  openShare: () => openSheet({ type: 'share' }),
   openClubInvite: () => openSheet({ type: 'sessionQr', kind: 'club', fmt: 'post' }),
   copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),

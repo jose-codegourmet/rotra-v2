@@ -22,7 +22,7 @@ Results are read-only. No manual MVP selection or Off Day editing.
 
 ## Q-STANDINGS-SLIDE — Slide 1
 
-Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 3); the slide keeps one row per player with the shared number ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
+Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 2 since November 19, 2026; was 1, 1, 3); the slide keeps one row per player with the shared number ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
 
 ## Q-AWARDS-SLIDE — Slide 2
 

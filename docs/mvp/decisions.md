@@ -1218,7 +1218,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**
   - **Same wins and same losses share one position** (owner's answer). Head-to-head and name no longer separate players; the name only orders the faces inside a shared position.
-  - **The next position skips the shared places:** 1, 1, 3 (owner's answer).
+  - ~~**The next position skips the shared places:** 1, 1, 3 (owner's answer).~~ **Amended November 19, 2026** (owner artifact comment on the console Leaderboard: “should be 1 2 3 4 5 6 7”; [log](../mockup-changes/2026-11-19-queue-standings-no-gaps.md); mockup only): positions run on without gaps, 1, 1, 2, so the table's rows read 1, 2, 3 …. The real app (Q23.4, merged November 19) still numbers 1, 1, 3 and needs a follow-up ticket.
   - On the standings tables (the console Leaderboard, the record's Standings, the finished session page's Leaderboard) a shared position is one row with the players' pictures stacked and their names listed.
 - **Open:** (the mockup shows a placeholder for each)
   - Share images and the Standings slide (mockup: one row per player, with the shared number).

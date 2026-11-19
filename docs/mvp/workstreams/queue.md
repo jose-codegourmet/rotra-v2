@@ -133,6 +133,8 @@ Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-202
 - [D-2026-11-07-06](../decisions.md#d-2026-11-07-06) — masked public names.
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — guest invites now open registration (#490); Request to join still offers guest entry or login.
 - [D-2026-11-14-02](../decisions.md#d-2026-11-14-02) — No show (cancelled): no fee, club-only, after Start only (#839).
+- [D-2026-11-19-01](../decisions.md#d-2026-11-19-01) — gender (optional) and the match category (mockup only).
+- [D-2026-11-19-02](../decisions.md#d-2026-11-19-02) to [D-2026-11-19-09](../decisions.md#d-2026-11-19-09) — the November 19 console round: tabs and Settings, Correct Queue Time Format, time picker standard, live match controls, Edit player, exemption list, Regenerate removed, Embla (all mockup only, tickets needed).
 
 ## Blocking open decisions
 

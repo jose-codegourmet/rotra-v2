@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-05, 06 and 07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-19 (D-2026-11-19-02 to 09 added; amendment notes on D-2026-11-18-03 and D-2026-11-18-04); 2026-11-18 (D-2026-11-18-05, 06 and 07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -66,6 +66,14 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | in progress: mock app; real mode written (#976), migration applied to the shared database 2026-11-19 | #961 | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-01](#d-2026-11-19-01) | Gender (optional) and the match category | approved 2026-11-19 (details open) | mockup only | — |
+| [D-2026-11-19-02](#d-2026-11-19-02) | Live console tabs, the Settings tab, and one Share button | approved 2026-11-19 (details open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-03](#d-2026-11-19-03) | Correct Queue Time Format: minutes, then hours, then “long time ago” | approved 2026-11-19 (wording open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-04](#d-2026-11-19-04) | Every time input opens the time picker dialog | approved 2026-11-19 | mockup only | needed | All apps |
+| [D-2026-11-19-05](#d-2026-11-19-05) | Live match controls: pause, move a playing match, swap partners, swap from match | approved 2026-11-19 (details open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-06](#d-2026-11-19-06) | Edit player during a session: one form, games played without a confirmation | approved 2026-11-19 (details open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-07](#d-2026-11-19-07) | Generate Queue exemption list | approved 2026-11-19 (details open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-08](#d-2026-11-19-08) | Regenerate is removed from the Main Queue | approved 2026-11-19 (rules cleanup open) | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-09](#d-2026-11-19-09) | Embla Carousel for sliders | approved 2026-11-19 by the owner naming it (scope open) | mockup only (loaded from a CDN) | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1185,6 +1193,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Results the Queue Master reads on their own screens after Session done (the mockup: account nickname there too).
   - ~~Nicknames already copied onto linked saved-player rows before this rule (database).~~ Answered November 18, 2026: the migration clears them only where they equal the linked player's account nickname after trimming (exact match).
 - **Amends:** the November 11, 2026 rule (#705) that Saved players always show a registered player's own nickname; “Registered players have no Edit details” still holds, the club nickname is the one exception.
+- **Amended November 19, 2026 (name order):** on club-facing lists (roster rows and cards, waitlist, can't-make-it requests, minimum-games rows, the Add player picker, the Change player and No show dialogs) the first name present in the order **club nickname → nickname → full name** is bold and the others sit under it (owner artifact comment: “when there is a club nickname it should appear first … CLUB nickname, nickname, fullname”; [log](../mockup-changes/2026-11-19-queue-roster-name-order.md)). Public pages keep their masking rule.
 - **References:** [players module](../business_logic/product/queue/modules/players/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Club nickname](../product-terms.md).
 
 <a id="d-2026-11-18-04"></a>
@@ -1209,6 +1218,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether the mode changes the expected match length (courts and time) or the minimum games estimate (mockup: no).
   - In a deuce mode a normal finish uses the short losing-score entry with Went to deuce for the rest (mockup: yes).
   - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
+- **Amended November 19, 2026 (picker only):** the setup picker shows the game points first (31 points, 21 points, 21 × 3) and then a **Deuce** switch, on illustrated cards (owner: “picking the game points first and then a switch to include Deuce or not”; [log](../mockup-changes/2026-11-19-queue-mode-scoring-cards.md)). The five modes and their rules are unchanged; 21 points has no no-deuce mode, so its switch stays on. Open: whether to add **21 points, no deuce** as a sixth mode.
 - **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.
 
@@ -1285,3 +1295,91 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether Admin can edit a player's gender, and whether a player can change it after setting it.
   - Whether Generate Queue, standings or leaderboards should split or filter by category later.
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [identity design](../database_design/product/player-information/modules/identity.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Match category](../product-terms.md).
+
+<a id="d-2026-11-19-02"></a>
+### D-2026-11-19-02 — Live console tabs, the Settings tab, and one Share button
+- **Decision status:** approved (owner artifact comments, November 19, 2026). The open items below are not decided.
+- **Implementation status:** mockup only ([tabs](../mockup-changes/2026-11-19-queue-console-tabs.md), [Match History](../mockup-changes/2026-11-19-queue-live-match-history.md), [Players under the Main Queue](../mockup-changes/2026-11-19-queue-players-under-main-queue.md), [Settings cards](../mockup-changes/2026-11-19-queue-live-settings-cards.md), [layout](../mockup-changes/2026-11-19-queue-settings-layout.md), [court widths](../mockup-changes/2026-11-19-queue-settings-court-widths.md), [Until editable](../mockup-changes/2026-11-19-queue-settings-until-editable.md), [Add court and Extend](../mockup-changes/2026-11-19-queue-settings-courts-add-extend.md), [preparation Settings tab](../mockup-changes/2026-11-19-queue-prep-settings-tab.md), [Share dialog](../mockup-changes/2026-11-19-queue-share-dialog.md), [⋯ menu](../mockup-changes/2026-11-19-queue-more-menu-no-settings.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Live console tabs:** Courts, Main Queue, Generate Queue, Players, Leaderboard, Match History, Settings. Leaderboard and Match History are hidden when Record games is off. The Players picker also sits under the Main Queue.
+  - **Settings tab (live):** the setup as cards. The **Courts** box shows court cards with **From** and **Until** times that save at once. Until is always editable: a time other than the session end unticks **Follows session end**. The box header has the session end with **Extend 30 min** and **Extend 1 h**, and the last tile is **Add court**. Below: Game rules, Players, Costs, Notes. **All session settings** opens the summary page. **Session settings** is no longer in the ⋯ menu.
+  - **Preparation:** the **Edit preparation** button is gone. A **Settings** tab after Payments shows the setup as cards, each with **Edit**, which opens that step of the session editor.
+  - **Share:** the session header's Copy invite link, Session QR and Copy Facebook post become one **Share** button. Its dialog offers Share photos, Share the link and Facebook post.
+- **Open:** the tab label “Courts” for the owner's “Court (Sessions)”; whether Overview keeps the Setup card before start; whether Facebook post stays in the Share dialog; a **Set end** time field in the Courts box.
+- **References:** [console screens](../screens/product/modules/queue/session-console.md), [session setup screens](../screens/product/modules/queue/session-setup.md)
+
+<a id="d-2026-11-19-03"></a>
+### D-2026-11-19-03 — Correct Queue Time Format: minutes, then hours, then “long time ago”
+- **Decision status:** approved (owner, November 19, 2026: “after 60 mins show hours · after 24 hours show "long time ago" · Maybe lets name this "Correct Queue Time Format"”; extended the same day to court and match times). The wording is open.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-queue-correct-time-format.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** elapsed and waiting times in the console read “N min” under 60 minutes, whole hours “N h” (rounded down) from 60 minutes, and “long time ago” from 24 hours. It covers Players cards, queued match faces, the planned-end line and banner, playing court lines, free-court chips, the match dialog and the profile card's tonight status. Time left before the end is unchanged.
+- **Open:** a rewording of “long time ago” (suggested: “24h+”, “1 day+”, “Over a day”, or stop counting).
+- **References:** [console screens](../screens/product/modules/queue/session-console.md), `apps/mockup/queue-app/rotra-queue.html` › `queueTime`, `elapsedTime`, `endStatus`
+
+<a id="d-2026-11-19-04"></a>
+### D-2026-11-19-04 — Every time input opens the time picker dialog
+- **Decision status:** approved (owner artifact comment, November 19, 2026: “can you make it a standard that time inputs open the time picker dialog”).
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-queue-time-picker-standard.md)). The last native time inputs (the Settings court times) were replaced; Player and Admin had none.
+- **Ticket:** needed
+- **Roadmap:** MVP — all apps
+- **Decision:** no screen uses a native `<input type="time">`. Every time field is the app's time field (clock icon, time, chevron) and opens the time dialog (AM | PM, hour and minute grids, Done). The dialog title may name the subject (“Court 1 opens”).
+- **References:** [experience contract](../screens/product/experience-contract.md) (date-and-time picker)
+
+<a id="d-2026-11-19-05"></a>
+### D-2026-11-19-05 — Live match controls: pause, move a playing match, swap partners, swap from match
+- **Decision status:** approved (owner artifact comments, November 19, 2026). The open items below are not decided.
+- **Implementation status:** mockup only ([pause](../mockup-changes/2026-11-19-queue-pause-match.md), [move](../mockup-changes/2026-11-19-queue-move-playing-match.md), [swap partners](../mockup-changes/2026-11-19-queue-swap-partners-playing.md), [swap from match](../mockup-changes/2026-11-19-queue-replace-swap-from-match.md), [tap court](../mockup-changes/2026-11-19-queue-court-tap-opens-match.md), [drag to a free court](../mockup-changes/2026-11-19-queue-drag-court-to-free.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Pause match** takes a Playing match back to Getting ready on the same court. The start time clears; players, sides and substitutions stay; nothing is recorded.
+  - **A Playing match can move** to a free court (⋯ menu, the match dialog, or dragging its court picture onto a free court). It keeps playing with the same start time.
+  - **Swap partners while playing:** drag a player onto someone in the other pair. No substitution is recorded; the result follows the pairs at Match done.
+  - **Swap from match** in Replace a player: the outgoing player's opponents in the same match. Picking one swaps the two; nobody new comes in.
+  - Tapping a busy court's picture opens the match.
+- **Open:** whether Pause should be a real clock pause; a confirmation for long-running matches; logging a mid-game partner swap; Swap from match in Substitute.
+- **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [match screens](../screens/product/modules/queue/match-control.md)
+
+<a id="d-2026-11-19-06"></a>
+### D-2026-11-19-06 — Edit player during a session: one form, games played without a confirmation
+- **Decision status:** approved (owner artifact comments, November 19, 2026). The open items below are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-queue-live-edit-player.md), [games compare](../mockup-changes/2026-11-19-queue-set-games-compare.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** the Players card's pencil opens **Edit NAME**: club nickname (registered players), profile picture (unclaimed players), games played (stepper), availability. It saves with **Save changes** and no confirmation step. **Set games for all…** keeps its confirmation.
+- **Open:** the picture for guests; bringing back a confirmation for one player's games.
+- **References:** [dialogs](../screens/product/dialogs.md) (D-EDIT-LIVE-PLAYER, D-SET-GAMES), [players and roster screens](../screens/product/modules/queue/players-roster.md)
+
+<a id="d-2026-11-19-07"></a>
+### D-2026-11-19-07 — Generate Queue exemption list
+- **Decision status:** approved (owner artifact comments, November 19, 2026). The open items below are not decided.
+- **Implementation status:** mockup only ([list](../mockup-changes/2026-11-19-queue-generate-exemption-list.md), [picker](../mockup-changes/2026-11-19-queue-exemption-picker.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** the session keeps an **exemption list**. Generate Queue (every strategy) leaves those players out of its drafts. They stay on the roster, and Add match, Make match and Suggest still allow them. Players are added through a picker dialog and removed with the chip's ×.
+- **Open:** whether Suggest and Auto Queue also respect it; whether it carries over to the club's next session.
+- **References:** [queueing module](../business_logic/product/queue/modules/queueing/README.md), [match queue screens](../screens/product/modules/queue/match-queue.md)
+
+<a id="d-2026-11-19-08"></a>
+### D-2026-11-19-08 — Regenerate is removed from the Main Queue
+- **Decision status:** approved (owner artifact comment, November 19, 2026: “remove this”, on Regenerate).
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-queue-remove-regenerate.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** the Main Queue header has no **Regenerate**. A match that needs attention is fixed by editing its lineup.
+- **Open:** whether to delete the Regenerate rules (protected manual matches, needs-attention rebuilds) from the queueing module, or whether Clear queue then Generate Queue replaces them. They are marked removed but kept.
+- **References:** [queueing module](../business_logic/product/queue/modules/queueing/README.md), [generate and dispatch flow](../business_logic/product/queue/modules/queueing/flow/generate-and-dispatch.md)
+
+<a id="d-2026-11-19-09"></a>
+### D-2026-11-19-09 — Embla Carousel for sliders
+- **Decision status:** approved for the Settings courts slider (owner artifact comment, November 19, 2026: “mobile one per row but make it as a slider use embla carousel”). AGENTS rule 11 asks for a decision before a new dependency; this entry records it.
+- **Implementation status:** mockup only: `embla-carousel@8.5.2` (UMD) from jsDelivr ([log](../mockup-changes/2026-11-19-queue-settings-courts-slider.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** on phones (640 px and narrower) the Settings courts are an Embla carousel, one court a slide with the next peeking and dots. The real app adds `embla-carousel-react` in `@rotra/ui`.
+- **Open:** whether the Main Queue slide mode and other sliders (Next match, share dialogs) move to Embla too.
+- **References:** [architecture](../architecture.md) (dependencies), [console screens](../screens/product/modules/queue/session-console.md)

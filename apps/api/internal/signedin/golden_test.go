@@ -55,6 +55,9 @@ func TestSessionReadsMatchRouteHandlers(t *testing.T) { replay(t, "sessions") }
 
 func TestProfileReadsMatchRouteHandlers(t *testing.T) { replay(t, "profile") }
 
+// The session page reads (access, my-night, match-history, match-request, options) and Compare.
+func TestSessionPageReadsMatchRouteHandlers(t *testing.T) { replay(t, "pubsession") }
+
 // replay runs every case of a suite through the Go routes and compares status, headers and body with what the
 // Route Handlers answered. A nil player is a visitor.
 func replay(t *testing.T, suite string) {

@@ -18,6 +18,13 @@ func (s *server) registerPlayer(rt *Router) {
 	rt.Handle("GET /api/me/profile", player, s.myProfile())
 	rt.Handle("GET /api/leaderboard/me", player, s.myLeaderboard())
 	rt.Handle("GET /api/rtr-ids/{rtrId}/stats", player, s.rtrStats())
+	// The session page reads of a signed-in Player, called from the paired Queue origin.
+	rt.Handle("GET /api/public-sessions/{slug}/access", player, s.fromQueueOrigin(s.player(s.readSessionAccess)))
+	rt.Handle("GET /api/public-sessions/{slug}/my-night", player, s.fromQueueOrigin(s.player(s.readMyNight)))
+	rt.Handle("GET /api/public-sessions/{slug}/match-history", player, s.fromQueueOrigin(s.player(s.readMatchHistory)))
+	rt.Handle("GET /api/public-sessions/{slug}/match-request", player, s.fromQueueOrigin(s.player(s.readMyMatchRequest)))
+	rt.Handle("GET /api/public-sessions/{slug}/match-request/options", player, s.fromQueueOrigin(s.player(s.readMatchRequestOptions)))
+	rt.Handle("GET /api/players/{playerId}/compare", player, s.playerCompare())
 	// The reads a visitor may make too share their paths with the Admin app, so they are routed per app. The viewer
 	// is the signed-in Player when the pass is valid and a visitor otherwise.
 	optional := s.auth.Optional(player)

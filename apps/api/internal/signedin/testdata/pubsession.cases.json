@@ -1,0 +1,968 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "subjects": {
+    "alice": "f1000000-0000-4000-8000-000000000001",
+    "ben": "f1000000-0000-4000-8000-000000000002",
+    "cara": "f1000000-0000-4000-8000-000000000003",
+    "dan": "f1000000-0000-4000-8000-000000000004",
+    "eli": "f1000000-0000-4000-8000-000000000005",
+    "fay": "f1000000-0000-4000-8000-000000000006",
+    "nia": "f1000000-0000-4000-8000-000000000008"
+  },
+  "passwordless": [],
+  "reset": [
+    "INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'Google sign-in for players', 'x', false, now()) ON CONFLICT DO NOTHING",
+    "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'"
+  ],
+  "scenarios": {
+    "base": [],
+    "google_gate": [
+      "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+    ]
+  },
+  "approved": [
+    "rank-test-v1"
+  ],
+  "cases": [
+    {
+      "name": "access_alice_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_cara_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000003",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_fay_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000006",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_live",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_free",
+      "path": "/api/public-sessions/free-courts/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_free",
+      "path": "/api/public-sessions/free-courts/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_wrap",
+      "path": "/api/public-sessions/wrapping-up/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_big",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_big",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_big",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_wait",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_wait",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_wait",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_fay_wait",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000006",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_wait",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_closed",
+      "path": "/api/public-sessions/closed-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_cancelled",
+      "path": "/api/public-sessions/cancelled-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_removed",
+      "path": "/api/public-sessions/removed-page/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_f1",
+      "path": "/api/public-sessions/done-shared/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_f1",
+      "path": "/api/public-sessions/done-shared/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_f3",
+      "path": "/api/public-sessions/done-unrecorded/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_inv",
+      "path": "/api/public-sessions/invalid-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_cara_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000003",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_fay_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000006",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_live",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_free",
+      "path": "/api/public-sessions/free-courts/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_wrap",
+      "path": "/api/public-sessions/wrapping-up/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_wait",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_wait",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_wait",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_fay_wait",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000006",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_wait",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_closed",
+      "path": "/api/public-sessions/closed-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_cancelled",
+      "path": "/api/public-sessions/cancelled-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_removed",
+      "path": "/api/public-sessions/removed-page/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_f1",
+      "path": "/api/public-sessions/done-shared/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_f1",
+      "path": "/api/public-sessions/done-shared/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_f3",
+      "path": "/api/public-sessions/done-unrecorded/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_inv",
+      "path": "/api/public-sessions/invalid-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_f1",
+      "path": "/api/public-sessions/done-shared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_ben_f1",
+      "path": "/api/public-sessions/done-shared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_nia_f1",
+      "path": "/api/public-sessions/done-shared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_f2",
+      "path": "/api/public-sessions/done-unshared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_ben_f2",
+      "path": "/api/public-sessions/done-unshared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_nia_f2",
+      "path": "/api/public-sessions/done-unshared/match-history",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_f3",
+      "path": "/api/public-sessions/done-unrecorded/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_live",
+      "path": "/api/public-sessions/live-now/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_big",
+      "path": "/api/public-sessions/big-night/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_removed",
+      "path": "/api/public-sessions/removed-page/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "history_alice_inv",
+      "path": "/api/public-sessions/invalid-night/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_alice_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_ben_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_eli_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_fay_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000006",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_dan_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_nia_live",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_alice_big",
+      "path": "/api/public-sessions/big-night/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "request_alice_removed",
+      "path": "/api/public-sessions/removed-page/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_alice_live",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_ben_live",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_nia_live",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_alice_big",
+      "path": "/api/public-sessions/big-night/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_alice_f1",
+      "path": "/api/public-sessions/done-shared/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "options_alice_removed",
+      "path": "/api/public-sessions/removed-page/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_visitor",
+      "path": "/api/public-sessions/live-now/access",
+      "player": null,
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_no_origin",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "access_other_origin",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9001"
+    },
+    {
+      "name": "access_evil_origin",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    },
+    {
+      "name": "access_unknown_slug",
+      "path": "/api/public-sessions/no-such-session/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "my-night_visitor",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": null,
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "my-night_no_origin",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "my-night_other_origin",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9001"
+    },
+    {
+      "name": "my-night_evil_origin",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    },
+    {
+      "name": "my-night_unknown_slug",
+      "path": "/api/public-sessions/no-such-session/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-history_visitor",
+      "path": "/api/public-sessions/live-now/match-history",
+      "player": null,
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-history_no_origin",
+      "path": "/api/public-sessions/live-now/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "match-history_other_origin",
+      "path": "/api/public-sessions/live-now/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9001"
+    },
+    {
+      "name": "match-history_evil_origin",
+      "path": "/api/public-sessions/live-now/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    },
+    {
+      "name": "match-history_unknown_slug",
+      "path": "/api/public-sessions/no-such-session/match-history",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-request_visitor",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": null,
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-request_no_origin",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "match-request_other_origin",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9001"
+    },
+    {
+      "name": "match-request_evil_origin",
+      "path": "/api/public-sessions/live-now/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    },
+    {
+      "name": "match-request_unknown_slug",
+      "path": "/api/public-sessions/no-such-session/match-request",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-request_options_visitor",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": null,
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "match-request_options_no_origin",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "match-request_options_other_origin",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9001"
+    },
+    {
+      "name": "match-request_options_evil_origin",
+      "path": "/api/public-sessions/live-now/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    },
+    {
+      "name": "match-request_options_unknown_slug",
+      "path": "/api/public-sessions/no-such-session/match-request/options",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_google_gate",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "google_gate",
+      "origin": "http://localhost:9000",
+      "now": "2027-01-01T04:00:00.000Z"
+    },
+    {
+      "name": "night_google_gate",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "google_gate",
+      "origin": "http://localhost:9000",
+      "now": "2027-01-01T04:00:00.000Z"
+    },
+    {
+      "name": "compare_google_gate",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "google_gate",
+      "now": "2027-01-01T04:00:00.000Z"
+    },
+    {
+      "name": "compare_alice_ben",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_all_page0",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=all&page=0",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_all_page1",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=1",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_all_page5",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=5",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_h2h",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=h2h",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_h2h_page1",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=h2h&page=1",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_together",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=together",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_together_page3",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=together&page=3",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_approved",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "approved": true
+    },
+    {
+      "name": "compare_ben_alice",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_dan",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000004/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_eli",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000005/compare?filter=together",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_dan_alice",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_self",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_self_upper",
+      "path": "/api/players/D1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_cara_forbidden",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_cara_alice",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_cara_self",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000003/compare",
+      "player": "f1000000-0000-4000-8000-000000000003",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_nia_no_rtr",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000008/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_nia_alice",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_gio_unclaimed",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000007/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_unknown",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000063/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_not_a_uuid",
+      "path": "/api/players/not-a-uuid/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_upper",
+      "path": "/api/players/D1000000-0000-4000-8000-000000000002/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_filter_bad",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=weekly",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_filter_empty",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_empty",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_negative",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=-1",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_text",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=abc",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_fraction",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=1.5",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_zeros",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=0001",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_safe_max",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=9007199254740991",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_unsafe",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=9007199254740992",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_page_huge",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?page=9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_ben_filter_twice",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare?filter=h2h&filter=together",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_bad_uuid_bad_filter",
+      "path": "/api/players/not-a-uuid/compare?filter=weekly",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_alice_self_bad_filter",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/compare?filter=weekly",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "compare_visitor",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare",
+      "player": null,
+      "scenario": "base"
+    },
+    {
+      "name": "compare_other_app_origin",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000002/compare",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "origin": "https://evil.example"
+    }
+  ]
+}

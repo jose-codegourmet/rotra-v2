@@ -20,6 +20,8 @@ func asServiceError(err error) error {
 		return &serviceError{code: httpapi.ErrInvalid}
 	case errors.Is(err, publicreads.ErrProfileNotFound), errors.Is(err, publicreads.ErrStatsNotFound):
 		return errNotFound
+	case errors.Is(err, publicreads.ErrProfileForbidden):
+		return &serviceError{code: httpapi.ErrForbidden}
 	}
 	return err
 }
@@ -48,14 +50,19 @@ func (s *server) myLeaderboard() http.Handler {
 }
 
 // rtrStats is the Latest stats for the Queue session page's participant profile card (#731): a credentialed read from
-// the paired Queue origin by a signed-in Player. The Origin is checked first, and every answer carries the CORS headers
-// of an allowed origin. The Go API cannot check that the Queue origin is paired with the Player origin it was
-// called on (the TypeScript compares the two); it allows the configured Queue origins.
+// the paired Queue origin by a signed-in Player.
 func (s *server) rtrStats() http.Handler {
-	inner := s.player(func(r *http.Request, q *sqlcgen.Queries, who viewer) (any, error) {
+	return s.fromQueueOrigin(s.player(func(r *http.Request, q *sqlcgen.Queries, who viewer) (any, error) {
 		body, err := publicreads.ReadStatsByRTR(r.Context(), q, r.PathValue("rtrId"), who.ID, s.now())
 		return body, asServiceError(err)
-	})
+	}))
+}
+
+// fromQueueOrigin is queueCorsHeaders of the Player app's credentialed reads for the Queue session page (#569, #687):
+// only the paired Queue origin may call. The Origin is checked first, and every answer carries the CORS headers of an
+// allowed origin. The Go API cannot check that the Queue origin is paired with the Player origin it was called on (the
+// TypeScript compares the two); it allows the configured Queue origins.
+func (s *server) fromQueueOrigin(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		allowed := origin != "" && slices.Contains(s.queueOrigins, origin)

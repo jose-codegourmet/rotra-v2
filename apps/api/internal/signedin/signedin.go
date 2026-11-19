@@ -37,6 +37,7 @@ type server struct {
 	log          *slog.Logger
 	now          func() time.Time
 	queueOrigins []string
+	approved     []string
 	viewer       *publicreads.ViewerReads
 }
 
@@ -46,7 +47,7 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("signedin: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

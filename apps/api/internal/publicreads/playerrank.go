@@ -1,6 +1,7 @@
 package publicreads
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -44,35 +45,8 @@ func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var body rankBody
-	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
-		ctx := r.Context()
-		row, err := q.GetPlayerRank(ctx, id)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil // no player, or no RTR ID
-		}
-		if err != nil {
-			return fmt.Errorf("reading rank: %w", err)
-		}
-		masked := isMasked(row.ProfileVisibility, viewerOf(r), id)
-		dto := &rankDTO{PlayerID: id.String(), FullName: row.FullName, Nickname: textPtr(row.Nickname), State: "provisional"}
-		body.Rank = dto
-		if masked {
-			dto.FullName, dto.Nickname = maskPublicName(row.FullName), nil
-		}
-		if !row.HasRank || masked || !slices.Contains(p.approved, row.AlgorithmVersion) {
-			return nil
-		}
-		dto.State = string(row.State.RankState)
-		if row.DisplayOrder.Valid {
-			dto.LevelIndex = &row.DisplayOrder.Int16
-		}
-		dto.RecentCount = row.RecentStandardMatchCount.Int32
-		counted, err := q.CountPlayerCountedFacts(ctx, id)
-		if err != nil {
-			return fmt.Errorf("counting facts: %w", err)
-		}
-		dto.OlderCount = max(0, counted-int64(dto.RecentCount))
-		dto.UpdatePending, err = pendingRankUpdate(r, q, id)
+	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) (err error) {
+		body.Rank, err = readRank(r.Context(), q, id, viewerOf(r), p.approved)
 		return err
 	})
 	if err != nil {
@@ -82,14 +56,45 @@ func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
 }
 
+// readRank is readPlayerRank: nil when no player with an RTR ID has this id.
+func readRank(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, v viewerRef, approved []string) (*rankDTO, error) {
+	row, err := q.GetPlayerRank(ctx, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil // no player, or no RTR ID
+	}
+	if err != nil {
+		return nil, fmt.Errorf("reading rank: %w", err)
+	}
+	masked := isMasked(row.ProfileVisibility, v, id)
+	dto := &rankDTO{PlayerID: id.String(), FullName: row.FullName, Nickname: textPtr(row.Nickname), State: "provisional"}
+	if masked {
+		dto.FullName, dto.Nickname = maskPublicName(row.FullName), nil
+	}
+	if !row.HasRank || masked || !slices.Contains(approved, row.AlgorithmVersion) {
+		return dto, nil
+	}
+	dto.State = string(row.State.RankState)
+	if row.DisplayOrder.Valid {
+		dto.LevelIndex = &row.DisplayOrder.Int16
+	}
+	dto.RecentCount = row.RecentStandardMatchCount.Int32
+	counted, err := q.CountPlayerCountedFacts(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("counting facts: %w", err)
+	}
+	dto.OlderCount = max(0, counted-int64(dto.RecentCount))
+	dto.UpdatePending, err = pendingRankUpdate(ctx, q, id)
+	return dto, err
+}
+
 type rankBody struct {
 	Rank *rankDTO `json:"rank"`
 }
 
 // pendingRankUpdate names the latest session of the player whose rank job has not finished. A job with no
 // session behind it (ageing, attribution, assessment) is not reported.
-func pendingRankUpdate(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) (*pendingUpdate, error) {
-	s, err := q.GetPendingRankSession(r.Context(), id)
+func pendingRankUpdate(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (*pendingUpdate, error) {
+	s, err := q.GetPendingRankSession(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}

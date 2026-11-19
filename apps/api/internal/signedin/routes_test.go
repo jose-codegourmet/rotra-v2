@@ -125,3 +125,34 @@ func TestAReadThatFailsAnswersTheUnexpectedErrorBody(t *testing.T) {
 		t.Fatalf("got %d %s", w.Code, w.Body.String())
 	}
 }
+
+// The session page reads are the Player app's. Queue and Admin have no such path in Go, and the Queue's own
+// /my-request and /join-request stay where they are today (not served here).
+func TestSessionPageReadsBelongToThePlayerApp(t *testing.T) {
+	e := newEnv(t, testNow)
+	paths := []string{
+		"/api/public-sessions/live-now/access", "/api/public-sessions/live-now/my-night", "/api/public-sessions/live-now/match-history",
+		"/api/public-sessions/live-now/match-request", "/api/public-sessions/live-now/match-request/options",
+		"/api/players/d1000000-0000-4000-8000-000000000002/compare",
+	}
+	for _, path := range paths {
+		for _, app := range []string{"", "club", "admin", "queue"} {
+			w := e.do(req{path: path, app: app, origin: queueOrigin})
+			if w.Code != http.StatusNotFound || errCode(t, w) != "not_found" {
+				t.Errorf("%s as %q: %d %s", path, app, w.Code, w.Body.String())
+			}
+		}
+		// The Player app with no pass is refused: the origin gate comes first on the Queue-called reads.
+		w := e.do(req{path: path, app: "player", origin: queueOrigin})
+		if w.Code != http.StatusUnauthorized || errCode(t, w) != "unauthenticated" {
+			t.Errorf("%s with no pass: %d %s", path, w.Code, w.Body.String())
+		}
+	}
+	for _, path := range []string{"/api/public-sessions/live-now/my-request", "/api/public-sessions/live-now/join-request"} {
+		for _, app := range []string{"club", "player"} {
+			if w := e.do(req{path: path, app: app, origin: queueOrigin}); w.Code != http.StatusNotFound {
+				t.Errorf("%s as %q is not served by the Go API yet: %d", path, app, w.Code)
+			}
+		}
+	}
+}

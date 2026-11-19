@@ -283,6 +283,10 @@ textarea.input { min-height: 80px; resize: vertical; }
 .qslide.m-l { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade)); mask-image: linear-gradient(to right, transparent, #000 var(--fade)); }
 .qslide.m-l.m-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); }
 @media (prefers-reduced-motion: no-preference) { .qslide { scroll-behavior: smooth; } }
+/* Owner artifact comment, November 19, 2026: tapping the court picture of a busy court opens the match, like Open match.
+   Faces keep opening the profile; the Open match button stays for keyboards and screen readers. */
+.open-pitch { cursor: pointer; transition: filter .15s; }
+.open-pitch:hover { filter: brightness(1.08); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4485,7 +4489,7 @@ function courtsPane(s) {
       const merged = m.courts.length > 1;
       m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
       const head = (label) => `<div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${label}${courtMenu(s, c, true)}</div></div>
-        <div class="pitch ${merged ? 'tall' : ''}" role="img" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
+        <div class="pitch open-pitch ${merged ? 'tall' : ''}" role="img" data-act="openMatch" data-id="${m.id}" title="Open match" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
       if (m.status === 'oncourt') {
         // On court: placed, getting ready. Normal border; the Queue Master starts it.
         const b = blockOf(s, m);

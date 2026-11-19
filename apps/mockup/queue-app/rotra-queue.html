@@ -2008,6 +2008,18 @@ function faceSVG(p, seed = 0) {
     ${glasses ? '<g fill="none" stroke="#1b1817" stroke-width="1.3"><circle cx="27" cy="29.5" r="4"/><circle cx="37" cy="29.5" r="4"/><path d="M31 29.5h2"/></g>' : ''}
   </svg>`;
 }
+// Club-set picture editor for a guest or unclaimed player (Edit details, and the live Edit player form). Changes apply at once.
+function picEditor(p) {
+  const pc = picOf(p), seeds = [0, 1, 2, 3, 4, 5, 6, 7];
+  const picWhat = !pc ? 'Initials' : pc.kind === 'photo' ? 'A photo' : 'A character';
+  return `<div class="field"><span>Profile picture</span>
+        <div class="pic-edit">${avatar(p, 'xl')}<div class="stack tight"><span class="small muted">${picWhat}</span>
+          <div class="row"><label class="btn sm" for="pic-file">Upload photo</label><input type="file" id="pic-file" class="sr-only" accept="image/*" data-id="${p.id}">${pc ? `<button class="btn sm ghost" data-act="picRemove" data-id="${p.id}">Remove</button>` : ''}</div>
+          ${p.picPrev ? `<div class="row" style="gap:10px"><span class="avatar photo md"><img src="${esc(p.picPrev.src)}" alt="Previous picture"></span><div class="stack tight"><span class="small muted">Previous picture</span><div><button class="btn sm" data-act="picUsePrev" data-id="${p.id}">Use previous picture</button></div></div></div>` : ''}</div></div>
+        <span class="small muted" id="pic-chars-l">Choose a character</span>
+        <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
+        <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>`;
+}
 const avatar = (p, cls = '') => (hasPhoto(p)
   ? `<span class="avatar photo ${cls}" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(p.name)}">${picInner(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
@@ -2264,7 +2276,7 @@ function syncLabel() {
 const AREA = {
   confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
-  confirmSetGames: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
+  confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
   confirmDispatch: 'Matches and results', placeOnCourt: 'Matches and results', startOnCourt: 'Matches and results', sendBack: 'Queue', confirmSwap: 'Queue', confirmReplace: 'Matches and results', confirmMove: 'Matches and results', setCourtFill: 'Courts and time', confirmResult: 'Matches and results', pickNextMatch: 'Matches and results', skipNextMatch: 'Matches and results', confirmSub: 'Matches and results', confirmInvalid: 'Matches and results',
   confirmAddCourt: 'Courts and time', saveCourtLabel: 'Courts and time', confirmNoShow: 'Roster', undoNoShow: 'Roster', removeCourt: 'Courts and time', confirmOpenEarly: 'Courts and time', dispatchOpenEarly: 'Courts and time', undoEarly: 'Courts and time', addCourt: 'Courts and time', extend: 'Courts and time',
@@ -4661,7 +4673,7 @@ function playersPane(s) {
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 lv-${rvBand(x.r)} ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
-        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
+        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div></div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
         <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played" title="Games played so far"><b class="tnum">${x.g}</b><span>Current</span></div><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
@@ -5430,6 +5442,26 @@ const SHEETS = {
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
         : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
   },
+  // Owner artifact comment, November 19, 2026: the live card's pencil opens one Edit player form: club nickname (registered),
+  // picture (unclaimed), games played and availability. "Set games for all…" keeps D-SET-GAMES.
+  editLive(sh) {
+    const s = cur(), r = R(s, sh.pid), p = P(sh.pid);
+    if (!r || !p) return sheetShell('Edit player', '<p>This player is no longer on the roster.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const busy = busyOf(s, p.id), now = gamesOf(s, p.id);
+    const nick = p.identity === 'registered' ? `<label class="field"><span>Club nickname (optional)</span><input class="input" id="el-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick)}" maxlength="30">
+        <span class="hint">What your club calls them. Only your club sees it. Empty uses ${p.nick ? `“${esc(p.nick)}”, the nickname on their ROTRA account` : 'the name on their ROTRA account'}.</span></label>` : '';
+    const pic = p.identity === 'unclaimed' ? picEditor(p) : '';
+    return sheetShell(`Edit ${esc(clubNickOf(p) || p.nick || p.name)}`, `
+      <div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r.level))} · ${{ registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' }[p.identity] || ''}</span></div></div>
+      ${nick}${pic}
+      <div class="field"><span id="el-games-l">Games played</span>
+        <div class="stepcard"><span class="small muted">Now ${now}</span><div class="row"><button class="btn sm icon-btn" data-act="elGames" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="el-games-l">${sh.games}</b><button class="btn sm icon-btn" data-act="elGames" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
+        <span class="hint">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</span></div>
+      <div class="field"><span id="el-av-l">Availability</span>
+        <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div>
+        ${!sh.present && busy ? `<span class="hint">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</div>`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditLive">Save changes</button>`);
+  },
   // #717 Set games played (D-SET-GAMES): one player or every roster player; the stored value is an adjustment, so games keep counting up afterwards.
   setGames(sh) {
     const s = cur(), one = sh.pid ? R(s, sh.pid) : null, name = one ? nm(one.pid) : '', n = s.roster.length;
@@ -5709,16 +5741,8 @@ const SHEETS = {
     const claim = p.identity === 'unclaimed', phoneOnFile = claim && !p.noPhone;
     const SOC = [['facebook', 'Facebook', 'https://facebook.com/yourname'], ['instagram', 'Instagram', 'https://instagram.com/yourname'], ['youtube', 'YouTube', 'https://youtube.com/@yourname'], ['linkedin', 'LinkedIn', 'https://linkedin.com/in/yourname']];
     const input = (id, label, k, o = {}) => `<label class="field"><span>${label}</span><input class="input${e[k] ? ' bad' : ''}" id="${id}" data-bind="ui.sheet.d.${k}" value="${esc(d[k])}" ${o.type ? `type="${o.type}"` : ''} ${o.im ? `inputmode="${o.im}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''}>${e[k] ? `<span class="err">${esc(e[k])}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
-    const pc = picOf(p), seeds = [0, 1, 2, 3, 4, 5, 6, 7];
-    const picWhat = !pc ? 'Initials' : pc.kind === 'photo' ? 'A photo' : 'A character';
     return sheetShell(`Edit ${esc(p.name)}`, `
-      <div class="field"><span>Profile picture</span>
-        <div class="pic-edit">${avatar(p, 'xl')}<div class="stack tight"><span class="small muted">${picWhat}</span>
-          <div class="row"><label class="btn sm" for="pic-file">Upload photo</label><input type="file" id="pic-file" class="sr-only" accept="image/*" data-id="${p.id}">${pc ? `<button class="btn sm ghost" data-act="picRemove" data-id="${p.id}">Remove</button>` : ''}</div>
-          ${p.picPrev ? `<div class="row" style="gap:10px"><span class="avatar photo md"><img src="${esc(p.picPrev.src)}" alt="Previous picture"></span><div class="stack tight"><span class="small muted">Previous picture</span><div><button class="btn sm" data-act="picUsePrev" data-id="${p.id}">Use previous picture</button></div></div></div>` : ''}</div></div>
-        <span class="small muted" id="pic-chars-l">Choose a character</span>
-        <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
-        <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>
+      ${picEditor(p)}
       ${needsEmail(p) ? notice('warn', '<b>Details required.</b> An unclaimed player needs an email. Add their email here, or delete the player.') : claim ? notice('', 'What you fill in here is filled in for them when they open their invite link. They can still change it and only need to choose a password.') : ''}
       <div class="fgrid">${input('ep-name', 'Full or display name', 'name')}${input('ep-nick', 'Nickname (optional)', 'nick')}</div>
       <label class="field"><span>Level for this club (optional)</span>${selectLevel('ep-level', d.level, 'data-bind="ui.sheet.d.level" data-num')}</label>
@@ -6963,6 +6987,27 @@ const ACT = {
   },
   allPresent: () => { cur().roster.forEach((r) => { r.present = true; r.selfLeft = false; }); commit('Everyone marked present'); render(); },
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
+  openEditLive: (d) => {
+    const s = cur(), r = s && R(s, d.pid), p = P(d.pid); if (!r || !p || s.status !== 'active') return;
+    openSheet({ type: 'editLive', pid: p.id, nick: p.clubNick || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present });
+  },
+  elGames: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive') return; sh.games = Math.min(99, Math.max(0, sh.games + (+d.d || 0))); render(); },
+  elPresent: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive') return; sh.present = d.v === 'true'; render(); },
+  saveEditLive: () => {
+    const sh = S.ui.sheet, s = cur(); if (sh?.type !== 'editLive' || !s) return;
+    const r = R(s, sh.pid), p = P(sh.pid); if (!r || !p) { S.ui.sheet = null; render(); return; }
+    let changed = false;
+    if (p.identity === 'registered') { const v = (sh.nick || '').trim(); if (v !== (p.clubNick || '')) { p.clubNick = v; changed = true; } }
+    if (sh.games !== gamesOf(s, p.id)) { r.gamesAdj = sh.games - countedGamesOf(s, p.id); changed = true; }
+    if (sh.present !== !!r.present) {
+      // D-2026-11-09-03: the QM's last action wins, as on the card's Present switch.
+      r.present = sh.present; if (r.present) { r.presentAt = Date.now(); r.selfLeft = false; } else r.selfCheckedIn = false;
+      changed = true;
+    }
+    S.ui.sheet = null;
+    if (changed) commit(`Changes saved · ${p.name}`); else toast('No changes');
+    render();
+  },
   // #717: Set games played, for one player (data-pid) or everyone on the roster.
   openSetGames: (d) => {
     const s = cur(); if (!s || s.status !== 'active') return;

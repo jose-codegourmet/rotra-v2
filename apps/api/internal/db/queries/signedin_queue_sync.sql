@@ -23,14 +23,14 @@ SELECT id, session_id, device_id, generation_no, downloaded_revision, contiguous
        sealed_final_sequence, sealed_at, state
 FROM device_session_streams
 WHERE session_id = @session_id
-ORDER BY enrolled_at ASC;
+ORDER BY enrolled_at ASC, id ASC;
 
 -- The open conflicts without their private evidence, oldest first.
 -- name: ListQueueSyncOpenConflicts :many
 SELECT id, category, detected_at
 FROM sync_conflicts
 WHERE session_id = @session_id AND state = 'open'
-ORDER BY detected_at ASC;
+ORDER BY detected_at ASC, id ASC;
 
 -- Session done barriers: matches on court and whether a ranking policy is already in force at the given instant.
 -- name: CountQueueActiveMatches :one
@@ -43,7 +43,8 @@ SELECT EXISTS (SELECT 1 FROM ranking_policy_versions WHERE effective_at <= @at):
 -- name: ListQueueReviewRoster :many
 SELECT id, name_snapshot
 FROM session_players
-WHERE session_id = @session_id AND released_at IS NULL AND no_show_at IS NULL;
+WHERE session_id = @session_id AND released_at IS NULL AND no_show_at IS NULL
+ORDER BY id;
 
 -- Participations of the session's completed matches that have a completed decision (invalid matches give nothing).
 -- name: ListQueueCompletedParticipations :many
@@ -60,7 +61,7 @@ SELECT sp.id, sp.club_player_id, sp.name_snapshot, cp.display_name, cp.nickname
 FROM session_players sp
 JOIN club_players cp ON cp.id = sp.club_player_id
 WHERE sp.session_id = @session_id AND sp.released_at IS NULL AND sp.no_show_at IS NULL AND cp.player_id IS NULL
-ORDER BY sp.confirmed_at ASC;
+ORDER BY sp.confirmed_at ASC, sp.id ASC;
 
 -- The club's saved players that have a ROTRA profile (the candidates), then those profiles with their RTR IDs.
 -- name: ListQueueProfiledClubPlayers :many

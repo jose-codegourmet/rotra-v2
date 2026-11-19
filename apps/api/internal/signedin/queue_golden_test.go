@@ -130,10 +130,9 @@ func TestQueueReadsMatchRouteHandlers(t *testing.T) {
 				redact(t, gotBody, path)
 			}
 			wantBody := decodeJSON(t, want.Body)
-			// The TypeScript sets no order on guest-review candidates (the database's own, which differs between
-			// machines), so both sides are put in id order before they are compared.
-			sortCandidates(gotBody)
-			sortCandidates(wantBody)
+			// Lists the TypeScript leaves unordered (see unorderedLists) are put in key order on both sides first.
+			sortUnordered(gotBody)
+			sortUnordered(wantBody)
 			if !reflect.DeepEqual(gotBody, wantBody) {
 				g, _ := json.Marshal(gotBody)
 				t.Errorf("body\n got %s\nwant %s", g, want.Body)
@@ -142,23 +141,33 @@ func TestQueueReadsMatchRouteHandlers(t *testing.T) {
 	}
 }
 
-// sortCandidates puts every "candidates" list in clubPlayerId order, anywhere in a decoded body.
-func sortCandidates(v any) {
+// unorderedLists are the response lists the TypeScript reads with no total order (the database's own, which differs
+// between machines and shows up on tied timestamps), each with the key that puts them in a fixed order. Go orders
+// them by (confirmed_at, id); the golden test compares them as sets.
+var unorderedLists = map[string]string{
+	"candidates":       "clubPlayerId",
+	"unresolvedGuests": "sessionPlayerId",
+	"belowMinimum":     "sessionPlayerId",
+}
+
+// sortUnordered puts every unordered list in key order, anywhere in a decoded body.
+func sortUnordered(v any) {
 	switch x := v.(type) {
 	case map[string]any:
 		for k, child := range x {
-			if list, ok := child.([]any); ok && k == "candidates" {
+			if list, ok := child.([]any); ok && unorderedLists[k] != "" {
+				key := unorderedLists[k]
 				sort.SliceStable(list, func(i, j int) bool {
 					a, _ := list[i].(map[string]any)
 					b, _ := list[j].(map[string]any)
-					return fmt.Sprint(a["clubPlayerId"]) < fmt.Sprint(b["clubPlayerId"])
+					return fmt.Sprint(a[key]) < fmt.Sprint(b[key])
 				})
 			}
-			sortCandidates(child)
+			sortUnordered(child)
 		}
 	case []any:
 		for _, child := range x {
-			sortCandidates(child)
+			sortUnordered(child)
 		}
 	}
 }

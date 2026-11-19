@@ -318,6 +318,16 @@ body.court-dragging { cursor: grabbing; }
 .qs-f .avatar { width: 34px; height: 34px; font-size: 12px; outline: 2px solid var(--ring); outline-offset: 0; box-shadow: 0 0 0 3px var(--surface); }
 .qs-f:hover { position: relative; z-index: 1; }
 .qs-names { font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Owner artifact comment, November 19, 2026: bigger court buttons in Put on court and Move match. */
+.court-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.court-pick { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 76px; padding: 14px 16px; border: 1.5px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
+.court-pick b { font-size: 17px; }
+.court-pick:hover { border-color: var(--accent); }
+.court-pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); box-shadow: 0 0 0 1px var(--accent) inset; }
+.court-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cp-dot { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: grid; place-items: center; }
+.court-pick[aria-pressed="true"] .cp-dot { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.cp-dot svg { width: 12px; height: 12px; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -6152,7 +6162,7 @@ const SHEETS = {
     return sheetShell(`Put match ${m.seq} on court`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}</div>
       <div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`)}</div>
       <p class="small muted">Drag a player onto someone on the other team to switch sides.</p>
-      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Court'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('') || '<span class="small muted">No court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>
+      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Court'}</span><div class="court-picks">${freeCourts(s).map((c) => `<button class="court-pick" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}"><span class="cp-dot" aria-hidden="true">${sel.includes(c.id) ? I.check : ''}</span><b>${esc(c.label)}</b><span class="small muted">Free now</span></button>`).join('') || '<span class="small muted">No court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>
       ${s.courts.some((c) => !courtOpen(s, c)) ? `<div class="field"><span>Not open yet</span>${s.courts.filter((c) => !courtOpen(s, c)).map((c) => `<div class="between"><span class="small">${esc(c.label)} <span class="muted">· Opens ${fmtWhen(courtStart(s, c), { lower: true })}</span></span><button class="btn xs" data-act="dispatchOpenEarly" data-id="${c.id}">Start anyway</button></div>`).join('')}<span class="hint">Start anyway opens the court now. The booking time and costs don't change.</span></div>` : ''}
       ${b ? notice('bad', esc(b.text)) : ''}
       <p class="small muted">The match goes on court getting ready. Its time starts when you tap Start match.</p>`,
@@ -6213,7 +6223,7 @@ const SHEETS = {
     const need = courtsNeeded(m);
     const sel = sh.courts || [];
     return sheetShell(`Move match ${m.seq}`, `<p class="small muted">Now on ${esc(courtsOf(s, m))}. ${m.status === 'active' ? 'It keeps playing on the new court; its time doesn\'t restart.' : 'It stays getting ready on the new court.'}</p>
-      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Move to'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('') || '<span class="small muted">No other court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>`,
+      <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Move to'}</span><div class="court-picks">${freeCourts(s).map((c) => `<button class="court-pick" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}"><span class="cp-dot" aria-hidden="true">${sel.includes(c.id) ? I.check : ''}</span><b>${esc(c.label)}</b><span class="small muted">Free now</span></button>`).join('') || '<span class="small muted">No other court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>`,
       `<button class="btn" data-act="openMatch" data-id="${m.id}">Back</button><button class="btn primary" data-act="confirmMove" ${sel.length !== need ? 'disabled' : ''}>Move match</button>`);
   },
   match(sh) {

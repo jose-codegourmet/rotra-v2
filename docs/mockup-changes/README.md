@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 30 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 31 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -384,6 +384,7 @@ NEW: 30 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
 | [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | NEW |
+| [2026-11-19-queue-bigger-court-buttons](2026-11-19-queue-bigger-court-buttons.md) | Queue app: bigger court buttons in Put on court and Move match | court pick tile (new) | NEW |
 | [2026-11-19-queue-card-min-300](2026-11-19-queue-card-min-300.md) | Queue app: queued match cards are at least 450 px wide | queue match card grid (no new component) | NEW |
 | [2026-11-19-queue-console-tabs](2026-11-19-queue-console-tabs.md) | Queue app: the live console has six tabs: Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings | tab row and phone tab menu (as on preparation), match queue, generate matches workspace, session setup card | NEW |
 | [2026-11-19-queue-correct-time-format](2026-11-19-queue-correct-time-format.md) | Queue app: Correct Queue Time Format: waiting times and the overdue line cap at hours, then “long time ago” | one shared time formatter (no new component) | NEW |

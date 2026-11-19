@@ -10,6 +10,8 @@
 
 ## Q-DISPATCH — Put a waiting match on court
 
+**Court buttons (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-bigger-court-buttons.md)):** in Put on court and Move match, each free court is a large tile (at least 140 px wide, 76 px tall): the court name in bold, “Free now” under it, and a round check in the corner that fills when picked; the picked tile gets the accent border and tint.
+
 **Entry (Manual Queue, or by hand in Auto Queue):** **Put on court** on a free court, **Put on court** on a ready queue card, or the row action in Q-CHOOSE-MATCH. In Auto Queue, ROTRA places the next eligible match itself, without this sheet, on every free court except the one a result just freed: that court goes through [Q-NEXT-MATCH](#q-next-match--next-match-picker-after-a-result) first, and Auto Queue fills it only if the operator skips; 5v5 matches and courts not open yet are always placed by hand here. A court whose booking ended still gets filled; the end is a reminder.
 
 Sheet “Put match N on court”: format chip (plus **Fun game**), Team A vs Team B as picture cards (names and levels; drag a player onto the other team to switch sides, see [switch sides](match-queue.md)), and **Court** buttons for every free court — “Choose two free courts” for 5v5 with “5v5 uses two courts as one match.” The court that opened the sheet is preselected (plus a second free court for 5v5).

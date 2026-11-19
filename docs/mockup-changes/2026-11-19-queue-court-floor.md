@@ -30,7 +30,7 @@ Superseded by: none
 - None.
 
 ## Open
-- Whether light theme should get its own floor art.
+- None. Owner, November 19, 2026: light theme keeps the flat green court.
 
 ## Docs updated
 - None: no rule or field changed.

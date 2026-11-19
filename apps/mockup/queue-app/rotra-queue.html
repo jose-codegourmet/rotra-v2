@@ -237,6 +237,19 @@ textarea.input { min-height: 80px; resize: vertical; }
 .sc-cap { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--fg2); padding-inline: 2px; }
 .sc-cap b { color: var(--fg); }
 .step-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+/* Edit player during a session (D-EDIT-LIVE-PLAYER). Owner comment, November 19, 2026: organize it, with the level ring. */
+.el-head { display: flex; align-items: center; gap: 14px; min-width: 0; --ring: var(--border-strong); }
+.el-head.lv-beginner { --ring: var(--lv-beg); } .el-head.lv-intermediate { --ring: var(--lv-int); } .el-head.lv-advanced { --ring: var(--lv-adv); }
+.el-head .avatar { width: 56px; height: 56px; flex: none; outline: 3px solid var(--ring); outline-offset: 3px; }
+.el-head .main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.el-head .el-name { font-size: 17px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
+.el-head .row { gap: 6px; }
+.el-sec { display: flex; flex-direction: column; gap: 12px; padding-top: 14px; border-top: 1px solid var(--border); }
+.el-sec > h3 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.el-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.el-line > div:first-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.el-step { display: flex; align-items: center; gap: 8px; }
+.el-step b { font-size: 22px; min-width: 32px; text-align: center; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -5452,19 +5465,23 @@ const SHEETS = {
   editLive(sh) {
     const s = cur(), r = R(s, sh.pid), p = P(sh.pid);
     if (!r || !p) return sheetShell('Edit player', '<p>This player is no longer on the roster.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
-    const busy = busyOf(s, p.id), now = gamesOf(s, p.id);
+    const busy = busyOf(s, p.id), now = gamesOf(s, p.id), shown = clubNickOf(p) || p.nick || p.name;
+    const who = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' }[p.identity] || '';
+    const tonight = busy ? chip(`${busy.status === 'oncourt' ? 'On court' : 'Playing'} · ${esc(courtsOf(s, busy))}`, 'ok') : r.present ? chip('Present') : chip('Not here', 'warn');
+    const head = `<div class="el-head lv-${rvBand(r)}">${avatar(p)}<div class="main"><span class="el-name">${esc(shown)}</span>${shown !== p.name ? `<span class="small muted">${esc(p.name)}</span>` : ''}
+        <div class="row">${chip(esc(lvLabel(r.level)))}${chip(who)}${tonight}</div></div></div>`;
     const nick = p.identity === 'registered' ? `<label class="field"><span>Club nickname (optional)</span><input class="input" id="el-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick)}" maxlength="30">
         <span class="hint">What your club calls them. Only your club sees it. Empty uses ${p.nick ? `“${esc(p.nick)}”, the nickname on their ROTRA account` : 'the name on their ROTRA account'}.</span></label>` : '';
     const pic = p.identity === 'unclaimed' ? picEditor(p) : '';
-    return sheetShell(`Edit ${esc(clubNickOf(p) || p.nick || p.name)}`, `
-      <div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r.level))} · ${{ registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' }[p.identity] || ''}</span></div></div>
-      ${nick}${pic}
-      <div class="field"><span id="el-games-l">Games played</span>
-        <div class="stepcard"><span class="small muted">Now ${now}</span><div class="row"><button class="btn sm icon-btn" data-act="elGames" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="el-games-l">${sh.games}</b><button class="btn sm icon-btn" data-act="elGames" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
-        <span class="hint">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</span></div>
-      <div class="field"><span id="el-av-l">Availability</span>
-        <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div>
-        ${!sh.present && busy ? `<span class="hint">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</div>`,
+    const profile = nick || pic ? `<section class="el-sec" aria-labelledby="el-prof-h"><h3 id="el-prof-h">Profile</h3>${nick}${pic}</section>` : '';
+    return sheetShell(`Edit ${esc(shown)}`, `${head}${profile}
+      <section class="el-sec" aria-labelledby="el-night-h"><h3 id="el-night-h">Tonight</h3>
+        <div class="el-line"><div><b id="el-games-l">Games played</b><span class="small muted">Now ${now}${sh.games !== now ? ` · will be ${sh.games}` : ''}</span></div>
+          <div class="el-step"><button class="btn sm icon-btn" data-act="elGames" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="el-games-l">${sh.games}</b><button class="btn sm icon-btn" data-act="elGames" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
+        <span class="hint" style="margin-top:-6px">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</span>
+        <div class="el-line"><b id="el-av-l">Availability</b>
+          <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div></div>
+        ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditLive">Save changes</button>`);
   },
   // #717 Set games played (D-SET-GAMES): one player or every roster player; the stored value is an adjustment, so games keep counting up afterwards.

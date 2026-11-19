@@ -76,11 +76,12 @@ Title **Set games played** (#717, owner decisions November 11, 2026). Opened fro
 
 ## D-EDIT-LIVE-PLAYER — Edit player during a session
 
-Owner artifact comment, November 19, 2026 ([log](../mockup-changes/2026-11-19-queue-live-edit-player.md)). Opened by the pencil (**Edit player**) on a live Players card; tapping it never selects the card. Title **Edit NAME** (the one name the card shows). Header row: picture, full name, “LEVEL · Registered / Unclaimed / Guest”. Fields, in order:
+Owner artifact comment, November 19, 2026 ([log](../mockup-changes/2026-11-19-queue-live-edit-player.md)). Opened by the pencil (**Edit player**) on a live Players card; tapping it never selects the card. Title **Edit NAME** (the one name the card shows). Header: the picture (56 px) with the level ring, as on the card; the shown name, the full name under it when they differ; chips LEVEL, Registered / Unclaimed / Guest, and tonight's state (**Playing · Court N** / **On court · Court N**, **Present**, or **Not here**). Then two sections with small headings (owner artifact comment, November 19, 2026: organize it and show the ring). **Profile** (left out when a guest has nothing to edit):
 - **Club nickname (optional)**, registered players only (same rule as Saved players › Club nickname; empty falls back to the account nickname or name).
 - **Profile picture**, unclaimed players only: the same picture editor as Edit details (upload, Remove, previous picture, eight characters). Picture changes apply at once.
-- **Games played**: “Now N” and a − N + stepper (0–99), with the copy “Auto Queue, Catch Up and fewest-games sorting use the new count right away.” Saved as an adjustment, as D-SET-GAMES.
-- **Availability**: **Present** · **Not here**. When Not here is picked for a player in a match: “NAME is in a match now. Marking them not here doesn't take them off it.”
+Section **Tonight**:
+- **Games played**: one row, label with “Now N” (and “· will be M” once changed) on the left, a − N + stepper on the right (0–99), with the copy “Auto Queue, Catch Up and fewest-games sorting use the new count right away.” Saved as an adjustment, as D-SET-GAMES.
+- **Availability**: one row, label on the left, **Present** · **Not here** on the right. When Not here is picked for a player in a match: “NAME is in a match now. Marking them not here doesn't take them off it.”
 
 Buttons: **Cancel**, primary **Save changes**. No confirmation step. Toast **“Changes saved · NAME”**, or **“No changes”** when nothing changed. Availability follows D-2026-11-09-03 (the Queue Master's last action wins), as the card's Present switch.
 

@@ -18,12 +18,17 @@ Superseded by: none
   - **Profile picture**, unclaimed players only (the Edit details picture editor; changes apply at once).
   - **Games played**, a − N + stepper with “Now N”.
   - **Availability**, Present · Not here, with a hint when a player in a match is marked not here.
+- **Layout** (owner's second comment, same day): a header with the picture in its level ring, the shown name, the full
+  name when it differs, and chips for level, account kind and tonight's state; then a **Profile** section (club
+  nickname or picture) and a **Tonight** section (games played and availability, each one row: label left, control right).
 - **Cancel** and **Save changes**; no confirmation step. Toast “Changes saved · NAME” or “No changes”.
 - **Set games for all…** in the Players header still opens D-SET-GAMES with its confirmation.
 
 ## Why
 - Owner artifact comment, November 19, 2026: “improve this form”; it should update the club nickname, the photo if
   unclaimed, games played and availability.
+- Owner artifact comment, the same day, on the new form: “please organize the information here properly”, “show the
+  skill borders too”.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

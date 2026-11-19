@@ -63,5 +63,6 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	rt := NewRouter()
 	s.registerPlayer(rt)
 	s.registerAdmin(rt)
+	s.registerQueue(rt)
 	return rt.Mount, nil
 }

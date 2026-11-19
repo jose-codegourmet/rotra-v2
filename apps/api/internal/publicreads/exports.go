@@ -96,3 +96,27 @@ func AdminClubPlayerHistory(ctx context.Context, q *sqlcgen.Queries, clubID, clu
 	}
 	return readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false)
 }
+
+// IsJSSpace is whether a rune is whitespace for a JavaScript regular expression's \s and for trim().
+func IsJSSpace(r rune) bool { return isJSSpace(r) }
+
+// RTRLookupKey is rtrId.trim().toUpperCase().
+func RTRLookupKey(s string) string { return rtrLookupKey(s) }
+
+// PlayerYearStats is yearGameStats(await readPlayerMatchHistory(playerId), Date.now()): the games, wins, losses and
+// win rate of a registered player's official games this calendar year, or nil without games. The Queue Master's
+// player profile dialog shows it.
+func PlayerYearStats(ctx context.Context, q *sqlcgen.Queries, playerID pgtype.UUID, now time.Time) (any, error) {
+	facts, err := q.ListPlayerFacts(ctx, playerID)
+	if err != nil {
+		return nil, fmt.Errorf("listing facts: %w", err)
+	}
+	sessions, err := readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true)
+	if err != nil {
+		return nil, err
+	}
+	if stats := yearGameStats(sessions, now.UnixMilli()); stats != nil {
+		return stats, nil
+	}
+	return nil, nil
+}

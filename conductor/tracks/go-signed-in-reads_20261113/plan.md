@@ -15,7 +15,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 3: Queue
 
-- [ ] **3.1** Characterize + port club and session reads
+- [~] **3.1** Characterize + port club and session reads (done: club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests; left: `/done-review`, `/finalization` after 3.2)
 - [ ] **3.2** Sync read
 
 ## Phase 4: Switch
@@ -40,3 +40,9 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 2.1 | Go role needs EXECUTE on `rotra_sales_*` and SELECT on the sales views and `admin_settings` | Migration revokes them from PUBLIC | Grant before switching `/api/sales` |
 | 2026-11-19 | 2.1 | `internal/rules/{sales,adminplayer,...}` are stubs; helpers live unexported in `signedin` | Rules packages not to be edited here | Move later (a copy) |
 | 2026-11-19 | 2.1 | `GET /api/players` has no query parameters in the TS, so none added | Characterized | Client filters |
+| 2026-11-19 | 3.1 | A disabled or unprovisioned club answers 401 (TS: 403 `wrong_account`); malformed ids answer 404 (TS: 500) | Go auth middleware and id validation | Owner to confirm |
+| 2026-11-19 | 3.1 | `GET /api/club` and `/api/club/invite` write on a read (fill a missing invite code, `revision + 1`) | Characterized from the TS | Go role needs UPDATE on `clubs`; pinned |
+| 2026-11-19 | 3.1 | `/requests` filters stale requests without closing them in the database | Reads should not write | Same answer, stored status not updated |
+| 2026-11-19 | 3.1 | `/finalization` runs `driveFinalizationJobs` before reading; `/done-review` needs `sessionCompleteness` from sync | Not a plain read | Left out; `/finalization` is an owner call, `/done-review` follows 3.2 |
+| 2026-11-19 | 3.1 | `/api/public-sessions/{slug}/my-request` is a visitor read keyed on a receipt cookie | Not a club read | Stays on Next; `/api/public-sessions` cannot be moved as a whole prefix |
+| 2026-11-19 | 3.1 | `internal/rules/{sessioncost,payment}` are empty stubs; helpers are unexported in `signedin/queue_money.go` | Rules not edited here | Move later |

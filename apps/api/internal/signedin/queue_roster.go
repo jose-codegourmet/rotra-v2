@@ -1,0 +1,216 @@
+package signedin
+
+import (
+	"net/http"
+	"sort"
+	"strings"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
+
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+)
+
+// GET /api/sessions/{sessionId}/roster: the Queue Master's roster read. Port of readSessionRoster in
+// packages/db/src/queue/session-roster.ts and rosterEntryDto, waitlistDto and joinRequestDto in queue/dto.ts.
+
+type queueRosterEntryDTO struct {
+	ID                   string  `json:"id"`
+	SessionID            string  `json:"sessionId"`
+	ClubPlayerID         string  `json:"clubPlayerId"`
+	NameSnapshot         string  `json:"nameSnapshot"`
+	NicknameSnapshot     *string `json:"nicknameSnapshot"`
+	ClubNickname         *string `json:"clubNickname"`
+	Present              bool    `json:"present"`
+	PresentChangedAt     string  `json:"presentChangedAt"`
+	Level                *string `json:"level"`
+	LevelLockedAt        *string `json:"levelLockedAt"`
+	ConfirmedAt          string  `json:"confirmedAt"`
+	GamesAdjustment      int32   `json:"gamesAdjustment"`
+	SelfCheckedInAt      *string `json:"selfCheckedInAt"`
+	LeftAt               *string `json:"leftAt"`
+	Revision             string  `json:"revision"`
+	HasPlayedAtClubBfore *bool   `json:"hasPlayedAtClubBefore,omitempty"`
+	NoShowAt             *string `json:"noShowAt,omitempty"`
+}
+
+type queueWaitlistDTO struct {
+	ID           string  `json:"id"`
+	SessionID    string  `json:"sessionId"`
+	ClubPlayerID string  `json:"clubPlayerId"`
+	Level        *string `json:"level"`
+	AddedAt      string  `json:"addedAt"`
+	Position     int     `json:"position"`
+}
+
+type queueJoinRequestDTO struct {
+	ID           string  `json:"id"`
+	SessionID    string  `json:"sessionId"`
+	Name         string  `json:"name"`
+	Nickname     *string `json:"nickname"`
+	PhoneE164    *string `json:"phoneE164"`
+	StatedBand   string  `json:"statedBand"`
+	Placement    string  `json:"placement"`
+	Status       string  `json:"status"`
+	RequestedAt  string  `json:"requestedAt"`
+	DecidedAt    *string `json:"decidedAt"`
+	ClubPlayerID *string `json:"clubPlayerId"`
+	PlayerID     *string `json:"playerId"`
+	Picture      *string `json:"picture"`
+	PictureName  *string `json:"pictureName"`
+}
+
+// rosterNames is rosterNamesOf for one entry: a registered player's account nickname with the club's own (trimmed,
+// null when blank), else the club's nickname alone.
+func rosterNames(clubNickname, playerNickname pgtype.Text, state sqlcgen.NullPlayerProfileState) (nickname, club *string) {
+	if state.Valid && state.PlayerProfileState == sqlcgen.PlayerProfileStateClaimed {
+		if n := strings.TrimFunc(clubNickname.String, publicreads.IsJSSpace); clubNickname.Valid && n != "" {
+			club = &n
+		}
+		return textPtr(playerNickname), club
+	}
+	return textPtr(clubNickname), nil
+}
+
+func rosterEntryOf(e sqlcgen.ListQueueRosterRow) queueRosterEntryDTO {
+	nick, club := rosterNames(e.ClubNickname, e.PlayerNickname, e.ProfileState)
+	return queueRosterEntryDTO{
+		ID: e.ID.String(), SessionID: e.SessionID.String(), ClubPlayerID: e.ClubPlayerID.String(), NameSnapshot: e.NameSnapshot,
+		NicknameSnapshot: nick, ClubNickname: club, Present: e.Present, PresentChangedAt: httpapi.ToIso(e.PresentChangedAt.Time),
+		Level: levelOf(e.SkillLevelID), LevelLockedAt: isoPtr(e.LevelLockedAt), ConfirmedAt: httpapi.ToIso(e.ConfirmedAt.Time),
+		GamesAdjustment: e.GamesAdjustment, SelfCheckedInAt: isoPtr(e.SelfCheckedInAt), LeftAt: isoPtr(e.LeftAt),
+		Revision: httpapi.ToDecimalString(e.Revision),
+	}
+}
+
+// orderedQueueWaitlist is orderedWaitlist: demoted entries first (latest demotion batch at the front, each batch in its
+// original slot order), then everyone else by arrival, the id last. Times compare at the millisecond.
+func orderedQueueWaitlist(rows []sqlcgen.ListQueueWaitlistRow) []sqlcgen.ListQueueWaitlistRow {
+	ms := func(t pgtype.Timestamptz) int64 {
+		if !t.Valid {
+			return 0
+		}
+		return t.Time.UnixMilli()
+	}
+	out := append([]sqlcgen.ListQueueWaitlistRow(nil), rows...)
+	sort.SliceStable(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		if a.DemotedAt.Valid && b.DemotedAt.Valid {
+			if d := ms(b.DemotedAt) - ms(a.DemotedAt); d != 0 {
+				return d < 0
+			}
+			if d := ms(a.DemotedConfirmedAt) - ms(b.DemotedConfirmedAt); d != 0 {
+				return d < 0
+			}
+		} else if a.DemotedAt.Valid || b.DemotedAt.Valid {
+			return a.DemotedAt.Valid
+		}
+		if d := ms(a.AddedAt) - ms(b.AddedAt); d != 0 {
+			return d < 0
+		}
+		return a.ID.String() < b.ID.String()
+	})
+	return out
+}
+
+func (s *server) queueRoster(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID) (any, error) {
+	ctx := r.Context()
+	sess, err := s.session(r, q, club)
+	if err != nil {
+		return nil, err
+	}
+	all, err := q.ListQueueRoster(ctx, sess.ID)
+	if err != nil {
+		return nil, err
+	}
+	var live, noShows []sqlcgen.ListQueueRosterRow
+	for _, e := range all {
+		if e.NoShowAt.Valid {
+			noShows = append(noShows, e)
+		} else {
+			live = append(live, e)
+		}
+	}
+	// No show (cancelled) entries: still unreleased, off the live roster, oldest first.
+	sort.SliceStable(noShows, func(i, j int) bool {
+		if d := noShows[i].NoShowAt.Time.UnixMilli() - noShows[j].NoShowAt.Time.UnixMilli(); d != 0 {
+			return d < 0
+		}
+		return noShows[i].ID.String() < noShows[j].ID.String()
+	})
+	waitRows, err := q.ListQueueWaitlist(ctx, sess.ID)
+	if err != nil {
+		return nil, err
+	}
+	var ids []pgtype.UUID
+	seen := map[pgtype.UUID]bool{}
+	for _, e := range live {
+		if !seen[e.ClubPlayerID] {
+			seen[e.ClubPlayerID] = true
+			ids = append(ids, e.ClubPlayerID)
+		}
+	}
+	returning := map[pgtype.UUID]bool{}
+	if len(ids) > 0 {
+		before := sess.FinalizedAt
+		if !before.Valid {
+			before = pgtype.Timestamptz{Time: s.now().Truncate(time.Millisecond), Valid: true}
+		}
+		prior, err := q.ListQueueReturningPlayers(ctx, sqlcgen.ListQueueReturningPlayersParams{ClubID: club, ClubPlayerIds: ids, SessionID: sess.ID, Before: before})
+		if err != nil {
+			return nil, err
+		}
+		for _, p := range prior {
+			returning[p] = true
+		}
+	}
+	reqs, err := q.ListQueuePendingJoinRequests(ctx, sess.ID)
+	if err != nil {
+		return nil, err
+	}
+	courts, err := q.ListQueueLiveCourts(ctx, club)
+	if err != nil {
+		return nil, err
+	}
+	capacity := int32(0)
+	for _, c := range courts {
+		if c.SessionID == sess.ID {
+			capacity += int32(sess.PlayersPerCourt)
+		}
+	}
+	out := struct {
+		Capacity     int32                 `json:"capacity"`
+		Roster       []queueRosterEntryDTO `json:"roster"`
+		NoShows      []queueRosterEntryDTO `json:"noShows"`
+		Waitlist     []queueWaitlistDTO    `json:"waitlist"`
+		JoinRequests []queueJoinRequestDTO `json:"joinRequests"`
+	}{Capacity: capacity, Roster: []queueRosterEntryDTO{}, NoShows: []queueRosterEntryDTO{}, Waitlist: []queueWaitlistDTO{}, JoinRequests: []queueJoinRequestDTO{}}
+	for _, e := range live {
+		d := rosterEntryOf(e)
+		played := returning[e.ClubPlayerID]
+		d.HasPlayedAtClubBfore = &played
+		out.Roster = append(out.Roster, d)
+	}
+	for _, e := range noShows {
+		d := rosterEntryOf(e)
+		d.NoShowAt = isoPtr(e.NoShowAt)
+		out.NoShows = append(out.NoShows, d)
+	}
+	for i, w := range orderedQueueWaitlist(waitRows) {
+		out.Waitlist = append(out.Waitlist, queueWaitlistDTO{
+			ID: w.ID.String(), SessionID: w.SessionID.String(), ClubPlayerID: w.ClubPlayerID.String(), Level: levelOf(w.SkillLevelID),
+			AddedAt: httpapi.ToIso(w.AddedAt.Time), Position: i + 1,
+		})
+	}
+	for _, j := range reqs {
+		out.JoinRequests = append(out.JoinRequests, queueJoinRequestDTO{
+			ID: j.ID.String(), SessionID: j.SessionID.String(), Name: j.Name, Nickname: textPtr(j.Nickname), PhoneE164: textPtr(j.PhoneE164),
+			StatedBand: string(j.StatedBand), Placement: string(j.Placement), Status: string(j.Status), RequestedAt: httpapi.ToIso(j.RequestedAt.Time),
+			DecidedAt: isoPtr(j.DecidedAt), ClubPlayerID: uuidPtr(j.ClubPlayerID), PlayerID: uuidPtr(j.PlayerID),
+			Picture: textPtr(j.AvatarRef), PictureName: textPtr(j.PlayerFullName),
+		})
+	}
+	return out, nil
+}

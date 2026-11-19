@@ -61,6 +61,8 @@ type env struct {
 	approved http.Handler
 	// adminIdentities is set once the Admin and Player test identities exist (see relinkAdmins).
 	adminIdentities bool
+	// clubIdentities is set once the club test identities exist (see relinkClubs).
+	clubIdentities bool
 	// noResets is the same server without the recovery service (the Admin password-reset list is left out).
 	noResets http.Handler
 }

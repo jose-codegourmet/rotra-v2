@@ -1,7 +1,7 @@
 # Track specification: Staging verification: live checks and load test
 
-**Track ID:** staging-verification_20261117 · **Type:** chore · **Priority:** high (order 12 of 13) · **Created:** 2026-11-17
-**Depends on:** every move track (go-public-reads, go-sign-in, go-signed-in-reads, go-writes-admin-player, go-writes-queue, live-updates, pictures-buckets) · **Decisions:** B-24, B-30, B-41–B-44, B-52 ([backend open decisions](../../../docs/backend/open-decisions.md))
+**Track ID:** staging-verification_20261117 · **Type:** chore · **Priority:** high (order 13 of 14) · **Created:** 2026-11-17
+**Depends on:** every move track (go-public-reads, go-sign-in, go-signed-in-reads, go-writes-admin-player, go-writes-queue, go-sign-in-catch-up, live-updates, pictures-buckets) · **Decisions:** B-24, B-30, B-41–B-44, B-52 ([backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 

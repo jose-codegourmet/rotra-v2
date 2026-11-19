@@ -1,6 +1,6 @@
 # Track specification: Queue writes and offline contract in Go
 
-**Track ID:** go-writes-queue_20261113 · **Type:** refactor · **Priority:** critical (order 9 of 13) · **Created:** 2026-11-13
+**Track ID:** go-writes-queue_20261113 · **Type:** refactor · **Priority:** critical (order 9 of 14) · **Created:** 2026-11-13
 **Depends on:** go-writes-admin-player · **Decisions:** B-01, B-02, B-04, D-2026-11-11-04 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -92,6 +92,7 @@ Epics Q24 (#962) and Q23 (#961) added these writes on `main`. They are in scope 
 - **Self check-in** ([D-2026-11-09-03](../../../docs/mvp/decisions.md#d-2026-11-09-03), migration `20261118000600_self_check_in`), Player app, signed in: `POST /api/public-sessions/{slug}/check-in` (I'm here; refused when the club turned self check-in off) and `POST /api/public-sessions/{slug}/leave` (I'm leaving). Each writes its timestamp on `session_players` together with `present`.
 - **I can't make it** (migration `20261118000700_drop_out_notices_session_invites`, table `session_drop_out_notices`): the player sends `POST /api/public-sessions/{slug}/drop-out`; the Queue Master answers with `POST /api/sessions/{sessionId}/requests/drop-outs/{noticeId}/keep` or `/remove`.
 - **Session invite** (table `session_invite_codes`): `POST /api/public-sessions/{slug}/invite-code` returns the player's code for the session, making it on first use. The migration also adds `session_join_requests.invite_code_id`, but no service on `main` sets it yet; ask before using it.
+- **Invite link for a guest** ([D-2026-11-18-07](../../../docs/mvp/decisions.md#d-2026-11-18-07), #966): `issueClaimLink` (Saved players › Invite) now issues a link for a guest with a name only; before, the record needed a phone or an email. Redeeming it is already in Go; the check of that is in [go-sign-in-catch-up](../go-sign-in-catch-up_20261119/spec.md).
 - **Club switch:** `/api/club` accepts `selfCheckInEnabled` (Players can check themselves in).
 - **Record games** ([D-2026-11-18-06](../../../docs/mvp/decisions.md#d-2026-11-18-06), migration `20261119000100_session_record_games`): `record_games` is set when a session is prepared and fixed once it starts (database trigger). With it off, Match done takes no winner or score, finishing the session writes no result snapshot, and result slides are refused. The database also guards this (`match_decisions_record_games_guard`).
 - **Shared standings positions** ([D-2026-11-18-05](../../../docs/mvp/decisions.md#d-2026-11-18-05)): the Go rule is already updated on `main` with its cases and `.wasm`; nothing more for this track beyond using it.

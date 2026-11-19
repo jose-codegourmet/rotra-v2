@@ -3,11 +3,11 @@
   "title": "Staging verification: live checks and load test",
   "type": "chore",
   "priority": "high",
-  "order": 12,
+  "order": 13,
   "status": "pending",
   "created": "2026-11-17",
   "updated": "2026-11-17",
-  "depends_on": "go-public-reads, go-sign-in, go-signed-in-reads, go-writes-admin-player, go-writes-queue, live-updates, pictures-buckets",
+  "depends_on": "go-public-reads, go-sign-in, go-signed-in-reads, go-writes-admin-player, go-writes-queue, go-sign-in-catch-up, live-updates, pictures-buckets",
   "phases": {
     "total": 5,
     "completed": 0

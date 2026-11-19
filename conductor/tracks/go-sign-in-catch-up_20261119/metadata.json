@@ -1,0 +1,19 @@
+{
+  "id": "go-sign-in-catch-up_20261119",
+  "title": "Google sign-in and the guest claim in Go",
+  "type": "feature",
+  "priority": "high",
+  "order": 10,
+  "status": "pending",
+  "created": "2026-11-19",
+  "updated": "2026-11-19",
+  "depends_on": "go-sign-in",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 7,
+    "completed": 0
+  }
+}

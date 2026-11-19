@@ -1,6 +1,6 @@
 # Track specification: Ship the Go stack and retire Supabase
 
-**Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 13 of 13) · **Created:** 2026-11-13
+**Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 14 of 14) · **Created:** 2026-11-13
 **Depends on:** all earlier tracks · **Decisions:** B-10, B-20, B-35, B-36, B-42, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

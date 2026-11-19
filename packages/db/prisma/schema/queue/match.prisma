@@ -197,7 +197,8 @@ model MatchDecision {
   clubId            String            @map("club_id") @db.Uuid
   sessionId         String            @map("session_id") @db.Uuid
   kind              MatchDecisionKind
-  /// Required for completed, null for invalid.
+  /// Required for completed on a recorded session. Null for invalid, and for every decision of a
+  /// session with record_games off (trigger match_decisions_record_games_guard).
   winningTeam       TeamSide?         @map("winning_team")
   /// Both null (winner-only) or both nonnegative, and they must agree with the winner.
   teamAScore        Int?              @map("team_a_score")

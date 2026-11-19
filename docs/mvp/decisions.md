@@ -64,7 +64,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
-| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | in progress: mock app; real mode written (#976), migration pending on the shared database | #961 | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1229,7 +1229,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 ### D-2026-11-18-06 — Record games: a Queue Session can run without recording its games
 - **Decision status:** approved in part (owner, November 18, 2026: “add a feature where the QM has the option record the session games or not. but the default is recorded”; the two answers below). The open items are not decided.
-- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-record-games-option.md)).
+- **Implementation status:** in progress (Epic Q23). Mock app: #973 (data), #975 (screens). Real mode written in #976: migration `20261119000100_session_record_games`, applied locally; shared database pending (applied after merge) ([log](../mockup-changes/2026-11-18-queue-record-games-option.md)).
 - **Ticket:** [#961](https://github.com/jose-codegourmet/rotra-v2/issues/961) (epic Q23)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md)
 - **Decision:**
@@ -1242,6 +1242,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Match requests, My night's won and lost counts, and the Facebook post on an unrecorded session (mockup: unchanged).
   - A club default in Club settings (mockup: none; every session starts recorded).
   - Database: the stored field and what finishing an unrecorded session writes (proposed: `record_games` boolean on the session, default true; no migration yet).
+- **Notes (build, November 19, 2026, #976):** the owner authorized the proposed column for the Q23 batch. Built as `queue_sessions.record_games` (default true, fixed after Start by a trigger). Finishing an unrecorded session writes the one finalization row and no results, publication or player facts. Match done with no result also needed the `match_decisions` winner CHECK widened, which the proposal did not name: see [database open decisions](../database_design/product/open-decisions.md#record-games-d-2026-11-18-06-built-november-19-2026).
 - **References:** [sessions module](../business_logic/product/queue/modules/sessions/README.md#record-games), [results module](../business_logic/product/queue/modules/results/README.md)
 
 ### D-2026-11-18-07 — A guest's invite link claims that guest's record

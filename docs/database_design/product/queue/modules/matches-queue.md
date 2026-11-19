@@ -64,12 +64,14 @@ Offline devices enforce the same checks locally. Concurrent disconnected starts 
 | `match_id` | PK/FK; at most one accepted terminal decision |
 | `club_id`, `session_id` | Scope |
 | `kind` | Completed or invalid |
-| `winning_team` | Required A/B for completed; null for invalid |
+| `winning_team` | Required A/B for completed on a session that records games; null for invalid, and null for every decision of a session with `record_games` off (Q23.8 #976) |
 | `team_a_score`, `team_b_score` | Both null or both nonnegative integers for completed; null for invalid. For a one-game scoring mode they are the game's score. For a best of 3 they are the **games won** (proposed, November 18, 2026) |
 | `source_operation_id` | Unique FK to accepted confirmation operation |
 | `confirmed_at`, `accepted_at`, actor/device | Source and server evidence |
 
-If scores exist, they must identify the selected winner; no tied-score completion. Winner-only completion is valid. The valid scores per game now depend on the session's scoring mode (proposed below); the earlier "no invented target" rule is replaced by the mode's target.
+If scores exist, they must identify the selected winner; no tied-score completion. Winner-only completion is valid.
+
+**No-result completion (Q23.8 #976, [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied locally; shared database pending (applied after merge)).** On a session with `queue_sessions.record_games = false`, Match done appends a `completed` decision with `winning_team`, `team_a_score` and `team_b_score` all null, whatever the command carries. The match still ends, frees its courts and players, and counts as a game for the minimum. `match_decisions_kind_check` now reads: completed with a winner, **or** no winner and no scores (the invalid shape and the no-result shape). Trigger `match_decisions_record_games_guard` (before insert) ties the shape to the session: a recorded session refuses a completed decision with no winner, and an unrecorded session refuses any winner. `player_match_facts_guard` needs a decision with the same winner, so a no-result decision can never produce a fact. The valid scores per game now depend on the session's scoring mode (proposed below); the earlier "no invented target" rule is replaced by the mode's target.
 
 ### Game scores and the scoring mode (proposed, November 18, 2026)
 

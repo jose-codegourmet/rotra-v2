@@ -21,6 +21,7 @@ SELECT s.id,
        s.players_per_court,
        s.accept_join_requests,
        s.always_require_request,
+       s.record_games,
        s.updated_at,
        s.public_slug,
        c.id   AS club_id,
@@ -78,7 +79,7 @@ WHERE w.session_id = @session_id;
 
 -- The published copy of the results, or nothing. Only a publication in state 'published' has any; the
 -- CHECK constraints keep the copy to names and counts (standings, awards, and Off Day only when this publish
--- chose it). The handler asks only for a completed session.
+-- chose it). The handler asks only for a completed session that records its games (record_games).
 -- name: GetPublishedResults :one
 SELECT public_results
 FROM session_publications

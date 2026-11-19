@@ -80,7 +80,7 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 ### Record games
 
-**Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mockup only).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
+**Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
 While it is **off**, the session is run only and nothing is kept:
 

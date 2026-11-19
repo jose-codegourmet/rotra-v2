@@ -671,10 +671,11 @@ export async function substitutePlayer(
   })
 }
 
+/** `winningTeam` is null only for Match done on a session with Record games off (no result kept). */
 type Outcome =
   | {
       kind: 'completed'
-      winningTeam: 'A' | 'B'
+      winningTeam: 'A' | 'B' | null
       teamAScore: number | null
       teamBScore: number | null
     }
@@ -720,17 +721,19 @@ async function decidedAlready(
  * usage, frees all holds and appends the one permanent decision (after which triggers freeze the
  * match). If any step fails nothing commits, so no court is freed by a failed write. In Auto Queue
  * the freed court(s) get the next eligible match in the same transaction (never on replay).
+ * `outcomeFor` reads the locked session, so what Match done stores follows its Record games flag.
  */
 async function decide(
   context: ClubContext,
   sessionId: string,
   matchId: string,
   operationId: string,
-  outcome: Outcome,
+  outcomeFor: (session: QueueSession) => Outcome,
   options: AutoFillOptions & { exceptCourtIds?: string[] },
 ) {
   let autoPlaced: AutoPlaced = []
   const done = await matchCommand(context, sessionId, {}, async (tx, session) => {
+    const outcome = outcomeFor(session)
     const match = await activeMatch(tx, session.id, matchId)
     if (match.decision) return decidedAlready(tx, session, match, operationId, outcome)
     if (match.state !== 'active')
@@ -779,7 +782,14 @@ async function decide(
   return withAutoPlaced(done, autoPlaced)
 }
 
-/** Winner-only results keep both scores null; scores must agree with the winner. */
+/**
+ * Winner-only results keep both scores null; scores must agree with the winner.
+ *
+ * A session with Record games off (D-2026-11-18-06): the match ends with no winner and no score,
+ * whatever the call carries; nothing is validated or kept. It still counts toward each player's
+ * games and the minimum, like any completed match. A no-result completion is accepted only there:
+ * a recorded session still needs a winner (the database refuses the other shape either way).
+ */
 export async function completeMatch(
   context: ClubContext,
   sessionId: string,
@@ -794,22 +804,26 @@ export async function completeMatch(
   },
   options: AutoFillOptions = {},
 ) {
-  const result = validateResult({
-    winner: input.winningTeam,
-    scoreA: input.teamAScore,
-    scoreB: input.teamBScore,
-  })
-  if (result.winner === null) throw new ServiceError('invalid', { result: result.error })
   return decide(
     context,
     sessionId,
     input.matchId,
     input.operationId,
-    {
-      kind: 'completed',
-      winningTeam: result.winner,
-      teamAScore: input.teamAScore ?? null,
-      teamBScore: input.teamBScore ?? null,
+    (session) => {
+      if (!session.recordGames)
+        return { kind: 'completed', winningTeam: null, teamAScore: null, teamBScore: null }
+      const result = validateResult({
+        winner: input.winningTeam,
+        scoreA: input.teamAScore,
+        scoreB: input.teamBScore,
+      })
+      if (result.winner === null) throw new ServiceError('invalid', { result: result.error })
+      return {
+        kind: 'completed',
+        winningTeam: result.winner,
+        teamAScore: input.teamAScore ?? null,
+        teamBScore: input.teamBScore ?? null,
+      }
     },
     { ...options, exceptCourtIds: input.holdCourtId ? [input.holdCourtId] : undefined },
   )
@@ -822,7 +836,14 @@ export async function invalidateMatch(
   input: { operationId: string; matchId: string },
   options: AutoFillOptions = {},
 ) {
-  return decide(context, sessionId, input.matchId, input.operationId, { kind: 'invalid' }, options)
+  return decide(
+    context,
+    sessionId,
+    input.matchId,
+    input.operationId,
+    () => ({ kind: 'invalid' }),
+    options,
+  )
 }
 
 const COURT_FILL_MODES = ['manual', 'auto'] as const

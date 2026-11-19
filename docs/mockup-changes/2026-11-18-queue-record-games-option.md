@@ -61,7 +61,9 @@ Superseded by: none
 ## Docs updated
 - Business logic: docs/business_logic/product/queue/modules/sessions/README.md — new Record games section;
   results/README.md — an unrecorded session has no standings, slides or awards
-- Database design: none yet; the proposed field is in D-2026-11-18-06 (no migration)
+- Database design: `queue_sessions.record_games` in docs/database_design/product/queue/modules/sessions-roster.md,
+  matches-queue.md (no-result decision) and results-publication.md (what finishing writes); migration
+  `20261119000100_session_record_games` (Q23.8 #976): applied locally; shared database pending (applied after merge)
 - Screen docs: none yet; the screens follow when the open points in D-2026-11-18-06 are answered
 - Decision: D-2026-11-18-06
 

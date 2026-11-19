@@ -26,6 +26,8 @@ type playerCases struct {
 		Player   *string    `json:"player"`
 		Scenario string     `json:"scenario"`
 		Now      *time.Time `json:"now"`
+		Origin   string     `json:"origin"`
+		Approved bool       `json:"approved"`
 	} `json:"cases"`
 }
 
@@ -50,6 +52,8 @@ func readJSONFile(t *testing.T, name string, v any) {
 func TestPlayerReadsMatchRouteHandlers(t *testing.T) { replay(t, "player") }
 
 func TestSessionReadsMatchRouteHandlers(t *testing.T) { replay(t, "sessions") }
+
+func TestProfileReadsMatchRouteHandlers(t *testing.T) { replay(t, "profile") }
 
 // replay runs every case of a suite through the Go routes and compares status, headers and body with what the
 // Route Handlers answered. A nil player is a visitor.
@@ -77,7 +81,7 @@ func replay(t *testing.T, suite string) {
 				now = *c.Now
 			}
 			e.clk.Set(now)
-			r := req{path: c.Path, app: "player"}
+			r := req{path: c.Path, app: "player", origin: c.Origin, approved: c.Approved}
 			if c.Player != nil {
 				r.bearer = e.accessPass(t, *c.Player)
 			}

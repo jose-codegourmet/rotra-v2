@@ -10,6 +10,7 @@ import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
 import { readLeaderboardPlaces } from './leaderboard'
+import { isMasked } from './masking'
 
 type Db = Prisma.TransactionClient | typeof prisma
 
@@ -83,27 +84,27 @@ export function experienceUpdate(next: number | null, shown: number | null, now:
 }
 
 /**
- * Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. An always-private
- * profile (D-2026-11-12-01) leaves here with the name masked, no nickname and no details; the
- * picture stays. `own` (the player's own read) keeps everything.
+ * Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. A masked profile (the
+ * one rule of `./masking`, B-54) leaves here with the name masked, no nickname, no details and no
+ * RTR ID; the picture and banner stay. The player's own read keeps everything.
  */
-function publicProfileDto(row: PublicPlayerRow, own = false) {
+function publicProfileDto(row: PublicPlayerRow, viewerId: string | null = null) {
   if (!row.idAllocation) return null
   const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
   for (const link of row.socialLinks) links[link.provider] = link.url
   const months = currentExperienceMonths(row.experienceMonths, row.experienceRecordedAt)
   const savingClub = row.clubPlayers.length === 1 ? row.clubPlayers[0] : undefined
   const visibility = savingClub ? 'public' : row.profileVisibility
-  const masked = !own && visibility === 'always_private'
+  const masked = isMasked(visibility, viewerId, row.id)
   return {
     playerId: row.id,
-    rtrId: row.idAllocation.rtrId,
+    ...(masked ? {} : { rtrId: row.idAllocation.rtrId }),
     fullName: masked ? maskPublicName(row.fullName) : (savingClub?.displayName ?? row.fullName),
     nickname: masked ? null : savingClub ? savingClub.nickname : row.nickname,
     picture: row.avatarRef,
     bannerId: row.bannerId,
     profileVisibility: visibility,
-    unclaimedSavedBy: savingClub?.club.name,
+    ...(masked ? {} : { unclaimedSavedBy: savingClub?.club.name }),
     // Stats on your profile: the flags only. The Player app hides Latest stats and the Weekly
     // performance chart from everyone but the player, like mock mode.
     showProfileStats: row.showProfileStats,
@@ -121,8 +122,8 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
  * The profile with the banner its card draws (`bannerKey`, `bannerImageUrl`). The banner is public,
  * like the picture, so an always-private profile keeps it.
  */
-async function profileWithBanner(db: Db, row: PublicPlayerRow, own = false) {
-  const dto = publicProfileDto(row, own)
+async function profileWithBanner(db: Db, row: PublicPlayerRow, viewerId: string | null = null) {
+  const dto = publicProfileDto(row, viewerId)
   if (!dto) return null
   return { ...dto, ...(await resolvePlayerBanner(row.banner, db)) }
 }
@@ -156,7 +157,7 @@ async function loadProfile(
     )
       throw new ServiceError('unauthenticated')
   }
-  const dto = await profileWithBanner(prisma, row, own)
+  const dto = await profileWithBanner(prisma, row, viewerId)
   if (!dto) throw new ServiceError('not_found')
   return dto
 }
@@ -182,9 +183,10 @@ export async function readPublicProfile(playerId: string, viewerId: string | nul
 export async function findPublicProfileByRtrId(rtrId: string, viewerId: string | null) {
   const allocation = await prisma.playerIdAllocation.findUnique({
     where: { rtrId: rtrId.trim().toUpperCase() },
-    select: { playerId: true },
+    select: { playerId: true, player: { select: { hiddenFromDirectory: true } } },
   })
-  if (!allocation) throw new ServiceError('not_found')
+  // B-53: Hide me from Player Information also hides the RTR ID lookup, for every caller.
+  if (!allocation || allocation.player?.hiddenFromDirectory) throw new ServiceError('not_found')
   try {
     return await readVisibleProfile(allocation.playerId, viewerId)
   } catch (error) {
@@ -337,7 +339,7 @@ export async function updateMyProfile(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, await profileWithBanner(tx, row, true))
+    return ownProfile(tx, await profileWithBanner(tx, row, row.id))
   })
 }
 
@@ -368,7 +370,7 @@ export async function setMyProfileBanner(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, await profileWithBanner(tx, row, true))
+    return ownProfile(tx, await profileWithBanner(tx, row, row.id))
   })
 }
 
@@ -456,7 +458,7 @@ export async function setStatsVisibility(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, await profileWithBanner(tx, row, true))
+    return ownProfile(tx, await profileWithBanner(tx, row, row.id))
   })
 }
 

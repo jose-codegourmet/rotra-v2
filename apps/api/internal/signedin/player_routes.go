@@ -15,4 +15,16 @@ func (s *server) registerPlayer(rt *Router) {
 	rt.Handle("GET /api/invites/{clubId}", player, s.invite())
 	rt.Handle("GET /api/me/verification", player, s.myVerification())
 	rt.Handle("GET /api/account/contact-change", player, s.myContactChange())
+	rt.Handle("GET /api/me/profile", player, s.myProfile())
+	rt.Handle("GET /api/leaderboard/me", player, s.myLeaderboard())
+	rt.Handle("GET /api/rtr-ids/{rtrId}/stats", player, s.rtrStats())
+	// The reads a visitor may make too share their paths with the Admin app, so they are routed per app. The viewer
+	// is the signed-in Player when the pass is valid and a visitor otherwise.
+	optional := s.auth.Optional(player)
+	rt.Handle("GET /api/leaderboard", player, optional(s.viewer.Leaderboard))
+	rt.Handle("GET /api/leaderboard/search", player, optional(s.viewer.Search))
+	rt.Handle("GET /api/players/{playerId}", player, optional(s.viewer.Profile))
+	rt.Handle("GET /api/players/{playerId}/rank", player, optional(s.viewer.Rank))
+	rt.Handle("GET /api/players/{playerId}/games", player, optional(s.viewer.Games))
+	rt.Handle("GET /api/rtr-ids/{rtrId}", player, optional(s.viewer.FindByRTR))
 }

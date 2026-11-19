@@ -56,7 +56,12 @@ type env struct {
 	svc     *session.Service
 	clk     *fakeClock
 	handler http.Handler
+	// approved serves the same database with a rank algorithm approved (#247); none is in the product.
+	approved http.Handler
 }
+
+// queueOrigin is the paired Queue origin the stats read allows.
+const queueOrigin = "http://localhost:9000"
 
 func newEnv(t *testing.T, now time.Time) *env {
 	t.Helper()
@@ -94,11 +99,19 @@ func newEnv(t *testing.T, now time.Time) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
-	register, err := signedin.Register(signedin.Deps{Pool: pool, Auth: e.svc.Authenticator(), Logger: log, Now: e.clk.Now})
-	if err != nil {
-		t.Fatal(err)
+	build := func(approved []string) http.Handler {
+		register, err := signedin.Register(signedin.Deps{
+			Pool: pool, Auth: e.svc.Authenticator(), Logger: log, Now: e.clk.Now,
+			Limiter:            httpapi.NewRateLimiter(1_000_000, nil), // the limit has its own tests
+			ApprovedAlgorithms: approved, QueueOrigins: []string{queueOrigin},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: httpapi.NewReadiness(), ProxySecret: secret}, register)
 	}
-	e.handler = httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: httpapi.NewReadiness(), ProxySecret: secret}, register)
+	e.handler = build(nil)
+	e.approved = build([]string{"rank-test-v1"})
 	return e
 }
 
@@ -201,6 +214,8 @@ type req struct {
 	path, app string
 	bearer    string
 	noSecret  bool
+	origin    string
+	approved  bool
 }
 
 func (e *env) do(r req) *httptest.ResponseRecorder {
@@ -215,8 +230,15 @@ func (e *env) do(r req) *httptest.ResponseRecorder {
 	if r.bearer != "" {
 		hr.Header.Set("Authorization", "Bearer "+r.bearer)
 	}
+	if r.origin != "" {
+		hr.Header.Set("Origin", r.origin)
+	}
 	w := httptest.NewRecorder()
-	e.handler.ServeHTTP(w, hr)
+	h := e.handler
+	if r.approved {
+		h = e.approved
+	}
+	h.ServeHTTP(w, hr)
 	return w
 }
 

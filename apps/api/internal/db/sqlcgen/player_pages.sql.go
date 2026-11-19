@@ -35,16 +35,23 @@ func (q *Queries) CountPlayerCountedFacts(ctx context.Context, playerID pgtype.U
 }
 
 const findPlayerIDByRTR = `-- name: FindPlayerIDByRTR :one
-SELECT player_id
-FROM player_id_allocations
-WHERE rtr_id = $1::text
+SELECT a.player_id, p.hidden_from_directory
+FROM player_id_allocations a
+JOIN players p ON p.id = a.player_id
+WHERE a.rtr_id = $1::text
 `
 
-func (q *Queries) FindPlayerIDByRTR(ctx context.Context, rtrID string) (pgtype.UUID, error) {
+type FindPlayerIDByRTRRow struct {
+	PlayerID            pgtype.UUID
+	HiddenFromDirectory bool
+}
+
+// B-53: a player hidden from Player Information has no RTR ID lookup, for every caller.
+func (q *Queries) FindPlayerIDByRTR(ctx context.Context, rtrID string) (FindPlayerIDByRTRRow, error) {
 	row := q.db.QueryRow(ctx, findPlayerIDByRTR, rtrID)
-	var player_id pgtype.UUID
-	err := row.Scan(&player_id)
-	return player_id, err
+	var i FindPlayerIDByRTRRow
+	err := row.Scan(&i.PlayerID, &i.HiddenFromDirectory)
+	return i, err
 }
 
 const getPendingRankSession = `-- name: GetPendingRankSession :one
@@ -88,7 +95,9 @@ func (q *Queries) GetPendingRankSession(ctx context.Context, playerID pgtype.UUI
 const getPlayerRank = `-- name: GetPlayerRank :one
 SELECT p.full_name,
        p.nickname,
+       p.profile_visibility,
        (r.player_id IS NOT NULL)::bool AS has_rank,
+       COALESCE(r.algorithm_version, '')::text AS algorithm_version,
        r.state,
        r.recent_standard_match_count,
        sl.display_order
@@ -102,7 +111,9 @@ WHERE p.id = $1
 type GetPlayerRankRow struct {
 	FullName                 string
 	Nickname                 pgtype.Text
+	ProfileVisibility        ProfileVisibility
 	HasRank                  bool
+	AlgorithmVersion         string
 	State                    NullRankState
 	RecentStandardMatchCount pgtype.Int4
 	DisplayOrder             pgtype.Int2
@@ -115,12 +126,28 @@ func (q *Queries) GetPlayerRank(ctx context.Context, playerID pgtype.UUID) (GetP
 	err := row.Scan(
 		&i.FullName,
 		&i.Nickname,
+		&i.ProfileVisibility,
 		&i.HasRank,
+		&i.AlgorithmVersion,
 		&i.State,
 		&i.RecentStandardMatchCount,
 		&i.DisplayOrder,
 	)
 	return i, err
+}
+
+const getPlayerVisibility = `-- name: GetPlayerVisibility :one
+SELECT profile_visibility
+FROM players
+WHERE id = $1
+`
+
+// The visibility of any player, with or without an RTR ID (the games read masks by it).
+func (q *Queries) GetPlayerVisibility(ctx context.Context, playerID pgtype.UUID) (ProfileVisibility, error) {
+	row := q.db.QueryRow(ctx, getPlayerVisibility, playerID)
+	var profile_visibility ProfileVisibility
+	err := row.Scan(&profile_visibility)
+	return profile_visibility, err
 }
 
 const getPublicClubsVisibility = `-- name: GetPublicClubsVisibility :one
@@ -151,6 +178,7 @@ SELECT p.id,
        p.experience_months,
        p.experience_recorded_at,
        p.personal_details,
+       p.profile_state = 'unclaimed' AS is_unclaimed,
        pb.id    AS banner_row_id,
        pb.image AS banner_image
 FROM players p
@@ -172,6 +200,7 @@ type GetPublicProfileRow struct {
 	ExperienceMonths      pgtype.Int4
 	ExperienceRecordedAt  pgtype.Timestamptz
 	PersonalDetails       []byte
+	IsUnclaimed           bool
 	BannerRowID           pgtype.Text
 	BannerImage           pgtype.Text
 }
@@ -195,6 +224,7 @@ func (q *Queries) GetPublicProfile(ctx context.Context, playerID pgtype.UUID) (G
 		&i.ExperienceMonths,
 		&i.ExperienceRecordedAt,
 		&i.PersonalDetails,
+		&i.IsUnclaimed,
 		&i.BannerRowID,
 		&i.BannerImage,
 	)
@@ -472,6 +502,44 @@ func (q *Queries) ListSessionGameNumbers(ctx context.Context, sessionIds []pgtyp
 			&i.MatchID,
 			&i.GameNumber,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUnclaimedSavers = `-- name: ListUnclaimedSavers :many
+SELECT cp.display_name, cp.nickname, c.name AS club_name
+FROM club_players cp
+JOIN players p ON p.id = cp.player_id AND p.profile_state = 'unclaimed'
+JOIN clubs c ON c.id = cp.club_id
+WHERE cp.player_id = $1
+  AND cp.removed_at IS NULL
+ORDER BY cp.id ASC
+`
+
+type ListUnclaimedSaversRow struct {
+	DisplayName string
+	Nickname    pgtype.Text
+	ClubName    string
+}
+
+// The clubs that currently save an unclaimed player (D-2026-11-16-04): the club's own name and nickname for them.
+// Only an unclaimed profile has any. The order is the club player id; it only matters when there is exactly one.
+func (q *Queries) ListUnclaimedSavers(ctx context.Context, playerID pgtype.UUID) ([]ListUnclaimedSaversRow, error) {
+	rows, err := q.db.Query(ctx, listUnclaimedSavers, playerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListUnclaimedSaversRow
+	for rows.Next() {
+		var i ListUnclaimedSaversRow
+		if err := rows.Scan(&i.DisplayName, &i.Nickname, &i.ClubName); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

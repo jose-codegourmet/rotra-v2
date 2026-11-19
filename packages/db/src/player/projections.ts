@@ -9,6 +9,7 @@ import { settleFinalization } from '../queue/finalization'
 import { matchContext } from '../queue/match-store'
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
+import { isMasked } from './masking'
 import { writePlayerNotifications } from './notification-events'
 
 type Tx = Prisma.TransactionClient
@@ -505,18 +506,15 @@ type CourtEntry = {
 function courtPlayer(
   entry: CourtEntry | undefined,
   maskAlwaysPrivate: boolean,
+  viewerId: string | null,
 ): { name: string; picture: string | null; playerId: string | null } {
   if (!entry) return { name: '', picture: null, playerId: null }
   const player = entry.playerAtEntry
   if (!player?.idAllocation) return { name: entry.nameSnapshot, picture: null, playerId: null }
-  return {
-    name:
-      maskAlwaysPrivate && player.profileVisibility === 'always_private'
-        ? maskPublicName(entry.nameSnapshot)
-        : entry.nameSnapshot,
-    picture: player.avatarRef ?? null,
-    playerId: player.id,
-  }
+  // The one masking rule (B-54): a masked player has no player ID that opens the profile.
+  if (maskAlwaysPrivate && isMasked(player.profileVisibility, viewerId, player.id))
+    return { name: maskPublicName(entry.nameSnapshot), picture: player.avatarRef ?? null, playerId: null }
+  return { name: entry.nameSnapshot, picture: player.avatarRef ?? null, playerId: player.id }
 }
 
 /**
@@ -525,7 +523,12 @@ function courtPlayer(
  * `opponentPlayers`, in the order of `partners` / `opponents`). No costs, levels, Off Day or
  * private identity; always-private players are masked unless `maskAlwaysPrivate` is false (Admin).
  */
-async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPrivate = true) {
+async function historyFromFacts(
+  tx: Tx,
+  facts: PlayerMatchFact[],
+  maskAlwaysPrivate = true,
+  viewerId: string | null = null,
+) {
   const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
   const [sessions, entries, allFacts] = await Promise.all([
     tx.queueSession.findMany({
@@ -575,7 +578,7 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
     gameNumbers.get(`${sessionId}:${entryId}:${matchId}`)
   const people = (ids: string[], sessionId: string, matchId: string) =>
     ids.map((id) => ({
-      ...courtPlayer(byId.get(id), maskAlwaysPrivate),
+      ...courtPlayer(byId.get(id), maskAlwaysPrivate, viewerId),
       sessionGameNumber: gameNumber(sessionId, id, matchId),
     }))
   return sessions
@@ -613,11 +616,28 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
 }
 
 /** `maskAlwaysPrivate: false` only behind the Admin account boundary (A-PLAYER games). */
-export async function readPlayerMatchHistory(playerId: string, { maskAlwaysPrivate = true } = {}) {
+export async function readPlayerMatchHistory(
+  playerId: string,
+  { maskAlwaysPrivate = true, viewerId = null as string | null } = {},
+) {
   if (!UUID.test(playerId)) return []
   return prisma.$transaction(async (tx) =>
-    historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate),
+    historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate, viewerId),
   )
+}
+
+/**
+ * The games read behind `/api/players/{id}/games` (B-54): a masked player has no game history, and
+ * the other faces on a court follow the same masking rule for this viewer.
+ */
+export async function readPublicMatchHistory(playerId: string, viewerId: string | null) {
+  if (!UUID.test(playerId)) return []
+  const owner = await prisma.player.findUnique({
+    where: { id: playerId },
+    select: { profileVisibility: true },
+  })
+  if (owner && isMasked(owner.profileVisibility, viewerId, playerId)) return []
+  return readPlayerMatchHistory(playerId, { viewerId })
 }
 
 /** Admin history for a club-only unclaimed record, scoped to that club's existing match facts. */
@@ -642,29 +662,44 @@ export async function readClubPlayerMatchHistory(clubId: string, clubPlayerId: s
  * assessment) has no session to name and is not reported. No RTR ID or no stored projection is
  * null (no rank yet).
  */
-export async function readPlayerRank(playerId: string) {
+export async function readPlayerRank(playerId: string, viewerId: string | null = null) {
   if (!UUID.test(playerId)) return null
   return prisma.$transaction(async (tx) => {
-    const rank = await tx.playerRankCurrent.findUnique({
+    const stored = await tx.playerRankCurrent.findUnique({
       where: { playerId },
       include: {
         skillLevel: { select: { displayOrder: true } },
         player: {
-          select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
+          select: {
+            fullName: true,
+            nickname: true,
+            profileVisibility: true,
+            idAllocation: { select: { rtrId: true } },
+          },
         },
       },
     })
-    if (!rank) {
+    // The approved-algorithm gate of the leaderboard (#247, B-54): a row no approved algorithm wrote
+    // reads as "no rank yet".
+    const rank = stored && APPROVED_RANK_ALGORITHMS.has(stored.algorithmVersion) ? stored : null
+    if (!rank || isMasked(stored?.player.profileVisibility ?? 'public', viewerId, playerId)) {
       // A public profile with no rank row yet (e.g. just registered): "no rank yet", not "not found".
+      // A masked player reads the same, with the masked name only.
       const player = await tx.player.findUnique({
         where: { id: playerId },
-        select: { fullName: true, nickname: true, idAllocation: { select: { rtrId: true } } },
+        select: {
+          fullName: true,
+          nickname: true,
+          profileVisibility: true,
+          idAllocation: { select: { rtrId: true } },
+        },
       })
       if (!player?.idAllocation) return null
+      const masked = isMasked(player.profileVisibility, viewerId, playerId)
       return {
         playerId,
-        fullName: player.fullName,
-        nickname: player.nickname,
+        fullName: masked ? maskPublicName(player.fullName) : player.fullName,
+        nickname: masked ? null : player.nickname,
         levelIndex: null,
         state: 'provisional' as const,
         updatePending: null,

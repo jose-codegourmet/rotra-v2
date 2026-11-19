@@ -30,6 +30,7 @@ type GetClubPageClubRow struct {
 // The public club page with no viewer, and the Player pickers and public numbers that sit beside it.
 // Ports of packages/db/src/player/{club-page,ranking-settings}.ts and packages/db/src/admin/profile-{banners,characters}.ts.
 // Reads only; nothing here calculates a rank.
+// The invite code is read for the signed-in invite card only; the public club page never sends it (B-55).
 func (q *Queries) GetClubPageClub(ctx context.Context, clubID pgtype.UUID) (GetClubPageClubRow, error) {
 	row := q.db.QueryRow(ctx, getClubPageClub, clubID)
 	var i GetClubPageClubRow
@@ -63,13 +64,7 @@ SELECT cp.id,
        p.full_name,
        p.avatar_ref,
        pb.id    AS banner_row_id,
-       pb.image AS banner_image,
-       COALESCE((SELECT a.skill_level_id
-                 FROM club_assessments a
-                 WHERE a.club_id = cp.club_id
-                   AND a.club_player_id = cp.id
-                 ORDER BY a.assessed_at DESC, a.id DESC
-                 LIMIT 1), -1)::smallint AS skill_level_id
+       pb.image AS banner_image
 FROM club_players cp
 JOIN players p ON p.id = cp.player_id
 LEFT JOIN profile_banners pb ON pb.id = p.banner_id
@@ -81,18 +76,17 @@ ORDER BY cp.id ASC
 `
 
 type ListClubPageMembersRow struct {
-	ID           pgtype.UUID
-	DisplayName  string
-	FullName     string
-	AvatarRef    pgtype.Text
-	BannerRowID  pgtype.Text
-	BannerImage  pgtype.Text
-	SkillLevelID int16
+	ID          pgtype.UUID
+	DisplayName string
+	FullName    string
+	AvatarRef   pgtype.Text
+	BannerRowID pgtype.Text
+	BannerImage pgtype.Text
 }
 
 // Registered members: current club players linked to a claimed profile that is not hidden from the directory.
 // Guests and unclaimed profiles never appear. The TypeScript has no ORDER BY (the database decides ties), so
-// the id is the tie-break here. The newest assessment decides the level; level 0 is a level, and -1 means no assessment.
+// the id is the tie-break here. A masked member carries no level (B-55), so none is read.
 func (q *Queries) ListClubPageMembers(ctx context.Context, clubID pgtype.UUID) ([]ListClubPageMembersRow, error) {
 	rows, err := q.db.Query(ctx, listClubPageMembers, clubID)
 	if err != nil {
@@ -109,7 +103,6 @@ func (q *Queries) ListClubPageMembers(ctx context.Context, clubID pgtype.UUID) (
 			&i.AvatarRef,
 			&i.BannerRowID,
 			&i.BannerImage,
-			&i.SkillLevelID,
 		); err != nil {
 			return nil, err
 		}

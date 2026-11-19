@@ -20,6 +20,7 @@ import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { levelCodeFor } from '../queue/session-store'
 import { ServiceError } from '../service/errors'
+import { isMasked } from './masking'
 
 export function parseLeaderboardPeriod(value: string | null): LeaderboardPeriod {
   if (value === null) return 'year'
@@ -109,24 +110,24 @@ export async function readPeriodLeaderboard(
       const player = identity.get(row.id)
       if (!player) return []
       const unclaimed = player.unclaimedClubCount === 1
-      const levelHidden =
-        !unclaimed && player.profileVisibility === 'always_private' && viewerId !== row.id
-      const masked =
-        levelHidden || (!unclaimed && !viewerId && player.profileVisibility === 'private')
+      // One masking rule (B-54). An unclaimed player saved by one club is public until they register.
+      const masked = !unclaimed && isMasked(player.profileVisibility, viewerId, row.id)
       return [
         {
           ...row,
+          // A masked row carries no player ID that opens a profile; the key is its place in the list.
+          id: masked ? `masked-${row.position}` : row.id,
           fullName: masked ? maskPublicName(player.fullName) : player.fullName,
           nickname: masked ? null : player.nickname,
-          playingLevel: levelHidden ? null : levelCodeFor(player.rankCurrent?.skillLevelId ?? null),
-          pictureUrl: masked && !levelHidden ? null : player.avatarRef,
+          playingLevel: masked ? null : levelCodeFor(player.rankCurrent?.skillLevelId ?? null),
+          pictureUrl: player.avatarRef,
           ...resolveProfileBanner(
             player.banner?.id ?? null,
             () => player.banner ?? undefined,
             banners,
           ),
           masked,
-          levelHidden,
+          levelHidden: masked,
           unclaimed,
         },
       ]

@@ -10,7 +10,6 @@ type ClubPageDto = {
     initials: string
     logoUrl: string | null
     city: string
-    inviteCode: string | null
   }
   signedIn: boolean
   viewerIsMember: boolean
@@ -27,7 +26,7 @@ type ClubPageDto = {
 
 /**
  * P-CLUB-PAGE / P-CLUB-MEMBERS in real mode: `/api/clubs/[clubId]` (masked on the server). Join
- * this club opens the club's current invite link, `?k=<code>` included (#712). Null on 404.
+ * this club opens the club's invite link without a code: the server never sends one (B-55). Null on 404.
  */
 export async function realGetClubPage(
   clubId: string,
@@ -45,7 +44,7 @@ export async function realGetClubPage(
         initials: page.club.initials,
         logoUrl: page.club.logoUrl,
         city: page.club.city,
-        joinHref: clubJoinHref(page.club.id, page.club.inviteCode),
+        joinHref: clubJoinHref(page.club.id),
       },
       signedIn: page.signedIn,
       viewerIsMember: page.viewerIsMember,

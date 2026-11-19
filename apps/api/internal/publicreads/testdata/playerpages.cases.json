@@ -1,6 +1,7 @@
 {
   "now": "2026-11-17T12:00:00.000Z",
   "reset": [
+    "UPDATE players SET profile_state = 'claimed'",
     "DELETE FROM projection_jobs WHERE id::text LIKE 'b1000000-%'",
     "UPDATE profile_banners SET shown = true, is_default = false, deleted_at = NULL WHERE id <> 'b0000000-0000-4000-8000-000000000001'",
     "UPDATE profile_banners SET is_default = true WHERE id = 'court'",

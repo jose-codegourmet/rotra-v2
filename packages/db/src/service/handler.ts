@@ -132,6 +132,8 @@ export const VISITOR_COMMANDS = [
   'player.club-page',
   'leaderboard.list',
   'player.public-profile',
+  /** P-MATCH-HISTORY: masked per viewer (B-54), so private and no-store */
+  'player.match-history',
   /** Google sign-in (#922): start, outcome, link, registration and claim; each checks the flag */
   'player.google-sign-in',
   /** P-INVITE: the invite card and, signed in, where the viewer stands */

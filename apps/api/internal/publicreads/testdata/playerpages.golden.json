@@ -2,8 +2,9 @@
   "profile_alice": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -26,15 +27,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_alice_with_query": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -57,15 +60,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_alice_uppercase_id": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -88,51 +93,35 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_bob_private": {
-    "status": 200,
+    "status": 401,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "profile": {
-        "playerId": "d1000000-0000-4000-8000-000000000002",
-        "rtrId": "RTR-PH-CEB-102926-0002",
-        "fullName": "Bob Santos",
-        "nickname": null,
-        "picture": null,
-        "bannerId": null,
-        "profileVisibility": "private",
-        "showProfileStats": true,
-        "showWeeklyPerformance": true,
-        "playingStyle": "",
-        "experienceYears": null,
-        "experienceMonths": null,
-        "socialLinks": {
-          "facebook": "",
-          "instagram": "",
-          "youtube": "",
-          "linkedin": ""
-        },
-        "bannerKey": "court",
-        "bannerImageUrl": null
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
       }
     }
   },
   "profile_carla_always_private": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
         "playerId": "d1000000-0000-4000-8000-000000000003",
-        "rtrId": "RTR-PH-CEB-102926-0003",
         "fullName": "C*** D***",
         "nickname": null,
         "picture": "https://example.test/carla.png",
@@ -150,20 +139,21 @@
           "linkedin": ""
         },
         "bannerKey": "ember",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_dan_always_private_odd_name": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
         "playerId": "d1000000-0000-4000-8000-000000000004",
-        "rtrId": "RTR-PH-CEB-102926-0004",
         "fullName": "😀*** S*** L***",
         "nickname": null,
         "picture": null,
@@ -181,7 +171,8 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
@@ -202,8 +193,9 @@
   "profile_frank_deleted_banner_future_experience": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -226,15 +218,17 @@
           "linkedin": ""
         },
         "bannerKey": "b0000000-0000-4000-8000-000000000001",
-        "bannerImageUrl": "https://example.test/banner-one.png"
+        "bannerImageUrl": "https://example.test/banner-one.png",
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_default_banner": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -257,15 +251,17 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_hal_style_not_a_string": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -288,15 +284,17 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_ida_no_details": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -319,15 +317,17 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_jon_unicode_one_link": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -350,7 +350,8 @@
           "linkedin": "https://li.test/jon"
         },
         "bannerKey": "dusk",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
@@ -441,13 +442,13 @@
   "profile_alice_always_private": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
         "playerId": "d1000000-0000-4000-8000-000000000001",
-        "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "A*** R***",
         "nickname": null,
         "picture": "https://example.test/alice.png",
@@ -465,46 +466,31 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_alice_private": {
-    "status": 200,
+    "status": 401,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "profile": {
-        "playerId": "d1000000-0000-4000-8000-000000000001",
-        "rtrId": "RTR-PH-CEB-102926-0001",
-        "fullName": "Alice Reyes",
-        "nickname": "Ace",
-        "picture": "https://example.test/alice.png",
-        "bannerId": "night",
-        "profileVisibility": "private",
-        "showProfileStats": false,
-        "showWeeklyPerformance": false,
-        "playingStyle": "Aggressive net player",
-        "experienceYears": 3,
-        "experienceMonths": 0,
-        "socialLinks": {
-          "facebook": "https://fb.test/alice",
-          "instagram": "https://ig.test/alice",
-          "youtube": "",
-          "linkedin": ""
-        },
-        "bannerKey": "night",
-        "bannerImageUrl": null
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
       }
     }
   },
   "profile_alice_hidden_from_directory": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -527,15 +513,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_carla_made_public": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -558,15 +546,17 @@
           "linkedin": "https://li.test/carla"
         },
         "bannerKey": "ember",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_alice_banner_hidden_kept": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -589,15 +579,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_alice_banner_deleted_kept": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -620,15 +612,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_banner_dusk_default": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -651,15 +645,17 @@
           "linkedin": ""
         },
         "bannerKey": "dusk",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_banner_court_hidden_no_default": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -682,15 +678,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_banner_no_default_court_shown": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -713,15 +711,17 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_banner_none_shown": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -744,15 +744,17 @@
           "linkedin": ""
         },
         "bannerKey": "court",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "profile_gina_banner_court_deleted_default": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "profile": {
@@ -775,15 +777,17 @@
           "linkedin": ""
         },
         "bannerKey": "night",
-        "bannerImageUrl": null
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
       }
     }
   },
   "rtr_alice": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
@@ -792,8 +796,9 @@
   "rtr_lowercase": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
@@ -802,8 +807,9 @@
   "rtr_mixed_case": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
@@ -812,8 +818,9 @@
   "rtr_padded": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
@@ -822,8 +829,9 @@
   "rtr_padded_with_unicode_space": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
@@ -832,41 +840,54 @@
   "rtr_with_query": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "playerId": "d1000000-0000-4000-8000-000000000001"
     }
   },
   "rtr_bob_private_is_found": {
-    "status": 200,
+    "status": 404,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "playerId": "d1000000-0000-4000-8000-000000000002"
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
     }
   },
   "rtr_carla_always_private_is_found": {
-    "status": 200,
+    "status": 404,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "playerId": "d1000000-0000-4000-8000-000000000003"
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
     }
   },
   "rtr_alice_hidden_from_directory_is_found": {
-    "status": 200,
+    "status": 404,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "playerId": "d1000000-0000-4000-8000-000000000001"
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
     }
   },
   "rtr_unknown": {
@@ -1247,8 +1268,9 @@
   "rank_alice": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1267,8 +1289,9 @@
   "rank_alice_with_query": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1287,39 +1310,41 @@
   "rank_bob_no_level": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
         "playerId": "d1000000-0000-4000-8000-000000000002",
-        "fullName": "Bob Santos",
+        "fullName": "B*** S***",
         "nickname": null,
         "levelIndex": null,
         "state": "provisional",
         "updatePending": null,
         "position": null,
         "recentCount": 0,
-        "olderCount": 7
+        "olderCount": 0
       }
     }
   },
   "rank_carla_always_private_name_not_masked": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
         "playerId": "d1000000-0000-4000-8000-000000000003",
-        "fullName": "Carla Dizon",
-        "nickname": "CD",
-        "levelIndex": 5,
-        "state": "needs_reassessment",
+        "fullName": "C*** D***",
+        "nickname": null,
+        "levelIndex": null,
+        "state": "provisional",
         "updatePending": null,
         "position": null,
-        "recentCount": 2,
+        "recentCount": 0,
         "olderCount": 0
       }
     }
@@ -1327,14 +1352,15 @@
   "rank_dan_no_rank_row_always_private_name_not_masked": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
         "playerId": "d1000000-0000-4000-8000-000000000004",
-        "fullName": "  😀 Smile   Lee ",
-        "nickname": "Smiley",
+        "fullName": "😀*** S*** L***",
+        "nickname": null,
         "levelIndex": null,
         "state": "provisional",
         "updatePending": null,
@@ -1347,8 +1373,9 @@
   "rank_eve_rank_row_but_no_rtr_id": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": null
@@ -1357,8 +1384,9 @@
   "rank_frank_level_zero": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1377,8 +1405,9 @@
   "rank_gina_no_rank_row": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1397,8 +1426,9 @@
   "rank_unknown_player": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": null
@@ -1407,8 +1437,9 @@
   "rank_malformed_id": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": null
@@ -1417,28 +1448,30 @@
   "rank_alice_always_private_name_not_masked": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
         "playerId": "d1000000-0000-4000-8000-000000000001",
-        "fullName": "Alice Reyes",
-        "nickname": "Ace",
-        "levelIndex": 8,
-        "state": "established",
+        "fullName": "A*** R***",
+        "nickname": null,
+        "levelIndex": null,
+        "state": "provisional",
         "updatePending": null,
         "position": null,
-        "recentCount": 5,
-        "olderCount": 3
+        "recentCount": 0,
+        "olderCount": 0
       }
     }
   },
   "rank_alice_job_pending": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1461,8 +1494,9 @@
   "rank_alice_job_running_and_failed": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1485,8 +1519,9 @@
   "rank_alice_job_done": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1505,8 +1540,9 @@
   "rank_alice_job_other_kind": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1525,8 +1561,9 @@
   "rank_alice_job_other_session": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1545,8 +1582,9 @@
   "rank_alice_job_unfinalized_session": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
@@ -1569,32 +1607,30 @@
   "rank_bob_job_pending_through_attribution": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "rank": {
         "playerId": "d1000000-0000-4000-8000-000000000002",
-        "fullName": "Bob Santos",
+        "fullName": "B*** S***",
         "nickname": null,
         "levelIndex": null,
         "state": "provisional",
-        "updatePending": {
-          "sessionTitle": "Friday Night",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-10T14:00:00.123Z"
-        },
+        "updatePending": null,
         "position": null,
         "recentCount": 0,
-        "olderCount": 7
+        "olderCount": 0
       }
     }
   },
   "games_alice": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -1613,7 +1649,7 @@
                 "Gail Guest"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 ""
               ],
               "partnerPlayers": [
@@ -1625,9 +1661,9 @@
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -1645,7 +1681,7 @@
               "format": "doubles",
               "sessionGameNumber": 1,
               "partners": [
-                "Bob Santos"
+                "B*** S***"
               ],
               "opponents": [
                 "C*** D***",
@@ -1653,9 +1689,9 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -1663,7 +1699,7 @@
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -1721,7 +1757,7 @@
               "format": "fun_3v3",
               "sessionGameNumber": 4,
               "partners": [
-                "Bob Santos",
+                "B*** S***",
                 "C*** D***"
               ],
               "opponents": [
@@ -1731,15 +1767,15 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 }
               ],
@@ -1747,7 +1783,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -1817,7 +1853,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -1833,22 +1869,22 @@
                 "C*** D***"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 "Gus Guest"
               ],
               "partnerPlayers": [
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -1870,8 +1906,9 @@
   "games_alice_with_query": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -1890,7 +1927,7 @@
                 "Gail Guest"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 ""
               ],
               "partnerPlayers": [
@@ -1902,9 +1939,9 @@
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -1922,7 +1959,7 @@
               "format": "doubles",
               "sessionGameNumber": 1,
               "partners": [
-                "Bob Santos"
+                "B*** S***"
               ],
               "opponents": [
                 "C*** D***",
@@ -1930,9 +1967,9 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -1940,7 +1977,7 @@
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -1998,7 +2035,7 @@
               "format": "fun_3v3",
               "sessionGameNumber": 4,
               "partners": [
-                "Bob Santos",
+                "B*** S***",
                 "C*** D***"
               ],
               "opponents": [
@@ -2008,15 +2045,15 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 }
               ],
@@ -2024,7 +2061,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -2094,7 +2131,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -2110,22 +2147,22 @@
                 "C*** D***"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 "Gus Guest"
               ],
               "partnerPlayers": [
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -2147,517 +2184,42 @@
   "games_bob_with_attributed_guest": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "games": [
-        {
-          "id": "f1000000-0000-4000-8000-000000000002",
-          "title": "Saturday Morning",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-12T10:00:00.000Z",
-          "sessionPageUrl": null,
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000012",
-              "format": "doubles",
-              "sessionGameNumber": 2,
-              "partners": [
-                ""
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "Gail Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "",
-                  "picture": null,
-                  "playerId": null
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–15"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000011",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "C*** D***"
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "Bob Santos"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": "19–21"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000011",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Alice Reyes"
-              ],
-              "opponents": [
-                "C*** D***",
-                "Gail Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–19"
-            }
-          ]
-        },
-        {
-          "id": "f1000000-0000-4000-8000-000000000001",
-          "title": "Friday Night",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-10T14:00:00.123Z",
-          "sessionPageUrl": "/s/friday-night",
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000004",
-              "format": "fun_3v3",
-              "sessionGameNumber": 2,
-              "partners": [
-                "Alice Reyes",
-                "C*** D***"
-              ],
-              "opponents": [
-                "😀*** S*** L***",
-                "Eve Alcala",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 4
-                },
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 2
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "😀*** S*** L***",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 3
-                }
-              ],
-              "counting": "fun",
-              "result": "won",
-              "score": "11–9"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000003",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Eve Alcala"
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 3
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": null
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000001",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Gus Guest"
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "C*** D***"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": "15–21"
-            }
-          ]
-        }
-      ]
+      "games": []
     }
   },
   "games_carla_always_private_own_history": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "games": [
-        {
-          "id": "f1000000-0000-4000-8000-000000000002",
-          "title": "Saturday Morning",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-12T10:00:00.000Z",
-          "sessionPageUrl": null,
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000011",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Gail Guest"
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "Bob Santos"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": "19–21"
-            }
-          ]
-        },
-        {
-          "id": "f1000000-0000-4000-8000-000000000001",
-          "title": "Friday Night",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-10T14:00:00.123Z",
-          "sessionPageUrl": "/s/friday-night",
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000004",
-              "format": "fun_3v3",
-              "sessionGameNumber": 2,
-              "partners": [
-                "Alice Reyes",
-                "Bob Santos"
-              ],
-              "opponents": [
-                "😀*** S*** L***",
-                "Eve Alcala",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 4
-                },
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 2
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "😀*** S*** L***",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 3
-                }
-              ],
-              "counting": "fun",
-              "result": "won",
-              "score": "11–9"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000001",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Alice Reyes"
-              ],
-              "opponents": [
-                "Bob Santos",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–15"
-            }
-          ]
-        }
-      ]
+      "games": []
     }
   },
   "games_dan_revoked_attribution": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "games": [
-        {
-          "id": "f1000000-0000-4000-8000-000000000001",
-          "title": "Friday Night",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-10T14:00:00.123Z",
-          "sessionPageUrl": "/s/friday-night",
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000004",
-              "format": "fun_3v3",
-              "sessionGameNumber": 2,
-              "partners": [
-                "Eve Alcala",
-                "Gus Guest"
-              ],
-              "opponents": [
-                "Alice Reyes",
-                "Bob Santos",
-                "C*** D***"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 3
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 4
-                },
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 2
-                }
-              ],
-              "counting": "fun",
-              "result": "lost",
-              "score": "9–11"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000002",
-              "format": "singles",
-              "sessionGameNumber": 1,
-              "partners": [],
-              "opponents": [
-                "Alice Reyes"
-              ],
-              "partnerPlayers": [],
-              "opponentPlayers": [
-                {
-                  "name": "Alice Reyes",
-                  "picture": "https://example.test/alice.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000001",
-                  "sessionGameNumber": 2
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–18"
-            }
-          ]
-        }
-      ]
+      "games": []
     }
   },
   "games_eve_no_rtr_id": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -2678,14 +2240,14 @@
               ],
               "opponents": [
                 "Alice Reyes",
-                "Bob Santos",
+                "B*** S***",
                 "C*** D***"
               ],
               "partnerPlayers": [
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -2703,15 +2265,15 @@
                   "sessionGameNumber": 4
                 },
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 }
               ],
@@ -2764,8 +2326,9 @@
   "games_gina_one_session": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -2805,8 +2368,9 @@
   "games_ida_no_history": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": []
@@ -2815,8 +2379,9 @@
   "games_unknown_player": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": []
@@ -2825,8 +2390,9 @@
   "games_malformed_id": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": []
@@ -2835,8 +2401,9 @@
   "games_alice_carla_made_public": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -2855,7 +2422,7 @@
                 "Gail Guest"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 ""
               ],
               "partnerPlayers": [
@@ -2867,9 +2434,9 @@
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -2887,7 +2454,7 @@
               "format": "doubles",
               "sessionGameNumber": 1,
               "partners": [
-                "Bob Santos"
+                "B*** S***"
               ],
               "opponents": [
                 "Carla Dizon",
@@ -2895,9 +2462,9 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -2963,7 +2530,7 @@
               "format": "fun_3v3",
               "sessionGameNumber": 4,
               "partners": [
-                "Bob Santos",
+                "B*** S***",
                 "Carla Dizon"
               ],
               "opponents": [
@@ -2973,9 +2540,9 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -2989,7 +2556,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -3059,7 +2626,7 @@
                 {
                   "name": "😀*** S*** L***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -3075,7 +2642,7 @@
                 "Carla Dizon"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 "Gus Guest"
               ],
               "partnerPlayers": [
@@ -3088,9 +2655,9 @@
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -3112,8 +2679,9 @@
   "games_alice_dan_made_public": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
       "games": [
@@ -3132,7 +2700,7 @@
                 "Gail Guest"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 ""
               ],
               "partnerPlayers": [
@@ -3144,9 +2712,9 @@
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
@@ -3164,7 +2732,7 @@
               "format": "doubles",
               "sessionGameNumber": 1,
               "partners": [
-                "Bob Santos"
+                "B*** S***"
               ],
               "opponents": [
                 "C*** D***",
@@ -3172,9 +2740,9 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
@@ -3182,7 +2750,7 @@
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -3240,7 +2808,7 @@
               "format": "fun_3v3",
               "sessionGameNumber": 4,
               "partners": [
-                "Bob Santos",
+                "B*** S***",
                 "C*** D***"
               ],
               "opponents": [
@@ -3250,15 +2818,15 @@
               ],
               "partnerPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 },
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 2
                 }
               ],
@@ -3352,22 +2920,22 @@
                 "C*** D***"
               ],
               "opponents": [
-                "Bob Santos",
+                "B*** S***",
                 "Gus Guest"
               ],
               "partnerPlayers": [
                 {
                   "name": "C*** D***",
                   "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 }
               ],
               "opponentPlayers": [
                 {
-                  "name": "Bob Santos",
+                  "name": "B*** S***",
                   "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
+                  "playerId": null,
                   "sessionGameNumber": 1
                 },
                 {
@@ -3389,278 +2957,12 @@
   "games_alice_always_private": {
     "status": 200,
     "headers": {
-      "cache-control": "public, max-age=0, must-revalidate",
-      "content-type": "application/json"
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
     },
     "body": {
-      "games": [
-        {
-          "id": "f1000000-0000-4000-8000-000000000002",
-          "title": "Saturday Morning",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-12T10:00:00.000Z",
-          "sessionPageUrl": null,
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000012",
-              "format": "doubles",
-              "sessionGameNumber": 2,
-              "partners": [
-                "Gail Guest"
-              ],
-              "opponents": [
-                "Bob Santos",
-                ""
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "",
-                  "picture": null,
-                  "playerId": null
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": "15–21"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000011",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "Bob Santos"
-              ],
-              "opponents": [
-                "C*** D***",
-                "Gail Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–19"
-            }
-          ]
-        },
-        {
-          "id": "f1000000-0000-4000-8000-000000000003",
-          "title": "ßeta Meetup",
-          "clubName": "ßeta Smash",
-          "finishedAt": "2026-11-11T08:00:00.000Z",
-          "sessionPageUrl": null,
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000031",
-              "format": "singles",
-              "sessionGameNumber": 1,
-              "partners": [],
-              "opponents": [
-                "Gio Guest"
-              ],
-              "partnerPlayers": [],
-              "opponentPlayers": [
-                {
-                  "name": "Gio Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–10"
-            }
-          ]
-        },
-        {
-          "id": "f1000000-0000-4000-8000-000000000001",
-          "title": "Friday Night",
-          "clubName": "Smash Club",
-          "finishedAt": "2026-11-10T14:00:00.123Z",
-          "sessionPageUrl": "/s/friday-night",
-          "games": [
-            {
-              "id": "f3000000-0000-4000-8000-000000000004",
-              "format": "fun_3v3",
-              "sessionGameNumber": 4,
-              "partners": [
-                "Bob Santos",
-                "C*** D***"
-              ],
-              "opponents": [
-                "😀*** S*** L***",
-                "Eve Alcala",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 2
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "😀*** S*** L***",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 3
-                }
-              ],
-              "counting": "fun",
-              "result": "won",
-              "score": "11–9"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000003",
-              "format": "doubles",
-              "sessionGameNumber": 3,
-              "partners": [
-                "Gus Guest"
-              ],
-              "opponents": [
-                "Eve Alcala",
-                "Gail Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 2
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Eve Alcala",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Gail Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": null
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000002",
-              "format": "singles",
-              "sessionGameNumber": 2,
-              "partners": [],
-              "opponents": [
-                "😀*** S*** L***"
-              ],
-              "partnerPlayers": [],
-              "opponentPlayers": [
-                {
-                  "name": "😀*** S*** L***",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000004",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "lost",
-              "score": "18–21"
-            },
-            {
-              "id": "f3000000-0000-4000-8000-000000000001",
-              "format": "doubles",
-              "sessionGameNumber": 1,
-              "partners": [
-                "C*** D***"
-              ],
-              "opponents": [
-                "Bob Santos",
-                "Gus Guest"
-              ],
-              "partnerPlayers": [
-                {
-                  "name": "C*** D***",
-                  "picture": "https://example.test/carla.png",
-                  "playerId": "d1000000-0000-4000-8000-000000000003",
-                  "sessionGameNumber": 1
-                }
-              ],
-              "opponentPlayers": [
-                {
-                  "name": "Bob Santos",
-                  "picture": null,
-                  "playerId": "d1000000-0000-4000-8000-000000000002",
-                  "sessionGameNumber": 1
-                },
-                {
-                  "name": "Gus Guest",
-                  "picture": null,
-                  "playerId": null,
-                  "sessionGameNumber": 1
-                }
-              ],
-              "counting": "counted",
-              "result": "won",
-              "score": "21–15"
-            }
-          ]
-        }
-      ]
+      "games": []
     }
   }
 }

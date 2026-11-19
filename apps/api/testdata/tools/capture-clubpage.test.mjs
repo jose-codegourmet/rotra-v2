@@ -21,6 +21,12 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, expect, test, vi } from 'vitest'
 
+// Only the Supabase session check is replaced: nobody is signed in, so every case is a visitor.
+vi.mock('../../../../packages/db/src/auth/supabase.ts', async (importOriginal) => ({
+  ...(await importOriginal()),
+  verifySubject: async () => null,
+}))
+
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../../..')
 const pkgDb = resolve(root, 'packages/db')

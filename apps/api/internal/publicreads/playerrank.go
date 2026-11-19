@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -33,14 +34,13 @@ type pendingUpdate struct {
 }
 
 // rank answers GET /api/players/{playerId}/rank: { rank }, null when the id names no player with an RTR ID.
-// A profile with no stored rank row is "no rank yet" (provisional, no level), not "not found".
-//
-// The name and nickname are returned as stored. The profile and leaderboard reads mask an always-private
-// player; this read does not, exactly as readPlayerRank does today.
+// Only a row written by an approved algorithm is read (the gate of #247, B-54); without one, or for a masked
+// player (./masking.go), it is "no rank yet": provisional, no level, no counts, and the masked name only for a
+// masked player. A profile with no stored rank row is "no rank yet" too, not "not found".
 func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 	id, ok := uuidParam(r)
 	if !ok {
-		httpapi.WriteJSON(w, http.StatusOK, rankBody{}, httpapi.Public)
+		httpapi.WriteJSON(w, http.StatusOK, rankBody{}, httpapi.Private)
 		return
 	}
 	var body rankBody
@@ -53,9 +53,13 @@ func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return fmt.Errorf("reading rank: %w", err)
 		}
+		masked := isMasked(row.ProfileVisibility, viewerOf(r), id)
 		dto := &rankDTO{PlayerID: id.String(), FullName: row.FullName, Nickname: textPtr(row.Nickname), State: "provisional"}
 		body.Rank = dto
-		if !row.HasRank {
+		if masked {
+			dto.FullName, dto.Nickname = maskPublicName(row.FullName), nil
+		}
+		if !row.HasRank || masked || !slices.Contains(p.approved, row.AlgorithmVersion) {
 			return nil
 		}
 		dto.State = string(row.State.RankState)
@@ -75,7 +79,7 @@ func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 		p.fail(w, r, err)
 		return
 	}
-	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Public)
+	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
 }
 
 type rankBody struct {

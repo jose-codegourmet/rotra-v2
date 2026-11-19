@@ -24,7 +24,9 @@ Superseded by: none
       - left: **Upcoming sessions** (with Finished) and **Your clubs**;
       - right: **Your stats** (the shared rank card, then the year's weekly performance).
     - Phones show one column.
-  - **Top bar:** visitors still see Leaderboard · Sign in; signed-in players see **Home · Leaderboard · My profile**.
+  - **Top bar:** unchanged, Leaderboard · Sign in for visitors and Leaderboard · My profile when signed in. The ROTRA
+    logo is Home. A Home button was tried and removed the same day (owner artifact comment: “just remove home, clicking
+    the logo is alraedy the home”).
   - **Own profile:** drops My sessions and Your clubs. Another player's profile keeps its Clubs card.
 
 ## Why

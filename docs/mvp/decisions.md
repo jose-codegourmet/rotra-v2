@@ -1387,7 +1387,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 
 <a id="d-2026-11-19-10"></a>
 ### D-2026-11-19-10 — Player Home for signed-in players
-- **Decision status:** approved by the owner, November 19, 2026: “the home page for Rotra Players should be the current session, upcoming sessions and access to clubs and current player stats”; then, asked: signed-in players only, top bar Home · Leaderboard · My profile, and My sessions and Your clubs move off the own profile.
+- **Decision status:** approved by the owner, November 19, 2026: “the home page for Rotra Players should be the current session, upcoming sessions and access to clubs and current player stats”; then, asked: signed-in players only, top bar Leaderboard · My profile with the ROTRA logo as Home (a Home button was tried and removed the same day: “just remove home, clicking the logo is already the home”), and My sessions and Your clubs move off the own profile.
 - **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-player-home.md)).
 - **Ticket:** needed
 - **Roadmap:** MVP — [Player](workstreams/player.md)

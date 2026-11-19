@@ -1629,7 +1629,6 @@ function topBar() {
   return `<header class="top"><div class="top-in">
     <button class="brand" data-act="go" data-to="${me ? 'home' : 'board'}" aria-label="ROTRA Players, open ${me ? 'Home' : 'the leaderboard'}">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
     <nav class="nav" aria-label="Main">
-      ${me ? `<button data-act="go" data-to="home" ${S.screen === 'home' ? 'aria-current="page"' : ''}>Home</button>` : ''}
       <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>Leaderboard</button>
       ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
     </nav>

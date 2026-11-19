@@ -1,6 +1,6 @@
 # Queue and Player apps: ROTRA court colours (dark theme)
 
-Status: NEW
+Status: CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted
 Date: 2026-11-19
 App: queue, player
 Mockup: apps/mockup/queue-app/rotra-queue.html › `--court`, `--court-line` (used by `courtSVG`, `setupCourtSVG`, `.pitch`,
@@ -13,6 +13,10 @@ Artifact: https://claude.ai/artifact/Xb3bpD4iWeWbnoXh7MpaEh, https://claude.ai/a
 Components: every drawn court (court card, match card court, setup court picture, player game cards)
 Supersedes: none
 Superseded by: none
+
+## Cancelled
+- Owner, November 19, 2026: “please revert the original court design”. Both mockups are back to the flat green
+  (#14603f) with white lines; nothing here goes to the real app.
 
 ## What changed
 - Before: courts were a flat mid green (#14603f) with white lines in both apps.

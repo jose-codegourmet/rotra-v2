@@ -127,8 +127,16 @@ async function profileWithBanner(db: Db, row: PublicPlayerRow, own = false) {
   return { ...dto, ...(await resolvePlayerBanner(row.banner, db)) }
 }
 
-/** Verify the audience before reading a profile's places or Compare statistics. */
-export async function readVisibleProfile(playerId: string, viewerId: string | null) {
+/**
+ * Loads the profile for this viewer. A private profile, or an unclaimed one saved by more than one
+ * club, needs a signed-in viewer. Always private (B-63): `refuse` answers forbidden to everyone but
+ * the owner; `mask` lets the masked profile through (`publicProfileDto` masks it).
+ */
+async function loadProfile(
+  playerId: string,
+  viewerId: string | null,
+  alwaysPrivate: 'refuse' | 'mask',
+) {
   // A URL segment that is not a UUID can name no player.
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
     throw new ServiceError('not_found')
@@ -140,8 +148,12 @@ export async function readVisibleProfile(playerId: string, viewerId: string | nu
   const own = viewerId === playerId
   const singleClub = row.profileState === 'unclaimed' && row.clubPlayers.length === 1
   if (!own && !singleClub) {
-    if (row.profileVisibility === 'always_private') throw new ServiceError('forbidden')
-    if (!viewerId && (row.profileVisibility === 'private' || row.profileState === 'unclaimed'))
+    const hidden = row.profileVisibility === 'always_private'
+    if (hidden && alwaysPrivate === 'refuse') throw new ServiceError('forbidden')
+    if (
+      !viewerId &&
+      (row.profileState === 'unclaimed' || (!hidden && row.profileVisibility === 'private'))
+    )
       throw new ServiceError('unauthenticated')
   }
   const dto = await profileWithBanner(prisma, row, own)
@@ -149,8 +161,19 @@ export async function readVisibleProfile(playerId: string, viewerId: string | nu
   return dto
 }
 
+/** Verify the audience before reading a profile's places or Compare statistics. */
+export async function readVisibleProfile(playerId: string, viewerId: string | null) {
+  return loadProfile(playerId, viewerId, 'refuse')
+}
+
+/**
+ * The profile page read. An always-private profile answers masked for everyone but the owner
+ * (B-63): picture, banner and masked name, and no leaderboard places.
+ */
 export async function readPublicProfile(playerId: string, viewerId: string | null = null) {
-  const profile = await readVisibleProfile(playerId, viewerId)
+  const profile = await loadProfile(playerId, viewerId, 'mask')
+  if (profile.profileVisibility === 'always_private' && viewerId !== playerId)
+    return { ...profile, leaderboardPlaces: [] }
   const places = await readLeaderboardPlaces([playerId])
   return { ...profile, leaderboardPlaces: places.get(playerId) ?? [] }
 }
@@ -162,7 +185,17 @@ export async function findPublicProfileByRtrId(rtrId: string, viewerId: string |
     select: { playerId: true },
   })
   if (!allocation) throw new ServiceError('not_found')
-  return readVisibleProfile(allocation.playerId, viewerId)
+  try {
+    return await readVisibleProfile(allocation.playerId, viewerId)
+  } catch (error) {
+    // B-63: an RTR ID whose profile this viewer may not open answers like an unknown one.
+    if (
+      error instanceof ServiceError &&
+      (error.code === 'forbidden' || error.code === 'unauthenticated')
+    )
+      throw new ServiceError('not_found')
+    throw error
+  }
 }
 
 /** `MyAccount`: the signed-in player's own private contacts. Private, no-store. */

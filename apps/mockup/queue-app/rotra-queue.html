@@ -543,6 +543,8 @@ select.input.inline { width: auto; min-height: 42px; }
 .team { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .team .tl { font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); }
 .pn { display: flex; gap: 2px 6px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.nm-sub { display: block; overflow-wrap: anywhere; }
+.pn .nm-sub { flex-basis: 100%; }
 .pn b { font-weight: 600; overflow-wrap: anywhere; }
 .pn .lv { font-size: 12px; color: var(--fg2); }
 .vs { font-size: 11px; font-weight: 800; color: var(--fg3); letter-spacing: 1px; }
@@ -2136,6 +2138,9 @@ const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
 // Guests and unclaimed players have no account yet, so their one nickname is already the club's (Edit details).
 const clubNickOf = (p) => (p && p.identity === 'registered' && p.clubNick) || '';
 const acctShort = (id) => { const p = P(id); return p ? (p.nick || p.name.split(' ')[0]) : '?'; };
+// Club-facing name order: club nickname, then nickname, then full name. The first one present is bold; the rest sit under it.
+const nameParts = (p) => [clubNickOf(p), p.nick, p.name].filter((v, i, a) => v && a.indexOf(v) === i);
+const nameB = (p) => { const [top, ...rest] = nameParts(p); return `<b>${esc(top)}</b>${rest.length ? `<span class="small muted nm-sub">${rest.map(esc).join(' · ')}</span>` : ''}`; };
 const short = (id) => { const p = P(id); return p ? (clubNickOf(p) || p.nick || p.name.split(' ')[0]) : '?'; };
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
 
@@ -4184,7 +4189,7 @@ function joinReqCard(s, r, full) {
 // D-2026-11-09-03: a drop-out notice frees nothing by itself. Remove from roster frees the slot; Keep closes the notice.
 function dropOutRow(s, d) {
   const p = P(d.pid);
-  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
       <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
@@ -4195,7 +4200,7 @@ function matchReqCard(s, mr) {
     if (!pid) return `<div class="li" style="padding:0"><span class="avatar" aria-hidden="true">?</span><div class="main"><b>Anyone</b> <span class="small muted">· ${role}</span><p class="small muted">Filled from present players with the fewest games</p></div></div>`;
     const p = P(pid), r = R(s, pid) || {}, a = busyOf(s, pid), q = waiting(s).findIndex((m) => all(m).includes(pid));
     const where = a ? ` · On ${courtsOf(s, a)}` : q >= 0 ? ` · In queue #${q + 1}` : '';
-    return `<div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b> <span class="small muted">· ${role}</span><p class="small muted">${gamesOf(s, pid)} of ${s.minimum} games · ${esc(lvLabel(r.level))}${where}</p></div></div>`;
+    return `<div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)} <span class="small muted">· ${role}</span><p class="small muted">${gamesOf(s, pid)} of ${s.minimum} games · ${esc(lvLabel(r.level))}${where}</p></div></div>`;
   };
   return `<div class="req-row"><div><b>${esc(nm(mr.pid))} asks for a ${REQ_LABEL[fmt] || fmt} ${FORMAT_LABEL[fmt].toLowerCase()} match</b><p class="small muted">Requested ${fmtWhen(mr.at, { lower: true })}</p></div>
       <div class="stack tight">${spots.map(line).join('')}</div>
@@ -4286,7 +4291,7 @@ function waitlistPanel(s) {
   const wl = waitOf(s), open = openSlots(s), cap = capacityOf(s);
   return `<section class="card stack" id="waitlist"><div class="between"><div><h2>Waitlist${wl.length ? ` · ${wl.length}` : ''}</h2><p class="small muted">Slots: <b>${s.roster.length} of ${cap}</b> used (${s.courts.length} court${s.courts.length > 1 ? 's' : ''} × ${perCourtOf(s)} players)${open ? ` · ${open} open` : ' · full'}. ${s.status === 'active' ? 'Choose any player to admit.' : 'First come, first served.'}</p></div>
       ${wl.length && open ? `<button class="btn sm primary" data-act="fillSlots">Fill ${Math.min(open, wl.length)} open slot${Math.min(open, wl.length) > 1 ? 's' : ''}</button>` : ''}</div>
-    ${wl.length ? `<div class="list">${wl.map((w, i) => { const p = P(w.pid); return `<div class="li wait-row"><span class="qt-pos">#${i + 1}</span>${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(w.level))} · waiting since ${fmtWhen(w.at, { lower: true })}</p></div>
+    ${wl.length ? `<div class="list">${wl.map((w, i) => { const p = P(w.pid); return `<div class="li wait-row"><span class="qt-pos">#${i + 1}</span>${faceBtn(p)}<div class="main">${nameB(p)}<p class="small muted">${esc(lvLabel(w.level))} · waiting since ${fmtWhen(w.at, { lower: true })}</p></div>
       <button class="btn xs ${s.status === 'active' || open ? 'primary' : ''}" data-act="giveSlot" data-pid="${w.pid}" ${s.status === 'active' || open ? '' : 'title="Over your slot budget"'}>${s.status === 'active' ? 'Admit player' : open ? 'Give slot' : 'Give slot anyway'}</button><button class="btn xs ghost icon-btn" data-act="removeWait" data-pid="${w.pid}" aria-label="Remove ${esc(p.name)} from the waitlist">${I.x}</button></div>`; }).join('')}</div>`
       : `<p class="small muted">${s.status === 'active' || open ? 'Nobody is waiting.' : 'Nobody is waiting. Players added from now on join the waitlist.'}</p>`}
   </section>`;
@@ -4393,7 +4398,7 @@ const rvAway = (r) => `<div class="row" style="display:grid;gap:2px"><span class
 function rvRow(s, r, live) {
   const p = P(r.pid);
   return `<div class="prow">
-        <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn"><b>${esc(p.name)}</b></div><div class="row" style="gap:6px">${identChip(p)}${rvSugg(p)}</div></div></div>
+        <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn">${nameB(p)}</div><div class="row" style="gap:6px">${identChip(p)}${rvSugg(p)}</div></div></div>
         ${rvLevel(r, p, live)}
         ${live ? rvAway(r) : `<div class="row" style="justify-content:flex-end">${rvStepDown(r, p)}${rvRemove(r, p)}</div>`}
       </div>`;
@@ -4404,7 +4409,7 @@ function rvCard(s, r, live) {
   // #704: before Start session there is no Present switch or text; presence shows only once the session has started.
   const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : '';
   return `<article class="rv-card ${r.present ? 'is-present' : ''}" aria-label="${esc(p.name)}">
-        <div class="rv-top">${faceBtn(p)}<div class="main"><b>${esc(p.name)}</b></div>${live ? '' : rvRemove(r, p)}</div>
+        <div class="rv-top">${faceBtn(p)}<div class="main">${nameB(p)}</div>${live ? '' : rvRemove(r, p)}</div>
         ${live ? `<div class="rv-pres">${pres}</div>` : ''}${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
         <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
         <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
@@ -6201,7 +6206,7 @@ const SHEETS = {
       const added = saved().filter((p) => inRoster.has(p.id)).length;
       body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
       // D-2026-11-16-04: exact RTR ID or exact email only. No name search here.
       const key = (sh.q || '').trim().toLowerCase();
@@ -6287,7 +6292,7 @@ const SHEETS = {
   },
   playerAction(sh) {
     const s = cur(), m = s.matches.find((x) => x.id === sh.id), p = P(sh.pid), first = esc(p.name.split(' ')[0]);
-    return sheetShell(`Change ${esc(p.name)}?`, `<div class="li" style="padding:0">${avatar(p, 'lg')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">Team ${m.teamA.includes(sh.pid) ? 'A' : 'B'} · match ${m.seq}, playing</p></div></div>
+    return sheetShell(`Change ${esc(p.name)}?`, `<div class="li" style="padding:0">${avatar(p, 'lg')}<div class="main">${nameB(p)}<p class="small muted">Team ${m.teamA.includes(sh.pid) ? 'A' : 'B'} · match ${m.seq}, playing</p></div></div>
       <div class="choices pa-choices">
         <!-- Artifact comment, same day: big words with icons; the explanation is a short line only. -->
         <button type="button" class="choice pa-big" data-act="pickPlayerAction" data-k="sub" aria-label="Substitute: ${first} has to leave mid-game"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4"/><path d="M3 8h13a4 4 0 0 1 4 4"/><path d="m17 20 4-4-4-4"/><path d="M21 16H8a4 4 0 0 1-4-4"/></svg><b>Substitute</b><span class="small muted">Has to leave</span></button>
@@ -6566,7 +6571,7 @@ const SHEETS = {
   // name changes (players, public page and history read the new label after sync).
   noShow(sh) {
     const s = cur(), p = P(sh.pid);
-    return sheetShell(`Mark ${esc(p.name)} as No show?`, `<div class="row" style="gap:12px;flex-wrap:nowrap">${avatar(p)}<div><b>${esc(p.name)}</b><div class="small muted">Away · no games tonight</div></div></div>
+    return sheetShell(`Mark ${esc(p.name)} as No show?`, `<div class="row" style="gap:12px;flex-wrap:nowrap">${avatar(p)}<div>${nameB(p)}<div class="small muted">Away · no games tonight</div></div></div>
       <p>They come off tonight's roster as <b>No show (cancelled)</b> and their slot opens${(s.waitlist || []).length ? ' for the waitlist' : ''}. You can bring them back while a slot is free.</p>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="confirmNoShow" data-pid="${sh.pid}">Mark No show</button>`);
   },

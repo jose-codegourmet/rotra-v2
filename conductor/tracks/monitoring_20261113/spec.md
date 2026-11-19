@@ -1,6 +1,6 @@
 # Track specification: Monitoring: Grafana for API, Postgres and pictures
 
-**Track ID:** monitoring_20261113 · **Type:** chore · **Priority:** high (order 3 of 13) · **Created:** 2026-11-13
+**Track ID:** monitoring_20261113 · **Type:** chore · **Priority:** high (order 3 of 14) · **Created:** 2026-11-13
 **Depends on:** go-api-foundation · **Decisions:** B-16, B-19 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

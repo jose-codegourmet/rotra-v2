@@ -1,6 +1,6 @@
 # Track specification: Live updates
 
-**Track ID:** live-updates_20261113 · **Type:** feature · **Priority:** high (order 10 of 13) · **Created:** 2026-11-13
+**Track ID:** live-updates_20261113 · **Type:** feature · **Priority:** high (order 11 of 14) · **Created:** 2026-11-13
 **Depends on:** go-writes-queue (events), beta-stack (ticket route, B-41) · **Decisions:** B-08, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

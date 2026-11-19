@@ -1,6 +1,6 @@
 # Track specification: Sign-in owned by Go
 
-**Track ID:** go-sign-in_20261113 · **Type:** feature · **Priority:** critical (order 6 of 13) · **Created:** 2026-11-13
+**Track ID:** go-sign-in_20261113 · **Type:** feature · **Priority:** critical (order 6 of 14) · **Created:** 2026-11-13
 **Depends on:** beta-stack · **Decisions:** B-04, B-11, D-2026-11-07-01, D-2026-11-09-14 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
@@ -76,19 +76,9 @@ Each app's `proxy.ts` session check verifies the Go access pass locally with Go'
 
 - [ ] Current project unchanged
 
-## Carried in from main (merged November 18, 2026)
+## Moved to go-sign-in-catch-up
 
-Google sign-in for players ([D-2026-11-16-01](../../../docs/mvp/decisions.md#d-2026-11-16-01), behind the `player_google_sign_in` flag that starts off, [D-2026-11-18-01](../../../docs/mvp/decisions.md#d-2026-11-18-01)) was built on Supabase Auth on `main` after phases 1 to 4 of this track were done. Go does not have it. Not planned or sized yet; it needs its own tasks before phase 5.2 or a decision to ship without it while the flag is off.
-
-- **Routes with no Go counterpart:** `/api/auth/google/start`, `/callback`, `/outcome`, `/link`, `/unclaimed`, `/api/claim/{token}/google`, `/api/register/{clubId}/google`.
-- **Tables:** `player_accounts.google_email` and `google_linked_at` (migration `20261118000200_player_google_sign_in`). The account import (R6) moves password logins only; a login that exists only as a Google identity in Supabase has nothing to import.
-- **Session:** a session started by Google is only valid for a player with Google connected (`startedWithOAuth`, `loadAccountContext`). After the deadline a player with no Google account is refused on most Player routes (`googleRequiredFor`), and the Player `proxy.ts` redirects to `/connect-google`. The Go pass check in the apps (R7) has neither rule.
-- **Claim:** `completeClaim` accepts a Google subject in place of a password, and registration adopts the RTR ID of an open shared entry with the same email ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04)).
-- **Open in the decision:** the deadline date, and whether the password still works after it.
-
-## Carried in from main (merged November 19, 2026)
-
-- **A guest's invite link claims that guest's record** ([D-2026-11-18-07](../../../docs/mvp/decisions.md#d-2026-11-18-07), #966; approved, details open). `issueClaimLink` now issues a link for a guest (a club record with no email, phone or shared entry), no longer only for a record with a phone or an email. Registering through it sets `club_players.player_id` on that same row, so the record with its roster entries and games becomes the player's; the person types their own email and phone. This changes the claim flow in R5. On `main` it is written but was not run against a database when it merged.
+Sign-in work that landed on `main` after this track was built is not part of this track: Google sign-in for players ([D-2026-11-16-01](../../../docs/mvp/decisions.md#d-2026-11-16-01)) and the check of a guest's invite link ([D-2026-11-18-07](../../../docs/mvp/decisions.md#d-2026-11-18-07)) are in [go-sign-in-catch-up](../go-sign-in-catch-up_20261119/spec.md). What is left here is task 5.2 only.
 
 ## Scope
 

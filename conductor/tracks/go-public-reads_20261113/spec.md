@@ -1,6 +1,6 @@
 # Track specification: Public reads in Go
 
-**Track ID:** go-public-reads_20261113 · **Type:** refactor · **Priority:** high (order 5 of 13) · **Created:** 2026-11-13
+**Track ID:** go-public-reads_20261113 · **Type:** refactor · **Priority:** high (order 5 of 14) · **Created:** 2026-11-13
 **Depends on:** beta-stack · **Decisions:** B-01, B-43, D-2026-11-09-09 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

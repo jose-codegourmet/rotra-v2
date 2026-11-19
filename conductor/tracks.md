@@ -19,10 +19,11 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 7 | [ ] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 4 / 6 |
 | 8 | [ ] | [go-writes-admin-player_20261113](./tracks/go-writes-admin-player_20261113/) — Admin and Player writes in Go | refactor | high | go-signed-in-reads | 3 / 4 |
 | 9 | [ ] | [go-writes-queue_20261113](./tracks/go-writes-queue_20261113/) — Queue writes and offline contract in Go | refactor | critical | go-writes-admin-player | 5 / 9 |
-| 10 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
-| 11 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
-| 12 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–11) | 5 / 10 |
-| 13 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
+| 10 | [ ] | [go-sign-in-catch-up_20261119](./tracks/go-sign-in-catch-up_20261119/) — Google sign-in and the guest claim in Go | feature | high | go-sign-in | 3 / 7 |
+| 11 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
+| 12 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
+| 13 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–12) | 5 / 10 |
+| 14 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
 
 ## Backlog
 

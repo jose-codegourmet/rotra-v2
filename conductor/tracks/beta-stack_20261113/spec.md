@@ -1,6 +1,6 @@
 # Track specification: Side-by-side beta stack
 
-**Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 13) · **Created:** 2026-11-13
+**Track ID:** beta-stack_20261113 · **Type:** chore · **Priority:** high (order 4 of 14) · **Created:** 2026-11-13
 **Depends on:** go-api-foundation · **Decisions:** B-05, B-10, B-18, B-20, B-41 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

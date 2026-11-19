@@ -1,6 +1,6 @@
 # Track specification: Admin and Player writes in Go
 
-**Track ID:** go-writes-admin-player_20261113 · **Type:** refactor · **Priority:** high (order 8 of 13) · **Created:** 2026-11-13
+**Track ID:** go-writes-admin-player_20261113 · **Type:** refactor · **Priority:** high (order 8 of 14) · **Created:** 2026-11-13
 **Depends on:** go-signed-in-reads · **Decisions:** B-01, B-02 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why

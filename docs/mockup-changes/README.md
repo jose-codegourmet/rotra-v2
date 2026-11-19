@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 57 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 58 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -386,6 +386,7 @@ NEW: 57 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-court-colors](2026-11-19-court-colors.md) | Queue and Player apps: ROTRA court colours (dark theme) | every drawn court (court card, match card court, setup court picture, player game cards) | CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted |
 | [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | NEW |
 | [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | NEW |
+| [2026-11-19-player-mobile-dock](2026-11-19-player-mobile-dock.md) | Player app: bottom dock for the main navigation on phones | top bar, mobile dock (new) | NEW |
 | [2026-11-19-queue-bagging-exempt-rings](2026-11-19-queue-bagging-exempt-rings.md) | Queue app: Bagging pairs and exemption chips show the level ring | picture with level ring (shared helper) | NEW |
 | [2026-11-19-queue-bigger-court-buttons](2026-11-19-queue-bigger-court-buttons.md) | Queue app: bigger court buttons in Put on court and Move match | court pick tile (new) | NEW |
 | [2026-11-19-queue-card-characters](2026-11-19-queue-card-characters.md) | Queue app: Rion and Tara drawn into the Mode and Scoring card art | art card (Mode and Scoring choices) | NEW |

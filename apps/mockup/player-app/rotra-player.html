@@ -348,10 +348,20 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .nav button { border: 0; background: none; min-height: 36px; padding: 0 12px; border-radius: var(--r-sm); font-weight: 600; color: var(--fg2); cursor: pointer; white-space: nowrap; }
 .nav button:hover { color: var(--fg); background: var(--surface); }
 .nav button[aria-current="page"] { color: var(--fg); background: var(--elev); }
-@media (max-width: 560px) {
-  .top-in { flex-wrap: wrap; row-gap: 6px; }
-  .nav { order: 5; width: 100%; margin: 0; }
-  .nav button { flex: 1; }
+/* Owner artifact comment, November 19, 2026: "make the mobile version of the header be a dock on mobile but keep the
+   notifications and light/dark mode button on the top right". Phones get a bottom dock; the top bar keeps the logo, bell,
+   theme switch (and the prototype button). */
+.dock { display: none; }
+@media (max-width: 640px) {
+  .top .nav { display: none; }
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: center; gap: 4px;
+    padding: 6px max(12px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--border); }
+  .dock button { flex: 1; max-width: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px;
+    border: 0; background: none; border-radius: var(--r); color: var(--fg2); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .dock button svg { width: 22px; height: 22px; }
+  .dock button[aria-current="page"] { color: var(--accent); background: var(--accent-subtle); }
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
 }
 .band-off { background: var(--warn-subtle); border-bottom: 1px solid var(--warn); font-size: 13px; }
 .band-off .in { max-width: 1240px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-start; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
@@ -1453,6 +1463,7 @@ const NI = {
   mail: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>', 18),
   club: svg('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>', 18),
   trophy: svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>', 18),
+  user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 18),
   shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 18),
 };
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
@@ -1636,7 +1647,10 @@ function topBar() {
     ${me ? (() => { const n = unreadCount(); return `<button class="btn xs ghost icon-btn bell" data-act="go" data-to="notifs" aria-label="Notifications${n ? `, ${n} unread` : ''}" ${S.screen === 'notifs' ? 'aria-current="page"' : ''}>${NI.bell}${n ? `<span class="cnt" aria-hidden="true">${n > 9 ? '9+' : n}</span>` : ''}</button>`; })() : ''}
     <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
     <button class="btn xs" data-act="openDemo">Prototype</button>
-  </div></header>${gRequiredBand()}${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+  </div></header><nav class="dock" aria-label="Main">
+      <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>${NI.trophy}<span>Leaderboard</span></button>
+      ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>${NI.user}<span>My profile</span></button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>${NI.user}<span>Sign in</span></button>`}
+    </nav>${gRequiredBand()}${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
 }
 
 // Shown at the top of every page while the signed-in account has not confirmed its email (D-2026-11-09-06).

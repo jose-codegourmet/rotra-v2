@@ -84,8 +84,8 @@ func playerSession(t *testing.T, e *writetest.Env, subject, playerID string) uui
 }
 
 // A password an Admin sets is the one the player signs in with: the identity of the account has the new argon2id hash
-// (the shared hasher accepts it and refuses the old one), its login key is unchanged, every session of it ended with the
-// reason password_changed, the events say so (and name no password), and the player's revision went up with one audit event.
+// (the shared hasher accepts it and refuses the old one), its login key is unchanged, no session of it ended (the
+// TypeScript ends none), no auth event was written, and the player's revision went up with one audit event.
 func TestAdminPasswordIsTheOneThePlayerSignsInWith(t *testing.T) {
 	e, _ := playersEnv(t)
 	live := playerSession(t, e, hanaSub, hana)
@@ -109,19 +109,11 @@ func TestAdminPasswordIsTheOneThePlayerSignsInWith(t *testing.T) {
 	if ok, _, _ := testHasher().Verify(e.Ctx, "the old one", ident.PasswordHash); ok {
 		t.Error("another password must not verify")
 	}
-	var reason *string
-	var revoked bool
-	if err := e.Pool.QueryRow(e.Ctx, `SELECT revoked_at IS NOT NULL, revoke_reason FROM auth_sessions WHERE id = $1`, live).Scan(&revoked, &reason); err != nil {
-		t.Fatal(err)
+	if n := count(t, e, `SELECT count(*) FROM auth_sessions WHERE id = $1 AND revoked_at IS NULL`, live); n != 1 {
+		t.Error("the session must stay")
 	}
-	if !revoked || reason == nil || *reason != "password_changed" {
-		t.Errorf("the session must end with password_changed: %v %v", revoked, reason)
-	}
-	if n := count(t, e, `SELECT count(*) FROM auth_events WHERE identity_id = $1 AND event = 'password_changed'`, uuid.MustParse(hanaSub)); n != 1 {
-		t.Errorf("%d password_changed events", n)
-	}
-	if n := count(t, e, `SELECT count(*) FROM auth_events WHERE identity_id = $1 AND event = 'session_revoked' AND session_id = $2`, uuid.MustParse(hanaSub), live); n != 1 {
-		t.Errorf("%d session_revoked events", n)
+	if n := count(t, e, `SELECT count(*) FROM auth_events WHERE identity_id = $1 AND event IN ('password_changed', 'session_revoked')`, uuid.MustParse(hanaSub)); n != 0 {
+		t.Errorf("%d auth events", n)
 	}
 	if n := count(t, e, `SELECT count(*) FROM admin_audit_events WHERE action = 'player.password_set' AND target_id = $1 AND metadata::text NOT LIKE '%password%' || '%a-new%'`, hana); n != 1 {
 		t.Errorf("%d password audit events", n)

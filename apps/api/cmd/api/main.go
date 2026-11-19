@@ -112,8 +112,8 @@ func run() error {
 			return err
 		}
 		routes = append(routes, claimRoutes)
-		// Admin-reviewed password recovery: the two public Player routes. The Admin list and review routes belong to
-		// go-writes-admin-player (track 8), which calls the same service.
+		// Admin-reviewed password recovery: the two public Player routes. The Admin list (signedin) and review
+		// (adminwrites) routes call the same service.
 		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
 		if err != nil {
 			return err
@@ -121,7 +121,7 @@ func run() error {
 		routes = append(routes, recoveryService.Routes())
 		// The Admin app's writes (go-writes-admin-player). They go on the signed-in router: the apps share paths, and
 		// net/http registers a pattern once, so every write package adds its routes there.
-		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log})
+		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log, PasswordResets: recoveryService})
 		if err != nil {
 			return err
 		}

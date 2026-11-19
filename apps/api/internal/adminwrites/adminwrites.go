@@ -34,12 +34,15 @@ type Deps struct {
 	Hasher *password.Hasher
 	// Logger may be nil: then nothing is logged.
 	Logger *slog.Logger
+	// PasswordResets reviews the password-reset requests (the recovery service). Nil leaves that route out.
+	PasswordResets PasswordResetReviewer
 	// Now is the clock the rows are stamped with (Prisma stamps created, updated and occurred times with the
 	// application clock). Nil is time.Now.
 	Now func() time.Time
 }
 
 type server struct {
+	resets PasswordResetReviewer
 	pool   *pgxpool.Pool
 	st     *store.Store
 	auth   *session.Authenticator
@@ -53,7 +56,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil || d.Hasher == nil {
 		return nil, errors.New("adminwrites: routes need a pool, an authenticator and a password hasher")
 	}
-	s := &server{pool: d.Pool, st: store.New(d.Pool), auth: d.Auth, hasher: d.Hasher, log: d.Logger, now: d.Now}
+	s := &server{pool: d.Pool, st: store.New(d.Pool), auth: d.Auth, hasher: d.Hasher, log: d.Logger, now: d.Now, resets: d.PasswordResets}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -72,6 +75,8 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerClubs(rt)
 	s.registerProfiles(rt)
 	s.registerPlayers(rt)
+	s.registerContacts(rt)
+	s.registerResets(rt)
 }
 
 // stamp is the clock as Prisma writes it: milliseconds, like a JavaScript Date.

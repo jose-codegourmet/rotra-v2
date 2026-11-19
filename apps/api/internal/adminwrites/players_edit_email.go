@@ -255,9 +255,6 @@ func (s *server) savePassword(ctx context.Context, p session.Principal, id pgtyp
 		if err := sq.UpdatePassword(ctx, identityID, hash, store.SchemeArgon2id, now.Time); err != nil {
 			return err
 		}
-		if err := endSessions(ctx, sq, identity, now.Time); err != nil {
-			return err
-		}
 		if _, err := q.BumpPlayerRevision(ctx, sqlcgen.BumpPlayerRevisionParams{Now: now, ID: id}); err != nil {
 			return err
 		}
@@ -266,25 +263,4 @@ func (s *server) savePassword(ctx context.Context, p session.Principal, id pgtyp
 			Metadata: map[string]any{"reason": reason, "name": name, "changed": []string{adminplayer.FieldPass}, "operationId": operationID},
 		})
 	})
-}
-
-// endSessions ends every session of the identity (reason password_changed) with a session_revoked event each, and records
-// password_changed, as session.Service.OnPasswordChangedTx does after a reset. The authenticator's cache is not told (the
-// service is not reachable from here): a revoked session is refused on writes within the cache's lifetime and its pass
-// expires with its own lifetime.
-func endSessions(ctx context.Context, sq *store.Queries, identity store.Identity, at time.Time) error {
-	ids, err := sq.RevokeIdentitySessions(ctx, identity.ID, store.ReasonPasswordChanged, at, nil)
-	if err != nil {
-		return err
-	}
-	for _, id := range ids {
-		sess, err := sq.GetSession(ctx, id)
-		if err != nil {
-			return err
-		}
-		if err := sq.InsertEvent(ctx, store.NewEvent{IdentityID: &identity.ID, SessionID: &id, Audience: sess.Audience, Event: store.EventSessionRevoked, DeviceID: sess.DeviceID, At: at}); err != nil {
-			return err
-		}
-	}
-	return sq.InsertEvent(ctx, store.NewEvent{IdentityID: &identity.ID, Audience: identity.Audience, Event: store.EventPasswordChanged, At: at})
 }

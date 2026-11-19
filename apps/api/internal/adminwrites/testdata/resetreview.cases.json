@@ -1,0 +1,927 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "contacts.seed.sql",
+  "scenarios": {
+    "base": [],
+    "email_moved": [
+      "UPDATE player_private_contacts SET email = 'alice.moved@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "disabled": [
+      "UPDATE player_accounts SET disabled_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "sync_failed": [
+      "UPDATE player_accounts SET contact_sync_status = 'failed' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "sync_applying": [
+      "UPDATE player_accounts SET contact_sync_status = 'applying' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "other_provider": [
+      "UPDATE player_accounts SET auth_provider = 'supabase' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "player_password_reset_requests",
+      "sql": "SELECT id, email, player_id, status, requested_at, reviewed_by_admin_id, reviewed_at, auth_subject, (token_digest IS NOT NULL) AS has_link, consumed_at, (issuance_id IS NOT NULL) AS has_lease, issuance_started_at, updated_at, revision::text AS revision FROM player_password_reset_requests ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata - 'requestId' AS metadata, (metadata ? 'requestId') AS has_request, COALESCE(metadata->>'requestId' IN (SELECT id::text FROM player_contact_change_requests), false) AS request_known FROM admin_audit_events ORDER BY action, target_id, source_command_id NULLS FIRST, metadata::text, occurred_at",
+      "redact": [
+        "id"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session_reset",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": null,
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_reset",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_reset",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "issue_a_link",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_a_link_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_revokes_the_players_earlier_link",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000104",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_again_for_an_issued_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000102",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_then_issue_the_other_request_of_the_player",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000105",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000104",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_for_a_google_account",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000108",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "issue_without_ownership_verified",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_ownership_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_ownership_is_a_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_ownership_is_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_ignores_ownership",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_a_pending_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000104",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_a_request_with_no_player",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000106",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_then_issue",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_an_issued_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000102",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_a_declined_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000103",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_a_declined_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000103",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_a_request_with_no_player",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000106",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_a_request_of_a_player_with_no_account",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000107",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_a_request_whose_email_moved",
+      "scenario": "email_moved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_a_disabled_account",
+      "scenario": "disabled",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_an_account_whose_sync_failed",
+      "scenario": "sync_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_an_account_still_applying",
+      "scenario": "sync_applying",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_an_account_of_another_sign_in",
+      "scenario": "other_provider",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/not-a-request",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/not-a-request",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_id_is_braced",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/{b3000000-0000-4000-8000-000000000101}",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "approve",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "ISSUE",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_padded",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": " issue ",
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": 1,
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": null,
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "action_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": [
+              "issue"
+            ],
+            "ownershipVerified": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "validation_comes_before_the_lookup",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ownership_is_checked_before_the_lookup",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "action": "issue",
+            "ownershipVerified": true,
+            "token": "x",
+            "playerId": "d4000000-0000-4000-8000-000000000001"
+          },
+          "redact": [
+            "token"
+          ]
+        }
+      ],
+      "redact": {
+        "player_password_reset_requests": [
+          "revision"
+        ]
+      }
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "\"x\""
+        }
+      ]
+    },
+    {
+      "name": "body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{} x"
+        }
+      ]
+    },
+    {
+      "name": "no_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/password-reset-requests/b3000000-0000-4000-8000-000000000101",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    }
+  ]
+}

@@ -187,9 +187,10 @@ async function snapshot(db, specs, extra = {}) {
 
 /**
  * Runs every case of `<testdata>/<name>.cases.json` and writes `<testdata>/<name>.golden.json`.
- * `apiDir` is the app's `src/app/api` folder (the Route Handlers).
+ * `apiDir` is the app's `src/app/api` folder (the Route Handlers). `beforeCase(case)` runs after the reseed, before the
+ * steps: a mock that keeps state resets it there.
  */
-export async function captureWrites({ db, testdata, name, apiDir }) {
+export async function captureWrites({ db, testdata, name, apiDir, beforeCase }) {
   const cf = JSON.parse(readFileSync(`${testdata}/${name}.cases.json`, 'utf8'))
   const seed = readFileSync(`${testdata}/${cf.seed}`, 'utf8')
   expect(new Set(cf.cases.map((c) => c.name)).size).toBe(cf.cases.length)
@@ -203,6 +204,7 @@ export async function captureWrites({ db, testdata, name, apiDir }) {
       await db.query(stmt)
       await db.query('SET session_replication_role = DEFAULT')
     }
+    if (beforeCase) await beforeCase(c)
     vi.useFakeTimers({ toFake: ['Date'], now: new Date(c.now ?? cf.now) })
     const steps = []
     for (const step of c.steps) {

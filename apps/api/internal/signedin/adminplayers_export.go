@@ -63,3 +63,21 @@ func (v *verification) admin() *adminVerificationDTO {
 	}
 	return out
 }
+
+// AdminContactRequest is a contact-change request as GET /api/contact-change-requests/{requestId} sends it: the request
+// with its player, and its pre-approval checks while it waits.
+type AdminContactRequest = contactRequestDTO
+
+// ReadAdminContactRequest is readAdminContactChangeRequests narrowed to one ID: nil when there is no such request. The
+// contact-change writes answer with it, so a write and the read can never disagree.
+func ReadAdminContactRequest(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (*AdminContactRequest, error) {
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
+	if err != nil {
+		return nil, err
+	}
+	list, err := contactRequests(r, q, id)
+	if err != nil || len(list) == 0 {
+		return nil, err
+	}
+	return &list[0], nil
+}

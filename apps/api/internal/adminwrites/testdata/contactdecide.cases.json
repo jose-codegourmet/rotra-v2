@@ -1,0 +1,1449 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "contacts.seed.sql",
+  "scenarios": {
+    "base": [],
+    "alice_email_pending": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "alice_second_pending": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "alice_email_taken": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'taken@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "alice_email_no_login": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "DELETE FROM auth_identities WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_no_login": [
+      "DELETE FROM auth_identities WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_contact_revised": [
+      "UPDATE player_private_contacts SET revision = 2 WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_admin_email_edit": [
+      "INSERT INTO admin_player_email_edits (id, player_id, admin_id, original_email, proposed_email, contact_revision, state, created_at, updated_at) VALUES ('e1000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'ad000000-0000-4000-8000-000000000001', 'alice@example.test', 'alice.edit@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "alice_admin_email_edit_applied": [
+      "INSERT INTO admin_player_email_edits (id, player_id, admin_id, original_email, proposed_email, contact_revision, state, created_at, updated_at) VALUES ('e1000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'ad000000-0000-4000-8000-000000000001', 'alice@example.test', 'alice.edit@example.test', 1, 'applied', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "email_reserved_by_an_edit": [
+      "INSERT INTO admin_player_email_edits (id, player_id, admin_id, original_email, proposed_email, contact_revision, state, created_at, updated_at) VALUES ('e1000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000002', 'ad000000-0000-4000-8000-000000000001', 'bob@example.test', 'carla.new@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "phone_held": [
+      "UPDATE player_private_contacts SET phone_e164 = '+639175550999' WHERE player_id = 'd4000000-0000-4000-8000-000000000004'"
+    ],
+    "email_held": [
+      "UPDATE player_private_contacts SET email = 'carla.new@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000004'"
+    ],
+    "phone_reserved_by_a_request": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, reviewed_by_admin_id, reviewed_at, approved_at, provider_operation_ref, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000015', 'd4000000-0000-4000-8000-000000000004', 'phone', 'owner', '+639175550999', '+639175550004', 1, 'approved', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000015', 'ad000000-0000-4000-8000-000000000001', 'ad000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-17 02:00:00+00', TIMESTAMPTZ '2026-11-17 02:00:00+00', 'b4000000-0000-4000-8000-000000000015', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "alice_phone_approved": [
+      "UPDATE player_contact_change_requests SET status = 'approved', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000001', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_phone_approved_and_held": [
+      "UPDATE player_contact_change_requests SET status = 'approved', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000001', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000001'",
+      "UPDATE player_private_contacts SET phone_e164 = '+639175550999' WHERE player_id = 'd4000000-0000-4000-8000-000000000004'"
+    ],
+    "alice_phone_failed": [
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000001', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_phone_failed_and_held": [
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000001', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000001'",
+      "UPDATE player_private_contacts SET phone_e164 = '+639175550999' WHERE player_id = 'd4000000-0000-4000-8000-000000000004'"
+    ],
+    "alice_sync_failed": [
+      "UPDATE player_accounts SET contact_sync_status = 'failed' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "dan_email_pending": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000012', 'd4000000-0000-4000-8000-000000000004', 'email', 'owner', 'dan.new@example.test', 'dan@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000012', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "dan_phone_pending": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000014', 'd4000000-0000-4000-8000-000000000004', 'phone', 'owner', '+639175550444', '+639175550004', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000014', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "bob_second_pending": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000013', 'd4000000-0000-4000-8000-000000000002', 'email', 'owner', 'bob.new@example.test', 'bob@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000013', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+    ],
+    "dan_email_approved": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000012', 'd4000000-0000-4000-8000-000000000004', 'email', 'owner', 'dan.new@example.test', 'dan@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000012', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'approved', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000012', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000012'"
+    ],
+    "alice_email_applying": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'"
+    ],
+    "alice_email_approved": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'approved', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'"
+    ],
+    "alice_email_failed": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'"
+    ],
+    "alice_email_failed_taken": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'taken@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'"
+    ],
+    "alice_email_failed_no_login": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "DELETE FROM auth_identities WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_applying_login_moved": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "UPDATE auth_identities SET login_key = 'alice.new@example.test' WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_approved_login_moved": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'approved', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "UPDATE auth_identities SET login_key = 'alice.new@example.test' WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_failed_login_moved": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'failed', failure_code = 'provider_unavailable', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "UPDATE auth_identities SET login_key = 'alice.new@example.test' WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_applying_login_other": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "UPDATE auth_identities SET login_key = 'someone.else@example.test' WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_applying_no_login": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "DELETE FROM auth_identities WHERE id = 'f4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_email_applying_login_moved_and_held": [
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-000000000011', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.new@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-000000000011', 'ad000000-0000-4000-8000-000000000001', 0, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000011', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000011'",
+      "UPDATE auth_identities SET login_key = 'alice.new@example.test' WHERE id = 'f4000000-0000-4000-8000-000000000001'",
+      "UPDATE player_private_contacts SET email = 'alice.new@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000004'"
+    ],
+    "carla_email_applying": [
+      "UPDATE player_private_contacts SET email = 'carla.old@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000003'",
+      "UPDATE player_contact_change_requests SET status = 'applying', application_attempts = 1, last_attempt_at = TIMESTAMPTZ '2026-11-18 01:05:00+00', reviewed_by_admin_id = 'ad000000-0000-4000-8000-000000000001', reviewed_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', approved_at = TIMESTAMPTZ '2026-11-18 01:00:00+00', provider_operation_ref = 'b4000000-0000-4000-8000-000000000004', revision = 2  WHERE id = 'b1000000-0000-4000-8000-000000000004'"
+    ],
+    "carla_has_her_email": [
+      "UPDATE player_private_contacts SET email = 'carla.old@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000003'"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "player_contact_change_requests",
+      "sql": "SELECT id, player_id, field, source, status, proposed_value, original_value, original_contact_revision::text AS original_contact_revision, requested_at, submitted_by_admin_id, source_command_id, reviewed_by_admin_id, reviewed_at, approved_at, rejected_at, superseded_at, (provider_operation_ref IS NOT NULL) AS has_ref, application_attempts, last_attempt_at, provider_applied_at, applied_at, failure_code, resolution_note, updated_at, revision::text AS revision FROM player_contact_change_requests ORDER BY source_command_id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_private_contacts",
+      "sql": "SELECT player_id, phone_e164, email, phone_verified_at, email_verified_at, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_accounts",
+      "sql": "SELECT player_id, contact_sync_status, contact_sync_version::text AS contact_sync_version, disabled_at, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_logins",
+      "sql": "SELECT id, login_key FROM auth_identities WHERE audience = 'player' ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_player_email_edits",
+      "sql": "SELECT player_id, original_email, proposed_email, state FROM admin_player_email_edits ORDER BY player_id, proposed_email, state",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata - 'requestId' AS metadata, (metadata ? 'requestId') AS has_request, COALESCE(metadata->>'requestId' IN (SELECT id::text FROM player_contact_change_requests), false) AS request_known FROM admin_audit_events ORDER BY action, target_id, source_command_id NULLS FIRST, metadata::text, occurred_at",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id, player_id, kind, title, body, target, source_type, COALESCE(source_id IN (SELECT id FROM player_contact_change_requests), false) AS source_is_request, read_at FROM player_notifications ORDER BY player_id, kind, source_type, title, body",
+      "redact": [
+        "id"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session_approve",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_approve",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_approve",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approve_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-0000000000ff/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/not-a-request/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/B1000000-0000-4000-8000-000000000007/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_body_is_ignored",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/approve",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_decline",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_decline",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_decline",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decline_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-0000000000ff/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/not-a-request/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/B1000000-0000-4000-8000-000000000007/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_a_body_is_ignored",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/decline",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_check",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_check",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_check",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "check_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-0000000000ff/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/not-a-request/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/B1000000-0000-4000-8000-000000000007/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_body_is_ignored",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/check",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_retry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_retry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_retry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry_unknown_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-0000000000ff/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/not-a-request/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/B1000000-0000-4000-8000-000000000007/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_body_is_ignored",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/retry",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_change",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_change_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000002"
+        }
+      ]
+    },
+    {
+      "name": "approve_an_email_change",
+      "scenario": "carla_has_her_email",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_an_email_change_of_a_player_with_an_email",
+      "scenario": "alice_email_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_change_to_the_number_the_player_has",
+      "scenario": "carla_has_her_email",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000006/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_then_approve_again",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_then_decline",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_then_check_and_retry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_the_older_request_then_the_newer",
+      "scenario": "carla_has_her_email",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000005/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_for_an_unclaimed_player",
+      "scenario": "dan_email_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000012/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_request_another_player_holds",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000002/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_when_the_player_has_a_change_in_flight",
+      "scenario": "bob_second_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000013/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_request_that_is_applying",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000003/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_request_that_failed",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000010/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_an_applied_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_rejected_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000008/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_superseded_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000009/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_request_that_is_approved_applies_it",
+      "scenario": "alice_phone_approved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_the_provider_refuses_the_email",
+      "scenario": "alice_email_taken",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_the_provider_cannot_be_reached",
+      "scenario": "alice_email_no_login",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_the_provider_cannot_be_reached_for_a_phone",
+      "scenario": "alice_no_login",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_contact_that_changed_since_the_request",
+      "scenario": "alice_contact_revised",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_with_an_admin_email_change_pending",
+      "scenario": "alice_admin_email_edit",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_with_an_admin_email_change_for_the_same_email_pending_elsewhere",
+      "scenario": "email_reserved_by_an_edit",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_with_an_admin_email_change_of_another_state",
+      "scenario": "alice_admin_email_edit_applied",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_another_contact_holds",
+      "scenario": "phone_held",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_an_email_another_contact_holds",
+      "scenario": "email_held",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_held_by_a_reserved_request_of_another_player",
+      "scenario": "phone_reserved_by_a_request",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_the_value_collides_when_the_approved_request_is_applied",
+      "scenario": "alice_phone_approved_and_held",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_when_the_account_sync_failed",
+      "scenario": "alice_sync_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_with_a_second_pending_request_for_the_player",
+      "scenario": "alice_second_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "approve_a_phone_change_of_a_player_with_no_account",
+      "scenario": "dan_phone_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000014/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_a_pending_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000002"
+        }
+      ]
+    },
+    {
+      "name": "decline_an_email_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_for_an_unclaimed_player",
+      "scenario": "dan_email_pending",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000012/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_then_approve",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/approve",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_then_check_and_retry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_a_rejected_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000008/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_a_superseded_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000009/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_an_applied_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_an_applying_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000003/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_a_failed_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000010/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_an_approved_request",
+      "scenario": "alice_phone_approved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "decline_each_pending_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000002/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000005/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000006/decline",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_pending_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_applied_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_rejected_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000008/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_pending_request_with_blocked_checks",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000002/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000006/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_failed_request_of_an_unclaimed_player_applies_it",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000010/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_approved_request_of_an_unclaimed_player",
+      "scenario": "dan_email_approved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000012/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_applying_request_whose_login_was_not_changed",
+      "scenario": "alice_email_applying",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_approved_request_whose_login_was_not_changed",
+      "scenario": "alice_email_approved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_failed_request_whose_login_was_not_changed",
+      "scenario": "alice_email_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_applying_request_whose_login_was_changed",
+      "scenario": "alice_email_applying_login_moved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_an_approved_request_whose_login_was_changed",
+      "scenario": "alice_email_approved_login_moved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_failed_request_whose_login_was_changed",
+      "scenario": "alice_email_failed_login_moved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_request_whose_login_is_another_email",
+      "scenario": "alice_email_applying_login_other",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_request_whose_login_is_gone",
+      "scenario": "alice_email_applying_no_login",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_a_request_of_a_player_with_no_email_login",
+      "scenario": "carla_email_applying",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_the_value_collides_when_it_settles",
+      "scenario": "alice_email_applying_login_moved_and_held",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_twice",
+      "scenario": "alice_email_applying_login_moved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "check_then_retry_after_a_failure",
+      "scenario": "alice_email_applying",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/check",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_request_of_an_unclaimed_player",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000010/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_email_request",
+      "scenario": "alice_email_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_phone_request",
+      "scenario": "alice_phone_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_email_the_provider_refuses_again",
+      "scenario": "alice_email_failed_taken",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_request_the_login_cannot_be_reached_for",
+      "scenario": "alice_email_failed_no_login",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_twice",
+      "scenario": "alice_email_failed",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000011/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_failed_request_whose_value_collides",
+      "scenario": "alice_phone_failed_and_held",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_an_applying_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000003/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_an_applied_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_pending_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_a_rejected_request",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000008/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "retry_an_approved_request",
+      "scenario": "alice_phone_approved",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001/retry",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    }
+  ]
+}

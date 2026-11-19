@@ -2,195 +2,17 @@ package signedin
 
 import (
 	"net/http"
-	"regexp"
-	"sort"
-	"strings"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
-	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/contactchange"
 )
 
 // The contact-change request views: GET /api/contact-change-requests and .../{requestId}. Ports of
 // readAdminContactChangeRequests (packages/db/src/player/contact-change.ts) and checksFor
-// (packages/data/src/contact-change-request/contactChangeRequest.rules.ts).
-
-// contactCheck is one pre-approval check, in the order ContactChecksList shows them. Only the fields of its kind are set.
-type contactCheck struct {
-	Kind           string       `json:"kind"`
-	OK             bool         `json:"ok"`
-	OtherPlayer    *checkPlayer `json:"otherPlayer,omitempty"`
-	NewerRequestID *string      `json:"newerRequestId,omitempty"`
-	SentAt         *int64       `json:"sentAt,omitempty"`
-	CurrentValue   *string      `json:"currentValue,omitempty"`
-}
-
-type checkPlayer struct {
-	ID       string `json:"id"`
-	FullName string `json:"fullName"`
-	RtrID    string `json:"rtrId"`
-}
-
-// holder is a player identity with the contacts it signs in with now.
-type holder struct {
-	id, fullName, rtrID string
-	phone, email        *string
-}
-
-func (h holder) contact(field sqlcgen.ContactChangeField) string {
-	var v *string
-	if field == sqlcgen.ContactChangeFieldPhone {
-		v = h.phone
-	} else {
-		v = h.email
-	}
-	if v == nil {
-		return ""
-	}
-	return *v
-}
-
-// checked is a request as the checks read it (CheckedRequest).
-type checked struct {
-	id, playerID string
-	field        sqlcgen.ContactChangeField
-	from, to     string
-	status       sqlcgen.ContactChangeStatus
-	requestedAt  int64
-}
-
-func inFlight(s sqlcgen.ContactChangeStatus) bool {
-	return s == sqlcgen.ContactChangeStatusApproved || s == sqlcgen.ContactChangeStatusApplying
-}
-
-var (
-	phoneChars   = regexp.MustCompile(`^\+?[0-9 -]+$`)
-	phoneNumber  = regexp.MustCompile(`^(?:0|\+?63)9[0-9]{9}$`)
-	phoneDisplay = regexp.MustCompile(`^(?:0[0-9]{0,10}|\+?63[0-9]{0,10})$`)
-	spaceDash    = strings.NewReplacer(" ", "", "-", "")
-)
-
-// normalizeContact: phones compare as E.164 whatever their display form; emails ignore case. ” is not set.
-func normalizeContact(field sqlcgen.ContactChangeField, value string) string {
-	trimmed := publicreads.JSTrim(value)
-	if trimmed == "" {
-		return ""
-	}
-	if field == sqlcgen.ContactChangeFieldEmail {
-		return publicreads.JSToLower(trimmed)
-	}
-	if phoneChars.MatchString(trimmed) {
-		compact := spaceDash.Replace(trimmed)
-		if phoneNumber.MatchString(compact) {
-			if strings.HasPrefix(compact, "0") {
-				return "+63" + compact[1:]
-			}
-			return "+" + strings.TrimPrefix(compact, "+")
-		}
-	}
-	return spaceDash.Replace(trimmed)
-}
-
-// formatPhoneForDisplay groups complete or partially typed PH mobiles for display only; other input is unchanged.
-func formatPhoneForDisplay(value string) string {
-	compact := spaceDash.Replace(value)
-	if !phoneDisplay.MatchString(compact) {
-		return value
-	}
-	var groups []string
-	if strings.HasPrefix(compact, "0") {
-		groups = []string{cut(compact, 0, 4), cut(compact, 4, 7), cut(compact, 7, len(compact))}
-	} else {
-		digits := cut(strings.TrimPrefix(compact, "+"), 2, len(compact))
-		groups = []string{"+63", cut(digits, 0, 3), cut(digits, 3, 6), cut(digits, 6, len(digits))}
-	}
-	out := groups[:0]
-	for _, g := range groups {
-		if g != "" {
-			out = append(out, g)
-		}
-	}
-	return strings.Join(out, " ")
-}
-
-// cut is s.slice(from, to) for ASCII text: out-of-range ends are clamped.
-func cut(s string, from, to int) string {
-	if from > len(s) {
-		from = len(s)
-	}
-	if to > len(s) {
-		to = len(s)
-	}
-	if from >= to {
-		return ""
-	}
-	return s[from:to]
-}
-
-// checksFor are the four pre-approval checks: the requested contact is not another player's, no newer open request
-// for the same field, the current contact still matches the request, and no other change for this player is being
-// applied.
-func checksFor(req checked, holders []holder, requests []checked) []contactCheck {
-	field := req.field
-	wanted := normalizeContact(field, req.to)
-	var other *holder
-	for i := range holders {
-		if holders[i].id != req.playerID && normalizeContact(field, holders[i].contact(field)) == wanted {
-			other = &holders[i]
-			break
-		}
-	}
-	var newer *checked
-	var open []checked
-	for _, e := range requests {
-		if e.id != req.id && e.playerID == req.playerID && e.field == field && e.requestedAt > req.requestedAt &&
-			(e.status == sqlcgen.ContactChangeStatusPending || inFlight(e.status)) {
-			open = append(open, e)
-		}
-	}
-	// Newest first; a stable sort keeps the stored order of requests sent at the same time.
-	sort.SliceStable(open, func(i, j int) bool { return open[i].requestedAt > open[j].requestedAt })
-	if len(open) > 0 {
-		newer = &open[0]
-	}
-	current := ""
-	for _, h := range holders {
-		if h.id == req.playerID {
-			current = h.contact(field)
-			break
-		}
-	}
-	unchanged := normalizeContact(field, current) == normalizeContact(field, req.from)
-	busy := false
-	for _, e := range requests {
-		if e.id != req.id && e.playerID == req.playerID && inFlight(e.status) {
-			busy = true
-		}
-	}
-	checks := make([]contactCheck, 0, 4)
-	if other != nil {
-		checks = append(checks, contactCheck{Kind: "linked-elsewhere", OtherPlayer: &checkPlayer{ID: other.id, FullName: other.fullName, RtrID: other.rtrID}})
-	} else {
-		checks = append(checks, contactCheck{Kind: "linked-elsewhere", OK: true})
-	}
-	if newer != nil {
-		checks = append(checks, contactCheck{Kind: "newer-request", NewerRequestID: addr(newer.id), SentAt: addr(newer.requestedAt)})
-	} else {
-		checks = append(checks, contactCheck{Kind: "newer-request", OK: true})
-	}
-	if unchanged {
-		checks = append(checks, contactCheck{Kind: "original-changed", OK: true})
-	} else {
-		value := current
-		if field == sqlcgen.ContactChangeFieldPhone && current != "" {
-			value = formatPhoneForDisplay(current)
-		}
-		checks = append(checks, contactCheck{Kind: "original-changed", CurrentValue: addr(value)})
-	}
-	return append(checks, contactCheck{Kind: "in-progress", OK: !busy})
-}
+// (packages/data/src/contact-change-request/contactChangeRequest.rules.ts), which is rules/contactchange.
 
 type contactPlayerDTO struct {
 	ID       string  `json:"id"`
@@ -203,25 +25,36 @@ type contactPlayerDTO struct {
 }
 
 type contactRequestDTO struct {
-	RequestID    string           `json:"requestId"`
-	PlayerID     string           `json:"playerId"`
-	Field        string           `json:"field"`
-	FromValue    string           `json:"fromValue"`
-	ToValue      string           `json:"toValue"`
-	Status       string           `json:"status"`
-	Source       string           `json:"source"`
-	RequestedAt  string           `json:"requestedAt"`
-	ApprovedAt   *string          `json:"approvedAt"`
-	AppliedAt    *string          `json:"appliedAt"`
-	DecidedAt    *string          `json:"decidedAt"`
-	SupersededAt *string          `json:"supersededAt"`
-	FailureCode  *string          `json:"failureCode"`
-	Player       contactPlayerDTO `json:"player"`
-	Checks       []contactCheck   `json:"checks"`
+	RequestID    string                `json:"requestId"`
+	PlayerID     string                `json:"playerId"`
+	Field        string                `json:"field"`
+	FromValue    string                `json:"fromValue"`
+	ToValue      string                `json:"toValue"`
+	Status       string                `json:"status"`
+	Source       string                `json:"source"`
+	RequestedAt  string                `json:"requestedAt"`
+	ApprovedAt   *string               `json:"approvedAt"`
+	AppliedAt    *string               `json:"appliedAt"`
+	DecidedAt    *string               `json:"decidedAt"`
+	SupersededAt *string               `json:"supersededAt"`
+	FailureCode  *string               `json:"failureCode"`
+	Player       contactPlayerDTO      `json:"player"`
+	Checks       []contactchange.Check `json:"checks"`
 }
 
-func checkedOf(id, playerID pgtype.UUID, field sqlcgen.ContactChangeField, from pgtype.Text, to string, status sqlcgen.ContactChangeStatus, at pgtype.Timestamptz) checked {
-	return checked{id: id.String(), playerID: playerID.String(), field: field, from: from.String, to: to, status: status, requestedAt: at.Time.UnixMilli()}
+func checkedOf(id, playerID pgtype.UUID, field sqlcgen.ContactChangeField, from pgtype.Text, to string, status sqlcgen.ContactChangeStatus, at pgtype.Timestamptz) contactchange.Request {
+	return contactchange.Request{ID: id.String(), PlayerID: playerID.String(), Field: string(field), From: from.String, To: to, Status: string(status), RequestedAt: at.Time.UnixMilli()}
+}
+
+func holderOf(id, fullName, rtrID string, phone, email *string) contactchange.Holder {
+	h := contactchange.Holder{ID: id, FullName: fullName, RtrID: rtrID}
+	if phone != nil {
+		h.Phone = *phone
+	}
+	if email != nil {
+		h.Email = *email
+	}
+	return h
 }
 
 // contactRequests is readAdminContactChangeRequests: every request (or the one), newest first, each with its player
@@ -257,8 +90,8 @@ func contactRequests(r *http.Request, q *sqlcgen.Queries, one pgtype.UUID) ([]co
 	for _, f := range firsts {
 		nicknames[f.PlayerID] = f.Nickname
 	}
-	var siblings []checked
-	var others []holder
+	var siblings []contactchange.Request
+	var others []contactchange.Holder
 	if phones != nil || emails != nil {
 		pendingPlayers := make([]pgtype.UUID, 0)
 		pendingSeen := map[pgtype.UUID]bool{}
@@ -280,7 +113,7 @@ func contactRequests(r *http.Request, q *sqlcgen.Queries, one pgtype.UUID) ([]co
 			return nil, err
 		}
 		for _, h := range held {
-			others = append(others, holder{id: h.PlayerID.String(), fullName: h.FullName, rtrID: h.RtrID.String, phone: addr(h.PhoneE164), email: optText(h.Email)})
+			others = append(others, holderOf(h.PlayerID.String(), h.FullName, h.RtrID.String, addr(h.PhoneE164), optText(h.Email)))
 		}
 	}
 	out := make([]contactRequestDTO, 0, len(rows))
@@ -302,13 +135,13 @@ func contactRequests(r *http.Request, q *sqlcgen.Queries, one pgtype.UUID) ([]co
 			},
 		}
 		if row.Status == sqlcgen.ContactChangeStatusPending {
-			holders := []holder{{id: d.Player.ID, fullName: row.FullName, rtrID: row.RtrID.String, phone: optText(row.PhoneE164), email: optText(row.Email)}}
+			holders := []contactchange.Holder{holderOf(d.Player.ID, row.FullName, row.RtrID.String, optText(row.PhoneE164), optText(row.Email))}
 			for _, h := range others {
-				if h.id != d.PlayerID {
+				if h.ID != d.PlayerID {
 					holders = append(holders, h)
 				}
 			}
-			d.Checks = checksFor(checkedOf(row.ID, row.PlayerID, row.Field, row.OriginalValue, row.ProposedValue, row.Status, row.RequestedAt), holders, siblings)
+			d.Checks = contactchange.ChecksFor(checkedOf(row.ID, row.PlayerID, row.Field, row.OriginalValue, row.ProposedValue, row.Status, row.RequestedAt), holders, siblings)
 		}
 		out = append(out, d)
 	}

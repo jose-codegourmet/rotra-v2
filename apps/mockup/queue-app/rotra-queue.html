@@ -1541,13 +1541,12 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .qtile.pq .qf .avatar { width: 36px; height: 36px; font-size: 12px; }
 .qtile.pq .qf-n { font-size: 12px; max-width: 52px; }
 .pq-row .vs { font-size: 11px; opacity: .8; }
-.qtile.pqc { position: relative; grid-template-columns: 44px minmax(0, 160px) auto minmax(0, 160px); justify-content: start; gap: 6px 16px; padding: 10px 44px 10px 12px; }
-.pqc .pq-team { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.pqc .qf { flex-direction: row; justify-content: flex-start; gap: 8px; width: auto; min-width: 0; }
-.qtile.pqc .qf .avatar { width: 28px; height: 28px; font-size: 11px; outline-width: 2px; outline-offset: 1px; flex: none; }
-.qtile.pqc .qf-n { max-width: none; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qtile.pqc { position: relative; grid-template-columns: 44px auto auto auto; justify-content: start; align-items: center; gap: 6px 14px; padding: 10px 44px 10px 12px; }
+.pqc .pq-team { display: flex; flex-direction: row; align-items: center; min-width: 0; padding-left: 10px; }
+.pqc .qf { width: auto; min-width: 0; margin-left: -10px; }
+.qtile.pqc .qf .avatar { width: 34px; height: 34px; font-size: 11px; outline-width: 2px; outline-offset: 0; box-shadow: 0 0 0 2px var(--surface); }
 .pqc .pq-eye { position: absolute; top: 6px; right: 6px; }
-@media (max-width: 640px) { .qtile.pq-row.pqc { grid-template-columns: 34px minmax(0, 1fr) auto minmax(0, 1fr); } .pqc .qt-head { grid-row: auto; align-self: center; } .pqc .vs { text-align: center; } }
+@media (max-width: 640px) { .qtile.pq-row.pqc { grid-template-columns: 34px auto auto auto; } .pqc .qt-head { grid-row: auto; align-self: center; } .pqc .vs { text-align: center; } .pqc .pq-team { flex-wrap: wrap; row-gap: 4px; } }
 .pq-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 @media (max-width: 640px) {
   .qtile.pq-row { grid-template-columns: 46px minmax(0, 1fr); gap: 8px 12px; }
@@ -5593,8 +5592,9 @@ function viewPublic() {
     ${tab === 'details' && s.status === 'finalized' ? pubHistory(s, pub) : ''}${tab === 'details' && s.status !== 'finalized' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p>${(() => {
         const q = s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos);
         // Owner artifact comment, November 19, 2026: "stack the players and make it a bit more compact and then put an eye icon on
-        // the top right to view the match in a dialog". Each team is a column of small rows; the eye opens the match on a court.
-        const tile = (m, i) => `<article class="qtile pq pq-row pqc${i === 0 ? ' next' : ''}" aria-label="Queue position ${i + 1}${i === 0 ? ', next match' : ''}"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${i === 0 ? chip('Next', 'warn') : ''}</div>${[m.teamA, m.teamB].map((ids) => `<div class="pq-team">${ids.map((pid) => pubFace(P(pid), `qf ${pubLv(s, pid)}`, pubNameText(P(pid)), `${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)).split(' ')[0])}</span>`)).join('')}</div>`).join('<div class="vs">VS</div>')}<button type="button" class="btn xs ghost icon-btn pq-eye" data-act="pubQueueMatch" data-mid="${esc(m.id)}" data-pos="${i + 1}" aria-label="View queue match #${i + 1}" title="View match"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></article>`;
+        // the top right to view the match in a dialog"; then "avatars should be like ( ) ) ) ) and the names are not displayed":
+        // each team is a row of overlapping pictures (names only in the label and the dialog); the eye opens the match on a court.
+        const tile = (m, i) => `<article class="qtile pq pq-row pqc${i === 0 ? ' next' : ''}" aria-label="Queue position ${i + 1}${i === 0 ? ', next match' : ''}"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${i === 0 ? chip('Next', 'warn') : ''}</div>${[m.teamA, m.teamB].map((ids) => `<div class="pq-team">${ids.map((pid) => pubFace(P(pid), `qf ${pubLv(s, pid)}`, pubNameText(P(pid)), pubAvatarOf(P(pid)))).join('')}</div>`).join('<div class="vs">VS</div>')}<button type="button" class="btn xs ghost icon-btn pq-eye" data-act="pubQueueMatch" data-mid="${esc(m.id)}" data-pos="${i + 1}" aria-label="View queue match #${i + 1}" title="View match"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></article>`;
         if (!q.length) return '<p>No matches queued yet.</p>';
         return `<div class="pq-first">${tile(q[0], 0)}</div>${q.length > 1 ? `<div class="pq-scroll" tabindex="0" role="region" aria-label="Rest of the queue, #2 onward, scrolls"><div class="pq-grid">${q.slice(1).map((m, i) => tile(m, i + 1)).join('')}</div></div>` : ''}`;
       })()}` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}

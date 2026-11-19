@@ -14,8 +14,10 @@ Superseded by: none
 ## What changed
 - Before: each Queue tile laid the players side by side, as 36 px pictures with the names under them.
 - After:
-  - **Tile:** each team is a column of compact rows: a 28 px picture with its level ring, then the first name. “VS”
-    sits between the teams, and the tile is tighter.
+  - **Tile:** one compact row. Each team is an overlapping stack of 34 px pictures with their level rings, and no names
+    (owner follow-up the same day: “no I mean avatars should be like ( ) ) ) ) and the names are not displayed”). Names
+    stay in each face's label and in the dialog. “VS” sits between the teams. On phones, a big team wraps onto a second
+    row.
   - **Eye button:** at the top right (“View match”), it opens a dialog:
     - title “Queue #N · <match label>”;
     - the match drawn on a court, the same as Courts now (two courts tall for more than six players);

@@ -162,8 +162,7 @@ const doneNote = (session: Pick<QueueSession, 'recordGames'>) =>
   recordsGames(session) ? 'player records updated' : 'games not recorded'
 const doneToast = (session: Pick<QueueSession, 'recordGames'>) =>
   `Session finished · ${doneNote(session)}`
-const doneLogText = (session: FinishedSession) =>
-  `${session.title} finished · ${doneNote(session)}`
+const doneLogText = (session: FinishedSession) => `${session.title} finished · ${doneNote(session)}`
 async function run(
   session: FinishedSession,
   commandId: string,

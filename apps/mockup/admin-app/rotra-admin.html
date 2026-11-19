@@ -742,6 +742,9 @@ const rtrParts = (rtr) => { const m = /^RTR-(.+)-(\d{6})-(\d+)$/.exec(rtr || '')
 const rtrYmd = (rtr) => { const x = rtrParts(rtr); return x ? `20${x.date.slice(4)}-${x.date.slice(0, 2)}-${x.date.slice(2, 4)}` : ''; };
 const rtrWith = (rtr, code, ymd) => { const x = rtrParts(rtr); return x && code && /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? `RTR-${code}-${ymd.slice(5, 7)}${ymd.slice(8, 10)}${ymd.slice(2, 4)}-${x.seq}` : rtr; };
 const demoGoogleEmails = { p2: 'bea.castillo.cebu@example.com', p4: 'kat.lim.smash@example.com', p5: 'enzo.plays@example.com', p20: 'andi.cruz@example.com' };
+// Owner, November 19, 2026: gender is optional for now (Male or Female). Sample values; the rest haven't added one.
+const demoGenders = { p1: null, p2: 'female', p3: 'male', p4: 'female', p5: 'male', p6: 'female', p7: 'male', p9: 'male', p9b: 'male', p10: 'female', p11: 'male', p14: 'male', p16: 'male', p18: 'female' };
+const GENDER_LABEL = { male: 'Male', female: 'Female' };
 function seedPlayers() {
   const out = [
     P('p1', 'Miguel Santos', 'Migs', 'RTR-PH-CEB-031526-0001', 'Lahug Smash Club', '+63 917 555 0142', 'migs.santos@example.com', 5, 12, { phoneHidden: true, registered: '2026-03-18', pic: { kind: 'char', charId: 'ch1', seed: 'base' } }),
@@ -901,6 +904,7 @@ if (!S.defaultBanner) S.defaultBanner = 'bn1';
 if (!S.players.some((p) => !p.registered && p.email)) S.players = seedPlayers();
 // Supply the Google facts for existing demo saves without replacing players or their edits.
 S.players.forEach((p) => { if (p.claimed && p.googleEmail === undefined) p.googleEmail = demoGoogleEmails[p.id] ?? null; });
+S.players.forEach((p) => { if (p.gender === undefined) p.gender = demoGenders[p.id] ?? null; });
 S.clubs.forEach((c) => { if (!c.price) { const p = SEED_PRICE[c.id] || [1500, 15000]; c.price = { monthly: p[0], yearly: p[1] }; } });
 Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false, nav: false, upload: null });
 S.ui.login.pending = false;
@@ -1659,6 +1663,7 @@ function viewPlayer() {
     overview: `<div class="detail"><div>
       <section class="card stack"><h2>Identity</h2><dl class="kv">
         <dt>Name</dt><dd>${esc(p.name)}</dd><dt>Nickname</dt><dd>${esc(p.nick || '—')}</dd>
+        <dt>Gender</dt><dd>${p.gender ? GENDER_LABEL[p.gender] : '<span class="muted">Not added yet</span>'}</dd>
         <dt>RTR ID</dt><dd class="mono">${esc(p.rtr)}</dd>
         <dt>Created</dt><dd>${fmtYmd(`20${yy}-${mm}-${dd}`)} by ${esc(p.club)}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}</dd>` : ''}</dl>
         ${savedBy(p) ? `<p class="small muted">${NO_BOARD}</p>` : ''}

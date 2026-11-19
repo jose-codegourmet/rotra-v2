@@ -28,7 +28,7 @@ Pagination/search errors retain context. An empty result offers a correction to 
 
 Separate sections:
 
-1. Identity (name, nickname, RTR ID, created date and club) and public profile fields. Under the RTR ID: “A contact change doesn't change the RTR ID. Admin can change it from Edit profile, by changing the registration place or date.”
+1. Identity (name, nickname, **Gender** (Male, Female or “Not added yet”, read-only; [D-2026-11-19-01](../../../../mvp/decisions.md#d-2026-11-19-01); [log](../../../../mockup-changes/2026-11-19-admin-player-gender.md)), RTR ID, created date and club) and public profile fields. Under the RTR ID: “A contact change doesn't change the RTR ID. Admin can change it from Edit profile, by changing the registration place or date.”
 2. Private current phone/email and their relevant verification/application state.
 3. Claimed account link/status and phone privacy preference.
 4. Pending contact-change requests.

@@ -79,7 +79,7 @@ Rules: [Sessions](business_logic/product/queue/modules/sessions/README.md) ·
 | Open until | A court's planned end, fixed or following session end; a reminder, never a hard stop |
 | Booking ended | A court past its closing time, free or with a match on it (warning style) |
 | Short on players | Live console banner when the present players can't fill every open court: "7 players present: enough for 1 doubles court. 3 sit out each game." A free court that can't get a match says "Not enough free players." |
-| Planned end | The session's scheduled end (in setup, also a court's). A reminder: the session never closes at it. Past it the console says "Planned end passed N ago" |
+| Planned end | The session's scheduled end (in setup, also a court's). A reminder: the session never closes at it. Past it the console says "Planned end passed N ago" (Correct Queue Time Format: "N min", then "N h", from 24 hours "long time ago") |
 | Set end time | Live action in **Courts and time** (header button, formerly **Extend time**): move the session end to any time after now; **Extend 30 min / 60 min** are shortcuts. The start time is fixed after Start session |
 | Venue | A place the club plays; the club's founding location is separate and fixed |
 | Session record | Read-only view of a finalized, invalid or cancelled session |

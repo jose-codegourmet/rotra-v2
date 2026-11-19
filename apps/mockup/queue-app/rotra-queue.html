@@ -2106,10 +2106,15 @@ const laterDay = (base, t) => { const n = dayDiff(base, t); return n === 1 ? ' �
 const fmtRange = (a, b, base = a) => `${fmtTime(a)}–${fmtTime(b)}${laterDay(base, b)}`;
 // Where no date is shown: the start carries its day word, the end its "· next day".
 const fmtWhenRange = (a, b, opts) => `${fmtWhen(a, opts)}–${fmtTime(b)}${laterDay(a, b)}`;
+// Correct Queue Time Format (owner, November 19, 2026): under 60 minutes "N min", then whole hours "N h", and from 24 hours on
+// "long time ago". Used for waiting times on Players cards and queued match faces, and for how long ago the planned end passed.
+const LONG_AGO = 'long time ago';
+const queueTime = (mins) => { const m = Math.max(0, Math.floor(mins)); return m < 60 ? `${m} min` : m < 1440 ? `${Math.floor(m / 60)} h` : LONG_AGO; };
 // Time left until the planned end, or how long ago it passed. The session never closes by itself.
 function endStatus(s, now = Date.now()) {
   if (now < s.end) return { over: false, text: `${courtDuration(Math.max(1, Math.ceil((s.end - now) / 60000)))} left` };
-  return { over: true, text: `Planned end passed ${courtDuration(Math.max(1, Math.floor((now - s.end) / 60000)))} ago` };
+  const t = queueTime(Math.max(1, Math.floor((now - s.end) / 60000)));
+  return { over: true, text: t === LONG_AGO ? `Planned end passed ${LONG_AGO}` : `Planned end passed ${t} ago` };
 }
 // Start session late (after the planned end) or on another day than planned: a new end is required first.
 const startNeedsEnd = (s, now = Date.now()) => now > s.end || dayStart(now) !== dayStart(s.start);
@@ -4621,9 +4626,9 @@ function queueCard(s, m, i, n, cols) {
     if (busy) return `<span class="qf-w muted">${busy.status === 'oncourt' ? 'On court' : 'Playing'}</span>`;
     if (!r || !r.present) return '<span class="qf-w muted">Not here</span>';
     const mins = restInfo(s, p).mins;
-    return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${mins} min</span>`;
+    return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span>`;
   };
-  const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${restInfo(s, p).mins} min` : ''; };
+  const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
     <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
@@ -4675,7 +4680,7 @@ function playersPane(s) {
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div></div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
         <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played" title="Games played so far"><b class="tnum">${x.g}</b><span>Current</span></div><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
-        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
+        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : queueTime(x.mins) === LONG_AGO ? ` · ${LONG_AGO}` : ` · ${queueTime(x.mins)} wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : 'No players yet.'}</div>`}

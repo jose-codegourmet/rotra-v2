@@ -1,0 +1,2329 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "admin.seed.sql",
+  "scenarios": {
+    "base": []
+  },
+  "snapshot": [
+    {
+      "name": "feature_flags",
+      "sql": "SELECT key, name, description, value, created_by_admin_id, updated_by_admin_id, created_at, updated_at, revision::text AS revision FROM feature_flags ORDER BY key",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata FROM admin_audit_events ORDER BY action, target_id, source_command_id NULLS FIRST, metadata::text",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "post_guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": null,
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000001",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000001",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_guard_unknown_subject",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000001",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "patch_guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": null,
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_creates_a_flag_off",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000002",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_creates_a_flag_on",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000003",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player.",
+            "on": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000004",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_trims_the_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000005",
+            "key": "  padded_key\n",
+            "name": "\t Padded name ",
+            "description": "  A long enough description.  "
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_on_must_be_the_boolean_true",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000006",
+            "key": "on_string",
+            "name": "On string",
+            "description": "Shows the estimated cost per player.",
+            "on": "true"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000007",
+            "key": "on_one",
+            "name": "On one",
+            "description": "Shows the estimated cost per player.",
+            "on": 1
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000008",
+            "key": "on_null",
+            "name": "On null",
+            "description": "Shows the estimated cost per player.",
+            "on": null
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000009",
+            "key": "on_false",
+            "name": "On false",
+            "description": "Shows the estimated cost per player.",
+            "on": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000010",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player.",
+            "extra": {
+              "a": 1
+            },
+            "value": true,
+            "createdByAdminId": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_name_of_fifty_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000011",
+            "key": "cost_estimate",
+            "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_name_counts_utf16_units",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000012",
+            "key": "emoji_ok",
+            "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000013",
+            "key": "emoji_long",
+            "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_key_of_forty_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000014",
+            "key": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_a_name_with_accents",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000015",
+            "key": "creme_brulee",
+            "name": "Crème brûlée",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_the_key_is_exact_but_the_name_is_not",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000016",
+            "key": "Cafe_Mode",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_empty_object",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "post_wrong_types",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000020",
+            "key": 5,
+            "name": [
+              "x"
+            ],
+            "description": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_name_too_long",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000021",
+            "key": "cost_estimate",
+            "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_description_too_short",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000022",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Too short"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_description_of_ten_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000023",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "0123456789"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_key_formats",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "ab",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "1abc",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "_abc",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "Abc",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "has-dash",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "has space",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000024",
+            "key": "ábc",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_all_fields_wrong",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000025",
+            "key": "A",
+            "name": "",
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_white_space_only",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000026",
+            "key": "   ",
+            "name": "﻿",
+            "description": " "
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_format_errors_beat_taken_ones",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000027",
+            "key": "sessions_beta",
+            "name": "Cost estimate",
+            "description": "short"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_key_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000030",
+            "key": "sessions_beta",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_name_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000031",
+            "key": "cost_estimate",
+            "name": "Sessions beta",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_name_taken_ignoring_case_and_accents",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000032",
+            "key": "cost_estimate",
+            "name": "CAFÉ MODE",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000033",
+            "key": "cost_estimate",
+            "name": "cafe mode",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000034",
+            "key": "cost_estimate",
+            "name": "  Cafe Mode  ",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_both_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000035",
+            "key": "night_mode",
+            "name": "NIGHT MODE",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_the_seeded_flag_key_is_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000036",
+            "key": "player_google_sign_in",
+            "name": "Another",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_the_same_flag_twice_with_new_commands",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000037",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000038",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "post_body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "post_body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "post_body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "post_body_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "\"x\""
+        }
+      ]
+    },
+    {
+      "name": "post_body_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "5"
+        }
+      ]
+    },
+    {
+      "name": "post_body_true",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "true"
+        }
+      ]
+    },
+    {
+      "name": "post_body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"a\":1} x"
+        }
+      ]
+    },
+    {
+      "name": "post_body_two_objects",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"a\":1}{\"b\":2}"
+        }
+      ]
+    },
+    {
+      "name": "post_body_unfinished",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{"
+        }
+      ]
+    },
+    {
+      "name": "post_body_with_a_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "﻿{\"commandId\": \"c1000000-0000-4000-8000-000000000040\", \"key\": \"cost_estimate\", \"name\": \"Cost estimate\", \"description\": \"Shows the estimated cost per player.\"}"
+        }
+      ]
+    },
+    {
+      "name": "post_body_duplicate_keys_last_wins",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"commandId\":\"c1000000-0000-4000-8000-000000000041\",\"key\":\"first_key\",\"key\":\"last_key\",\"name\":\"Dup\",\"description\":\"Shows the estimated cost per player.\"}"
+        }
+      ]
+    },
+    {
+      "name": "post_no_command_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "not-a-uuid",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": 5,
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_uppercase",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "C1000000-0000-4000-8000-000000000042",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_without_hyphens",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000000040008000000000000043",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_in_braces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "{c1000000-0000-4000-8000-000000000044}",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_with_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": " c1000000-0000-4000-8000-000000000045 ",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_retry_returns_the_same_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000050",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000050",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_retry_ignores_a_changed_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000051",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000051",
+            "key": "other_key",
+            "name": "Other",
+            "description": "Shows the estimated cost per player.",
+            "on": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_retry_with_a_bad_body_is_still_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000052",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c1000000-0000-4000-8000-000000000052",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "short"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_retry_of_a_seeded_command",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c0000000-0000-4000-8000-0000000000a1",
+            "key": "other_key",
+            "name": "Other",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_of_another_audit_event",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c0000000-0000-4000-8000-0000000000b2",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "post_race_same_key",
+      "scenario": "base",
+      "steps": [
+        {
+          "redact": [
+            "flag.name"
+          ],
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/feature-flags",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c1000000-0000-4000-8000-000000000062",
+                "key": "cost_estimate",
+                "name": "Zeta one",
+                "description": "Shows the estimated cost per player."
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/feature-flags",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c1000000-0000-4000-8000-000000000063",
+                "key": "cost_estimate",
+                "name": "Zeta two",
+                "description": "Shows the estimated cost per player."
+              }
+            }
+          ]
+        }
+      ],
+      "redact": {
+        "feature_flags": [
+          "name"
+        ],
+        "admin_audit_events": [
+          "source_command_id"
+        ]
+      }
+    },
+    {
+      "name": "post_no_race_for_other_flags",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/feature-flags",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c1000000-0000-4000-8000-000000000068",
+                "key": "zeta_one",
+                "name": "Zeta one",
+                "description": "Shows the estimated cost per player."
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/feature-flags",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c1000000-0000-4000-8000-000000000069",
+                "key": "zeta_two",
+                "name": "Zeta two",
+                "description": "Shows the estimated cost per player."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_as_a_urn",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "urn:uuid:c1000000-0000-4000-8000-000000000046",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_in_braces_without_hyphens",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "{c1000000000040008000000000000047}",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_with_some_hyphens",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c10000000000-4000-8000-000000000048",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_with_a_bad_digit",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "g1000000-0000-4000-8000-000000000049",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "post_command_id_a_nil_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/feature-flags",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "00000000-0000-0000-0000-000000000000",
+            "key": "cost_estimate",
+            "name": "Cost estimate",
+            "description": "Shows the estimated cost per player."
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_turns_a_flag_on",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/night_mode",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "9007199254740993"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_turns_a_flag_off",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_a_seeded_flag_gets_an_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/player_google_sign_in",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/cafe_mode",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "on": true,
+            "expectedRevision": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_to_the_same_value_writes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_there_and_back",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "5"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "6"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4",
+            "name": "Renamed",
+            "value": true,
+            "key": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_key_is_percent_decoded",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions%5Fbeta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_stale_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_stale_revision_with_the_same_value",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_a_second_change_with_the_old_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "4"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_beyond_2_53_off_by_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/night_mode",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "9007199254740992"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": 4
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_padded",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": " 4 "
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_hex",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0x4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_hex_upper",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0X4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_octal",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0o4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_binary",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0b100"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_plus_sign",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "+4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_leading_zeros",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "004"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_minus_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "-1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_twenty_digits",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "99999999999999999999"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_decimal_point",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4.0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_exponent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4e0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_letters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "abc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_separator",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "1_0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_signed_hex",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "-0x4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_bare_prefix",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "0x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_two_numbers",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4 4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_boolean",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": [
+              "4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_tab_padded",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "\t4\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_revision_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "﻿4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_bad_revision_beats_the_same_value",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "abc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_on_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_on_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "4",
+            "on": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_on_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "4",
+            "on": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_on_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "4",
+            "on": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_on_object",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "4",
+            "on": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_unknown_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/nope_flag",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_unknown_flag_beats_a_bad_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/nope_flag",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": true,
+            "expectedRevision": "abc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_a_bad_value_beats_an_unknown_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/nope_flag",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedRevision": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_key_is_exact",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/Sessions_Beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_key_with_a_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions%20beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "on": false,
+            "expectedRevision": "4"
+          }
+        }
+      ]
+    },
+    {
+      "name": "patch_body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "patch_body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "patch_body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "patch_body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "patch_body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/sessions_beta",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"on\":true} x"
+        }
+      ]
+    },
+    {
+      "name": "patch_a_bad_body_beats_an_unknown_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/feature-flags/nope_flag",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "patch_race_same_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/sessions_beta",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": false,
+                "expectedRevision": "4"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/sessions_beta",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": false,
+                "expectedRevision": "4"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "patch_race_two_admins",
+      "scenario": "base",
+      "steps": [
+        {
+          "redact": [
+            "flag.updatedByDisplayName"
+          ],
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/sessions_beta",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": false,
+                "expectedRevision": "4"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/sessions_beta",
+              "who": "ad100000-0000-4000-8000-000000000002",
+              "body": {
+                "on": false,
+                "expectedRevision": "4"
+              }
+            }
+          ]
+        }
+      ],
+      "redact": {
+        "feature_flags": [
+          "updated_by_admin_id"
+        ],
+        "admin_audit_events": [
+          "actor_admin_id"
+        ]
+      }
+    },
+    {
+      "name": "patch_race_on_the_huge_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/night_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "9007199254740993"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/night_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "9007199254740993"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "patch_race_three_at_once",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/cafe_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "1"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/cafe_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "1"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/cafe_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "patch_no_race_for_other_flags",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/night_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "9007199254740993"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/cafe_mode",
+              "who": "ad100000-0000-4000-8000-000000000002",
+              "body": {
+                "on": true,
+                "expectedRevision": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "patch_race_with_adding_a_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/feature-flags/cafe_mode",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "on": true,
+                "expectedRevision": "1"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/feature-flags",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c1000000-0000-4000-8000-000000000070",
+                "key": "zeta_one",
+                "name": "Zeta one",
+                "description": "Shows the estimated cost per player."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

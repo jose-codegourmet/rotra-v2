@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/adminwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/claim"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
@@ -118,10 +119,17 @@ func run() error {
 			return err
 		}
 		routes = append(routes, recoveryService.Routes())
+		// The Admin app's writes (go-writes-admin-player). They go on the signed-in router: the apps share paths, and
+		// net/http registers a pattern once, so every write package adds its routes there.
+		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		if err != nil {
+			return err
+		}
 		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
 		// they are served only where sign-in is.
 		signedInRoutes, err := signedin.Register(signedin.Deps{
-			Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log,
+			Routes: []func(*signedin.Router){adminWrites},
+			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
 			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins,

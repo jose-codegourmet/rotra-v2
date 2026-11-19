@@ -76,6 +76,31 @@ GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o rules.wasm ./cmd/rule
 The committed build lives in `packages/rules-wasm/wasm/`. After any change under `internal/rules` or `cmd/ruleswasm`
 run `make wasm` and commit the result; `make check` fails while the recorded fingerprint is stale.
 
+## Writes (go-writes-admin-player)
+
+A ported POST, PATCH or DELETE is pinned against the real TypeScript, answer for answer and row for row, with the
+write harness: `internal/writetest` (Go replay) and `testdata/tools/capture-writes-base.mjs` (capture). Shared code
+for write routes is `internal/writes` (service error, JSON body reader, `RequireRevision`, `InTx`); a write package
+such as `internal/adminwrites` registers its routes on the shared `signedin.Router` through `signedin.Deps.Routes`.
+
+To add a write group (for example `PATCH /api/clubs/{clubId}`):
+
+1. Write `<group>.cases.json` in the package's `testdata/` (the field list is the doc of `internal/writetest`): one
+   seed SQL file that also resets itself, `snapshot` specs (the tables the write touches, the audit events, the player
+   notifications; a unique ORDER BY, bigints as text), and cases made of steps. A step is one request, or `parallel`
+   (a race). Name generated values with `redact` (response paths, snapshot columns), never by shape.
+2. Add a `test(...)` to a `capture-writes-<app>.test.mjs` (or copy `capture-writes-admin.test.mjs`; add the file to
+   `include` in `vitest.capture.config.mjs`) and run it; the command is at the top of the file. It reseeds for every
+   case, runs the real Route Handler and service, and writes `<group>.golden.json`.
+3. Add a Go test that calls `writetest.Replay(t, "testdata", "<group>", build)`; `build` registers the package's routes.
+   Watch it fail, then write the routes. A race whose answer depends on timing is not pinned in the golden file: test
+   what always holds in a test of its own (`internal/adminwrites/flags_race_test.go`, with `Env.DoAll`).
+4. Where Go must differ (the TypeScript answers 500), set `goExpects` and `allow500` on the step and log it in the plan.
+
+The capture fakes `Date` only: Prisma stamps `@default(now())` and `@updatedAt` times with the
+application clock, so those are pinned, and Go writes them from its own clock (`Deps.Now`). Only truly generated values
+(an audit event id) are redacted.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

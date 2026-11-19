@@ -31,6 +31,9 @@ type Deps struct {
 	QueueOrigins []string
 	// PasswordResets lists the Admin's password-reset requests (the recovery service). Nil leaves that route out.
 	PasswordResets PasswordResetReader
+	// Routes add more handlers to the shared router before it is mounted: the write packages (adminwrites, ...)
+	// register here. net/http panics on a duplicate pattern, so every app's handler for a path must be on this one router.
+	Routes []func(*Router)
 }
 
 type server struct {
@@ -64,5 +67,8 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	s.registerPlayer(rt)
 	s.registerAdmin(rt)
 	s.registerQueue(rt)
+	for _, add := range d.Routes {
+		add(rt)
+	}
 	return rt.Mount, nil
 }

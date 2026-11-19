@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -53,14 +54,75 @@ type gamesBody struct {
 	Games []historySession `json:"games"`
 }
 
+// gamesPageBody is the paged answer: a page of sessions and where the next page starts (null after the last).
+type gamesPageBody struct {
+	Games      []historySession `json:"games"`
+	NextOffset *int             `json:"nextOffset"`
+}
+
+// gamesPageMax is the most sessions one page holds (GAMES_PAGE_MAX in projections.ts).
+const gamesPageMax = 50
+
+// gamesPage is parseGamesPage: ?limit= (1 to 50 sessions) and ?offset= page the history, newest first. No usable
+// limit means no paging. A value that is not a whole number is ignored; an offset is never below 0.
+func gamesPage(r *http.Request) (limit, offset int, paged bool) {
+	whole := func(name string) (int, bool) {
+		v := r.URL.Query().Get(name)
+		if v == "" {
+			return 0, false
+		}
+		for _, c := range v {
+			if c < '0' || c > '9' {
+				return 0, false
+			}
+		}
+		n, err := strconv.ParseUint(v, 10, 31)
+		if err != nil {
+			return int(^uint32(0) >> 1), true // too big for an int: as large as it gets
+		}
+		return int(n), true
+	}
+	limit, ok := whole("limit")
+	if !ok || limit < 1 {
+		return 0, 0, false
+	}
+	offset, _ = whole("offset")
+	return min(limit, gamesPageMax), offset, true
+}
+
+// pageHistory is pageGames: the slice of sessions for the page and the offset of the next one.
+func pageHistory(sessions []historySession, limit, offset int) gamesPageBody {
+	end := offset + limit
+	if offset > len(sessions) {
+		offset = len(sessions)
+	}
+	if end > len(sessions) || end < offset { // the second test guards an overflow
+		end = len(sessions)
+	}
+	body := gamesPageBody{Games: sessions[offset:end]}
+	if next := offset + limit; next > offset && next < len(sessions) {
+		body.NextOffset = &next
+	}
+	return body
+}
+
+// writeGames sends the history whole, or one page of it when the request asked for paging.
+func writeGames(w http.ResponseWriter, r *http.Request, sessions []historySession) {
+	if limit, offset, paged := gamesPage(r); paged {
+		httpapi.WriteJSON(w, http.StatusOK, pageHistory(sessions, limit, offset), httpapi.Private)
+		return
+	}
+	httpapi.WriteJSON(w, http.StatusOK, gamesBody{Games: sessions}, httpapi.Private)
+}
+
 func (p *players) games(w http.ResponseWriter, r *http.Request) {
 	id, ok := uuidParam(r)
 	if !ok {
-		httpapi.WriteJSON(w, http.StatusOK, gamesBody{Games: []historySession{}}, httpapi.Private)
+		writeGames(w, r, []historySession{})
 		return
 	}
 	v := viewerOf(r)
-	body := gamesBody{Games: []historySession{}}
+	sessions := []historySession{}
 	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
 		visibility, err := q.GetPlayerVisibility(r.Context(), id)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
@@ -73,14 +135,14 @@ func (p *players) games(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return fmt.Errorf("listing facts: %w", err)
 		}
-		body.Games, err = readHistory(r.Context(), q, historyFactsOf(facts), v, true)
+		sessions, err = readHistory(r.Context(), q, historyFactsOf(facts), v, true)
 		return err
 	})
 	if err != nil {
 		p.fail(w, r, err)
 		return
 	}
-	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
+	writeGames(w, r, sessions)
 }
 
 // historyFact is one fact of a history: the columns ListPlayerFacts and ListClubPlayerFacts share.

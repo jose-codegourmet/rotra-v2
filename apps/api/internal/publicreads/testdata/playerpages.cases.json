@@ -475,6 +475,46 @@
       "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?maskAlwaysPrivate=false"
     },
     {
+      "name": "games_alice_limit_1",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=1"
+    },
+    {
+      "name": "games_alice_limit_1_offset_1",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=1&offset=1"
+    },
+    {
+      "name": "games_alice_limit_1_offset_past_end",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=1&offset=99"
+    },
+    {
+      "name": "games_alice_limit_zero_is_unpaged",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=0"
+    },
+    {
+      "name": "games_alice_limit_not_a_number_is_unpaged",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=abc&offset=1"
+    },
+    {
+      "name": "games_alice_offset_only_is_unpaged",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?offset=1"
+    },
+    {
+      "name": "games_alice_limit_too_big_is_lowered",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=500"
+    },
+    {
+      "name": "games_alice_negative_offset_is_zero",
+      "scenario": "base",
+      "path": "/api/players/d1000000-0000-4000-8000-000000000001/games?limit=1&offset=-1"
+    },
+    {
       "name": "games_bob_with_attributed_guest",
       "scenario": "base",
       "path": "/api/players/d1000000-0000-4000-8000-000000000002/games"

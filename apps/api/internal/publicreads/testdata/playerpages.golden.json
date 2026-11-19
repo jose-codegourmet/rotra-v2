@@ -2181,6 +2181,1362 @@
       ]
     }
   },
+  "games_alice_limit_1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        }
+      ],
+      "nextOffset": 1
+    }
+  },
+  "games_alice_limit_1_offset_1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000003",
+          "title": "ßeta Meetup",
+          "clubName": "ßeta Smash",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000031",
+              "format": "singles",
+              "sessionGameNumber": 1,
+              "partners": [],
+              "opponents": [
+                "Gio Guest"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "Gio Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–10"
+            }
+          ]
+        }
+      ],
+      "nextOffset": 2
+    }
+  },
+  "games_alice_limit_1_offset_past_end": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [],
+      "nextOffset": null
+    }
+  },
+  "games_alice_limit_zero_is_unpaged": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000003",
+          "title": "ßeta Meetup",
+          "clubName": "ßeta Smash",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000031",
+              "format": "singles",
+              "sessionGameNumber": 1,
+              "partners": [],
+              "opponents": [
+                "Gio Guest"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "Gio Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–10"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "sessionPageUrl": "/s/friday-night",
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000004",
+              "format": "fun_3v3",
+              "sessionGameNumber": 4,
+              "partners": [
+                "B*** S***",
+                "C*** D***"
+              ],
+              "opponents": [
+                "😀*** S*** L***",
+                "Eve Alcala",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 3
+                }
+              ],
+              "counting": "fun",
+              "result": "won",
+              "score": "11–9"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000003",
+              "format": "doubles",
+              "sessionGameNumber": 3,
+              "partners": [
+                "Gus Guest"
+              ],
+              "opponents": [
+                "Eve Alcala",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": null
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000002",
+              "format": "singles",
+              "sessionGameNumber": 2,
+              "partners": [],
+              "opponents": [
+                "😀*** S*** L***"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "18–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000001",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "C*** D***"
+              ],
+              "opponents": [
+                "B*** S***",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–15"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "games_alice_limit_not_a_number_is_unpaged": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000003",
+          "title": "ßeta Meetup",
+          "clubName": "ßeta Smash",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000031",
+              "format": "singles",
+              "sessionGameNumber": 1,
+              "partners": [],
+              "opponents": [
+                "Gio Guest"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "Gio Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–10"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "sessionPageUrl": "/s/friday-night",
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000004",
+              "format": "fun_3v3",
+              "sessionGameNumber": 4,
+              "partners": [
+                "B*** S***",
+                "C*** D***"
+              ],
+              "opponents": [
+                "😀*** S*** L***",
+                "Eve Alcala",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 3
+                }
+              ],
+              "counting": "fun",
+              "result": "won",
+              "score": "11–9"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000003",
+              "format": "doubles",
+              "sessionGameNumber": 3,
+              "partners": [
+                "Gus Guest"
+              ],
+              "opponents": [
+                "Eve Alcala",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": null
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000002",
+              "format": "singles",
+              "sessionGameNumber": 2,
+              "partners": [],
+              "opponents": [
+                "😀*** S*** L***"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "18–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000001",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "C*** D***"
+              ],
+              "opponents": [
+                "B*** S***",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–15"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "games_alice_offset_only_is_unpaged": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000003",
+          "title": "ßeta Meetup",
+          "clubName": "ßeta Smash",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000031",
+              "format": "singles",
+              "sessionGameNumber": 1,
+              "partners": [],
+              "opponents": [
+                "Gio Guest"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "Gio Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–10"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "sessionPageUrl": "/s/friday-night",
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000004",
+              "format": "fun_3v3",
+              "sessionGameNumber": 4,
+              "partners": [
+                "B*** S***",
+                "C*** D***"
+              ],
+              "opponents": [
+                "😀*** S*** L***",
+                "Eve Alcala",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 3
+                }
+              ],
+              "counting": "fun",
+              "result": "won",
+              "score": "11–9"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000003",
+              "format": "doubles",
+              "sessionGameNumber": 3,
+              "partners": [
+                "Gus Guest"
+              ],
+              "opponents": [
+                "Eve Alcala",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": null
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000002",
+              "format": "singles",
+              "sessionGameNumber": 2,
+              "partners": [],
+              "opponents": [
+                "😀*** S*** L***"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "18–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000001",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "C*** D***"
+              ],
+              "opponents": [
+                "B*** S***",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–15"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "games_alice_limit_too_big_is_lowered": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000003",
+          "title": "ßeta Meetup",
+          "clubName": "ßeta Smash",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000031",
+              "format": "singles",
+              "sessionGameNumber": 1,
+              "partners": [],
+              "opponents": [
+                "Gio Guest"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "Gio Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–10"
+            }
+          ]
+        },
+        {
+          "id": "f1000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "sessionPageUrl": "/s/friday-night",
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000004",
+              "format": "fun_3v3",
+              "sessionGameNumber": 4,
+              "partners": [
+                "B*** S***",
+                "C*** D***"
+              ],
+              "opponents": [
+                "😀*** S*** L***",
+                "Eve Alcala",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 3
+                }
+              ],
+              "counting": "fun",
+              "result": "won",
+              "score": "11–9"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000003",
+              "format": "doubles",
+              "sessionGameNumber": 3,
+              "partners": [
+                "Gus Guest"
+              ],
+              "opponents": [
+                "Eve Alcala",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "Eve Alcala",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": null
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000002",
+              "format": "singles",
+              "sessionGameNumber": 2,
+              "partners": [],
+              "opponents": [
+                "😀*** S*** L***"
+              ],
+              "partnerPlayers": [],
+              "opponentPlayers": [
+                {
+                  "name": "😀*** S*** L***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "18–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000001",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "C*** D***"
+              ],
+              "opponents": [
+                "B*** S***",
+                "Gus Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gus Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–15"
+            }
+          ]
+        }
+      ],
+      "nextOffset": null
+    }
+  },
+  "games_alice_negative_offset_is_zero": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": [
+        {
+          "id": "f1000000-0000-4000-8000-000000000002",
+          "title": "Saturday Morning",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "sessionPageUrl": null,
+          "games": [
+            {
+              "id": "f3000000-0000-4000-8000-000000000012",
+              "format": "doubles",
+              "sessionGameNumber": 2,
+              "partners": [
+                "Gail Guest"
+              ],
+              "opponents": [
+                "B*** S***",
+                ""
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 2
+                },
+                {
+                  "name": "",
+                  "picture": null,
+                  "playerId": null
+                }
+              ],
+              "counting": "counted",
+              "result": "lost",
+              "score": "15–21"
+            },
+            {
+              "id": "f3000000-0000-4000-8000-000000000011",
+              "format": "doubles",
+              "sessionGameNumber": 1,
+              "partners": [
+                "B*** S***"
+              ],
+              "opponents": [
+                "C*** D***",
+                "Gail Guest"
+              ],
+              "partnerPlayers": [
+                {
+                  "name": "B*** S***",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "opponentPlayers": [
+                {
+                  "name": "C*** D***",
+                  "picture": "https://example.test/carla.png",
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                },
+                {
+                  "name": "Gail Guest",
+                  "picture": null,
+                  "playerId": null,
+                  "sessionGameNumber": 1
+                }
+              ],
+              "counting": "counted",
+              "result": "won",
+              "score": "21–19"
+            }
+          ]
+        }
+      ],
+      "nextOffset": 1
+    }
+  },
   "games_bob_with_attributed_guest": {
     "status": 200,
     "headers": {

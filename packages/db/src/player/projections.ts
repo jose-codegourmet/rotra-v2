@@ -644,6 +644,28 @@ export async function readPublicMatchHistory(playerId: string, viewerId: string 
   return readPlayerMatchHistory(playerId, { viewerId })
 }
 
+/** The most sessions one games page may hold (`limit` above it is lowered to it). */
+export const GAMES_PAGE_MAX = 50
+
+/**
+ * Optional paging of the games read, by session (newest first): `limit` 1 to GAMES_PAGE_MAX sessions,
+ * `offset` sessions skipped. No usable `limit` means no paging, so the whole history is sent. A value
+ * that is not a whole number is ignored; `offset` is never below 0.
+ */
+export function parseGamesPage(params: URLSearchParams): { limit: number; offset: number } | null {
+  const whole = (v: string | null) => (v !== null && /^\d+$/.test(v) ? Number(v) : null)
+  const limit = whole(params.get('limit'))
+  if (limit === null || limit < 1) return null
+  return { limit: Math.min(limit, GAMES_PAGE_MAX), offset: whole(params.get('offset')) ?? 0 }
+}
+
+/** One page of sessions and where the next page starts (`null` after the last). */
+export function pageGames<T>(sessions: T[], page: { limit: number; offset: number }) {
+  const games = sessions.slice(page.offset, page.offset + page.limit)
+  const next = page.offset + page.limit
+  return { games, nextOffset: next < sessions.length ? next : null }
+}
+
 /** Admin history for a club-only unclaimed record, scoped to that club's existing match facts. */
 export async function readClubPlayerMatchHistory(clubId: string, clubPlayerId: string) {
   if (!UUID.test(clubId) || !UUID.test(clubPlayerId)) return []

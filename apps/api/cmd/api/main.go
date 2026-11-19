@@ -124,7 +124,7 @@ func run() error {
 			Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
-			Limiter: publicLimiter, QueueOrigins: cfg.AllowedOrigins,
+			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins,
 			// The Admin list of password-reset requests is the recovery service's read.
 			PasswordResets: recoveryService,
 		})

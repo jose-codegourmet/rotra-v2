@@ -29,6 +29,9 @@ type Config struct {
 	ProxySecret string
 	// AllowedOrigins is ROTRA_ALLOWED_ORIGINS: exact app origins allowed by CORS on the stream routes (B-41).
 	AllowedOrigins []string
+	// QueueOrigins is ROTRA_QUEUE_ORIGINS: exact Queue app origins that may call the credentialed Player stats read.
+	// Kept apart from AllowedOrigins so one list never grants the other's access.
+	QueueOrigins []string
 	// AuthHashConcurrency is ROTRA_AUTH_HASH_CONCURRENCY: how many password hashes may run at once
 	// (each argon2id hash holds about 19 MiB). 1 to 64, default 4.
 	AuthHashConcurrency int
@@ -174,16 +177,29 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 	cfg.AuthTuning = tuning
 
 	cfg.ProxySecret = get("ROTRA_PROXY_SECRET")
-	for _, o := range strings.Split(get("ROTRA_ALLOWED_ORIGINS"), ",") {
+	var err2 error
+	if cfg.AllowedOrigins, err2 = originList(get, "ROTRA_ALLOWED_ORIGINS"); err2 != nil {
+		return Config{}, err2
+	}
+	if cfg.QueueOrigins, err2 = originList(get, "ROTRA_QUEUE_ORIGINS"); err2 != nil {
+		return Config{}, err2
+	}
+	return cfg, nil
+}
+
+// originList reads a comma-separated list of exact origins from one variable; each must pass validOrigin.
+func originList(get func(string) string, name string) ([]string, error) {
+	var out []string
+	for _, o := range strings.Split(get(name), ",") {
 		if o = strings.TrimSpace(o); o == "" {
 			continue
 		}
 		if !validOrigin(o) {
-			return Config{}, fmt.Errorf("ROTRA_ALLOWED_ORIGINS must list exact origins such as https://queue.rotra.club (no *, path or trailing slash), got %q", o)
+			return nil, fmt.Errorf("%s must list exact origins such as https://queue.rotra.club (no *, path or trailing slash), got %q", name, o)
 		}
-		cfg.AllowedOrigins = append(cfg.AllowedOrigins, o)
+		out = append(out, o)
 	}
-	return cfg, nil
+	return out, nil
 }
 
 // validOrigin accepts only scheme://host[:port] with an http or https scheme and no wildcard.

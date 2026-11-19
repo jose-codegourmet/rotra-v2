@@ -6,16 +6,16 @@ Ticket: #877 (one issue for the whole track, under epic #869).
 
 ## Phase 1: Admin
 
-- [ ] **1.1** Characterize + port each Admin write group
-- [ ] **1.2** Audit events identical
+- [x] **1.1** Characterize + port each Admin write group
+- [x] **1.2** Audit events identical (every golden pins `admin_audit_events`)
 
 ## Phase 2: Player
 
-- [ ] **2.1** Characterize + port each Player write group
+- [x] **2.1** Characterize + port each Player write group (the `/api/me` writes, the contact-change request and registration; Google routes belong to go-sign-in-catch-up)
 
 ## Phase 3: Switch
 
-- [ ] **3.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check locally
+- [x] **3.1** Listed in `docs/architecture.md` (not applied anywhere: B-60 and staging-verification apply the list). Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check locally
 
 ## Rule case runs (R3)
 

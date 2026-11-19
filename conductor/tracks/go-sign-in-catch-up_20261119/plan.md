@@ -2,7 +2,7 @@
 
 **Track ID:** go-sign-in-catch-up_20261119 · **Spec:** [spec.md](./spec.md)
 
-Ticket: none yet (one issue for the whole track, under epic #869).
+Ticket: #977 (one issue for the whole track, under epic #869).
 
 ## Phase 1: Decide
 

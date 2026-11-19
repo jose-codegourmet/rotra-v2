@@ -25,7 +25,7 @@ Offline notice: “Working offline on this device. Matches, results and roster c
 | Tab | Chip | Content |
 |---|---|---|
 | Courts (was Session) | “X/Y courts in use” | Q-COURTS, then one row of upcoming queued matches |
-| Main Queue (was Queue › Main Queue) | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md) |
+| Main Queue (was Queue › Main Queue) | “N waiting”, plus “N need attention” in warning | [Q-QUEUE](match-queue.md), then the **Players** picker under it (the same filters, cards and Make match as the Players tab), so matches can be made while watching the queue (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-players-under-main-queue.md)) |
 | Generate Queue (was Queue › Generate matches) | none | [Q-AUTO](match-queue.md#q-auto--generate-matches-workspace) |
 | Players | “P/R present” | Q-POOL |
 | Leaderboard | “NAME leads” (or “N tied”) once a game is done; **no tab at all when Record games is off** | Q-LEADERBOARD |

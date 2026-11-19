@@ -307,6 +307,7 @@ body.court-dragging { cursor: grabbing; }
 .gcmp-step { display: flex; align-items: center; gap: 8px; }
 .gcmp-step b { font-size: 30px; line-height: 1.1; font-weight: 800; min-width: 36px; text-align: center; }
 .gcmp-arrow { display: grid; place-items: center; color: var(--fg3); }
+.mq-players { margin-top: 12px; padding-top: 20px; border-top: 1px solid var(--border); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4466,7 +4467,8 @@ function viewConsole() {
     </div>`;
     })()}
     ${pane === 'roster' ? `<section class="stack" aria-label="Players">${playersPane(s)}</section>`
-      : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section>`
+      // Owner, November 19, 2026: the Players picker sits under the Main Queue, so matches can be made while watching the queue.
+      : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section><section class="stack mq-players" aria-label="Players">${playersPane(s)}</section>`
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
       : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
       : pane === 'history' && recordedOf(s) ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`

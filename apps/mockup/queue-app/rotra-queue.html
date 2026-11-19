@@ -4613,9 +4613,10 @@ function upcomingPane(s) {
       <button class="qtile qmore" data-act="pane" data-k="queue" aria-label="More queues: open the Main Queue tab"><span class="plus" aria-hidden="true">→</span><b>More queues</b><span class="small muted">${rest > 0 ? `+${rest} more waiting` : list.length ? 'Reorder, add or regenerate' : 'Add or generate matches'}</span></button>
     </div>`;
 }
-// Queue grid columns from the content width (window − rail − side padding): tiles of 220 px or more, 10 px gaps, no upper limit.
+// Queue grid columns from the content width (window − rail − side padding): tiles of 300 px or more (owner artifact comment,
+// November 19, 2026; was 220), 10 px gaps, no upper limit. On a phone narrower than that, one full-width column.
 // Drafts carry chips under each name, so they need wider tiles to keep a doubles team on one row.
-const QUEUE_TILE_MIN = 220, QUEUE_GAP = 10, DRAFT_TILE_MIN = 230;
+const QUEUE_TILE_MIN = 300, QUEUE_GAP = 10, DRAFT_TILE_MIN = 230;
 function queueCols(tileMin = QUEUE_TILE_MIN) {
   const vw = window.innerWidth, pad = Math.min(40, Math.max(16, vw * 0.03));
   const rail = !hasShell() || narrowScreen() ? 0 : navMin ? 68 : 232;

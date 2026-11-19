@@ -14,7 +14,7 @@ Header “Queued matches” with **Add match**, **Suggest**, **Generate matches*
 
 Attention notice: “N waiting matches need attention. Edit the lineup to swap the player, or regenerate.” Context: “One waiting list for every court. MODE mode guides suggestions; you can override any of it.”
 
-**Layout:** cards in a grid with as many columns as fit the content width (tiles of 220 px or more, 10 px gaps, no upper limit). Order runs in a **snake**: left to right, then right to left on the next row, with small flow arrows between cards. Copy: “Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on court now, whatever its place.”
+**Layout:** cards in a grid with as many columns as fit the content width (tiles of 300 px or more, 10 px gaps, no upper limit; owner artifact comment, November 19, 2026, was 220 px, [log](../../../../mockup-changes/2026-11-19-queue-card-min-300.md); narrower phones get one full-width column). Order runs in a **snake**: left to right, then right to left on the next row, with small flow arrows between cards. Copy: “Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on court now, whatever its place.”
 
 **Queue card:**
 

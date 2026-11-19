@@ -89,6 +89,8 @@ type Mode int
 const (
 	ModeRead Mode = iota
 	ModeWrite
+	// ModeSessionRead is a read that also checks the session row, like a write. The Admin app uses it.
+	ModeSessionRead
 )
 
 // Revoked names sessions a transaction revoked, for the caller to hand to Service.Forget after commit.

@@ -1,0 +1,2212 @@
+{
+  "account_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "phone": "+639175550001",
+        "email": "alice@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": "alice@example.test",
+        "googleLinkedAt": "2026-11-18T08:30:15.123Z",
+        "hasPassword": true,
+        "revision": "3"
+      }
+    }
+  },
+  "clubs_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "session_link"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000003",
+          "name": "ßeta  Net Ninjas",
+          "initials": "SSN",
+          "logoUrl": "https://example.test/ninjas.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        }
+      ]
+    },
+    "rawContains": [
+      "\\ud83dB"
+    ]
+  },
+  "notifications_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000001",
+      "notifications": [
+        {
+          "id": "a1000000-0000-4000-8000-00000000000a",
+          "kind": "club",
+          "title": "Upper case target",
+          "body": "Id in capitals",
+          "target": "/players/d2000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000001",
+      "unreadCount": 1
+    }
+  },
+  "verification_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "verified": true,
+        "verifiedByAdmin": false,
+        "completedSteps": 3,
+        "googleEmail": "alice@example.test",
+        "maskedPhone": "+63 917 ••• ••01",
+        "email": {
+          "kind": "match",
+          "rotraEmail": "alice@example.test",
+          "googleEmail": "alice@example.test"
+        }
+      }
+    }
+  },
+  "contact_alice": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": {
+        "id": "c1000000-0000-4000-8000-000000000002",
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "field": "email",
+        "originalValue": "alice@example.test",
+        "proposedValue": "alice.new@example.test",
+        "status": "approved_pending",
+        "requestedAt": "2026-11-10T00:00:00.000Z",
+        "appliedAt": null,
+        "rejectedAt": null,
+        "supersededAt": null
+      }
+    }
+  },
+  "account_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000002",
+        "phone": "+639175550002",
+        "email": "bob@example.test",
+        "phoneHidden": true,
+        "profileVisibility": "private",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "12"
+      }
+    }
+  },
+  "clubs_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": []
+    }
+  },
+  "notifications_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000002",
+      "notifications": []
+    }
+  },
+  "unread_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000002",
+      "unreadCount": 0
+    }
+  },
+  "verification_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000002",
+        "verified": true,
+        "verifiedByAdmin": true,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+63 917 ••• ••02",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "contact_bob": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": null
+    }
+  },
+  "account_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000003",
+        "phone": "+639175550003",
+        "email": "carla@example.test",
+        "phoneHidden": true,
+        "profileVisibility": "always_private",
+        "hiddenFromDirectory": true,
+        "googleEmail": "carla@gmail.test",
+        "googleLinkedAt": "2026-11-10T00:00:00.000Z",
+        "hasPassword": false,
+        "revision": "1"
+      }
+    }
+  },
+  "clubs_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": []
+    }
+  },
+  "notifications_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000003",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 2 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": "2026-11-12T09:00:00.000Z",
+          "pinned": true
+        }
+      ]
+    }
+  },
+  "unread_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000003",
+      "unreadCount": 0
+    }
+  },
+  "verification_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000003",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 2,
+        "googleEmail": "carla@gmail.test",
+        "maskedPhone": "+63 917 ••• ••03",
+        "email": {
+          "kind": "mismatch",
+          "rotraEmail": "carla@example.test",
+          "googleEmail": "carla@gmail.test",
+          "pendingEmailRequest": true
+        }
+      }
+    }
+  },
+  "contact_carla": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": {
+        "id": "c1000000-0000-4000-8000-000000000005",
+        "playerId": "d2000000-0000-4000-8000-000000000003",
+        "field": "phone",
+        "originalValue": "+639175550003",
+        "proposedValue": "+639175558888",
+        "status": "approved_pending",
+        "requestedAt": "2026-11-13T00:00:00.000Z",
+        "appliedAt": null,
+        "rejectedAt": null,
+        "supersededAt": null
+      }
+    }
+  },
+  "account_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "clubs_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "club_added"
+        }
+      ]
+    }
+  },
+  "notifications_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "verification_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+63 917 ••• ••04",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "contact_dan": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": null
+    }
+  },
+  "account_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000005",
+        "phone": "+639175550005",
+        "email": "eve@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": "eve.alt@gmail.test",
+        "googleLinkedAt": "2026-11-11T00:00:00.000Z",
+        "hasPassword": true,
+        "revision": "9007199254740993"
+      }
+    }
+  },
+  "clubs_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": []
+    }
+  },
+  "notifications_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000005",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 2 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-00000000000b",
+          "kind": "account",
+          "title": "Eve read",
+          "body": "Done",
+          "target": "/profile",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": "2026-11-18T11:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000005",
+      "unreadCount": 1
+    }
+  },
+  "verification_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000005",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 2,
+        "googleEmail": "eve.alt@gmail.test",
+        "maskedPhone": "+63 917 ••• ••05",
+        "email": {
+          "kind": "mismatch",
+          "rotraEmail": "eve@example.test",
+          "googleEmail": "eve.alt@gmail.test",
+          "pendingEmailRequest": false
+        }
+      }
+    }
+  },
+  "contact_eve": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": {
+        "id": "c1000000-0000-4000-8000-000000000006",
+        "playerId": "d2000000-0000-4000-8000-000000000005",
+        "field": "email",
+        "originalValue": "eve@example.test",
+        "proposedValue": "eve.alt@gmail.test",
+        "status": "rejected",
+        "requestedAt": "2026-11-12T00:00:00.000Z",
+        "appliedAt": null,
+        "rejectedAt": "2026-11-12T12:00:00.000Z",
+        "supersededAt": null
+      }
+    }
+  },
+  "account_dan_gated": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "account_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "account_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "account_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "phone": "+639175550001",
+        "email": "alice@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": "alice@example.test",
+        "googleLinkedAt": "2026-11-18T08:30:15.123Z",
+        "hasPassword": true,
+        "revision": "3"
+      }
+    }
+  },
+  "clubs_dan_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "clubs_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "club_added"
+        }
+      ]
+    }
+  },
+  "clubs_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "club_added"
+        }
+      ]
+    }
+  },
+  "clubs_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "session_link"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000003",
+          "name": "ßeta  Net Ninjas",
+          "initials": "SSN",
+          "logoUrl": "https://example.test/ninjas.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        }
+      ]
+    }
+  },
+  "notifications_dan_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "notifications_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2027-01-01T15:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "notifications_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "notifications_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000001",
+      "notifications": [
+        {
+          "id": "a1000000-0000-4000-8000-00000000000a",
+          "kind": "club",
+          "title": "Upper case target",
+          "body": "Id in capitals",
+          "target": "/players/d2000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "unread_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "unread_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "unread_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000001",
+      "unreadCount": 1
+    }
+  },
+  "verification_dan_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "verification_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+63 917 ••• ••04",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "verification_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+63 917 ••• ••04",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "verification_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "verified": true,
+        "verifiedByAdmin": false,
+        "completedSteps": 3,
+        "googleEmail": "alice@example.test",
+        "maskedPhone": "+63 917 ••• ••01",
+        "email": {
+          "kind": "match",
+          "rotraEmail": "alice@example.test",
+          "googleEmail": "alice@example.test"
+        }
+      }
+    }
+  },
+  "contact_dan_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "contact_dan_deadline_flag_off": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": null
+    }
+  },
+  "contact_dan_before_deadline_flag_on": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": null
+    }
+  },
+  "contact_alice_google_after_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "request": {
+        "id": "c1000000-0000-4000-8000-000000000002",
+        "playerId": "d2000000-0000-4000-8000-000000000001",
+        "field": "email",
+        "originalValue": "alice@example.test",
+        "proposedValue": "alice.new@example.test",
+        "status": "approved_pending",
+        "requestedAt": "2026-11-10T00:00:00.000Z",
+        "appliedAt": null,
+        "rejectedAt": null,
+        "supersededAt": null
+      }
+    }
+  },
+  "clubs_dan_one_ms_before_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e5000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "joinedVia": "club_added"
+        },
+        {
+          "id": "e5000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "joinedVia": "club_added"
+        }
+      ]
+    }
+  },
+  "clubs_dan_at_deadline": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "verification_dan_phone_us": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+1 415 ••• ••23",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "account_dan_phone_us": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+14155550123",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "notifications_dan_phone_us": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_phone_us": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "verification_dan_phone_short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 1,
+        "googleEmail": null,
+        "maskedPhone": "+12 345 ••• ••78",
+        "email": {
+          "kind": "google_missing"
+        }
+      }
+    }
+  },
+  "account_dan_phone_short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+12345678",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "notifications_dan_phone_short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_phone_short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "verification_dan_google_match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": true,
+        "verifiedByAdmin": false,
+        "completedSteps": 3,
+        "googleEmail": "dan@example.test",
+        "maskedPhone": "+63 917 ••• ••04",
+        "email": {
+          "kind": "match",
+          "rotraEmail": "dan@example.test",
+          "googleEmail": "dan@example.test"
+        }
+      }
+    }
+  },
+  "account_dan_google_match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": "dan@example.test",
+        "googleLinkedAt": "2026-11-18T00:00:00.000Z",
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "notifications_dan_google_match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_google_match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 5
+    }
+  },
+  "verification_dan_unverified_with_pending": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "verified": false,
+        "verifiedByAdmin": false,
+        "completedSteps": 2,
+        "googleEmail": "dan@gmail.test",
+        "maskedPhone": "+63 917 ••• ••04",
+        "email": {
+          "kind": "mismatch",
+          "rotraEmail": "dan@example.test",
+          "googleEmail": "dan@gmail.test",
+          "pendingEmailRequest": true
+        }
+      }
+    }
+  },
+  "account_dan_unverified_with_pending": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": "dan@gmail.test",
+        "googleLinkedAt": "2026-11-18T00:00:00.000Z",
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "notifications_dan_unverified_with_pending": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 2 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_unverified_with_pending": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "verification_dan_unclaimed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "verification": null
+    }
+  },
+  "account_dan_unclaimed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "account": {
+        "playerId": "d2000000-0000-4000-8000-000000000004",
+        "phone": "+639175550004",
+        "email": "dan@example.test",
+        "phoneHidden": false,
+        "profileVisibility": "public",
+        "hiddenFromDirectory": false,
+        "googleEmail": null,
+        "googleLinkedAt": null,
+        "hasPassword": true,
+        "revision": "1"
+      }
+    }
+  },
+  "notifications_dan_unclaimed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_unclaimed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 5
+    }
+  },
+  "notifications_alice_no_notes": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000001",
+      "notifications": []
+    }
+  },
+  "notifications_dan_later": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-20T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        }
+      ]
+    }
+  },
+  "unread_dan_later": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "unreadCount": 6
+    }
+  },
+  "notifications_dan_window_edge": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d2000000-0000-4000-8000-000000000004",
+      "notifications": [
+        {
+          "id": "ann-google",
+          "kind": "announce",
+          "title": "Verify your ROTRA account",
+          "body": "Connect Google, have your phone on file and use your Google email, by December 31, 2026. 1 of 3 done.",
+          "target": "/profile/verification",
+          "createdAt": "2026-11-19T03:59:00.000Z",
+          "readAt": null,
+          "pinned": true
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000001",
+          "kind": "club",
+          "title": "Smash Club posted",
+          "body": "New session",
+          "target": "/clubs/e5000000-0000-4000-8000-000000000001",
+          "createdAt": "2026-11-18T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000002",
+          "kind": "club",
+          "title": "Net Ninjas posted",
+          "body": "Not a member",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-17T10:00:00.000Z",
+          "readAt": "2026-11-17T11:00:00.250Z",
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000004",
+          "kind": "session",
+          "title": "Session starts",
+          "body": "Tonight",
+          "target": "/s/friday-night",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000003",
+          "kind": "club",
+          "title": "Odd club target",
+          "body": "Bad target",
+          "target": "/players/d2000000-0000-4000-8000-000000000004",
+          "createdAt": "2026-11-16T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000009",
+          "kind": "invite",
+          "title": "Same instant A",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000008",
+          "kind": "invite",
+          "title": "Same instant B",
+          "body": "Tie",
+          "target": "/invite",
+          "createdAt": "2026-11-15T10:00:00.000Z",
+          "readAt": null,
+          "pinned": false
+        },
+        {
+          "id": "a1000000-0000-4000-8000-000000000005",
+          "kind": "rank",
+          "title": "Rank updated",
+          "body": "Level up",
+          "target": "/rank",
+          "createdAt": "2026-08-21T04:00:00.001Z",
+          "readAt": "2026-08-22T00:00:00.000Z",
+          "pinned": false
+        }
+      ]
+    }
+  }
+}

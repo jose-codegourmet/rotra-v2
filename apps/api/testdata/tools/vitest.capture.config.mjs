@@ -13,7 +13,9 @@ export default {
       { find: 'server-only', replacement: `${here}/empty-module.mjs` },
       { find: 'next/headers', replacement: `${here}/next-headers-stub.mjs` },
       { find: /^@rotra\/db\/(.*)$/, replacement: `${root}/packages/db/src/$1` },
+      // The Player Route Handlers import their sibling helpers through the app's own `@/` alias.
+      { find: /^@\/(.*)$/, replacement: `${root}/apps/player/src/$1` },
     ],
   },
-  test: { include: ['apps/api/testdata/tools/capture-leaderboard.test.mjs', 'apps/api/testdata/tools/capture-playerpages.test.mjs', 'apps/api/testdata/tools/capture-clubpage.test.mjs', 'apps/api/testdata/tools/capture-publicsession.test.mjs', 'apps/api/testdata/tools/capture-claim.test.mjs', 'apps/api/testdata/tools/capture-recovery.test.mjs'], testTimeout: 120_000, hookTimeout: 120_000 },
+  test: { include: ['apps/api/testdata/tools/capture-playerpages.test.mjs', 'apps/api/testdata/tools/capture-clubpage.test.mjs', 'apps/api/testdata/tools/capture-publicsession.test.mjs', 'apps/api/testdata/tools/capture-claim.test.mjs', 'apps/api/testdata/tools/capture-recovery.test.mjs', 'apps/api/testdata/tools/capture-signedin-player.test.mjs', 'apps/api/testdata/tools/capture-signedin-profile.test.mjs', 'apps/api/testdata/tools/capture-signedin-pubsession.test.mjs', 'apps/api/testdata/tools/capture-signedin-admin.test.mjs', 'apps/api/testdata/tools/capture-signedin-queue.test.mjs'], testTimeout: 120_000, hookTimeout: 120_000 },
 }

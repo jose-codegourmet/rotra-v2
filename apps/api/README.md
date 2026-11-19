@@ -42,6 +42,8 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
   streamed), a `: ping` comment every 20 s, open until the client leaves or draining starts.
 - `ROTRA_ALLOWED_ORIGINS` (optional): comma-separated exact origins (`https://queue.rotra.club,http://localhost:9000`; no `*`,
   path or trailing slash, validated at start). CORS headers are sent on the two stream routes only, only for a listed origin.
+- `ROTRA_QUEUE_ORIGINS` (optional): same format; the Queue app origins that may call the credentialed Player stats read
+  (`GET /api/rtr-ids/{rtrId}/stats` with cookies). Separate from `ROTRA_ALLOWED_ORIGINS`; unset means no Queue origin is allowed.
 
 ## Housekeeping (B-34)
 

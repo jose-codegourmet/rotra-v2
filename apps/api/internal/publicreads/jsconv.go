@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 	"unicode/utf16"
 	"unicode/utf8"
 )
@@ -164,4 +165,30 @@ func unhex(c byte) byte {
 		return c - 'a' + 10
 	}
 	return c - 'A' + 10
+}
+
+// jsToLower is String.prototype.toLowerCase for the cases where it differs from Go's simple case mapping: a
+// dotted capital I becomes "i" and a combining dot, and a capital sigma at the end of a word becomes the final
+// sigma. The search over names uses it so that both sides fold the same way.
+func jsToLower(s string) string {
+	if !strings.ContainsAny(s, "İΣ") {
+		return strings.ToLower(s)
+	}
+	runes := []rune(s)
+	var b strings.Builder
+	for i, r := range runes {
+		switch r {
+		case 'İ':
+			b.WriteString("i̇")
+		case 'Σ':
+			if i > 0 && unicode.IsLetter(runes[i-1]) && (i+1 >= len(runes) || !unicode.IsLetter(runes[i+1])) {
+				b.WriteRune('ς')
+			} else {
+				b.WriteRune('σ')
+			}
+		default:
+			b.WriteRune(unicode.ToLower(r))
+		}
+	}
+	return b.String()
 }

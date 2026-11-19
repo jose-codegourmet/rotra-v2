@@ -430,12 +430,12 @@
    "results": {
     "awards": {
      "mvp": {
-      "name": "Alice Reyes",
+      "name": "A*** R***",
       "pictureUrl": "https://example.test/alice.png",
       "participant": 0
      },
      "mostImproved": {
-      "name": "Mika",
+      "name": "M***",
       "priorSessions": 3,
       "pictureUrl": "https://example.test/mika.png",
       "participant": 1
@@ -456,7 +456,7 @@
     ],
     "standings": [
      {
-      "name": "Alice Reyes",
+      "name": "A*** R***",
       "wins": 5,
       "games": 6,
       "losses": 1,
@@ -465,7 +465,7 @@
       "participant": 0
      },
      {
-      "name": "Mika",
+      "name": "M***",
       "wins": 4,
       "games": 6,
       "losses": 2,
@@ -482,7 +482,7 @@
       "pictureUrl": null
      },
      {
-      "name": "Jose Adrian",
+      "name": "J*** A***",
       "wins": 2,
       "games": 6,
       "losses": 4,
@@ -2394,12 +2394,12 @@
    "results": {
     "awards": {
      "mvp": {
-      "name": "Alice Reyes",
+      "name": "A*** R***",
       "pictureUrl": "https://example.test/alice.png",
       "participant": 0
      },
      "mostImproved": {
-      "name": "Mika",
+      "name": "M***",
       "priorSessions": 3,
       "pictureUrl": "https://example.test/mika.png",
       "participant": 1
@@ -2420,7 +2420,7 @@
     ],
     "standings": [
      {
-      "name": "Alice Reyes",
+      "name": "A*** R***",
       "wins": 5,
       "games": 6,
       "losses": 1,
@@ -2429,7 +2429,7 @@
       "participant": 0
      },
      {
-      "name": "Mika",
+      "name": "M***",
       "wins": 4,
       "games": 6,
       "losses": 2,
@@ -2446,7 +2446,7 @@
       "pictureUrl": null
      },
      {
-      "name": "Jose Adrian",
+      "name": "J*** A***",
       "wins": 2,
       "games": 6,
       "losses": 4,

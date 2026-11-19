@@ -1,0 +1,705 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "subjects": {
+    "sam": "b0000000-0000-4000-8000-000000000001",
+    "tess": "b0000000-0000-4000-8000-000000000002"
+  },
+  "passwordless": [],
+  "reset": [
+    "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'",
+    "INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'Google sign-in for players', 'x', false, now()) ON CONFLICT DO NOTHING",
+    "UPDATE queue_sessions SET state = v.st::queue_session_state, started_at = v.sa, cancelled_at = v.ca, finalized_at = v.fa FROM (VALUES ('b4000000-0000-4000-8000-000000000001','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000002','active',TIMESTAMPTZ '2026-11-19 03:00:00+00',NULL,NULL),('b4000000-0000-4000-8000-000000000003','finalizing',TIMESTAMPTZ '2026-11-19 02:00:00+00',NULL,NULL),('b4000000-0000-4000-8000-000000000004','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000005','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000006','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000007','cancelled',NULL,TIMESTAMPTZ '2026-11-01 00:00:00+00',NULL),('b4000000-0000-4000-8000-000000000008','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000009','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000010','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000011','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000012','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000013','prepared',NULL,NULL,NULL),('b4000000-0000-4000-8000-000000000021','completed',TIMESTAMPTZ '2026-10-01 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-10 14:00:00.123456+00'),('b4000000-0000-4000-8000-000000000022','completed',TIMESTAMPTZ '2026-10-02 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-12 10:00:00+00'),('b4000000-0000-4000-8000-000000000023','completed',TIMESTAMPTZ '2026-10-03 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-11 08:00:00+00'),('b4000000-0000-4000-8000-000000000024','completed',TIMESTAMPTZ '2026-10-04 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-09 08:00:00+00'),('b4000000-0000-4000-8000-000000000025','completed',TIMESTAMPTZ '2026-10-05 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-13 09:00:00+00'),('b4000000-0000-4000-8000-000000000026','active',TIMESTAMPTZ '2026-10-06 09:00:00+00',NULL,NULL),('b4000000-0000-4000-8000-000000000027','completed',TIMESTAMPTZ '2026-10-07 09:00:00+00',NULL,TIMESTAMPTZ '2026-11-08 09:00:00+00')) AS v(id, st, sa, ca, fa) WHERE queue_sessions.id = v.id::uuid",
+    "UPDATE session_waitlist SET demoted_at = NULL, demoted_confirmed_at = NULL, added_at = TIMESTAMPTZ '2026-11-02 10:00:00+00'",
+    "UPDATE session_waitlist SET demoted_at = TIMESTAMPTZ '2026-11-03 11:00:00.000500+00', demoted_confirmed_at = TIMESTAMPTZ '2026-11-01 08:00:00+00', added_at = TIMESTAMPTZ '2026-11-02 09:00:00+00' WHERE id = 'ba000000-0000-4000-8000-000000000001'",
+    "UPDATE player_history_attributions SET revoked_at = NULL, revoke_reason = NULL",
+    "UPDATE session_result_snapshots SET standings = '[{\"clubPlayerId\":\"b3000000-0000-4000-8000-000000000001\",\"position\":2},{\"clubPlayerId\":\"b3000000-0000-4000-8000-000000000003\",\"position\":1},{\"clubPlayerId\":5,\"position\":9},{\"position\":\"x\"}]'::jsonb WHERE session_id = 'b4000000-0000-4000-8000-000000000021'",
+    "INSERT INTO players (id, full_name, nickname, avatar_ref, profile_visibility, profile_state, updated_at) VALUES ('b2000000-0000-4000-8000-000000000001', 'Sam Cruz', 'Sammy', 'https://example.test/p1.png', 'public', 'claimed', now()) ON CONFLICT DO NOTHING",
+    "UPDATE session_publications SET state = 'published', published_snapshot_id = 'b9000000-0000-4000-8000-000000000001', published_at = TIMESTAMPTZ '2026-11-10 15:00:00+00', public_results = '{}'::jsonb, published_slides = ARRAY['standings']::result_slide[] WHERE session_id = 'b4000000-0000-4000-8000-000000000021'",
+    "UPDATE session_publications SET state = 'published', published_snapshot_id = 'b9000000-0000-4000-8000-000000000005', published_at = TIMESTAMPTZ '2026-11-13 10:00:00+00', public_results = '{}'::jsonb, published_slides = ARRAY['standings','awards']::result_slide[] WHERE session_id = 'b4000000-0000-4000-8000-000000000025'"
+  ],
+  "scenarios": {
+    "base": [],
+    "flag_on": [
+      "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+    ],
+    "no_open": [
+      "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-01 00:00:00+00', started_at = NULL, finalized_at = NULL WHERE state IN ('prepared','active','finalizing')"
+    ],
+    "no_history": [
+      "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-01 00:00:00+00', started_at = NULL, finalized_at = NULL WHERE state = 'completed'"
+    ],
+    "unpublish_standings": [
+      "UPDATE session_publications SET published_slides = ARRAY['awards']::result_slide[] WHERE session_id = 'b4000000-0000-4000-8000-000000000021'",
+      "UPDATE session_publications SET state = 'details', published_snapshot_id = NULL, published_at = NULL, public_results = NULL, published_slides = ARRAY[]::result_slide[] WHERE session_id = 'b4000000-0000-4000-8000-000000000025'"
+    ],
+    "revoke_attribution": [
+      "UPDATE player_history_attributions SET revoked_at = TIMESTAMPTZ '2026-11-12 00:00:00+00', revoke_reason = 'test'"
+    ],
+    "live_states": [
+      "UPDATE queue_sessions SET state = 'prepared', started_at = NULL WHERE id = 'b4000000-0000-4000-8000-000000000002'",
+      "UPDATE queue_sessions SET state = 'active' WHERE id = 'b4000000-0000-4000-8000-000000000003'"
+    ],
+    "sam_demoted": [
+      "UPDATE session_waitlist SET demoted_at = TIMESTAMPTZ '2026-11-03 11:00:00.000900+00', demoted_confirmed_at = TIMESTAMPTZ '2026-11-01 09:00:00+00' WHERE club_player_id = 'b3000000-0000-4000-8000-000000000002' AND session_id = 'b4000000-0000-4000-8000-000000000004'"
+    ],
+    "waitlist_ties": [
+      "UPDATE session_waitlist SET added_at = TIMESTAMPTZ '2026-11-02 10:00:00.0004+00' WHERE session_id = 'b4000000-0000-4000-8000-000000000004'",
+      "UPDATE session_waitlist SET demoted_at = NULL, demoted_confirmed_at = NULL WHERE session_id = 'b4000000-0000-4000-8000-000000000004'"
+    ],
+    "position_text": [
+      "UPDATE session_result_snapshots SET standings = '[{\"clubPlayerId\":\"b3000000-0000-4000-8000-000000000001\",\"position\":\"2\"}]'::jsonb WHERE session_id = 'b4000000-0000-4000-8000-000000000021'"
+    ],
+    "snapshot_object": [
+      "UPDATE session_result_snapshots SET standings = '{\"clubPlayerId\":\"b3000000-0000-4000-8000-000000000001\",\"position\":2}'::jsonb WHERE session_id = 'b4000000-0000-4000-8000-000000000021'"
+    ],
+    "viewer_row_gone": [
+      "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'",
+      "DELETE FROM players WHERE id = 'b2000000-0000-4000-8000-000000000001'"
+    ],
+    "flag_off_row_gone": [
+      "DELETE FROM feature_flags WHERE key = 'player_google_sign_in'"
+    ]
+  },
+  "cases": [
+    {
+      "name": "sessions_sam",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sessions_tess",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "sessions_sam_gated",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "sessions_sam_before_deadline",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+      "name": "sessions_sam_none_open",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "no_open"
+    },
+    {
+      "name": "sessions_sam_no_history",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "no_history"
+    },
+    {
+      "name": "sessions_sam_unpublished_standings",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "unpublish_standings"
+    },
+    {
+      "name": "sessions_sam_attribution_revoked",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "revoke_attribution"
+    },
+    {
+      "name": "sessions_sam_state_flip",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "live_states"
+    },
+    {
+      "name": "sessions_sam_demoted_waitlist",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "sam_demoted"
+    },
+    {
+      "name": "sessions_sam_waitlist_ties",
+      "path": "/api/me/sessions",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "waitlist_ties"
+    },
+    {
+      "name": "share_21_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_22_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000022/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_23_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000023/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_24_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000024/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_25_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000025/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_26_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000026/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_27_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000027/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_1_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000001/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_2_sam",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000002/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_21_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_22_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000022/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_23_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000023/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_24_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000024/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_25_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000025/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_26_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000026/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_27_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000027/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_1_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000001/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_2_tess",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000002/share",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "share_unknown_session",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000999/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_not_a_uuid",
+      "path": "/api/me/sessions/not-a-uuid/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_upper_case_uuid",
+      "path": "/api/me/sessions/B4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "share_after_revoke",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000024/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "revoke_attribution"
+    },
+    {
+      "name": "share_gated",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "share_standing_position_not_number",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "position_text"
+    },
+    {
+      "name": "share_snapshot_not_array",
+      "path": "/api/me/sessions/b4000000-0000-4000-8000-000000000021/share",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "snapshot_object"
+    },
+    {
+      "name": "invite_club_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k2_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?k=BIRDIE2026XY",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k3_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000003?k=SMASH2026ABC",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_flag_off_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": null,
+      "scenario": "base"
+    },
+    {
+      "name": "invite_session_friday-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_waitlist-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=waitlist-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_requested-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=requested-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_both-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=both-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_guest-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=guest-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_live-now_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=live-now",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_released-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=released-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_club-player-request_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=club-player-request",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_confirmed-request_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=confirmed-request",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_no-show-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=no-show-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_cancelled-night_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=cancelled-night",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_nope_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=nope",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_friday-done_visitor",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-done",
+      "player": null,
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k2_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?k=BIRDIE2026XY",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k3_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000003?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_flag_off_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "invite_session_friday-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_waitlist-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=waitlist-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_requested-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=requested-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_both-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=both-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_guest-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=guest-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_live-now_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=live-now",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_released-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=released-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_club-player-request_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=club-player-request",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_confirmed-request_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=confirmed-request",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_no-show-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=no-show-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_cancelled-night_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=cancelled-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_nope_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=nope",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_friday-done_sam",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-done",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k2_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?k=BIRDIE2026XY",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_k3_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000003?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_flag_off_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "invite_session_friday-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_waitlist-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=waitlist-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_requested-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=requested-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_both-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=both-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_guest-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=guest-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_live-now_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=live-now",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_released-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=released-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_club-player-request_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=club-player-request",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_confirmed-request_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=confirmed-request",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_no-show-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=no-show-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_cancelled-night_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=cancelled-night",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_nope_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=nope",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_friday-done_tess",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-done",
+      "player": "b0000000-0000-4000-8000-000000000002",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_padded_lower",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=%20smash2026abc%20",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_wrong",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=WRONGCODE123",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_short",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_missing",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_empty",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_code_too_long",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABCDEFGHI",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_empty_param_with_code",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=&k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_wins_over_code",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday-night&k=WRONG",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_of_other_club",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000002?session=friday-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_unknown_club",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000099?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_not_a_uuid",
+      "path": "/api/invites/nope?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_club_upper_case_uuid",
+      "path": "/api/invites/B1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_deleted_page",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=no-show-night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_encoded_slug",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday%2Dnight",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_session_plus_is_space",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?session=friday+night",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_after_deadline_no_gate",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on",
+      "now": "2027-01-01T16:00:00.000Z"
+    },
+    {
+      "name": "invite_member_removed",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000003?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_on"
+    },
+    {
+      "name": "invite_player_missing_row",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "viewer_row_gone"
+    },
+    {
+      "name": "invite_not_found_flag_value_false",
+      "path": "/api/invites/b1000000-0000-4000-8000-000000000001?k=SMASH2026ABC",
+      "player": "b0000000-0000-4000-8000-000000000001",
+      "scenario": "flag_off_row_gone"
+    }
+  ]
+}

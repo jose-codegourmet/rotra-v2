@@ -4,16 +4,16 @@
   "type": "refactor",
   "priority": "high",
   "order": 7,
-  "status": "pending",
+  "status": "complete",
   "created": "2026-11-13",
   "updated": "2026-11-19",
   "depends_on": "go-sign-in, go-public-reads",
   "phases": {
     "total": 4,
-    "completed": 0
+    "completed": 4
   },
   "tasks": {
     "total": 6,
-    "completed": 0
+    "completed": 6
   }
 }

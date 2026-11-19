@@ -1,18 +1,23 @@
 package publicreads
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 )
 
-// P-MATCH-HISTORY: GET /api/players/{playerId}/games, readPlayerMatchHistory(playerId) with its default
-// maskAlwaysPrivate = true. The Admin-only unmasked form is not reachable here: no query string changes it.
+// P-MATCH-HISTORY: GET /api/players/{playerId}/games, readPublicMatchHistory(playerId, viewerId): the games of a
+// masked player are not sent, and a masked face on a court has the masked name and no player ID (B-54). The
+// Admin-only unmasked form is not reachable here: no query string changes it.
 
 // courtPlayerDTO is one person on a game court: the entry's name snapshot, the player's picture reference and
 // player ID. A guest or a record with no RTR ID has no picture and no player ID.
@@ -49,23 +54,108 @@ type gamesBody struct {
 	Games []historySession `json:"games"`
 }
 
+// gamesPageBody is the paged answer: a page of sessions and where the next page starts (null after the last).
+type gamesPageBody struct {
+	Games      []historySession `json:"games"`
+	NextOffset *int             `json:"nextOffset"`
+}
+
+// gamesPageMax is the most sessions one page holds (GAMES_PAGE_MAX in projections.ts).
+const gamesPageMax = 50
+
+// gamesPage is parseGamesPage: ?limit= (1 to 50 sessions) and ?offset= page the history, newest first. No usable
+// limit means no paging. A value that is not a whole number is ignored; an offset is never below 0.
+func gamesPage(r *http.Request) (limit, offset int, paged bool) {
+	whole := func(name string) (int, bool) {
+		v := r.URL.Query().Get(name)
+		if v == "" {
+			return 0, false
+		}
+		for _, c := range v {
+			if c < '0' || c > '9' {
+				return 0, false
+			}
+		}
+		n, err := strconv.ParseUint(v, 10, 31)
+		if err != nil {
+			return int(^uint32(0) >> 1), true // too big for an int: as large as it gets
+		}
+		return int(n), true
+	}
+	limit, ok := whole("limit")
+	if !ok || limit < 1 {
+		return 0, 0, false
+	}
+	offset, _ = whole("offset")
+	return min(limit, gamesPageMax), offset, true
+}
+
+// pageHistory is pageGames: the slice of sessions for the page and the offset of the next one.
+func pageHistory(sessions []historySession, limit, offset int) gamesPageBody {
+	end := offset + limit
+	if offset > len(sessions) {
+		offset = len(sessions)
+	}
+	if end > len(sessions) || end < offset { // the second test guards an overflow
+		end = len(sessions)
+	}
+	body := gamesPageBody{Games: sessions[offset:end]}
+	if next := offset + limit; next > offset && next < len(sessions) {
+		body.NextOffset = &next
+	}
+	return body
+}
+
+// writeGames sends the history whole, or one page of it when the request asked for paging.
+func writeGames(w http.ResponseWriter, r *http.Request, sessions []historySession) {
+	if limit, offset, paged := gamesPage(r); paged {
+		httpapi.WriteJSON(w, http.StatusOK, pageHistory(sessions, limit, offset), httpapi.Private)
+		return
+	}
+	httpapi.WriteJSON(w, http.StatusOK, gamesBody{Games: sessions}, httpapi.Private)
+}
+
 func (p *players) games(w http.ResponseWriter, r *http.Request) {
 	id, ok := uuidParam(r)
 	if !ok {
-		httpapi.WriteJSON(w, http.StatusOK, gamesBody{Games: []historySession{}}, httpapi.Public)
+		writeGames(w, r, []historySession{})
 		return
 	}
-	body := gamesBody{Games: []historySession{}}
+	v := viewerOf(r)
+	sessions := []historySession{}
 	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
-		var err error
-		body.Games, err = readHistory(r, q, id)
+		visibility, err := q.GetPlayerVisibility(r.Context(), id)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("reading visibility: %w", err)
+		}
+		if err == nil && isMasked(visibility, v, id) {
+			return nil // a masked player has no game history
+		}
+		facts, err := q.ListPlayerFacts(r.Context(), id)
+		if err != nil {
+			return fmt.Errorf("listing facts: %w", err)
+		}
+		sessions, err = readHistory(r.Context(), q, historyFactsOf(facts), v, true)
 		return err
 	})
 	if err != nil {
 		p.fail(w, r, err)
 		return
 	}
-	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Public)
+	writeGames(w, r, sessions)
+}
+
+// historyFact is one fact of a history: the columns ListPlayerFacts and ListClubPlayerFacts share.
+type historyFact = sqlcgen.ListPlayerFactsRow
+
+func historyFactsOf(rows []sqlcgen.ListPlayerFactsRow) []historyFact { return rows }
+
+func clubHistoryFactsOf(rows []sqlcgen.ListClubPlayerFactsRow) []historyFact {
+	out := make([]historyFact, len(rows))
+	for i, r := range rows {
+		out[i] = historyFact(r)
+	}
+	return out
 }
 
 type entryKey struct{ session, entry, match pgtype.UUID }
@@ -73,12 +163,7 @@ type entryKey struct{ session, entry, match pgtype.UUID }
 // readHistory is historyFromFacts: valid finalized sessions only, grouped by session, newest first.
 // Games keep the order of the facts (newest played first). Two sessions finalized in the same millisecond
 // have no order in the TypeScript (the database's); here they keep the order of their newest game.
-func readHistory(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) ([]historySession, error) {
-	ctx := r.Context()
-	facts, err := q.ListPlayerFacts(ctx, id)
-	if err != nil {
-		return nil, fmt.Errorf("listing facts: %w", err)
-	}
+func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v viewerRef, maskFaces bool) ([]historySession, error) {
 	var sessionIDs []pgtype.UUID
 	seen := map[pgtype.UUID]bool{}
 	for _, f := range facts {
@@ -134,7 +219,7 @@ func readHistory(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) ([]history
 		people := func(ids []pgtype.UUID) ([]string, []courtPlayerDTO) {
 			names, faces := make([]string, len(ids)), make([]courtPlayerDTO, len(ids))
 			for i, eid := range ids {
-				faces[i] = courtPlayer(entries, eid)
+				faces[i] = courtPlayer(entries, eid, v, maskFaces)
 				faces[i].SessionGameNumber = number(eid)
 				names[i] = faces[i].Name
 			}
@@ -179,9 +264,9 @@ func deref(s *string) string {
 	return *s
 }
 
-// courtPlayer is courtPlayer() in projections.ts with maskAlwaysPrivate on: an always-private player's name
-// is masked; their picture and player ID stay, as on the leaderboard.
-func courtPlayer(entries map[pgtype.UUID]sqlcgen.ListSessionEntriesRow, id pgtype.UUID) courtPlayerDTO {
+// courtPlayer is courtPlayer() in projections.ts: a face the masking rule hides (when maskFaces is on) has the
+// masked name and no player ID; the picture stays.
+func courtPlayer(entries map[pgtype.UUID]sqlcgen.ListSessionEntriesRow, id pgtype.UUID, v viewerRef, maskFaces bool) courtPlayerDTO {
 	e, ok := entries[id]
 	if !ok {
 		return courtPlayerDTO{}
@@ -190,8 +275,9 @@ func courtPlayer(entries map[pgtype.UUID]sqlcgen.ListSessionEntriesRow, id pgtyp
 		return courtPlayerDTO{Name: e.NameSnapshot}
 	}
 	c := courtPlayerDTO{Name: e.NameSnapshot, Picture: textPtr(e.AvatarRef)}
-	if e.ProfileVisibility.Valid && e.ProfileVisibility.ProfileVisibility == sqlcgen.ProfileVisibilityAlwaysPrivate {
+	if maskFaces && e.ProfileVisibility.Valid && isMasked(e.ProfileVisibility.ProfileVisibility, v, e.PlayerID) {
 		c.Name = maskPublicName(e.NameSnapshot)
+		return c
 	}
 	pid := e.PlayerID.String()
 	c.PlayerID = &pid

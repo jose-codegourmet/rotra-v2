@@ -85,3 +85,32 @@ func (a *Authenticator) fail(w http.ResponseWriter, r *http.Request, err error) 
 		httpapi.WriteInternal(w)
 	}
 }
+
+// Optional is Require for routes a visitor may read too (the TypeScript optionalPlayerId). With no pass, or a
+// pass that does not verify, is for another app, or whose account can no longer sign in, the request is a
+// visitor: the handler runs and PrincipalFrom finds nothing. A valid pass puts the Principal in the context.
+//
+// An expired pass (or one signed by a removed key) is answered with the distinct 401 `expired`, not as a
+// visitor: the TypeScript side refreshed the provider session through its cookies and then read as that
+// player, so a silent downgrade to visitor would show a signed-in player the wrong page. The client refreshes
+// once and retries, as it does for every other signed-in read. A database failure is a 500.
+func (a *Authenticator) Optional(aud store.Audience) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			token := TokenFromRequest(r, aud)
+			if token == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
+			p, err := a.Authenticate(r.Context(), token, aud, ModeRead)
+			switch {
+			case err == nil:
+				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), principalKey{}, p)))
+			case errors.Is(err, ErrUnauthenticated), errors.Is(err, ErrWrongAccount), errors.Is(err, ErrSessionRevoked):
+				next.ServeHTTP(w, r)
+			default:
+				a.fail(w, r, err)
+			}
+		})
+	}
+}

@@ -408,7 +408,8 @@ func readOrdered(dec *json.Decoder) (any, error) {
 // resultsWithPictures is withResultPictures: the published copy holds names and counts only, so each standings
 // row, Off Day row and award winner gets its picture, and its `participant` (the index in the live roster, the
 // order `participants` shows), from the live roster by name. A name two roster entries share gets neither.
-// No published copy is null. Every other key passes through as stored.
+// A registered player who is not public is masked in those rows as in the participant list, and a name shared with
+// such a player is masked too (B-56). No published copy is null. Every other key passes through as stored.
 func resultsWithPictures(raw []byte, roster []sqlcgen.ListPublicSessionRosterRow) (*orderedObject, error) {
 	if len(raw) == 0 {
 		return nil, nil
@@ -427,7 +428,11 @@ func resultsWithPictures(raw []byte, roster []sqlcgen.ListPublicSessionRosterRow
 	}
 	seen := map[string]face{}
 	clash := map[string]bool{}
+	maskedNames := map[string]bool{}
 	for i, entry := range roster {
+		if entry.ResultMasked {
+			maskedNames[entry.NameSnapshot] = true
+		}
 		if _, dup := seen[entry.NameSnapshot]; dup {
 			clash[entry.NameSnapshot] = true
 		} else {
@@ -444,6 +449,9 @@ func resultsWithPictures(raw []byte, roster []sqlcgen.ListPublicSessionRosterRow
 			return row
 		}
 		name, isString := nameVal.(string)
+		if isString && maskedNames[name] {
+			obj.set("name", maskPublicName(name))
+		}
 		var picture any
 		if f, found := seen[name]; isString && found && !clash[name] {
 			if f.picture != nil {

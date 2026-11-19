@@ -55,6 +55,8 @@ func TestPlayerPagesMatchRouteHandlers(t *testing.T) {
 		Pool:    pool.Raw(),
 		Limiter: httpapi.NewRateLimiter(1_000_000, nil), // the limit has its own tests
 		Now:     func() time.Time { return cases.Now },
+		// No rank formula is approved in the product (#247); the fixture's stored rows are read as if one were.
+		ApprovedAlgorithms: []string{"rank-test-v1"},
 	})
 	ctx := context.Background()
 

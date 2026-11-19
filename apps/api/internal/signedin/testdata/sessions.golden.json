@@ -1,0 +1,3695 @@
+{
+  "sessions_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "sessions_sam_before_deadline": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_none_open": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_no_history": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": []
+    }
+  },
+  "sessions_sam_unpublished_standings": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_attribution_revoked": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_state_flip": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_demoted_waitlist": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "sessions_sam_waitlist_ties": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessions": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000026",
+          "title": "Running With Facts",
+          "slug": "running-facts",
+          "start": "2026-10-06T09:00:00.000Z",
+          "end": "2026-10-06T15:00:00.000Z",
+          "clubName": "Net Ninjas",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000003",
+          "title": "Wrapping Up",
+          "slug": "wrapping-up",
+          "start": "2026-11-19T02:00:00.000Z",
+          "end": "2026-11-19T05:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000002",
+          "title": "Live Now",
+          "slug": "live-now",
+          "start": "2026-11-19T03:00:00.000Z",
+          "end": "2026-11-19T06:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "live",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000001",
+          "title": "Friday Night",
+          "slug": "friday-night",
+          "start": "2026-11-20T10:00:00.000Z",
+          "end": "2026-11-20T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000004",
+          "title": "Waitlist Night",
+          "slug": "waitlist-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "waitlist",
+          "waitlistPosition": 2
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000013",
+          "title": "Tie Night",
+          "slug": "tie-night",
+          "start": "2026-11-21T10:00:00.000Z",
+          "end": "2026-11-21T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000005",
+          "title": "Requested Night",
+          "slug": "requested-night",
+          "start": "2026-11-22T10:00:00.000Z",
+          "end": "2026-11-22T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000009",
+          "title": "Guest Night",
+          "slug": "guest-night",
+          "start": "2026-11-25T10:00:00.000Z",
+          "end": "2026-11-25T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "waitlist",
+          "waitlistPosition": 1
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000010",
+          "title": "Club Player Request",
+          "slug": "club-player-request",
+          "start": "2026-11-26T10:00:00.000Z",
+          "end": "2026-11-26T13:00:00.000Z",
+          "clubName": "Smash Club",
+          "status": "requested",
+          "waitlistPosition": null
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000008",
+          "title": "Both Night",
+          "slug": "both-night",
+          "start": "2026-11-28T10:00:00.000Z",
+          "end": "2026-11-28T13:00:00.000Z",
+          "clubName": "Birdie Club",
+          "status": "confirmed",
+          "waitlistPosition": null
+        }
+      ],
+      "finished": [
+        {
+          "id": "b4000000-0000-4000-8000-000000000025",
+          "title": "Shared Without Sam",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-13T09:00:00.000Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000022",
+          "title": "Birdie Done",
+          "clubName": "Birdie Club",
+          "finishedAt": "2026-11-12T10:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000023",
+          "title": "Awards Only",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-11T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000021",
+          "title": "Friday Night Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-10T14:00:00.123Z",
+          "published": true
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000024",
+          "title": "Guest Done",
+          "clubName": "Smash Club",
+          "finishedAt": "2026-11-09T08:00:00.000Z",
+          "published": false
+        },
+        {
+          "id": "b4000000-0000-4000-8000-000000000027",
+          "title": "Removed Club Done",
+          "clubName": "Net Ninjas",
+          "finishedAt": "2026-11-08T09:00:00.000Z",
+          "published": false
+        }
+      ]
+    }
+  },
+  "share_21_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": 2,
+      "games": {
+        "b6000000-0000-4000-8000-000000000001": {
+          "partners": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            },
+            {
+              "name": "U*** O***",
+              "picture": "https://example.test/p3.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000002": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000003": {
+          "partners": [
+            {
+              "name": "Player",
+              "picture": null
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            },
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_22_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000005": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_23_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000008": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_24_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000006": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_25_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000007": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_26_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_27_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000009": {
+          "partners": [],
+          "opponents": []
+        }
+      }
+    }
+  },
+  "share_1_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_2_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_21_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": 1,
+      "games": {
+        "b6000000-0000-4000-8000-000000000001": {
+          "partners": [
+            {
+              "name": "W*** G***",
+              "picture": null
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            },
+            {
+              "name": "U*** O***",
+              "picture": "https://example.test/p3.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000004": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_22_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000005": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_23_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_24_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000006": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "W*** G***",
+              "picture": null
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_25_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": 1,
+      "games": {
+        "b6000000-0000-4000-8000-000000000007": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_26_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_27_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_1_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_2_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_unknown_session": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_not_a_uuid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_upper_case_uuid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": 2,
+      "games": {
+        "b6000000-0000-4000-8000-000000000001": {
+          "partners": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            },
+            {
+              "name": "U*** O***",
+              "picture": "https://example.test/p3.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000002": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000003": {
+          "partners": [
+            {
+              "name": "Player",
+              "picture": null
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            },
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_after_revoke": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": false,
+      "position": null,
+      "games": {}
+    }
+  },
+  "share_gated": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "forbidden",
+        "message": "You do not have access to this.",
+        "fields": {
+          "google": "Connect a Google account to keep using ROTRA."
+        }
+      }
+    }
+  },
+  "share_standing_position_not_number": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000001": {
+          "partners": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            },
+            {
+              "name": "U*** O***",
+              "picture": "https://example.test/p3.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000002": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000003": {
+          "partners": [
+            {
+              "name": "Player",
+              "picture": null
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            },
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "share_snapshot_not_array": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "published": true,
+      "position": null,
+      "games": {
+        "b6000000-0000-4000-8000-000000000001": {
+          "partners": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Sam Cruz",
+              "picture": "https://example.test/p1.png"
+            },
+            {
+              "name": "U*** O***",
+              "picture": "https://example.test/p3.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000002": {
+          "partners": [],
+          "opponents": [
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        },
+        "b6000000-0000-4000-8000-000000000003": {
+          "partners": [
+            {
+              "name": "Player",
+              "picture": null
+            }
+          ],
+          "opponents": [
+            {
+              "name": "Tess Lopez",
+              "picture": "https://example.test/p2.png"
+            },
+            {
+              "name": "Vik Rao",
+              "picture": "https://example.test/p4.png"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "invite_club_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_club_k2_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "memberCount": 2
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_club_k3_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_flag_off_visitor": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "invite_session_friday-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "friday-night",
+          "title": "Friday Night",
+          "startsAt": 1795168800000,
+          "endsAt": 1795179600000,
+          "venueName": "Court One"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_waitlist-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "waitlist-night",
+          "title": "Waitlist Night",
+          "startsAt": 1795255200000,
+          "endsAt": 1795266000000,
+          "venueName": "Court Two"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_requested-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "requested-night",
+          "title": "Requested Night",
+          "startsAt": 1795341600000,
+          "endsAt": 1795352400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_both-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "both-night",
+          "title": "Both Night",
+          "startsAt": 1795860000000,
+          "endsAt": 1795870800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_guest-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "guest-night",
+          "title": "Guest Night",
+          "startsAt": 1795600800000,
+          "endsAt": 1795611600000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_live-now_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_released-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "released-night",
+          "title": "Released Night",
+          "startsAt": 1795428000000,
+          "endsAt": 1795438800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_club-player-request_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "club-player-request",
+          "title": "Club Player Request",
+          "startsAt": 1795687200000,
+          "endsAt": 1795698000000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_confirmed-request_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "confirmed-request",
+          "title": "Confirmed Request",
+          "startsAt": 1795773600000,
+          "endsAt": 1795784400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_no-show-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_cancelled-night_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_nope_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_session_friday-done_visitor": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_club_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_club_k2_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "memberCount": 2
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_club_k3_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_flag_off_sam": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "invite_session_friday-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "friday-night",
+          "title": "Friday Night",
+          "startsAt": 1795168800000,
+          "endsAt": 1795179600000,
+          "venueName": "Court One"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "already-in",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_waitlist-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "waitlist-night",
+          "title": "Waitlist Night",
+          "startsAt": 1795255200000,
+          "endsAt": 1795266000000,
+          "venueName": "Court Two"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "on-waitlist",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz",
+        "position": 2
+      }
+    }
+  },
+  "invite_session_requested-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "requested-night",
+          "title": "Requested Night",
+          "startsAt": 1795341600000,
+          "endsAt": 1795352400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "request-pending",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_both-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "both-night",
+          "title": "Both Night",
+          "startsAt": 1795860000000,
+          "endsAt": 1795870800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "already-in",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_guest-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "guest-night",
+          "title": "Guest Night",
+          "startsAt": 1795600800000,
+          "endsAt": 1795611600000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_live-now_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_released-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "released-night",
+          "title": "Released Night",
+          "startsAt": 1795428000000,
+          "endsAt": 1795438800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_club-player-request_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "club-player-request",
+          "title": "Club Player Request",
+          "startsAt": 1795687200000,
+          "endsAt": 1795698000000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_confirmed-request_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "confirmed-request",
+          "title": "Confirmed Request",
+          "startsAt": 1795773600000,
+          "endsAt": 1795784400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_no-show-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_cancelled-night_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_nope_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_friday-done_sam": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_club_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_club_k2_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "memberCount": 2
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_club_k3_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_flag_off_tess": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "invite_session_friday-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "friday-night",
+          "title": "Friday Night",
+          "startsAt": 1795168800000,
+          "endsAt": 1795179600000,
+          "venueName": "Court One"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "already-in",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_waitlist-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "waitlist-night",
+          "title": "Waitlist Night",
+          "startsAt": 1795255200000,
+          "endsAt": 1795266000000,
+          "venueName": "Court Two"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "on-waitlist",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez",
+        "position": 1
+      }
+    }
+  },
+  "invite_session_requested-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "requested-night",
+          "title": "Requested Night",
+          "startsAt": 1795341600000,
+          "endsAt": 1795352400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "request-pending",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_both-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Birdie Club",
+          "initials": "BC",
+          "logoUrl": null,
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "both-night",
+          "title": "Both Night",
+          "startsAt": 1795860000000,
+          "endsAt": 1795870800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_guest-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "guest-night",
+          "title": "Guest Night",
+          "startsAt": 1795600800000,
+          "endsAt": 1795611600000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_live-now_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_released-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "released-night",
+          "title": "Released Night",
+          "startsAt": 1795428000000,
+          "endsAt": 1795438800000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_club-player-request_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "club-player-request",
+          "title": "Club Player Request",
+          "startsAt": 1795687200000,
+          "endsAt": 1795698000000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_confirmed-request_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "confirmed-request",
+          "title": "Confirmed Request",
+          "startsAt": 1795773600000,
+          "endsAt": 1795784400000,
+          "venueName": ""
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_no-show-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_cancelled-night_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_nope_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_session_friday-done_tess": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "started"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000002",
+        "name": "Tess Lopez"
+      }
+    }
+  },
+  "invite_code_padded_lower": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_code_wrong": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_code_short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_code_missing": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_code_empty": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_code_too_long": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_empty_param_with_code": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_wins_over_code": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "friday-night",
+          "title": "Friday Night",
+          "startsAt": 1795168800000,
+          "endsAt": 1795179600000,
+          "venueName": "Court One"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "already-in",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_of_other_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_unknown_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "club"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_club_not_a_uuid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "club"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_club_upper_case_uuid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_deleted_page": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_encoded_slug": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "session",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "session": {
+          "slug": "friday-night",
+          "title": "Friday Night",
+          "startsAt": 1795168800000,
+          "endsAt": 1795179600000,
+          "venueName": "Court One"
+        },
+        "inviter": null,
+        "continueUrl": ""
+      },
+      "viewer": {
+        "status": "already-in",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_session_plus_is_space": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "session"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_after_deadline_no_gate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 4
+      },
+      "viewer": {
+        "status": "already-member",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_member_removed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "unavailable",
+        "reason": "code"
+      },
+      "viewer": {
+        "status": "ready",
+        "playerId": "b2000000-0000-4000-8000-000000000001",
+        "name": "Sam Cruz"
+      }
+    }
+  },
+  "invite_player_missing_row": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "card": {
+        "kind": "club",
+        "club": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "city": "Cebu City"
+        },
+        "memberCount": 3
+      },
+      "viewer": {
+        "status": "visitor"
+      }
+    }
+  },
+  "invite_not_found_flag_value_false": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  }
+}

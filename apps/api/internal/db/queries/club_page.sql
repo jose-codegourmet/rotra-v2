@@ -2,6 +2,7 @@
 -- Ports of packages/db/src/player/{club-page,ranking-settings}.ts and packages/db/src/admin/profile-{banners,characters}.ts.
 -- Reads only; nothing here calculates a rank.
 
+-- The invite code is read for the signed-in invite card only; the public club page never sends it (B-55).
 -- name: GetClubPageClub :one
 SELECT c.id, c.name, c.logo_ref, c.invite_code, l.display_name AS city
 FROM clubs c
@@ -10,20 +11,14 @@ WHERE c.id = @club_id;
 
 -- Registered members: current club players linked to a claimed profile that is not hidden from the directory.
 -- Guests and unclaimed profiles never appear. The TypeScript has no ORDER BY (the database decides ties), so
--- the id is the tie-break here. The newest assessment decides the level; level 0 is a level, and -1 means no assessment.
+-- the id is the tie-break here. A masked member carries no level (B-55), so none is read.
 -- name: ListClubPageMembers :many
 SELECT cp.id,
        cp.display_name,
        p.full_name,
        p.avatar_ref,
        pb.id    AS banner_row_id,
-       pb.image AS banner_image,
-       COALESCE((SELECT a.skill_level_id
-                 FROM club_assessments a
-                 WHERE a.club_id = cp.club_id
-                   AND a.club_player_id = cp.id
-                 ORDER BY a.assessed_at DESC, a.id DESC
-                 LIMIT 1), -1)::smallint AS skill_level_id
+       pb.image AS banner_image
 FROM club_players cp
 JOIN players p ON p.id = cp.player_id
 LEFT JOIN profile_banners pb ON pb.id = p.banner_id

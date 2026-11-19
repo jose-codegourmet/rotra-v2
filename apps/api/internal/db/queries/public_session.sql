@@ -47,11 +47,13 @@ WHERE session_id = @session_id
 ORDER BY created_at ASC, id ASC;
 
 -- The live roster in slot order: not released and not a no show. The club player is looked up inside the
--- session's own club; a missing one (or a guest, with no profile) has no picture.
+-- session's own club; a missing one (or a guest, with no profile) has no picture. result_masked is B-56: a registered
+-- player who is not public stays masked on the published results (guests and unclaimed players show as the club shows them).
 -- name: ListPublicSessionRoster :many
 SELECT sp.name_snapshot,
        sp.skill_level_id,
-       p.avatar_ref
+       p.avatar_ref,
+       (p.id IS NOT NULL AND p.profile_state <> 'unclaimed' AND p.profile_visibility <> 'public')::bool AS result_masked
 FROM session_players sp
 JOIN queue_sessions s ON s.id = sp.session_id
 LEFT JOIN club_players cp ON cp.id = sp.club_player_id AND cp.club_id = s.club_id

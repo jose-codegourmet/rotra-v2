@@ -18,6 +18,12 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, expect, test, vi } from 'vitest'
 
+// Only the Supabase session check is replaced: nobody is signed in, so every case is a visitor.
+vi.mock('../../../../packages/db/src/auth/supabase.ts', async (importOriginal) => ({
+  ...(await importOriginal()),
+  verifySubject: async () => null,
+}))
+
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../../..')
 const pkgDb = resolve(root, 'packages/db')
@@ -59,6 +65,8 @@ beforeAll(async () => {
 
   process.env.DATABASE_URL = dbUrl
   process.env.ROTRA_DATA_MODE = 'real'
+  // No rank formula is approved in the product (#247); the stored rows of this fixture are read as if one were.
+  ;(await import('../../../../packages/db/src/player/projections.ts')).APPROVED_RANK_ALGORITHMS.add('rank-test-v1')
   const api = '../../../../apps/player/src/app/api'
   routes.profile = (await import(`${api}/players/[playerId]/route.ts`)).GET
   routes.rank = (await import(`${api}/players/[playerId]/rank/route.ts`)).GET

@@ -423,3 +423,13 @@ Both trigger functions are revoked from PUBLIC. No grant, RLS or index change. E
 passes the wider CHECK (it accepts everything the old one did). Checked on a disposable local database
 (`rotra_disposable_q238` on the local Supabase Postgres, 127.0.0.1:54322): rebuild with no drift, seed,
 80/80 checks. Not applied to the shared database.
+
+## Go API role grants (go-signed-in-reads)
+
+`20261119000200_go_api_role_grants`. SQL only; no table, column or row changes. The owner approved it on
+November 19, 2026. **Status: NOT applied to the shared database**; checked on a throwaway `postgres:16-alpine`
+only. It grants the Go API role `EXECUTE` on `rotra_player_compare` and the six `rotra_sales_*` functions,
+`SELECT` on the two sales views and `admin_settings`, and `UPDATE` on `clubs` (a missing invite code is filled on
+`GET /api/club` and `/api/club/invite`). The role name `rotra_api` is a placeholder chosen in the migration, not a
+name found in the repo: the block skips with a notice when the role does not exist. Confirm the role in Go's
+`DATABASE_URL` before applying.

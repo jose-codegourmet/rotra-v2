@@ -3,7 +3,6 @@ package publicreads_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
 	"net"
@@ -11,7 +10,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -41,14 +39,15 @@ func (c *clock) Advance(d time.Duration) {
 
 func quietLogger() *slog.Logger { return slog.New(slog.NewTextHandler(io.Discard, nil)) }
 
-// server builds the full router (proxy guard included) with the public reads registered.
+// server builds the full router (proxy guard included) with the public reads registered, and the reads that depend
+// on the viewer as a server with no sign-in serves them: every caller is a visitor.
 func server(d publicreads.Deps) http.Handler {
 	if d.Logger == nil {
 		d.Logger = quietLogger()
 	}
 	return httpapi.NewHandler(httpapi.Deps{
 		Logger: d.Logger, Pinger: noPing{}, Readiness: httpapi.NewReadiness(), ProxySecret: secret,
-	}, publicreads.Register(d))
+	}, publicreads.Register(d), publicreads.RegisterVisitorOnly(d))
 }
 
 type noPing struct{}
@@ -78,24 +77,6 @@ func decode(t *testing.T, raw []byte) any {
 
 // ---- characterization against the TypeScript Route Handlers ----
 
-type casesFile struct {
-	Approved  []string            `json:"approved"`
-	Reset     []string            `json:"reset"`
-	Scenarios map[string][]string `json:"scenarios"`
-	Cases     []struct {
-		Name     string `json:"name"`
-		Scenario string `json:"scenario"`
-		Approved bool   `json:"approved"`
-		Path     string `json:"path"`
-	} `json:"cases"`
-}
-
-type goldenCase struct {
-	Status  int               `json:"status"`
-	Headers map[string]string `json:"headers"`
-	Body    json.RawMessage   `json:"body"`
-}
-
 func readTestdata(t *testing.T, name string, into any) {
 	t.Helper()
 	raw, err := os.ReadFile(filepath.Join("testdata", name))
@@ -106,9 +87,6 @@ func readTestdata(t *testing.T, name string, into any) {
 		t.Fatal(err)
 	}
 }
-
-// openSeeded makes a database with the Prisma migrations and the leaderboard fixture rows.
-func openSeeded(t *testing.T) *db.Pool { return openSeededWith(t, "leaderboard.seed.sql") }
 
 // openSeededWith makes a database with the Prisma migrations and the named fixture file from testdata.
 func openSeededWith(t *testing.T, seedFile string) *db.Pool {
@@ -128,77 +106,6 @@ func openSeededWith(t *testing.T, seedFile string) *db.Pool {
 		t.Fatalf("seed: %v", err)
 	}
 	return pool
-}
-
-// knownDeviations are inputs where the Go answer differs from the captured TypeScript one on purpose;
-// the test pins the Go answer instead. Each is listed in the track's report to the owner.
-var knownDeviations = map[string]string{
-	// Prisma turns skip = 2^53 into 0 and returns the first page; every other huge offset below 2^63 is an empty page.
-	"page_offset_2_pow_53": "empty page",
-}
-
-func TestLeaderboardMatchesRouteHandlers(t *testing.T) {
-	var cases casesFile
-	readTestdata(t, "leaderboard.cases.json", &cases)
-	golden := map[string]goldenCase{}
-	readTestdata(t, "leaderboard.golden.json", &golden)
-	if len(golden) != len(cases.Cases) {
-		t.Fatalf("%d golden cases for %d case definitions: rerun apps/api/testdata/tools/capture-leaderboard.test.mjs", len(golden), len(cases.Cases))
-	}
-
-	pool := openSeeded(t)
-	limiter := httpapi.NewRateLimiter(1_000_000, nil) // the limit has its own tests
-	closed := server(publicreads.Deps{Pool: pool.Raw(), Limiter: limiter})
-	open := server(publicreads.Deps{Pool: pool.Raw(), Limiter: limiter, ApprovedAlgorithms: cases.Approved})
-	ctx := context.Background()
-
-	for i, c := range cases.Cases {
-		t.Run(c.Name, func(t *testing.T) {
-			for _, stmt := range append(append([]string{}, cases.Reset...), cases.Scenarios[c.Scenario]...) {
-				if _, err := pool.Raw().Exec(ctx, stmt); err != nil {
-					t.Fatalf("%s: %v", stmt, err)
-				}
-			}
-			h := closed
-			if c.Approved {
-				h = open
-			}
-			rec := get(h, c.Path, fmt.Sprintf("198.51.100.%d", 1+i%250))
-			want, ok := golden[c.Name]
-			if !ok {
-				t.Fatalf("no golden for %s", c.Name)
-			}
-			if dev, isDev := knownDeviations[c.Name]; isDev {
-				if dev != "empty page" || rec.Code != 200 {
-					t.Fatalf("deviation %q: status %d", dev, rec.Code)
-				}
-				var body struct {
-					Entries []any `json:"entries"`
-					Total   int   `json:"total"`
-				}
-				if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil || len(body.Entries) != 0 || body.Total == 0 {
-					t.Fatalf("want an empty page with the total, got %s", rec.Body.String())
-				}
-				return
-			}
-			if rec.Code != want.Status {
-				t.Errorf("status %d, want %d (%s)", rec.Code, want.Status, rec.Body.String())
-			}
-			got := map[string]string{}
-			for k := range rec.Header() {
-				if strings.EqualFold(k, httpapi.RequestIDHeader) {
-					continue // the Go server adds a request id; the Route Handler does not
-				}
-				got[strings.ToLower(k)] = rec.Header().Get(k)
-			}
-			if !reflect.DeepEqual(got, want.Headers) {
-				t.Errorf("headers %v, want %v", got, want.Headers)
-			}
-			if !reflect.DeepEqual(decode(t, rec.Body.Bytes()), decode(t, want.Body)) {
-				t.Errorf("body\n got %s\nwant %s", rec.Body.Bytes(), want.Body)
-			}
-		})
-	}
 }
 
 // ---- behavior that needs no fixture rows ----
@@ -325,7 +232,7 @@ func TestDatabaseDownAnswersTheUnexpectedErrorBody(t *testing.T) {
 	defer pool.Close()
 	var logs strings.Builder
 	log := slog.New(slog.NewTextHandler(&logs, nil))
-	h := server(publicreads.Deps{Pool: pool.Raw(), Logger: log, ApprovedAlgorithms: []string{"rank-test-v1"}})
+	h := server(publicreads.Deps{Pool: pool.Raw(), Logger: log})
 	for _, p := range []string{"/api/leaderboard", "/api/leaderboard/search?q=alice"} {
 		rec := get(h, p, "198.51.100.1")
 		if rec.Code != http.StatusInternalServerError {
@@ -341,23 +248,5 @@ func TestDatabaseDownAnswersTheUnexpectedErrorBody(t *testing.T) {
 	}
 	if strings.Contains(logs.String(), "secret-password") {
 		t.Fatal("the database password must never reach the log")
-	}
-}
-
-func TestClosedGateNeverTouchesTheDatabase(t *testing.T) {
-	// Pool nil: any query would panic. With no approved algorithm (#247) every read is the empty state.
-	h := server(publicreads.Deps{})
-	for p, want := range map[string]string{
-		"/api/leaderboard":                  `{"entries":[],"total":0}`,
-		"/api/leaderboard?offset=3&limit=2": `{"entries":[],"total":0}`,
-		"/api/leaderboard/search?q=alice":   `{"hits":[],"total":0}`,
-	} {
-		rec := get(h, p, "198.51.100.1")
-		if rec.Code != 200 || rec.Body.String() != want {
-			t.Errorf("%s = %d %s, want 200 %s", p, rec.Code, rec.Body.String(), want)
-		}
-		if cc := rec.Header().Get("Cache-Control"); cc != "public, max-age=0, must-revalidate" {
-			t.Errorf("%s Cache-Control %q", p, cc)
-		}
 	}
 }

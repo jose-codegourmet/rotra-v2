@@ -15,6 +15,7 @@ SELECT p.id,
        p.experience_months,
        p.experience_recorded_at,
        p.personal_details,
+       p.profile_state = 'unclaimed' AS is_unclaimed,
        pb.id    AS banner_row_id,
        pb.image AS banner_image
 FROM players p
@@ -27,10 +28,23 @@ SELECT provider, url
 FROM player_social_links
 WHERE player_id = @player_id;
 
+-- The clubs that currently save an unclaimed player (D-2026-11-16-04): the club's own name and nickname for them.
+-- Only an unclaimed profile has any. The order is the club player id; it only matters when there is exactly one.
+-- name: ListUnclaimedSavers :many
+SELECT cp.display_name, cp.nickname, c.name AS club_name
+FROM club_players cp
+JOIN players p ON p.id = cp.player_id AND p.profile_state = 'unclaimed'
+JOIN clubs c ON c.id = cp.club_id
+WHERE cp.player_id = @player_id
+  AND cp.removed_at IS NULL
+ORDER BY cp.id ASC;
+
+-- B-53: a player hidden from Player Information has no RTR ID lookup, for every caller.
 -- name: FindPlayerIDByRTR :one
-SELECT player_id
-FROM player_id_allocations
-WHERE rtr_id = @rtr_id::text;
+SELECT a.player_id, p.hidden_from_directory
+FROM player_id_allocations a
+JOIN players p ON p.id = a.player_id
+WHERE a.rtr_id = @rtr_id::text;
 
 -- name: GetPublicClubsVisibility :one
 SELECT p.profile_visibility
@@ -51,7 +65,9 @@ ORDER BY cp.added_at ASC, cp.id ASC;
 -- name: GetPlayerRank :one
 SELECT p.full_name,
        p.nickname,
+       p.profile_visibility,
        (r.player_id IS NOT NULL)::bool AS has_rank,
+       COALESCE(r.algorithm_version, '')::text AS algorithm_version,
        r.state,
        r.recent_standard_match_count,
        sl.display_order
@@ -99,6 +115,12 @@ WHERE qs.id IN (
                       AND h.club_player_id = f.club_player_id)))
 ORDER BY qs.finalized_at DESC, qs.id ASC
 LIMIT 1;
+
+-- The visibility of any player, with or without an RTR ID (the games read masks by it).
+-- name: GetPlayerVisibility :one
+SELECT profile_visibility
+FROM players
+WHERE id = @player_id;
 
 -- name: ListPlayerFacts :many
 SELECT f.session_id,

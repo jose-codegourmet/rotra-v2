@@ -1,9 +1,11 @@
 package publicreads
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -33,49 +35,56 @@ type pendingUpdate struct {
 }
 
 // rank answers GET /api/players/{playerId}/rank: { rank }, null when the id names no player with an RTR ID.
-// A profile with no stored rank row is "no rank yet" (provisional, no level), not "not found".
-//
-// The name and nickname are returned as stored. The profile and leaderboard reads mask an always-private
-// player; this read does not, exactly as readPlayerRank does today.
+// Only a row written by an approved algorithm is read (the gate of #247, B-54); without one, or for a masked
+// player (./masking.go), it is "no rank yet": provisional, no level, no counts, and the masked name only for a
+// masked player. A profile with no stored rank row is "no rank yet" too, not "not found".
 func (p *players) rank(w http.ResponseWriter, r *http.Request) {
 	id, ok := uuidParam(r)
 	if !ok {
-		httpapi.WriteJSON(w, http.StatusOK, rankBody{}, httpapi.Public)
+		httpapi.WriteJSON(w, http.StatusOK, rankBody{}, httpapi.Private)
 		return
 	}
 	var body rankBody
-	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
-		ctx := r.Context()
-		row, err := q.GetPlayerRank(ctx, id)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil // no player, or no RTR ID
-		}
-		if err != nil {
-			return fmt.Errorf("reading rank: %w", err)
-		}
-		dto := &rankDTO{PlayerID: id.String(), FullName: row.FullName, Nickname: textPtr(row.Nickname), State: "provisional"}
-		body.Rank = dto
-		if !row.HasRank {
-			return nil
-		}
-		dto.State = string(row.State.RankState)
-		if row.DisplayOrder.Valid {
-			dto.LevelIndex = &row.DisplayOrder.Int16
-		}
-		dto.RecentCount = row.RecentStandardMatchCount.Int32
-		counted, err := q.CountPlayerCountedFacts(ctx, id)
-		if err != nil {
-			return fmt.Errorf("counting facts: %w", err)
-		}
-		dto.OlderCount = max(0, counted-int64(dto.RecentCount))
-		dto.UpdatePending, err = pendingRankUpdate(r, q, id)
+	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) (err error) {
+		body.Rank, err = readRank(r.Context(), q, id, viewerOf(r), p.approved)
 		return err
 	})
 	if err != nil {
 		p.fail(w, r, err)
 		return
 	}
-	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Public)
+	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
+}
+
+// readRank is readPlayerRank: nil when no player with an RTR ID has this id.
+func readRank(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, v viewerRef, approved []string) (*rankDTO, error) {
+	row, err := q.GetPlayerRank(ctx, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil // no player, or no RTR ID
+	}
+	if err != nil {
+		return nil, fmt.Errorf("reading rank: %w", err)
+	}
+	masked := isMasked(row.ProfileVisibility, v, id)
+	dto := &rankDTO{PlayerID: id.String(), FullName: row.FullName, Nickname: textPtr(row.Nickname), State: "provisional"}
+	if masked {
+		dto.FullName, dto.Nickname = maskPublicName(row.FullName), nil
+	}
+	if !row.HasRank || masked || !slices.Contains(approved, row.AlgorithmVersion) {
+		return dto, nil
+	}
+	dto.State = string(row.State.RankState)
+	if row.DisplayOrder.Valid {
+		dto.LevelIndex = &row.DisplayOrder.Int16
+	}
+	dto.RecentCount = row.RecentStandardMatchCount.Int32
+	counted, err := q.CountPlayerCountedFacts(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("counting facts: %w", err)
+	}
+	dto.OlderCount = max(0, counted-int64(dto.RecentCount))
+	dto.UpdatePending, err = pendingRankUpdate(ctx, q, id)
+	return dto, err
 }
 
 type rankBody struct {
@@ -84,8 +93,8 @@ type rankBody struct {
 
 // pendingRankUpdate names the latest session of the player whose rank job has not finished. A job with no
 // session behind it (ageing, attribution, assessment) is not reported.
-func pendingRankUpdate(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) (*pendingUpdate, error) {
-	s, err := q.GetPendingRankSession(r.Context(), id)
+func pendingRankUpdate(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (*pendingUpdate, error) {
+	s, err := q.GetPendingRankSession(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}

@@ -1,0 +1,2695 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "subjects": {
+  "alice": "f3000000-0000-4000-8000-000000000001",
+  "bob": "f3000000-0000-4000-8000-000000000002",
+  "carla": "f3000000-0000-4000-8000-000000000003",
+  "dan": "f3000000-0000-4000-8000-000000000004",
+  "eve": "f3000000-0000-4000-8000-000000000005"
+ },
+ "passwordless": [],
+ "approved": [
+  "rank-test-v1"
+ ],
+ "reset": [
+  "UPDATE players SET profile_visibility = v.vis::profile_visibility, hidden_from_directory = v.hid, show_profile_stats = v.stats FROM (VALUES ('d3000000-0000-4000-8000-000000000001', 'public', false, false), ('d3000000-0000-4000-8000-000000000002', 'private', false, true), ('d3000000-0000-4000-8000-000000000003', 'always_private', false, true), ('d3000000-0000-4000-8000-000000000004', 'public', true, true), ('d3000000-0000-4000-8000-000000000005', 'public', false, true), ('d3000000-0000-4000-8000-000000000006', 'public', false, true), ('d3000000-0000-4000-8000-000000000007', 'private', false, true), ('d3000000-0000-4000-8000-000000000008', 'public', false, true), ('d3000000-0000-4000-8000-000000000009', 'public', false, true), ('d3000000-0000-4000-8000-00000000000a', 'always_private', false, true)) AS v(pid, vis, hid, stats) WHERE id = v.pid::uuid",
+  "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e9000000-0000-4000-8000-000000000011'",
+  "DELETE FROM player_match_facts WHERE id::text LIKE 'a9%'",
+  "DELETE FROM match_decisions WHERE match_id::text LIKE 'a9%'",
+  "DELETE FROM matches WHERE id::text LIKE 'a9%'",
+  "DELETE FROM player_id_allocations WHERE player_id::text LIKE 'd9%'",
+  "DELETE FROM players WHERE id::text LIKE 'd9%'",
+  "DELETE FROM projection_jobs WHERE id::text LIKE 'b9%'"
+ ],
+ "scenarios": {
+  "base": [],
+  "alice_always_private": [
+   "UPDATE players SET profile_visibility = 'always_private' WHERE id = 'd3000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_private": [
+   "UPDATE players SET profile_visibility = 'private' WHERE id = 'd3000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_public": [
+   "UPDATE players SET profile_visibility = 'public' WHERE id = 'd3000000-0000-4000-8000-000000000002'"
+  ],
+  "carla_public": [
+   "UPDATE players SET profile_visibility = 'public' WHERE id = 'd3000000-0000-4000-8000-000000000003'"
+  ],
+  "alice_hidden": [
+   "UPDATE players SET hidden_from_directory = true WHERE id = 'd3000000-0000-4000-8000-000000000001'"
+  ],
+  "carla_hidden": [
+   "UPDATE players SET hidden_from_directory = true WHERE id = 'd3000000-0000-4000-8000-000000000003'"
+  ],
+  "una_two_clubs": [
+   "UPDATE club_players SET removed_at = NULL WHERE id = 'e9000000-0000-4000-8000-000000000011'"
+  ],
+  "uri_public": [
+   "UPDATE players SET profile_visibility = 'public' WHERE id = 'd3000000-0000-4000-8000-000000000007'"
+  ],
+  "alice_stats_shown": [
+   "UPDATE players SET show_profile_stats = true WHERE id = 'd3000000-0000-4000-8000-000000000001'"
+  ],
+  "crowded": [
+   "INSERT INTO players (id, full_name, profile_visibility, profile_state, updated_at) SELECT ('d9000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid, 'Filler ' || lpad(i::text, 2, '0'), 'public', 'claimed', now() FROM generate_series(1, 50) i",
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) SELECT ('d9000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid, 'RTR-PH-CEB-102926-' || lpad((100 + i)::text, 4, '0'), 'e8000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 100 + i FROM generate_series(1, 50) i",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, origin, source_operation_id, started_at, ended_at, updated_at) SELECT ('a9000000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, 'e8000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', 100 + i * 10 + j, 'completed', 'singles', 'manual', ('c9000000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, TIMESTAMPTZ '2026-11-10 04:00:00+00', TIMESTAMPTZ '2026-11-10 04:00:00+00', now() FROM generate_series(1, 50) i, generate_series(1, 4) j",
+   "INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, actor_club_id) SELECT ('a9000000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, 'e8000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', 'completed', 'A', 21, 15, ('c9100000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, TIMESTAMPTZ '2026-11-10 04:00:00+00', 'e8000000-0000-4000-8000-000000000001' FROM generate_series(1, 50) i, generate_series(1, 4) j",
+   "INSERT INTO player_match_facts (id, club_id, session_id, match_id, session_player_id, club_player_id, player_id_at_finalization, played_at, format, team, winning_team, full_participation, standard_match, skill_level_snapshot_id, partner_entry_ids, opponent_entry_ids, team_a_score, team_b_score, fact_version) SELECT ('a9100000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, 'e8000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', ('a9000000-0000-4000-8000-' || lpad((i * 10 + j)::text, 12, '0'))::uuid, 'a2000000-0000-4000-8000-000000000101', 'e9000000-0000-4000-8000-000000000001', ('d9000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid, TIMESTAMPTZ '2026-11-10 04:00:00+00', 'singles', 'A', 'A', true, true, 4, '{}'::uuid[], '{}'::uuid[], 21, 15, 1 FROM generate_series(1, 50) i, generate_series(1, 4) j"
+  ],
+  "job_pending": [
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b9000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'a1000000-0000-4000-8000-000000000001', 'pending', NULL, now())"
+  ]
+ },
+ "cases": [
+  {
+   "name": "lb_default_visitor",
+   "path": "/api/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_default_alice",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_default_bob",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_default_carla",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_default_eve",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_year_visitor",
+   "path": "/api/leaderboard?period=year",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_year_alice",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_year_bob",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_year_carla",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_year_eve",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_month_visitor",
+   "path": "/api/leaderboard?period=month",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_month_alice",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_month_bob",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_month_carla",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_month_eve",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_week_visitor",
+   "path": "/api/leaderboard?period=week",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_week_alice",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_week_bob",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_week_carla",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_week_eve",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_limit",
+   "path": "/api/leaderboard?offset=1&limit=2",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_beyond",
+   "path": "/api/leaderboard?offset=100",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_limit_zero",
+   "path": "/api/leaderboard?limit=0",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_limit_51",
+   "path": "/api/leaderboard?limit=51",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_limit_50",
+   "path": "/api/leaderboard?limit=50",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_negative",
+   "path": "/api/leaderboard?offset=-1",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_fraction",
+   "path": "/api/leaderboard?offset=1.5",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_text",
+   "path": "/api/leaderboard?offset=abc",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_empty",
+   "path": "/api/leaderboard?offset=&limit=",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_unsafe",
+   "path": "/api/leaderboard?offset=9007199254740993",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_offset_exp",
+   "path": "/api/leaderboard?offset=1e1&limit=0x2",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_period_bad",
+   "path": "/api/leaderboard?period=day",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_period_empty",
+   "path": "/api/leaderboard?period=",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_period_bad_limit_bad",
+   "path": "/api/leaderboard?period=day&limit=0",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_period_bad_limit_ok",
+   "path": "/api/leaderboard?period=day&limit=5",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_period_upper",
+   "path": "/api/leaderboard?period=YEAR",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_at_week_before_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_week_before_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_week_before_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_week_after_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_week_after_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_week_after_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-15T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_month_before_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_month_before_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_month_before_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_month_after_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_month_after_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_month_after_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-30T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_year_before_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_year_before_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_year_before_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T15:59:59.000Z"
+  },
+  {
+   "name": "lb_at_year_after_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_year_after_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_year_after_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T16:00:00.000Z"
+  },
+  {
+   "name": "lb_at_midday_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-17T12:00:00.000Z"
+  },
+  {
+   "name": "lb_at_midday_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-17T12:00:00.000Z"
+  },
+  {
+   "name": "lb_at_midday_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-17T12:00:00.000Z"
+  },
+  {
+   "name": "lb_at_march_year",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-03-31T00:00:00.000Z"
+  },
+  {
+   "name": "lb_at_march_month",
+   "path": "/api/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-03-31T00:00:00.000Z"
+  },
+  {
+   "name": "lb_at_march_week",
+   "path": "/api/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-03-31T00:00:00.000Z"
+  },
+  {
+   "name": "lb_crowded_page",
+   "path": "/api/leaderboard?limit=50",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "crowded"
+  },
+  {
+   "name": "lb_crowded_page2",
+   "path": "/api/leaderboard?offset=40&limit=20",
+   "player": null,
+   "scenario": "crowded"
+  },
+  {
+   "name": "lb_unclaimed_two",
+   "path": "/api/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "una_two_clubs"
+  },
+  {
+   "name": "lb_alice_private",
+   "path": "/api/leaderboard",
+   "player": null,
+   "scenario": "alice_private"
+  },
+  {
+   "name": "lb_alice_always_private_other",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "lb_alice_always_private_self",
+   "path": "/api/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "lb_carla_public",
+   "path": "/api/leaderboard",
+   "player": null,
+   "scenario": "carla_public"
+  },
+  {
+   "name": "lb_hidden_alice",
+   "path": "/api/leaderboard",
+   "player": null,
+   "scenario": "alice_hidden"
+  },
+  {
+   "name": "search_ali_visitor",
+   "path": "/api/leaderboard/search?q=ali",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_ali_alice",
+   "path": "/api/leaderboard/search?q=ali",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ali_carla",
+   "path": "/api/leaderboard/search?q=ali",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ALICE_visitor",
+   "path": "/api/leaderboard/search?q=ALICE",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_ALICE_alice",
+   "path": "/api/leaderboard/search?q=ALICE",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ALICE_carla",
+   "path": "/api/leaderboard/search?q=ALICE",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ace_visitor",
+   "path": "/api/leaderboard/search?q=ace",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_ace_alice",
+   "path": "/api/leaderboard/search?q=ace",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ace_carla",
+   "path": "/api/leaderboard/search?q=ace",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_una_visitor",
+   "path": "/api/leaderboard/search?q=una",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_una_alice",
+   "path": "/api/leaderboard/search?q=una",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_una_carla",
+   "path": "/api/leaderboard/search?q=una",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_uni_visitor",
+   "path": "/api/leaderboard/search?q=uni",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_uni_alice",
+   "path": "/api/leaderboard/search?q=uni",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_uni_carla",
+   "path": "/api/leaderboard/search?q=uni",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_uri_visitor",
+   "path": "/api/leaderboard/search?q=uri",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_uri_alice",
+   "path": "/api/leaderboard/search?q=uri",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_uri_carla",
+   "path": "/api/leaderboard/search?q=uri",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_zoe_visitor",
+   "path": "/api/leaderboard/search?q=zoe",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_zoe_alice",
+   "path": "/api/leaderboard/search?q=zoe",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_zoe_carla",
+   "path": "/api/leaderboard/search?q=zoe",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_zopcC3pcAB_visitor",
+   "path": "/api/leaderboard/search?q=zo%C3%AB",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_zopcC3pcAB_alice",
+   "path": "/api/leaderboard/search?q=zo%C3%AB",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_zopcC3pcAB_carla",
+   "path": "/api/leaderboard/search?q=zo%C3%AB",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ZOEpc20TAN_visitor",
+   "path": "/api/leaderboard/search?q=ZOE%20TAN",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_ZOEpc20TAN_alice",
+   "path": "/api/leaderboard/search?q=ZOE%20TAN",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_ZOEpc20TAN_carla",
+   "path": "/api/leaderboard/search?q=ZOE%20TAN",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_carla_visitor",
+   "path": "/api/leaderboard/search?q=carla",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_carla_alice",
+   "path": "/api/leaderboard/search?q=carla",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_carla_carla",
+   "path": "/api/leaderboard/search?q=carla",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_cd_visitor",
+   "path": "/api/leaderboard/search?q=cd",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_cd_alice",
+   "path": "/api/leaderboard/search?q=cd",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_cd_carla",
+   "path": "/api/leaderboard/search?q=cd",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_bob_visitor",
+   "path": "/api/leaderboard/search?q=bob",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_bob_alice",
+   "path": "/api/leaderboard/search?q=bob",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_bob_carla",
+   "path": "/api/leaderboard/search?q=bob",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_dan_visitor",
+   "path": "/api/leaderboard/search?q=dan",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_dan_alice",
+   "path": "/api/leaderboard/search?q=dan",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_dan_carla",
+   "path": "/api/leaderboard/search?q=dan",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_hal_visitor",
+   "path": "/api/leaderboard/search?q=hal",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_hal_alice",
+   "path": "/api/leaderboard/search?q=hal",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_hal_carla",
+   "path": "/api/leaderboard/search?q=hal",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_smash_visitor",
+   "path": "/api/leaderboard/search?q=smash",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_smash_alice",
+   "path": "/api/leaderboard/search?q=smash",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_smash_carla",
+   "path": "/api/leaderboard/search?q=smash",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_a_visitor",
+   "path": "/api/leaderboard/search?q=a",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_a_alice",
+   "path": "/api/leaderboard/search?q=a",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_a_carla",
+   "path": "/api/leaderboard/search?q=a",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc25_visitor",
+   "path": "/api/leaderboard/search?q=%25",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc25_alice",
+   "path": "/api/leaderboard/search?q=%25",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc25_carla",
+   "path": "/api/leaderboard/search?q=%25",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search___visitor",
+   "path": "/api/leaderboard/search?q=_",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search___alice",
+   "path": "/api/leaderboard/search?q=_",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search___carla",
+   "path": "/api/leaderboard/search?q=_",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_apc25_visitor",
+   "path": "/api/leaderboard/search?q=a%25",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_apc25_alice",
+   "path": "/api/leaderboard/search?q=a%25",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_apc25_carla",
+   "path": "/api/leaderboard/search?q=a%25",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc20pc20alipc20pc20_visitor",
+   "path": "/api/leaderboard/search?q=%20%20ali%20%20",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc20pc20alipc20pc20_alice",
+   "path": "/api/leaderboard/search?q=%20%20ali%20%20",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_pc20pc20alipc20pc20_carla",
+   "path": "/api/leaderboard/search?q=%20%20ali%20%20",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_nobody_visitor",
+   "path": "/api/leaderboard/search?q=nobody",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "search_nobody_alice",
+   "path": "/api/leaderboard/search?q=nobody",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_nobody_carla",
+   "path": "/api/leaderboard/search?q=nobody",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "search_blank",
+   "path": "/api/leaderboard/search?q=",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_space",
+   "path": "/api/leaderboard/search?q=%20%20",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_missing",
+   "path": "/api/leaderboard/search",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_period_bad",
+   "path": "/api/leaderboard/search?period=day&q=",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_period_bad_q",
+   "path": "/api/leaderboard/search?period=day&q=ali",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_month",
+   "path": "/api/leaderboard/search?period=month&q=e",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_week",
+   "path": "/api/leaderboard/search?period=week&q=a",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "search_long",
+   "path": "/api/leaderboard/search?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazzzz",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_long_match",
+   "path": "/api/leaderboard/search?q=Alice%20Reyes%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20xx",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_crowded",
+   "path": "/api/leaderboard/search?q=filler",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "crowded"
+  },
+  {
+   "name": "search_crowded_wins_below",
+   "path": "/api/leaderboard/search?q=e",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "crowded"
+  },
+  {
+   "name": "search_bob_public",
+   "path": "/api/leaderboard/search?q=bob",
+   "player": null,
+   "scenario": "bob_public"
+  },
+  {
+   "name": "lbme_default_alice",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_default_bob",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_default_carla",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_default_dan",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_default_eve",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_year_alice",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_year_bob",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_year_carla",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_year_dan",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_year_eve",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_month_alice",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_month_bob",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_month_carla",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_month_dan",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_month_eve",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_week_alice",
+   "path": "/api/leaderboard/me?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_week_bob",
+   "path": "/api/leaderboard/me?period=week",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_week_carla",
+   "path": "/api/leaderboard/me?period=week",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_week_dan",
+   "path": "/api/leaderboard/me?period=week",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_week_eve",
+   "path": "/api/leaderboard/me?period=week",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_day_alice",
+   "path": "/api/leaderboard/me?period=day",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_day_bob",
+   "path": "/api/leaderboard/me?period=day",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_day_carla",
+   "path": "/api/leaderboard/me?period=day",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_day_dan",
+   "path": "/api/leaderboard/me?period=day",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_day_eve",
+   "path": "/api/leaderboard/me?period=day",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_crowded_bob",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "crowded"
+  },
+  {
+   "name": "lbme_crowded_default_bob",
+   "path": "/api/leaderboard/me",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "crowded"
+  },
+  {
+   "name": "lbme_crowded_alice",
+   "path": "/api/leaderboard/me?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "crowded"
+  },
+  {
+   "name": "lbme_crowded_eve_month",
+   "path": "/api/leaderboard/me?period=month",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "crowded"
+  },
+  {
+   "name": "lbme_empty_period",
+   "path": "/api/leaderboard/me?period=",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_bob_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_dan_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_una_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_uri_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_zoe_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_dan",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_hal_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_unknown",
+   "path": "/api/players/d3000000-0000-4000-8000-0000000000ff",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_not_uuid",
+   "path": "/api/players/not-a-uuid",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_upper",
+   "path": "/api/players/D3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_upper_self",
+   "path": "/api/players/D3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_upper_self",
+   "path": "/api/players/D3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_carla_upper_other",
+   "path": "/api/players/D3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "profile_alice_always_private",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "profile_alice_always_private_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "profile_alice_always_private_self",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "profile_alice_private_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "alice_private"
+  },
+  {
+   "name": "profile_alice_private_viewer",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_private"
+  },
+  {
+   "name": "profile_alice_hidden_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "alice_hidden"
+  },
+  {
+   "name": "profile_una_two_clubs_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": null,
+   "scenario": "una_two_clubs"
+  },
+  {
+   "name": "profile_una_two_clubs_viewer",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "una_two_clubs"
+  },
+  {
+   "name": "profile_uri_public_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007",
+   "player": null,
+   "scenario": "uri_public"
+  },
+  {
+   "name": "profile_carla_public_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003",
+   "player": null,
+   "scenario": "carla_public"
+  },
+  {
+   "name": "profile_crowded_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "crowded"
+  },
+  {
+   "name": "profile_week_boundary",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "now": "2026-11-15T16:00:00.000Z"
+  },
+  {
+   "name": "profile_year_after",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "now": "2027-01-15T00:00:00.000Z"
+  },
+  {
+   "name": "meprofile_alice",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "meprofile_bob",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "meprofile_carla",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "meprofile_dan",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "meprofile_eve",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "meprofile_alice_always_private",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "meprofile_crowded_bob",
+   "path": "/api/me/profile",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "crowded"
+  },
+  {
+   "name": "rtr_alice_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_bob_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_carla_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_dan_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_una_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_uri_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_zoe_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_carla",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_dan",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_hal_eve",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_unknown",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-9999",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_lower",
+   "path": "/api/rtr-ids/rtr-ph-ceb-102926-0001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_trim",
+   "path": "/api/rtr-ids/%20RTR-PH-CEB-102926-0001%20",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_empty_like",
+   "path": "/api/rtr-ids/%20",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "rtr_alice_hidden_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": null,
+   "scenario": "alice_hidden"
+  },
+  {
+   "name": "rtr_alice_hidden_self",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "alice_hidden"
+  },
+  {
+   "name": "rtr_carla_hidden_self",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "carla_hidden"
+  },
+  {
+   "name": "rtr_alice_private_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": null,
+   "scenario": "alice_private"
+  },
+  {
+   "name": "rtr_alice_private_viewer",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_private"
+  },
+  {
+   "name": "rtr_una_two_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": null,
+   "scenario": "una_two_clubs"
+  },
+  {
+   "name": "rtr_una_two_viewer",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "una_two_clubs"
+  },
+  {
+   "name": "rtr_bob_public_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002",
+   "player": null,
+   "scenario": "bob_public"
+  },
+  {
+   "name": "rank_alice_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_alice_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_alice_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_alice_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_bob_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_bob_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_bob_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_bob_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_carla_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_carla_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_carla_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_carla_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_dan_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_dan_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_dan_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_dan_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_una_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_una_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_una_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_una_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_uri_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_uri_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_uri_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_uri_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_zoe_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_zoe_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_zoe_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_zoe_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_hal_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_hal_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_hal_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/rank",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_hal_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/rank",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_alice_unapproved",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rank_carla_unapproved",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "rank_unknown",
+   "path": "/api/players/d3000000-0000-4000-8000-0000000000ff/rank",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_not_uuid",
+   "path": "/api/players/x/rank",
+   "player": null,
+   "scenario": "base",
+   "approved": true
+  },
+  {
+   "name": "rank_job_pending",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "job_pending",
+   "approved": true
+  },
+  {
+   "name": "rank_alice_private_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/rank",
+   "player": null,
+   "scenario": "alice_private",
+   "approved": true
+  },
+  {
+   "name": "games_alice_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_alice_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_alice_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_alice_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_alice_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_bob_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_bob_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_bob_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_bob_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_bob_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000002/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_carla_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_carla_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_carla_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_carla_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_carla_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000003/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_dan_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_dan_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_dan_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_dan_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_dan_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000004/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_eve_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_eve_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_eve_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_eve_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_eve_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_una_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_una_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_una_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_una_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_una_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000006/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_uri_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_uri_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_uri_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_uri_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_uri_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000007/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_zoe_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_zoe_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_zoe_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_zoe_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_zoe_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000008/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_hal_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_hal_alice",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_hal_bob",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "games_hal_carla",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/games",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "games_hal_eve",
+   "path": "/api/players/d3000000-0000-4000-8000-00000000000a/games",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "games_unknown",
+   "path": "/api/players/d3000000-0000-4000-8000-0000000000ff/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "games_not_uuid",
+   "path": "/api/players/x/games",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "games_alice_private_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": null,
+   "scenario": "alice_private"
+  },
+  {
+   "name": "games_alice_always_private_other",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "games_alice_always_private_self",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000001/games",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "alice_always_private"
+  },
+  {
+   "name": "games_bob_public_visitor",
+   "path": "/api/players/d3000000-0000-4000-8000-000000000005/games",
+   "player": null,
+   "scenario": "bob_public"
+  },
+  {
+   "name": "stats_alice_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_alice_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_bob_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_bob_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_carla_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_carla_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0003/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_dan_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_dan_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0004/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_una_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_una_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_uri_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_uri_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0007/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_zoe_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_zoe_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0008/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_hal_alice",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_hal_bob",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0010/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_alice_shown",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "alice_stats_shown",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_unknown",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-9999/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_lower",
+   "path": "/api/rtr-ids/rtr-ph-ceb-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_una_two",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0006/stats",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "una_two_clubs",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_visitor",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": null,
+   "scenario": "base",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_no_origin",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "stats_bad_origin",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "https://evil.example"
+  },
+  {
+   "name": "stats_player_origin",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "origin": "http://localhost:9001"
+  },
+  {
+   "name": "stats_year_start",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T15:59:59.000Z",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_next_year",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-12-31T16:00:00.000Z",
+   "origin": "http://localhost:9000"
+  },
+  {
+   "name": "stats_early_year",
+   "path": "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-03-05T04:30:00.000Z",
+   "origin": "http://localhost:9000"
+  }
+ ]
+}

@@ -42,15 +42,15 @@ type clubPageDTO struct {
 }
 
 type clubPageClub struct {
-	ID         string      `json:"id"`
-	Name       string      `json:"name"`
-	Initials   utf16String `json:"initials"`
-	LogoURL    *string     `json:"logoUrl"`
-	City       string      `json:"city"`
-	InviteCode *string     `json:"inviteCode"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	Initials utf16String `json:"initials"`
+	LogoURL  *string     `json:"logoUrl"`
+	City     string      `json:"city"`
 }
 
-// clubPageMember is a masked member: no player id and no nickname, the picture, banner and level kept.
+// clubPageMember is a masked member: no player id, nickname or level, and a key that is only their place in the list
+// (B-55); the picture and banner stay.
 type clubPageMember struct {
 	Key            string  `json:"key"`
 	PlayerID       *string `json:"playerId"`
@@ -144,7 +144,7 @@ func (c *clubPages) page(w http.ResponseWriter, r *http.Request) {
 		page = clubPageDTO{
 			Club: clubPageClub{
 				ID: club.ID.String(), Name: club.Name, Initials: clubInitials(club.Name),
-				LogoURL: textPtr(club.LogoRef), City: club.City, InviteCode: textPtr(club.InviteCode),
+				LogoURL: textPtr(club.LogoRef), City: club.City,
 			},
 			Members:  maskedMembers(rows, shown),
 			Sessions: clubSessions(sessions, c.now()),
@@ -176,12 +176,15 @@ func maskedMembers(rows []sqlcgen.ListClubPageMembersRow, shown []sqlcgen.ListSh
 		}
 		key, image := resolveBanner(row.BannerRowID, row.BannerImage, shown)
 		out = append(out, clubPageMember{
-			Key: row.ID.String(), Name: maskPublicName(name), Picture: textPtr(row.AvatarRef),
-			Level: levelCode(row.SkillLevelID), Masked: true, BannerKey: key, BannerImageURL: image,
+			Name: maskPublicName(name), Picture: textPtr(row.AvatarRef),
+			Masked: true, BannerKey: key, BannerImageURL: image,
 		})
 	}
 	compare := newNameComparer()
 	sort.SliceStable(out, func(i, j int) bool { return compare(out[i].Name, out[j].Name) < 0 })
+	for i := range out {
+		out[i].Key = fmt.Sprintf("masked-%d", i) // no stable member key (B-55)
+	}
 	return out
 }
 

@@ -178,20 +178,30 @@ func canonicalMembers(body any) {
 	})
 }
 
-func TestClubPageMembersWithTheSameNameAreOrderedByID(t *testing.T) {
+// A masked member has no stable key (B-55): the key is only the place in the list, so the order of members that share
+// a masked name (the TypeScript leaves it to the database) is not visible on the wire.
+func TestClubPageMaskedMembersHaveOnlyPlaceKeysAndNoLevel(t *testing.T) {
 	pool := openSeededWith(t, "clubpage.seed.sql")
 	h := server(publicreads.Deps{Pool: pool.Raw(), Limiter: httpapi.NewRateLimiter(1_000_000, nil)})
 	rec := get(h, "/api/clubs/a1000000-0000-4000-8000-000000000002", "198.51.100.1")
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
 	}
-	var keys []string
-	for _, m := range members(decode(t, rec.Body.Bytes())) {
-		keys = append(keys, m.(map[string]any)["key"].(string)[34:])
+	var names, keys []string
+	for i, m := range members(decode(t, rec.Body.Bytes())) {
+		member := m.(map[string]any)
+		names = append(names, member["name"].(string))
+		keys = append(keys, member["key"].(string))
+		if want := fmt.Sprintf("masked-%d", i); member["key"] != want {
+			t.Errorf("member %d key %v, want %s", i, member["key"], want)
+		}
+		if member["level"] != nil {
+			t.Errorf("member %d carries a level: %v", i, member["level"])
+		}
 	}
-	// "j*** d***" (lower case first), then the four "J*** D***" members by id
-	if want := []string{"15", "11", "12", "13", "14"}; !reflect.DeepEqual(keys, want) {
-		t.Errorf("member order %v, want %v", keys, want)
+	// "j*** d***" (lower case first), then the four "J*** D***" members
+	if want := []string{"j*** d***", "J*** D***", "J*** D***", "J*** D***", "J*** D***"}; !reflect.DeepEqual(names, want) {
+		t.Errorf("member names %v, want %v (keys %v)", names, want, keys)
 	}
 }
 

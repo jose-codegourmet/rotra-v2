@@ -26,6 +26,8 @@ type players struct {
 	pool *pgxpool.Pool
 	log  *slog.Logger
 	now  func() time.Time
+	// approved are the rank algorithm versions /rank may show (#247).
+	approved []string
 }
 
 func (p *players) fail(w http.ResponseWriter, r *http.Request, err error) {
@@ -40,7 +42,7 @@ func uuidParam(r *http.Request) (pgtype.UUID, bool) {
 	return pgtype.UUID{Bytes: b, Valid: ok}, ok
 }
 
-// ---- GET /api/players/{playerId}: the public profile ----
+// ---- GET /api/players/{playerId}: the profile for this viewer ----
 
 // socialLinks is the four providers, each a URL or the empty string.
 type socialLinks struct {
@@ -50,15 +52,17 @@ type socialLinks struct {
 	Linkedin  string `json:"linkedin"`
 }
 
-// profileDTO is PlayerProfile on the wire. Contacts, account and claim fields never appear.
+// profileDTO is PlayerProfile on the wire. Contacts, account and claim fields never appear. A masked profile
+// (./masking.go) has no RTR ID, and only an unclaimed player carries the club that saved them.
 type profileDTO struct {
 	PlayerID              string      `json:"playerId"`
-	RtrID                 string      `json:"rtrId"`
+	RtrID                 *string     `json:"rtrId,omitempty"`
 	FullName              string      `json:"fullName"`
 	Nickname              *string     `json:"nickname"`
 	Picture               *string     `json:"picture"`
 	BannerID              *string     `json:"bannerId"`
 	ProfileVisibility     string      `json:"profileVisibility"`
+	UnclaimedSavedBy      *string     `json:"unclaimedSavedBy,omitempty"`
 	ShowProfileStats      bool        `json:"showProfileStats"`
 	ShowWeeklyPerformance bool        `json:"showWeeklyPerformance"`
 	PlayingStyle          string      `json:"playingStyle"`
@@ -69,72 +73,158 @@ type profileDTO struct {
 	BannerImageURL        *string     `json:"bannerImageUrl"`
 }
 
+// profileWithPlaces is the profile page read: the profile and the lists the player is in the top 50 of.
+type profileWithPlaces struct {
+	profileDTO
+	LeaderboardPlaces []place `json:"leaderboardPlaces"`
+}
+
+// How a profile read refuses a viewer, as the ServiceError codes of loadProfile in the TypeScript.
+var (
+	errProfileNotFound  = errors.New("profile not found")
+	errProfileForbidden = errors.New("profile forbidden")
+	errProfileSignIn    = errors.New("profile needs a signed-in viewer")
+)
+
+// alwaysPrivateMode is loadProfile's alwaysPrivate argument: refuse an always-private profile (Compare, the RTR ID
+// lookup) or let the masked profile through (the profile page).
+type alwaysPrivateMode int
+
+const (
+	refuseAlwaysPrivate alwaysPrivateMode = iota
+	maskAlwaysPrivate
+)
+
 func (p *players) profile(w http.ResponseWriter, r *http.Request) {
 	id, ok := uuidParam(r)
 	if !ok {
 		notFound(w)
 		return
 	}
-	dto, found, err := p.readProfile(r.Context(), id)
+	var body struct {
+		Profile profileWithPlaces `json:"profile"`
+	}
+	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
+		return p.readPublicProfile(r.Context(), q, id, r.PathValue("playerId"), viewerOf(r), &body.Profile)
+	})
+	if p.refused(w, err) {
+		return
+	}
 	if err != nil {
 		p.fail(w, r, err)
 		return
 	}
-	if !found {
+	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
+}
+
+// refused answers a profile read that the viewer may not see, with the status of the TypeScript ServiceError.
+func (p *players) refused(w http.ResponseWriter, err error) bool {
+	switch {
+	case errors.Is(err, errProfileNotFound):
 		notFound(w)
-		return
+	case errors.Is(err, errProfileForbidden):
+		httpapi.WriteError(w, httpapi.ErrForbidden, nil)
+	case errors.Is(err, errProfileSignIn):
+		httpapi.WriteError(w, httpapi.ErrUnauthenticated, nil)
+	default:
+		return false
 	}
-	httpapi.WriteJSON(w, http.StatusOK, struct {
-		Profile profileDTO `json:"profile"`
-	}{dto}, httpapi.Public)
+	return true
 }
 
-// readProfile is readPublicProfile: only a player with a permanent RTR ID is found. An always-private
-// profile leaves with the name masked and no nickname, style, experience or links; the picture and
-// the banner stay public.
-func (p *players) readProfile(ctx context.Context, id pgtype.UUID) (dto profileDTO, found bool, err error) {
-	err = readTx(ctx, p.pool, func(q *sqlcgen.Queries) error {
-		row, err := q.GetPublicProfile(ctx, id)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil
-		}
-		if err != nil {
-			return fmt.Errorf("reading profile: %w", err)
-		}
-		found = true
-		var shown []sqlcgen.ListShownProfileBannersRow
-		if !row.BannerRowID.Valid {
-			if shown, err = q.ListShownProfileBanners(ctx); err != nil {
-				return fmt.Errorf("reading shown banners: %w", err)
-			}
-		}
-		links, err := q.ListPlayerSocialLinks(ctx, id)
-		if err != nil {
-			return fmt.Errorf("reading social links: %w", err)
-		}
-		dto = profileFrom(row, links, shown, p.now())
+// readPublicProfile is readPublicProfile: the profile page read. An always-private profile answers masked for
+// everyone but the owner (B-63), with no leaderboard places.
+//
+// raw is the player ID as the caller wrote it. The TypeScript compares and keys by that string, so an upper-case ID
+// is never the viewer's own and finds no places: the quirk is kept (it is pinned by the profile_upper cases).
+func (p *players) readPublicProfile(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, raw string, v viewerRef, out *profileWithPlaces) error {
+	dto, err := p.loadProfile(ctx, q, id, raw, v, maskAlwaysPrivate)
+	if err != nil {
+		return err
+	}
+	out.profileDTO, out.LeaderboardPlaces = dto, []place{}
+	if dto.ProfileVisibility == string(sqlcgen.ProfileVisibilityAlwaysPrivate) && !(v.ok && v.id.String() == raw) {
 		return nil
-	})
-	return dto, found, err
+	}
+	b, err := readBoard(ctx, q, periodYear, p.now().UnixMilli())
+	if err != nil {
+		return err
+	}
+	if raw == id.String() {
+		out.LeaderboardPlaces = b.places(id)[raw]
+	}
+	return nil
 }
 
-func profileFrom(row sqlcgen.GetPublicProfileRow, links []sqlcgen.ListPlayerSocialLinksRow, shown []sqlcgen.ListShownProfileBannersRow, now time.Time) profileDTO {
-	masked := row.ProfileVisibility == sqlcgen.ProfileVisibilityAlwaysPrivate
+// loadProfile is loadProfile: the profile for this viewer. A private profile, or an unclaimed one saved by more than
+// one club, needs a signed-in viewer. Always private: forbidden to everyone but the owner, or the masked profile.
+func (p *players) loadProfile(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, raw string, v viewerRef, mode alwaysPrivateMode) (profileDTO, error) {
+	row, err := q.GetPublicProfile(ctx, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return profileDTO{}, errProfileNotFound
+	}
+	if err != nil {
+		return profileDTO{}, fmt.Errorf("reading profile: %w", err)
+	}
+	savers, err := q.ListUnclaimedSavers(ctx, id)
+	if err != nil {
+		return profileDTO{}, fmt.Errorf("reading saving clubs: %w", err)
+	}
+	own := v.ok && v.id.String() == raw
+	singleClub := row.IsUnclaimed && len(savers) == 1
+	if !own && !singleClub {
+		hidden := row.ProfileVisibility == sqlcgen.ProfileVisibilityAlwaysPrivate
+		if hidden && mode == refuseAlwaysPrivate {
+			return profileDTO{}, errProfileForbidden
+		}
+		if !v.ok && (row.IsUnclaimed || (!hidden && row.ProfileVisibility == sqlcgen.ProfileVisibilityPrivate)) {
+			return profileDTO{}, errProfileSignIn
+		}
+	}
+	var shown []sqlcgen.ListShownProfileBannersRow
+	if !row.BannerRowID.Valid {
+		if shown, err = q.ListShownProfileBanners(ctx); err != nil {
+			return profileDTO{}, fmt.Errorf("reading shown banners: %w", err)
+		}
+	}
+	links, err := q.ListPlayerSocialLinks(ctx, id)
+	if err != nil {
+		return profileDTO{}, fmt.Errorf("reading social links: %w", err)
+	}
+	return profileFrom(row, links, shown, savers, v, p.now()), nil
+}
+
+// profileFrom is publicProfileDto with the banner of profileWithBanner. The effective visibility of an unclaimed
+// player saved by one club is public (D-2026-11-16-04): they appear under that club's name and nickname.
+func profileFrom(row sqlcgen.GetPublicProfileRow, links []sqlcgen.ListPlayerSocialLinksRow, shown []sqlcgen.ListShownProfileBannersRow,
+	savers []sqlcgen.ListUnclaimedSaversRow, v viewerRef, now time.Time) profileDTO {
+	visibility := row.ProfileVisibility
+	var saver *sqlcgen.ListUnclaimedSaversRow
+	if len(savers) == 1 {
+		saver, visibility = &savers[0], sqlcgen.ProfileVisibilityPublic
+	}
+	masked := isMasked(visibility, v, row.ID)
 	dto := profileDTO{
 		PlayerID:              row.ID.String(),
-		RtrID:                 row.RtrID,
 		FullName:              row.FullName,
 		Nickname:              textPtr(row.Nickname),
 		Picture:               textPtr(row.AvatarRef),
 		BannerID:              textPtr(row.BannerID),
-		ProfileVisibility:     string(row.ProfileVisibility),
+		ProfileVisibility:     string(visibility),
 		ShowProfileStats:      row.ShowProfileStats,
 		ShowWeeklyPerformance: row.ShowWeeklyPerformance,
 	}
 	dto.BannerKey, dto.BannerImageURL = resolveBanner(row.BannerRowID, row.BannerImage, shown)
 	if masked {
 		dto.FullName, dto.Nickname = maskPublicName(row.FullName), nil
-		return dto // no style, no experience, no links
+		return dto // no RTR ID, no style, no experience, no links
+	}
+	rtr := row.RtrID
+	dto.RtrID = &rtr
+	if saver != nil {
+		dto.FullName, dto.Nickname = saver.DisplayName, textPtr(saver.Nickname)
+		club := saver.ClubName
+		dto.UnclaimedSavedBy = &club
 	}
 	dto.PlayingStyle = playingStyleOf(row.PersonalDetails)
 	if months, ok := currentExperienceMonths(row.ExperienceMonths, row.ExperienceRecordedAt, now); ok {
@@ -195,16 +285,31 @@ var rtrUpper = strings.NewReplacer(
 // rtrLookupKey is rtrId.trim().toUpperCase().
 func rtrLookupKey(s string) string { return strings.ToUpper(rtrUpper.Replace(jsTrim(s))) }
 
-// findByRTR answers { playerId } for an RTR ID. The lookup does not look at the profile's visibility: every
-// player with an RTR ID is found, exactly as findPublicProfileByRtrId does today.
+// findByRTR answers { playerId } for an RTR ID (findPublicProfileByRtrId). It answers 404, the same as for an
+// unknown ID, whenever the profile read would refuse this viewer (a private profile or an unclaimed one under
+// several clubs for a visitor, an always-private one for anyone but the owner, B-53 and B-63), and for a player
+// hidden from Player Information, for every caller (B-53).
 func (p *players) findByRTR(w http.ResponseWriter, r *http.Request) {
 	key := rtrLookupKey(r.PathValue("rtrId"))
 	var playerID pgtype.UUID
-	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) (err error) {
-		playerID, err = q.FindPlayerIDByRTR(r.Context(), key)
-		return err
+	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
+		found, err := q.FindPlayerIDByRTR(r.Context(), key)
+		if err != nil {
+			return err
+		}
+		if found.HiddenFromDirectory {
+			return errProfileNotFound
+		}
+		playerID = found.PlayerID
+		if _, err := p.loadProfile(r.Context(), q, playerID, playerID.String(), viewerOf(r), refuseAlwaysPrivate); err != nil {
+			if errors.Is(err, errProfileForbidden) || errors.Is(err, errProfileSignIn) {
+				return errProfileNotFound
+			}
+			return err
+		}
+		return nil
 	})
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, errProfileNotFound) {
 		notFound(w)
 		return
 	}
@@ -214,5 +319,5 @@ func (p *players) findByRTR(w http.ResponseWriter, r *http.Request) {
 	}
 	httpapi.WriteJSON(w, http.StatusOK, struct {
 		PlayerID string `json:"playerId"`
-	}{playerID.String()}, httpapi.Public)
+	}{playerID.String()}, httpapi.Private)
 }

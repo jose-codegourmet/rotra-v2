@@ -1,0 +1,3751 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "subjects": {
+  "1": "c7000000-0000-4000-8000-000000000001",
+  "2": "c7000000-0000-4000-8000-000000000002",
+  "3": "c7000000-0000-4000-8000-000000000003",
+  "4": "c7000000-0000-4000-8000-000000000004",
+  "5": "c7000000-0000-4000-8000-000000000005",
+  "6": "c7000000-0000-4000-8000-000000000006",
+  "7": "c7000000-0000-4000-8000-000000000007"
+ },
+ "scenarios": {
+  "base": [],
+  "fill_invite": [],
+  "fill_invite_2": [],
+  "smash_bare": [
+   "UPDATE clubs SET description = NULL, court_rules = NULL, post_template = NULL, default_entrance_fee_minor = NULL, logo_ref = NULL WHERE id = 'c9000000-0000-4000-8000-000000000001'",
+   "DELETE FROM club_name_change_requests WHERE club_id = 'c9000000-0000-4000-8000-000000000001'",
+   "DELETE FROM club_accounts WHERE club_id = 'c9000000-0000-4000-8000-000000000003'"
+  ],
+  "smash_expired": [
+   "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'"
+  ],
+  "smash_no_terms": [
+   "DELETE FROM club_license_terms WHERE club_id = 'c9000000-0000-4000-8000-000000000001'",
+   "DELETE FROM club_entitlements WHERE club_id = 'c9000000-0000-4000-8000-000000000001'",
+   "DELETE FROM club_venues; DELETE FROM inventory_items"
+  ],
+  "no_banners_shown": [
+   "UPDATE profile_banners SET shown = false"
+  ],
+  "one_banner_default": [
+   "UPDATE profile_banners SET shown = (id = 'court')"
+  ],
+  "alice_picked_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'",
+   "UPDATE players SET banner_id = 'sun' WHERE id = 'd4000000-0000-4000-8000-000000000002'",
+   "UPDATE profile_banners SET shown = false WHERE id = 'sun'"
+  ],
+  "live_session_ended": [
+   "UPDATE queue_sessions SET state = 'completed', finalized_at = TIMESTAMPTZ '2026-11-19 03:00:00+00' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_hides_stats": [
+   "UPDATE players SET show_profile_stats = false WHERE id = 'd4000000-0000-4000-8000-000000000001'",
+   "UPDATE players SET show_profile_stats = false WHERE id = 'd4000000-0000-4000-8000-000000000003'"
+  ],
+  "alice_hidden": [
+   "UPDATE players SET hidden_from_directory = true WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_not_claimed": [
+   "UPDATE players SET profile_state = 'unclaimed' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "carla_unclaimed": [
+   "UPDATE players SET profile_state = 'unclaimed' WHERE id = 'd4000000-0000-4000-8000-000000000003'"
+  ],
+  "no_ranks": [
+   "DELETE FROM player_rank_current"
+  ],
+  "requests_close_stale": [],
+  "live_started_under_term": [
+   "UPDATE queue_sessions SET start_license_term_id = 'a1000000-0000-4000-8000-000000000002' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "smash_expired_live_started": [
+   "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'",
+   "UPDATE queue_sessions SET start_license_term_id = 'a1000000-0000-4000-8000-000000000002' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "no_courts": [
+   "DELETE FROM session_courts"
+  ],
+  "live_nobody_present": [
+   "UPDATE session_players SET present = false WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_finalized_before_history": [
+   "UPDATE queue_sessions SET state = 'completed', finalized_at = TIMESTAMPTZ '2026-11-13 13:00:00+00' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "nicknames_changed": [
+   "UPDATE club_players SET nickname = '  ' WHERE id = 'c6000000-0000-4000-8000-000000000003'",
+   "UPDATE club_players SET nickname = ' Ally ' WHERE id = 'c6000000-0000-4000-8000-000000000001'",
+   "UPDATE players SET nickname = NULL WHERE id = 'd4000000-0000-4000-8000-000000000001'",
+   "UPDATE club_players SET nickname = 'Cor ' WHERE id = 'c6000000-0000-4000-8000-000000000021'"
+  ],
+  "live_no_estimate": [
+   "DELETE FROM session_cost_estimates WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_custom_fee": [
+   "UPDATE session_cost_estimates SET payment_mode = 'custom', custom_fee_per_head_minor = 100000 WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_custom_loss": [
+   "UPDATE session_cost_estimates SET payment_mode = 'custom', custom_fee_per_head_minor = 10000 WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_names": [
+   "UPDATE session_players SET name_snapshot = 'alice reyes' WHERE id = 'a7000000-0000-4000-8000-000000000018'",
+   "UPDATE session_players SET name_snapshot = '\u00c1lvaro' WHERE id = 'a7000000-0000-4000-8000-000000000015'",
+   "UPDATE session_players SET name_snapshot = 'Alice Reyes' WHERE id = 'a7000000-0000-4000-8000-000000000014'",
+   "DELETE FROM session_payment_marks WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_empty_roster": [
+   "DELETE FROM session_players WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "prepared_no_roster": [
+   "DELETE FROM session_players WHERE session_id = 'a3000000-0000-4000-8000-000000000009'",
+   "UPDATE queue_sessions SET expected_players = NULL WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
+  "live_even_split": [
+   "UPDATE session_cost_estimates SET court_fee_per_court_hour_minor = 30000, entrance_fee_per_head_minor = 0 WHERE session_id = 'a3000000-0000-4000-8000-000000000001'",
+   "DELETE FROM session_shuttle_plan_lines WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_odd_length": [
+   "UPDATE queue_sessions SET scheduled_end_at = scheduled_start_at + interval '100 minutes 40 seconds' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_half_minute": [
+   "UPDATE queue_sessions SET scheduled_end_at = scheduled_start_at + interval '90 minutes 30 seconds' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "prepared_invalid": [
+   "UPDATE queue_sessions SET state = 'invalid', invalid_reason = 'Wrong date' WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
+  "friday_no_record": [
+   "UPDATE queue_sessions SET record_games = false WHERE id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "friday_off_expired": [
+   "UPDATE queue_sessions SET record_games = false WHERE id = 'a3000000-0000-4000-8000-000000000004'",
+   "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'"
+  ],
+  "friday_no_snapshot": [
+   "DELETE FROM session_result_snapshots",
+   "DELETE FROM session_publications",
+   "DELETE FROM session_finalizations",
+   "DELETE FROM result_exports"
+  ],
+  "friday_many_exports": [
+   "INSERT INTO result_exports (id, club_id, session_id, snapshot_id, slides, format, include_off_day, club_name_snapshot, footer, frame_count, source_command_id, created_at) SELECT ('a3b00000-0000-4000-8000-0000000001' || lpad(n::text, 2, '0'))::uuid, 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'a3a00000-0000-4000-8000-000000000002', ARRAY['standings'::result_slide], 'feed', false, 'Smash Club', 'powered by rotra', 1, ('a3b10000-0000-4000-8000-0000000001' || lpad(n::text, 2, '0'))::uuid, TIMESTAMPTZ '2026-11-14 00:00:00+00' + make_interval(secs => n) FROM generate_series(1, 12) AS n"
+  ],
+  "una_present": [
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000015'"
+  ],
+  "live_nobody_present_2": [
+   "UPDATE session_players SET present = false WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "live_no_matches": [
+   "DELETE FROM active_court_holds",
+   "UPDATE matches SET state = 'completed', started_at = TIMESTAMPTZ '2026-11-19 03:00:00+00', ended_at = TIMESTAMPTZ '2026-11-19 03:10:00+00', placed_at = NULL WHERE state IN ('on_court','active')"
+  ],
+  "live_finalizing": [
+   "UPDATE queue_sessions SET state = 'finalizing' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "notice_player_released": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-19 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000021'"
+  ],
+  "sync_open_stream_live": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_sealed_proven": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 2, 2, 2, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'accepted', TIMESTAMPTZ '2026-11-19 02:10:00+00', 3, NULL, now())",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 2, 'match', 'a8200000-0000-4000-8000-000000000002', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'rejected', TIMESTAMPTZ '2026-11-19 02:10:00+00', NULL, 'invalid', now())"
+  ],
+  "sync_sealed_short": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 2, 2, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_revoked_only": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 3, 5, NULL, NULL, NULL, 'revoked', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_open_conflict": [
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())"
+  ],
+  "sync_resolved_conflict": [
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'resolved', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, TIMESTAMPTZ '2026-11-19 03:30:00+00', '{\"version\":1,\"note\":\"checked\"}'::jsonb, now())"
+  ],
+  "sync_op_received": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 1, 1, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'received', NULL, NULL, NULL, now())"
+  ],
+  "sync_op_waiting": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 1, 1, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'waiting', NULL, NULL, NULL, now())"
+  ],
+  "sync_op_accepted": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 1, 1, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'accepted', TIMESTAMPTZ '2026-11-19 02:10:00+00', 5, NULL, now())"
+  ],
+  "sync_op_rejected": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 1, 1, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'rejected', TIMESTAMPTZ '2026-11-19 02:10:00+00', NULL, 'invalid', now())"
+  ],
+  "sync_op_conflicted": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 1, 1, 1, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'conflicted', TIMESTAMPTZ '2026-11-19 02:10:00+00', NULL, NULL, now())"
+  ],
+  "sync_prepared_open": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_completed_open": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000007', 'a8000000-0000-4000-8000-000000000002', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000007', 'a8100000-0000-4000-8000-000000000002', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'received', NULL, NULL, NULL, now())"
+  ],
+  "sync_finalizing_open": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_other_club": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000003', 'a3000000-0000-4000-8000-000000000003', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000003', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())"
+  ],
+  "sync_stray_club": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_two_incomplete": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000002', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())"
+  ],
+  "sync_one_proven_one_not": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 4, 4, 4, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a8000000-0000-4000-8000-000000000002', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "sync_big_numbers": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 9007199254740993, 9007199254740993, 9007199254740995, 9007199254740993, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 3)"
+  ],
+  "sync_many_streams": [
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 2, 3, NULL, NULL, NULL, 'revoked', TIMESTAMPTZ '2026-11-19 02:00:00+00', now(), 1)",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000002', 2, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00.5+00', now(), 1)",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000003', 3, 1, 5, 5, 5, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 03:00:00+00', now(), 1)",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'payload_mismatch', 'open', TIMESTAMPTZ '2026-11-19 02:45:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:15:00.5+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'identity_link', 'resolved', TIMESTAMPTZ '2026-11-19 01:15:00+00', '{\"secret\":\"private evidence\"}'::jsonb, TIMESTAMPTZ '2026-11-19 03:30:00+00', '{\"version\":1,\"note\":\"checked\"}'::jsonb, now())",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'contradictory_decision', 'open', TIMESTAMPTZ '2026-11-19 03:15:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000002', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'received', NULL, NULL, NULL, now())",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000002', 2, 'match', 'a8200000-0000-4000-8000-000000000002', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'waiting', NULL, NULL, NULL, now())",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000003', 1, 'match', 'a8200000-0000-4000-8000-000000000003', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'accepted', TIMESTAMPTZ '2026-11-19 02:10:00+00', 5, NULL, now())"
+  ],
+  "review_no_policy": [
+   "DELETE FROM ranking_policy_versions"
+  ],
+  "review_policy_at_now": [
+   "DELETE FROM ranking_policy_versions WHERE version > 1",
+   "UPDATE ranking_policy_versions SET effective_at = TIMESTAMPTZ '2026-11-19 04:00:00+00'"
+  ],
+  "review_policy_after_now": [
+   "DELETE FROM ranking_policy_versions WHERE version > 1",
+   "UPDATE ranking_policy_versions SET effective_at = TIMESTAMPTZ '2026-11-19 04:00:00.0004+00'"
+  ],
+  "review_no_active_match": [
+   "UPDATE matches SET state = 'completed', ended_at = TIMESTAMPTZ '2026-11-19 04:00:00+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000001' AND state = 'active'"
+  ],
+  "review_all_block": [
+   "DELETE FROM ranking_policy_versions",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_conflicts (id, club_id, session_id, category, state, detected_at, evidence, resolved_at, resolution_evidence, updated_at) VALUES ('a8300000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'missing_prerequisite', 'open', TIMESTAMPTZ '2026-11-19 02:30:00+00', '{\"secret\":\"private evidence\"}'::jsonb, NULL, NULL, now())",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000002', 1, 1, 0, 0, 0, TIMESTAMPTZ '2026-11-19 03:00:00.25+00', decode(repeat('ab', 32), 'hex'), 'sealed', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)",
+   "INSERT INTO sync_operations (id, club_id, session_id, stream_id, sequence, entity_type, entity_id, command_kind, payload_version, payload, payload_digest, occurred_at, state, processed_at, result_revision, rejection_code, updated_at) VALUES ('a8200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8100000-0000-4000-8000-000000000001', 1, 'match', 'a8200000-0000-4000-8000-000000000001', 'match.complete', 1, '{}'::jsonb, decode(repeat('00', 32), 'hex'), TIMESTAMPTZ '2026-11-19 02:00:00+00', 'received', NULL, NULL, NULL, now())"
+  ],
+  "review_min_0": [
+   "UPDATE queue_sessions SET minimum_games = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_min_1": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_min_2": [
+   "UPDATE queue_sessions SET minimum_games = 2 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_min_5": [
+   "UPDATE queue_sessions SET minimum_games = 5 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_credit_outgoing": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE matches SET state = 'completed', queue_position = NULL, started_at = TIMESTAMPTZ '2026-11-19 03:50:00+00', ended_at = TIMESTAMPTZ '2026-11-19 03:59:00+00' WHERE id = 'a5000000-0000-4000-8000-000000000013'",
+   "INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, actor_club_id) VALUES ('a5000000-0000-4000-8000-000000000013', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'completed', 'B', 10, 21, 'a9300000-0000-4000-8000-000000000013', TIMESTAMPTZ '2026-11-19 03:59:00+00', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE match_participations SET session_player_id = 'a7000000-0000-4000-8000-000000000018', started_with_match = true, finished_with_match = false, left_operation_id = 'a9200000-0000-4000-8000-0000000000f1', left_at = TIMESTAMPTZ '2026-11-19 03:55:00+00' WHERE id = 'a9100000-0000-4000-8000-000000000007'",
+   "UPDATE match_participations SET started_with_match = true, finished_with_match = true WHERE id = 'a9100000-0000-4000-8000-000000000008'",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, left_operation_id, joined_at, left_at, started_with_match, finished_with_match, credit_to, updated_at) VALUES ('a9100000-0000-4000-8000-0000000000f1', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000013', 'a7000000-0000-4000-8000-000000000015', 'A', 2, 'a9200000-0000-4000-8000-0000000000f1', NULL, TIMESTAMPTZ '2026-11-19 03:55:00+00', NULL, false, true, 'outgoing', now())"
+  ],
+  "review_credit_incoming": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE matches SET state = 'completed', queue_position = NULL, started_at = TIMESTAMPTZ '2026-11-19 03:50:00+00', ended_at = TIMESTAMPTZ '2026-11-19 03:59:00+00' WHERE id = 'a5000000-0000-4000-8000-000000000013'",
+   "INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, actor_club_id) VALUES ('a5000000-0000-4000-8000-000000000013', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'completed', 'B', 10, 21, 'a9300000-0000-4000-8000-000000000013', TIMESTAMPTZ '2026-11-19 03:59:00+00', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE match_participations SET session_player_id = 'a7000000-0000-4000-8000-000000000018', started_with_match = true, finished_with_match = false, left_operation_id = 'a9200000-0000-4000-8000-0000000000f1', left_at = TIMESTAMPTZ '2026-11-19 03:55:00+00' WHERE id = 'a9100000-0000-4000-8000-000000000007'",
+   "UPDATE match_participations SET started_with_match = true, finished_with_match = true WHERE id = 'a9100000-0000-4000-8000-000000000008'",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, left_operation_id, joined_at, left_at, started_with_match, finished_with_match, credit_to, updated_at) VALUES ('a9100000-0000-4000-8000-0000000000f1', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000013', 'a7000000-0000-4000-8000-000000000015', 'A', 2, 'a9200000-0000-4000-8000-0000000000f1', NULL, TIMESTAMPTZ '2026-11-19 03:55:00+00', NULL, false, true, 'incoming', now())"
+  ],
+  "review_credit_none": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE matches SET state = 'completed', queue_position = NULL, started_at = TIMESTAMPTZ '2026-11-19 03:50:00+00', ended_at = TIMESTAMPTZ '2026-11-19 03:59:00+00' WHERE id = 'a5000000-0000-4000-8000-000000000013'",
+   "INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, actor_club_id) VALUES ('a5000000-0000-4000-8000-000000000013', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'completed', 'B', 10, 21, 'a9300000-0000-4000-8000-000000000013', TIMESTAMPTZ '2026-11-19 03:59:00+00', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE match_participations SET session_player_id = 'a7000000-0000-4000-8000-000000000018', started_with_match = true, finished_with_match = false, left_operation_id = 'a9200000-0000-4000-8000-0000000000f1', left_at = TIMESTAMPTZ '2026-11-19 03:55:00+00' WHERE id = 'a9100000-0000-4000-8000-000000000007'",
+   "UPDATE match_participations SET started_with_match = true, finished_with_match = true WHERE id = 'a9100000-0000-4000-8000-000000000008'",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, left_operation_id, joined_at, left_at, started_with_match, finished_with_match, credit_to, updated_at) VALUES ('a9100000-0000-4000-8000-0000000000f1', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000013', 'a7000000-0000-4000-8000-000000000015', 'A', 2, 'a9200000-0000-4000-8000-0000000000f1', NULL, TIMESTAMPTZ '2026-11-19 03:55:00+00', NULL, false, true, 'none', now())"
+  ],
+  "review_credit_dangling": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, left_operation_id, joined_at, left_at, started_with_match, finished_with_match, credit_to, updated_at) VALUES ('a9100000-0000-4000-8000-0000000000f2', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a5000000-0000-4000-8000-000000000011', 'a7000000-0000-4000-8000-000000000015', 'A', 2, 'a9200000-0000-4000-8000-0000000000f2', NULL, TIMESTAMPTZ '2026-11-19 01:40:00+00', NULL, false, true, 'outgoing', now())",
+   "UPDATE match_participations SET credit_to = 'incoming', started_with_match = false WHERE id = 'a9100000-0000-4000-8000-000000000005'"
+  ],
+  "review_invalid_decision": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE match_decisions SET kind = 'invalid', winning_team = NULL, team_a_score = NULL, team_b_score = NULL WHERE match_id = 'a5000000-0000-4000-8000-000000000011'"
+  ],
+  "review_no_decision": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "DELETE FROM match_decisions WHERE match_id = 'a5000000-0000-4000-8000-000000000011'"
+  ],
+  "review_no_completed": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE matches SET state = 'invalid' WHERE state = 'completed' AND session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_adjusted": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE session_players SET games_adjustment = 5"
+  ],
+  "review_no_record": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE queue_sessions SET record_games = false WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "review_left": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-19 02:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000015'",
+   "UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a7000000-0000-4000-8000-000000000014'"
+  ],
+  "review_guest_alice": [
+   "UPDATE club_players SET display_name = '  alice   REYES ' WHERE id = 'c6000000-0000-4000-8000-000000000021'"
+  ],
+  "review_guest_snapshot": [
+   "UPDATE session_players SET name_snapshot = 'Bob Santos' WHERE id = 'a7000000-0000-4000-8000-000000000014'"
+  ],
+  "review_guest_nickname": [
+   "UPDATE club_players SET nickname = 'Ace' WHERE id = 'c6000000-0000-4000-8000-000000000021'"
+  ],
+  "review_guest_club_nick": [
+   "UPDATE club_players SET nickname = 'bobby' WHERE id = 'c6000000-0000-4000-8000-000000000021'"
+  ],
+  "review_guest_two": [
+   "UPDATE club_players SET display_name = 'Carla Dizon' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-0000000000f1', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', 'Carla D.', 'carla dizon', TIMESTAMPTZ '2026-02-03 00:00:00+00', 1, now())"
+  ],
+  "review_guest_unclaimed": [
+   "UPDATE club_players SET display_name = 'Erin Lim' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE players SET profile_state = 'unclaimed' WHERE id = 'd4000000-0000-4000-8000-000000000005'"
+  ],
+  "review_guest_no_rtr": [
+   "UPDATE club_players SET display_name = 'Frank No Id' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-0000000000f2', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000006', 'Frank No Id', TIMESTAMPTZ '2026-02-03 00:00:00+00', 1, now())"
+  ],
+  "review_guest_removed": [
+   "UPDATE club_players SET display_name = 'Alice Reyes' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000001'"
+  ],
+  "review_guest_other_club": [
+   "UPDATE club_players SET display_name = 'Bob Santos' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE club_players SET club_id = 'c9000000-0000-4000-8000-000000000002', nickname = NULL WHERE id = 'c6000000-0000-4000-8000-000000000003'"
+  ],
+  "review_guest_blank": [
+   "UPDATE club_players SET nickname = ' ' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE players SET nickname = '' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "review_guest_unicode": [
+   "UPDATE club_players SET display_name = '\u0130lker' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE players SET full_name = 'i\u0307lker' WHERE id = 'd4000000-0000-4000-8000-000000000001'",
+   "UPDATE club_players SET display_name = '\u039f\u0394\u039f\u03a3' WHERE id = 'c6000000-0000-4000-8000-000000000011'",
+   "UPDATE players SET full_name = '\u03bf\u03b4\u03bf\u03c2' WHERE id = 'd4000000-0000-4000-8000-000000000002'",
+   "UPDATE club_players SET display_name = 'Stra\u00dfe' WHERE id = 'c6000000-0000-4000-8000-000000000024'",
+   "UPDATE players SET nickname = 'STRASSE' WHERE id = 'd4000000-0000-4000-8000-000000000003'",
+   "UPDATE players SET full_name = '\u00df' WHERE id = 'd4000000-0000-4000-8000-000000000005'"
+  ],
+  "review_guest_space": [
+   "UPDATE club_players SET display_name = E'\\u00a0\\ufeffAlice\\u2003\\u3000 Reyes\\u2028' WHERE id = 'c6000000-0000-4000-8000-000000000021'"
+  ],
+  "review_no_guests": [
+   "UPDATE club_players SET player_id = 'd4000000-0000-4000-8000-000000000004' WHERE id = 'c6000000-0000-4000-8000-000000000021'",
+   "UPDATE club_players SET player_id = 'd4000000-0000-4000-8000-000000000006' WHERE id = 'c6000000-0000-4000-8000-000000000011'",
+   "UPDATE club_players SET player_id = 'd4000000-0000-4000-8000-000000000007' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "review_guest_ties": [
+   "UPDATE session_players SET confirmed_at = TIMESTAMPTZ '2026-11-18 12:10:00+00' WHERE club_player_id IN ('c6000000-0000-4000-8000-000000000021', 'c6000000-0000-4000-8000-000000000011', 'c6000000-0000-4000-8000-000000000024')"
+  ],
+  "review_prepared_stream": [
+   "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000009'",
+   "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "fin_done": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'slides', completed_at = TIMESTAMPTZ '2026-11-13 14:05:00.25+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 2, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_done_error": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'slides', completed_at = TIMESTAMPTZ '2026-11-13 14:05:00+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 3, TIMESTAMPTZ '2026-11-13 14:00:00+00', 'projection_failed', TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_unrecorded": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'finishing', completed_at = TIMESTAMPTZ '2026-11-13 14:00:00.5+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_running": [
+   "UPDATE session_finalizations SET state = 'running', stage = 'checking', committed_at = NULL, facts_digest = NULL WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_micros": [
+   "UPDATE session_finalizations SET committed_at = TIMESTAMPTZ '2026-11-13 14:00:00.123987+00', completed_at = TIMESTAMPTZ '2026-11-13 14:00:01.9999+00', state = 'done' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_exhausted": [
+   "UPDATE session_finalizations SET state = 'failed', stage = 'player_records', failed_stage = 'slides', failure_code = 'snapshot_error' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'failed', 8, TIMESTAMPTZ '2026-11-19 03:00:00+00', 'invalid', NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_not_due": [
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_running_job": [
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'running', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "UPDATE projection_jobs SET locked_at = TIMESTAMPTZ '2026-11-19 03:59:00+00' WHERE id = 'a8400000-0000-4000-8000-000000000001'"
+  ],
+  "fin_other_clubs": [
+   "INSERT INTO session_finalizations (session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, manifest_digest, accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, facts_digest, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'a3100000-0000-4000-8000-000000000002', 'done', 'slides', NULL, NULL, '[]'::jsonb, decode(repeat('00', 32), 'hex'), 1, 'fa000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-13 14:00:00+00', TIMESTAMPTZ '2026-11-13 14:00:00.5+00', TIMESTAMPTZ '2026-11-13 14:05:00+00', decode(repeat('01', 32), 'hex'), now())",
+   "INSERT INTO session_finalizations (session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, manifest_digest, accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, facts_digest, updated_at) VALUES ('a3000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000002', 'a3100000-0000-4000-8000-000000000005', 'committed', 'player_records', NULL, NULL, '[]'::jsonb, decode(repeat('00', 32), 'hex'), 1, 'fa000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-13 14:00:00+00', TIMESTAMPTZ '2026-11-13 14:00:00.5+00', NULL, decode(repeat('01', 32), 'hex'), now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000002', 'done', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_pending": [
+   "UPDATE session_finalizations SET state = 'committed', stage = 'player_records' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_lost_response": [
+   "UPDATE session_finalizations SET state = 'committed', stage = 'player_records' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_failed_retry": [
+   "UPDATE session_finalizations SET state = 'failed', stage = 'player_records', failed_stage = 'slides', failure_code = 'snapshot_error' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'failed', 2, TIMESTAMPTZ '2026-11-19 03:00:00+00', 'snapshot_error', NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_pending_expired": [
+   "UPDATE session_finalizations SET state = 'committed' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'"
+  ]
+ },
+ "cases": [
+  {
+   "name": "club-signed-out",
+   "path": "/api/club",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "club-club1",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "club-club3",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "club-club4",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "club-club5",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "club-disabled",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "club-unprovisioned",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "invite-signed-out",
+   "path": "/api/club/invite",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "invite-club1",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "invite-club3",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "invite-club4",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "invite-club5",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "invite-disabled",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "invite-unprovisioned",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "venues-signed-out",
+   "path": "/api/venues",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "venues-club1",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "venues-club2",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "venues-club3",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "venues-club4",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "venues-club5",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "venues-disabled",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "venues-unprovisioned",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "inventory-signed-out",
+   "path": "/api/inventory",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-club1",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-club2",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-club3",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-club4",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-club5",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "inventory-disabled",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "inventory-unprovisioned",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "license-signed-out",
+   "path": "/api/license",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "license-club1",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "license-club2",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "license-club3",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "license-club4",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "license-club5",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "license-disabled",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "license-unprovisioned",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "club-club2-fills-invite",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fill_invite",
+   "redact": [
+    "club.inviteCode"
+   ]
+  },
+  {
+   "name": "invite-club2-fills-invite",
+   "path": "/api/club/invite",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fill_invite_2",
+   "redact": [
+    "inviteCode"
+   ]
+  },
+  {
+   "name": "club-club1-bare",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_bare"
+  },
+  {
+   "name": "club-club3-no-account-row",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "smash_bare",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "license-club1-expired",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "club-club1-expired",
+   "path": "/api/club",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "venues-club1-expired",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "inventory-club1-expired",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "license-club1-no-terms",
+   "path": "/api/license",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_no_terms"
+  },
+  {
+   "name": "venues-club1-none",
+   "path": "/api/venues",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_no_terms"
+  },
+  {
+   "name": "inventory-club1-none",
+   "path": "/api/inventory",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_no_terms"
+  },
+  {
+   "name": "players-signed-out",
+   "path": "/api/club/players",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "players-club1",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "players-club2",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "players-club3",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "players-club4",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "players-club5",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "players-disabled",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "players-club1-no-banner-shown",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "no_banners_shown"
+  },
+  {
+   "name": "players-club1-one-banner-shown",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "one_banner_default"
+  },
+  {
+   "name": "players-club1-picked-banners",
+   "path": "/api/club/players",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "alice_picked_banner"
+  },
+  {
+   "name": "details-club1-una",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000011",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-cory",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-ned",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-nia",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000025",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-dan",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000016",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-retired-entry",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000014",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-alice-registered",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-erin",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-removed",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000023",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-other-club",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000022",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-other-club-registered",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000002",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-unknown",
+   "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-not-a-uuid",
+   "path": "/api/club/players/not-an-id",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "details-signed-out",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "details-club3-own",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000022",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club3-other-club",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club2-expired",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000013",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club5-no-row",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club4-edge",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "details-club1-expired",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "details-club1-experience-later",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2027-02-01T04:00:00.000Z"
+  },
+  {
+   "name": "delete-impact-club1-alice",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-bob",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000003/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-carla",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000004/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-erin",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000005/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-dan",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000016/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-cory",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-ned",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-nia",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000025/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-una",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000011/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-other-club",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000022/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-removed",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000023/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-unknown",
+   "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-not-a-uuid",
+   "path": "/api/club/players/x/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "delete-impact-signed-out",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/delete-impact",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club2-expired",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000013/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club3-unknown",
+   "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "delete-impact-club1-expired",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "delete-impact-club1-bob-session-ended",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000003/delete-impact",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_session_ended"
+  },
+  {
+   "name": "year-stats-club1-alice",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-alice-other-club",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000002/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-bob",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000003/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-carla",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000004/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-erin-unclaimed",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000005/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-una",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000011/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-cory-guest",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000021/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-removed",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000023/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-other-club",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000022/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club2-alice",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000002/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-unknown",
+   "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-not-a-uuid",
+   "path": "/api/club/players/x/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-signed-out",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/year-stats",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club2-expired",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000013/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "year-stats-club1-next-year",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2027-01-02T04:00:00.000Z"
+  },
+  {
+   "name": "year-stats-club1-alice-hidden",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "alice_hides_stats"
+  },
+  {
+   "name": "year-stats-club1-carla-hidden",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000004/year-stats",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "alice_hides_stats"
+  },
+  {
+   "name": "lookup-club1-alice-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-alice-rtr-lower",
+   "path": "/api/players?q=rtr-ph-ceb-102926-0001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-bob-rtr-spaces",
+   "path": "/api/players?q=%20%20RTR-PH-CEB-102926-0002%20%20",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-alice-email",
+   "path": "/api/players?q=alice%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-alice-email-upper",
+   "path": "/api/players?q=ALICE%40Example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-carla-google-email",
+   "path": "/api/players?q=carla%40gmail.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-una-rtr-saved",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0007",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-una-email-saved",
+   "path": "/api/players?q=una%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-uri-email",
+   "path": "/api/players?q=uri%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-uri-rtr",
+   "path": "/api/players?q=RTR-PH-MNL-103026-0008",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-retired-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-empty-entry-email",
+   "path": "/api/players?q=empty%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-hidden-player-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0013",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-unclaimed-profile-rtr",
+   "path": "/api/players?q=RTR-PH-MNL-102926-0005",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-dan-email-entry",
+   "path": "/api/players?q=dan%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-dan-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0004",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-empty",
+   "path": "/api/players?q=",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-blank",
+   "path": "/api/players?q=%20%20%20",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name",
+   "path": "/api/players?q=Alice%20Reyes",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-phone",
+   "path": "/api/players?q=%2B639175550001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-unknown-email",
+   "path": "/api/players?q=nobody%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-unknown-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-9999",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-garbage",
+   "path": "/api/players?q=not%20an%20email",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-email-with-space",
+   "path": "/api/players?q=a%20b%40c.d",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-short-rtr",
+   "path": "/api/players?q=RTR-PH-CEB-102926-000",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-no-q",
+   "path": "/api/players",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-two-q",
+   "path": "/api/players?q=alice%40example.test&q=bob%40example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club2-alice-saved",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0001",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club2-una-saved",
+   "path": "/api/players?q=una@example.test",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club3-alice",
+   "path": "/api/players?q=RTR-PH-CEB-102926-0001",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club5-alice-no-licence",
+   "path": "/api/players?q=alice@example.test",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-signed-out",
+   "path": "/api/players?q=alice@example.test",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-disabled",
+   "path": "/api/players?q=alice@example.test",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "lookup-club1-alice-hidden-from-directory",
+   "path": "/api/players?q=alice@example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "alice_hidden"
+  },
+  {
+   "name": "lookup-club1-alice-private-contact-gone",
+   "path": "/api/players?q=alice@example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "alice_not_claimed"
+  },
+  {
+   "name": "lookup-club1-carla-google-unclaimed",
+   "path": "/api/players?q=carla@gmail.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "carla_unclaimed"
+  },
+  {
+   "name": "lookup-club1-bob-rank-none",
+   "path": "/api/players?q=bob@example.test",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "no_ranks"
+  },
+  {
+   "name": "sessions-signed-out",
+   "path": "/api/sessions",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-club1",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-club2",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-club3",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-club4",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-club5",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "sessions-disabled",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "sessions-club1-expired",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "sessions-club1-no-courts",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "no_courts"
+  },
+  {
+   "name": "sessions-club1-later",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-28T04:00:00.000Z"
+  },
+  {
+   "name": "session-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "session-club1-not-a-uuid",
+   "path": "/api/sessions/nope",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "session-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "session-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "session-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "session-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "roster-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/roster",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-not-a-uuid",
+   "path": "/api/sessions/nope/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "roster-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "roster-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "roster-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "roster-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "matches-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/matches",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/matches",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "matches-club1-not-a-uuid",
+   "path": "/api/sessions/nope/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "matches-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "matches-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "matches-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "matches-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "cost-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/cost",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/cost",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/cost",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club1-not-a-uuid",
+   "path": "/api/sessions/nope/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "cost-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "cost-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "cost-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "cost-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "payments-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/payments",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/payments",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/payments",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-not-a-uuid",
+   "path": "/api/sessions/nope/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "payments-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "payments-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "payments-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "payments-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "results-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/results",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/results",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/results",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-not-a-uuid",
+   "path": "/api/sessions/nope/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "results-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "results-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "results-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "results-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "requests-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "requests-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/requests",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/requests",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/requests",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "requests-club1-not-a-uuid",
+   "path": "/api/sessions/nope/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "requests-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "requests-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "requests-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "requests-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "session-disabled",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "session-club1-s1-nobody-present",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_nobody_present"
+  },
+  {
+   "name": "roster-club1-s1-nobody-present",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_nobody_present"
+  },
+  {
+   "name": "roster-club1-s1-later",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-20T04:00:00.000Z"
+  },
+  {
+   "name": "roster-club1-s4-finalized",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "roster-club1-s1-finalized-before-history",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_finalized_before_history"
+  },
+  {
+   "name": "roster-club1-s1-nicknames",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "nicknames_changed"
+  },
+  {
+   "name": "cost-club1-s1-no-estimate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_no_estimate"
+  },
+  {
+   "name": "payments-club1-s1-no-estimate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_no_estimate"
+  },
+  {
+   "name": "cost-club1-s1-custom-profit",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_custom_fee"
+  },
+  {
+   "name": "payments-club1-s1-custom-profit",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_custom_fee"
+  },
+  {
+   "name": "cost-club1-s1-custom-loss",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_custom_loss"
+  },
+  {
+   "name": "payments-club1-s1-custom-loss",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_custom_loss"
+  },
+  {
+   "name": "payments-club1-s1-name-order",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_names"
+  },
+  {
+   "name": "payments-club1-s1-empty-roster",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_empty_roster"
+  },
+  {
+   "name": "cost-club1-s1-empty-roster",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_empty_roster"
+  },
+  {
+   "name": "cost-club1-s9-no-players",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "prepared_no_roster"
+  },
+  {
+   "name": "payments-club1-s9-no-players",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "prepared_no_roster"
+  },
+  {
+   "name": "cost-club1-s1-even-split",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_even_split"
+  },
+  {
+   "name": "payments-club1-s1-even-split",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_even_split"
+  },
+  {
+   "name": "cost-club1-s1-odd-length",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_odd_length"
+  },
+  {
+   "name": "cost-club1-s1-half-minute",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_half_minute"
+  },
+  {
+   "name": "payments-club3-s8-invalid-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/payments",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "cost-club3-s8-invalid-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/cost",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "payments-club1-s9-invalid",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "prepared_invalid"
+  },
+  {
+   "name": "session-club1-s9-invalid",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "prepared_invalid"
+  },
+  {
+   "name": "results-club1-s4-record-off",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "friday_no_record"
+  },
+  {
+   "name": "results-club1-s4-expired-record-off",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "friday_off_expired"
+  },
+  {
+   "name": "results-club1-s4-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "results-club3-s8-invalid-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/results",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "results-club1-s4-nothing-stored",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "friday_no_snapshot"
+  },
+  {
+   "name": "results-club1-s4-twelve-exports",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "friday_many_exports"
+  },
+  {
+   "name": "requests-club1-s1-una-present",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "una_present"
+  },
+  {
+   "name": "requests-club1-s1-nobody-present",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_nobody_present_2"
+  },
+  {
+   "name": "requests-club1-s1-no-court-matches",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_no_matches"
+  },
+  {
+   "name": "requests-club1-s1-finalizing",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_finalizing"
+  },
+  {
+   "name": "session-club1-s1-finalizing",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_finalizing"
+  },
+  {
+   "name": "requests-club1-s9-notice-entry-released",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "notice_player_released"
+  },
+  {
+   "name": "session-club1-s9-notice-entry-released",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "notice_player_released"
+  },
+  {
+   "name": "requests-club2-s2-finalizing-lapsed",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/requests",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "requests_close_stale"
+  },
+  {
+   "name": "sync-signed-out",
+   "path": "/api/sync",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "sync-club1",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sync-club2",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "sync-club3",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "sync-club4",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "sync-club5",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "sync-disabled",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "sync-unprovisioned",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "sync-club1-expired",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "sync-club1-later",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-11-28T04:00:00.123Z"
+  },
+  {
+   "name": "sync-club1-open-stream",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_open_stream_live"
+  },
+  {
+   "name": "sync-club1-sealed-proven",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_proven"
+  },
+  {
+   "name": "sync-club1-sealed-prefix-short",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_short"
+  },
+  {
+   "name": "sync-club1-revoked-stream-alone-is-fine",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_revoked_only"
+  },
+  {
+   "name": "sync-club1-open-conflict",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_open_conflict"
+  },
+  {
+   "name": "sync-club1-resolved-conflict",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_resolved_conflict"
+  },
+  {
+   "name": "sync-club1-operation-received",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_received"
+  },
+  {
+   "name": "sync-club1-operation-waiting",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_waiting"
+  },
+  {
+   "name": "sync-club1-operation-accepted",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_accepted"
+  },
+  {
+   "name": "sync-club1-operation-rejected",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_rejected"
+  },
+  {
+   "name": "sync-club1-operation-conflicted",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_conflicted"
+  },
+  {
+   "name": "sync-club1-prepared-session-open-stream",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_prepared_open"
+  },
+  {
+   "name": "sync-club1-completed-sessions-are-ignored",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_completed_open"
+  },
+  {
+   "name": "sync-club2-finalizing-session-is-ignored",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "sync_finalizing_open"
+  },
+  {
+   "name": "sync-club1-other-clubs-rows-are-ignored",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_other_club"
+  },
+  {
+   "name": "sync-club3-own-open-stream",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "sync_other_club"
+  },
+  {
+   "name": "sync-club1-stray-club-id-counts",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_stray_club"
+  },
+  {
+   "name": "sync-club1-two-incomplete",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_two_incomplete"
+  },
+  {
+   "name": "sync-club1-one-proven-one-not",
+   "path": "/api/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_one_proven_one_not"
+  },
+  {
+   "name": "sessionsync-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/sync",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/sync",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/sync",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "sessionsync-club1-not-a-uuid",
+   "path": "/api/sessions/nope/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "sessionsync-disabled",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "sessionsync-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "sessionsync-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "sessionsync-club1-big-numbers",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_big_numbers"
+  },
+  {
+   "name": "sessionsync-club1-many-streams-and-conflicts",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_many_streams"
+  },
+  {
+   "name": "sessionsync-club1-stray-session-rows-of-other-club",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_stray_club"
+  },
+  {
+   "name": "sessionsync-club2-cannot-read-smash-streams",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "sync_many_streams"
+  },
+  {
+   "name": "sessionsync-club1-completed-with-open-stream",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_completed_open"
+  },
+  {
+   "name": "sessionsync-club1-sealed-proven",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_proven"
+  },
+  {
+   "name": "sessionsync-club1-sealed-prefix-short",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_short"
+  },
+  {
+   "name": "sessionsync-club1-revoked-only",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_revoked_only"
+  },
+  {
+   "name": "sessionsync-club1-resolved-conflict",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_resolved_conflict"
+  },
+  {
+   "name": "sessionsync-club1-open-conflict-hides-evidence",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_open_conflict"
+  },
+  {
+   "name": "sessionsync-club1-operation-received",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_received"
+  },
+  {
+   "name": "sessionsync-club1-operation-waiting",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_waiting"
+  },
+  {
+   "name": "sessionsync-club1-operation-accepted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_accepted"
+  },
+  {
+   "name": "sessionsync-club1-operation-rejected",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_rejected"
+  },
+  {
+   "name": "sessionsync-club1-operation-conflicted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/sync",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_conflicted"
+  },
+  {
+   "name": "donereview-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s6",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s7",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s8",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-s9",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club2-own-s2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/done-review",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club3-own-s3",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/done-review",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club3-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/done-review",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club4-edge",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club5-no-row",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "donereview-club1-not-a-uuid",
+   "path": "/api/sessions/nope/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "donereview-disabled",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "donereview-club1-expired-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "donereview-club1-expired-live-started",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "donereview-club1-expired-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired_live_started"
+  },
+  {
+   "name": "donereview-club1-started-term-live",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "live_started_under_term"
+  },
+  {
+   "name": "donereview-club1-s4-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "donereview-club1-s1-open-stream",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_open_stream_live"
+  },
+  {
+   "name": "donereview-club1-s1-sealed-proven",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_proven"
+  },
+  {
+   "name": "donereview-club1-s1-sealed-short",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_sealed_short"
+  },
+  {
+   "name": "donereview-club1-s1-revoked",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_revoked_only"
+  },
+  {
+   "name": "donereview-club1-s1-open-conflict",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_open_conflict"
+  },
+  {
+   "name": "donereview-club1-s1-resolved-conflict",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_resolved_conflict"
+  },
+  {
+   "name": "donereview-club1-s1-many",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_many_streams"
+  },
+  {
+   "name": "donereview-club1-s1-big",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_big_numbers"
+  },
+  {
+   "name": "donereview-club1-s1-stray-club",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_stray_club"
+  },
+  {
+   "name": "donereview-club1-s1-operation-received",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_received"
+  },
+  {
+   "name": "donereview-club1-s1-operation-waiting",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_waiting"
+  },
+  {
+   "name": "donereview-club1-s1-operation-accepted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_accepted"
+  },
+  {
+   "name": "donereview-club1-s1-operation-rejected",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_rejected"
+  },
+  {
+   "name": "donereview-club1-s1-operation-conflicted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "sync_op_conflicted"
+  },
+  {
+   "name": "donereview-club1-s1-no-policy",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_policy"
+  },
+  {
+   "name": "donereview-club1-s1-before-the-first-policy",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2026-09-30T04:00:00.000Z"
+  },
+  {
+   "name": "donereview-club1-s1-policy-starts-this-instant",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_policy_at_now"
+  },
+  {
+   "name": "donereview-club1-s1-policy-starts-in-a-moment",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_policy_after_now"
+  },
+  {
+   "name": "donereview-club1-s1-no-active-match",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_active_match"
+  },
+  {
+   "name": "donereview-club1-s1-everything-blocks",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_all_block"
+  },
+  {
+   "name": "donereview-club1-s1-minimum-0",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_min_0"
+  },
+  {
+   "name": "donereview-club1-s1-minimum-1",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_min_1"
+  },
+  {
+   "name": "donereview-club1-s1-minimum-2",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_min_2"
+  },
+  {
+   "name": "donereview-club1-s1-minimum-5",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_min_5"
+  },
+  {
+   "name": "donereview-club1-s1-credit-outgoing",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_credit_outgoing"
+  },
+  {
+   "name": "donereview-club1-s1-credit-incoming",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_credit_incoming"
+  },
+  {
+   "name": "donereview-club1-s1-credit-none",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_credit_none"
+  },
+  {
+   "name": "donereview-club1-s1-credit-dangling",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_credit_dangling"
+  },
+  {
+   "name": "donereview-club1-s1-invalid-match-gives-nothing",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_invalid_decision"
+  },
+  {
+   "name": "donereview-club1-s1-completed-without-decision",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_decision"
+  },
+  {
+   "name": "donereview-club1-s1-no-completed-matches",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_completed"
+  },
+  {
+   "name": "donereview-club1-s1-games-adjustment-is-not-counted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_adjusted"
+  },
+  {
+   "name": "donereview-club1-s1-no-record-games",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_record"
+  },
+  {
+   "name": "donereview-club1-s1-released-and-no-show-leave-the-list",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_left"
+  },
+  {
+   "name": "donereview-club1-s1-guest-named-like-a-profile",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_alice"
+  },
+  {
+   "name": "donereview-club1-s1-guest-snapshot-matches",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_snapshot"
+  },
+  {
+   "name": "donereview-club1-s1-guest-nickname-matches",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_nickname"
+  },
+  {
+   "name": "donereview-club1-s1-guest-matches-club-nickname",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_club_nick"
+  },
+  {
+   "name": "donereview-club1-s1-guest-matches-two-profiles",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_two"
+  },
+  {
+   "name": "donereview-club1-s1-guest-profile-unclaimed-has-rtr",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_unclaimed"
+  },
+  {
+   "name": "donereview-club1-s1-guest-profile-without-rtr-id",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_no_rtr"
+  },
+  {
+   "name": "donereview-club1-s1-guest-removed-profile-is-no-candidate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_removed"
+  },
+  {
+   "name": "donereview-club1-s1-guest-other-clubs-profile-is-no-candidate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_other_club"
+  },
+  {
+   "name": "donereview-club1-s1-guest-blank-names-never-match",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_blank"
+  },
+  {
+   "name": "donereview-club1-s1-guest-unicode-lowercase",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_unicode"
+  },
+  {
+   "name": "donereview-club1-s1-guest-js-whitespace",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_space"
+  },
+  {
+   "name": "donereview-club1-s1-no-guests",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_no_guests"
+  },
+  {
+   "name": "donereview-club1-s1-guest-entries-confirmed-the-same-moment",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_guest_ties"
+  },
+  {
+   "name": "donereview-club1-s9-prepared",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/done-review",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "review_prepared_stream"
+  },
+  {
+   "name": "donereview-club3-s8-invalid-expired",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/done-review",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club2-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club3-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club4-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club5-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-disabled",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "finalization-unprovisioned",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "finalization-club1-s1-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s2-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s3-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s5-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s6-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s7-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s8-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s9-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-not-a-uuid",
+   "path": "/api/sessions/nope/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "finalization-club1-s4-expired-still-answers",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "finalization-club1-s4-later",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2027-03-01T04:00:00.000Z"
+  },
+  {
+   "name": "finalization-club1-s4-done",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_done"
+  },
+  {
+   "name": "finalization-club2-s4-done-is-not-theirs",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_done"
+  },
+  {
+   "name": "finalization-club1-s4-done-with-error-text-kept",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_done_error"
+  },
+  {
+   "name": "finalization-club1-s4-unrecorded-done-no-jobs",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_unrecorded"
+  },
+  {
+   "name": "finalization-club1-s4-not-committed-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_running"
+  },
+  {
+   "name": "finalization-club1-s4-micros-cut-to-milliseconds",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_micros"
+  },
+  {
+   "name": "finalization-club1-s4-attempts-used-up-stays-failed",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_exhausted"
+  },
+  {
+   "name": "finalization-club1-s4-jobs-not-due-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_not_due"
+  },
+  {
+   "name": "finalization-club1-s4-job-running-within-lease",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_running_job"
+  },
+  {
+   "name": "finalization-club2-s2-own-lapsed-still-answers",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club1-s2-another-clubs-is-not-found",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club2-s5-own",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club1-s4-pending-jobs-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-pending-jobs-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending",
+   "goGolden": "finalization-club1-s4-pending-jobs-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-half-done-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_lost_response",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-half-done-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_lost_response",
+   "goGolden": "finalization-club1-s4-half-done-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-failed-due-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_failed_retry",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-failed-due-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_failed_retry",
+   "goGolden": "finalization-club1-s4-failed-due-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-pending-expired-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending_expired",
+   "noDrive": true
+  }
+ ]
+}

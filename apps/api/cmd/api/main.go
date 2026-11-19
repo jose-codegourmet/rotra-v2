@@ -25,6 +25,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
 
@@ -69,6 +70,8 @@ func run() error {
 	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log})}
 	if cfg.AuthSigningKey == nil {
 		log.Warn("ROTRA_AUTH_SIGNING_KEY is not set: no auth routes are served")
+		// With no sign-in every caller is a visitor, so the reads that depend on the viewer are served as the visitor's.
+		routes = append(routes, publicreads.RegisterVisitorOnly(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log}))
 	} else {
 		current := cfg.AuthSigningKey.Public().(ed25519.PublicKey)
 		keys, err := pass.NewKeySet(current, cfg.AuthExtraPublicKeys...)
@@ -115,6 +118,20 @@ func run() error {
 			return err
 		}
 		routes = append(routes, recoveryService.Routes())
+		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
+		// they are served only where sign-in is.
+		signedInRoutes, err := signedin.Register(signedin.Deps{
+			Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log,
+			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
+			// as the stream routes (the paired Queue pages).
+			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins,
+			// The Admin list of password-reset requests is the recovery service's read.
+			PasswordResets: recoveryService,
+		})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, signedInRoutes)
 		log.Info("auth signing key loaded", slog.String("kid", pass.KeyID(current)), slog.Int("published_keys", len(keys.JWKS())))
 	}
 	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{

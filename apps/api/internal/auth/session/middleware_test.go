@@ -160,3 +160,80 @@ func TestMiddlewareAnswersInternalErrorsWithoutDetails(t *testing.T) {
 		t.Fatalf("%d %+v", rec.Code, body)
 	}
 }
+
+func TestOptionalReadsNoPassAndBadPassesAsAVisitor(t *testing.T) {
+	e := newEnv(t)
+	auth := e.svc.Authenticator()
+	p := &probe{}
+	h := auth.Optional(store.AudiencePlayer)(p)
+
+	rec, _ := serve(h, httptest.NewRequest(http.MethodGet, "/api/x", nil))
+	if rec.Code != http.StatusNoContent || p.called != 1 || p.ok {
+		t.Fatalf("no pass is a visitor: %d %+v", rec.Code, p)
+	}
+	rec, _ = serve(h, cookieReq(http.MethodGet, store.AudiencePlayer, "garbage"))
+	if rec.Code != http.StatusNoContent || p.called != 2 || p.ok {
+		t.Fatalf("an unverifiable pass is a visitor: %d %+v", rec.Code, p)
+	}
+	club := e.issue(t, e.newClub(t, "opt-club"))
+	rec, _ = serve(h, cookieReq(http.MethodGet, store.AudiencePlayer, club.AccessPass))
+	if rec.Code != http.StatusNoContent || p.called != 3 || p.ok {
+		t.Fatalf("a pass for another app is a visitor: %d %+v", rec.Code, p)
+	}
+}
+
+func TestOptionalPutsAValidPrincipalInTheContext(t *testing.T) {
+	e := newEnv(t)
+	player := e.newPlayer(t, "opt-player@example.com")
+	iss := e.issue(t, player)
+	p := &probe{}
+	h := e.svc.Authenticator().Optional(store.AudiencePlayer)(p)
+	rec, _ := serve(h, cookieReq(http.MethodGet, store.AudiencePlayer, iss.AccessPass))
+	if rec.Code != http.StatusNoContent || !p.ok || p.principal.AccountID != player.accountID || p.principal.Audience != store.AudiencePlayer {
+		t.Fatalf("valid pass: %d %+v", rec.Code, p)
+	}
+}
+
+func TestOptionalAnswersExpiredNotVisitor(t *testing.T) {
+	e := newEnv(t)
+	iss := e.issue(t, e.newPlayer(t, "opt-exp@example.com"))
+	p := &probe{}
+	h := e.svc.Authenticator().Optional(store.AudiencePlayer)(p)
+	e.clk.Advance(16 * time.Minute)
+	rec, body := serve(h, cookieReq(http.MethodGet, store.AudiencePlayer, iss.AccessPass))
+	if rec.Code != http.StatusUnauthorized || body.Error.Code != "expired" || p.called != 0 {
+		t.Fatalf("expired: %d %+v called %d", rec.Code, body, p.called)
+	}
+}
+
+func TestOptionalReadsAnAccountThatCannotSignInAsAVisitor(t *testing.T) {
+	e := newEnv(t)
+	player := e.newPlayer(t, "opt-disabled@example.com")
+	iss := e.issue(t, player)
+	e.exec(t, `UPDATE player_accounts SET disabled_at = now() WHERE player_id = $1`, player.accountID)
+	p := &probe{}
+	h := e.svc.Authenticator().Optional(store.AudiencePlayer)(p)
+	rec, _ := serve(h, cookieReq(http.MethodGet, store.AudiencePlayer, iss.AccessPass))
+	if rec.Code != http.StatusNoContent || p.ok {
+		t.Fatalf("a disabled account reads as a visitor: %d %+v", rec.Code, p)
+	}
+}
+
+func TestAudienceOfReadsTheAppHeader(t *testing.T) {
+	for header, want := range map[string]store.Audience{"club": store.AudienceClub, "player": store.AudiencePlayer, "admin": store.AudienceAdmin} {
+		r := httptest.NewRequest(http.MethodGet, "/", nil)
+		r.Header.Set(session.AppHeader, header)
+		if aud, ok := session.AudienceOf(r); !ok || aud != want {
+			t.Fatalf("%s: got %q %v", header, aud, ok)
+		}
+	}
+	for _, bad := range []string{"", "Club", "queue", "player "} {
+		r := httptest.NewRequest(http.MethodGet, "/", nil)
+		if bad != "" {
+			r.Header.Set(session.AppHeader, bad)
+		}
+		if _, ok := session.AudienceOf(r); ok {
+			t.Fatalf("%q must not name an app", bad)
+		}
+	}
+}

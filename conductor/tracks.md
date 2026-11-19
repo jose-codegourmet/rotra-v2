@@ -16,7 +16,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 4 | [x] | [beta-stack_20261113](./tracks/beta-stack_20261113/) — Side-by-side beta stack | chore | high | go-api-foundation | 3 / 6 |
 | 5 | [x] | [go-public-reads_20261113](./tracks/go-public-reads_20261113/) — Public reads in Go | refactor | high | beta-stack | 3 / 7 |
 | 6 | [ ] | [go-sign-in_20261113](./tracks/go-sign-in_20261113/) — Sign-in owned by Go | feature | critical | beta-stack | 5 / 15 |
-| 7 | [ ] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 4 / 6 |
+| 7 | [x] | [go-signed-in-reads_20261113](./tracks/go-signed-in-reads_20261113/) — Signed-in reads in Go | refactor | high | go-sign-in, go-public-reads | 6 / 6 |
 | 8 | [ ] | [go-writes-admin-player_20261113](./tracks/go-writes-admin-player_20261113/) — Admin and Player writes in Go | refactor | high | go-signed-in-reads | 3 / 4 |
 | 9 | [ ] | [go-writes-queue_20261113](./tracks/go-writes-queue_20261113/) — Queue writes and offline contract in Go | refactor | critical | go-writes-admin-player | 5 / 9 |
 | 10 | [ ] | [go-sign-in-catch-up_20261119](./tracks/go-sign-in-catch-up_20261119/) — Google sign-in and the guest claim in Go | feature | high | go-sign-in | 3 / 7 |
@@ -40,6 +40,7 @@ Open items set aside on 2026-11-13. Not scheduled; each says when it must be pic
 | BL-7 | Mockup change: "Sign in to sync N waiting changes", the revoked-device message, the sign-out warning with waiting changes, and the revoke dialog's offline-copy warning | [B-28](../docs/backend/open-decisions.md#settled) | go-sign-in R3 |
 | BL-8 | Mockup change + ticket: read-only switch for the cutover (one setting; writes refused with a "ROTRA is updating" message) | [B-35](../docs/backend/open-decisions.md#settled) | ship-and-retire R2 |
 | BL-9 | Backups and a restore drill: confirm what Railway Hobby includes, production schedule (suggested daily + weekly; point-in-time recovery after pricing), a timed restore drill on staging, a manual off-Railway `pg_dump` before ship and risky migrations | [B-40](../docs/backend/open-decisions.md#will-hurt-later) | ship-and-retire R1 |
+| BL-10 | Ticket: the real Player club page reads the invite link (`?k=`) and shows Join only with it, as the mockup change `2026-11-19-player-club-page-join-needs-invite-link` says; until then the real Join link has no code and the server rejects it. No code change made in this track (owner: backlog only) | [B-55](../docs/backend/open-decisions.md#settled), [mockup change](../docs/mockup-changes/2026-11-19-player-club-page-join-needs-invite-link.md) | the next UI ticket batch for Player, and before real clubs share club-page links |
 
 **Testing (B-52).** Tracks 3–11 check their work locally (apps → local Go API → local Postgres); live checks on Railway and Vercel run once in `staging-verification`, and what they find is logged as bugs.
 

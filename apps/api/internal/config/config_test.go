@@ -172,6 +172,25 @@ func TestLoadProxySecretAndOrigins(t *testing.T) {
 	}
 }
 
+func TestLoadQueueOriginsAreSeparate(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{
+		"DATABASE_URL": "postgres://x", "ROTRA_ALLOWED_ORIGINS": "https://a.club",
+		"ROTRA_QUEUE_ORIGINS": " https://queue.rotra.club ,http://localhost:9000",
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.QueueOrigins) != 2 || cfg.QueueOrigins[0] != "https://queue.rotra.club" || len(cfg.AllowedOrigins) != 1 {
+		t.Fatalf("queue %v allowed %v", cfg.QueueOrigins, cfg.AllowedOrigins)
+	}
+	for _, v := range []string{"*", "https://q.club/x", "q.club"} {
+		_, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_QUEUE_ORIGINS": v}))
+		if err == nil || !strings.Contains(err.Error(), "ROTRA_QUEUE_ORIGINS") {
+			t.Errorf("%q: want a ROTRA_QUEUE_ORIGINS error, got %v", v, err)
+		}
+	}
+}
+
 func TestLoadRejectsBadOrigins(t *testing.T) {
 	for _, v := range []string{"*", "https://a.club/path", "queue.rotra.club", "https://a.club/", "ftp://a.club", "https://*.rotra.club"} {
 		_, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_ALLOWED_ORIGINS": v}))

@@ -6,23 +6,64 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 1: Player
 
-- [ ] **1.1** Characterize + port me/account/clubs/sessions
-- [ ] **1.2** Compare, #569 access and the signed-in match history read (#850)
+- [x] **1.1** Characterize + port me/account/clubs/sessions (done: account, clubs, verification, notifications, sessions, share, invites, contact-change; foundation = per-app router + optional viewer. then profile, leaderboard period/search/me, rtr-ids stats, B-53/54/55/56/63 ported in the second commit)
+- [x] **1.2** Compare, #569 access and the signed-in match history read (#850)
 
 ## Phase 2: Admin
 
-- [ ] **2.1** Characterize + port Admin lists and views
+- [x] **2.1** Characterize + port Admin lists and views
 
 ## Phase 3: Queue
 
-- [ ] **3.1** Characterize + port club and session reads
-- [ ] **3.2** Sync read
+- [x] **3.1** Characterize + port club and session reads (club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests, done-review; `/finalization` read-only, see deviations)
+- [x] **3.2** Sync read (`/api/sync`, `/api/sessions/{id}/sync`)
 
 ## Phase 4: Switch
 
-- [ ] **4.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
+- [x] **4.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
 
 ## Deviations log
 
 | Date | Task | Deviation | Reason | Resolution |
 |---|---|---|---|---|
+| 2026-11-19 | 1.1 | An expired pass on an optional-viewer route answers 401 `expired` instead of acting as a visitor | TS refreshed through cookies; a visitor answer would silently downgrade a signed-in player | Owner to confirm (auth decision) |
+| 2026-11-19 | 1.1 | `hasPassword` reads `auth_identities.password_hash` (TS reads `auth.users`) | Go has no `auth.users` | Only read when Google is connected |
+| 2026-11-19 | 1.1 | B-54 masked leaderboard row id is `masked-<position>`; masked profile omits rtrId and unclaimedSavedBy; `/rank` and `/games` are now `private, no-store` | B-54 gives no wire detail | Ported per the row; owner to confirm |
+| 2026-11-19 | 1.1 | `/games` paging is opt-in: `?limit=` (1 to 50 sessions) and `?offset=`, newest first; the answer adds `nextOffset` (null after the last page). No usable `limit` sends the whole history as before | The Games screen's weekly chart, compare win rate and share data need the whole list, so the default cannot change | Done in TS and Go (8 new golden cases). The UI does not page: a "load more" would change the Games screen, so it starts in the mockup (AGENTS rule 15) and must first drop the chart's need for every game |
+| 2026-11-19 | 1.1 | `/rtr-ids/{rtrId}/stats` CORS allows only the exact Queue origins; the Queue/Player pairing is not checked | Go cannot see the pairing | Origin header must reach Go through go-forward |
+| 2026-11-19 | 1.2 | Queue/Player origin pairing is not checked; `ROTRA_ALLOWED_ORIGINS` is used as the Queue origin list | Go cannot see the pairing | **Fixed:** new `ROTRA_QUEUE_ORIGINS` setting (same format as `ROTRA_ALLOWED_ORIGINS`, kept apart from it, unset = no Queue origin allowed). Set it on the Go service before switching the stats read |
+| 2026-11-19 | 1.2 | Go database role needs EXECUTE on `public.rotra_player_compare` | Migration revokes it from PUBLIC | Migration `20261119000200_go_api_role_grants` now exists (role name `rotra_api` is a placeholder; on beta Go connects as `postgres`, so nothing is needed there; skips if absent) but is NOT applied to the shared database (it covers `rotra_player_compare`). Apply it before switching `/compare` |
+| 2026-11-19 | 1.2 | my-night has no `recordGames` gate; access carries no standings; wire keys are `checkedIn`/`hasLeft` | Characterized from the TS | Ported as is |
+| 2026-11-19 | 2.1 | Admin reads did not check the session row, so a revoked admin session read 200. **Fixed:** Admin routes use the new `session.ModeSessionRead` (account check plus the session-row check of a write, through the same short caches); Player and Queue reads keep `ModeRead`. A revoked or expired session row answers 401 `unauthenticated` | `internal/auth/session/authn.go`, `internal/signedin/admin*.go` | Fixed; `TestAdminReadsCheckTheSession`, `TestAdminReadsRefuseAnExpiredSessionRow` |
+| 2026-11-19 | 2.1 | An inactive or unknown admin answers 401 `unauthenticated` (TS: 403 `wrong_account`) | Go auth middleware | Owner to confirm |
+| 2026-11-19 | 2.1 | Malformed ids answer 404 where the TS crashes with 500 | Go validates ids first | Pinned in a Go test |
+| 2026-11-19 | 2.1 | Go role needs EXECUTE on `rotra_sales_*` and SELECT on the sales views and `admin_settings` | Migration revokes them from PUBLIC | Migration `20261119000200_go_api_role_grants` now exists (role name `rotra_api` is a placeholder; on beta Go connects as `postgres`, so nothing is needed there; skips if absent) but is NOT applied to the shared database. Apply it before switching `/api/sales` |
+| 2026-11-19 | 2.1 | `internal/rules/{sales,adminplayer,...}` are stubs; helpers live unexported in `signedin` | Rules packages not to be edited here | Move later (a copy) |
+| 2026-11-19 | 2.1 | `GET /api/players` has no query parameters in the TS, so none added | Characterized | Client filters |
+| 2026-11-19 | 3.1 | A disabled or unprovisioned club answers 401 (TS: 403 `wrong_account`); malformed ids answer 404 (TS: 500) | Go auth middleware and id validation | Owner to confirm |
+| 2026-11-19 | 3.1 | `GET /api/club` and `/api/club/invite` write on a read (fill a missing invite code, `revision + 1`) | Characterized from the TS | Migration `20261119000200_go_api_role_grants` now exists (role name `rotra_api` is a placeholder; on beta Go connects as `postgres`, so nothing is needed there; skips if absent) but is NOT applied to the shared database. Apply it before switching `/api/club` |
+| 2026-11-19 | 3.1 | `/requests` filters stale requests without closing them in the database | Reads should not write | Same answer, stored status not updated |
+| 2026-11-19 | 3.1 | `/finalization` runs `driveFinalizationJobs` before reading; `/done-review` needs `sessionCompleteness` from sync | Not a plain read | Left out; `/finalization` is an owner call, `/done-review` follows 3.2 |
+| 2026-11-19 | 3.1 | `/api/public-sessions/{slug}/my-request` is a visitor read keyed on a receipt cookie | Not a club read | Stays on Next; `/api/public-sessions` cannot be moved as a whole prefix |
+| 2026-11-19 | 3.1 | `internal/rules/{sessioncost,payment}` are empty stubs; helpers are unexported in `signedin/queue_money.go` | Rules not edited here | Move later |
+| 2026-11-19 | 3.2 | The two sync reads make no entitlement check (TS has none); `done-review` ignores `record_games` (TS does) | Characterized | Ported as is, pinned |
+| 2026-11-19 | 3.2 | `incompleteSessionIds`, `belowMinimum` and guest candidates have no ORDER BY, as in the TS | Characterized | Production order not guaranteed |
+| 2026-11-19 | 3.2 | `normalizedName` hand-ports JS `toLocaleLowerCase` (dotted I, final sigma); captured on an en-US machine | No Go equivalent | Pinned in golden |
+| 2026-11-19 | 4.1 | Only prefixes with no write route left are listed (B-60): Queue `/api/license,/api/sync,/api/players`; Player `/api/leaderboard,/api/rtr-ids,/api/invites,/api/players`; Admin `/api/audit-events,/api/sales,/api/license-operations` | `ROTRA_GO_MOVED_AREAS` forwards every method | The rest move with go-writes-admin-player and go-writes-queue; listed in docs/architecture.md |
+| 2026-11-19 | 4.1 | The list is documented and checked locally, not applied to any deployment | The beta project gets the full list in staging-verification | Done there |
+| 2026-11-19 | 4.1 | App-side sign-in cannot go through Go yet (`/api/auth/*` not moved), so the check attached Go-issued passes as a Bearer | Sign-in moves in go-sign-in | Forwarding carries Authorization and Cookie through |
+| 2026-11-19 | 4.1 | `GET /api/sessions/{id}/finalization` not ported | Runs `driveFinalizationJobs` before reading | Owner call |
+| 2026-11-19 | 3.1 | `GET /sessions/{id}/finalization` is registered in Go read-only; the pre-read `driveFinalizationJobs` (writes `session_result_snapshots` and `player_rank_current`) is NOT ported | Touches permanent results and ranking | Go answers the stored state, so a committed finalization with due jobs shows an earlier state than the TS; route unused until go-writes-queue decides where the in-request worker lives |
+
+## Local check, 2026-11-19 (4.1)
+
+Throwaway `postgres:16-alpine` with all Prisma migrations, the Go API built from this branch (commit `e32a967b`), and Queue, Player and Admin (`next dev`, ports 9000 to 9002) in real mode with the moved lists from [architecture.md](../../../docs/architecture.md). Passes came from Go sign-in and were sent as a Bearer. curl only; no browser click-through.
+
+| Check | Result |
+|---|---|
+| Listed prefixes (Queue `/api/license`, `/api/sync`, `/api/players`; Player `/api/leaderboard`, `/api/leaderboard/me`, `/api/invites/{id}`, `/api/ranking-settings`; Admin `/api/audit-events`, `/api/sales`, `/api/license-operations/{id}`) | Reached Go (new Go log line and Go's `x-request-id`) |
+| Unlisted prefixes (Queue `/api/sessions`, `/api/club`, `/api/venues`; Player `/api/me/account`, `/api/public-sessions`; Admin `/api/clubs`, `/api/players`, `/api/feature-flags`) | Not forwarded; Next handlers answered |
+| Signed-in listed reads with a Go pass / without | 200 / 401 (Player `/api/invites/{id}` is optional-viewer: 200 for both) |
+| Direct to Go with app header, secret and Bearer (Admin 4, Queue 4, Player 3 routes) | All 200; 401 without a Bearer |
+| Not covered | Browser click-through, Vercel and Railway, writes |
+| 2026-11-19 | 2.1, 3.1 | Owner decisions: Admin reads check the session row (done); disabled club or Admin keeps Go's 401 (apps checked: Admin treats 401 and 403 alike, Queue behaves as before); expired pass keeps 401 `expired`; `/games` stays unpaged until a page size is chosen; Join link ticketed as BL-10 | Owner call, 2026-11-19 | Closed |

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 20 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 21 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -402,4 +402,5 @@ NEW: 20 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-players-not-here-waitlist](2026-11-19-queue-players-not-here-waitlist.md) | Queue app: the live Players tab filter adds Not here and Waitlist | segmented control, player cards, waitlist panel | NEW |
 | [2026-11-19-queue-ready-card-highlight](2026-11-19-queue-ready-card-highlight.md) | Queue app: a queued match that can go on a court now stands out | queue match card (ready state), pill label (new, small) | NEW |
 | [2026-11-19-queue-standings-no-gaps](2026-11-19-queue-standings-no-gaps.md) | Queue app: standings positions run on without gaps (1, 1, 2) | live-leaderboard, session-standings, leaderboard-share-card | NEW |
+| [2026-11-19-queue-swap-partners-playing](2026-11-19-queue-swap-partners-playing.md) | Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside | dialog player card (reuse), drag swap (reuse) | NEW |
 <!-- status-index:end -->

@@ -49,7 +49,7 @@ Players in a Getting ready match are busy: other matches that include them show 
 
 ## Q-ACTIVE-MATCH — Playing control
 
-**Player cards (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-match-card-tap-swaps.md)):** tapping a player's card opens **Change NAME?** (Substitute or Replace); tapping their picture opens their profile. Help line: “Tap a player's card to substitute or replace them, or their picture to see their profile.”
+**Player cards (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-match-card-tap-swaps.md)):** tapping a player's card opens **Change NAME?** (Substitute or Replace); tapping their picture opens their profile. Players can also be dragged onto someone in the other pair to swap partners while playing (toast “Match N: A and B swapped partners”; arrow keys do the same on a focused card). Help line: “Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring in someone from outside (substitute or replace), or their picture to see their profile.”
 
 Elapsed times here and on the court cards follow Correct Queue Time Format: “N min”, then “N h”, from 24 hours “started long time ago” (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-correct-time-format.md)).
 

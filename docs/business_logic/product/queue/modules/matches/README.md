@@ -27,10 +27,12 @@ A match moves through these steps (owner decision, November 6, 2026):
 |---|---|---|---|---|
 | Waiting | In the queue, no court | Yes (edit lineup) | Yes (edit lineup) | — |
 | On court | Placed on a court, not started yet | Yes | Yes: a plain lineup change (see [Substitutions](#substitutions)) | **Getting ready** |
-| Playing | Started with **Start match** | No | **Replace player** to fix a mistake (no substitution recorded), or **Substitute** with the game-credit choice | **Playing** |
+| Playing | Started with **Start match** | Yes, by dragging a player onto the other pair (owner, November 19, 2026; was No) | **Replace player** to fix a mistake (no substitution recorded), or **Substitute** with the game-credit choice | **Playing** |
 | Done / Invalid | Permanent outcome | No | No | — |
 
 The buttons stay **Start match** and **Match done**.
+
+**Swap partners while playing** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-swap-partners-playing.md)): in the match dialogs, dragging a player onto someone in the other pair swaps them (Getting ready and Playing alike). It records no substitution; the result follows the pairs as they are at Match done. Tapping a card brings in someone from outside: **Replace** (Getting ready) or **Substitute / Replace** (Playing).
 
 **Pause match** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a Playing match can go back to **On court** (Getting ready) on the same court(s), for a match started by mistake. The start time clears and **Start match** starts it again; players, sides and substitutions stay, and nothing is recorded. It is not a timer pause.
 

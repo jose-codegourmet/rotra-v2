@@ -6093,7 +6093,7 @@ const SHEETS = {
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))} · Getting ready`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}${chip('Getting ready')}</div>
       ${(() => { const card = (pid) => ({ attrs: `data-act="replaceFor" data-mid="${m.id}" data-pid="${pid}"`, label: 'Replace player' });
         return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div>`; })()}
-      <p class="small muted">Tap a player's card to replace them, or their picture to see their profile. Drag a player onto someone on the other team to switch sides. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
+      <p class="small muted">Drag a player onto someone in the other pair to swap partners. Tap a player's card to replace them with someone from outside, or their picture to see their profile. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
       ${b ? notice('bad', `${esc(b.text)}. Replace the player or send the match back to the queue.`) : ''}
       ${(() => { const n = swapCandidate(s, m), at = n ? waiting(s).indexOf(n) + 1 : 0; return `<div class="row"><button class="btn sm" data-act="openReplace" data-id="${m.id}">Replace player</button><button class="btn sm" data-act="openMoveCourt" data-id="${m.id}">Move to another court</button><button class="btn sm" data-act="openSwap" data-id="${m.id}" ${n ? '' : 'disabled'}>${n ? `Swap with #${at}` : 'Swap with the queue'}</button></div>
       <p class="small muted">${n ? `Swap: Match ${n.seq} (${esc(listNames(n.teamA))} vs ${esc(listNames(n.teamB))}) goes on ${esc(courtsOf(s, m))}, and this match takes its place at #${at} in the queue.` : 'Swap: no other waiting match is ready for this court.'}</p>`; })()}`,
@@ -6152,7 +6152,9 @@ const SHEETS = {
       ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in.
         November 19, 2026: the card does that; the picture opens the profile. */
         const card = (pid) => ({ attrs: `data-act="playerAction" data-mid="${m.id}" data-pid="${pid}"`, label: 'Substitute or replace' });
-        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', null, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', null, card)}</div><p class="small muted" style="margin:0">Tap a player's card to substitute or replace them, or their picture to see their profile.</p>`; })()}
+        // Owner artifact comment, November 19, 2026: drag a player onto the other pair to swap partners (also while playing);
+        // tap a card to bring in a player from outside.
+        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div><p class="small muted" style="margin:0">Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring in someone from outside (substitute or replace), or their picture to see their profile.</p>`; })()}
       ${(m.subs || []).map((x) => `<p class="small muted">Substitution: ${esc(subLine(x, m))}.</p>`).join('')}
       <p class="small muted">The court stays in use until you confirm a winner or mark the match invalid. Closing this doesn't end the game.</p>`,
       `<button class="btn" data-act="pauseMatch" data-id="${m.id}">${I.q_pause} Pause match</button><button class="btn danger" data-act="openInvalid" data-id="${m.id}">Mark invalid</button><button class="btn primary" data-act="openResult" data-id="${m.id}">Match done</button>`);
@@ -7828,14 +7830,15 @@ document.addEventListener('keydown', (e) => {
     if (to) { e.preventDefault(); to.focus(); }
     return;
   }
-  // Keyboard alternative to dragging a player across: swap with the player opposite.
-  if (el.dataset && el.dataset.swap && el.dataset.pid && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+  // Keyboard alternative to dragging a player across: swap with the player opposite. A split card's swap data sits on the card.
+  const swapK = el.classList && el.classList.contains('sg-main') ? el.parentElement : el;
+  if (swapK.dataset && swapK.dataset.swap && swapK.dataset.pid && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
     e.preventDefault();
-    const scope = el.dataset.swap, a = slotOf(el), team = a.team === 'teamA' ? 'teamB' : 'teamA';
+    const scope = swapK.dataset.swap, a = slotOf(swapK), team = a.team === 'teamA' ? 'teamB' : 'teamA';
     const n = scope === 'ed' ? FORMATS[S.ui.sheet.format][team === 'teamA' ? 0 : 1] : swapObj(scope)[team].length;
     const b = { team, i: Math.min(a.i, n - 1) };
     swapSides(scope, a, b);
-    const f = document.querySelector(`[data-swap="${scope}"][data-team="${b.team}"][data-i="${b.i}"]`); if (f) f.focus();
+    const f = document.querySelector(`[data-swap="${scope}"][data-team="${b.team}"][data-i="${b.i}"]`); if (f) (f.querySelector('.sg-main') || f).focus();
     return;
   }
   // Session setup: Enter in a field acts as Next on pages 1–2 and saves only on page 3.
@@ -8030,7 +8033,8 @@ function swapSides(scope, a, b) {
   o[a.team][a.i] = y; o[b.team][b.i] = x;
   const what = y ? `${short(x)} and ${short(y)} switched sides` : `${short(x)} moved to Team ${b.team === 'teamA' ? 'A' : 'B'}`;
   curAct = 'swapSides';
-  if (scope.startsWith('m:')) { o.protected = true; commit(`Match ${o.seq}: ${what} · protected from regeneration`); }
+  if (scope.startsWith('m:') && o.status === 'active') commit(`Match ${o.seq}: ${what.replace('switched sides', 'swapped partners')}`);
+  else if (scope.startsWith('m:')) { o.protected = true; commit(`Match ${o.seq}: ${what} · protected from regeneration`); }
   else { if (scope === 'sg') S.ui.sheet.edited = true; toast(what); }
   render();
 }

@@ -168,3 +168,7 @@ Regenerate:
 Before applying, the operator sees counts: automatic matches rebuilt, healthy manual matches kept, manual matches needing attention rebuilt, games in play untouched (On court matches count as untouched too). Regenerate is unavailable when the queue is empty or nothing would be rebuilt. If generation fails, the queue is left exactly as it was.
 
 See [generation and dispatch flow](flow/generate-and-dispatch.md).
+
+## Exemption list (owner, November 19, 2026; mockup only)
+
+A Queue Session keeps an **exemption list** of roster players that Generate Queue leaves out of every generated match, in every strategy. They stay on the roster, keep their games and presence, and can still be put in a match by hand (Add match, Make match, Suggest). Taking a player off the list makes them available again. ([log](../../../../../mockup-changes/2026-11-19-queue-generate-exemption-list.md))

@@ -63,7 +63,7 @@ Superseded by: none
   results/README.md — an unrecorded session has no standings, slides or awards
 - Database design: `queue_sessions.record_games` in docs/database_design/product/queue/modules/sessions-roster.md,
   matches-queue.md (no-result decision) and results-publication.md (what finishing writes); migration
-  `20261119000100_session_record_games` (Q23.8 #976): applied locally; shared database pending (applied after merge)
+  `20261119000100_session_record_games` (Q23.8 #976): applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off)
 - Screen docs: none yet; the screens follow when the open points in D-2026-11-18-06 are answered
 - Decision: D-2026-11-18-06
 

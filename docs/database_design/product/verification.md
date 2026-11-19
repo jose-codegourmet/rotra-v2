@@ -209,4 +209,4 @@ rejected on a recorded session and accepted on an unrecorded one; a winner, or a
 winner, is rejected on an unrecorded session. `prisma validate`, `prisma generate` and `make sqlc`
 ran. The services and routes were not run against a database.
 
-**Hosted: not applied.** Applied locally; shared database pending (applied after merge).
+**Hosted: applied 2026-11-19** (`prisma db execute` + `migrate resolve`); also applied to a local disposable database.

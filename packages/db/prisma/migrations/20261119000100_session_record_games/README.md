@@ -7,7 +7,7 @@ The owner authorized the proposed column for the Q23 batch on November 19, 2026.
 the `prisma migrate diff` output for the new column plus hand-written SQL: two trigger functions and
 one replaced CHECK, under a header comment.
 
-**Status: applied locally; shared database pending (applied after merge).**
+**Status: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).**
 
 ## Why
 

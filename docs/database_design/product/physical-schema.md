@@ -411,7 +411,7 @@ linked player's `players.nickname` after `btrim` (case-sensitive). Checked on a 
 ## Q23.8 — Record games (D-2026-11-18-06)
 
 `20261119000100_session_record_games` (#976; the owner authorized the migration for the Q23 batch on
-November 19, 2026). **Status: applied locally; shared database pending (applied after merge).** One new column; one CHECK replaced
+November 19, 2026). **Status: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).** One new column; one CHECK replaced
 by a wider one; two triggers. No table, column or row is dropped, moved, rewritten or backfilled.
 
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |

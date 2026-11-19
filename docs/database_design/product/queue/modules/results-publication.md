@@ -41,7 +41,7 @@ Most Improved/Off Day need five **previous** qualifying sessions at that same cl
 
 ## A session with Record games off
 
-Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied locally; shared database pending (applied after merge). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
+Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
 
 | Table | What Session done and later commands write |
 |---|---|

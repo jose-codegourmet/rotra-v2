@@ -573,6 +573,10 @@ body.swapping, body.swapping * { cursor: grabbing !important; }
 .qfaces { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; }
 .qf { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
 .qf .avatar { width: 44px; height: 44px; font-size: 15px; }
+.qtile .qf { --ring: var(--border-strong); }
+.qtile .qf.lv-beginner { --ring: var(--lv-beg); } .qtile .qf.lv-intermediate { --ring: var(--lv-int); } .qtile .qf.lv-advanced { --ring: var(--lv-adv); }
+.qtile .qf .avatar { outline: 3px solid var(--ring); outline-offset: 2px; }
+.qtile .qf .pf-g { top: -6px; right: -9px; }
 .face-btn { border: 0; background: none; padding: 0; margin: 0; border-radius: 50%; cursor: pointer; flex: none; line-height: 0; }
 .face-btn:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 button.qf { border: 0; background: none; padding: 2px; margin: -2px; font: inherit; color: inherit; cursor: pointer; border-radius: 8px; }
@@ -4841,7 +4845,8 @@ function queueCard(s, m, i, n, cols, compact = false) {
     return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span>`;
   };
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
-  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
+  // Owner artifact comment, November 19, 2026: each picture has the level ring and the player's games so far on it.
+  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
   // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
   const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(', ')}</span></div>`;

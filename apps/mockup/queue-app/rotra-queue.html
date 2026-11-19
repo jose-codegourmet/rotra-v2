@@ -526,7 +526,9 @@ select.input.inline { width: auto; min-height: 42px; }
 .qt-ready { position: absolute; top: -10px; left: 12px; display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
 .qt-ready svg { width: 12px; height: 12px; }
 .qgrid .qtile:not(.ready), .qslide .qtile:not(.ready) { margin-top: 8px; }
-.qtile.attn { border-color: var(--warn); }
+/* Owner artifact comment, November 19, 2026: "remove the yellow ones, green is enough". A waiting match that needs attention keeps
+   its warning status line (icon + text) and the header count, but no yellow border. Generate Queue drafts keep theirs. */
+.qtile.draft.attn { border-color: var(--warn); }
 .qtile.dragging { pointer-events: none; z-index: 5; opacity: .92; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); }
 .qtile.drop { outline: 2px dashed var(--accent); outline-offset: 2px; }
 [data-swap] { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }

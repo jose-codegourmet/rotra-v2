@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 26 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 27 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -398,6 +398,7 @@ NEW: 26 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-match-category-gender](2026-11-19-queue-match-category-gender.md) | Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender | match card format chip, draft tile, court sheets (reuse); a segmented gender control (reuse the segmented control) | NEW |
 | [2026-11-19-queue-match-history-timeline](2026-11-19-queue-match-history-timeline.md) | Queue app: Match History stacks the courts, with each match's start time on the left | match court card (reuse), a time column (new, small) | NEW |
 | [2026-11-19-queue-move-playing-match](2026-11-19-queue-move-playing-match.md) | Queue app: a playing match can move to a free court | court menu item, a button in the match sheet, the Move match sheet (reuse) | NEW |
+| [2026-11-19-queue-no-attention-border](2026-11-19-queue-no-attention-border.md) | Queue app: waiting matches that need attention lose the yellow border | queue match card (attention state) | NEW |
 | [2026-11-19-queue-pause-match](2026-11-19-queue-pause-match.md) | Queue app: Pause match takes a playing match back to Getting ready | court card, match sheet footer (reuse buttons; pause icon new) | NEW |
 | [2026-11-19-queue-player-card-compact-games](2026-11-19-queue-player-card-compact-games.md) | Queue app: the live player card's game counts become one compact strip, Current / Total | player card | NEW |
 | [2026-11-19-queue-player-card-games-buttons](2026-11-19-queue-player-card-games-buttons.md) | Queue app: the Players card's Current opens Set games played | live player card (two small buttons in the games strip) | NEW |

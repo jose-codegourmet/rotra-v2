@@ -4366,6 +4366,31 @@ function liveSettings(s, est, present) {
   return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div></div>
     <div class="ls-grid">${courts}${players}${rules}${money}${notes}</div></section>`;
 }
+// Settings tab before start (owner artifact comment, November 19, 2026): the setup as cards, each with Edit opening that step
+// of the session editor. Replaces the header's Edit preparation button.
+function prepSettings(s) {
+  const est = sessionEstimate(s);
+  const row = (k, v, note) => `<div class="ls-row"><span>${k}</span><div><span>${v}</span>${note ? `<span class="small muted">${note}</span>` : ''}</div></div>`;
+  const edit = (k, what) => `<button class="btn sm" data-act="editSetup" data-k="${k}" aria-label="Edit ${what}">${I.edit} Edit</button>`;
+  const head = (id, t, k) => `<div class="between"><h3 id="${id}">${t}</h3>${edit(k, t.toLowerCase())}</div>`;
+  const reqOn = (() => { const a = reqAllowed(s); return REQ_FORMATS.filter((k) => a[k]).map((k) => REQ_LABEL[k]); })();
+  const per = s.courts.length ? Math.round(capacityOf(s) / s.courts.length) : 0;
+  const when = `<section class="card ls-card" aria-labelledby="ps-when-h">${head('ps-when-h', 'Date and venue', 0)}
+      <div class="ls-rows">${row('Title', esc(s.title))}${row('When', `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`, fmtDur(s.start, s.end))}${row('Venue', esc(s.venue))}</div></section>`;
+  const courts = `<section class="card ls-card" aria-labelledby="ps-courts-h">${head('ps-courts-h', 'Courts', 0)}
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.courts.length}</b><span>Courts booked</span></div><div class="ls-stat"><b class="tnum">${capacityOf(s)}</b><span>Slots · ${per} a court</span></div></div>
+      <div class="ls-rows">${s.courts.map((c) => row(esc(c.label), fmtWhenRange(courtStart(s, c), courtUntil(s, c)), c.until ? 'Set time' : 'Follows session end')).join('')}</div></section>`;
+  const rules = `<section class="card ls-card" aria-labelledby="ps-rules-h">${head('ps-rules-h', 'Game rules', 1)}
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? `calculated (${est.low}–${est.high})` : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off')}</div></section>`;
+  const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
+    return `<section class="card ls-card" aria-labelledby="ps-money-h">${head('ps-money-h', 'Costs', 2)}
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${peso(c.perHead)}</b><span>Each player pays${c.custom ? ' (custom)' : ''}</span></div><div class="ls-stat"><b class="tnum">${peso(c.total)}</b><span>Estimated total</span></div></div>
+      <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div></section>`; })() : '';
+  const notes = `<section class="card ls-card" aria-labelledby="ps-notes-h">${head('ps-notes-h', 'Notes', 2)}<p class="small${s.notes ? '' : ' muted'}" style="margin:0;white-space:pre-line">${s.notes ? esc(s.notes) : 'No notes. Notes show on the public session page.'}</p></section>`;
+  return `<section class="stack" aria-labelledby="ps-h"><div class="ls-head"><div><h2 id="ps-h">Settings</h2><p class="small muted">Everything set when the session was made. Edit opens that part of the session editor; saving needs an internet connection.</p></div></div>
+    <div class="ls-grid">${when}${courts}${rules}${money}${notes}</div></section>`;
+}
 // ---------- Q-PREPARE ----------
 // Roster and levels panel. Level tabs follow each player's level family; Group by splits the list into headed
 // sections (empty ones hidden); List | Grid swaps rows for cards with the same controls. All three stay on this device.
@@ -4484,15 +4509,15 @@ function viewPrepare() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between"><div class="stack tight"><span class="label">${live ? 'Session settings' : 'Preparation'}</span><div class="title-row">${sessTitle(s)}${live ? '' : prepDangerMenu()}</div><p class="muted">${live ? `${fmtDate(s.startedAt)} · Started ${fmtTime(s.startedAt)} · Ends ${fmtTime(s.end)}${laterDay(s.startedAt, s.end)}` : `${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}`} · ${esc(s.venue)}</p></div>
-      <div class="row acts">${live ? `<button class="btn sm" data-act="go" data-to="console" aria-label="Back to live session">${I.back} <span class="lbl-long">Back to live session</span><span class="lbl-short">Live session</span></button>` : `<button class="btn sm" data-act="editSetup" aria-label="Edit preparation">${I.edit} <span class="lbl-long">Edit preparation</span><span class="lbl-short">Edit</span></button>`}<button class="btn sm" data-act="copyLink" aria-label="Copy invite link">${I.link} <span class="lbl-long">Copy invite link</span><span class="lbl-short">Invite link</span></button><button class="btn sm" data-act="openSessionQr">${I.qr} Session QR</button><button class="btn sm" data-act="openPost" aria-label="Copy Facebook post">${I.post} <span class="lbl-long">Copy Facebook post</span><span class="lbl-short">Facebook post</span></button></div></div>
+      <div class="row acts">${live ? `<button class="btn sm" data-act="go" data-to="console" aria-label="Back to live session">${I.back} <span class="lbl-long">Back to live session</span><span class="lbl-short">Live session</span></button>` : ''}<button class="btn sm" data-act="copyLink" aria-label="Copy invite link">${I.link} <span class="lbl-long">Copy invite link</span><span class="lbl-short">Invite link</span></button><button class="btn sm" data-act="openSessionQr">${I.qr} Session QR</button><button class="btn sm" data-act="openPost" aria-label="Copy Facebook post">${I.post} <span class="lbl-long">Copy Facebook post</span><span class="lbl-short">Facebook post</span></button></div></div>
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : reqCount(s) ? requestsPanel(s) : ''}
     ${(() => {
-      const tab = ['overview', 'roster', 'waitlist', 'payments'].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
+      const tab = ['overview', 'roster', 'waitlist', 'payments', ...(live ? [] : ['settings'])].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
       const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
-      const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`]];
+      const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`], ...(live ? [] : [['settings', 'Settings', null]])];
       return `${tabMenu('dd-prep', live ? 'Session settings section' : 'Preparation section', tabs, tab)}
       <div class="tabs has-dd" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
-      <div id="prep-panel" role="tabpanel" aria-labelledby="ptb-${tab}" class="stack">${tab === 'overview' ? prepOverview(s) : tab === 'waitlist' ? waitlistPanel(s) : tab === 'payments' ? paymentsPanel(s) : rosterPanel(s, live, missing)}</div>`;
+      <div id="prep-panel" role="tabpanel" aria-labelledby="ptb-${tab}" class="stack">${tab === 'overview' ? prepOverview(s) : tab === 'waitlist' ? waitlistPanel(s) : tab === 'payments' ? paymentsPanel(s) : tab === 'settings' ? prepSettings(s) : rosterPanel(s, live, missing)}</div>`;
     })()}
   </main>
   ${!live ? `<div class="footer-bar ${cantStart ? 'dock-note' : 'dock-dup'}"><div class="in">
@@ -6815,7 +6840,7 @@ const ACT = {
   closeSettingsMenu: () => { S.ui.setOpen = false; render(); const b = document.querySelector('.settings-trigger'); if (b) b.focus(); },
   clubTab: (d) => { const wasOpen = S.ui.setOpen; S.ui.clubTab = d.k; S.ui.setOpen = false; render(); if (wasOpen) { const t = document.querySelector('.settings-trigger'); if (t) t.focus(); window.scrollTo(0, 0); return; } window.scrollTo(0, 0); const b = document.querySelector(`.settings-nav [data-k="${d.k}"]`); if (b) b.focus(); },
   newSession: (d) => { S.ui.draft = draftFrom(null, d && d.k ? +d.k : null); S.ui.errors = {}; go('setup'); },
-  editSetup: () => { S.ui.draft = draftFrom(cur()); S.ui.errors = {}; go('setup'); },
+  editSetup: (d) => { S.ui.draft = draftFrom(cur()); if (d && d.k != null) { S.ui.draft.step = +d.k; S.ui.draft.wiz3 = true; } S.ui.errors = {}; go('setup'); },
   cancelSetup: () => go(S.ui.draft && S.ui.draft.id ? 'prepare' : 'home'),
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
@@ -8422,7 +8447,7 @@ function applyPrototypeRoute(url) {
   if (!screen) return false;
   S.screen = screen; S.ui.sheet = null; S.ui.navOpen = false; S.ui.setOpen = false;
   if (screen !== 'public') S.ui.guest = false;
-  S.ui.prepTab = ['roster', 'waitlist', 'payments'].includes(tab) ? tab : 'overview';
+  S.ui.prepTab = ['roster', 'waitlist', 'payments', 'settings'].includes(tab) ? tab : 'overview';
   S.ui.pane = ['queue', 'generate', 'roster', 'board', 'history', 'settings'].includes(tab) ? tab : 'live';
   S.ui.histTab = HIST_TABS.some(([key]) => key === tab) ? tab : 'results';
   S.ui.slide = ['1', '2'].includes(tab) ? Number(tab) : 0;

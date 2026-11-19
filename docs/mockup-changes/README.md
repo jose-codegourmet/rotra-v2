@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 41 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 42 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -414,6 +414,7 @@ NEW: 41 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-player-card-nickname-ring](2026-11-19-queue-player-card-nickname-ring.md) | Queue app: the live Players card shows the level as a ring and one name (club nickname, nickname, full name) | live player card (reuse the level ring used on public tiles and Add bagging pair) | NEW |
 | [2026-11-19-queue-players-not-here-waitlist](2026-11-19-queue-players-not-here-waitlist.md) | Queue app: the live Players tab filter adds Not here and Waitlist | segmented control, player cards, waitlist panel | NEW |
 | [2026-11-19-queue-players-under-main-queue](2026-11-19-queue-players-under-main-queue.md) | Queue app: the Players picker sits under the Main Queue | Players pane (reuse as is) | NEW |
+| [2026-11-19-queue-prep-settings-tab](2026-11-19-queue-prep-settings-tab.md) | Queue app: preparation gets a Settings tab; the Edit preparation button is gone | preparation tab row and phone tab menu, settings cards (same style as the live console's Settings) | NEW |
 | [2026-11-19-queue-ready-card-highlight](2026-11-19-queue-ready-card-highlight.md) | Queue app: a queued match that can go on a court now stands out | queue match card (ready state), pill label (new, small) | NEW |
 | [2026-11-19-queue-replace-swap-from-match](2026-11-19-queue-replace-swap-from-match.md) | Queue app: Replace player has a second row, Swap from match | player picker dialog (reuse tiles); a new section | NEW |
 | [2026-11-19-queue-roster-name-order](2026-11-19-queue-roster-name-order.md) | Queue app: club-facing player lists show the club nickname first, then nickname, then full name | player name block in roster rows, roster cards and player lists | NEW |

@@ -43,7 +43,9 @@ export function StandingsFaces({
   return (
     <span className={cn('inline-flex flex-none flex-wrap items-center gap-y-1 pl-2.5', className)}>
       {faces.map((face, index) => {
-        const avatar = <Avatar name={face.name} src={face.pictureUrl ?? undefined} size={size} />
+        const avatar = (
+          <Avatar key={face.id} name={face.name} src={face.pictureUrl ?? undefined} size={size} />
+        )
         const ring = '-ml-2.5 relative rounded-full shadow-[0_0_0_2px_var(--surface)]'
         const style = { zIndex: Math.max(1, 6 - index) }
         return face.onOpen ? (

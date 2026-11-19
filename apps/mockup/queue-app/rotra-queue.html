@@ -268,6 +268,7 @@ textarea.input { min-height: 80px; resize: vertical; }
 .ls-court:first-child { border-top: 0; padding-top: 0; }
 .ls-court > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ls-card .acts { margin-top: auto; }
+.lh-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); align-items: start; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -3298,6 +3299,19 @@ function historyMatch(s, m) {
     ${(m.subs || []).map((x) => `<p class="small muted">${esc(subLine(x, m))}</p>`).join('')}
   </article>`;
 }
+// Live console › Match History (owner artifact comment, November 19, 2026): every finished match tonight, newest first, as the
+// same small courts as the session record. Filter by court; a match on two courts shows under each.
+const LH_GRID = '<div class="lh-grid">';
+function liveHistoryPane(s) {
+  const f = S.ui.lhCourt && s.courts.some((c) => c.id === S.ui.lhCourt) ? S.ui.lhCourt : 'all';
+  const played = s.matches.filter((m) => m.status === 'done' || m.status === 'invalid');
+  const list = played.filter((m) => f === 'all' || m.courts.includes(f)).sort((a, b) => (b.endedAt || 0) - (a.endedAt || 0));
+  const inv = played.filter((m) => m.status === 'invalid').length;
+  const seg = `<div class="seg" role="group" aria-label="Court">${[['all', `All courts · ${played.length}`], ...s.courts.map((c) => [c.id, `${esc(c.label)} · ${played.filter((m) => m.courts.includes(c.id)).length}`])].map(([k, l]) => `<button type="button" aria-pressed="${f === k}" data-act="lhCourt" data-v="${k}">${l}</button>`).join('')}</div>`;
+  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, newest first. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
+    ${seg}
+    ${list.length ? `${LH_GRID}${list.map((m) => historyMatch(s, m)).join('')}</div>` : `<div class="card empty">${played.length ? 'No finished matches on this court yet.' : 'No finished matches yet. They show here after Match done.'}</div>`}`;
+}
 // Session record tabs. Results is the default; the replay scrubber lives there.
 const HIST_TABS = [['public', 'Public page'], ['results', 'Results'], ['night', 'How the night ran'], ['players', 'Players'], ['financials', 'Financials']];
 function viewHistory() {
@@ -4351,6 +4365,8 @@ function viewConsole() {
         ['generate', 'Generate Queue', null, ''],
         ['roster', 'Players', `${s.roster.filter((r) => r.present).length}/${s.roster.length}`, ' present'],
         recordedOf(s) && ['board', 'Leaderboard', lead, ''],
+        // Owner artifact comment, November 19, 2026: "please add Match History".
+        recordedOf(s) && ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
         ['settings', 'Settings', null, ''],
       ].filter(Boolean);
       const on = tabs.some(([k]) => k === pane) ? pane : 'live';
@@ -4363,6 +4379,7 @@ function viewConsole() {
       : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section>`
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
       : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
+      : pane === 'history' && recordedOf(s) ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
       : pane === 'settings' ? `<section class="stack" aria-label="Settings">${prepOverview(s)}<div><button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button></div></section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
@@ -6572,6 +6589,7 @@ const ACT = {
   useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
   openSessionQr: () => openSheet({ type: 'sessionQr', fmt: 'post' }),
   qrFmt: (d) => { if (S.ui.sheet?.type === 'sessionQr') { S.ui.sheet.fmt = d.k; render(); } },
+  lhCourt: (d) => { S.ui.lhCourt = d.v; render(); },
   ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else if (d.menu === 'dd-console') ACT.pane({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
   downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
   copyRtr: (d) => { try { navigator.clipboard.writeText(d.v); } catch (e) { /* clipboard unavailable */ } toast('RTR ID copied'); },
@@ -8022,7 +8040,7 @@ function prototypePath() {
   if (S.screen === 'setup') path = S.ui.draft?.id ? `/sessions/${encodeURIComponent(S.ui.draft.id)}/edit` : '/sessions/new';
   if (S.screen in sessionSuffixes) path = `/sessions/${encodeURIComponent(S.currentId)}${sessionSuffixes[S.screen]}`;
   if (S.screen === 'prepare') tab = S.ui.prepTab && S.ui.prepTab !== 'overview' ? S.ui.prepTab : null;
-  if (S.screen === 'console') tab = ['queue', 'generate', 'roster', 'board', 'settings'].includes(S.ui.pane) ? S.ui.pane : null;
+  if (S.screen === 'console') tab = ['queue', 'generate', 'roster', 'board', 'history', 'settings'].includes(S.ui.pane) ? S.ui.pane : null;
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
@@ -8062,7 +8080,7 @@ function applyPrototypeRoute(url) {
   S.screen = screen; S.ui.sheet = null; S.ui.navOpen = false; S.ui.setOpen = false;
   if (screen !== 'public') S.ui.guest = false;
   S.ui.prepTab = ['roster', 'waitlist', 'payments'].includes(tab) ? tab : 'overview';
-  S.ui.pane = ['queue', 'generate', 'roster', 'board', 'settings'].includes(tab) ? tab : 'live';
+  S.ui.pane = ['queue', 'generate', 'roster', 'board', 'history', 'settings'].includes(tab) ? tab : 'live';
   S.ui.histTab = HIST_TABS.some(([key]) => key === tab) ? tab : 'results';
   S.ui.slide = ['1', '2'].includes(tab) ? Number(tab) : 0;
   S.ui.pubTab = tab === 'participants' ? tab : 'details';

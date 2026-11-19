@@ -2185,6 +2185,8 @@ const fmtWhenRange = (a, b, opts) => `${fmtWhen(a, opts)}–${fmtTime(b)}${later
 // Correct Queue Time Format (owner, November 19, 2026): under 60 minutes "N min", then whole hours "N h", and from 24 hours on
 // "long time ago". Used for waiting times on Players cards and queued match faces, and for how long ago the planned end passed.
 const LONG_AGO = 'long time ago';
+// Elapsed match time ("Match 17 · 2 h"); past a day it reads "started long time ago".
+const elapsedTime = (mins) => (queueTime(mins) === LONG_AGO ? `started ${LONG_AGO}` : queueTime(mins));
 const queueTime = (mins) => { const m = Math.max(0, Math.floor(mins)); return m < 60 ? `${m} min` : m < 1440 ? `${Math.floor(m / 60)} h` : LONG_AGO; };
 // Time left until the planned end, or how long ago it passed. The session never closes by itself.
 function endStatus(s, now = Date.now()) {
@@ -3530,14 +3532,14 @@ function freeSince(s, c, t = Date.now(), replay = false) {
   const ends = s.matches.filter((m) => m.courts.includes(c.id) && m.startedAt && m.startedAt <= t).map((m) => (replay ? mEnd(s, m) : m.endedAt || Infinity)).filter((e) => e <= t);
   return ends.length ? Math.max(...ends) : null;
 }
-const freeChip = (s, c, t = Date.now(), fallback = null, replay = false) => { const since = freeSince(s, c, t, replay) ?? fallback; if (since == null || since > t) return chip('Free'); const mins = Math.max(0, Math.floor((t - since) / 6e4)); return chip(`Free · ${mins} min`, mins >= 16 ? 'bad' : mins >= 10 ? 'warn' : ''); };
+const freeChip = (s, c, t = Date.now(), fallback = null, replay = false) => { const since = freeSince(s, c, t, replay) ?? fallback; if (since == null || since > t) return chip('Free'); const mins = Math.max(0, Math.floor((t - since) / 6e4)); return chip(`Free · ${queueTime(mins)}`, mins >= 16 ? 'bad' : mins >= 10 ? 'warn' : ''); };
 function replayCourts(s, t) {
   return s.courts.map((c) => {
     const m = s.matches.find((x) => x.courts.includes(c.id) && x.startedAt <= t && t < mEnd(s, x));
     const notStarted = !s.matches.some((x) => x.courts.includes(c.id) && x.startedAt && x.startedAt <= t);
     if (!m) return `<div class="rp-court"><div class="between"><b>${esc(c.label)}</b>${notStarted ? chip('Not started') : freeChip(s, c, t, null, true)}</div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not started' : 'Free'}</span></div></div>`;
     const mins = Math.floor((t - m.startedAt) / 6e4);
-    return `<div class="rp-court busy"><div class="between"><b>${esc(c.label)}</b>${chip(`#${m.seq} · ${mins} min`, 'ok')}</div><div class="pitch">${courtSVG(1)}${S.screen === 'public' ? pubCourtSides(s, m) : courtSides(s, m)}</div></div>`;
+    return `<div class="rp-court busy"><div class="between"><b>${esc(c.label)}</b>${chip(`#${m.seq} · ${elapsedTime(mins)}`, 'ok')}</div><div class="pitch">${courtSVG(1)}${S.screen === 'public' ? pubCourtSides(s, m) : courtSides(s, m)}</div></div>`;
   }).join('');
 }
 function replayCard(s) {
@@ -4502,7 +4504,7 @@ function courtsPane(s) {
       const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
       const subs = (m.subs || []).length;
       return `<div class="court busy ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
-        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${mins} min${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
+        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${elapsedTime(mins)}${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button><button class="btn sm" data-act="pauseMatch" data-id="${m.id}" title="Back to Getting ready, for a match started by mistake">${I.q_pause} Pause match</button></div></div>`;
     }
     const notStarted = !courtOpen(s, c);
@@ -5344,7 +5346,7 @@ const ppPill = (a, r, qi, tonight, tone, s, pid) => { if (!tonight || !s || s.st
   if (a) short = `${a.status === 'oncourt' ? 'Waiting in' : 'Playing in'} ${courtsOf(s, a)}`;
   else if (!r.present) short = 'Away';
   else if (qi >= 0) short = `Queued #${qi + 1}`;
-  else { const mins = restInfo(s, pid).mins; short = `Free · ${mins} min`; cls = mins >= 16 ? 'wait-err' : mins >= 10 ? 'wait-warn' : 'live'; tip = `Tonight · Free · waiting ${mins} min`; }
+  else { const mins = restInfo(s, pid).mins; short = `Free · ${queueTime(mins)}`; cls = mins >= 16 ? 'wait-err' : mins >= 10 ? 'wait-warn' : 'live'; tip = `Tonight · Free · waiting ${queueTime(mins)}`; }
   return `<span class="pp-pill ${cls}" tabindex="0" role="note" aria-label="${esc(tip)}" data-tip="${esc(tip)}"><span class="pp-dot" aria-hidden="true"></span>${esc(short)}</span>`; };
 // Owner comment, November 13, 2026: the profile stats block, the same in Queue, Player and Admin. Counts the calendar year; resets on January 1.
 // Owner, November 13, 2026: "I dont like the progress bar for win rate · just 78% (put fire here) · bigger the fire bigger percent".
@@ -6081,7 +6083,7 @@ const SHEETS = {
     const s = cur(), m = s.matches.find((x) => x.id === sh.id), n = s.matches.find((x) => x.id === sh.with);
     const at = waiting(s).indexOf(n) + 1, where = courtsOf(s, m);
     // Each face shows its games this session (badge) and minutes since the player's last game, colored like the queue cards.
-    const face = (p) => { const mins = restInfo(s, p).mins, g = gamesOf(s, p); return `<div class="qf" aria-label="${esc(nm(p))}, ${g} of ${s.minimum} games, waiting ${mins} min"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="qf-n">${esc(short(p))}</span><span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${mins} min</span></div>`; };
+    const face = (p) => { const mins = restInfo(s, p).mins, g = gamesOf(s, p); return `<div class="qf" aria-label="${esc(nm(p))}, ${g} of ${s.minimum} games, waiting ${queueTime(mins)}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="qf-n">${esc(short(p))}</span><span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span></div>`; };
     const faces = (ids) => `<div class="qfaces">${ids.map(face).join('')}</div>`;
     const card = (x, after) => `<div class="swap-card ${after ? 'after' : ''}"><span class="small ${after ? '' : 'muted'}"><b>Match ${x.seq}</b>${after ? ' · after' : ' · now'}</span>${faces(x.teamA)}<span class="vs">VS</span>${faces(x.teamB)}</div>`;
     const row = (label, now, after) => `<div class="swap-row"><span class="label">${label}</span><div class="swap-pair">${card(now)}<span class="swap-arr" aria-hidden="true">→</span>${card(after, true)}</div></div>`;
@@ -6125,7 +6127,7 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))}`, `
-      <p class="small muted">${matchLabel(m)} · started ${fmtWhen(m.startedAt, { lower: true })} · ${mins} min in · Scoring · ${scoringDef(s).label}</p>
+      <p class="small muted">${matchLabel(m)} · started ${fmtWhen(m.startedAt, { lower: true })}${queueTime(mins) === LONG_AGO ? '' : ` · ${queueTime(mins)} in`} · Scoring · ${scoringDef(s).label}</p>
       ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in. */
         const tap = (h) => h.replace(/data-act="openProfile" data-id="([^"]+)" data-back="1"/g, `data-act="playerAction" data-mid="${m.id}" data-pid="$1"`).replace(/\. View profile/g, '. Substitute or replace');
         return `<div class="qteams">${tap(faceTeam(s, m.teamA, 'Team A'))}<span class="vs">VS</span>${tap(faceTeam(s, m.teamB, 'Team B'))}</div><p class="small muted" style="margin:0">Tap a player to substitute or replace them.</p>`; })()}
@@ -6199,7 +6201,7 @@ const SHEETS = {
           const off = (k === 'in' && !sh.in) || (k === 'out' && !sh.out);
           return `<button class="choice" aria-pressed="${credit === k}" data-act="sheetSet" data-k="credit" data-v="${k}" ${off ? 'disabled' : ''}><b>${label}</b><span class="small muted">${note}</span></button>`;
         }).join('')}</div>
-        <span class="hint">Started ${mins} min ago. At most one person gets this game; it never counts toward long-term rank.</span></div>`;
+        <span class="hint">${queueTime(mins) === LONG_AGO ? `Started ${LONG_AGO}` : `Started ${queueTime(mins)} ago`}. At most one person gets this game; it never counts toward long-term rank.</span></div>`;
     return spBack(sheetShell(`Substitute in match ${m.seq}`, swapPicker(s, m, sh, "Who's coming off?", creditHtml, `<button class="btn primary" data-act="sheetSet" data-k="step" data-v="confirm" ${sh.out && sh.in ? '' : 'disabled'}>Review substitution</button>`, `Substitute in match ${m.seq}`), '', true, sh.all && innerWidth >= 900 ? 'sp-dlg' : 'sp-dlg sp-compact'), m);
   },
   // Delete a planned session nobody is confirmed in. Needs internet; confirmed players block it (Open roster instead).

@@ -45,6 +45,8 @@ Players in a Getting ready match are busy: other matches that include them show 
 
 ## Q-ACTIVE-MATCH — Playing control
 
+Elapsed times here and on the court cards follow Correct Queue Time Format: “N min”, then “N h”, from 24 hours “started long time ago” (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-correct-time-format.md)).
+
 **Pause match** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a secondary button with a pause icon, first in the footer (before **Mark invalid** and **Match done**), and on the Playing court card next to **Open match**. It takes the match back to Getting ready on the same court(s) at once, closes the sheet and toasts “Match N paused · back to Getting ready on Court X”. **Start match** starts it again with a fresh start time.
 
 Sheet “Match N · Court X” with the **Playing** chip: “FORMAT · started HH:MM · M min in”, both teams with levels, one line per substitution (“Kiko replaced Jom. Neither gets credit for this game.”, or with a credit choice “Kiko replaced Jom · Kiko got the game (QM choice)”), and “The court stays in use until you confirm a winner or mark the match invalid. Closing this doesn't end the game.”

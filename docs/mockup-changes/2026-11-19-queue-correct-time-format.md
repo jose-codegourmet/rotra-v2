@@ -19,7 +19,12 @@ Superseded by: none
   “long time ago”. The red and amber colours still start at 16 and 10 minutes. Screen-reader text follows the same rule.
 - **Overdue line and banner:** “Planned end passed 59 h 10 min ago” → “Planned end passed 3 h ago”, and from 24 hours
   “Planned end passed long time ago”. Time left before the end is unchanged.
-- Nothing else changes (free-court chips, match times, the suggestion dialog's waits).
+- **Extended the same day** (owner artifact comment on a court card, “time format not correct”, on “Match 17 · 3662 min”):
+  the rule now covers every elapsed time in the console as well:
+  - playing court line “Match 17 · 45 min” → “· 2 h”, and from 24 hours “· started long time ago”;
+  - free-court chip “Free · 2 h” / “Free · long time ago”; the replay court chip “#N · …”;
+  - Q-ACTIVE-MATCH “· N min in” (left out from 24 hours), the substitution hint “Started … ago”;
+  - the profile card's tonight status “Free · …” and the suggestion dialog's waits.
 
 ## Why
 - Owner, November 19, 2026, in the session with screenshots of the Players cards, the queued matches and the overdue
@@ -35,6 +40,7 @@ Superseded by: none
   “Planned end passed long time ago”.
 
 ## Docs updated
+- docs/screens/product/modules/queue/match-control.md (elapsed times)
 - docs/screens/product/modules/queue/session-console.md (Overdue banner, Player card)
 - docs/screens/product/modules/queue/match-queue.md (Wait timer)
 - docs/business_logic/product/queue/modules/sessions/README.md (Overdue reminder)

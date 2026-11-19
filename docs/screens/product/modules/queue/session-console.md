@@ -29,7 +29,7 @@ Offline notice: “Working offline on this device. Matches, results and roster c
 | Generate Queue (was Queue › Generate matches) | none | [Q-AUTO](match-queue.md#q-auto--generate-matches-workspace) |
 | Players | “P/R present” | Q-POOL |
 | Leaderboard | “NAME leads” (or “N tied”) once a game is done; **no tab at all when Record games is off** | Q-LEADERBOARD |
-| Settings | none | The session settings summary (Setup card with Courts and time, Add player, Match requests and Payments, and the session link), plus **All session settings**, which opens Q-PREPARE |
+| Settings | none | The session settings summary as cards under **Setup** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-live-settings-cards.md)): **Courts · N** (each court with its times and a Set time / Follows session end chip; **Courts and time**), **Players** (Confirmed and Present counts, the match request formats; **Add player**, **Match requests · N**), **Game rules** with a “Fixed after start” chip (Minimum games and Record games as counts, then Formats, Mode and Scoring rows), **Costs** (Each player pays, Estimated total, Break-even share, Result; **Payments**) and **Notes**. Then the session link and **All session settings**, which opens Q-PREPARE |
 
 Main Queue and Generate Queue no longer have a Main Queue | Generate matches switch above them: the tabs replace it. Main Queue's **Generate Queue** button opens the Generate Queue tab. Payments stays a header button, not a tab.
 

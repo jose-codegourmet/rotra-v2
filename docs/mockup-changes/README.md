@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 12 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 13 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -389,6 +389,7 @@ NEW: 12 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-correct-time-format](2026-11-19-queue-correct-time-format.md) | Queue app: Correct Queue Time Format: waiting times and the overdue line cap at hours, then “long time ago” | one shared time formatter (no new component) | NEW |
 | [2026-11-19-queue-live-edit-player](2026-11-19-queue-live-edit-player.md) | Queue app: the live Players card's pencil opens one Edit player form | sheet; reuse the club nickname field, the picture editor from Edit details, the games stepper from D-SET-GAMES, the segmented control | NEW |
 | [2026-11-19-queue-live-no-move-to-waitlist](2026-11-19-queue-live-no-move-to-waitlist.md) | Queue app: no Move to waitlist on the live Players card | player card, roster card | NEW |
+| [2026-11-19-queue-live-settings-cards](2026-11-19-queue-live-settings-cards.md) | Queue app: the live Settings tab shows the setup as cards | card, chip, a stat tile and a label-value row (new, small), button row | NEW |
 | [2026-11-19-queue-match-category-gender](2026-11-19-queue-match-category-gender.md) | Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender | match card format chip, draft tile, court sheets (reuse); a segmented gender control (reuse the segmented control) | NEW |
 | [2026-11-19-queue-player-card-compact-games](2026-11-19-queue-player-card-compact-games.md) | Queue app: the live player card's game counts become one compact strip, Current / Total | player card | NEW |
 | [2026-11-19-queue-player-card-nickname-ring](2026-11-19-queue-player-card-nickname-ring.md) | Queue app: the live Players card shows the level as a ring and one name (club nickname, nickname, full name) | live player card (reuse the level ring used on public tiles and Add bagging pair) | NEW |

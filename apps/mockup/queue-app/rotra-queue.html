@@ -250,6 +250,24 @@ textarea.input { min-height: 80px; resize: vertical; }
 .el-line > div:first-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .el-step { display: flex; align-items: center; gap: 8px; }
 .el-step b { font-size: 22px; min-width: 32px; text-align: center; }
+/* Settings tab, live (owner artifact comment, November 19, 2026: readable layout, some areas as cards). */
+.ls-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ls-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); align-items: start; }
+.ls-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ls-card > .between h3 { margin: 0; font-size: 15px; }
+.ls-rows { display: flex; flex-direction: column; }
+.ls-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border); min-width: 0; }
+.ls-row:first-child { border-top: 0; padding-top: 0; }
+.ls-row > span:first-child { color: var(--fg2); font-size: 13px; flex: none; }
+.ls-row > div { text-align: right; min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+.ls-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ls-stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--bg); min-width: 0; }
+.ls-stat b { font-size: 22px; line-height: 1.1; font-weight: 800; }
+.ls-stat span { font-size: 12px; color: var(--fg2); }
+.ls-court { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+.ls-court:first-child { border-top: 0; padding-top: 0; }
+.ls-court > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ls-card .acts { margin-top: auto; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4116,6 +4134,8 @@ function prepOverview(s) {
   };
   const present = s.roster.filter((r) => r.present).length;
   const dl = { none: ['Not downloaded on this device', ''], downloading: ['Downloading…', 'warn'], ready: ['Ready on this device', 'ok'] }[s.download];
+  if (live) return liveSettings(s, est, present) + `
+    ${linkCard(s)}`;
   return `    <div class="${live ? 'stack' : 'grid2'}">
       <section class="card stack${live ? ' live-settings' : ''}"><h2>Setup</h2><dl class="kv">
         <dt>Courts</dt><dd>${s.courts.map((c) => live ? `${esc(c.label)} · ${courtWindowText(c)}` : esc(c.label)).join(live ? '<br>' : ', ')}</dd>
@@ -4134,6 +4154,30 @@ function prepOverview(s) {
         ${!S.online ? '<p class="small muted">Downloading needs an internet connection.</p>' : ''}</section>` : ''}
     </div>
     ${linkCard(s)}`;
+}
+// Settings tab during a live session: the setup summary as cards (owner artifact comment, November 19, 2026).
+function liveSettings(s, est, present) {
+  const fixed = chip('Fixed after start');
+  const row = (k, v, note) => `<div class="ls-row"><span>${k}</span><div><span>${v}</span>${note ? `<span class="small muted">${note}</span>` : ''}</div></div>`;
+  const reqOn = (() => { const a = reqAllowed(s); return REQ_FORMATS.filter((k) => a[k]).map((k) => REQ_LABEL[k]); })();
+  const courts = `<section class="card ls-card" aria-labelledby="ls-courts-h"><div class="between"><h3 id="ls-courts-h">Courts · ${s.courts.length}</h3></div>
+      <div>${s.courts.map((c) => `<div class="ls-court"><div><b>${esc(c.label)}</b><span class="small muted">${fmtWhenRange(courtStart(s, c), courtUntil(s, c))}</span></div>${chip(c.until ? 'Set time' : 'Follows session end')}</div>`).join('')}</div>
+      <div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button></div></section>`;
+  const players = `<section class="card ls-card" aria-labelledby="ls-pl-h"><div class="between"><h3 id="ls-pl-h">Players</h3></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.roster.length}</b><span>Confirmed</span></div><div class="ls-stat"><b class="tnum">${present}</b><span>Present</span></div></div>
+      <div class="ls-rows">${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off', reqOn.length ? 'Formats players can ask for' : 'Players can\'t request matches')}</div>
+      <div class="row acts"><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm${reqCount(s) ? ' attn' : ''}" data-act="openRequests">Match requests · ${reqCount(s)}</button></div></section>`;
+  const rules = `<section class="card ls-card" aria-labelledby="ls-rules-h"><div class="between"><h3 id="ls-rules-h">Game rules</h3>${fixed}</div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? 'calculated' : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}</div></section>`;
+  const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
+    return `<section class="card ls-card" aria-labelledby="ls-money-h"><div class="between"><h3 id="ls-money-h">Costs</h3></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${peso(c.perHead)}</b><span>Each player pays${c.custom ? ' (custom)' : ''}</span></div><div class="ls-stat"><b class="tnum">${peso(c.total)}</b><span>Estimated total</span></div></div>
+      <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div>
+      <div class="row acts"><button class="btn sm" data-act="openPayments">Payments</button></div></section>`; })() : '';
+  const notes = s.notes ? `<section class="card ls-card" aria-labelledby="ls-notes-h"><h3 id="ls-notes-h" style="margin:0;font-size:15px">Notes</h3><p class="small" style="margin:0;white-space:pre-line">${esc(s.notes)}</p></section>` : '';
+  return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div></div>
+    <div class="ls-grid">${courts}${players}${rules}${money}${notes}</div></section>`;
 }
 // ---------- Q-PREPARE ----------
 // Roster and levels panel. Level tabs follow each player's level family; Group by splits the list into headed

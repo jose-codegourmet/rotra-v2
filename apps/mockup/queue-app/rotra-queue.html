@@ -4127,7 +4127,7 @@ function rvCard(s, r, live) {
         ${live ? `<div class="rv-pres">${pres}</div>` : ''}${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
         <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
         <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
-        <div class="rv-meta">${rvStepDown(r, p)}</div>
+        ${live ? '' : `<div class="rv-meta">${rvStepDown(r, p)}</div>`}
       </article>`;
 }
 function skillMix(rows) {
@@ -4659,7 +4659,7 @@ function playersPane(s) {
         <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
         <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played"><b class="tnum">${x.g}</b><span>played</span></div><div class="pg-total"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>for the night</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
-        <div class="row"><button class="btn xs" data-act="stepDown" data-pid="${x.r.pid}" aria-label="Move ${esc(x.p.name)} to the waitlist">Move to waitlist</button>${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
+        <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">

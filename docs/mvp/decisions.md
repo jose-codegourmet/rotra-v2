@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-19 (D-2026-11-19-02 to 09 added; amendment notes on D-2026-11-18-03 and D-2026-11-18-04); 2026-11-18 (D-2026-11-18-05, 06 and 07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-19 (D-2026-11-19-02 to 14 added; amendment note on D-2026-11-19-01; amendment notes on D-2026-11-18-03 and D-2026-11-18-04); 2026-11-18 (D-2026-11-18-05, 06 and 07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -77,6 +77,8 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-19-10](#d-2026-11-19-10) | Player Home for signed-in players | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-19-11](#d-2026-11-19-11) | Invite-link onboarding and getting-to-know answers | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-19-12](#d-2026-11-19-12) | Session level restrictions | approved 2026-11-19 by the owner | mockup only | needed | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-13](#d-2026-11-19-13) | Player bottom dock on phones | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-19-14](#d-2026-11-19-14) | Higgsfield art inside the apps | approved 2026-11-19 by the owner | mockup only | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1417,3 +1419,23 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Decision:** one restriction per session (all levels · beginners only · beginners to intermediate · slots per level), by level band. Enforced on public join requests; a warning for the Queue Master's confirm and add. Stored on the session ([sessions and roster](../database_design/product/queue/modules/sessions-roster.md), proposed columns).
 - **Open:** what happens to slots per level when courts are added or removed during the session (the mockup keeps the numbers and only checks new players); whether Generate Queue should respect it (it doesn't today); whether visitors see the restriction before signing in (only in Details today).
 - **References:** [players rules](../business_logic/product/queue/modules/players/README.md#level-restrictions-on-slots), [Q-SETUP](../screens/product/modules/queue/session-setup.md), [public session](../screens/product/modules/queue/public-session.md)
+
+<a id="d-2026-11-19-13"></a>
+### D-2026-11-19-13 — Player bottom dock on phones
+- **Decision status:** approved by the owner, November 19, 2026 (artifact comment on the Player top bar: “make the mobile version of the header be a dock on mobile but keep the notifications and light/dark mode button on the top right”; earlier the same day: “just remove home, clicking the logo is already the home”).
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-player-mobile-dock.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:** at 640 px and narrower, Leaderboard and My profile (Sign in for visitors) move to a fixed bottom dock with icons; the top bar keeps the logo (Home when signed in), the bell and the theme switch. No Home button anywhere; the logo is Home. The fullscreen onboarding shows neither.
+- **Open:** whether the dock gets a Home item.
+- **References:** [Player screens](../screens/product/modules/player-information/README.md)
+
+<a id="d-2026-11-19-14"></a>
+### D-2026-11-19-14 — Higgsfield art inside the apps
+- **Decision status:** approved by the owner, November 19, 2026, across several requests: Mode and Scoring cards with Rion or Tara drawn into each scene (“dont just slap them in the graphics”), sign-in backgrounds for Queue, Player and Admin, and onboarding art (Where you play cards, the shots and favorite player banners). The court-floor texture was tried and reverted (“please revert the original court design”).
+- **Implementation status:** mockup only; images are embedded as WebP data URIs in the prototypes ([card art](../mockup-changes/2026-11-19-queue-card-characters.md), [auth](../mockup-changes/2026-11-19-auth-backgrounds.md), [court position](../mockup-changes/2026-11-19-player-court-position-art.md), [shots](../mockup-changes/2026-11-19-player-shots-others.md), [favorite](../mockup-changes/2026-11-19-player-favorite-art.md), [court colours, cancelled](../mockup-changes/2026-11-19-court-colors.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Decision:** in-app illustrations follow the rotra.club art direction (flat vector, near-black, dark greens, one mint); characters are part of the scene, never pasted on top; no real person is drawn. The real apps serve them as static WebP files, not data URIs. Courts stay the flat green drawing.
+- **Open:** light-theme versions of the art; where the files live in the repo (`@rotra/ui` assets or each app's `public/`).
+- **References:** [branding](../branding/branding.md)

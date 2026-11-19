@@ -72,6 +72,8 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 - [D-2026-11-19-10](../decisions.md#d-2026-11-19-10) — Home for signed-in players (current session, upcoming sessions, clubs, stats).
 - [D-2026-11-19-11](../decisions.md#d-2026-11-19-11) — fullscreen onboarding after an invite link; where you play, shots, favorite player.
+- [D-2026-11-19-13](../decisions.md#d-2026-11-19-13) — bottom dock on phones; the logo is Home.
+- [D-2026-11-19-14](../decisions.md#d-2026-11-19-14) — Higgsfield art inside the apps (sign-in, onboarding).
 
 ## Blocking open decisions
 

@@ -62,7 +62,7 @@ Registration includes:
 
 - Full name; operator may preset it.
 - Nickname; operator may preset it.
-- Gender, **optional**: Male or Female; public. Players without one get a reminder notification and a profile notice until they add it ([D-2026-11-19-01](../../../../../mvp/decisions.md#d-2026-11-19-01)). The Queue Master may set it for guests and unclaimed players.
+- Gender: Male or Female; public. **Required when registering** (a new record, owner artifact comment, November 19, 2026: “since this is a new record this form will have to require gender”); stays **optional** for accounts registered before, which keep the reminder below. Players without one get a reminder notification and a profile notice until they add it ([D-2026-11-19-01](../../../../../mvp/decisions.md#d-2026-11-19-01)). The Queue Master may set it for guests and unclaimed players.
 - Phone number; operator may preset it; **required**.
 - Email; **required**.
 - Optional Facebook identity/link, potentially preset by the operator.

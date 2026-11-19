@@ -21,7 +21,10 @@ Superseded by: none
     “already on file” when the club saved one); City when asked.
   - **Required pill:** every required label carries a green **Required** pill in place of the star. This applies to
     every form in the Player app built with the shared field helper.
-  - **Optional · add now or later:** a folded card for nickname, gender, experience and links, prefilled from the club.
+  - **Gender:** now in Needed to continue as required Male · Female chips, with the error “Choose Male or Female.” (owner
+    follow-up the same day: “since this is a new record this form will have to require gender”). Edit profile keeps it
+    optional for existing accounts.
+  - **Optional · add now or later:** a folded card for nickname, experience and links, prefilled from the club.
     It opens by itself if one of them has an error.
   - **Footer:** fixed at the bottom, with “Next: 3 quick questions” and **Continue**.
   - **Phones:** 48 px tall inputs with 16 px text so they don't zoom, and tighter side padding.
@@ -46,11 +49,15 @@ Superseded by: none
   you need to fill in.” without a club profile)
 - “Needed to continue” · “Required” · “Phone number · already on file” · “Linked to this profile. Not your number? Ask the
   club or ROTRA.” · “Mobile number” · “Private. Never shown publicly.” · “For password resets. Private.”
-- “Optional · add now or later” · “Nickname, gender, experience and links, prefilled from your club” · “You can change
+- “Optional · add now or later” · “Nickname, experience and links, prefilled from your club” · “Choose Male or Female.” · “You can change
   all of these later in Edit profile.” · “Next: 3 quick questions” · Continue
 
 ## Open
 - None.
+
+## Also
+- The onboarding header now carries the Prototype button, so the mockup can be reset mid-onboarding. This is a
+  prototype control, not part of the product.
 
 ## Docs updated
 - screens/product/modules/player-information/access-registration.md (P-ONBOARD step 1)

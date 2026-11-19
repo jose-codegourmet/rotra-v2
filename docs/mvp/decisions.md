@@ -1297,6 +1297,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Whether gender ever becomes required, and when.
   - Whether Admin can edit a player's gender, and whether a player can change it after setting it.
   - Whether Generate Queue, standings or leaderboards should split or filter by category later.
+- **Amended November 19, 2026:** gender is **required when registering** (owner artifact comment on the registration details step: “since this is a new record this form will have to require gender”); existing accounts keep it optional with the reminder ([log](../mockup-changes/2026-11-19-player-details-step-mobile.md)).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [identity design](../database_design/product/player-information/modules/identity.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Match category](../product-terms.md).
 
 <a id="d-2026-11-19-02"></a>

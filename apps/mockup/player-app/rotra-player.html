@@ -2931,6 +2931,8 @@ function viewClaim(standalone = false) {
       ${viaEmail ? notice('', `<b>Lahug Smash Club already saved a profile with this email.</b> Its details are filled in below. Your player ID stays <span class="mono">${esc(a.rtr)}</span> and your games carry over.`) : ''}
       <section class="card stack ob-sec"><h2 class="ob-sec-h">Needed to continue</h2>
         ${field('cl-name', 'Full name', 'ui.claim.name', C.name, e.name, { req: true, pub: true, ac: 'name', hint: 'Shows to signed-in ROTRA players on sessions you join.' })}
+        <!-- Owner artifact comment, November 19, 2026: "since this is a new record this form will have to require gender". -->
+        <div class="field"><span>Gender <span class="req-pill">Required</span> · <span class="hint">public</span></span><div class="ob-chips" role="radiogroup" aria-label="Gender">${[['male', 'Male'], ['female', 'Female']].map(([k, l]) => `<button type="button" class="ob-chip" role="radio" aria-checked="${C.gender === k}" data-act="pickSet" data-path="ui.claim.gender" data-v="${k}">${C.gender === k ? I.check : ''}${l}</button>`).join('')}</div>${e.gender ? `<span class="err">${esc(e.gender)}</span>` : '<span class="hint">Clubs use it to name your matches: Men\'s, Women\'s or Mixed Doubles.</span>'}</div>
         ${gMode ? `<div class="field"><span>Signs in with</span>${gChip(gId)}<span class="hint">This becomes your ROTRA email. Private.</span></div>` : ''}
         ${a.phone ? `<div class="field"><span>Phone number <span class="hint">· already on file</span></span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile. Not your number? Ask the club or ROTRA.</span></div>`
           : field('cl-phone', 'Mobile number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: 'Private. Never shown publicly.' })}
@@ -2941,8 +2943,8 @@ function viewClaim(standalone = false) {
         <label class="field" for="cl-pass2"><span>Confirm password <span class="req-pill">Required</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label>`}
         ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span class="req-pill">Required</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
       </section>
-      <details class="card ob-sec ob-more" ${['nick', 'expY', 'expM', 'since', ...Object.keys(SOCIAL)].some((k) => e[k]) ? 'open' : ''}><summary><span class="stack tight"><b>Optional · add now or later</b><span class="small muted">Nickname, gender, experience and links${standalone && !viaEmail ? '' : ', prefilled from your club'}</span></span>${I.fwd}</summary>
-        <div class="stack" style="gap:16px;padding-top:12px">${field('cl-nick', 'Nickname', 'ui.claim.nick', C.nick, e.nick, { pub: true, hint: 'Optional' })}${genderSelect('ui.claim', C, 'cl')}${fieldsExp('ui.claim', C, e, 'cl')}
+      <details class="card ob-sec ob-more" ${['nick', 'expY', 'expM', 'since', ...Object.keys(SOCIAL)].some((k) => e[k]) ? 'open' : ''}><summary><span class="stack tight"><b>Optional · add now or later</b><span class="small muted">Nickname, experience and links${standalone && !viaEmail ? '' : ', prefilled from your club'}</span></span>${I.fwd}</summary>
+        <div class="stack" style="gap:16px;padding-top:12px">${field('cl-nick', 'Nickname', 'ui.claim.nick', C.nick, e.nick, { pub: true, hint: 'Optional' })}${fieldsExp('ui.claim', C, e, 'cl')}
           <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks('ui.claim', C, e, 'cl')}</fieldset>
           <p class="small muted" style="margin:0">You can change all of these later in Edit profile.</p></div></details>
       <div class="ob-foot"><div class="ob-foot-in"><span class="small muted">Next: 3 quick questions</span><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : 'Continue'}</button></div></div>
@@ -2993,7 +2995,7 @@ function finishOnboard() {
   S.ui.ob = null; go(o.next);
 }
 const OB_STEPS = ['Your details', 'Where you play', 'Shots you know', 'Favorite player'];
-const obTop = (n) => `<div class="ob-top"><div class="ob-brand">${rotraLogo('resp', 'brand-logo')}<span class="small muted">Step ${n} of 4 · ${OB_STEPS[n - 1]}</span></div>
+const obTop = (n) => `<div class="ob-top"><div class="ob-brand">${rotraLogo('resp', 'brand-logo')}<span class="row" style="gap:10px"><span class="small muted">Step ${n} of 4 · ${OB_STEPS[n - 1]}</span><button class="btn xs" data-act="openDemo">Prototype</button></span></div>
   <div class="ob-bar" role="progressbar" aria-label="Onboarding" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${n}">${OB_STEPS.map((_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div></div>`;
 function viewOnboard() {
   const o = S.ui.ob, a = o && S.accounts[o.id];
@@ -4268,6 +4270,7 @@ const FORM = {
   claim: () => {
     const C = S.ui.claim;
     const e = validatePersonal(C);
+    if (!C.gender) e.gender = 'Choose Male or Female.'; // owner, November 19, 2026: required when registering
     const a = S.accounts.u2;
     if (!a.phone) {
       const n = normPhone(C.phone || '');
@@ -4293,6 +4296,7 @@ const FORM = {
   },
   register: () => {
     const C = S.ui.claim, e = validatePersonal(C), ctx = S.ui.regCtx;
+    if (!C.gender) e.gender = 'Choose Male or Female.'; // owner, November 19, 2026: required when registering
     if (!normPhone(C.phone || '')) e.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     if (!validEmail(C.email || '')) e.email = 'Enter an email address, like name@example.com.';
     const gr = S.ui.regStep === 'google' && S.ui.gReg;

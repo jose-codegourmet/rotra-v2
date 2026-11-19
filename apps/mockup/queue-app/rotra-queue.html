@@ -4119,12 +4119,15 @@ const BAND_CHOICES = [['Beginner', 'Beginner'], ['Intermediate', 'Intermediate']
 const bandMid = (band) => { const ix = LEVELS.map((l, i) => [l, i]).filter(([l]) => l.band.startsWith(band)).map(([, i]) => i); return ix.length ? ix[Math.floor(ix.length / 2)] : null; };
 function linkCard(s) {
   const n = pendingReqs(s).length, on = s.acceptReq !== false, always = on && s.alwaysReq === true;
-  return `<section class="card stack" id="session-link"><div class="between"><div><h2>Session link</h2><p class="small muted">Share it in your Facebook post or group chat. Anyone with it sees the public page; guests can send a join request, and nobody gets a slot until you confirm them.</p></div>${n ? chip(`${n} join request${n > 1 ? 's' : ''}`, 'warn') : ''}</div>
+  // Owner artifact comment, November 19, 2026: the session link and the join switches are separate boxes, side by side.
+  return `<div class="grid2 link-pair"><section class="card stack" id="session-link"><div class="between"><div><h2>Session link</h2><p class="small muted">Share it in your Facebook post or group chat. Anyone with it sees the public page; guests can send a join request, and nobody gets a slot until you confirm them.</p></div>${n ? chip(`${n} join request${n > 1 ? 's' : ''}`, 'warn') : ''}</div>
     <div class="invite-link"><input class="input" id="session-link-in" readonly value="${sessionLink(s)}" aria-label="Session link"><button class="btn sm primary" data-act="copyLink">Copy link</button></div>
     <div class="row acts"><button class="btn sm" data-act="openGuest">Open as a guest</button><button class="btn sm" data-act="go" data-to="public">Preview public page</button></div>
+  </section>
+  <section class="card stack" id="join-settings" aria-labelledby="join-settings-h"><div><h2 id="join-settings-h">Who can join</h2><p class="small muted">How people get a slot from the session link.</p></div>
     <div class="li" style="padding:0"><div class="main"><b>Accept join requests</b><p class="small muted">${on ? 'Guests can request a slot from the public page.' : 'The public page says to contact the Queue Master instead.'}</p></div>${sw(on, 'toggleAcceptReq', '', 'Accept join requests')}</div>
     <div class="li" style="padding:0"><div class="main"><b>Always require a request</b><p class="small muted">${always ? 'Club members send a join request too, like everyone else.' : 'Club members join upcoming sessions right away; guests still send a request.'}</p></div>${sw(always, 'toggleAlwaysReq', on ? '' : 'disabled', 'Always require a request')}</div>
-  </section>`;
+  </section></div>`;
 }
 function requestsPanel(s, inSheet) {
   const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');

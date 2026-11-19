@@ -184,7 +184,7 @@ export const GuestOpenedFromMatch: Story = {
 }
 export const JoinedViaClubLink: Story = { args: { joinedVia: 'club' } }
 export const JoinedViaSessionLink: Story = { args: { joinedVia: 'session' } }
-/** A guest with an invite link: the text says their games here don't follow them without an email. */
+/** A guest with their own invite link: the text says this record becomes theirs when they register. */
 export const GuestWithInvite: Story = {
   decorators: [
     (Story) => (
@@ -196,7 +196,7 @@ export const GuestWithInvite: Story = {
   ],
   args: propsFor(storyIdentityPlayers.guest, {
     sessionsHere: 1,
-    inviteUrl: 'https://player.rotra.club/register/6cd364d4-0e3a-5c3d-9e75-2116cc845714',
+    getInviteLink: async () => 'https://player.rotra.club/claim/X7K2M9Q',
   }),
 }
 export const LookupPending: Story = {

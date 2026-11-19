@@ -11,6 +11,7 @@ export const preparationRosterMeta = {
     'Level changes save immediately with their toast; removing a roster player is immediate with its toast and no dialog. Each mutation toasts the mutation message and toast.error on failure.',
     'Roster views: level tabs, Group by and List | Grid are controlled here and remembered on this device (localStorage "rotra-queue-roster-views"). Paid comes from useSessionPayments and Returning or first time from the roster flag hasPlayedAtClubBefore; both work before and after start, including the read-only Session settings roster.',
     'Saved-player details (identity, suggestion, profile fields) come from useClubPlayers by clubPlayerId; the roster entries carry the name snapshot, level and presence.',
+    "A guest's profile gets PlayerProfileSheet getInviteLink from useCreatePlayerInvite: the guest's own invite link (D-2026-11-18-07), made on the first Copy invite link or Share tap and kept for that guest while this screen stays open, since a new link cancels the earlier one.",
   ],
   docs: [
     'docs/screens/product/modules/queue/session-setup.md',

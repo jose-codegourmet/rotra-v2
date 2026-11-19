@@ -17,6 +17,7 @@ import {
 import { JOINED_VIA_TEXT } from '@rotra/ui/saved-player-card'
 import { Sheet } from '@rotra/ui/sheet'
 import { toast } from '@rotra/ui/toaster'
+import { useState } from 'react'
 
 export type PlayerProfileSheetProps = {
   open: boolean
@@ -88,8 +89,13 @@ export type PlayerProfileSheetProps = {
   onDelete?: () => void
   /** The delete is being checked or saved */
   deleting?: boolean
-  /** Absolute ROTRA Player registration link. Guests get an Invite to ROTRA section; hidden when absent. */
-  inviteUrl?: string
+  /**
+   * Makes the guest's own invite link (absolute ROTRA Player URL): registering through it claims this
+   * record (D-2026-11-18-07). Guests get an Invite to ROTRA section; hidden when absent. Called on
+   * each Copy invite link or Share tap: return the same link while the profile stays open, since
+   * making a new link cancels the earlier one. A rejection shows its message as an error toast.
+   */
+  getInviteLink?: () => Promise<string>
 }
 
 const STATUS: Record<Identity, string> = {
@@ -141,8 +147,9 @@ export function PlayerProfileSheet({
   onEdit,
   onDelete,
   deleting = false,
-  inviteUrl,
+  getInviteLink,
 }: PlayerProfileSheetProps) {
+  const [linking, setLinking] = useState<'copy' | 'share' | null>(null)
   const canInvite = identity === 'guest' || identity === 'unclaimed'
   const detailsRequired = detailsRequiredProp && identity === 'unclaimed'
   const statusLine = detailsRequired
@@ -154,19 +161,52 @@ export function PlayerProfileSheet({
       ? 'None on file'
       : 'Kept private; confirmed in person when adding them to a session'
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
-  const copyInvite = async (url: string) => {
+  /** The link, or the reason it could not be made (offline, the player was deleted). */
+  const settle = (link: Promise<string>) =>
+    link.then(
+      (url) => ({ url, error: null }),
+      (error: unknown) => ({
+        url: null,
+        error: error instanceof Error ? error.message : "Couldn't make the invite link. Try again.",
+      }),
+    )
+  const copyInvite = async (makeLink: () => Promise<string>) => {
+    setLinking('copy')
+    const link = makeLink()
     try {
-      await navigator.clipboard.writeText(url)
+      // The write starts in the tap itself and waits for the link inside it: Safari refuses a
+      // clipboard write that only starts after waiting.
+      if (typeof ClipboardItem === 'undefined')
+        await link.then((url) => navigator.clipboard.writeText(url))
+      else
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': link.then((url) => new Blob([url], { type: 'text/plain' })),
+          }),
+        ])
       toast('Invite link copied')
     } catch {
-      toast(`Copy this link: ${url}`)
+      const made = await settle(link)
+      if (made.url) toast(`Copy this link: ${made.url}`)
+      else toast.error(made.error ?? '')
+    } finally {
+      setLinking(null)
     }
   }
-  const shareInvite = async (url: string) => {
+  const shareInvite = async (makeLink: () => Promise<string>) => {
+    setLinking('share')
+    const made = await settle(makeLink())
+    setLinking(null)
+    if (!made.url) {
+      toast.error(made.error ?? '')
+      return
+    }
     try {
-      await navigator.share({ title: 'Register for ROTRA Player', url })
-    } catch {
-      // Dismissing the share sheet is not an error
+      await navigator.share({ title: 'Register for ROTRA Player', url: made.url })
+    } catch (error) {
+      // Dismissing the share sheet is not an error; a browser that refused to open it shows the link
+      if (!(error instanceof DOMException && error.name === 'AbortError'))
+        toast(`Copy this link: ${made.url}`)
     }
   }
   return (
@@ -265,18 +305,32 @@ export function PlayerProfileSheet({
             ]}
           />
         </ProfileCardSection>
-        {identity === 'guest' && inviteUrl ? (
+        {identity === 'guest' && getInviteLink ? (
           <section className="flex flex-col gap-2" aria-labelledby="invite-to-rotra">
             <h3 id="invite-to-rotra" className="m-0 text-[14px] font-semibold">
               Invite to ROTRA
             </h3>
             <p className="m-0 text-[13px] text-fg2">
-              Send this link so they can register for ROTRA Player. Games they played here as a
-              guest don't follow them. To keep those games, add their email in Edit details first.
+              Send this link so they can register for ROTRA Player. This record becomes theirs when
+              they register: their games here stay with them. The link works once and lasts 7 days.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button onClick={() => void copyInvite(inviteUrl)}>Copy invite link</Button>
-              {canShare ? <Button onClick={() => void shareInvite(inviteUrl)}>Share</Button> : null}
+              <Button
+                onClick={() => void copyInvite(getInviteLink)}
+                loading={linking === 'copy'}
+                disabled={linking === 'share'}
+              >
+                Copy invite link
+              </Button>
+              {canShare ? (
+                <Button
+                  onClick={() => void shareInvite(getInviteLink)}
+                  loading={linking === 'share'}
+                  disabled={linking === 'copy'}
+                >
+                  Share
+                </Button>
+              ) : null}
             </div>
           </section>
         ) : null}

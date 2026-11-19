@@ -7,8 +7,12 @@ import { type MockState, mockStore, readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import {
   realCancelMyJoinRequest,
+  realGetSessionInviteCode,
   realJoinAsPlayer,
+  realLeaveSession,
   realMoveMeToWaitlist,
+  realSelfCheckIn,
+  realSendDropOutNotice,
 } from '../real/public-session'
 import {
   JOIN_REQUESTS_STARTED_ERROR,
@@ -31,8 +35,9 @@ import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.type
 /**
  * Player-side writes from a signed-in ROTRA Player on the session page (Q17.2, mock only). They go
  * straight to the server, never through the club device's sync log, so the Queue Master sees them
- * with their next refresh. Real mode has no route yet for the others: `delay` refuses with NotConnectedError; Request to
- * join and Cancel request go to the Player app (#687).
+ * with their next refresh. In real mode Request to join, Cancel request (#687), Move me to the
+ * waitlist (#735), I'm here, I'm leaving, I can't make it and the Session invite go to the Player app
+ * (`delay` still refuses with NotConnectedError).
  * Identity (`playerId`) comes from the Player session; the server checks the roster link.
  */
 function fail(text: string, kind: 'permission' | 'conflict' = 'permission'): never {
@@ -215,6 +220,9 @@ export function cancelMyJoinRequest(slug: string, input: PlayerSessionInput) {
  * club device is offline (DevMenu) the toast says the QM sees it after their next sync.
  */
 export function selfCheckIn(slug: string, input: PlayerSessionInput) {
+  // Real mode: the Player app knows who is signed in. Before playerWrite, whose mock delay refuses
+  // in real mode.
+  if (isRealDataMode()) return realSelfCheckIn(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -242,6 +250,7 @@ export function selfCheckIn(slug: string, input: PlayerSessionInput) {
  * plus any other open request that names them. Never releases the slot.
  */
 export function leaveSession(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realLeaveSession(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -288,6 +297,7 @@ export function moveMeToWaitlist(slug: string, input: PlayerSessionInput) {
  * until the QM acts. One open notice per player.
  */
 export function sendDropOutNotice(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realSendDropOutNotice(slug)
   return playerWrite(
     slug,
     (s, session) => {
@@ -318,6 +328,7 @@ export function sendDropOutNotice(slug: string, input: PlayerSessionInput) {
  * is Prepared (refused once it is live, finished or cancelled).
  */
 export async function getSessionInviteCode(slug: string, input: PlayerSessionInput) {
+  if (isRealDataMode()) return realGetSessionInviteCode(slug)
   const check = (s: MockState, session: MockState['sessions'][number]) => {
     if (session.state !== 'prepared') fail('Invites close when the session starts.')
     const slot = playerSlot(s, session, input.playerId)

@@ -8,6 +8,7 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import type { PlayingLevel } from '../player/player.types'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
+import { realKeepDropOut, realRemoveDropOut } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
 import {
   capacity,
@@ -24,10 +25,8 @@ import type { SessionJoinRequest } from './sessionRoster.types'
  * cover: confirming a signed-in ROTRA player's request, and the drop-out notices' Remove from
  * roster / Keep (D-2026-11-09-03). There is no Link / Not them on a guest request any more
  * (D-2026-11-16-04): a guest request carries no phone and nothing links it to a saved player.
- * Mock only; real mode refuses truthfully.
+ * The drop-out notices' Keep and Remove from roster go to the Queue app in real mode.
  */
-
-const NOT_REAL = 'This request action is not available in real mode yet.'
 
 function fail(text: string, kind: 'permission' | 'conflict' = 'permission'): never {
   throw new MockError(kind, text)
@@ -190,7 +189,7 @@ function openNotice(s: MockState, sessionId: string, noticeId: string) {
 
 /** **Keep**: closes the drop-out notice; the player stays on the roster. */
 export function keepDropOut(input: { sessionId: string; noticeId: string }) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
+  if (isRealDataMode()) return realKeepDropOut(input)
   return requestMutation(input.sessionId, (s) => {
     const { d, row } = openNotice(s, input.sessionId, input.noticeId)
     d.status = 'closed'
@@ -206,7 +205,7 @@ export function keepDropOut(input: { sessionId: string; noticeId: string }) {
  * the player are left as they are, and match requests naming them close (they stopped being present).
  */
 export function removeDropOut(input: { sessionId: string; noticeId: string }) {
-  if (isRealDataMode()) throw new MockError('permission', NOT_REAL)
+  if (isRealDataMode()) return realRemoveDropOut(input)
   return requestMutation(input.sessionId, (s) => {
     const { d, row } = openNotice(s, input.sessionId, input.noticeId)
     d.status = 'closed'

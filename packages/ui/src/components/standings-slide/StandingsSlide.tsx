@@ -4,7 +4,7 @@ import { ResultSlideFrame, type ResultSlideFrameProps } from '@rotra/ui/result-s
 export type StandingsSlideRow = {
   /** Stable row id; only needed to be matched by `highlightRowId` */
   id?: string
-  /** Unique position, 1-based */
+  /** Standings position, 1-based; players with the same wins and losses share it (1, 1, 3) */
   position: number
   name: string
   wins: number

@@ -23,6 +23,7 @@ import type { QueueSession } from '../generated/prisma/client'
 import { requireOwnPlayer } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { openDropOutNotices } from './drop-out-notices'
 import { requestFormatsRecord } from './dto'
 import {
   type AutoFillOptions,
@@ -372,10 +373,11 @@ export async function readMatchRequestOptions(context: PlayerContext, slug: stri
 /**
  * Q-REQUESTS › Match: the open match requests, oldest first, each named spot with its counted
  * games, level and where the player is now (`{ kind: 'court', courtLabels }` / `{ kind: 'queue',
- * position }` / null). Stale requests are closed first, like the mock's sweep. Join requests and
- * drop-out notices stay on the roster read in real mode, so `join` and `dropOuts` are empty and
- * their counts 0; `selfCheckIn` is empty (self check-in is not real yet). Finished, invalid and
- * cancelled sessions return empty lists.
+ * position }` / null). Stale requests are closed first, like the mock's sweep. The open drop-out
+ * notices (I can't make it, D-2026-11-09-03) come back in `dropOuts`, oldest first, and count in
+ * `total`, `join` and `dropOuts`. Join requests stay on the roster read in real mode, so `join` is
+ * empty; `selfCheckIn` is empty here (the roster read carries each entry's own marks). Finished,
+ * invalid and cancelled sessions return empty lists.
  */
 export async function readSessionRequests(context: ClubContext, sessionId: string) {
   const found = await prisma.queueSession.findUnique({
@@ -385,21 +387,21 @@ export async function readSessionRequests(context: ClubContext, sessionId: strin
   await requireSessionAccess(context, found)
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    const counts = (match: number) => ({
-      total: match,
-      join: 0,
+    const counts = (match: number, dropOuts: number) => ({
+      total: match + dropOuts,
+      join: dropOuts,
       joinRequests: 0,
-      dropOuts: 0,
+      dropOuts,
       match,
     })
     const empty = {
       sessionId,
       minimum: session.minimumGames,
       join: [],
-      dropOuts: [],
+      dropOuts: [] as Awaited<ReturnType<typeof openDropOutNotices>>,
       selfCheckIn: {},
     }
-    if (!takesRequests(session)) return { ...empty, counts: counts(0), match: [] }
+    if (!takesRequests(session)) return { ...empty, counts: counts(0, 0), match: [] }
     await closeStaleMatchRequests(tx, session.id)
     const open = await liveOpenRequests(tx, session.id)
     const { ctx } = await matchContext(tx, session)
@@ -437,7 +439,8 @@ export async function readSessionRequests(context: ClubContext, sessionId: strin
         opponents: shape.opponents.map((id) => (id ? spot(id) : null)),
       }
     })
-    return { ...empty, counts: counts(match.length), match }
+    const dropOuts = await openDropOutNotices(tx, session.id)
+    return { ...empty, dropOuts, counts: counts(match.length, dropOuts.length), match }
   })
 }
 

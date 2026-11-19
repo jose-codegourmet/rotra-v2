@@ -285,7 +285,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
   // mode has no Player session in this app: the Player app's access read (below) says who is
   // signed in, for the join card (#687), My night and a finished session's Match history (#850);
-  // the other signed-in reads (names, Courts now, the Queue) are mock only.
+  // Courts now and the Queue come with that access read too. The signed-in page read is mock only.
   const playerSession = useSession('player')
   const viewerAccount =
     viewer === 'visitor' && !isRealDataMode() && playerSession.data?.account.audience === 'player'
@@ -585,17 +585,20 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // A finished session (2026-11-13-queue-finished-session-page): the Leaderboard tab exists only
   // once the club shared the Standings, and the page then opens on it.
   const finished = p.status === 'completed'
+  // Record games off (D-2026-11-18-06): no Leaderboard tab, no awards, Match history says so.
+  const unrecorded = p.recordGames === false
   // The published rows carry no viewer flag in real mode (the public copy is cacheable, D-2026-11-09-09);
   // the signed-in read's participants do, and each row points at its participant, so your row is
   // marked here: the leaderboard highlights it and shows Your position.
-  const standings = finished
-    ? p.results?.standings?.map((row) => ({
-        ...row,
-        isViewer:
-          row.isViewer ??
-          (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
-      }))
-    : undefined
+  const standings =
+    finished && !unrecorded
+      ? p.results?.standings?.map((row) => ({
+          ...row,
+          isViewer:
+            row.isViewer ??
+            (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
+        }))
+      : undefined
   const activeTab =
     tab === 'auto' || (tab === 'leaderboard' && !standings)
       ? standings
@@ -648,7 +651,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             onOpenClub={p.club.id ? () => setClubOpen(true) : undefined}
             className="col-span-full"
           />
-          {signedRead ? (
+          {signedRead || realPlayer ? (
             <div className="col-span-full">
               <PublicRefreshBar
                 updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}
@@ -717,16 +720,26 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                   modeLabel={mode.label}
                   modeDescription={mode.text}
                   minimumGames={p.minimum}
+                  recorded={!unrecorded}
                   amountDuePerPlayer={p.amountDuePerPlayer}
                   notes={p.notes}
                   lastUpdatedLabel={time(p.lastSyncedAt)}
                   hasPendingChanges={p.hasPendingChanges}
-                  courtsNow={signedRead ? courtsNowProps(signedRead.courtsNow) : undefined}
+                  courtsNow={
+                    signedRead
+                      ? courtsNowProps(signedRead.courtsNow)
+                      : // Real mode: the Player app's access read carries Courts now.
+                        realPlayer?.courtsNow
+                        ? courtsNowProps(realPlayer.courtsNow)
+                        : undefined
+                  }
                   onOpenCourtPlayer={openFace ? (id) => openFace(faceParticipant(id)) : undefined}
                   queueSlot={
                     // A finished session shows its Match history where the Queue was.
                     finished ? (
-                      signedRead ? (
+                      unrecorded ? (
+                        <MatchHistory history={null} recorded={false} />
+                      ) : signedRead ? (
                         <MatchHistory
                           history={signedRead.history}
                           onOpenParticipant={openParticipant}
@@ -762,12 +775,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                           checking={playerAccess.isPending}
                           failed={playerAccess.isError}
                           onRetry={() => void playerAccess.refetch()}
+                          onOpenPlayer={openFace}
                         />
                       )
                     ) : undefined
                   }
                 />
-                {finished ? (
+                {finished && !unrecorded ? (
                   p.results && (p.results.awards || p.results.offDay) ? (
                     <SessionAwards
                       results={p.results}
@@ -833,13 +847,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           onClose={() => setProfileOf(null)}
         />
       ) : null}
-      {signedIn && viewerAccount && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (
+      {signedIn && nightViewer && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (
         <SessionInviteSheet
           slug={slug}
-          playerId={viewerAccount.id}
+          playerId={nightViewer.id}
           open={inviteOpen}
           onOpenChange={setInviteOpen}
-          inviterName={viewerAccount.name}
+          inviterName={nightViewer.name}
           clubName={p.club.name}
           clubInitials={p.club.initials}
           clubLogoUrl={p.club.logoUrl}

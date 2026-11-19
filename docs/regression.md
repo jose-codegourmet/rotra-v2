@@ -127,6 +127,11 @@ Simulation (`tests/sim`):
 - **REG-29** closing the last court is refused.
 - **REG-30** remove a court, then add one.
 - **REG-DEF-01** Session done with a match left On court (never started).
+- **REG-31** self check-in: I'm here, I'm leaving, and the club switch off refusal.
+- **REG-32** Courts now in the signed-in Player's session access read.
+- **REG-33** a name-only guest's invite link registers onto the same club player.
+- **REG-34** I can't make it: Keep and Remove from roster.
+- **REG-35** the Session invite code is the same on every call.
 
 Browser (`tests/ui`):
 
@@ -160,7 +165,7 @@ test runs on and shows a `defect-fixed` annotation: remove the wrapper and the t
   invalid, as the sims' `finishSession` does.
 - **UI-17 Send request** (no POST sent) did not reproduce on the built apps; UI-17 runs as an
   ordinary test.
-- **UI-17 "I'm here"** (`test.fixme`): self check-in has no real route.
+- **UI-17 "I'm here"** (`test.fixme`): the route exists since Q24.2 (REG-31 covers it over HTTP); the browser journey is not written yet.
 
 ### Match-request defects
 

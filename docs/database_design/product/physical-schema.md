@@ -407,3 +407,19 @@ data step and one trigger function swap; nothing dropped, moved or deleted.
 revoked from PUBLIC. Data step: `club_players.nickname` set to null on linked rows where it equals the
 linked player's `players.nickname` after `btrim` (case-sensitive). Checked on a disposable database
 (`rotra_disposable_p15`: rebuild with no drift, seed, 74/74 checks); not applied to the shared one.
+
+## Q23.8 — Record games (D-2026-11-18-06)
+
+`20261119000100_session_record_games` (#976; the owner authorized the migration for the Q23 batch on
+November 19, 2026). **Status: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).** One new column; one CHECK replaced
+by a wider one; two triggers. No table, column or row is dropped, moved, rewritten or backfilled.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `queue_sessions` (added) | `record_games` boolean NOT NULL DEFAULT true; no index | trigger `queue_sessions_record_games_lock` (before update, only when the value changes): refused unless the row's current state is `prepared` | unchanged |
+| `match_decisions` (changed) | unchanged | `match_decisions_kind_check` replaced: `(kind = completed AND winning_team IS NOT NULL) OR (winning_team IS NULL AND team_a_score IS NULL AND team_b_score IS NULL)`; before: completed always needed a winner. Trigger `match_decisions_record_games_guard` (before insert): a session with `record_games` true refuses a completed decision with no winner; one with `record_games` false refuses any winner | unchanged |
+
+Both trigger functions are revoked from PUBLIC. No grant, RLS or index change. Every existing decision
+passes the wider CHECK (it accepts everything the old one did). Checked on a disposable local database
+(`rotra_disposable_q238` on the local Supabase Postgres, 127.0.0.1:54322): rebuild with no drift, seed,
+80/80 checks. Not applied to the shared database.

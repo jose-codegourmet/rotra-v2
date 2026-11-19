@@ -5,21 +5,37 @@ import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import {
+  formatStandingsGames,
+  type StandingsGames,
+  StandingsPlayerCell,
+} from '@rotra/ui/standings-faces'
 import { useRef } from 'react'
 
-export type SessionStandingsRow = {
+/** One player inside a standings position. */
+export type SessionStandingsPlayer = {
   id: string
-  position: number
   /** Per the page's name rule */
   name: string
   pictureUrl?: string | null
-  wins: number
-  losses: number
-  games: number
-  /** The viewer's own row: tinted, “(you)” after the name */
+  /** The signed-in viewer: the row is tinted and the name reads "NAME (you)" */
   isViewer?: boolean
   /** Opens the profile card; without it the face is plain */
   onOpen?: () => void
+}
+
+/**
+ * One standings row: a position and the players who hold it (same wins and losses share a position,
+ * numbered 1, 1, 3). The caller computes the position and orders the players inside it.
+ */
+export type SessionStandingsRow = {
+  id: string
+  position: number
+  players: SessionStandingsPlayer[]
+  wins: number
+  losses: number
+  /** One number, or {min, max} when the players inside the position counted different games */
+  games: StandingsGames
 }
 
 export type SessionStandingsProps = {
@@ -47,9 +63,9 @@ const flash = (row: HTMLElement) => {
 /**
  * Finished session page › **Leaderboard** tab (2026-11-13-queue-finished-session-page; the
  * prototype's pubLeaderboard), shown only once the club shares the Standings: the **Your position**
- * card (picture, “#N of M”, W, L and games; the card scrolls to your row and flashes it; Share), the
- * players count with **Share leaderboard**, the standings table (#, face and name, W, L, G; your row
- * tinted with “(you)”), and the order rule.
+ * card (picture, “#N of M · tied with 2 others”, W, L and games; the card scrolls to your row and flashes it; Share), the
+ * players count with **Share leaderboard**, the standings table (#, faces and names, W, L, G; one row per position, stacked faces when players
+ * share it; the row holding you tinted with “(you)”), and the order rule.
  */
 export function SessionStandings({
   rows,
@@ -58,7 +74,10 @@ export function SessionStandings({
   onShareLeaderboard,
 }: SessionStandingsProps) {
   const mineRef = useRef<HTMLTableRowElement>(null)
-  const mine = rows.find((row) => row.isViewer)
+  const mine = rows.find((row) => row.players.some((player) => player.isViewer))
+  const playerCount = rows.reduce((total, row) => total + row.players.length, 0)
+  const tiedWith = mine ? mine.players.length - 1 : 0
+  const tiedLabel = tiedWith ? `tied with ${tiedWith} ${tiedWith === 1 ? 'other' : 'others'}` : ''
   const record = (row: SessionStandingsRow) => (
     <span className="flex gap-3.5 text-[13px] text-fg2">
       <span>
@@ -68,7 +87,8 @@ export function SessionStandings({
         <b className="mr-0.5 text-lg text-fg tabular-nums">{row.losses}</b> L
       </span>
       <span>
-        <b className="mr-0.5 text-lg text-fg tabular-nums">{row.games}</b> games
+        <b className="mr-0.5 text-lg text-fg tabular-nums">{formatStandingsGames(row.games)}</b>{' '}
+        games
       </span>
     </span>
   )
@@ -87,7 +107,7 @@ export function SessionStandings({
         <div
           role="button"
           tabIndex={0}
-          aria-label={`Your position, number ${mine.position} of ${rows.length}. Go to your row`}
+          aria-label={`Your position, number ${mine.position} of ${playerCount}${tiedLabel ? `, ${tiedLabel}` : ''}. Go to your row`}
           onClick={goToMine}
           onKeyDown={(event) => {
             if (event.target !== event.currentTarget) return
@@ -114,7 +134,10 @@ export function SessionStandings({
             <b className="text-[30px] leading-none font-extrabold text-accent tabular-nums">
               #{mine.position}
             </b>
-            <span className="text-[13px] text-fg2">of {rows.length}</span>
+            <span className="text-[13px] text-fg2">
+              of {playerCount}
+              {tiedLabel ? ` · ${tiedLabel}` : ''}
+            </span>
           </div>
           {record(mine)}
           <Button
@@ -135,7 +158,7 @@ export function SessionStandings({
         </div>
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-[13px] text-fg2">{rows.length} players</span>
+        <span className="text-[13px] text-fg2">{playerCount} players</span>
         <Button size="sm" onClick={onShareLeaderboard}>
           <Icon name="share" />
           Share leaderboard
@@ -154,49 +177,38 @@ export function SessionStandings({
           </thead>
           <tbody>
             {rows.map((row) => {
-              const face = (
-                <Avatar
-                  name={row.name}
-                  src={row.pictureUrl ?? undefined}
-                  size={28}
-                  className={
-                    row.onOpen ? 'group-hover/face:ring-2 group-hover/face:ring-accent' : ''
-                  }
-                />
-              )
+              const isViewerRow = row.players.some((player) => player.isViewer)
               const cell = cn(
                 'border-t border-border px-2 py-1.5 align-middle',
-                row.isViewer && 'bg-accent-subtle font-bold',
+                isViewerRow && 'bg-accent-subtle font-bold',
               )
               return (
                 <tr
                   key={row.id}
-                  ref={row.isViewer ? mineRef : undefined}
-                  aria-current={row.isViewer ? 'true' : undefined}
+                  ref={isViewerRow ? mineRef : undefined}
+                  aria-current={isViewerRow ? 'true' : undefined}
                 >
                   <td className={cn(cell, 'w-9 text-fg2 tabular-nums')}>{row.position}</td>
                   <td className={cell}>
-                    <span className="inline-flex min-w-0 items-center gap-2.5">
-                      {row.onOpen ? (
-                        <button
-                          type="button"
-                          onClick={row.onOpen}
-                          aria-label={`${row.name}. View profile`}
-                          className="group/face cursor-pointer rounded-full border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-accent"
-                        >
-                          {face}
-                        </button>
-                      ) : (
-                        face
-                      )}
-                      <span className="[overflow-wrap:anywhere]">
-                        {row.isViewer ? `${row.name} (you)` : row.name}
-                      </span>
-                    </span>
+                    <StandingsPlayerCell
+                      size={28}
+                      profileLabel={(name) => `${name}. View profile`}
+                      faces={row.players.map((player) => ({
+                        id: player.id,
+                        name: player.name,
+                        pictureUrl: player.pictureUrl,
+                        onOpen: player.onOpen,
+                      }))}
+                      names={row.players
+                        .map((player) => (player.isViewer ? `${player.name} (you)` : player.name))
+                        .join(', ')}
+                    />
                   </td>
                   <td className={cn(cell, 'text-right tabular-nums')}>{row.wins}</td>
                   <td className={cn(cell, 'text-right tabular-nums')}>{row.losses}</td>
-                  <td className={cn(cell, 'text-right tabular-nums')}>{row.games}</td>
+                  <td className={cn(cell, 'text-right whitespace-nowrap tabular-nums')}>
+                    {formatStandingsGames(row.games)}
+                  </td>
                 </tr>
               )
             })}
@@ -204,7 +216,8 @@ export function SessionStandings({
         </table>
       </Card>
       <p className="m-0 text-[13px] text-fg2">
-        Wins first, then fewer losses, then head-to-head. Counted games only.
+        Wins first, then fewer losses. Players with the same wins and losses share a position.
+        Counted games only.
       </p>
     </section>
   )

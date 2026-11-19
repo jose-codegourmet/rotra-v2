@@ -231,7 +231,7 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
             }
           : undefined
       }
-      onSubmit={({ confirmPassword: _confirm, ...values }) =>
+      onSubmit={({ confirmPassword: _confirm, cityCode: _city, ...values }) =>
         complete.mutate(
           { token, values },
           {

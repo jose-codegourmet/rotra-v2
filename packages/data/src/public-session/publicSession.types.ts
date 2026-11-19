@@ -184,7 +184,16 @@ export type PublicSessionPage = {
   lastSyncedAt: number
   /** The operator's device has changes that have not synced yet */
   hasPendingChanges: boolean
-  /** null until results are published (always null for prepared, active and invalid sessions) */
+  /**
+   * **Record games** (D-2026-11-18-06): false when the session keeps no results, so the page says
+   * "Not recorded" (Details) and "This session's games were not recorded." (Match history). Missing
+   * reads as true (older wire shapes).
+   */
+  recordGames?: boolean
+  /**
+   * null until results are published (always null for prepared, active and invalid sessions, and
+   * for an unrecorded one)
+   */
   results: PublicSessionResults | null
   /**
    * Finished session only: false reads “Results for this session have not been shared.” Missing on
@@ -413,6 +422,11 @@ export type PlayerSessionAccess = {
   joinRequest: MyJoinRequest | null
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /**
+   * Real mode: **Courts now** for the signed-in Player (live sessions; empty otherwise). Missing in
+   * mock mode, where the signed-in read carries it, and on a server from before it was connected.
+   */
+  courtsNow?: PublicCourtNow[]
   queue: {
     matchNo: number
     format: MatchFormat

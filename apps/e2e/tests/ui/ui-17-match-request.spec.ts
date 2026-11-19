@@ -90,9 +90,7 @@ test('UI-17 Request a match: added to the queue, then a second one declined', as
   ).toBeVisible()
 })
 
-// No real-mode path: I'm here (useSelfCheckIn -> playerMutations.selfCheckIn) is mock only. In
-// real mode its mock `delay()` refuses with NotConnectedError, there is no Player-app route for it,
-// and there is no self check-in mark in the database (packages/db/src/queue/match-requests.ts
-// readSessionRequests: "self check-in is not real yet"). Building it needs a schema change, so it
-// is out of scope for wiring; UI-17 above has the Queue Master mark the requester present instead.
+// The route exists since Q24.2 (POST /api/public-sessions/[slug]/check-in; REG-31 covers it over HTTP).
+// The browser journey (My night > I'm here) is not written yet; UI-17 above has the Queue Master
+// mark the requester present instead.
 test.fixme("UI-17 I'm here: the signed-in Player checks themselves in from My night", () => {})

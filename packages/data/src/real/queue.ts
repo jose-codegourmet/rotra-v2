@@ -9,7 +9,6 @@ import type {
   DeleteImpact,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
-import { clubInviteUrl } from '../club-player/registrationUrl'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
 import { queueDeviceId, queueDeviceLabel } from '../device/deviceIdentity'
 import {
@@ -101,6 +100,8 @@ type WireClubSettings = {
   description: string
   courtRules: string
   postTemplate: string | null
+  /** Missing on a server from before self check-in was connected: reads as on */
+  selfCheckInEnabled?: boolean
   foundingAddress: string
   city: string
   cityCode: string
@@ -123,6 +124,7 @@ export async function realGetClub(signal?: AbortSignal): Promise<Club> {
     description: club.description,
     courtRules: club.courtRules || null,
     postTemplate: club.postTemplate,
+    selfCheckInEnabled: club.selfCheckInEnabled !== false,
     defaultPlayersPerCourt: club.defaultPlayersPerCourt,
     defaultEntranceFeeMinor: minorOf(club.defaultEntranceFee),
     foundingAddress: club.foundingAddress,
@@ -151,6 +153,19 @@ export async function realUpdateClubLogo(input: {
 }) {
   await realRequest('/api/club', { method: 'PATCH', body: input })
   return accepted(null, input.logoUrl === null ? 'Club logo removed' : 'Club logo updated')
+}
+
+/** Q-CLUB › Players can check themselves in (D-2026-11-09-03): the club's switch for I'm here. */
+export async function realUpdateSelfCheckIn(input: { enabled: boolean }) {
+  const { revision } = await realGetClub()
+  await realRequest('/api/club', {
+    method: 'PATCH',
+    body: { selfCheckInEnabled: input.enabled, expectedRevision: revision },
+  })
+  return accepted(
+    null,
+    input.enabled ? 'Players can check themselves in' : 'Only you mark presence now',
+  )
 }
 
 /** Q-CLUB › Regenerate link (#712): the old link and its QR images stop working. */
@@ -478,6 +493,9 @@ export type WireRosterEntry = {
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
+  /** The Player's own I'm here / I'm leaving times (D-2026-11-09-03); missing on older servers */
+  selfCheckedInAt?: string | null
+  leftAt?: string | null
 }
 export type WireWaitlistEntry = {
   id: string
@@ -499,6 +517,8 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
   presentChangedAt: msOf(entry.presentChangedAt),
   levelLockedAt: msOrNull(entry.levelLockedAt),
   confirmedAt: msOf(entry.confirmedAt),
+  selfCheckedInAt: msOrNull(entry.selfCheckedInAt ?? null),
+  leftAt: msOrNull(entry.leftAt ?? null),
 })
 
 export type WireRosterRead = {
@@ -651,14 +671,11 @@ export function playerAppOrigin() {
 }
 
 /**
- * Invite: a registration link for an unclaimed profile; a guest gets independent registration with
- * no guest identity attached, through the club invite link and its current code (#712).
+ * Invite: the player's own registration link, for an unclaimed profile and for a guest alike
+ * (D-2026-11-18-07). Registering through it claims that club record, so its games stay with the
+ * person. Works once, lasts 7 days; a new link cancels the earlier one.
  */
 export async function realCreatePlayerInvite(player: ClubPlayerView) {
-  if (player.identity !== 'unclaimed') {
-    const { inviteCode } = await realRequest<{ inviteCode: string }>('/api/club/invite')
-    return { url: clubInviteUrl(player.clubId, inviteCode), message: 'Invite link ready' }
-  }
   const { token } = await realRequest<{ token: string; expiresAt: string }>(
     `/api/club/players/${encodeURIComponent(player.id)}/registration-link`,
     { method: 'POST' },

@@ -48,11 +48,12 @@ import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
 import type { PlayerNotification } from '../player-notifications/playerNotifications.types'
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
-import type {
-  DownloadState,
-  QueueSession,
-  SessionCourt,
-  SessionFinalization,
+import {
+  type DownloadState,
+  type QueueSession,
+  recordsGames,
+  type SessionCourt,
+  type SessionFinalization,
 } from '../queue-session/queueSession.types'
 import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import { isRealDataMode } from '../real/mode'
@@ -185,10 +186,11 @@ function seedState(): MockState {
   const now = Date.now(),
     { sessions, courts, roster, history, requests } = createQueueFixtures(now),
     publicationFixtures = createSessionPublicationFixtures(now)
-  // The seeded completed history sessions carry the snapshot their finalization `slides` stage produced.
+  // The seeded completed history sessions carry the snapshot their finalization `slides` stage
+  // produced; an unrecorded one never reached that stage and has none.
   const resultSnapshots = Object.fromEntries(
     sessions
-      .filter((s) => s.state === 'completed')
+      .filter((s) => s.state === 'completed' && recordsGames(s))
       .map((s) => [
         s.id,
         createResultSnapshot({

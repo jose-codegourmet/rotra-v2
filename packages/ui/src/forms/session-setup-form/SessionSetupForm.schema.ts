@@ -72,6 +72,8 @@ export const sessionSetupSchema = z
     /** Players can request: the formats a signed-in Player may ask for with Request a match */
     requestFormats: z.array(z.enum(REQUEST_FORMAT_VALUES)),
     sessionMode: z.enum(['chill', 'fair', 'hard']),
+    /** Record games: off runs the night and keeps no results. A session saved before this field reads as on. */
+    recordGames: z.boolean().default(true),
     minimumIsCalculated: z.boolean(),
     /** Only read when minimumIsCalculated is false */
     minimumGames: z.string(),
@@ -142,6 +144,7 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'allowDoubles',
     'requestFormats',
     'sessionMode',
+    'recordGames',
     'minimumIsCalculated',
     'minimumGames',
     'expectedPlayers',

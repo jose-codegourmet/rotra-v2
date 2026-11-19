@@ -51,6 +51,14 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Sequence formatting above 9999 (the city registry, Admin-added cities and founding-location corrections were settled November 11, 2026).
 - Refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes (renewal dates and overlapping terms were settled November 11, 2026). (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)
 
+## Record games (D-2026-11-18-06), built November 19, 2026
+
+Source: [D-2026-11-18-06](../../mvp/decisions.md#d-2026-11-18-06). Built in Q23.8 (#976) as migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).
+
+- **Settled for the build (the owner authorized the proposed shape for the Q23 batch):** `queue_sessions.record_games`, boolean, default true, fixed once the session is no longer prepared (trigger); no backfill. Finishing an unrecorded session writes one `session_finalizations` row and nothing in the result, publication or player fact tables ([results publication](queue/modules/results-publication.md#a-session-with-record-games-off)).
+- **Needs the owner's eye before the shared database gets it:** the ticket's proposal named only the column. Match done with no result also needed `match_decisions_kind_check` widened (a completed decision may have no winner and no scores) and a trigger that ties that shape to the session ([matches](queue/modules/matches-queue.md#match_decisions)). No existing row changes.
+- **Still open:** a winner or score kept for the night only; a club default (no column on `clubs`); the Player's own session list (an unrecorded session has no facts, so it is not listed after it finishes); whether an unrecorded session should count for "has played at this club before" and the award baselines (today it does not: no summaries are written); whether the ranking policy barrier should apply to a session that never ranks anyone (today it does).
+
 ## Owner decision recorded November 18, 2026
 
 Source: [D-2026-11-18-04](../../mvp/decisions.md#d-2026-11-18-04). Proposed only; no migration, no Prisma change.

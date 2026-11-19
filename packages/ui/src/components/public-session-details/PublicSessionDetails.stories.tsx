@@ -96,6 +96,14 @@ export const SinglesAndDoubles: Story = { args: { formats: { singles: true, doub
 export const NoStandardFormat: Story = { args: { formats: { singles: false, doubles: false } } }
 export const NoAddress: Story = { args: { venueAddress: null } }
 
+/** Record games off: a Results row reads "Not recorded" */
+export const NotRecorded: Story = { args: { recorded: false } }
+export const NotRecordedLight: Story = { ...NotRecorded, globals: { theme: 'light' } }
+export const NotRecordedPhone: Story = {
+  ...NotRecorded,
+  globals: { viewport: { value: 'phone' } },
+}
+
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 

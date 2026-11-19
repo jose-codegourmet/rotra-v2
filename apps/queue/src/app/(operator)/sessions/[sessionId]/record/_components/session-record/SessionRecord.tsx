@@ -100,6 +100,7 @@ function FinishedSessionRecord({ sessionId }: SessionRecordProps) {
           venue={r.venueName}
           state={r.state}
           published={!!publication.data}
+          recorded={r.recordGames !== false}
           totals={{
             games: invalid ? null : r.games,
             invalidGames: r.invalidGames,

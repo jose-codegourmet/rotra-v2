@@ -9,7 +9,12 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireClubAccess } from '../mock/transaction'
 import { realGetFacebookPost, realGetPostPreview } from '../real/facebook-post'
 import { isRealDataMode } from '../real/mode'
-import { realRegenerateClubInvite, realSaveFacebookPost, realUpdateClubLogo } from '../real/queue'
+import {
+  realRegenerateClubInvite,
+  realSaveFacebookPost,
+  realUpdateClubLogo,
+  realUpdateSelfCheckIn,
+} from '../real/queue'
 import { clubInitials, composeFacebookPost } from './club.rules'
 import { MOCK_INVITE_CODE_LENGTH, newClubInviteCode } from './inviteCode'
 
@@ -62,7 +67,7 @@ export const regenerateClubInvite = () => {
 }
 /** Whether players may check themselves in; missing reads as on. */
 export const updateSelfCheckIn = (input: { enabled: boolean }) => {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realUpdateSelfCheckIn(input)
   return changeClub((state) => {
     clubIn(state).selfCheckInEnabled = input.enabled
     return {

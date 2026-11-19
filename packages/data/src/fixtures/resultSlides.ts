@@ -37,8 +37,8 @@ export function createResultSlideFixtures(now = Date.now()) {
     venue: history.session.venueName,
   }
   const standings: ResultSlideStandingRow[] = computeStandings(history.roster, history.matches).map(
-    (r, i) => ({
-      position: i + 1,
+    (r) => ({
+      position: r.position,
       name: r.name,
       wins: r.wins,
       losses: r.losses,

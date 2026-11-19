@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerProfileSheetMeta = {
   name: 'PlayerProfileSheet',
   description:
-    "A player's profile on operator screens as the header-less banner profile card (ProfileBannerCard, D-PARTICIPANT-PROFILE): the player's banner strip, overlapping picture with the status pill while live, the name block (display name, new-tab icon, full name, Copy RTR ID), identity chip and level badge, the identity line, then boxed About (Registered in, Joined), Latest stats and In your club (Added to club, Sessions here, Phone, and Email for guests and unclaimed players). Guests with an inviteUrl also get an Invite to ROTRA section (Copy invite link, Share); the levels note stays last.",
+    "A player's profile on operator screens as the header-less banner profile card (ProfileBannerCard, D-PARTICIPANT-PROFILE): the player's banner strip, overlapping picture with the status pill while live, the name block (display name, new-tab icon, full name, Copy RTR ID), identity chip and level badge, the identity line, then boxed About (Registered in, Joined), Latest stats and In your club (Added to club, Sessions here, Phone, and Email for guests and unclaimed players). Guests with getInviteLink also get an Invite to ROTRA section (Copy invite link, Share); the levels note stays last.",
   usage: [
     'Open it from any player picture on operator screens (queue cards, match dialogs, roster, payments, leaderboard). Never on public pages.',
     'Opened from inside a dialog, pass backLabel ("suggestion", "match" or "payments") and onBack to return to that dialog in the same state; otherwise the footer says Close.',
@@ -15,7 +15,7 @@ export const playerProfileSheetMeta = {
     'The level badge reads “LEVEL tonight” from tonightLevel (the player is on tonight’s roster), else “LEVEL · suggestion” from level, else “No level yet”. Pass tonight (ParticipantTonight) for the status pill only while the session is live; leave it out otherwise.',
     'onPhotoClick makes the big picture the Avatar view button (“View full photo of NAME”, zoom-in cursor, focus ring); open PhotoViewer from it (#716). Initials never open anything.',
     'joinedVia ("club", "session" or null) sets the Joined row: "Joined via club link", "Joined via session link" or "Added by the club".',
-    "Pass inviteUrl (the absolute ROTRA Player registration link) to show Invite to ROTRA for guests only: Copy invite link (toast; on clipboard failure the toast shows the link) and Share when the browser supports it. No auto-send, no identity linking. The text says games played here as a guest don't follow them; to keep them, add their email in Edit details first. Link to saved player… no longer exists (D-2026-11-16-04).",
+    "Pass getInviteLink (an async getter for the guest's own invite link, the absolute ROTRA Player /claim/<token> URL) to show Invite to ROTRA for guests only: Copy invite link (toast; on clipboard failure the toast shows the link) and Share when the browser supports it. Each tap calls it and the button shows loading; a rejection shows its message as an error toast. Return the same link while the profile stays open: making a new link cancels the earlier one. No auto-send. The text reads 'Send this link so they can register for ROTRA Player. This record becomes theirs when they register: their games here stay with them. The link works once and lasts 7 days.' (D-2026-11-18-07). Link to saved player… no longer exists (D-2026-11-16-04).",
     'Registered players only: pass clubNickname (null for none) for the Club nickname row under In your club (“NICK” · only your club sees it, or "None") and onClubNickname for the Club nickname button (not shown when opened from another dialog). Guests and unclaimed players get neither.',
   ],
   prototype: {
@@ -27,6 +27,7 @@ export const playerProfileSheetMeta = {
     'docs/screens/product/modules/queue/access-home.md',
     'docs/mockup-changes/2026-11-16-queue-unclaimed-email-lookup.md',
     'docs/mockup-changes/2026-11-18-queue-club-nickname.md',
+    'docs/mockup-changes/2026-11-18-queue-guest-invite-claims-record.md',
     'docs/screens/product/experience-contract.md#sensitive-and-optional-information',
   ],
   related: [

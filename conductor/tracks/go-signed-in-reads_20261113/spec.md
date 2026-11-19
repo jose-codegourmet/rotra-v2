@@ -62,7 +62,7 @@ New signed-in reads:
 - `GET /api/invites/{clubId}` (P-INVITE and where a signed-in player stands on a session).
 - Queue and Admin player lists: lookup by exact RTR ID or email, the four player statuses, club nickname.
 
-**Stop and ask before porting:** the new profile read (`readVisibleProfile`, behind both `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}`) refuses instead of masking, which differs from B-53 and B-54 above. Always-private: `forbidden` for every caller but the owner (B-54: a masked profile; B-53: 404 on the RTR ID route for a caller who is not signed in). Private, or unclaimed under more than one club, and not signed in: `unauthenticated` (B-54: a masked profile; B-53: 404 on the RTR ID route). The owner decides which rule both stacks follow: open as [B-63](../../../docs/backend/open-decisions.md#blocks-a-track), which blocks the port of these two routes only.
+**Settled by [B-63](../../../docs/backend/open-decisions.md#settled) (November 19, 2026):** the profile read (`readPublicProfile` and `readVisibleProfile`, behind `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}`) answers as follows, and Go ports exactly this. Always private, any caller but the owner: the masked profile with an empty `leaderboardPlaces` on the profile route; `404` on the RTR ID route; `403` on Compare. Private and not signed in: `401` on the profile route, `404` on the RTR ID route. Unclaimed under more than one club and not signed in: `401` on the profile route, `404` on the RTR ID route. The TypeScript side is on `go-stack` only until it merges into `main`. Still to do here: B-53's `hidden_from_directory` 404 and B-54's trimmed masked body.
 
 ## Scope
 

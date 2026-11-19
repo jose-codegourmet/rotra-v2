@@ -5,6 +5,7 @@ import {
   activeMatches,
   activeMatchFor,
   courtMatches,
+  groupStandings,
   nextMatchCandidates,
   onCourtMatches,
 } from './match.rules'
@@ -54,6 +55,43 @@ describe('On court matches', () => {
     expect(activeMatches(matches).map((m) => m.id)).toEqual(['playing'])
     expect(onCourtMatches(matches).map((m) => m.id)).toEqual(['placed'])
     expect(courtMatches(matches).map((m) => m.id)).toEqual(['placed', 'playing'])
+  })
+})
+
+describe('Standings grouped by position', () => {
+  const row = (name: string, position: number, wins: number, losses: number, games: number) => ({
+    name,
+    position,
+    wins,
+    losses,
+    games,
+  })
+  const rows = [
+    row('Amy', 1, 4, 2, 6),
+    row('Ben', 1, 4, 2, 6),
+    row('Cat', 3, 2, 1, 3),
+    row('Dan', 3, 2, 1, 5),
+    row('Eve', 3, 2, 1, 4),
+    row('Fay', 6, 0, 3, 3),
+  ]
+
+  it('makes one row per position, players in standings order (1, 1, 3 → 1, 3, 6)', () => {
+    expect(groupStandings(rows, (r) => r.name)).toEqual([
+      { position: 1, players: ['Amy', 'Ben'], wins: 4, losses: 2, games: 6 },
+      {
+        position: 3,
+        players: ['Cat', 'Dan', 'Eve'],
+        wins: 2,
+        losses: 1,
+        games: { min: 3, max: 5 },
+      },
+      { position: 6, players: ['Fay'], wins: 0, losses: 3, games: 3 },
+    ])
+  })
+
+  it('keeps the rows as the players without a mapper, and no rows give no positions', () => {
+    expect(groupStandings(rows)[0]?.players).toEqual([rows[0], rows[1]])
+    expect(groupStandings([])).toEqual([])
   })
 })
 

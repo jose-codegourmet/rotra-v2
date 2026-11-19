@@ -1,29 +1,48 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import { Avatar } from '@rotra/ui/avatar'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { DataTable } from '@rotra/ui/data-table'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { levelLabel } from '@rotra/ui/level-pill'
+import {
+  formatStandingsGames,
+  type StandingsGames,
+  StandingsPlayerCell,
+} from '@rotra/ui/standings-faces'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-/** One standings row, already sorted by the standings rules (most wins, fewest losses, head-to-head). */
-export type LiveLeaderboardRow = {
+/** One player inside a standings position. */
+export type LiveLeaderboardPlayer = {
   playerId: string
   name: string
   level: PlayingLevel | null
   photoUrl?: string
+}
+
+/**
+ * One standings row: a position and the players who hold it. Players with the same wins and losses
+ * share one row (1, 1, 3); the caller computes the position and orders the players inside it.
+ */
+export type LiveLeaderboardRow = {
+  /** The shared position number: 1, 1, 3 */
+  position: number
+  /** One or more players, in the order their names and faces show */
+  players: LiveLeaderboardPlayer[]
+  /** Shared by every player in the row */
   wins: number
   losses: number
-  /** Counted games: partial (substituted) and invalid games are already left out */
-  games: number
+  /**
+   * Counted games: partial (substituted) and invalid games are already left out. A number, or
+   * {min, max} when the players inside the position counted different games (shown "5–6").
+   */
+  games: StandingsGames
 }
 
 type LiveLeaderboardBaseProps = {
-  /** Pre-sorted standings; the row's index is its rank */
+  /** Standings already grouped into positions, best first */
   rows: LiveLeaderboardRow[]
   /** The player's picture opens their profile */
   onOpenProfile: (playerId: string) => void
@@ -50,6 +69,8 @@ export type LiveLeaderboardProps = LiveLeaderboardBaseProps &
 
 const column = createColumnHelper<LiveLeaderboardRow>()
 
+const profileLabelOf = (name: string) => `${name}. View profile`
+
 /** The prototype's .rank: a 26 px circle; first is filled, second and third are outlined. */
 function RankBadge({ rank }: { rank: number }) {
   return (
@@ -67,8 +88,8 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 /**
- * Tonight's standings on the console's Leaderboard view: rank (top three highlighted), player
- * picture, name and level, wins, losses, games against the minimum, and win %. One labelled card
+ * Tonight's standings on the console's Leaderboard view: position (top three highlighted), player
+ * faces (stacked when a position is shared), names and levels, wins, losses, games against the minimum, and win %. One labelled card
  * per row on phones. A working view for the operator, never official history.
  *
  * The record variant is the same table on a session record's Results tab (the prototype's
@@ -90,40 +111,34 @@ export function LiveLeaderboard({
         header: '#',
         enableSorting: false,
         meta: { align: 'right', nowrap: true, cardLabel: 'Rank' },
-        cell: ({ row }) => <RankBadge rank={row.index + 1} />,
+        cell: ({ row }) => <RankBadge rank={row.original.position} />,
       }),
-      column.accessor('name', {
+      column.display({
+        id: 'player',
         header: 'Player',
         enableSorting: false,
         meta: { lead: true },
-        cell: ({ row }) =>
-          record ? (
-            <span className="flex min-w-0 items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => onOpenProfile(row.original.playerId)}
-                aria-label={`${row.original.name}. View profile`}
-                title={row.original.name}
-                className="m-0 flex-none rounded-full border-0 bg-transparent p-0 leading-none [&>span]:hover:shadow-[0_0_0_2px_var(--accent)]"
-              >
-                <Avatar name={row.original.name} src={row.original.photoUrl} size={36} />
-              </button>
-              <b className="min-w-0 [overflow-wrap:anywhere]">{row.original.name}</b>
-            </span>
-          ) : (
-            <span className="flex min-w-0 items-center gap-2.5">
-              <Avatar
-                name={row.original.name}
-                src={row.original.photoUrl}
-                size={36}
-                onClick={() => onOpenProfile(row.original.playerId)}
-              />
-              <span className="min-w-0">
-                <b className="block [overflow-wrap:anywhere]">{row.original.name}</b>
-                <span className="block text-[13px] text-fg2">{levelLabel(row.original.level)}</span>
-              </span>
-            </span>
-          ),
+        cell: ({ row }) => {
+          const { players } = row.original
+          const levels = [...new Set(players.map((p) => levelLabel(p.level)))]
+          return (
+            <StandingsPlayerCell
+              faces={players.map((p) => ({
+                id: p.playerId,
+                name: p.name,
+                pictureUrl: p.photoUrl,
+                onOpen: () => onOpenProfile(p.playerId),
+              }))}
+              profileLabel={record ? profileLabelOf : undefined}
+              names={<b>{players.map((p) => p.name).join(', ')}</b>}
+              detail={
+                record ? undefined : (
+                  <span className="block text-[13px] text-fg2">{levels.join(', ')}</span>
+                )
+              }
+            />
+          )
+        },
       }),
       column.accessor('wins', {
         header: 'W',
@@ -143,10 +158,10 @@ export function LiveLeaderboard({
         meta: { align: 'right', nowrap: true },
         cell: ({ getValue }) =>
           record ? (
-            <span className="tabular-nums">{getValue()}</span>
+            <span className="tabular-nums">{formatStandingsGames(getValue())}</span>
           ) : (
             <span className="tabular-nums">
-              {getValue()}
+              {formatStandingsGames(getValue())}
               <span className="text-fg2">/{minimumGames}</span>
             </span>
           ),
@@ -161,8 +176,10 @@ export function LiveLeaderboard({
               meta: { align: 'right', nowrap: true },
               cell: ({ row }) => (
                 <span className="tabular-nums">
-                  {row.original.games
-                    ? Math.round((row.original.wins / row.original.games) * 100)
+                  {row.original.wins + row.original.losses
+                    ? Math.round(
+                        (row.original.wins / (row.original.wins + row.original.losses)) * 100,
+                      )
                     : 0}
                   %
                 </span>
@@ -179,9 +196,9 @@ export function LiveLeaderboard({
         <div>
           <h2 className="text-lg font-bold">Leaderboard</h2>
           <p className="mt-1 text-[13px] text-fg2">
-            Tonight's standings from completed games: most wins, then fewest losses, then
-            head-to-head. It updates each time you confirm a result. Partial and invalid games don't
-            count.
+            Tonight's standings from completed games: most wins, then fewest losses. Players with
+            the same wins and losses share a position. It updates each time you confirm a result.
+            Partial and invalid games don't count, unless you gave a substitute the game.
           </p>
         </div>
       )}
@@ -191,9 +208,9 @@ export function LiveLeaderboard({
             aria-label={record ? 'Standings' : "Tonight's standings"}
             columns={columns}
             data={rows}
-            getRowId={(row) => row.playerId}
-            rowClassName={(_, index) =>
-              index < 3 ? 'bg-accent-subtle/50 [&>td]:bg-accent-subtle/50' : undefined
+            getRowId={(row) => `${row.position}-${row.players[0]?.playerId ?? ''}`}
+            rowClassName={(row) =>
+              row.position <= 3 ? 'bg-accent-subtle/50 [&>td]:bg-accent-subtle/50' : undefined
             }
           />
         </Card>

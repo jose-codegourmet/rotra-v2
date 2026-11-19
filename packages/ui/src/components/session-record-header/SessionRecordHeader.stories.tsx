@@ -76,6 +76,15 @@ export const CompletedPrivateWithInvalidGames: Story = {
   args: { ...propsFor('h2', { games: 19, invalidGames: 2, players: 15 }), published: false },
 }
 
+/** Record games was off: a Not recorded chip instead of Results published / private */
+export const CompletedNotRecorded: Story = {
+  args: { ...propsFor('h2', { games: 19, invalidGames: 0, players: 15 }), recorded: false },
+}
+export const CompletedNotRecordedLight: Story = {
+  ...CompletedNotRecorded,
+  globals: { theme: 'light' },
+}
+
 /** Tuesday Drills: only the Invalid session chip; Games shows "—" and published is ignored */
 export const InvalidSession: Story = {
   args: { ...propsFor('h3', { games: null, invalidGames: 0, players: 12 }), published: true },

@@ -180,6 +180,7 @@
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
    "results": null
@@ -257,6 +258,7 @@
    "slotBudget": 16,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": true,
+   "recordGames": true,
    "lastSyncedAt": 1794904200000,
    "hasPendingChanges": false,
    "results": null
@@ -326,6 +328,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794924000000,
    "hasPendingChanges": true,
    "results": null
@@ -421,6 +424,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794679200000,
    "hasPendingChanges": false,
    "results": {
@@ -565,6 +569,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794592800000,
    "hasPendingChanges": false,
    "results": null
@@ -623,6 +628,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794506400000,
    "hasPendingChanges": false,
    "results": null
@@ -699,6 +705,7 @@
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -747,6 +754,7 @@
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -795,6 +803,7 @@
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -852,6 +861,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794902400000,
    "hasPendingChanges": false,
    "results": null
@@ -900,6 +910,7 @@
    "slotBudget": 0,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -948,6 +959,7 @@
    "slotBudget": 0,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -1005,6 +1017,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
    "results": null
@@ -1072,6 +1085,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794247200000,
    "hasPendingChanges": false,
    "results": {
@@ -1148,6 +1162,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794160800000,
    "hasPendingChanges": false,
    "results": {
@@ -1217,6 +1232,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
    "results": null
@@ -1280,6 +1296,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
    "results": {
@@ -1394,6 +1411,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
    "results": {
@@ -1466,6 +1484,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
    "results": {
@@ -1531,6 +1550,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
    "results": {
@@ -1719,6 +1739,7 @@
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
    "results": null
@@ -1905,6 +1926,7 @@
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
    "results": null
@@ -2193,6 +2215,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
    "results": null
@@ -2257,6 +2280,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
    "results": {
@@ -2364,6 +2388,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794679200000,
    "hasPendingChanges": false,
    "results": {
@@ -2652,6 +2677,7 @@
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794384000000,
    "hasPendingChanges": false,
    "results": null
@@ -2709,6 +2735,7 @@
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794902400000,
    "hasPendingChanges": false,
    "results": {
@@ -2907,6 +2934,7 @@
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
    "results": null

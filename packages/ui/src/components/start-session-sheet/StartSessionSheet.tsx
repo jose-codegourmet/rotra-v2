@@ -3,6 +3,7 @@
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
+import { recordGamesLabel } from '@rotra/ui/forms/session-setup-form/helpers'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
 import { useEffect, useState } from 'react'
@@ -20,6 +21,8 @@ export type StartSessionSheetProps = {
   courts: number
   formatsLabel: string
   modeLabel: string
+  /** Record games; omitted reads as on */
+  recordGames?: boolean
   minimumGames: number
   rosterCount: number
   presentCount: number
@@ -51,6 +54,7 @@ export function StartSessionSheet({
   courts,
   formatsLabel,
   modeLabel,
+  recordGames = true,
   minimumGames,
   rosterCount,
   presentCount,
@@ -120,6 +124,7 @@ export function StartSessionSheet({
               { label: 'Courts', value: String(courts) },
               { label: 'Formats', value: formatsLabel },
               { label: 'Mode', value: modeLabel },
+              { label: 'Record games', value: recordGamesLabel(recordGames) },
               { label: 'Minimum', value: `${minimumGames} games` },
               {
                 label: 'Roster',

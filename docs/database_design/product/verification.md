@@ -194,3 +194,19 @@ history row with the file's checksum (`76110e…7ed5`). Read-only check afterwar
 in `_prisma_migrations`, none rolled back, the latest `20261114000300_session_players_no_show`;
 `no_show_at` is `timestamp with time zone`, nullable; the CHECK `(no_show_at IS NULL) OR
 (released_at IS NULL)` is present; RLS on `session_players` still on; no row is a no show yet.
+
+## Q23.8 (#976) — `queue_sessions.record_games` (November 19, 2026)
+
+Disposable local database `rotra_disposable_q238` on the local Supabase Postgres (127.0.0.1:54322),
+`scripts/disposable-db.sh all`: the full migration history through
+`20261119000100_session_record_games` rebuilds with no drift between the database and the Prisma
+schema. SQL-only objects: 209 check constraints (`match_decisions_kind_check` replaced, count
+unchanged), 1 exclusion constraint, 31 triggers (two new: `queue_sessions_record_games_lock`,
+`match_decisions_record_games_guard`), 28 partial/expression indexes; 0 tables granted to
+anon/authenticated. Integrity checks: 80 passed, 0 failed, including six new ones: Record games
+turned off while prepared is accepted and changed after Start is rejected; a no-result decision is
+rejected on a recorded session and accepted on an unrecorded one; a winner, or a score without a
+winner, is rejected on an unrecorded session. `prisma validate`, `prisma generate` and `make sqlc`
+ran. The services and routes were not run against a database.
+
+**Hosted: applied 2026-11-19** (`prisma db execute` + `migrate resolve`); also applied to a local disposable database.

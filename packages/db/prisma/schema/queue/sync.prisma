@@ -22,12 +22,13 @@ model Device {
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision     BigInt    @default(1)
 
-  clubAccount         ClubAccount           @relation(fields: [clubId], references: [clubId], onDelete: Restrict)
-  streams             DeviceSessionStream[]
-  assessments         ClubAssessment[]
-  decidedJoinRequests SessionJoinRequest[]
-  resolvedConflicts   SyncConflict[]
-  matchDecisions      MatchDecision[]
+  clubAccount          ClubAccount            @relation(fields: [clubId], references: [clubId], onDelete: Restrict)
+  streams              DeviceSessionStream[]
+  assessments          ClubAssessment[]
+  decidedJoinRequests  SessionJoinRequest[]
+  closedDropOutNotices SessionDropOutNotice[]
+  resolvedConflicts    SyncConflict[]
+  matchDecisions       MatchDecision[]
 
   paymentMarks SessionPaymentMark[]
 

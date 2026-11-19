@@ -11,6 +11,7 @@ import {
   sessionMinutes,
   startBlocker,
 } from '@rotra/data/queue-session/queueSession.rules'
+import { recordsGames } from '@rotra/data/queue-session/types'
 import { useCancelSession } from '@rotra/data/queue-session/useCancelSession'
 import { useDeleteSession } from '@rotra/data/queue-session/useDeleteSession'
 import { useDownloadSession } from '@rotra/data/queue-session/useDownloadSession'
@@ -373,6 +374,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-4">
                 <SessionSetupCard
+                  recordGames={recordsGames(s)}
                   requestFormatLabels={allowedRequestFormats(s).map(
                     (format) => REQUEST_FORMAT_PILL[format],
                   )}
@@ -558,6 +560,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           formatsLabel={formats}
           modeLabel={MODES[s.sessionMode].label}
           minimumGames={s.minimumGames}
+          recordGames={recordsGames(s)}
           rosterCount={rosterList.length}
           presentCount={present}
           waitlistCount={waitlist.length}

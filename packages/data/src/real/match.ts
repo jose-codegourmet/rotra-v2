@@ -542,10 +542,12 @@ export async function realCompleteMatch(input: {
     },
   )
   const m = matchOf(done.result.match)
-  return accepted(
-    null,
-    `Team ${done.result.decision.winningTeam} wins match ${m.matchNo} · ${courtNames(m, courts)} free${await autoNote(sessionId, done.autoPlaced, courts)}`,
-  )
+  const winner = done.result.decision.winningTeam
+  // Record games off (D-2026-11-18-06): the server stores no winner, so the toast names none.
+  const text = winner
+    ? `Team ${winner} wins match ${m.matchNo} · ${courtNames(m, courts)} free`
+    : `Match ${m.matchNo} done · ${courtNames(m, courts)} free`
+  return accepted(null, `${text}${await autoNote(sessionId, done.autoPlaced, courts)}`)
 }
 
 export async function realInvalidateMatch(input: { matchId: string; operationId: string }) {

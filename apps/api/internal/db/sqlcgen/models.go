@@ -358,6 +358,90 @@ func (ns NullDeviceStreamState) Value() (driver.Value, error) {
 	return string(ns.DeviceStreamState), nil
 }
 
+type DropOutNoticeDecision string
+
+const (
+	DropOutNoticeDecisionKept    DropOutNoticeDecision = "kept"
+	DropOutNoticeDecisionRemoved DropOutNoticeDecision = "removed"
+)
+
+func (e *DropOutNoticeDecision) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DropOutNoticeDecision(s)
+	case string:
+		*e = DropOutNoticeDecision(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DropOutNoticeDecision: %T", src)
+	}
+	return nil
+}
+
+type NullDropOutNoticeDecision struct {
+	DropOutNoticeDecision DropOutNoticeDecision
+	Valid                 bool // Valid is true if DropOutNoticeDecision is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDropOutNoticeDecision) Scan(value interface{}) error {
+	if value == nil {
+		ns.DropOutNoticeDecision, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DropOutNoticeDecision.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDropOutNoticeDecision) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DropOutNoticeDecision), nil
+}
+
+type DropOutNoticeStatus string
+
+const (
+	DropOutNoticeStatusOpen   DropOutNoticeStatus = "open"
+	DropOutNoticeStatusClosed DropOutNoticeStatus = "closed"
+)
+
+func (e *DropOutNoticeStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DropOutNoticeStatus(s)
+	case string:
+		*e = DropOutNoticeStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DropOutNoticeStatus: %T", src)
+	}
+	return nil
+}
+
+type NullDropOutNoticeStatus struct {
+	DropOutNoticeStatus DropOutNoticeStatus
+	Valid               bool // Valid is true if DropOutNoticeStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDropOutNoticeStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.DropOutNoticeStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DropOutNoticeStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDropOutNoticeStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DropOutNoticeStatus), nil
+}
+
 type ExportFormat string
 
 const (
@@ -2223,6 +2307,7 @@ type Club struct {
 	UpdatedAt               pgtype.Timestamptz
 	Revision                int64
 	InviteCode              pgtype.Text
+	SelfCheckInEnabled      bool
 }
 
 type ClubAccount struct {
@@ -2814,6 +2899,7 @@ type QueueSession struct {
 	CourtFillMode        CourtFillMode
 	AlwaysRequireRequest bool
 	RequestFormats       []MatchFormat
+	RecordGames          bool
 }
 
 type RankingPolicyVersion struct {
@@ -2891,6 +2977,19 @@ type SessionCourt struct {
 	StartsAt      pgtype.Timestamptz
 }
 
+type SessionDropOutNotice struct {
+	ID               pgtype.UUID
+	ClubID           pgtype.UUID
+	SessionID        pgtype.UUID
+	SessionPlayerID  pgtype.UUID
+	PlayerID         pgtype.UUID
+	Status           DropOutNoticeStatus
+	Decision         NullDropOutNoticeDecision
+	CreatedAt        pgtype.Timestamptz
+	ClosedAt         pgtype.Timestamptz
+	ClosedByDeviceID pgtype.UUID
+}
+
 type SessionFinalization struct {
 	SessionID               pgtype.UUID
 	ClubID                  pgtype.UUID
@@ -2911,6 +3010,15 @@ type SessionFinalization struct {
 	Revision                int64
 }
 
+type SessionInviteCode struct {
+	ID        pgtype.UUID
+	ClubID    pgtype.UUID
+	SessionID pgtype.UUID
+	PlayerID  pgtype.UUID
+	Code      string
+	CreatedAt pgtype.Timestamptz
+}
+
 type SessionJoinRequest struct {
 	ID                pgtype.UUID
 	ClubID            pgtype.UUID
@@ -2929,6 +3037,7 @@ type SessionJoinRequest struct {
 	Revision          int64
 	PlayerID          pgtype.UUID
 	Placement         JoinRequestPlacement
+	InviteCodeID      pgtype.UUID
 }
 
 type SessionMatchRequest struct {
@@ -2989,6 +3098,8 @@ type SessionPlayer struct {
 	Revision         int64
 	GamesAdjustment  int32
 	NoShowAt         pgtype.Timestamptz
+	SelfCheckedInAt  pgtype.Timestamptz
+	LeftAt           pgtype.Timestamptz
 }
 
 type SessionPublication struct {

@@ -5,6 +5,8 @@ import { createConsoleFixtures } from './consoleSessions'
 
 /** One row of the live leaderboard: the standings maths plus the player's locked level. */
 export type LiveStandingRow = {
+  /** Shared by players on the same wins and losses (1, 1, 3) */
+  position: number
   playerId: string
   name: string
   level: PlayingLevel | null
@@ -15,9 +17,9 @@ export type LiveStandingRow = {
 
 /**
  * Story-only standings for the tonight console fixture. `rows` adds four more completed games so
- * the table has a clear leader, a three-way tie on wins broken by losses and head-to-head, and a
- * bottom tie broken by name. `tiedRows` is the console fixture as is: three players at 1–0 and four
- * at 0–1, every tie resolved by head-to-head or name. The normal store starts with no matches.
+ * the table has a clear leader and players on the same wins and losses sharing a position (ordered
+ * by name inside it). `tiedRows` is the console fixture as is: three players at 1–0 sharing position
+ * 1 and four at 0–1 sharing position 4. The normal store starts with no matches.
  */
 export function createLiveStandingsFixtures(now = Date.now()) {
   const fixture = createConsoleFixtures(now)

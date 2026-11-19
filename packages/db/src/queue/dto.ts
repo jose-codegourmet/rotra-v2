@@ -69,6 +69,8 @@ export function sessionDto(session: QueueSession) {
     courtFillMode: session.courtFillMode,
     /** Players can request (D-2026-11-09-05): one switch per format */
     requestFormats: requestFormatsRecord(session.requestFormats),
+    /** Record games (D-2026-11-18-06): false keeps no results; fixed once the session starts. */
+    recordGames: session.recordGames,
     revision: toDecimalString(session.revision),
   }
 }
@@ -105,6 +107,8 @@ export function rosterEntryDto(entry: SessionPlayer, names: RosterNames | null) 
     levelLockedAt: toIsoOrNull(entry.levelLockedAt),
     confirmedAt: toIso(entry.confirmedAt),
     gamesAdjustment: entry.gamesAdjustment,
+    selfCheckedInAt: toIsoOrNull(entry.selfCheckedInAt),
+    leftAt: toIsoOrNull(entry.leftAt),
     revision: toDecimalString(entry.revision),
   }
 }

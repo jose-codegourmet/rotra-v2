@@ -1,18 +1,26 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { MOCK_COOKIE_PREFIX } from '@rotra/api-proxy/data-mode'
-import { computeStandings, courtNames, holdsCourt } from '@rotra/data/match/match.rules'
+import {
+  computeStandings,
+  courtFreeSince,
+  courtNames,
+  holdsCourt,
+} from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import {
+  makeInviteCode,
   maskPublicName,
   myMatchLabel,
   publicFirstName,
   publicLevel,
   publicSkillMix,
+  selfCheckInMark,
 } from '@rotra/data/public-session/rules'
 import type {
   MyNightStage,
+  PublicCourtNow,
   PublicHistoryMatch,
   PublicMatchHistory,
   PublicMatchPlayer,
@@ -232,10 +240,12 @@ export async function readPublicSession(slug: string) {
       slotBudget: capacity,
       acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),
       alwaysRequireRequest: session.alwaysRequireRequest,
+      /** Record games (D-2026-11-18-06): false = "Not recorded", no results or match history. */
+      recordGames: session.recordGames,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
       results:
-        session.state === 'completed'
+        session.state === 'completed' && session.recordGames
           ? withResultPictures(
               await readPublishedResults(session.id, tx),
               roster.map((entry) => ({
@@ -572,16 +582,64 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         },
       },
     })
+    // The participants this read returns (capped at 12 unless the Player is in the session); a
+    // face points at its entry there so it can open the same profile card.
+    const listed = fullRoster ? roster.length : Math.min(roster.length, 12)
+    /** A face on a Courts now tile or a queued match: first name by the signed-in name rule. */
+    const faceOf = (sessionPlayerId: string) => {
+      const entry = byId.get(sessionPlayerId)
+      const who = entry ? person(entry) : null
+      const index = entry ? roster.indexOf(entry) : -1
+      return {
+        name: publicFirstName(who?.name ?? maskPublicName(entry?.nameSnapshot ?? '')),
+        level: levelCodeFor(entry?.skillLevelId ?? null),
+        pictureUrl: entry ? (pictures.get(entry.clubPlayerId) ?? null) : null,
+        masked: who?.masked ?? true,
+        isViewer: who?.isViewer ?? false,
+        ...(index >= 0 && index < listed ? { participant: index } : {}),
+      }
+    }
     const team = (members: { team: string; sessionPlayerId: string }[], side: string) =>
-      members
-        .filter((member) => member.team === side)
-        .map((member) => {
-          const entry = byId.get(member.sessionPlayerId)
-          return {
-            name: maskPublicName(entry?.nameSnapshot ?? ''),
-            level: levelCodeFor(entry?.skillLevelId ?? null),
-          }
+      members.filter((member) => member.team === side).map((m) => faceOf(m.sessionPlayerId))
+    // Courts now (the live feed): one entry per court, or per match on merged courts. Live
+    // sessions only. Who is on which court and since when; never a score or a running result.
+    const full = await tx.queueSession.findUniqueOrThrow({ where: { id: session.id } })
+    const courtsNow: PublicCourtNow[] = []
+    if (full.state === 'active' || full.state === 'finalizing') {
+      const { ctx } = await matchContext(tx, full)
+      const held = ctx.matches.filter(holdsCourt)
+      const seen = new Set<string>()
+      for (const court of ctx.courts) {
+        if (seen.has(court.id)) continue
+        const match = held.find((m) => m.courtIds.includes(court.id))
+        if (!match) {
+          courtsNow.push({
+            id: court.id,
+            label: court.label,
+            courtLabels: [court.label],
+            merged: false,
+            status: 'free',
+            teamA: [],
+            teamB: [],
+            startedAt: null,
+            freeSince: courtFreeSince(court.id, ctx.matches) ?? full.startedAt?.getTime() ?? null,
+          })
+          continue
+        }
+        for (const id of match.courtIds) seen.add(id)
+        courtsNow.push({
+          id: court.id,
+          label: courtNames(match, ctx.courts),
+          courtLabels: ctx.courts.filter((c) => match.courtIds.includes(c.id)).map((c) => c.label),
+          merged: match.courtIds.length > 1,
+          status: match.state === 'active' ? 'playing' : 'getting-ready',
+          teamA: match.teamA.map(faceOf),
+          teamB: match.teamB.map(faceOf),
+          startedAt: match.state === 'active' ? (match.startedAt ?? null) : null,
+          freeSince: null,
         })
+      }
+    }
     const { waitlistClubPlayerId: _, ...standing } = await playerStanding(
       tx,
       context.playerId,
@@ -598,6 +656,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),
+      courtsNow,
       queue: matches.map((match) => ({
         matchNo: match.matchNo,
         format: match.format,
@@ -613,9 +672,12 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
  * `MyNight` shape (`@rotra/data/public-session/types`), epoch-ms `startsAt`. Own standing only:
  * their status and stage, counted games, wins and losses, the minimum, the first waiting match with
  * them in it and the match holding a court with them in it (faces by the signed-in name rule, first
- * name only), their latest join request and open match request, and club membership. Self check-in
- * marks, drop-out notices and Session invites are not real yet, so `checkedIn`, `hasLeft`,
- * `cantMakeItSent` and `canInvite` read false and `inviteCode` null. Never another player's results
+ * name only), their latest join request and open match request, club membership, and their own
+ * I'm here / I'm leaving marks (`checkedIn`, `hasLeft`: the Queue Master's last action wins, like
+ * the roster's mark), whether they have an open I can't make it notice (`cantMakeItSent`), whether
+ * the Session invite is open to them (`canInvite`: confirmed or waitlisted, Prepared, join requests
+ * on) and their existing invite code (`inviteCode`, null until they first open the card). Never
+ * another player's results
  * or positions, presence of others, contacts or operator notes.
  */
 export async function readMyNight(context: PlayerContext, slug: string) {
@@ -638,10 +700,36 @@ export async function readMyNight(context: PlayerContext, slug: string) {
         ...LIVE_ENTRY,
         clubPlayer: { playerId: context.playerId },
       },
-      select: { id: true },
+      select: {
+        id: true,
+        present: true,
+        presentChangedAt: true,
+        selfCheckedInAt: true,
+        leftAt: true,
+      },
     })
     const row = own ? (ctx.roster.find((r) => r.id === own.id) ?? null) : null
+    // The same rule as the roster's mark: a later presence change by the Queue Master hides it.
+    const mark = own
+      ? selfCheckInMark({
+          present: own.present,
+          presentChangedAt: own.presentChangedAt.getTime(),
+          selfCheckedInAt: own.selfCheckedInAt?.getTime() ?? null,
+          leftAt: own.leftAt?.getTime() ?? null,
+        })
+      : null
     const waitlisted = !row && standing.waitlistPosition !== null
+    // Own drop-out notice and Session invite (D-2026-11-09-03, D-2026-11-09-08).
+    const openNotice =
+      !!row &&
+      !!(await tx.sessionDropOutNotice.findFirst({
+        where: { sessionPlayerId: row.id, status: 'open' },
+        select: { id: true },
+      }))
+    const invite = await tx.sessionInviteCode.findUnique({
+      where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
+      select: { code: true },
+    })
     const takesPart =
       session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
     const isLive = session.state === 'active' || session.state === 'finalizing'
@@ -699,9 +787,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       waitlistPosition: standing.waitlistPosition,
       startsAt: session.scheduledStartAt.getTime(),
       present: row?.present ?? false,
-      checkedIn: false,
-      hasLeft: false,
-      cantMakeItSent: false,
+      checkedIn: mark?.kind === 'checked-in',
+      hasLeft: mark?.kind === 'left',
+      cantMakeItSent: openNotice,
       offline: false,
       games: result?.games ?? 0,
       won: result?.wins ?? 0,
@@ -719,8 +807,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
           : null,
       joinRequest: standing.joinRequest,
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
-      canInvite: false,
-      inviteCode: null,
+      canInvite:
+        session.state === 'prepared' && session.acceptJoinRequests && (!!row || waitlisted),
+      inviteCode: invite?.code ?? null,
     }
   })
   const { matchRequest } = await readMyMatchRequest(context, slug)
@@ -731,7 +820,8 @@ export async function readMyNight(context: PlayerContext, slug: string) {
  * Q-PUBLIC-JOIN › Match history (2026-11-13 finished session and match history courts logs) in real
  * mode: a finished session's matches for the signed-in Player, in the `PublicMatchHistory` shape
  * (`@rotra/data/public-session/types`), epoch-ms times, newest first, with the replay's courts and
- * bounds. `null` for any session that is not completed. Publication gate (results module ›
+ * bounds. `null` for any session that is not completed; no matches for one with Record games off
+ * (D-2026-11-18-06). Publication gate (results module ›
  * Publishing): until the club shares the results (a `published` publication with a public copy)
  * only the matches the Player played in are listed and `courtLabels` is empty; `total` always
  * counts every finished or invalid match. Faces follow the signed-in name rule, first name only;
@@ -751,6 +841,9 @@ export async function readPublicMatchHistory(
   return prisma.$transaction(async (tx) => {
     const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
     if (session.state !== 'completed') return null
+    // Record games off (D-2026-11-18-06): no match history or replay, so no matches, `total` 0
+    // and never `shared`, as in mock mode.
+    const recorded = session.recordGames
     const { ctx, roster: live } = await matchContext(tx, session)
     // Every entry, released and no show too, so a player who played and then left keeps their face.
     const [entries, courts] = await Promise.all([
@@ -791,7 +884,7 @@ export async function readPublicMatchHistory(
           confirmedAt: r.confirmedAt.getTime(),
         }),
       ),
-      matches: ctx.matches,
+      matches: recorded ? ctx.matches : [],
     })
     const people = await peopleFor(tx, entries, context.playerId)
     const levels = new Map(entries.map((r) => [r.id, levelCodeFor(r.skillLevelId)]))
@@ -830,7 +923,7 @@ export async function readPublicMatchHistory(
         }),
       )
       .sort((a, b) => b.number - a.number)
-    const shared = (await readPublishedResults(session.id, tx)) !== null
+    const shared = recorded && (await readPublishedResults(session.id, tx)) !== null
     return {
       shared,
       total: all.length,
@@ -1057,4 +1150,209 @@ export async function movePlayerToWaitlist(
   } catch (error) {
     mapDatabaseError(error)
   }
+}
+
+/** The signed-in Player's own live roster entry in a session found by its public link. */
+async function ownEntry(tx: Tx, sessionId: string, playerId: string) {
+  const entry = await tx.sessionPlayer.findFirst({
+    where: { sessionId, ...LIVE_ENTRY, clubPlayer: { playerId } },
+    select: { id: true, present: true },
+  })
+  if (!entry)
+    throw new ServiceError('invalid', {
+      player: 'Only confirmed players in this session can do this.',
+    })
+  return entry
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I'm here** (D-2026-11-09-03) from the Queue session page, live sessions only:
+ * the signed-in Player's own roster entry becomes Present with the “checked in themselves” mark
+ * (`self_checked_in_at` = `present_changed_at`). Refused while the club has self check-in off, and
+ * for anyone without a live entry in this session. A check-in after the Queue Master turned Present
+ * off is a new check-in with a new mark; a tap while already present is a 409 that changes nothing.
+ * A tap only: no location and no venue QR.
+ */
+export async function selfCheckIn(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      requireState(session, ['active'], 'Check-in opens when the session starts.')
+      const club = await tx.club.findUniqueOrThrow({
+        where: { id: session.clubId },
+        select: { selfCheckInEnabled: true },
+      })
+      if (!club.selfCheckInEnabled)
+        throw new ServiceError('invalid', { player: 'Your club has turned self check-in off.' })
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      if (entry.present)
+        throw new ServiceError('conflict', { player: "You're already marked present." })
+      const now = new Date()
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: {
+          present: true,
+          presentChangedAt: now,
+          selfCheckedInAt: now,
+          revision: { increment: 1 },
+        },
+      })
+      await touchSession(tx, session)
+      return { rosterId: entry.id, message: 'Checked in' }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I'm leaving** (D-2026-11-09-03), live sessions only: the signed-in Player's own
+ * entry turns Present off with the “Left” mark (`left_at` = `present_changed_at`), and every open
+ * match request that names them closes. Never releases the slot, and never ends a match they are
+ * in. Allowed with self check-in off: it only tells the Queue Master.
+ */
+export async function leaveSessionAsPlayer(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      requireState(session, ['active'], 'Only a live session can be left.')
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      if (!entry.present)
+        throw new ServiceError('conflict', { player: "You're not marked present." })
+      const now = new Date()
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: { present: false, presentChangedAt: now, leftAt: now, revision: { increment: 1 } },
+      })
+      await closeStaleMatchRequests(tx, session.id, now)
+      await touchSession(tx, session)
+      return { rosterId: entry.id, message: "Told the QM you're leaving" }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Q-PUBLIC-JOIN · **I can't make it** (D-2026-11-09-03) from the Queue session page, before the
+ * start only: the signed-in Player's own roster entry gets an open drop-out notice for the Queue
+ * Master. The slot stays until the Queue Master acts (Keep or Remove from roster, in Requests).
+ * 409 when the Player already has an open notice; refused for anyone without a live entry in this
+ * session and once the session has started.
+ */
+export async function sendDropOutNotice(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      if (session.state !== 'prepared')
+        throw new ServiceError('invalid', { state: 'The session has already started.' })
+      const entry = await ownEntry(tx, session.id, context.playerId)
+      const open = await tx.sessionDropOutNotice.findFirst({
+        where: { sessionPlayerId: entry.id, status: 'open' },
+        select: { id: true },
+      })
+      if (open) throw new ServiceError('conflict', { player: "Told the QM you can't make it" })
+      const notice = await tx.sessionDropOutNotice.create({
+        data: {
+          id: crypto.randomUUID(),
+          clubId: session.clubId,
+          sessionId: session.id,
+          sessionPlayerId: entry.id,
+          playerId: context.playerId,
+        },
+        select: { id: true },
+      })
+      await touchSession(tx, session)
+      return { noticeId: notice.id, message: "Told the QM you can't make it" }
+    })
+  } catch (error) {
+    if (error instanceof ServiceError) throw error
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Session invite (D-2026-11-09-08): the signed-in Player's code for this session, made the first
+ * time and the same on every later call. Only a confirmed or waitlisted Player, only while the
+ * session is Prepared and takes join requests. The code is short and random, never the RTR ID; a
+ * collision (or a parallel first call) is retried, each try in its own transaction.
+ */
+export async function getSessionInviteCode(context: PlayerContext, slug: string) {
+  const found = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    select: { id: true, clubId: true },
+  })
+  if (!found) throw new ServiceError('not_found')
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
+        if (session.state !== 'prepared')
+          throw new ServiceError('invalid', { state: 'Invites close when the session starts.' })
+        if (!session.acceptJoinRequests)
+          throw new ServiceError('invalid', { state: 'This session is not taking requests.' })
+        const [entry, waiting] = await Promise.all([
+          tx.sessionPlayer.findFirst({
+            where: {
+              sessionId: session.id,
+              ...LIVE_ENTRY,
+              clubPlayer: { playerId: context.playerId },
+            },
+            select: { id: true },
+          }),
+          tx.sessionWaitlistEntry.findFirst({
+            where: { sessionId: session.id, clubPlayer: { playerId: context.playerId } },
+            select: { id: true },
+          }),
+        ])
+        if (!entry && !waiting)
+          throw new ServiceError('invalid', {
+            player: 'Only confirmed or waitlisted players can invite.',
+          })
+        const saved = await tx.sessionInviteCode.findUnique({
+          where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
+          select: { code: true },
+        })
+        if (saved) return { code: saved.code }
+        const created = await tx.sessionInviteCode.create({
+          data: {
+            id: crypto.randomUUID(),
+            clubId: session.clubId,
+            sessionId: session.id,
+            playerId: context.playerId,
+            code: makeInviteCode(),
+          },
+          select: { code: true },
+        })
+        return { code: created.code }
+      })
+    } catch (error) {
+      if (error instanceof ServiceError) throw error
+      // A taken code or a parallel first call: try again (the retry reads the saved code).
+      const failure = error as {
+        code?: string
+        meta?: { code?: string }
+        cause?: { code?: string }
+      }
+      if (failure?.code === 'P2002' || (failure?.meta?.code ?? failure?.cause?.code) === '23505')
+        continue
+      mapDatabaseError(error)
+    }
+  }
+  throw new ServiceError('conflict')
 }

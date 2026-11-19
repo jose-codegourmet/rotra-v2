@@ -28,6 +28,7 @@ SELECT s.id,
        s.players_per_court,
        s.accept_join_requests,
        s.always_require_request,
+       s.record_games,
        s.updated_at,
        s.public_slug,
        c.id   AS club_id,
@@ -61,6 +62,7 @@ type GetPublicSessionBySlugRow struct {
 	PlayersPerCourt      int16
 	AcceptJoinRequests   bool
 	AlwaysRequireRequest bool
+	RecordGames          bool
 	UpdatedAt            pgtype.Timestamptz
 	PublicSlug           string
 	ClubID               pgtype.UUID
@@ -95,6 +97,7 @@ func (q *Queries) GetPublicSessionBySlug(ctx context.Context, slug string) (GetP
 		&i.PlayersPerCourt,
 		&i.AcceptJoinRequests,
 		&i.AlwaysRequireRequest,
+		&i.RecordGames,
 		&i.UpdatedAt,
 		&i.PublicSlug,
 		&i.ClubID,
@@ -116,7 +119,7 @@ WHERE session_id = $1
 
 // The published copy of the results, or nothing. Only a publication in state 'published' has any; the
 // CHECK constraints keep the copy to names and counts (standings, awards, and Off Day only when this publish
-// chose it). The handler asks only for a completed session.
+// chose it). The handler asks only for a completed session that records its games (record_games).
 func (q *Queries) GetPublishedResults(ctx context.Context, sessionID pgtype.UUID) ([]byte, error) {
 	row := q.db.QueryRow(ctx, getPublishedResults, sessionID)
 	var public_results []byte

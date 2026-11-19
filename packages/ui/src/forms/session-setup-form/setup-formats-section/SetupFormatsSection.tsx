@@ -1,12 +1,13 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import { Chip } from '@rotra/ui/chip'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
 import { cn } from '@rotra/ui/cn'
 import { Notice } from '@rotra/ui/notice'
 import { Switch } from '@rotra/ui/switch'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
-import { MODE_OPTIONS } from '../SessionSetupForm.helpers'
+import { MODE_OPTIONS, recordGamesHint } from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
 
 const FORMATS = [
@@ -23,18 +24,26 @@ const REQUEST_FORMATS: { value: MatchFormat; label: string }[] = [
   { value: 'fun_5v5', label: '5 v 5' },
 ]
 export type SetupFormatsSectionProps = {
+  /** The session has started: Record games is a read-only On / Off chip, not a switch */
+  recordGamesLocked?: boolean
   allowedRequestFormats?: MatchFormat[]
   onRequestFormatsChange?: (formats: MatchFormat[]) => void
 }
 
-/** Page 2 › Formats and mode: the Singles / Doubles switches and the Chill / Fair / Hard cards. */
+/**
+ * Page 2 › Formats and mode: the Singles / Doubles switches, the Chill / Fair / Hard cards and the
+ * Record games switch (a read-only On / Off chip once the session has started).
+ */
 export function SetupFormatsSection({
+  recordGamesLocked = false,
   allowedRequestFormats,
   onRequestFormatsChange,
 }: SetupFormatsSectionProps = {}) {
   const form = useFormContext<SessionSetupInput>()
   const singles = useWatch({ control: form.control, name: 'allowSingles' })
   const doubles = useWatch({ control: form.control, name: 'allowDoubles' })
+  // A value that is missing (a session saved before Record games) reads as on.
+  const recordGames = useWatch({ control: form.control, name: 'recordGames' }) !== false
   return (
     <>
       {FORMATS.map(([name, label, text]) => (
@@ -120,6 +129,27 @@ export function SetupFormatsSection({
           An easy game means that player's team is favored to win. Modes are flexible pairing
           presets. You can always change a match yourself.
         </span>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[13px] font-semibold text-fg2">Record games</span>
+          {recordGamesLocked ? (
+            <Chip>{recordGames ? 'On' : 'Off'}</Chip>
+          ) : (
+            <Controller
+              control={form.control}
+              name="recordGames"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value !== false}
+                  onChange={field.onChange}
+                  aria-label="Record games"
+                />
+              )}
+            />
+          )}
+        </div>
+        <span className="text-xs text-fg2">{recordGamesHint(recordGames, recordGamesLocked)}</span>
       </div>
     </>
   )

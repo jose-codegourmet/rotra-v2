@@ -1,6 +1,6 @@
 # MVP decisions and tracking
 
-**Last verified:** 2026-11-18 (D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
+**Last verified:** 2026-11-18 (D-2026-11-18-05, 06 and 07 added, amendment note on D-2026-11-16-04; D-2026-11-18-01 to 04 added; the club nickname decision renumbered from 02 to 03, which two decisions shared; amendment note on D-2026-11-17-01; P15.8 status lines on D-2026-11-16-04 and the club nickname); 2026-11-17 (D-2026-11-17-01 added); 2026-11-16 (D-2026-11-16-01 to 06 added); 2026-11-13 (D-2026-11-13-01 approved; amendment notes on D-2026-11-08-03, D-2026-11-09-04, D-2026-11-09-09, D-2026-11-11-04); 2026-11-12 (decisions and status lines; code trace of `main` @ `aca899f2` for the older entries); decisions added 2026-11-09. This is the short decision register
 for MVP discussions. The [MVP hub](README.md) summarizes delivery; GitHub issues track implementation.
 Product rules and existing open-decision documents remain authoritative for their domains.
 
@@ -22,12 +22,12 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-08-06](#d-2026-11-08-06) | Player access to public Queue sessions | approved | implemented in source; authenticated real verification pending | #569 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-01](#d-2026-11-09-01) | Next-match picker after every result | approved | in progress | #579 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-02](#d-2026-11-09-02) | Signed-in Players on the session page: full names and one-tap join | approved | in progress (mock app; real mode: join only) | #585, #687 | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
-| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626 | [Queue](workstreams/queue.md) |
+| [D-2026-11-09-03](#d-2026-11-09-03) | Players check themselves in, leave, and say they can't make it | approved | in progress | #617, #619, #624, #626, #964, #968 | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-04](#d-2026-11-09-04) | The player's live view: My night, Courts now, own standing, refresh only | approved | not started | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 | [D-2026-11-09-05](#d-2026-11-09-05) | Match requests | approved | not started | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-09-06](#d-2026-11-09-06) | Registration from session and club links, guest linking and club membership | approved | in progress | #622, #625, #627 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-07](#d-2026-11-09-07) | Public or private player profile | approved | in progress (three levels and the hide switch built in P08.5, #753; always-private rules in the services) | #753 | [Player](workstreams/player.md) |
-| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress (club invite code checked on the server in real mode, #755; Post image stays 1080 × 1350) | #620, #621, #624, #626, #755 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
+| [D-2026-11-09-08](#d-2026-11-09-08) | Sharing: links, QR codes and post/story images | approved | in progress (club invite code checked on the server in real mode, #755; Post image stays 1080 × 1350) | #620, #621, #624, #626, #755, #968 | [Player](workstreams/player.md), [Queue](workstreams/queue.md) |
 | [D-2026-11-09-09](#d-2026-11-09-09) | Keeping the session page cheap to serve | approved | not started | needed | [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-10](#d-2026-11-09-10) | Uploaded pictures: keep only the current and the previous | approved | in progress | #619, #624, #626 | [Player](workstreams/player.md), [Queue](workstreams/queue.md), [Backend](workstreams/backend.md) |
 | [D-2026-11-09-11](#d-2026-11-09-11) | Session page and Queue refinements from the owner's artifact review | approved | in progress (Q18 Queue Master side in the mock app; request-format defaults decided 2026-11-10) | needed | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
@@ -63,6 +63,9 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-02](#d-2026-11-18-02) | Fuller Privacy Policy and Terms of Service, also on rotra.club | approved 2026-11-18 (lawyer review and details open) | in progress | none | [Player](workstreams/player.md) |
 | [D-2026-11-18-03](#d-2026-11-18-03) | Club nickname: set by the Queue Master, shown on Queue Master screens only | approved 2026-11-18 (details open) | in mock app; real mode written (#927), migration applied locally only | #941, #942; real mode #927 (epic #900) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | in progress: mock app; real mode written (#976), migration applied to the shared database 2026-11-19 | #961 | [Queue](workstreams/queue.md) |
+| [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
 
@@ -286,8 +289,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-03"></a>
 ### D-2026-11-09-03 — Players check themselves in, leave, and say they can't make it
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) and the club setting Players can check themselves in (Club settings › Session defaults, #619, #624, #626) are in the mock app. Real mode does not persist it.
-- **Ticket:** #617, #619, #624, #626
+- **Implementation status:** in progress — the Queue Master roster mark (Checked in themselves / Left, #617) and the club setting Players can check themselves in (Club settings › Session defaults, #619, #624, #626) are in the mock app. Real mode: I'm here and I'm leaving are written (#964, migration `20261118000600_self_check_in`); I can't make it with Keep and Remove from roster is written November 19, 2026 (#968, migration `20261118000700_drop_out_notices_session_invites`). Neither migration is applied to the shared database; not run against a database.
+- **Ticket:** #617, #619, #624, #626, #964, #968
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Queue](workstreams/queue.md)
 - **Decision:**
   - **Self check-in.** During a live session, a confirmed signed-in player who isn't present sees a large **I'm here** button. Tapping it sets Present directly. The QM's roster shows a small "checked in themselves" mark and the QM can undo it. The club can turn self check-in off. Check-in is a tap only, with no location check and no venue QR scan.
@@ -385,8 +388,8 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 <a id="d-2026-11-09-08"></a>
 ### D-2026-11-09-08 — Sharing: links, QR codes and post/story images
 - **Decision status:** approved (owner discussion, November 9, 2026)
-- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it, except the club invite code: `?k=` is checked on the server and Regenerate link replaces it (P08.7, #712).
-- **Ticket:** #620, #621, #624, #626
+- **Implementation status:** in progress — the Queue club side (club invite link, invite card, Share club invite on Home: #620, #621, #624, #626) is in the mock app; the Player side is in the mock app too (epic P06, #588); the Admin parts are not started. Real mode does not persist it, except the club invite code: `?k=` is checked on the server and Regenerate link replaces it (P08.7, #712), and the Session invite code (a player's own code per session, `POST /api/public-sessions/[slug]/invite-code`, written November 19, 2026, #968, migration `20261118000700_drop_out_notices_session_invites`, not applied to the shared database; “Invited by NAME” from `?invite=` is not in real mode).
+- **Ticket:** #620, #621, #624, #626, #968
 - **Roadmap:** MVP (owner, November 9, 2026: added to the scope frozen by [D-2026-11-07-04](#d-2026-11-07-04)) — [Player](workstreams/player.md), [Queue](workstreams/queue.md)
 - **Decision:**
   - **What every share offers**, in the owner's words: "share by link", "share by QR", and "sharing pictures such as fb posts and ig stories posts… follow the ratio". Images reuse the Session QR share card's **Post | Story** switch: 4:5 (1080 × 1350) and 9:16 (1080 × 1920), on the fixed dark brand card. Every invitation image has a QR ("anything invitation is always a QR"). Info images also carry a small corner QR that opens the player's profile, which follows the privacy setting.
@@ -1020,6 +1023,7 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - **What the mock data does on the open points below** (owner answers relayed with #923): lookup is by exact RTR ID or exact email only, with no phone lookup, and QR scanning is left as it is; after Admin changes an RTR ID there is no alias, so the old RTR ID no longer finds the player, and its number is never given to someone else; the Same person move is built as the mockup shows; a returning guest's new join request makes a second guest record; a record is claimed when the registering person's ROTRA email or Google email equals the saved email, and the phone linking of D-2026-11-11-03 still joins older phone-only records; picking an identity card prefills the name, nickname, picture and level only; Admin's own Add player is unchanged.
 - **Ticket:** [#900](https://github.com/jose-codegourmet/rotra-v2/issues/900) (Epic P15)
 - **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md), [Admin](workstreams/admin.md)
+- **Amended by:** [D-2026-11-18-07](#d-2026-11-18-07) (“A guest's games never join an account by themselves” no longer holds for a guest who registers through their own invite link: that claims the guest's record).
 - **Supersedes:** in part [D-2026-11-09-06](#d-2026-11-09-06) (guest linking), [D-2026-11-09-14](#d-2026-11-09-14) (RTR ID read-only for Admin) and [D-2026-11-11-03](#d-2026-11-11-03): "RTR ID only on registration", "never found by another club", "same phone in two clubs: keep separate", and the phone as what makes a record unclaimed.
 - **Decision:**
   - **Four statuses.** **Guest**, **Unclaimed**, **Registered**, **Verified**. Verified sits on top of Registered ([D-2026-11-16-02](#d-2026-11-16-02)).
@@ -1206,3 +1210,57 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - Database: whether the game rows also go into the frozen result evidence and the finalized facts; how old data reads (proposed: 16/31).
 - **Amends:** the score rules in [matches](../business_logic/product/queue/modules/matches/README.md#scoring-modes-owner-november-18-2026-mockup-only) (“both are required, the higher score wins, no fixed target, no set or deuce system” now holds per scoring mode).
 - **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [sessions module](../business_logic/product/queue/modules/sessions/README.md#scoring-mode), [match screens](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [proposed stored shape](../database_design/product/queue/modules/matches-queue.md#game-scores-and-the-scoring-mode-proposed-november-18-2026), [product terms](../product-terms.md), `apps/mockup/queue-app/rotra-queue.html` › `SCORING`.
+
+### D-2026-11-18-05 — Session standings: players with the same wins and losses share a position
+- **Decision status:** approved (owner, November 18, 2026: “players within the same standing should be in the same position stacking their avatars”; the two answers below). The open items are not decided.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-18-queue-shared-standings-positions.md)). The real app still breaks ties by head-to-head, then name.
+- **Ticket:** [#961](https://github.com/jose-codegourmet/rotra-v2/issues/961) (epic Q23)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **Same wins and same losses share one position** (owner's answer). Head-to-head and name no longer separate players; the name only orders the faces inside a shared position.
+  - **The next position skips the shared places:** 1, 1, 3 (owner's answer).
+  - On the standings tables (the console Leaderboard, the record's Standings, the finished session page's Leaderboard) a shared position is one row with the players' pictures stacked and their names listed.
+- **Open:** (the mockup shows a placeholder for each)
+  - Share images and the Standings slide (mockup: one row per player, with the shared number).
+  - MVP and other awards when several players share position 1 (mockup: awards unchanged).
+  - Whether Player Information ranking reads the shared position (mockup: no change).
+- **Amends:** the standings order in the [results module](../business_logic/product/queue/modules/results/README.md#session-standings) (“Positions are unique (no shared ranks)” and the head-to-head and name tiebreaks no longer hold).
+- **References:** [results module](../business_logic/product/queue/modules/results/README.md), [results screens](../screens/product/modules/queue/results-sharing.md), [console](../screens/product/modules/queue/session-console.md)
+
+### D-2026-11-18-06 — Record games: a Queue Session can run without recording its games
+- **Decision status:** approved in part (owner, November 18, 2026: “add a feature where the QM has the option record the session games or not. but the default is recorded”; the two answers below). The open items are not decided.
+- **Implementation status:** in progress (Epic Q23). Mock app: #973 (data), #975 (screens). Real mode written in #976: migration `20261119000100_session_record_games`, applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off) ([log](../mockup-changes/2026-11-18-queue-record-games-option.md)).
+- **Ticket:** [#961](https://github.com/jose-codegourmet/rotra-v2/issues/961) (epic Q23)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:**
+  - **A Record games switch on the session form, on by default,** changeable until the session starts and fixed after (owner's answer: “Session form, until start”).
+  - **Off means run only, keep nothing** (owner's answer): the queue, courts and minimum games work on the night, but there are no standings, result slides or awards, and nothing goes to player history or ranking.
+- **Open:** (the mockup shows a placeholder for each)
+  - Whether Match done still takes a winner or score for the night only (mockup: no result is asked).
+  - Whether the session shows in the club's records and on a player's own session list (mockup: in the club's records, marked Not recorded; the Player app is unchanged).
+  - What the finished public session page shows (mockup: “This session's games were not recorded.”, no Leaderboard tab).
+  - Match requests, My night's won and lost counts, and the Facebook post on an unrecorded session (mockup: unchanged).
+  - A club default in Club settings (mockup: none; every session starts recorded).
+  - Database: the stored field and what finishing an unrecorded session writes (proposed: `record_games` boolean on the session, default true; no migration yet).
+- **Notes (build, November 19, 2026, #976):** the owner authorized the proposed column for the Q23 batch. Built as `queue_sessions.record_games` (default true, fixed after Start by a trigger). Finishing an unrecorded session writes the one finalization row and no results, publication or player facts. Match done with no result also needed the `match_decisions` winner CHECK widened, which the proposal did not name: see [database open decisions](../database_design/product/open-decisions.md#record-games-d-2026-11-18-06-built-november-19-2026).
+- **References:** [sessions module](../business_logic/product/queue/modules/sessions/README.md#record-games), [results module](../business_logic/product/queue/modules/results/README.md)
+
+### D-2026-11-18-07 — A guest's invite link claims that guest's record
+- **Decision status:** approved (owner, November 18, 2026: “As a QM, I created an Account for them, that guest account was intended for them until they feel ready to use that account. So if they enter their details. and they register. That ACCOUNT WAS FOR THEM”). The open items are not decided.
+- **Implementation status:** mockup, mock app and real mode written in one change ([log](../mockup-changes/2026-11-18-queue-guest-invite-claims-record.md)); not run in a browser or against a database yet. No migration: `club_player_claim_links` already exists.
+- **Ticket:** [#966](https://github.com/jose-codegourmet/rotra-v2/issues/966) (epic Q24)
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), [Player](workstreams/player.md)
+- **Problem it fixes:** a guest's **Copy invite link** copied the generic club invite link, so a guest who registered got a second club player record and their own record, games and session slots stayed behind.
+- **Decision:**
+  - **The invite link made from a guest's own profile belongs to that guest.** Invite to ROTRA › **Copy invite link** and **Share** on the guest's profile, and **Invite** in Saved players, make that guest's own registration link (`/claim/<token>`), the kind an unclaimed player already gets: it works once, lasts 7 days, and a new link cancels the earlier one.
+  - **Registering through it claims that club player record.** The name and nickname prefill the form; the person types their own email and phone and sets a password (or uses Google). The new account is attached to that same record, so their games and session slots stay with them. No second record is made. They get their RTR ID then, from the inviting club's place, as any club record does.
+  - **The link is the proof.** Nobody is matched or merged by name alone.
+  - **Every existing guard stays:** an email that already has an account or a login is refused, a phone that belongs to another profile is refused, and an expired, used or replaced link doesn't work. A person who already has an account cannot attach a guest record through the link; nothing is merged.
+  - **Unchanged:** the generic club invite link (Club settings, the invite card and its QR) and guest join requests on the public session page.
+- **Open:**
+  - A returning guest's new join request on the public session page still makes a second guest record.
+  - A guest who registers through the generic club link or the session page's register link, instead of their own link, still starts a new record. The Queue Master's **Same person** move remains the remedy for both.
+  - A person who already has a ROTRA account and played as a guest: their own link refuses their email and phone (mockup and app: no merge).
+  - History attribution for the claimed record's earlier games (one attribution per joined record) stays open, as in [D-2026-11-16-04](#d-2026-11-16-04).
+- **Amends:** [D-2026-11-16-04](#d-2026-11-16-04) (“A guest's games never join an account by themselves. They come along only after the club makes the guest unclaimed by adding an email.”) and the guest invitation note of November 8, 2026 (#490: “Registration keeps the guest record unlinked”) for a guest's own link.
+- **References:** [players module](../business_logic/product/queue/modules/players/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [registration screens](../screens/product/modules/player-information/access-registration.md), [product terms](../product-terms.md), `packages/db/src/player/claim.ts` › `issueClaimLink`, `completeRecordClaim`.

@@ -128,7 +128,7 @@ export function createSessionRecordFixtures(now = Date.now()) {
     ...r,
     level: roster.find((p) => p.id === r.playerId)?.level ?? null,
   }))
-  const rankOf = new Map(standings.map((r, i) => [r.playerId, i + 1] as const))
+  const rankOf = new Map(standings.map((r) => [r.playerId, r.position] as const))
   const rowOf = new Map(standings.map((r) => [r.playerId, r] as const))
 
   const playerCards: SessionRecordPlayerCard[] = roster

@@ -20,6 +20,7 @@ import { autoFillCourts } from './match-control'
 import { liveOpenRequests } from './match-request-store'
 import {
   derivedId,
+  LIVE_ENTRY,
   liveCourts,
   liveRoster,
   lockSession,
@@ -52,6 +53,11 @@ export type QueueSessionInput = {
    * on create, the prototype default (2 v 2, plus 1 v 1 when singles is on); on edit, unchanged.
    */
   requestFormats?: unknown
+  /**
+   * Record games (D-2026-11-18-06). Left out on create, true (recorded); on edit, unchanged. Only a
+   * prepared session can be edited, so it never changes after Start (the database refuses it too).
+   */
+  recordGames?: boolean
   /**
    * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
    * start (null or the session start = follows the session start).
@@ -257,6 +263,8 @@ export async function createQueueSession(
             requestFormats:
               requestFormatsInput(input.requestFormats) ??
               (input.allowSingles ? ['doubles', 'singles'] : ['doubles']),
+            // Every date of a series gets the same choice; anything but an explicit false records.
+            recordGames: input.recordGames !== false,
             seriesId,
             publicSlug: `${publicSlugFor(id)}${id.slice(0, 4)}`,
             sourceCommandId: await derivedId(commandId, `session:${index}`),
@@ -344,6 +352,7 @@ export async function updateQueueSession(
           ...(requestFormatsInput(input.requestFormats)
             ? { requestFormats: requestFormatsInput(input.requestFormats) }
             : {}),
+          ...(typeof input.recordGames === 'boolean' ? { recordGames: input.recordGames } : {}),
           revision: { increment: 1 },
         },
       })
@@ -910,6 +919,16 @@ export async function readQueueSession(context: ClubContext, sessionId: string) 
   await requireSessionAccess(context, session)
   return prisma.$transaction(async (tx) => {
     const summary = await sessionSummaryDto(tx, session)
+    // Prepared: Requests · N, pending join requests + open drop-out notices (D-2026-11-09-03).
+    if (session.state === 'prepared') {
+      const [joining, notices] = await Promise.all([
+        tx.sessionJoinRequest.count({ where: { sessionId: session.id, status: 'pending' } }),
+        tx.sessionDropOutNotice.count({
+          where: { sessionId: session.id, status: 'open', entry: LIVE_ENTRY },
+        }),
+      ])
+      return { ...summary, requestCount: joining + notices }
+    }
     // Live: Match requests · N, the open match requests whose named players are all present.
     if (session.state !== 'active') return summary
     return { ...summary, requestCount: (await liveOpenRequests(tx, session.id)).length }

@@ -1,4 +1,5 @@
 import { Card } from '@rotra/ui/card'
+import { recordGamesLabel } from '@rotra/ui/forms/session-setup-form/helpers'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import type { ReactNode } from 'react'
 
@@ -8,6 +9,8 @@ export type SessionSetupCardProps = {
   formatsLabel: string
   modeLabel: string
   modeDescription: string
+  /** Record games; omitted reads as on (a session saved before the option existed) */
+  recordGames?: boolean
   minimumGames: number
   minimum:
     | {
@@ -39,6 +42,7 @@ export function SessionSetupCard({
   formatsLabel,
   modeLabel,
   modeDescription,
+  recordGames = true,
   minimumGames,
   minimum,
   rosterCount,
@@ -89,6 +93,17 @@ export function SessionSetupCard({
               value: (
                 <>
                   {modeLabel} · <span className="text-fg2">{modeDescription}</span>
+                  {fixedAfterStart ? (
+                    <span className="text-[13px] text-fg2"> · Fixed after start</span>
+                  ) : null}
+                </>
+              ),
+            },
+            {
+              label: 'Record games',
+              value: (
+                <>
+                  {recordGamesLabel(recordGames)}
                   {fixedAfterStart ? (
                     <span className="text-[13px] text-fg2"> · Fixed after start</span>
                   ) : null}

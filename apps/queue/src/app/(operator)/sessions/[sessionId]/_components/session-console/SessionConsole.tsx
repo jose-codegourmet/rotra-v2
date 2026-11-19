@@ -10,6 +10,7 @@ import {
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { recordsGames } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
@@ -20,6 +21,7 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
+import { NotRecordedChip } from '@rotra/ui/not-recorded-chip'
 import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
@@ -140,6 +142,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [focusEnd, setFocusEnd] = useState(false)
 
   const s = session.data
+  // Record games off: no Leaderboard tab, a Not recorded chip in the header.
+  const unrecorded = s ? !recordsGames(s) : false
   if (session.isError && isPermissionRefusal(session.error)) notFound()
   const redirectTo = s && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {
@@ -196,7 +200,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   // Match requests · N: open match requests, carried by the live session read. Join requests close
   // at Start, so none count here; real mode has no Requests read yet and shows 0.
   const matchRequestCount = s?.requestCount ?? 0
-  const leader = standings.data?.[0]
+  // The top position: one leader ("NAME leads") or the players sharing it ("3 tied").
+  const leaders = (standings.data ?? []).filter((r) => r.position === 1)
+  const leader = leaders[0]
   const leaderPlayer = leader ? rosterList.find((p) => p.id === leader.playerId) : undefined
   const formats =
     [s?.allowSingles && 'Singles', s?.allowDoubles && 'Doubles'].filter(Boolean).join(' + ') ||
@@ -227,14 +233,25 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       label: 'Players',
       badges: [{ text: `${present}/${rosterList.length}`, longText: ' present' }],
     },
-    {
-      value: 'leaderboard',
-      label: 'Leaderboard',
-      shortLabel: 'Board',
-      badges: leader
-        ? [{ text: `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads` }]
-        : [],
-    },
+    ...(unrecorded
+      ? []
+      : [
+          {
+            value: 'leaderboard',
+            label: 'Leaderboard',
+            shortLabel: 'Board',
+            badges: leader
+              ? [
+                  {
+                    text:
+                      leaders.length > 1
+                        ? `${leaders.length} tied`
+                        : `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads`,
+                  },
+                ]
+              : [],
+          },
+        ]),
     {
       value: 'payments',
       label: 'Payments',
@@ -293,6 +310,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               <Chip>{MODE_LABELS[s.sessionMode]}</Chip>
               <Chip>{formats}</Chip>
               <Chip>Min {s.minimumGames} games</Chip>
+              {unrecorded ? <NotRecordedChip /> : null}
             </span>
           }
           // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
@@ -385,7 +403,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           )}
         </TabsContent>
         <TabsContent value="players">{panel('players')}</TabsContent>
-        <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
+        {unrecorded ? null : <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>}
         <TabsContent value="payments">
           <PaymentsPanel sessionId={sessionId} />
         </TabsContent>

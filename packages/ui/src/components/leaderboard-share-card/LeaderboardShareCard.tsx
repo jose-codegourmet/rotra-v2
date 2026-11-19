@@ -8,6 +8,10 @@ import { ShareImage } from '@rotra/ui/share-image'
 import { ShareImagePicker, type ShareImagePickerItem } from '@rotra/ui/share-image-picker'
 import { useState } from 'react'
 
+/**
+ * One share-image row: still one row per player. `position` is the standings position, shared by
+ * players with the same wins and losses (1, 1, 3), so two rows can carry the same number.
+ */
 export type LeaderboardShareRow = {
   position: number
   /** As the page shows names (masked for private players and guests) */
@@ -40,7 +44,7 @@ export const LEADERBOARD_SHARE_ROWS: Record<ShareFormat, number> = { story: 10, 
 
 /**
  * Share leaderboard (2026-11-13-share-leaderboard; the prototype's SHEETS.shareBoard): the size
- * switch beside the picked count, the standings split into images of 10 / 8 / 6 places (rank with
+ * switch beside the picked count, the standings split into images of 10 / 8 / 6 places (position with
  * the top three in the accent, picture, name ending in an ellipsis, then wins green, losses red,
  * games in the text colour), “#a–b of N” by the ROTRA mark. All images start picked; changing the
  * size re-splits and picks all. The viewer's row is highlighted with a YOU tag and the carousel
@@ -99,7 +103,7 @@ export function LeaderboardShareCard({
               const index = k * per + i
               return (
                 <li
-                  key={row.position}
+                  key={`${row.position}-${index}`}
                   data-share-cell={row.isViewer ? 'current' : 'row'}
                   className={cn(
                     'grid grid-cols-[20px_22px_minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2 text-[12px] leading-[1.25]',

@@ -56,6 +56,9 @@ Superseded by: none
 - None.
 
 ## Also
+- Back on the first question (Where you play) reopens Your details (owner artifact comment, same day: “I cant go back
+  to initial form”). The account already exists, so the details show prefilled with the sign-in method and phone
+  read-only. **Continue** saves and returns, with the toast “Details saved”; **Cancel** returns without saving.
 - The onboarding header now carries the Prototype button, so the mockup can be reset mid-onboarding. This is a
   prototype control, not part of the product.
 

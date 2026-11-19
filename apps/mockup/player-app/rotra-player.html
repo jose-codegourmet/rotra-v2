@@ -3042,8 +3042,29 @@ function viewOnboard() {
   ][o.step - 1];
   return `<main class="ob">${obTop(o.step + 1)}
     <div class="ob-in"><div class="stack tight"><h1>${Q[0]}</h1><p class="muted">${Q[1]}</p></div>${Q[2]}<p class="small muted">Shows on your public profile. You can change it any time in Edit profile.</p></div>
-    <div class="ob-foot"><div class="ob-foot-in">${o.step > 1 ? '<button type="button" class="btn ghost" data-act="obBack">Back</button>' : '<span></span>'}
+    <div class="ob-foot"><div class="ob-foot-in"><button type="button" class="btn ghost" data-act="obBack">Back</button>
       <div class="row" style="gap:8px"><button type="button" class="btn ghost" data-act="obSkip">Skip</button><button type="button" class="btn primary" data-act="obNext">${o.step === 3 ? 'Finish' : 'Continue'}</button></div></div></div></main>`;
+}
+// Owner artifact comment, November 19, 2026: "I cant go back to initial form". Back on the first question reopens Your details. The account
+// already exists, so the sign-in details show as they are and only the profile fields can change; Continue saves them and returns.
+function viewObDetails() {
+  const o = S.ui.ob, a = o && S.accounts[o.id];
+  if (!a) return viewBoard();
+  S.ui.fullscreen = true;
+  const C = o.det, e = o.detErr || {};
+  return `<main class="ob ob-form">${obTop(1)}<div class="wrap slim"><div class="page-head"><h1>Your details</h1><p class="muted">Your account is set up. Change anything here, then continue.</p></div>
+    <form class="stack ob-details" data-form="obDetails" novalidate>
+      <section class="card stack ob-sec"><h2 class="ob-sec-h">Needed to continue</h2>
+        ${field('od-name', 'Full name', 'ui.ob.det.name', C.name, e.name, { req: true, pub: true, ac: 'name', hint: 'Shows to signed-in ROTRA players on sessions you join.' })}
+        <div class="field"><span>Gender <span class="req-pill">Required</span> · <span class="hint">public</span></span><div class="ob-chips" role="radiogroup" aria-label="Gender">${[['male', 'Male'], ['female', 'Female']].map(([k, l]) => `<button type="button" class="ob-chip" role="radio" aria-checked="${C.gender === k}" data-act="pickSet" data-path="ui.ob.det.gender" data-v="${k}">${C.gender === k ? I.check : ''}${l}</button>`).join('')}</div>${e.gender ? `<span class="err">${esc(e.gender)}</span>` : ''}</div>
+        <dl class="kv"><dt>Signs in with</dt><dd>${esc(a.google || a.email)}</dd><dt>Phone</dt><dd class="mono">${esc(maskPhone(a.phone))}</dd></dl>
+        <span class="hint">To change your sign-in email or phone later, use Privacy and contact.</span>
+      </section>
+      <details class="card ob-sec ob-more" ${['nick', 'expY', 'expM', 'since', ...Object.keys(SOCIAL)].some((k) => e[k]) ? 'open' : ''}><summary><span class="stack tight"><b>Optional · add now or later</b><span class="small muted">Nickname, experience and links</span></span>${I.fwd}</summary>
+        <div class="stack" style="gap:16px;padding-top:12px">${field('od-nick', 'Nickname', 'ui.ob.det.nick', C.nick, e.nick, { pub: true, hint: 'Optional' })}${fieldsExp('ui.ob.det', C, e, 'od')}
+          <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks('ui.ob.det', C, e, 'od')}</fieldset></div></details>
+      <div class="ob-foot"><div class="ob-foot-in"><button type="button" class="btn ghost" data-act="obDetailsBack">Cancel</button><button class="btn primary" type="submit">Continue</button></div></div>
+    </form></div></main>`;
 }
 function viewClaimDone() {
   const p = profileOf('u2');
@@ -3966,7 +3987,8 @@ const ACT = {
   pickToggle: (el) => { const arr = el.dataset.path.split('.').reduce((o, k) => o && o[k], S) || []; setPath(el.dataset.path, arr.includes(el.dataset.v) ? arr.filter((x) => x !== el.dataset.v) : [...arr, el.dataset.v]); render(); },
   obNext: () => { const o = S.ui.ob; if (o.step === 3) { const err = validatePersonal({ name: 'x', nick: '', ...o.d }); if (err.favOther) { o.err = err.favOther; render(); return; } } o.err = ''; if (o.step < 3) { o.step += 1; render(); window.scrollTo(0, 0); return; } finishOnboard(); },
   obSkip: () => { const o = S.ui.ob; o.err = ''; if (o.step === 1) o.d.courtPos = ''; if (o.step === 2) { o.d.skills = []; o.d.skillsOther = []; } if (o.step === 3) { o.d.fav = ''; o.d.favOther = ''; } if (o.step < 3) { o.step += 1; render(); window.scrollTo(0, 0); return; } finishOnboard(); },
-  obBack: () => { const o = S.ui.ob; o.err = ''; if (o.step > 1) { o.step -= 1; render(); } },
+  obBack: () => { const o = S.ui.ob; o.err = ''; if (o.step > 1) { o.step -= 1; render(); return; } o.det = editFields(profileOf(o.id)); o.detErr = {}; S.screen = 'obDetails'; render(); window.scrollTo(0, 0); },
+  obDetailsBack: () => { S.screen = 'onboard'; render(); window.scrollTo(0, 0); },
   signOut: () => { S.me = null; S.ui.sheet = null; S.ui.edit = null; go('board'); toast('Signed out'); },
   demoSignIn: () => { S.ui.sheet = null; signIn('u1'); },
   openEdit: () => { S.ui.edit = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.editTab = 'basics'; go('edit'); },
@@ -4307,6 +4329,13 @@ const FORM = {
       window.scrollTo(0, 0);
     });
   },
+  obDetails: () => {
+    const o = S.ui.ob, a = S.accounts[o.id], C = o.det, e = validatePersonal(C);
+    if (!C.gender) e.gender = 'Choose Male or Female.';
+    o.detErr = e;
+    if (Object.keys(e).length) { render(); const bad = document.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+    applyPersonal(a, { ...C, ...gameOf(a) }); o.det = null; S.screen = 'onboard'; render(); window.scrollTo(0, 0); toast('Details saved');
+  },
   claim: () => {
     const C = S.ui.claim;
     const e = validatePersonal(C);
@@ -4557,7 +4586,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { onboard: viewOnboard, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;

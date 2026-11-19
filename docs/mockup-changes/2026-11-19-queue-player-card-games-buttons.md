@@ -1,9 +1,9 @@
-# Queue app: the Players card's Current and Total are buttons
+# Queue app: the Players card's Current opens Set games played
 
 Status: NEW
 Date: 2026-11-19
 App: queue
-Mockup: apps/mockup/queue-app/rotra-queue.html › `playersPane()` (`.pc3-games`), action `showInQueue`
+Mockup: apps/mockup/queue-app/rotra-queue.html › `playersPane()` (`.pc3-games`)
 Route: /queue/sessions/s-tonight?tab=roster
 Screen ID: Q-CONSOLE, D-SET-GAMES
 Artifact: https://claude.ai/artifact/Xb3bpD4iWeWbnoXh7MpaEh
@@ -12,21 +12,21 @@ Supersedes: none
 Superseded by: none
 
 ## What changed
-- The games strip is two bordered buttons instead of one plain strip with a divider. Each label has an icon (Current: a
-  pencil; Total: an arrow); hover turns the border and background accent; keyboard focus shows a ring.
-- **Current** opens Set games played (D-SET-GAMES) for that player. Tapping it never selects the card.
-- **Total** opens the Main Queue in grid mode with the player's name in the queue search, so their queued matches are
-  highlighted and the rest dimmed.
+- The games strip stays one bordered rectangle with Current and Total split by a divider.
+- **Current** is a button: its label has a dashed underline, its half tints on hover, and keyboard focus shows a ring. It
+  opens Set games played (D-SET-GAMES) for that player and never selects the card.
+- **Total** is not clickable.
+- First version, the same day: two separate bordered buttons with a pencil and an arrow, and Total opened the Main Queue.
+  The owner's follow-up (“one big rectangle for the 2, but only current is clickable, and remove the pencil icon, total
+  is not clickable”) replaced it.
 
 ## Why
 - Owner artifact comment, November 19, 2026, on a Players card: “clicking on ‘current’ actually opens the edit game and also
-  make sure that the boxes look clickable”.
+  make sure that the boxes look clickable”; then “one big rectangle for the 2 … only current is clickable … remove the
+  pencil icon … total is not clickable”.
 
 ## Like for like
-- Compare at: 375 px and 1280 px, dark and light; hover and focus; Current to Set games played; Total to the Main Queue.
-
-## Open
-- What Total should open. The mockup shows the player's queued matches; say if it should do something else.
+- Compare at: 375 px and 1280 px, dark and light; hover and focus on Current; Current to Set games played.
 
 ## Docs updated
 - docs/screens/product/modules/queue/session-console.md (Player card)

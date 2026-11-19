@@ -648,7 +648,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
             onOpenClub={p.club.id ? () => setClubOpen(true) : undefined}
             className="col-span-full"
           />
-          {signedRead ? (
+          {signedRead || realPlayer ? (
             <div className="col-span-full">
               <PublicRefreshBar
                 updatedLabel={time(refreshing.lastRefreshedAt ?? p.lastSyncedAt)}

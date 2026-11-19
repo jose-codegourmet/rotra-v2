@@ -20,8 +20,6 @@ export type ClubPageDto = {
     initials: string
     logoUrl: string | null
     city: string
-    /** Join this club opens the club's current invite link (club-page.md, #712). */
-    inviteCode: string | null
   }
   signedIn: boolean
   /** The signed-in viewer has a current (not removed) row in this club: Leave club (#766) */
@@ -75,7 +73,6 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
       id: true,
       name: true,
       logoRef: true,
-      inviteCode: true,
       foundingLocation: { select: { displayName: true } },
     },
   })
@@ -152,6 +149,10 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
         : [],
     )
     .sort((a, b) => a.name.localeCompare(b.name))
+    // B-55: a masked member carries no level and no stable key, only their place in the list.
+    .map((member, index) =>
+      member.masked ? { ...member, key: `masked-${index}`, level: null } : member,
+    )
   return {
     club: {
       id: club.id,
@@ -159,7 +160,6 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
       initials: initials(club.name),
       logoUrl: club.logoRef,
       city: club.foundingLocation.displayName,
-      inviteCode: club.inviteCode,
     },
     signedIn: !!viewerId,
     viewerIsMember: !!viewerRow,

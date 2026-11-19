@@ -85,6 +85,19 @@ Queue writes added or changed on `main` after this track was written. They are i
 - **New routes:** `/api/club/players/{clubPlayerId}/move` (same person) and `/club-nickname`.
 - **Join request:** a guest request no longer carries a phone.
 
+## Carried in from main (merged November 19, 2026)
+
+Epics Q24 (#962) and Q23 (#961) added these writes on `main`. They are in scope for R2.
+
+- **Self check-in** ([D-2026-11-09-03](../../../docs/mvp/decisions.md#d-2026-11-09-03), migration `20261118000600_self_check_in`), Player app, signed in: `POST /api/public-sessions/{slug}/check-in` (I'm here; refused when the club turned self check-in off) and `POST /api/public-sessions/{slug}/leave` (I'm leaving). Each writes its timestamp on `session_players` together with `present`.
+- **I can't make it** (migration `20261118000700_drop_out_notices_session_invites`, table `session_drop_out_notices`): the player sends `POST /api/public-sessions/{slug}/drop-out`; the Queue Master answers with `POST /api/sessions/{sessionId}/requests/drop-outs/{noticeId}/keep` or `/remove`.
+- **Session invite** (table `session_invite_codes`): `POST /api/public-sessions/{slug}/invite-code` returns the player's code for the session, making it on first use. The migration also adds `session_join_requests.invite_code_id`, but no service on `main` sets it yet; ask before using it.
+- **Club switch:** `/api/club` accepts `selfCheckInEnabled` (Players can check themselves in).
+- **Record games** ([D-2026-11-18-06](../../../docs/mvp/decisions.md#d-2026-11-18-06), migration `20261119000100_session_record_games`): `record_games` is set when a session is prepared and fixed once it starts (database trigger). With it off, Match done takes no winner or score, finishing the session writes no result snapshot, and result slides are refused. The database also guards this (`match_decisions_record_games_guard`).
+- **Shared standings positions** ([D-2026-11-18-05](../../../docs/mvp/decisions.md#d-2026-11-18-05)): the Go rule is already updated on `main` with its cases and `.wasm`; nothing more for this track beyond using it.
+
+D-2026-11-18-05, 06 and 07 are approved with details still open. Ask before porting anything the decision leaves open.
+
 ## Scope
 
 **In:** All Queue write routes.

@@ -64,6 +64,18 @@ New signed-in reads:
 
 **Settled by [B-63](../../../docs/backend/open-decisions.md#settled) (November 19, 2026):** the profile read (`readPublicProfile` and `readVisibleProfile`, behind `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}`) answers as follows, and Go ports exactly this. Always private, any caller but the owner: the masked profile with an empty `leaderboardPlaces` on the profile route; `404` on the RTR ID route; `403` on Compare. Private and not signed in: `401` on the profile route, `404` on the RTR ID route. Unclaimed under more than one club and not signed in: `401` on the profile route, `404` on the RTR ID route. The TypeScript side is on `go-stack` only until it merges into `main`. Still to do here: B-53's `hidden_from_directory` 404 and B-54's trimmed masked body.
 
+## Carried in from main (merged November 19, 2026)
+
+Epics Q24 (#962) and Q23 (#961) changed these reads on `main`. They are in scope for R1.
+
+- **Signed-in session page** (`GET /api/public-sessions/{slug}/access`, `readPlayerSessionAccess`): now carries **Courts now** (`courtsNow`, each court with `freeSince`).
+- **My night** (`GET /api/public-sessions/{slug}/my-night`, `readMyNight`): now carries the player's own self check-in marks (`selfCheckedInAt`, `leftAt`; [D-2026-11-09-03](../../../docs/mvp/decisions.md#d-2026-11-09-03), migration `20261118000600_self_check_in`) and their Session invite code (`inviteCode`, null until one is made).
+- **Record games** ([D-2026-11-18-06](../../../docs/mvp/decisions.md#d-2026-11-18-06), migration `20261119000100_session_record_games`): a session with `record_games` off has no results. Every signed-in read that shows results, standings or a result snapshot follows the flag, as the anonymous page already does in Go (`recordGames`).
+- **Shared standings positions** ([D-2026-11-18-05](../../../docs/mvp/decisions.md#d-2026-11-18-05)): players with the same wins and losses share a position. The Go rule (`computeStandings`) is already updated; reads that list standings use it.
+- **Club read for Queue:** the club carries `selfCheckInEnabled` (default on).
+
+Not run against a database on the Go side: the anonymous page's updated golden case was merged but the Go database tests were not run after the merge.
+
 ## Scope
 
 **In:** All signed-in GET routes.

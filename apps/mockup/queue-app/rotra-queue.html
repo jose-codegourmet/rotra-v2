@@ -268,7 +268,18 @@ textarea.input { min-height: 80px; resize: vertical; }
 .ls-court:first-child { border-top: 0; padding-top: 0; }
 .ls-court > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ls-card .acts { margin-top: auto; }
-.lh-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); align-items: start; }
+.lh-tl { --gut: 56px; overflow-x: auto; }
+.lh-head, .lh-body { display: grid; grid-template-columns: var(--gut) repeat(var(--cols), minmax(240px, 1fr)); column-gap: 10px; min-width: calc(var(--gut) + var(--cols) * 250px); }
+.lh-head { position: sticky; top: 0; z-index: 2; padding: 6px 0; background: var(--bg); }
+.lh-head b { font-size: 13px; }
+.lh-body { position: relative; height: calc(var(--h) + 8px); }
+.lh-gutter, .lh-col { position: relative; height: var(--h); }
+.lh-tick { position: absolute; right: 6px; transform: translateY(-50%); font-size: 11px; color: var(--fg3); white-space: nowrap; }
+.lh-tick.hr b { font-size: 12px; color: var(--fg); }
+.lh-line { position: absolute; left: 0; right: 0; height: 0; border-top: 1px dashed color-mix(in srgb, var(--border) 70%, transparent); }
+.lh-line.hr { border-top: 1px solid var(--border-strong); }
+.lh-slot { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; justify-content: flex-start; border-left: 3px solid var(--accent); padding-left: 6px; }
+.lh-slot:hover { z-index: 1; }
 /* Main Queue slide mode (owner artifact comment, November 19, 2026): one row that scrolls sideways and snaps per card, like an
    Embla carousel. An edge fades out (gradient mask) only while there are more cards that way. Grid mode keeps the snake grid. */
 .qview { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); }
@@ -3365,9 +3376,24 @@ function liveHistoryPane(s) {
   const list = played.filter((m) => f === 'all' || m.courts.includes(f)).sort((a, b) => (b.endedAt || 0) - (a.endedAt || 0));
   const inv = played.filter((m) => m.status === 'invalid').length;
   const seg = `<div class="seg" role="group" aria-label="Court">${[['all', `All courts · ${played.length}`], ...s.courts.map((c) => [c.id, `${esc(c.label)} · ${played.filter((m) => m.courts.includes(c.id)).length}`])].map(([k, l]) => `<button type="button" aria-pressed="${f === k}" data-act="lhCourt" data-v="${k}">${l}</button>`).join('')}</div>`;
-  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, newest first. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
+  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches on a timeline: time runs down the left in 10-minute steps, one column per court. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
     ${seg}
-    ${list.length ? `${LH_GRID}${list.map((m) => historyMatch(s, m)).join('')}</div>` : `<div class="card empty">${played.length ? 'No finished matches on this court yet.' : 'No finished matches yet. They show here after Match done.'}</div>`}`;
+    ${list.length ? lhTimeline(s, list, f) : `<div class="card empty">${played.length ? 'No finished matches on this court yet.' : 'No finished matches yet. They show here after Match done.'}</div>`}`;
+}
+// Owner artifact comment, November 19, 2026: Match History as a timeline. Hours down the left with a line every 10 minutes, one
+// column per court; each match sits at its start time and is as tall as it lasted (a two-court match shows in both columns).
+const LH_PX = 10; // pixels per minute: 10 minutes = 100 px
+function lhTimeline(s, list, f) {
+  const cols = f === 'all' ? s.courts : s.courts.filter((c) => c.id === f);
+  const step = 10 * 60000, t0 = Math.floor(Math.min(s.start, ...list.map((m) => m.startedAt)) / step) * step;
+  const t1 = Math.ceil(Math.max(...list.map((m) => m.endedAt || m.startedAt)) / step) * step + step;
+  const y = (t) => Math.round((t - t0) / 60000 * LH_PX), H = y(t1);
+  const ticks = []; for (let t = t0; t <= t1; t += step) ticks.push(t);
+  const label = (t) => { const d = new Date(t); return d.getMinutes() === 0 ? `<b>${d.toLocaleTimeString([], { hour: 'numeric' })}</b>` : `<span>${fmtTime(t).replace(/\s?[AP]M$/i, '')}</span>`; };
+  return `<div class="lh-tl" style="--h:${H}px;--cols:${cols.length}"><div class="lh-head"><span></span>${cols.map((c) => `<b>${esc(c.label)}</b>`).join('')}</div>
+    <div class="lh-body"><div class="lh-gutter" aria-hidden="true">${ticks.map((t) => `<div class="lh-tick${new Date(t).getMinutes() === 0 ? ' hr' : ''}" style="top:${y(t)}px">${label(t)}</div>`).join('')}</div>
+    ${cols.map((c) => `<div class="lh-col" role="list" aria-label="${esc(c.label)}">${ticks.map((t) => `<i class="lh-line${new Date(t).getMinutes() === 0 ? ' hr' : ''}" style="top:${y(t)}px"></i>`).join('')}
+      ${list.filter((m) => m.courts.includes(c.id)).map((m) => `<div class="lh-slot" role="listitem" style="top:${y(m.startedAt)}px;min-height:${Math.max(1, y(m.endedAt || m.startedAt) - y(m.startedAt))}px">${historyMatch(s, m)}</div>`).join('')}</div>`).join('')}</div></div>`;
 }
 // Session record tabs. Results is the default; the replay scrubber lives there.
 const HIST_TABS = [['public', 'Public page'], ['results', 'Results'], ['night', 'How the night ran'], ['players', 'Players'], ['financials', 'Financials']];

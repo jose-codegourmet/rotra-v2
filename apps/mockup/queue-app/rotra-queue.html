@@ -342,6 +342,15 @@ body.court-dragging { cursor: grabbing; }
 .cfilter .cf-n { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--bg); color: var(--fg2); }
 .cfilter button[aria-pressed="true"] .cf-n { background: color-mix(in srgb, var(--on-accent) 18%, transparent); color: var(--on-accent); }
 .cfilter button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ls-card.ls-wide { grid-column: 1 / -1; }
+.ls-courts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.ls-cc { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); min-width: 0; }
+.ls-cc.playing { border-color: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 22%, transparent); }
+.ls-pitch { position: relative; }
+.ls-free { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--fg3); }
+.ls-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ls-times .input { min-width: 0; }
+.ls-follow input { width: 16px; height: 16px; accent-color: var(--accent); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4306,9 +4315,24 @@ function liveSettings(s, est, present) {
   const fixed = chip('Fixed after start');
   const row = (k, v, note) => `<div class="ls-row"><span>${k}</span><div><span>${v}</span>${note ? `<span class="small muted">${note}</span>` : ''}</div></div>`;
   const reqOn = (() => { const a = reqAllowed(s); return REQ_FORMATS.filter((k) => a[k]).map((k) => REQ_LABEL[k]); })();
-  const courts = `<section class="card ls-card" aria-labelledby="ls-courts-h"><div class="between"><h3 id="ls-courts-h">Courts · ${s.courts.length}</h3></div>
-      <div>${s.courts.map((c) => `<div class="ls-court"><div><b>${esc(c.label)}</b><span class="small muted">${fmtWhenRange(courtStart(s, c), courtUntil(s, c))}</span></div>${chip(c.until ? 'Set time' : 'Follows session end')}</div>`).join('')}</div>
-      <div class="row acts"><button class="btn sm" data-act="openAdjust">Courts and time</button></div></section>`;
+  // Owner, November 19, 2026: the Courts box looks like the Courts tab's cards (label, status, the court drawing), and the
+  // times under each court are inputs: From, Until, and Follows session end.
+  const hm = (t) => { const d = new Date(t); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+  const courtMini = (c) => {
+    const m = courtMatches(s).find((x) => x.courts.includes(c.id));
+    const st = m ? (m.status === 'active' ? chip('Playing', 'ok') : chip('Getting ready')) : !courtOpen(s, c) ? chip('Not open yet') : chip('Free');
+    const follows = !c.until;
+    return `<article class="ls-cc${m && m.status === 'active' ? ' playing' : ''}"><div class="between"><b>${esc(c.label)}</b>${st}</div>
+      <div class="pitch ls-pitch${m ? '' : ' empty'}">${courtSVG(1)}${m ? courtSides(s, m) : '<span class="ls-free">FREE</span>'}</div>
+      <div class="ls-times">
+        <label class="field"><span>From</span><input class="input" type="time" id="ct-from-${esc(c.id)}" value="${hm(courtStart(s, c))}" data-act-change="courtTime" data-id="${esc(c.id)}" data-k="from"></label>
+        <label class="field"><span>Until</span><input class="input" type="time" id="ct-until-${esc(c.id)}" value="${hm(courtUntil(s, c))}" data-act-change="courtTime" data-id="${esc(c.id)}" data-k="until" ${follows ? 'disabled' : ''}></label>
+      </div>
+      <label class="row ls-follow" style="gap:8px;flex-wrap:nowrap"><input type="checkbox" ${follows ? 'checked' : ''} data-act-change="courtFollow" data-id="${esc(c.id)}"><span class="small">Follows session end</span></label>
+    </article>`;
+  };
+  const courts = `<section class="card ls-card ls-wide" aria-labelledby="ls-courts-h"><div class="between"><h3 id="ls-courts-h">Courts · ${s.courts.length}</h3><button class="btn sm" data-act="openAdjust">Courts and time</button></div>
+      <div class="ls-courts">${s.courts.map(courtMini).join('')}</div></section>`;
   const players = `<section class="card ls-card" aria-labelledby="ls-pl-h"><div class="between"><h3 id="ls-pl-h">Players</h3></div>
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.roster.length}</b><span>Confirmed</span></div><div class="ls-stat"><b class="tnum">${present}</b><span>Present</span></div></div>
       <div class="ls-rows">${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off', reqOn.length ? 'Formats players can ask for' : 'Players can\'t request matches')}</div>
@@ -7863,6 +7887,21 @@ const ACT = {
   pubHistoryJump: () => { if (S.ui.pubTab !== 'details') { S.ui.pubTab = 'details'; render(); } setTimeout(() => document.getElementById('pub-history')?.scrollIntoView({ block: 'start' }), 0); },
 };
 const CHANGE = {
+  // Settings › Courts: a court's own times (owner, November 19, 2026). Times keep the court's day; an Until before From is the next day.
+  courtTime: (el) => {
+    const s = cur(), c = s.courts.find((x) => x.id === el.dataset.id); if (!c || !el.value) return;
+    const [h, mi] = el.value.split(':').map(Number), at = (base) => { const d = new Date(base); d.setHours(h, mi, 0, 0); return d.getTime(); };
+    if (el.dataset.k === 'from') {
+      const v = at(courtStart(s, c));
+      if (v >= courtUntil(s, c)) { toast(`${c.label} has to open before it closes.`); render(); return; }
+      c.startsAt = v; commit(`${c.label} opens ${fmtTime(v)}`);
+    } else {
+      let v = at(courtUntil(s, c)); if (v <= courtStart(s, c)) v += 864e5;
+      c.until = v; commit(`${c.label} open until ${fmtWhen(v, { lower: true })}`);
+    }
+    render();
+  },
+  courtFollow: (el) => { const s = cur(), c = s.courts.find((x) => x.id === el.dataset.id); if (!c) return; c.until = el.checked ? null : courtUntil(s, c); commit(el.checked ? `${c.label} follows the session end` : `${c.label} has its own end time`); render(); },
   exemptAdd: (el) => { const s = cur(), pid = el.value; if (!pid || !R(s, pid)) return; s.exempt = [...exemptOf(s), pid]; commit(`${nm(pid)} added to the exemption list`); render(); },
   bagPick: (el) => { const sh = S.ui.sheet; sh[el.dataset.slot] = el.value; render(); },
   pubAs: (el) => setPubAs(el.value),

@@ -48,6 +48,17 @@ type submission struct {
 	// phone is the typed phone as E.164, "" when none was typed.
 	phone string
 	input profile.Input
+	// onRefusal, when set, sees every refusal before it is answered; true means it answered. Only the guest registration
+	// sets it (a taken email is its "account-match").
+	onRefusal func(w http.ResponseWriter, p *problem) bool
+}
+
+// write answers a refusal, unless onRefusal did.
+func (s submission) write(w http.ResponseWriter, p *problem) {
+	if s.onRefusal != nil && s.onRefusal(w, p) {
+		return
+	}
+	writeProblem(w, p)
 }
 
 // readObject is readJsonBody (service/request.ts): the body must be a JSON object, or the answer is a plain

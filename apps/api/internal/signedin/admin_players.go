@@ -333,6 +333,20 @@ func (s *server) adminPlayer(r *http.Request, q *sqlcgen.Queries) (any, error) {
 	if !ok {
 		return nil, errNotFound
 	}
+	edit, err := s.readAdminPlayerEdit(ctx, q, id, r.PathValue("playerId"))
+	if err != nil {
+		return nil, err
+	}
+	return struct {
+		Edit             adminPlayerEditDTO `json:"edit"`
+		SocialLinks      socialLinksDTO     `json:"socialLinks"`
+		ShowProfileStats bool               `json:"showProfileStats"`
+	}{*edit, edit.SocialLinks, edit.ShowProfileStats}, nil
+}
+
+// readAdminPlayerEdit is readAdminPlayerEdit: the directory row with the current edit values on top. idText is the
+// target as typed (the password audit event is matched on the text). errNotFound when there is no such row.
+func (s *server) readAdminPlayerEdit(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, idText string) (*adminPlayerEditDTO, error) {
 	rows, err := s.adminPlayerDirectory(ctx, q, id)
 	if err != nil {
 		return nil, err
@@ -376,16 +390,12 @@ func (s *server) adminPlayer(r *http.Request, q *sqlcgen.Queries) (any, error) {
 			edit.SocialLinks.Linkedin = l.Url
 		}
 	}
-	set, err := q.GetPlayerPasswordSetAt(ctx, r.PathValue("playerId")) // the target is matched as typed
+	set, err := q.GetPlayerPasswordSetAt(ctx, idText) // the target is matched as typed
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
 	edit.PasswordSetAt = isoPtr(set)
-	return struct {
-		Edit             adminPlayerEditDTO `json:"edit"`
-		SocialLinks      socialLinksDTO     `json:"socialLinks"`
-		ShowProfileStats bool               `json:"showProfileStats"`
-	}{edit, edit.SocialLinks, edit.ShowProfileStats}, nil
+	return &edit, nil
 }
 
 // ---- GET /api/players/{playerId}/games ----
@@ -470,9 +480,5 @@ func (s *server) adminPlayerVerification(r *http.Request, q *sqlcgen.Queries) (a
 	if v == nil {
 		return body{}, nil
 	}
-	out := &adminVerificationDTO{verificationDTO: v.dto, Revision: httpapi.ToDecimalString(v.revision)}
-	if v.phone != "" {
-		out.Phone = addr(v.phone)
-	}
-	return body{out}, nil
+	return body{v.admin()}, nil
 }

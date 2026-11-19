@@ -1,0 +1,737 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "player_notifications",
+   "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_accounts",
+   "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at FROM admin_audit_events ORDER BY id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "mark_all_marks_the_window_and_the_reminder",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_marks_only_the_unread_inside_the_window",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_leaves_a_read_reminder_alone",
+   "scenario": "bob_reminder_read",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_of_a_verified_player_has_no_reminder",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_of_an_unverified_alice_marks_the_reminder",
+   "scenario": "alice_unverified",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_of_a_player_made_verified_by_the_owner",
+   "scenario": "dan_verified",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_twice_the_first_mark_wins",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_with_no_notifications",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000008",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000008"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_for_another_player_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_with_the_id_in_capitals_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "D4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_with_no_player_id_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "mark_all_with_a_player_id_that_is_not_text_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "x"
+    }
+   ]
+  },
+  {
+   "name": "mark_all_body_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": ""
+    }
+   ]
+  },
+  {
+   "name": "mark_all_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": null,
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_disabled_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000006"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_race_of_two",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "PATCH",
+       "path": "/api/me/notifications",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "playerId": "d4000000-0000-4000-8000-000000000002"
+       }
+      },
+      {
+       "method": "PATCH",
+       "path": "/api/me/notifications",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "playerId": "d4000000-0000-4000-8000-000000000002"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mark_all_a_minute_later_keeps_the_first_time",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_all_window_moves_with_the_clock",
+   "scenario": "base",
+   "now": "2026-11-21T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_unread",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_already_read_is_fine_and_keeps_its_time",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000002",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000003",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000003",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_just_inside_the_window",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000004",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_at_the_edge_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000005",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_outside_the_window_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000006",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_of_another_player_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000007",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_unknown_id_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-0000000000ff",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_with_an_upper_case_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/A1000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_with_an_id_that_is_not_a_uuid_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/not-a-uuid",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_with_braces_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/%7Ba1000000-0000-4000-8000-000000000001%7D",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_with_a_trailing_space_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001%20",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_the_reminder_marks_the_account_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ann-google",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_the_reminder_of_a_verified_player_is_a_no_op",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ann-google",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_the_reminder_twice_the_first_mark_wins",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ann-google",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ann-google",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_the_reminder_already_read",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ann-google",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_the_reminder_in_capitals_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/ANN-GOOGLE",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_wrong_player_id_is_checked_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/not-a-uuid",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_body_not_json_is_checked_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/not-a-uuid",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "rawBody": "x"
+    }
+   ]
+  },
+  {
+   "name": "mark_one_no_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "mark_one_with_no_player_id_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "mark_one_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+     "who": null,
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000007",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mark_one_race_of_two",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "PATCH",
+       "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+       "who": "f4000000-0000-4000-8000-000000000004",
+       "body": {
+        "playerId": "d4000000-0000-4000-8000-000000000004"
+       }
+      },
+      {
+       "method": "PATCH",
+       "path": "/api/me/notifications/a1000000-0000-4000-8000-000000000001",
+       "who": "f4000000-0000-4000-8000-000000000004",
+       "body": {
+        "playerId": "d4000000-0000-4000-8000-000000000004"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

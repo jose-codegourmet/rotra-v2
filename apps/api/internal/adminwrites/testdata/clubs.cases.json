@@ -1,0 +1,3534 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "clubs.seed.sql",
+  "scenarios": {
+    "base": []
+  },
+  "snapshot": [
+    {
+      "name": "clubs",
+      "sql": "SELECT name, name_key, (SELECT l.country_code || '-' || l.city_code FROM location_codes l WHERE l.id = c.founding_location_code_id) AS city_code, founding_address, license_pricing::text AS license_pricing, license_monthly_minor, license_yearly_minor, currency, default_players_per_court, default_entrance_fee_minor, description, court_rules, post_template, logo_ref, self_check_in_enabled, source_command_id, invite_code ~ '^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{10}$' AS invite_code_is_ten_unambiguous_characters, created_at, updated_at, revision::text AS revision FROM clubs c ORDER BY name, source_command_id",
+      "redact": []
+    },
+    {
+      "name": "club_accounts",
+      "sql": "SELECT (SELECT c.name FROM clubs c WHERE c.id = a.club_id) AS club, username, auth_subject IS NOT NULL AS has_subject, (provisioned_at IS NOT NULL) = (auth_subject IS NOT NULL) AS provisioned_with_a_subject, provisioned_at, disabled_at, created_at, updated_at, revision::text AS revision FROM club_accounts a ORDER BY username",
+      "redact": []
+    },
+    {
+      "name": "club_entitlements",
+      "sql": "SELECT (SELECT c.name FROM clubs c WHERE c.id = e.club_id) AS club, effective_term_id IS NULL AS no_term, effective_access_ends_at, current_expiry_cycle_id IS NULL AS no_cycle, refreshed_at, updated_at, revision::text AS revision FROM club_entitlements e ORDER BY 1",
+      "redact": []
+    },
+    {
+      "name": "club_license_terms",
+      "sql": "SELECT count(*)::int AS terms FROM club_license_terms",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT a.id, a.actor_admin_id, a.action, a.target_type, a.target_id, a.source_command_id, a.occurred_at, a.metadata, (SELECT c.name FROM clubs c WHERE c.id::text = a.target_id) AS target_club FROM admin_audit_events a ORDER BY a.action, a.target_type, a.source_command_id NULLS FIRST, a.occurred_at, a.metadata::text, 9",
+      "redact": [
+        "id",
+        "target_id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": null,
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "creates_a_paid_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "creates_a_free_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000002",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "free"
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "free_club_stores_no_amounts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000003",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "free",
+              "monthly": 150000,
+              "yearly": 1500000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000004",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "in_manila",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000005",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-MNL",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "city_code_with_a_third_part_is_ignored",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000006",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB-extra",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_and_address_are_trimmed",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000007",
+            "name": "  \t Banilad  Birdies \n",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "  Hall 9  \n",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_inner_spaces_are_kept_in_the_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000008",
+            "name": "Banilad   Birdies   Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_is_trimmed_and_lower_cased",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000009",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "  Banilad.BIRDIES \t",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000010",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            },
+            "id": "d1000000-0000-4000-8000-000000000001",
+            "clubId": "d1000000-0000-4000-8000-000000000001",
+            "logoRef": "x",
+            "inviteCode": "AAAAAAAAAA",
+            "revision": 9,
+            "accountState": "ready",
+            "authSubject": "x"
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "password_of_eight_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000011",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "12345678",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "password_of_four_astral_characters_is_eight_units",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000012",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "🏸🏸🏸🏸",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "password_with_spaces_and_accents",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000013",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "  pässwörd  ",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "monthly_of_one_centavo_and_yearly_below_twelve",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000014",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 1,
+              "yearly": 11
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amounts_written_as_floats",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000015",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 150000.0,
+              "yearly": 1500000.0
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pricing_free_ignores_bad_amounts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000016",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "free",
+              "monthly": "x",
+              "yearly": -5
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_decomposed_accents",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000020",
+            "name": "Ångström Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.00",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_ligature_and_full_width",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000021",
+            "name": "ﬁne Ｆｕｌｌ Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.01",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_dotted_capital_i",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000022",
+            "name": "İstanbul Smash",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.02",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_final_sigma",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000023",
+            "name": "ΣΊΣΥΦΟΣ Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.03",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_kelvin_sign",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000024",
+            "name": "K Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.04",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_titlecase_digraph",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000025",
+            "name": "ǅungla Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.05",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_capital_sharp_s",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000026",
+            "name": "Straẞe Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.06",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_roman_numeral",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000027",
+            "name": "Ⅷ Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.07",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_odd_white_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000028",
+            "name": "  Spaced  Out﻿ Club 　",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.08",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_emoji",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000029",
+            "name": "🏸 Smash",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.09",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_greek_capital_sigma_inside",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000030",
+            "name": "ΑΣΑ Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.10",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_final_sigma_before_a_dot",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000031",
+            "name": "ΟΔΟΣ. Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.11",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_superscripts_and_fractions",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000032",
+            "name": "²½ Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.12",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_angstrom_sign",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000033",
+            "name": "Å Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.13",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_key_long_s",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000034",
+            "name": "ſmash Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "key.14",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_ntilde_upper",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000040",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "ÑANDÚ",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_dotted_capital_i",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000041",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "İZMİR",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_capital_sigma",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000042",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "ΣΊΣΥΦΟΣ",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_with_inner_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000043",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "ban ilad",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_with_symbols",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000044",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "b@n!lad+/x",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_long",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000045",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_single_char",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000046",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "x",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "username_nbsp_around",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000047",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": " banilad ",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[1]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_with_a_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "﻿{\"sourceCommandId\": \"c2000000-0000-4000-8000-000000000050\", \"name\": \"Banilad Birdies\", \"cityCode\": \"PH-CEB\", \"foundingAddress\": \"Hall 9, Banilad, Cebu City\", \"username\": \"banilad.birdies\", \"password\": \"correct horse\", \"price\": {\"pricing\": \"paid\", \"monthly\": 180000, \"yearly\": 1800000}}",
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "body_empty_object_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "password_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000060",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_of_seven",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000061",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "1234567",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_of_three_astral_characters_is_six_units",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000062",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "🏸🏸🏸",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000063",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000064",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": 12345678,
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000065",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": null,
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_is_checked_before_the_city",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000066",
+            "name": "Banilad Birdies",
+            "cityCode": "zz",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "x",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_is_checked_before_the_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000067",
+            "name": "",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "x",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "password_at_the_hash_limit",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000069",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "city_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000080",
+            "name": "Banilad Birdies",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000081",
+            "name": "Banilad Birdies",
+            "cityCode": "",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_lower_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000082",
+            "name": "Banilad Birdies",
+            "cityCode": "ph-ceb",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_country_only",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000083",
+            "name": "Banilad Birdies",
+            "cityCode": "PH",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_no_city",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000084",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_no_country",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000085",
+            "name": "Banilad Birdies",
+            "cityCode": "-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_unknown_city",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000086",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-XXX",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_unknown_country",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000087",
+            "name": "Banilad Birdies",
+            "cityCode": "US-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_no_dash",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000088",
+            "name": "Banilad Birdies",
+            "cityCode": "PHCEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_trailing_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000089",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB ",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_leading_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000090",
+            "name": "Banilad Birdies",
+            "cityCode": " PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_double_dash",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000091",
+            "name": "Banilad Birdies",
+            "cityCode": "PH--CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000092",
+            "name": "Banilad Birdies",
+            "cityCode": 5,
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_underscore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000093",
+            "name": "Banilad Birdies",
+            "cityCode": "PH_CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "city_is_checked_before_the_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000095",
+            "name": "",
+            "cityCode": "zz",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_name_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000100",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_name_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000101",
+            "name": "",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_name_blank",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000102",
+            "name": "    ",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_name_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000103",
+            "name": 5,
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_address_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000104",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_address_blank",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000105",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "  \t",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_username_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000106",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_username_blank",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000107",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "   ",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_username_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000108",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": 5,
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_all_three_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000109",
+            "name": "",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "",
+            "username": "",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_fields_are_checked_before_the_price",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000110",
+            "name": "",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000120",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "yearly": 1800000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000121",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_both_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000122",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid"
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_pricing_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000123",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "price_pricing_other_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000124",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "Free",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000125",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 0,
+              "yearly": 5
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000126",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 5,
+              "yearly": 0
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_negative",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000127",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": -1,
+              "yearly": 5
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_fraction",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000128",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 1500.5,
+              "yearly": 1800000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_fraction",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000129",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1799999.5
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000130",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": "180000",
+              "yearly": 1800000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000131",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": "1800000"
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_monthly_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000132",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": null,
+              "yearly": 1800000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_twelve_months",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000133",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 150000,
+              "yearly": 1800000
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_above_twelve_months",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000134",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 150000,
+              "yearly": 1800001
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_yearly_one_below_twelve_months",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000135",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 150000,
+              "yearly": 1799999
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "price_amounts_above_a_safe_integer",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000136",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 9007199254740992,
+              "yearly": 9007199254740992
+            }
+          },
+          "redact": null
+        }
+      ]
+    },
+    {
+      "name": "price_amount_overflowing_a_double",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"sourceCommandId\": \"c2000000-0000-4000-8000-000000000137\", \"name\": \"Banilad Birdies\", \"cityCode\": \"PH-CEB\", \"foundingAddress\": \"Hall 9, Banilad, Cebu City\", \"username\": \"banilad.birdies\", \"password\": \"correct horse\", \"price\": {\"pricing\": \"paid\", \"monthly\": 1e999, \"yearly\": 5}}"
+        }
+      ]
+    },
+    {
+      "name": "price_missing_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000140",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse"
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_null_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000141",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_a_string_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000142",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": "free"
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_an_array_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000143",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": [
+              "free"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_free_inside_an_array_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000144",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": [
+              {
+                "pricing": "free"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "price_beyond_the_column_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000145",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 3000000000,
+              "yearly": 35000000000
+            }
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "price_at_the_column_limit",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000146",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 2147483647,
+              "yearly": 2147483647
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000150",
+            "name": "Lahug Smashers",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "name_taken_in_other_case_and_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000151",
+            "name": "  LAHUG   smashers ",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "name_with_a_combining_accent_is_another_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000152",
+            "name": "Lahúg Smashers",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "name_taken_by_a_full_width_variant",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000153",
+            "name": "Ｌａｈｕｇ Smashers",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "username_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000154",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "lahug.smash",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "username_taken_in_other_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000155",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "LAHUG.SMASH",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "username_of_a_staged_club_is_taken",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000156",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "freshstart",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "name_of_a_pending_rename_is_free",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000157",
+            "name": "Lahug Smash Club",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "conflict_writes_nothing_then_a_free_name_works",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000158",
+            "name": "Lahug Smashers",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000159",
+            "name": "Lahug Smashers Two",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_returns_the_same_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000170",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000170",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_other_values_returns_the_first",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000171",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000171",
+            "name": "Other Name",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "other.user",
+            "password": "another one",
+            "price": {
+              "pricing": "free"
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_an_invalid_body_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000172",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000172",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "x",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry_by_the_other_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000173",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000173",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000174",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "C2000000-0000-4000-8000-000000000174",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_resumes_a_staged_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c3000000-0000-4000-8000-0000000000c4",
+            "name": "Whatever",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "whatever",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_of_a_provisioned_seeded_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c3000000-0000-4000-8000-0000000000c1",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_of_an_old_audit_event_creates_the_club_without_an_event",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c0000000-0000-4000-8000-0000000000b2",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "not-a-uuid",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": 5,
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_in_braces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "{c2000000-0000-4000-8000-000000000181}",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid",
+              "monthly": 180000,
+              "yearly": 1800000
+            }
+          },
+          "redact": [
+            "clubId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_is_checked_after_the_price",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "x",
+            "name": "Banilad Birdies",
+            "cityCode": "PH-CEB",
+            "foundingAddress": "Hall 9, Banilad, Cebu City",
+            "username": "banilad.birdies",
+            "password": "correct horse",
+            "price": {
+              "pricing": "paid"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "race_one_name_two_commands",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/clubs",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000190",
+                "name": "Banilad Birdies",
+                "cityCode": "PH-CEB",
+                "foundingAddress": "Hall 9, Banilad, Cebu City",
+                "username": "race.a",
+                "password": "correct horse",
+                "price": {
+                  "pricing": "paid",
+                  "monthly": 180000,
+                  "yearly": 1800000
+                }
+              },
+              "redact": [
+                "clubId"
+              ]
+            },
+            {
+              "method": "POST",
+              "path": "/api/clubs",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000191",
+                "name": "Banilad Birdies",
+                "cityCode": "PH-CEB",
+                "foundingAddress": "Hall 9, Banilad, Cebu City",
+                "username": "race.b",
+                "password": "correct horse",
+                "price": {
+                  "pricing": "paid",
+                  "monthly": 180000,
+                  "yearly": 1800000
+                }
+              },
+              "redact": [
+                "clubId"
+              ]
+            }
+          ],
+          "redact": [
+            "clubId"
+          ]
+        }
+      ],
+      "redact": {
+        "clubs": [
+          "source_command_id"
+        ],
+        "admin_audit_events": [
+          "source_command_id"
+        ],
+        "club_accounts": [
+          "username"
+        ]
+      }
+    },
+    {
+      "name": "race_one_username_two_commands",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/clubs",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000192",
+                "name": "Race One",
+                "cityCode": "PH-CEB",
+                "foundingAddress": "Hall 9, Banilad, Cebu City",
+                "username": "banilad.birdies",
+                "password": "correct horse",
+                "price": {
+                  "pricing": "paid",
+                  "monthly": 180000,
+                  "yearly": 1800000
+                }
+              },
+              "redact": [
+                "clubId"
+              ]
+            },
+            {
+              "method": "POST",
+              "path": "/api/clubs",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000193",
+                "name": "Race Two",
+                "cityCode": "PH-CEB",
+                "foundingAddress": "Hall 9, Banilad, Cebu City",
+                "username": "banilad.birdies",
+                "password": "correct horse",
+                "price": {
+                  "pricing": "paid",
+                  "monthly": 180000,
+                  "yearly": 1800000
+                }
+              },
+              "redact": [
+                "clubId"
+              ]
+            }
+          ],
+          "redact": [
+            "clubId",
+            "name"
+          ]
+        }
+      ],
+      "redact": {
+        "clubs": [
+          "name",
+          "name_key",
+          "source_command_id"
+        ],
+        "admin_audit_events": [
+          "source_command_id",
+          "target_club"
+        ],
+        "club_accounts": [
+          "club"
+        ],
+        "club_entitlements": [
+          "club"
+        ]
+      }
+    }
+  ]
+}

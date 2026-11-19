@@ -67,17 +67,22 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Pool == nil || d.Service == nil || d.Store == nil || d.ReadLimiter == nil {
 		return nil, errors.New("claim: routes need a pool, a session service, a store and a read limiter")
 	}
-	h := &handlers{pool: d.Pool, svc: d.Service, st: d.Store, read: d.ReadLimiter, now: d.Clock, log: d.Logger}
+	h := (&handlers{pool: d.Pool, svc: d.Service, st: d.Store, read: d.ReadLimiter, now: d.Clock, log: d.Logger}).withDefaults()
+	return func(mux *http.ServeMux) {
+		mux.Handle("GET /api/claim/{token}", h.forPlayerApp(httpapi.RateLimit(h.read, readMessage, http.HandlerFunc(h.getLink))))
+		mux.Handle("POST /api/claim/{token}", h.forPlayerApp(http.HandlerFunc(h.submit)))
+	}, nil
+}
+
+// withDefaults fills the clock and the logger.
+func (h *handlers) withDefaults() *handlers {
 	if h.now == nil {
 		h.now = time.Now
 	}
 	if h.log == nil {
 		h.log = slog.New(slog.DiscardHandler)
 	}
-	return func(mux *http.ServeMux) {
-		mux.Handle("GET /api/claim/{token}", h.forPlayerApp(httpapi.RateLimit(h.read, readMessage, http.HandlerFunc(h.getLink))))
-		mux.Handle("POST /api/claim/{token}", h.forPlayerApp(http.HandlerFunc(h.submit)))
-	}, nil
+	return h
 }
 
 // forPlayerApp refuses every request that is not from the Player app, before anything is counted.

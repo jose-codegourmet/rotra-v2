@@ -61,18 +61,48 @@ func ReadMyProfile(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, now 
 	if err := p.readPublicProfile(ctx, q, id, id.String(), viewerRef{id: id, ok: true}, &out.profileWithPlaces); err != nil {
 		return nil, err
 	}
+	note, err := adminChangeNote(ctx, q, id)
+	out.AdminChangeNote = note
+	return out, err
+}
+
+// ownCard is the profile a write answers with: the public profile with its banner and the owner-only Admin change note,
+// and no leaderboard places (ownProfile(db, profileWithBanner(...)) in the TypeScript).
+type ownCard struct {
+	profileDTO
+	AdminChangeNote string `json:"adminChangeNote,omitempty"`
+}
+
+// ReadOwnProfileCard is the profile card the Player's own writes (profile, banner, stats switches) answer with, read on the
+// caller's transaction. A player with no RTR ID has no profile card: the TypeScript answers null there (publicProfileDto),
+// not an error, so this does too.
+func ReadOwnProfileCard(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, now time.Time) (any, error) {
+	p := &players{now: func() time.Time { return now }}
+	dto, err := p.loadProfile(ctx, q, id, id.String(), viewerRef{id: id, ok: true}, maskAlwaysPrivate)
+	if errors.Is(err, errProfileNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	note, err := adminChangeNote(ctx, q, id)
+	return ownCard{profileDTO: dto, AdminChangeNote: note}, err
+}
+
+// adminChangeNote is adminChangeNoteOf: the reason of the latest Admin edit of a claimed profile, or "".
+func adminChangeNote(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (string, error) {
 	metadata, err := q.GetAdminChangeReason(ctx, id)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, fmt.Errorf("reading the Admin change note: %w", err)
+		return "", fmt.Errorf("reading the Admin change note: %w", err)
 	}
 	var meta struct {
 		Reason json.RawMessage `json:"reason"`
 	}
 	var reason string
 	if json.Unmarshal(metadata, &meta) == nil && json.Unmarshal(meta.Reason, &reason) == nil {
-		out.AdminChangeNote = reason
+		return reason, nil
 	}
-	return out, nil
+	return "", nil
 }
 
 // yearStats is RecentGameStats.

@@ -1,0 +1,2822 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "clubs.seed.sql",
+  "scenarios": {
+    "base": [],
+    "reference_gap": [
+      "UPDATE club_license_terms SET payment_reference = 'LIC-0005' WHERE payment_reference = 'LIC-0003'"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "club_license_terms",
+      "sql": "SELECT c.name AS club, t.payment_reference, t.plan::text AS plan, t.starts_at, t.ends_at, t.activated_by_admin_id, t.activated_at, t.source_command_id, t.pricing_at_activation::text AS pricing_at_activation, t.paid_on::text AS paid_on, t.amount_minor, t.currency, t.notes, t.created_at FROM club_license_terms t JOIN clubs c ON c.id = t.club_id ORDER BY t.payment_reference, t.source_command_id",
+      "redact": []
+    },
+    {
+      "name": "club_entitlements",
+      "sql": "SELECT c.name AS club, e.effective_access_ends_at, e.refreshed_at, e.updated_at, e.revision::text AS revision, (SELECT t.payment_reference FROM club_license_terms t WHERE t.id = e.effective_term_id) AS effective_term_reference, e.effective_term_id IS NULL AS no_effective_term, (SELECT x.expired_at FROM club_expiry_cycles x WHERE x.id = e.current_expiry_cycle_id) AS cycle_expired_at, e.current_expiry_cycle_id IS NOT NULL AS has_cycle FROM club_entitlements e JOIN clubs c ON c.id = e.club_id ORDER BY c.name",
+      "redact": []
+    },
+    {
+      "name": "club_expiry_cycles",
+      "sql": "SELECT c.name AS club, x.expired_at, x.delete_public_pages_after, x.cancelled_at, (SELECT t.payment_reference FROM club_license_terms t WHERE t.id = x.cancellation_term_id) AS cancellation_term_reference, x.state::text AS state, x.created_at, x.updated_at, x.revision::text AS revision FROM club_expiry_cycles x JOIN clubs c ON c.id = x.club_id ORDER BY c.name, x.expired_at",
+      "redact": []
+    },
+    {
+      "name": "session_publications",
+      "sql": "SELECT p.public_key, p.state::text AS state, p.revision::text AS revision, p.updated_at, (SELECT x.expired_at FROM club_expiry_cycles x WHERE x.id = p.expiry_cycle_id) AS retained_under_cycle_expired_at, p.expiry_cycle_id IS NOT NULL AS retained FROM session_publications p ORDER BY p.public_key",
+      "redact": []
+    },
+    {
+      "name": "clubs",
+      "sql": "SELECT name, license_pricing::text AS license_pricing, license_monthly_minor, license_yearly_minor, currency, revision::text AS revision, updated_at FROM clubs ORDER BY name",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT a.id, a.actor_admin_id, a.action, a.target_type, a.target_id, a.source_command_id, a.occurred_at, a.metadata - 'termId' AS metadata, (SELECT t.payment_reference FROM club_license_terms t WHERE t.id::text = a.metadata ->> 'termId') AS term_reference FROM admin_audit_events a ORDER BY a.action, a.target_type, a.source_command_id NULLS FIRST, a.occurred_at, a.metadata::text, a.target_id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": null,
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "activates_a_never_licensed_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activates_a_club_with_no_entitlement_row",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000005/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000002",
+            "plan": "Monthly",
+            "amountMinor": 150000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activates_yearly",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000003",
+            "plan": "Yearly",
+            "amountMinor": 1800000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activates_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000004",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "custom_amount_is_kept",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000005",
+            "plan": "Monthly",
+            "amountMinor": 99999,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amount_of_one_centavo",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000006",
+            "plan": "Monthly",
+            "amountMinor": 1,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amount_as_a_float_written_whole",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"sourceCommandId\":\"c2000000-0000-4000-8000-000000000007\",\"plan\":\"Monthly\",\"amountMinor\":180000.0,\"paidOn\":\"2026-11-19\"}",
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "largest_amount_a_column_holds",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000008",
+            "plan": "Monthly",
+            "amountMinor": 2147483647,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "amount_beyond_the_column_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000009",
+            "plan": "Monthly",
+            "amountMinor": 2147483648,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "amount_beyond_a_safe_integer_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000010",
+            "plan": "Monthly",
+            "amountMinor": 9007199254740992,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "largest_safe_integer_amount_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000011",
+            "plan": "Monthly",
+            "amountMinor": 9007199254740991,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "amount_zero_for_a_paid_club_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000012",
+            "plan": "Monthly",
+            "amountMinor": 0,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "amount_missing_is_invalid_for_a_paid_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000013",
+            "plan": "Monthly",
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount_null_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000014",
+            "plan": "Monthly",
+            "amountMinor": null,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount_string_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000015",
+            "plan": "Monthly",
+            "amountMinor": "1800",
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount_negative_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000016",
+            "plan": "Monthly",
+            "amountMinor": -1,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount_fraction_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000017",
+            "plan": "Monthly",
+            "amountMinor": 1800.5,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount_overflowing_a_double_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"sourceCommandId\":\"c2000000-0000-4000-8000-000000000018\",\"plan\":\"Monthly\",\"amountMinor\":1e999,\"paidOn\":\"2026-11-19\"}"
+        }
+      ]
+    },
+    {
+      "name": "paid_on_missing_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000020",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_null_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000021",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": null,
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_empty_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000022",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_a_number_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000023",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": 20261119,
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_far_future",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000200",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2099-12-31",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_year_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000201",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "0001-01-01",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_a_leap_day",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000202",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2028-02-29",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_a_rollover_date",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000203",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-02-30",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_a_leap_day_in_a_common_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000204",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2027-02-29",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_day_thirty_one_of_a_short_month",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000205",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-04-31",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_an_expanded_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000206",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "+002026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "paid_on_garbage",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000207",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "yesterday",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_with_a_time",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000208",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19T10:00:00",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_one_digit_parts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000209",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-1-5",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_without_dashes",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000210",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "20261119",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_with_a_leading_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000211",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": " 2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_with_a_trailing_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000212",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19 ",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_month_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000213",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-00-10",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_day_thirty_two",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000214",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-01-32",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_day_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000215",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-01-00",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_month_thirteen",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000216",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-13-01",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_year_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000217",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "0000-01-01",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_negative_expanded_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000218",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "-000001-01-01",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_negative_zero_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000219",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "-000000-01-01",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_expanded_year_above_ten_thousand",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000220",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "+012026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_last_year_a_date_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000221",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "+275760-09-13",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_one_day_after_the_last_date",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000222",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "+275760-09-14",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_expanded_year_too_short",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000223",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "+02026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_two_digit_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000224",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "26-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_slashes",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000225",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026/11/19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_lower_case_t_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000226",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19t",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_with_a_zone",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000227",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19Z",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_full_width_digits",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000228",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "２０２６-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_eastern_arabic_digits",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000229",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "٢٠٢٦-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "paid_on_with_a_newline",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000230",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19\n",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_lower_case_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000040",
+            "plan": "monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_yearly_lower_case_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000041",
+            "plan": "yearly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_missing_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000042",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_null_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000043",
+            "plan": null,
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_other_text_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000044",
+            "plan": "Weekly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_with_a_space_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000045",
+            "plan": "Monthly ",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "reference_is_trimmed",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000050",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "  \t GCash 12345 \n"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_empty_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000051",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": ""
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_blank_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000052",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "   ﻿ "
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_missing_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000053",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_a_number_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000054",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": 12
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_unicode_kept",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000055",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "Bayad sa café 🏸"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000056",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "clubId": "d1000000-0000-4000-8000-000000000001",
+            "price": 1,
+            "activatedByAdminId": "x",
+            "endsAt": "2030-01-01",
+            "paymentReference": "LIC-9999",
+            "currency": "USD"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "starts_on_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000060",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsOn": "2026-12-01"
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_at_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000061",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsAt": "2026-12-01T00:00:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_on_null_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000062",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsOn": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_at_null_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000063",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsAt": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_on_empty_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000064",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsOn": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_on_is_refused_before_the_plan",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000065",
+            "plan": "nope",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsOn": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "starts_on_is_refused_before_the_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000066",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001",
+            "startsOn": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan_is_checked_before_the_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000067",
+            "plan": "nope",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000070",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_not_a_uuid_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/abc/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000071",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 404,
+            "code": "not_found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_of_thirty_six_dashes_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/------------------------------------/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000072",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 404,
+            "code": "not_found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/D1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000073",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "the_club_is_checked_before_the_command",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "not-a-uuid",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "renews_after_the_current_term",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000080",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "renews_yearly_after_the_current_term",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000081",
+            "plan": "Yearly",
+            "amountMinor": 1500000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "renewal_keeps_the_club_price",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000082",
+            "plan": "Monthly",
+            "amountMinor": 1,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "renewal_after_a_renewal",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000083",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000084",
+            "plan": "Yearly",
+            "amountMinor": 1500000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "two_activations_of_a_new_club_stack",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000085",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000086",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "renews_when_the_access_end_has_microseconds",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000007/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000087",
+            "plan": "Monthly",
+            "amountMinor": 150000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activates_a_lapsed_club_and_cancels_its_cycle",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000003/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000090",
+            "plan": "Monthly",
+            "amountMinor": 120000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activates_a_lapsed_club_yearly",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000003/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000091",
+            "plan": "Yearly",
+            "amountMinor": 1200000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "free_club_records_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000095",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "free_club_ignores_amount_and_paid_on",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000096",
+            "plan": "Monthly",
+            "amountMinor": "x",
+            "paidOn": "nope",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "free_club_with_no_amount_or_date",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000097",
+            "plan": "Yearly"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "free_club_keeps_its_kept_price",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000098",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000099",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stale_projection_starts_a_cycle_and_retains_the_pages",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000006/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000100",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_returns_the_same_term",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000110",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000110",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_other_values_returns_the_first",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000111",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000111",
+            "plan": "Yearly",
+            "amountMinor": 5,
+            "paidOn": "2020-01-01",
+            "reference": "other"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_an_invalid_body_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000112",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000112",
+            "plan": "nope",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry_by_the_other_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000113",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000113",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_for_another_club_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000114",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000005/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000114",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000115",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "C2000000-0000-4000-8000-000000000115",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_of_a_seeded_term_for_its_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c3000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_of_a_seeded_term_for_another_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c3000000-0000-4000-8000-000000000001",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_of_an_audit_event_writes_the_term_and_no_event",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c0000000-0000-4000-8000-0000000000a1",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "command_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "not-a-uuid",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": 5,
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_in_braces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "{c2000000-0000-4000-8000-000000000122}",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reference_number_taken_is_unexpected",
+      "scenario": "reference_gap",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000123",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[1]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_with_a_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "﻿{\"sourceCommandId\": \"c2000000-0000-4000-8000-000000000130\", \"plan\": \"Monthly\", \"amountMinor\": 180000, \"paidOn\": \"2026-11-19\", \"reference\": \"GCash 0001\"}",
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "body_empty_object_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "monthly_from_the_thirty_first",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000140",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2027-01-31T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_from_the_thirty_first_of_august",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000141",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2026-08-31T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_from_the_thirtieth_of_january",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000142",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2026-01-30T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_from_the_twenty_ninth_of_january",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000143",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2027-01-29T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_from_the_twenty_ninth_of_january_leap_year",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000144",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2028-01-29T04:00:00.000Z"
+    },
+    {
+      "name": "yearly_from_a_leap_day",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000145",
+            "plan": "Yearly",
+            "amountMinor": 1800000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2028-02-29T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_across_a_year_end",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000146",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2026-12-31T04:00:00.000Z"
+    },
+    {
+      "name": "monthly_from_the_thirty_first_of_december",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000147",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2026-12-31T23:59:59.999Z"
+    },
+    {
+      "name": "renewal_from_a_month_end_access",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000148",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "sourceCommandId": "c2000000-0000-4000-8000-000000000149",
+            "plan": "Monthly",
+            "amountMinor": 180000,
+            "paidOn": "2026-11-19",
+            "reference": "GCash 0001"
+          },
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "now": "2026-10-31T04:00:00.000Z"
+    },
+    {
+      "name": "race_two_activations_of_one_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000150",
+                "plan": "Monthly",
+                "amountMinor": 180000,
+                "paidOn": "2026-11-19",
+                "reference": "GCash 0001"
+              },
+              "redact": [
+                "term.id"
+              ]
+            },
+            {
+              "method": "POST",
+              "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000151",
+                "plan": "Monthly",
+                "amountMinor": 180000,
+                "paidOn": "2026-11-19",
+                "reference": "GCash 0001"
+              },
+              "redact": [
+                "term.id"
+              ]
+            }
+          ],
+          "redact": [
+            "term.id"
+          ]
+        }
+      ],
+      "redact": {
+        "club_license_terms": [
+          "source_command_id"
+        ],
+        "admin_audit_events": [
+          "source_command_id"
+        ]
+      }
+    },
+    {
+      "name": "race_one_command_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000152",
+                "plan": "Monthly",
+                "amountMinor": 180000,
+                "paidOn": "2026-11-19",
+                "reference": "GCash 0001"
+              },
+              "redact": [
+                "term.id"
+              ]
+            },
+            {
+              "method": "POST",
+              "path": "/api/clubs/d1000000-0000-4000-8000-000000000004/licenses",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "sourceCommandId": "c2000000-0000-4000-8000-000000000152",
+                "plan": "Monthly",
+                "amountMinor": 180000,
+                "paidOn": "2026-11-19",
+                "reference": "GCash 0001"
+              },
+              "redact": [
+                "term.id"
+              ]
+            }
+          ],
+          "redact": [
+            "term.id"
+          ]
+        }
+      ]
+    }
+  ]
+}

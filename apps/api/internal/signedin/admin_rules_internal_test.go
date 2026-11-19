@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
-
-	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 )
 
 // The pure rules of the Admin reads, pinned against what the TypeScript functions give for the same input.
@@ -108,68 +106,6 @@ func TestSalesPeriodAndPerSession(t *testing.T) {
 	}
 	if got := perSession(5, 2); got == nil || got.AmountMinor != 3 { // 2.5 rounds up
 		t.Errorf("perSession(5, 2) = %+v", got)
-	}
-}
-
-func TestContactNormalizeAndDisplay(t *testing.T) {
-	phone, email := sqlcgen.ContactChangeFieldPhone, sqlcgen.ContactChangeFieldEmail
-	for _, c := range []struct {
-		field sqlcgen.ContactChangeField
-		in    string
-		want  string
-	}{
-		{phone, "0917 555 0142", "+639175550142"},
-		{phone, " 0917-555-0142 ", "+639175550142"},
-		{phone, "639175550142", "+639175550142"},
-		{phone, "+63 917 555 0142", "+639175550142"},
-		{phone, "0817 555 0142", "08175550142"}, // not a PH mobile: only spaces and hyphens go
-		{phone, "call me", "callme"},
-		{phone, "", ""},
-		{email, "  Alice@Example.TEST ", "alice@example.test"},
-	} {
-		if got := normalizeContact(c.field, c.in); got != c.want {
-			t.Errorf("normalizeContact(%s, %q) = %q, want %q", c.field, c.in, got, c.want)
-		}
-	}
-	for in, want := range map[string]string{
-		"+639175550142": "+63 917 555 0142", "09175550142": "0917 555 0142", "0917": "0917", "09175": "0917 5", "+63917": "+63 917",
-		"+639": "+63 9", "hello": "hello", "+1 202 555 0100": "+1 202 555 0100", "": "",
-	} {
-		if got := formatPhoneForDisplay(in); got != want {
-			t.Errorf("formatPhoneForDisplay(%q) = %q, want %q", in, got, want)
-		}
-	}
-}
-
-func TestChecksFor(t *testing.T) {
-	phone := sqlcgen.ContactChangeFieldPhone
-	self := holder{id: "p1", fullName: "Pat", rtrID: "R1", phone: addr("+639175550001")}
-	other := holder{id: "p2", fullName: "Quin", rtrID: "R2", phone: addr("+639175550002")}
-	req := checked{id: "r1", playerID: "p1", field: phone, from: "+639175550009", to: "0917 555 0002", status: sqlcgen.ContactChangeStatusPending, requestedAt: 1000}
-	newer := checked{id: "r2", playerID: "p1", field: phone, status: sqlcgen.ContactChangeStatusApproved, requestedAt: 2000}
-	later := checked{id: "r3", playerID: "p1", field: phone, status: sqlcgen.ContactChangeStatusPending, requestedAt: 3000}
-	closed := checked{id: "r4", playerID: "p1", field: phone, status: sqlcgen.ContactChangeStatusRejected, requestedAt: 4000}
-	checks := checksFor(req, []holder{self, other}, []checked{req, newer, later, closed})
-	if len(checks) != 4 {
-		t.Fatalf("%d checks", len(checks))
-	}
-	if c := checks[0]; c.OK || c.OtherPlayer == nil || c.OtherPlayer.ID != "p2" {
-		t.Errorf("linked elsewhere: %+v", c)
-	}
-	if c := checks[1]; c.OK || c.NewerRequestID == nil || *c.NewerRequestID != "r3" || *c.SentAt != 3000 {
-		t.Errorf("newer request must be the latest open one: %+v", c)
-	}
-	if c := checks[2]; c.OK || c.CurrentValue == nil || *c.CurrentValue != "+63 917 555 0001" {
-		t.Errorf("original changed: %+v", c)
-	}
-	if c := checks[3]; c.OK {
-		t.Errorf("an approved request for the player is in progress: %+v", c)
-	}
-	clean := checksFor(checked{id: "r1", playerID: "p1", field: phone, from: "+639175550001", to: "+639175550777", status: sqlcgen.ContactChangeStatusPending, requestedAt: 1}, []holder{self}, nil)
-	for i, c := range clean {
-		if !c.OK {
-			t.Errorf("check %d should pass: %+v", i, c)
-		}
 	}
 }
 

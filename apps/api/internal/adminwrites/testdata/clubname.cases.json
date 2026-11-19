@@ -1,0 +1,840 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "clubs.seed.sql",
+  "scenarios": {
+    "base": [],
+    "same_name_pending": [
+      "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('e5000000-0000-4000-8000-000000000006', 'd1000000-0000-4000-8000-000000000004', 'Free Birds Collective', 'free birds collective', TIMESTAMPTZ '2026-11-18 08:00:00+00', 'pending', 'c3000000-0000-4000-8000-000000000016', TIMESTAMPTZ '2026-11-18 08:00:00+00', TIMESTAMPTZ '2026-11-18 08:00:00+00', 1)"
+    ],
+    "request_for_own_name": [
+      "UPDATE club_name_change_requests SET requested_name = 'LAHUG SMASHERS', requested_name_key = 'lahug smashers' WHERE id = 'e5000000-0000-4000-8000-000000000001'"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "clubs",
+      "sql": "SELECT id, name, name_key, license_pricing::text AS license_pricing, license_monthly_minor, license_yearly_minor, revision::text AS revision, created_at, updated_at FROM clubs ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "club_name_change_requests",
+      "sql": "SELECT id, club_id, requested_name, requested_name_key, requested_at, state::text AS state, reviewed_by_admin_id, reviewed_at, source_command_id, created_at, updated_at, revision::text AS revision FROM club_name_change_requests ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata FROM admin_audit_events ORDER BY action, target_type, source_command_id NULLS FIRST, occurred_at, metadata::text, target_id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": null,
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_club_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/zz",
+          "who": null,
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approves_a_name_change",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approves_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rejects_a_name_change",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rejects_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approves_in_upper_case_club_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/D1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approves_with_a_name_of_other_case",
+      "scenario": "request_for_own_name",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved",
+            "name": "Hacked",
+            "clubId": "d1000000-0000-4000-8000-000000000002",
+            "reviewedByAdminId": "x",
+            "state": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approval_of_a_taken_name_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000003",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000003",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rejection_of_a_taken_name_works",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000003",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000003",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approving_the_same_name_twice_in_two_clubs_conflicts",
+      "scenario": "same_name_pending",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "approved"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000006",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rejecting_one_of_two_clubs_asking_for_a_name_then_the_other_approves",
+      "scenario": "same_name_pending",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "rejected"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000006",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_missing_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_other_text_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approve"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_in_upper_case_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "APPROVED"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_cancelled_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_a_number_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_null_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_is_checked_before_the_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "decision_with_a_space_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved "
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_of_another_club_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_missing_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_empty_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_a_number_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": 5,
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_in_upper_case_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "E5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_unknown_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-0000000000ff",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_not_a_uuid_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "not-a-uuid",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_already_approved_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000004",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "request_already_rejected_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000004",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000005",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_without_requests_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000005",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approve_twice_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "approve_then_reject_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "reject_then_approve_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "rejected"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "both_clubs_in_a_row",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000002",
+            "decision": "rejected"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown_club_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-0000000000ff",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_not_hex_is_not_found",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_too_short_is_not_found",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/abc",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_of_thirty_six_dashes_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/------------------------------------",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 404,
+            "code": "not_found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_of_thirty_six_hex_digits_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "requestId": "e5000000-0000-4000-8000-000000000001",
+            "decision": "approved"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 404,
+            "code": "not_found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "club_id_with_a_not_found_check_before_the_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/zz",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[1]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_with_a_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "﻿{\"requestId\": \"e5000000-0000-4000-8000-000000000001\", \"decision\": \"approved\"}"
+        }
+      ]
+    },
+    {
+      "name": "body_empty_object_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/clubs/d1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    }
+  ]
+}

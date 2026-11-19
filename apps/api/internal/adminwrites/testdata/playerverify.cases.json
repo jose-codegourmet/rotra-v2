@@ -1,0 +1,1124 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "players.seed.sql",
+  "scenarios": {
+    "base": []
+  },
+  "snapshot": [
+    {
+      "name": "players",
+      "sql": "SELECT id, full_name, nickname, avatar_ref, avatar_previous_ref, profile_state, hide_phone_from_clubs, profile_visibility, show_profile_stats, banner_id, experience_months, experience_recorded_at, personal_details, details_version, updated_at, revision::text AS revision, verification_override, verification_override_by, verification_override_at FROM players ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "player_private_contacts",
+      "sql": "SELECT player_id, phone_e164, email, phone_verified_at, email_verified_at, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_accounts",
+      "sql": "SELECT player_id, contact_sync_status, contact_sync_version::text AS contact_sync_version, disabled_at, google_email, verification_reminder_read_at, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_social_links",
+      "sql": "SELECT player_id, provider, url, updated_at FROM player_social_links ORDER BY player_id, provider",
+      "redact": []
+    },
+    {
+      "name": "player_id_allocations",
+      "sql": "SELECT player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date::text AS sync_date, sequence FROM player_id_allocations ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_id_counters",
+      "sql": "SELECT location_code_id, sync_date::text AS sync_date, last_sequence FROM player_id_counters ORDER BY location_code_id, sync_date",
+      "redact": []
+    },
+    {
+      "name": "shared_player_entries",
+      "sql": "SELECT id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date::text AS sync_date, sequence, claimed_player_id, retired_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "club_players",
+      "sql": "SELECT id, club_id, player_id, shared_entry_id, display_name, nickname, added_at, removed_at, updated_at, revision::text AS revision, EXISTS (SELECT 1 FROM admin_audit_events a WHERE a.action = 'player.created' AND a.target_id = club_players.id::text) AS audited, EXISTS (SELECT 1 FROM club_player_private_inputs i WHERE i.club_player_id = club_players.id AND i.club_id = club_players.club_id) AS has_input FROM club_players ORDER BY club_id, display_name, added_at, id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "club_player_private_inputs",
+      "sql": "SELECT club_player_id, club_id, phone_e164, email, preset_fields, captured_at, state, resolved_player_id, resolved_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_id, phone_e164, captured_at, club_player_id",
+      "redact": [
+        "club_player_id"
+      ]
+    },
+    {
+      "name": "player_contact_change_requests",
+      "sql": "SELECT id, player_id, field, status, proposed_value, reviewed_by_admin_id, reviewed_at, rejected_at, superseded_at, resolution_note, updated_at, revision::text AS revision FROM player_contact_change_requests ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_player_email_edits",
+      "sql": "SELECT id, player_id, admin_id, original_email, proposed_email, contact_revision::text AS contact_revision, state, updated_at FROM admin_player_email_edits ORDER BY player_id, proposed_email, state, id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata - 'operationId' AS metadata, (metadata ? 'operationId') AS has_operation FROM admin_audit_events ORDER BY action, occurred_at, metadata::text, target_id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "audit_operations",
+      "sql": "SELECT count(*) AS events, count(DISTINCT metadata->>'operationId') AS operations FROM admin_audit_events WHERE metadata ? 'operationId'",
+      "redact": []
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id, player_id, kind, title, body, target, source_type, (source_id IN (SELECT id FROM admin_audit_events)) AS source_is_audit, read_at FROM player_notifications ORDER BY player_id, kind, source_type, title",
+      "redact": [
+        "id"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session_set",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": null,
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_set",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_set",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "set_verified",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_trims_the_reason",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "  spaced out \n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_with_a_long_reason",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_a_player_with_google_and_all_steps",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000010/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "2",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_then_clear",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "4",
+            "verifiedByAdmin": false,
+            "reason": "Mistake"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_twice_with_the_old_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_twice_with_the_new_revision_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "4",
+            "verifiedByAdmin": true,
+            "reason": "Again"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_verified_when_already_verified_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740993",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "clear_the_override",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740993",
+            "verifiedByAdmin": false,
+            "reason": "Rescinded"
+          }
+        }
+      ]
+    },
+    {
+      "name": "clear_when_not_overridden_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": false,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "clear_then_set_again",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740993",
+            "verifiedByAdmin": false,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740994",
+            "verifiedByAdmin": true,
+            "reason": "Back"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_without_an_account_gets_no_notification",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000007/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stale_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "2",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stale_revision_is_checked_before_the_value",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_too_big",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "99999999999999999999999",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_precision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740992",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "9007199254740993",
+            "verifiedByAdmin": false,
+            "reason": "Exact"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "0",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_negative",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "-1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_leading_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "03",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "abc",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_decimal",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3.0",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_plus",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "+3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": " 3 ",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_hex",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "0x3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "revision_is_a_number_not_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": 3,
+            "verifiedByAdmin": true,
+            "reason": "r"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": "true",
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": null,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": 1,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_object",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": {},
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verified_by_admin_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": [
+              true
+            ],
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "   "
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": 5
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "reason_is_checked_before_the_flag",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": "yes",
+            "reason": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "flag_is_checked_before_the_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "x",
+            "verifiedByAdmin": "yes",
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000099/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_unclaimed",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000004/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000005/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "2",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_not_registered_id_a_shared_entry",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/a6000000-0000-4000-8000-000000000007/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_claimed_without_an_account",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000006/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/not-a-uuid/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/players/D4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "Checked the ID in person"
+          }
+        }
+      ]
+    },
+    {
+      "name": "id_is_checked_before_the_reason",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/nope/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "1",
+            "verifiedByAdmin": true,
+            "reason": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"revision\":\"3\"} x"
+        }
+      ]
+    },
+    {
+      "name": "ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "verifiedByAdmin": true,
+            "reason": "r",
+            "playerId": "d4000000-0000-4000-8000-000000000002",
+            "verified": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "race_two_sets_with_one_revision",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "revision": "3",
+                "verifiedByAdmin": true,
+                "reason": "Checked the ID in person"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "revision": "3",
+                "verifiedByAdmin": true,
+                "reason": "Second"
+              }
+            }
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "metadata"
+        ]
+      }
+    },
+    {
+      "name": "race_two_players",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "revision": "3",
+                "verifiedByAdmin": true,
+                "reason": "Checked the ID in person"
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/players/d4000000-0000-4000-8000-000000000008/verification",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "revision": "4",
+                "verifiedByAdmin": true,
+                "reason": "Checked the ID in person"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

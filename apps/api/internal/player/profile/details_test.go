@@ -30,8 +30,12 @@ func TestParseFullName(t *testing.T) {
 	wantField(t, "blank", in, "fullName", "Enter your full name.")
 	in.FullName = strings.Repeat("a", 61)
 	wantField(t, "61", in, "fullName", "Keep your name to 60 characters or fewer.")
-	in.FullName = strings.Repeat("\U0001F3F8", 31) // 62 UTF-16 units, as zod counts them
-	wantField(t, "units", in, "fullName", "Keep your name to 60 characters or fewer.")
+	in.FullName = strings.Repeat("\U0001F3F8", 61) // zod 4 counts code points: 61 of them are too many
+	wantField(t, "code points", in, "fullName", "Keep your name to 60 characters or fewer.")
+	in.FullName = strings.Repeat("\U0001F3F8", 31) // 62 UTF-16 units but 31 code points: fine
+	if _, ferr := profile.Parse(in); ferr != nil {
+		t.Fatalf("31 emoji: %+v", ferr)
+	}
 	in.FullName = "  " + strings.Repeat("a", 60) + "\n"
 	d, ferr := profile.Parse(in)
 	if ferr != nil || d.FullName != strings.Repeat("a", 60) {

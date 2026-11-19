@@ -88,3 +88,5 @@ func LinkClubRecordsByPhone(ctx context.Context, tx pgx.Tx, playerID uuid.UUID, 
 	}
 	return linked, nil
 }
+
+func pgText(s string) pgtype.Text { return pgtype.Text{String: s, Valid: true} }

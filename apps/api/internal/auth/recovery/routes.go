@@ -24,8 +24,8 @@ const limitMessage = "Too many requests. Try again in a minute."
 
 // Routes registers the two public routes of the Player app: POST /api/auth/password-reset (P-FORGOT) and POST
 // /api/auth/reset-password (P-RESET). They are not in the proxy guard's open list, so they answer 404 without the
-// proxy secret (B-30). The Admin list and review routes are not registered here: they belong to
-// go-writes-admin-player (track 8), which calls ReadRequests and Review.
+// proxy secret (B-30). The Admin list and review routes are not registered here: signedin serves the list (ReadRequests)
+// and adminwrites the review (Review), each behind the Admin pass check.
 func (r *Recovery) Routes() func(*http.ServeMux) {
 	return func(mux *http.ServeMux) {
 		mux.Handle("POST /api/auth/password-reset", r.forPlayerApp(http.HandlerFunc(r.submitRoute)))

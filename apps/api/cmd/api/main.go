@@ -13,10 +13,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/adminwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/claim"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/recovery"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/register"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/signin"
 	authstore "github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
@@ -24,6 +26,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/playerwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
@@ -111,17 +114,36 @@ func run() error {
 			return err
 		}
 		routes = append(routes, claimRoutes)
-		// Admin-reviewed password recovery: the two public Player routes. The Admin list and review routes belong to
-		// go-writes-admin-player (track 8), which calls the same service.
+		// Guest registration through a club or session link (POST only; its page read stays in Next.js). It finishes a claim,
+		// so it takes the claim's dependencies and counts against the claim's per-address limit.
+		registerRoutes, err := register.Register(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, registerRoutes)
+		// Admin-reviewed password recovery: the two public Player routes. The Admin list (signedin) and review
+		// (adminwrites) routes call the same service.
 		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
 		if err != nil {
 			return err
 		}
 		routes = append(routes, recoveryService.Routes())
+		// The Admin app's writes (go-writes-admin-player). They go on the signed-in router: the apps share paths, and
+		// net/http registers a pattern once, so every write package adds its routes there.
+		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log, PasswordResets: recoveryService})
+		if err != nil {
+			return err
+		}
+		// The Player app's own writes: the profile, the privacy switches, notifications, clubs and the contact-change request.
+		playerWrites, err := playerwrites.Routes(playerwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		if err != nil {
+			return err
+		}
 		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
 		// they are served only where sign-in is.
 		signedInRoutes, err := signedin.Register(signedin.Deps{
-			Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log,
+			Routes: []func(*signedin.Router){adminWrites, playerWrites},
+			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
 			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins,

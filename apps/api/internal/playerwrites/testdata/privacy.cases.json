@@ -1,0 +1,826 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_accounts",
+   "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "player_private_contacts",
+   "sql": "SELECT player_id, phone_e164, email, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at FROM admin_audit_events ORDER BY id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "visibility_public",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_private",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_always_private",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "always_private",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_unchanged_with_a_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_unchanged_with_a_bad_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_bad_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "1.5"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": "private"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_unknown_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": "friends",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_upper_case_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": "PUBLIC",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_null_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": null,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_number_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": 1,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_level_empty_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": "",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "{"
+    }
+   ]
+  },
+  {
+   "name": "visibility_answers_a_player_with_google_and_a_password",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_answers_a_player_with_google_and_no_password",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000003",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_answers_a_player_with_no_contact_row",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000007",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_twice_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "9007199254740993"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": null,
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "3"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_disabled_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "body": {
+      "profileVisibility": "private",
+      "expectedRevision": "1"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "visibility_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "profileVisibility": "public",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_hide",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_show",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000003",
+     "body": {
+      "hiddenFromDirectory": false,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_unchanged_with_a_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000003",
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "7"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_bad_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "?"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_value_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": "true",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_value_number_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": 1,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_value_null_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": null,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_value_array_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "hiddenFromDirectory": [
+       true
+      ],
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_value_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "x"
+    }
+   ]
+  },
+  {
+   "name": "directory_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": null,
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "directory_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/directory-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "hiddenFromDirectory": true,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_hide",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_show_with_a_big_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": false,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_unchanged_with_a_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": true,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_unchanged_with_no_revision_at_all",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": false,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_bad_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": false,
+      "expectedRevision": "0b2x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_binary_revision_form",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": true,
+      "expectedRevision": "0b11"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_value_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": "yes",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_value_number_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": 0,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_value_null_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": null,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": ""
+    }
+   ]
+  },
+  {
+   "name": "phone_twice_in_a_row",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": true,
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "phoneHidden": false,
+      "expectedRevision": "4"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": null,
+     "body": {
+      "phoneHidden": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/phone-privacy",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "phoneHidden": false,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  }
+ ]
+}

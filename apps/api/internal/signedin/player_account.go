@@ -1,6 +1,7 @@
 package signedin
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strings"
@@ -49,8 +50,8 @@ type accountDTO struct {
 }
 
 // readMyAccount is readMyAccount. A missing player is an unexpected failure (findUniqueOrThrow), so a 500.
-func readMyAccount(r *http.Request, q *sqlcgen.Queries, who viewer) (accountDTO, error) {
-	row, err := q.GetMyAccount(r.Context(), who.ID)
+func readMyAccount(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (accountDTO, error) {
+	row, err := q.GetMyAccount(ctx, id)
 	if err != nil {
 		return accountDTO{}, err
 	}
@@ -63,7 +64,7 @@ func readMyAccount(r *http.Request, q *sqlcgen.Queries, who viewer) (accountDTO,
 	}
 	// Only an account made with Google can have no password, so the sign-in identity is asked only then.
 	if google != nil && *google != "" && row.AccountPlayerID.Valid {
-		present, err := q.IdentityHasPassword(r.Context(), row.AuthSubject)
+		present, err := q.IdentityHasPassword(ctx, row.AuthSubject)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return accountDTO{}, err
 		}
@@ -75,7 +76,7 @@ func readMyAccount(r *http.Request, q *sqlcgen.Queries, who viewer) (accountDTO,
 func (s *server) myAccount() http.Handler {
 	// Open after the Google deadline too: the connect screen (P-GOOGLE-REQUIRED) shows this account.
 	return s.player(func(r *http.Request, q *sqlcgen.Queries, who viewer) (any, error) {
-		a, err := readMyAccount(r, q, who)
+		a, err := readMyAccount(r.Context(), q, who.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -267,6 +268,15 @@ func statusLabel(status sqlcgen.ContactChangeStatus) string {
 	return string(status)
 }
 
+// toContactChangeDTO is ownRequestDto.
+func toContactChangeDTO(c sqlcgen.ListOwnContactChangesRow) contactChangeDTO {
+	return contactChangeDTO{
+		ID: c.ID.String(), PlayerID: c.PlayerID.String(), Field: string(c.Field), OriginalValue: textPtr(c.OriginalValue),
+		ProposedValue: c.ProposedValue, Status: statusLabel(c.Status), RequestedAt: httpapi.ToIso(c.RequestedAt.Time),
+		AppliedAt: isoPtr(c.AppliedAt), RejectedAt: isoPtr(c.RejectedAt), SupersededAt: isoPtr(c.SupersededAt),
+	}
+}
+
 func (s *server) myContactChange() http.Handler {
 	return s.player(func(r *http.Request, q *sqlcgen.Queries, who viewer) (any, error) {
 		rows, err := q.ListOwnContactChanges(r.Context(), who.ID)
@@ -275,12 +285,8 @@ func (s *server) myContactChange() http.Handler {
 		}
 		var latest *contactChangeDTO
 		if len(rows) > 0 {
-			c := rows[0]
-			latest = &contactChangeDTO{
-				ID: c.ID.String(), PlayerID: c.PlayerID.String(), Field: string(c.Field), OriginalValue: textPtr(c.OriginalValue),
-				ProposedValue: c.ProposedValue, Status: statusLabel(c.Status), RequestedAt: httpapi.ToIso(c.RequestedAt.Time),
-				AppliedAt: isoPtr(c.AppliedAt), RejectedAt: isoPtr(c.RejectedAt), SupersededAt: isoPtr(c.SupersededAt),
-			}
+			dto := toContactChangeDTO(rows[0])
+			latest = &dto
 		}
 		return struct {
 			Request *contactChangeDTO `json:"request"`

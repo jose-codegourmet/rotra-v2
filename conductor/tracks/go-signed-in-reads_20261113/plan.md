@@ -20,7 +20,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Switch
 
-- [ ] **4.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
+- [~] **4.1** (prefix list decided and documented; manual per-app check not run) Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
 
 ## Deviations log
 
@@ -49,3 +49,6 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 3.2 | The two sync reads make no entitlement check (TS has none); `done-review` ignores `record_games` (TS does) | Characterized | Ported as is, pinned |
 | 2026-11-19 | 3.2 | `incompleteSessionIds`, `belowMinimum` and guest candidates have no ORDER BY, as in the TS | Characterized | Production order not guaranteed |
 | 2026-11-19 | 3.2 | `normalizedName` hand-ports JS `toLocaleLowerCase` (dotted I, final sigma); captured on an en-US machine | No Go equivalent | Pinned in golden |
+| 2026-11-19 | 4.1 | Only prefixes with no write route left are listed (B-60): Queue `/api/license,/api/sync,/api/players`; Player `/api/leaderboard,/api/rtr-ids,/api/invites,/api/players`; Admin `/api/audit-events,/api/sales,/api/license-operations` | `ROTRA_GO_MOVED_AREAS` forwards every method | The rest move with go-writes-admin-player and go-writes-queue; listed in docs/architecture.md |
+| 2026-11-19 | 4.1 | No manual per-app check run; the list is documented, not applied to any deployment | The beta project gets the full list in staging-verification; the local sign-in check needs the app-side pass wiring | Done in staging-verification |
+| 2026-11-19 | 4.1 | `GET /api/sessions/{id}/finalization` not ported | Runs `driveFinalizationJobs` before reading | Owner call |

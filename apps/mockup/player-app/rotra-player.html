@@ -2077,7 +2077,7 @@ function viewClub() {
     <section class="card hero club-hero">
       <div class="who">${avatar({ name: club.name }, 'xxl')}<div style="min-width:0" class="stack tight"><h1>${esc(club.name)}</h1>
         <div class="club-meta">${chip(`${I.pin || ''}${esc(city)}`)}${chip(`${num(members.length)} member${members.length === 1 ? '' : 's'}`)}${next ? chip(next.live ? 'Playing now' : `Next ${fmtDay(next.ago)}`, next.live ? 'ok' : '') : ''}</div></div></div>
-      <div class="club-acts">${S.me && clubsOf({ id: S.me }).some((c) => c.id === id) ? `<button class="btn" data-act="openLeaveClub" data-id="${id}">Leave club</button>` : `<button class="btn primary" data-act="clubJoin" data-club="${id}">Join this club</button>`}<button class="btn" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
+      <div class="club-acts">${S.me && clubsOf({ id: S.me }).some((c) => c.id === id) ? `<button class="btn" data-act="openLeaveClub" data-id="${id}">Leave club</button>` : (S.ui.regCtx.club === id && S.ui.regCtx.invite ? `<button class="btn primary" data-act="clubJoin" data-club="${id}" data-invite="${esc(S.ui.regCtx.invite)}">Join this club</button>` : '<span class="small muted" role="note">Ask the club for an invite link to join.</span>')}<button class="btn" data-act="shareClub" data-club="${id}">${I.share} Share club page</button></div>
       ${(() => {
         // Owner comment, November 11, 2026 ("cards can be redesigned better"): icon, number, label and a one-line detail per card.
         const doneMonth = all.filter((x) => x.done && monthIdx(dayOf(x.ago)) === monthIdx(new Date())).length, toCome = thisMonth - doneMonth;

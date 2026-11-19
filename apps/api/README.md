@@ -81,7 +81,7 @@ run `make wasm` and commit the result; `make check` fails while the recorded fin
 A ported POST, PATCH or DELETE is pinned against the real TypeScript, answer for answer and row for row, with the
 write harness: `internal/writetest` (Go replay) and `testdata/tools/capture-writes-base.mjs` (capture). Shared code
 for write routes is `internal/writes` (service error, JSON body reader, `RequireRevision`, `InTx`); a write package
-such as `internal/adminwrites` registers its routes on the shared `signedin.Router` through `signedin.Deps.Routes`.
+such as `internal/adminwrites` (the Admin app) or `internal/playerwrites` (the Player's own writes: `/api/me/*`, `/api/account/contact-change`) registers its routes on the shared `signedin.Router` through `signedin.Deps.Routes`. `internal/contactwrites` is the contact-change `submit` both of them call.
 
 To add a write group (for example `PATCH /api/clubs/{clubId}`):
 

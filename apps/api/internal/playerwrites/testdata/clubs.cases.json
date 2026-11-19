@@ -1,0 +1,775 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "club_players",
+   "sql": "SELECT id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, removed_at, revision::text AS revision, created_at, updated_at FROM club_players ORDER BY club_id, player_id, id",
+   "redact": [
+    "id",
+    "created_at"
+   ]
+  },
+  {
+   "name": "clubs",
+   "sql": "SELECT id, invite_code, revision::text AS revision, updated_at FROM clubs ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at FROM admin_audit_events ORDER BY id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "join_a_new_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_copies_the_name_and_nickname",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000004",
+      "inviteCode": "NINJA2026X"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_copies_a_name_with_no_nickname",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000001",
+      "inviteCode": "SMASHSS123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_code_is_trimmed_and_upper_cased",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "  birdie2026\t"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_code_with_a_sharp_s_reads_as_two_letters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000001",
+      "inviteCode": "smashß123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_again_after_leaving_brings_the_row_back",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_again_after_leaving_smash",
+   "scenario": "dan_left_smash",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000001",
+      "inviteCode": "SMASHSS123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_club_already_in_changes_nothing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000001",
+      "inviteCode": "SMASHSS123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_twice_the_second_changes_nothing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_the_club_id_in_capitals",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "C9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_wrong_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "WRONGCODE9"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_another_clubs_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "SMASHSS123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_no_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_an_empty_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_code_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": 12345678901
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_short_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_long_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_code_with_a_dash",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE-2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_club_with_no_code",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000003",
+      "inviteCode": "ANYCODE123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_an_unknown_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000099",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_club_id_that_is_not_a_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "birdie",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_no_club_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_club_id_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": 5,
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_with_a_club_id_with_spaces",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": " c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "x"
+    }
+   ]
+  },
+  {
+   "name": "join_body_array",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "[]"
+    }
+   ]
+  },
+  {
+   "name": "join_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": null,
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_disabled_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_race_of_two_taps_makes_one_row",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/me/clubs",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "clubId": "c9000000-0000-4000-8000-000000000002",
+        "inviteCode": "BIRDIE2026"
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/me/clubs",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "clubId": "c9000000-0000-4000-8000-000000000002",
+        "inviteCode": "BIRDIE2026"
+       }
+      }
+     ]
+    }
+   ],
+   "redact": {}
+  },
+  {
+   "name": "join_race_of_two_players_into_one_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/me/clubs",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "clubId": "c9000000-0000-4000-8000-000000000002",
+        "inviteCode": "BIRDIE2026"
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/me/clubs",
+       "who": "f4000000-0000-4000-8000-000000000008",
+       "body": {
+        "clubId": "c9000000-0000-4000-8000-000000000002",
+        "inviteCode": "BIRDIE2026"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "join_a_player_with_no_rtr_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000005",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000002",
+      "inviteCode": "BIRDIE2026"
+     }
+    }
+   ]
+  },
+  {
+   "name": "leave_a_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_keeps_the_row_for_history",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "leave_twice_is_a_no_op",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_a_club_already_left",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000002",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_a_club_never_joined",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "leave_an_unknown_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000099",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "leave_with_a_club_id_that_is_not_a_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/smash",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_echoes_the_club_id_as_typed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/C9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_does_not_touch_another_players_row",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "leave_then_join_again",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/clubs",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "clubId": "c9000000-0000-4000-8000-000000000001",
+      "inviteCode": "SMASHSS123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "leave_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "leave_unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "leave_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "leave_race_of_two",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "DELETE",
+       "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+       "who": "f4000000-0000-4000-8000-000000000004"
+      },
+      {
+       "method": "DELETE",
+       "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+       "who": "f4000000-0000-4000-8000-000000000004"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

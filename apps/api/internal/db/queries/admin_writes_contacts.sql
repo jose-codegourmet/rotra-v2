@@ -12,12 +12,13 @@ SELECT * FROM player_contact_change_requests WHERE id = $1;
 -- A repeat of a command: the request it made.
 SELECT * FROM player_contact_change_requests WHERE source_command_id = $1;
 
--- name: InsertOwnerContactRequest :one
--- The owner enters a request for a player (submit, source owner): pending, revision 1, no attempts.
+-- name: InsertContactRequest :one
+-- submit: a request for a player, pending, revision 1, no attempts. The player's own (source app, no admin) or the owner's
+-- (source owner, the admin who entered it).
 INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision,
                                             requested_at, submitted_by_admin_id, source_command_id, updated_at)
-VALUES (@id, @player_id, @field::contact_change_field, 'owner', @proposed, sqlc.narg('original'), @original_revision,
-        @now, @admin_id, @command_id, @now)
+VALUES (@id, @player_id, @field::contact_change_field, @source::contact_change_source, @proposed, sqlc.narg('original'), @original_revision,
+        @now, sqlc.narg('admin_id'), @command_id, @now)
 RETURNING *;
 
 -- name: RejectContactRequest :one

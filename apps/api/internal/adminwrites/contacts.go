@@ -10,6 +10,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/contactwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
@@ -95,33 +96,6 @@ func toRequestDTO(r sqlcgen.PlayerContactChangeRequest) requestDTO {
 	}
 }
 
-// mapOpen is the TypeScript's: a unique index that refuses a request (one in flight per player, one reserved value, one
-// request per command) is "a contact change is already open"; anything else goes on.
-func mapOpen(err error) error {
-	if writes.IsUniqueViolation(err) {
-		return writes.Fail(httpapi.ErrConflict, map[string]string{"request": contactchange.MsgOpen})
-	}
-	return err
-}
-
-// collides is `collides`: the value belongs to a contact of another player.
-func collides(ctx context.Context, q *sqlcgen.Queries, playerID pgtype.UUID, field sqlcgen.ContactChangeField, value string) (bool, error) {
-	var owner pgtype.UUID
-	var err error
-	if field == sqlcgen.ContactChangeFieldPhone {
-		owner, err = q.GetContactPlayerByPhone(ctx, value)
-	} else {
-		owner, err = q.GetContactPlayerByEmail(ctx, pgtype.Text{String: value, Valid: true})
-	}
-	if errors.Is(err, pgx.ErrNoRows) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return owner != playerID, nil
-}
-
 // createContactRequest is POST /api/contact-change-requests: the owner enters a player's new email. It creates a pending
 // owner-sourced request only; the email changes after review and application, never here. Repeat-safe on `commandId`; the
 // reason goes to the audit event. The order is the TypeScript's: the JSON body; the two IDs and the field (`invalid` with no
@@ -157,55 +131,17 @@ func (s *server) createContactRequest(r *http.Request, p session.Principal) (wri
 		})
 	})
 	if err != nil {
-		return writes.Result{}, mapOpen(err)
+		return writes.Result{}, contactwrites.MapOpen(err)
 	}
 	return writes.Result{Status: http.StatusCreated, Body: struct {
 		Request requestDTO `json:"request"`
 	}{toRequestDTO(created)}}, nil
 }
 
-// submitOwnerRequest is `submit` for the owner: a repeat of the command answers the request it made (`not_found` for another
-// player's), else the value is normalized, the player's contact read, and the request created.
+// submitOwnerRequest is `submit` for the owner (the one the Player's own request shares: internal/contactwrites).
 func (s *server) submitOwnerRequest(ctx context.Context, q *sqlcgen.Queries, p session.Principal, playerID, commandID pgtype.UUID, value string) (sqlcgen.PlayerContactChangeRequest, error) {
-	repeated, err := q.GetContactRequestByCommand(ctx, commandID)
-	if err == nil {
-		if repeated.PlayerID != playerID {
-			return repeated, writes.Fail(httpapi.ErrNotFound, nil)
-		}
-		return repeated, nil
-	}
-	if !errors.Is(err, pgx.ErrNoRows) {
-		return repeated, err
-	}
-	proposed, msg := contactchange.Normalize(contactchange.FieldEmail, value)
-	if msg != "" {
-		return repeated, writes.Fail(httpapi.ErrInvalid, map[string]string{"value": msg})
-	}
-	contact, err := q.GetPrivateContactOfPlayer(ctx, playerID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return repeated, writes.Fail(httpapi.ErrNotFound, nil)
-	}
-	if err != nil {
-		return repeated, err
-	}
-	if contact.Email.Valid && contact.Email.String == proposed {
-		return repeated, writes.Fail(httpapi.ErrInvalid, map[string]string{"value": contactchange.SameWord(contactchange.FieldEmail, true)})
-	}
-	taken, err := collides(ctx, q, playerID, sqlcgen.ContactChangeFieldEmail, proposed)
-	if err != nil {
-		return repeated, err
-	}
-	if taken {
-		return repeated, writes.Fail(httpapi.ErrConflict, map[string]string{"value": contactchange.TakenWord(contactchange.FieldEmail, true)})
-	}
-	id, err := newUUID()
-	if err != nil {
-		return repeated, err
-	}
-	return q.InsertOwnerContactRequest(ctx, sqlcgen.InsertOwnerContactRequestParams{
-		ID: id, PlayerID: playerID, Field: sqlcgen.ContactChangeFieldEmail, Proposed: proposed, Original: contact.Email,
-		OriginalRevision: contact.Revision, Now: s.stamp(), AdminID: pgtype.UUID{Bytes: p.AccountID, Valid: true}, CommandID: commandID,
-	})
+	return contactwrites.Submit(ctx, q, s.stamp(), playerID, commandID, contactchange.FieldEmail, value,
+		contactwrites.Source{Owner: true, Admin: pgtype.UUID{Bytes: p.AccountID, Valid: true}})
 }
 
 // requestAnswer is `{ request }` of the four decisions: the request as it stands, read the way GET reads it.
@@ -381,7 +317,7 @@ func (s *server) reviewContact(ctx context.Context, p session.Principal, idText 
 		out = approved
 		return nil
 	})
-	return out, mapOpen(err)
+	return out, contactwrites.MapOpen(err)
 }
 
 // approveRequest is the approval of a pending request, under the request's lock: serialized with an Admin email edit, it
@@ -416,7 +352,7 @@ func (s *server) approveRequest(ctx context.Context, q *sqlcgen.Queries, p sessi
 			return request, err
 		}
 	}
-	taken, err := collides(ctx, q, request.PlayerID, request.Field, request.ProposedValue)
+	taken, err := contactwrites.Collides(ctx, q, request.PlayerID, request.Field, request.ProposedValue)
 	if err != nil {
 		return request, err
 	}

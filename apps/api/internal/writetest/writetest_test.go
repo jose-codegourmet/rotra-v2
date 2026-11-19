@@ -184,3 +184,62 @@ func TestDoAllAndSigningIn(t *testing.T) {
 		t.Error("the clock moves")
 	}
 }
+
+const playerSeed = `
+DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM players;
+DELETE FROM auth_identities WHERE audience = 'player';
+SET LOCAL session_replication_role = replica;
+INSERT INTO players (id, full_name, profile_state, updated_at) VALUES
+  ('d4000000-0000-4000-8000-000000000001', 'Ann', 'claimed', now()),
+  ('d4000000-0000-4000-8000-000000000002', 'Ben', 'claimed', now()),
+  ('d4000000-0000-4000-8000-000000000003', 'Cy', 'claimed', now());
+INSERT INTO player_private_contacts (player_id, phone_e164, email, updated_at) VALUES
+  ('d4000000-0000-4000-8000-000000000001', '+639175550001', 'ann@example.test', now()),
+  ('d4000000-0000-4000-8000-000000000002', '+639175550002', NULL, now());
+INSERT INTO player_accounts (player_id, auth_provider, auth_subject, claimed_at, contact_sync_version, updated_at) VALUES
+  ('d4000000-0000-4000-8000-000000000001', 'supabase', 'f4000000-0000-4000-8000-000000000001', now(), 1, now()),
+  ('d4000000-0000-4000-8000-000000000002', 'supabase', 'f4000000-0000-4000-8000-000000000002', now(), 1, now()),
+  ('d4000000-0000-4000-8000-000000000003', 'rotra', 'f4000000-0000-4000-8000-000000000003', now(), 1, now());
+INSERT INTO auth_identities (id, audience, login_key, password_hash, password_scheme, password_changed_at, created_at, updated_at, revision) VALUES
+  ('f4000000-0000-4000-8000-000000000003', 'player', 'cy-own-login', 'kept', 'argon2id', now(), now(), now(), 1);
+`
+
+// The accounts of a Player case file become Go sign-in identities after every load of the seed: one per account that has none,
+// the contact email (lower case) as the login or "player-<id>" without one, and the provider 'rotra'. An identity the seed
+// made keeps its login and hash.
+func TestRelinkPlayersAndPlayerPass(t *testing.T) {
+	e := writetest.NewEnv(t, time.Date(2026, 11, 19, 4, 0, 0, 0, time.UTC), probe)
+	e.Players = true
+	for i := 0; i < 2; i++ { // the second load keeps the identities
+		e.Reseed(t, playerSeed, nil)
+		rows, err := e.Pool.Query(e.Ctx, `SELECT login_key || ' ' || password_hash FROM auth_identities WHERE audience = 'player' ORDER BY id`)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got []string
+		for rows.Next() {
+			var s string
+			if err := rows.Scan(&s); err != nil {
+				t.Fatal(err)
+			}
+			got = append(got, s)
+		}
+		rows.Close()
+		want := []string{"ann@example.test fake-hash-for-tests", "player-d4000000-0000-4000-8000-000000000002 fake-hash-for-tests", "cy-own-login kept"}
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("identities %q, want %q", got, want)
+		}
+		var providers int
+		if err := e.Pool.QueryRow(e.Ctx, `SELECT count(*) FROM player_accounts WHERE auth_provider = 'rotra'`).Scan(&providers); err != nil || providers != 3 {
+			t.Fatalf("%d accounts are linked to the Go sign-in: %v", providers, err)
+		}
+	}
+	for _, subject := range []string{"f4000000-0000-4000-8000-000000000001", "f4000000-0000-4000-8000-000000000003"} {
+		if e.PlayerPass(t, subject) == "" {
+			t.Errorf("%s gets no pass", subject)
+		}
+	}
+	if e.PlayerPass(t, "f4000000-0000-4000-8000-0000000000ff") != "" {
+		t.Error("a subject with no identity has no pass")
+	}
+}

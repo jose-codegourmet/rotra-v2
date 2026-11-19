@@ -258,18 +258,19 @@ func (q *Queries) GetContactRequestByCommand(ctx context.Context, sourceCommandI
 	return i, err
 }
 
-const insertOwnerContactRequest = `-- name: InsertOwnerContactRequest :one
+const insertContactRequest = `-- name: InsertContactRequest :one
 INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision,
                                             requested_at, submitted_by_admin_id, source_command_id, updated_at)
-VALUES ($1, $2, $3::contact_change_field, 'owner', $4, $5, $6,
-        $7, $8, $9, $7)
+VALUES ($1, $2, $3::contact_change_field, $4::contact_change_source, $5, $6, $7,
+        $8, $9, $10, $8)
 RETURNING id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, submitted_by_admin_id, source_command_id, reviewed_by_admin_id, reviewed_at, approved_at, rejected_at, provider_operation_ref, application_attempts, last_attempt_at, provider_applied_at, applied_at, failure_code, resolution_note, created_at, updated_at, revision, superseded_at
 `
 
-type InsertOwnerContactRequestParams struct {
+type InsertContactRequestParams struct {
 	ID               pgtype.UUID
 	PlayerID         pgtype.UUID
 	Field            ContactChangeField
+	Source           ContactChangeSource
 	Proposed         string
 	Original         pgtype.Text
 	OriginalRevision int64
@@ -278,12 +279,14 @@ type InsertOwnerContactRequestParams struct {
 	CommandID        pgtype.UUID
 }
 
-// The owner enters a request for a player (submit, source owner): pending, revision 1, no attempts.
-func (q *Queries) InsertOwnerContactRequest(ctx context.Context, arg InsertOwnerContactRequestParams) (PlayerContactChangeRequest, error) {
-	row := q.db.QueryRow(ctx, insertOwnerContactRequest,
+// submit: a request for a player, pending, revision 1, no attempts. The player's own (source app, no admin) or the owner's
+// (source owner, the admin who entered it).
+func (q *Queries) InsertContactRequest(ctx context.Context, arg InsertContactRequestParams) (PlayerContactChangeRequest, error) {
+	row := q.db.QueryRow(ctx, insertContactRequest,
 		arg.ID,
 		arg.PlayerID,
 		arg.Field,
+		arg.Source,
 		arg.Proposed,
 		arg.Original,
 		arg.OriginalRevision,

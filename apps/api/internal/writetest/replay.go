@@ -32,6 +32,7 @@ func Replay(t *testing.T, dir, name string, build Build) {
 	}
 	seed := ReadSeed(t, dir, cf.Seed)
 	e := NewEnv(t, cf.Now, build)
+	e.Players = cf.App == "player"
 	for _, c := range cf.Cases {
 		t.Run(c.Name, func(t *testing.T) {
 			want, ok := golden[c.Name]
@@ -70,7 +71,11 @@ type answer struct {
 func (e *Env) request(t *testing.T, app string, s Step) Request {
 	r := Request{Method: s.Method, Path: s.Path, App: app}
 	if s.Who != nil {
-		r.Bearer = e.AdminPass(t, *s.Who)
+		if app == "player" {
+			r.Bearer = e.PlayerPass(t, *s.Who)
+		} else {
+			r.Bearer = e.AdminPass(t, *s.Who)
+		}
 	}
 	switch {
 	case s.RawBody != nil:

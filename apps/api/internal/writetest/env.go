@@ -62,7 +62,13 @@ type Env struct {
 	Handler http.Handler
 
 	adminIdentities bool
+	// Players makes Reseed relink the player accounts too (Replay sets it for the Player app's case files; an Admin
+	// seed keeps its accounts as they are).
+	Players bool
 }
+
+// appHosts are the dev hosts of the apps, as the browser sends them in the Host header.
+var appHosts = map[string]string{"club": "localhost:9000", "player": "localhost:9001", "admin": "localhost:9002"}
 
 // NewEnv makes a migrated database, a sign-in service and the routes build registers.
 func NewEnv(t *testing.T, now time.Time, build Build) *Env {
@@ -174,6 +180,62 @@ func (e *Env) RelinkAdmins(t testing.TB) {
 	}
 }
 
+// RelinkPlayers turns the capture's player accounts into Go sign-in identities. An account whose subject already
+// has an identity (a seed may insert them) keeps it; any other gets one with the account's subject as its ID, its
+// contact email as the login (or "player-<id>" when it has none) and a password. It also sets the provider to 'rotra',
+// the one the Go sign-in knows. Run it after every load of the seed, which may put the provider back.
+func (e *Env) RelinkPlayers(t testing.TB) {
+	t.Helper()
+	e.Setup(t, []string{`UPDATE player_accounts SET auth_provider = 'rotra'`})
+	rows, err := e.Pool.Query(e.Ctx, `SELECT a.auth_subject, COALESCE(lower(c.email), 'player-' || a.player_id::text)
+		FROM player_accounts a LEFT JOIN player_private_contacts c ON c.player_id = a.player_id
+		WHERE NOT EXISTS (SELECT 1 FROM auth_identities i WHERE i.id = a.auth_subject) ORDER BY a.player_id`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	type acc struct {
+		subject uuid.UUID
+		login   string
+	}
+	var accs []acc
+	for rows.Next() {
+		var a acc
+		if err := rows.Scan(&a.subject, &a.login); err != nil {
+			t.Fatal(err)
+		}
+		accs = append(accs, a)
+	}
+	rows.Close()
+	for _, a := range accs {
+		if _, err := e.Store.InsertIdentity(e.Ctx, store.NewIdentity{
+			ID: a.subject, Audience: store.AudiencePlayer, LoginKey: a.login, PasswordHash: "fake-hash-for-tests",
+			PasswordScheme: store.SchemeArgon2id, Now: e.Clock.Now(),
+		}); err != nil {
+			t.Fatalf("insert player identity: %v", err)
+		}
+	}
+}
+
+// PlayerPass signs the player behind a subject in at the current fake time and returns the access pass. A subject with
+// no identity gets no pass (the request goes out signed out).
+func (e *Env) PlayerPass(t testing.TB, subject string) string {
+	t.Helper()
+	id := uuid.MustParse(subject)
+	ident, err := e.Store.GetIdentityByID(e.Ctx, id)
+	if err != nil {
+		return "" // no identity behind the subject: nothing to sign in with, the request is signed out
+	}
+	var player uuid.UUID
+	if err := e.Pool.QueryRow(e.Ctx, `SELECT player_id FROM player_accounts WHERE auth_subject = $1`, id).Scan(&player); err != nil {
+		t.Fatalf("player of %s: %v", subject, err)
+	}
+	iss, err := e.Service.Issue(e.Ctx, session.IssueInput{Identity: ident, AccountID: player, DeviceLabel: "Chrome on Android"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return iss.AccessPass
+}
+
 // AdminPass signs the admin behind a subject in at the current fake time and returns the access pass. A subject
 // with no identity gets no pass (the request goes out signed out).
 func (e *Env) AdminPass(t testing.TB, subject string) string {
@@ -207,7 +269,10 @@ type Request struct {
 // Do sends the request through the proxy guard and returns what was answered.
 func (e *Env) Do(r Request) *httptest.ResponseRecorder {
 	hr := httptest.NewRequest(r.Method, r.Path, strings.NewReader(r.Body))
-	hr.Host = "localhost:9002"
+	hr.Host = appHosts[r.App]
+	if hr.Host == "" {
+		hr.Host = appHosts["admin"]
+	}
 	if !r.NoSecret {
 		hr.Header.Set(httpapi.ProxySecretHeader, ProxySecret)
 	}
@@ -245,11 +310,14 @@ func (e *Env) DoAll(reqs []Request) []*httptest.ResponseRecorder {
 }
 
 // Reseed puts the database back to the seed: the seed SQL (which deletes what it inserts), the Go sign-in identities
-// of its admins, then the scenario's statements. Replay does it before every case; a test of its own does the same.
+// of its admins and players, then the scenario's statements. Replay does it before every case; a test of its own does the same.
 func (e *Env) Reseed(t testing.TB, seed string, scenario []string) {
 	t.Helper()
 	e.Exec(t, seed)
 	e.RelinkAdmins(t)
+	if e.Players {
+		e.RelinkPlayers(t)
+	}
 	e.Setup(t, scenario)
 }
 

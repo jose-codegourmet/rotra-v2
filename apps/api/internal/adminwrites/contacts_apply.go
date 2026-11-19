@@ -11,6 +11,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/contactwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/contactchange"
@@ -244,7 +245,7 @@ func (s *server) reconcile(ctx context.Context, p session.Principal, id pgtype.U
 			return nil
 		}
 		// The provider may already hold the value: fail (retryable), never leave it applying.
-		if taken, err := collides(ctx, q, current.PlayerID, current.Field, current.ProposedValue); err != nil {
+		if taken, err := contactwrites.Collides(ctx, q, current.PlayerID, current.Field, current.ProposedValue); err != nil {
 			return err
 		} else if taken {
 			collided = true

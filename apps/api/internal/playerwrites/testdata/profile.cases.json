@@ -1,0 +1,2727 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_social_links",
+   "sql": "SELECT player_id, provider, url, id, created_at, updated_at FROM player_social_links ORDER BY player_id, provider",
+   "redact": [
+    "id",
+    "created_at"
+   ]
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_accounts",
+   "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "club_players",
+   "sql": "SELECT id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, removed_at, revision::text AS revision, created_at, updated_at FROM club_players ORDER BY club_id, player_id, id",
+   "redact": [
+    "id",
+    "created_at"
+   ]
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at FROM admin_audit_events ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_private_contacts",
+   "sql": "SELECT player_id, phone_e164, email, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "profile_save_all_fields",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "  Alice R. Reyes ",
+      "nickname": " Ace ",
+      "playingStyle": " Smash and drive ",
+      "experienceYears": 4,
+      "experienceMonths": 2,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice.r",
+       "instagram": " https://instagram.com/alice ",
+       "youtube": "",
+       "linkedin": "https://linkedin.com/in/alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_unchanged_experience_keeps_its_date",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_changed_is_recorded_now",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 1,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_cleared",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_years_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 2,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_months_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": null,
+      "experienceMonths": 7,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_missing_keys",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_whole_float",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 2.0,
+      "experienceMonths": 3.0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_recorded_from_nothing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740993",
+      "fullName": "Bob Santos",
+      "playingStyle": "",
+      "experienceYears": 1,
+      "experienceMonths": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_fraction_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 1.5,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_negative_years_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": -1,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_negative_months_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 0,
+      "experienceMonths": -1,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_twelve_months_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 0,
+      "experienceMonths": 12,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_years_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": "3",
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_months_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 0,
+      "experienceMonths": "3",
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_years_bool_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": true,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_years_array_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": [
+       3
+      ],
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_years_object_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": {},
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_beyond_the_column",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 300000000,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_at_the_largest_stored_value",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 178956970,
+      "experienceMonths": 7,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_one_month_beyond_the_largest",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 178956970,
+      "experienceMonths": 8,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_very_large_years_is_not_a_crash_for_the_form",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 1e+308,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_name_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_blank",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "   \t\n",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_no_break_space_is_blank",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "  ",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": 7,
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_trims_like_javascript",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": " ﻿Ana Reyes ",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_200_characters_is_saved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_name_with_a_nul_character",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Al\u0000ice",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_style_with_a_nul_character",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "a\u0000b",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_nickname_blank_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "   ",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_nickname_empty_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_nickname_null_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": null,
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_nickname_not_text_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": 5,
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_style_not_text_is_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": null,
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_all_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_missing_means_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_null_means_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_text_means_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": "https://facebook.com/x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_array_means_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": [
+       "https://facebook.com/x"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_values_not_text_mean_removed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": 5,
+       "youtube": null,
+       "instagram": [
+        "x"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_any_https_host_is_kept",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://example.com/not-facebook",
+       "linkedin": "https://x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_links_unknown_provider_is_ignored",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "tiktok": "https://tiktok.com/x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_link_http_is_refused_by_the_table",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "http://facebook.com/alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_link_upper_scheme_is_refused_by_the_table",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "HTTPS://facebook.com/alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_link_no_scheme_is_refused_by_the_table",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "facebook.com/alice"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_link_javascript_is_refused_by_the_table",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "javascript:alert(1)"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_link_with_a_nul_character",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://x\u0000y"
+      }
+     },
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "profile_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "2",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_stale_revision_changes_nothing_at_all",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "4",
+      "fullName": "Changed",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_not_a_number",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "abc",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_with_a_fraction",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3.5",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_as_number_is_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": 3,
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_hex_form",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "0x3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_with_spaces",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": " 3 ",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_plus_sign",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "+3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_beyond_a_double_is_exact",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740993",
+      "fullName": "Bob S.",
+      "playingStyle": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_revision_just_below_a_double_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740992",
+      "fullName": "Bob S.",
+      "playingStyle": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "not json"
+    }
+   ]
+  },
+  {
+   "name": "profile_body_empty_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": ""
+    }
+   ]
+  },
+  {
+   "name": "profile_body_array",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "[]"
+    }
+   ]
+  },
+  {
+   "name": "profile_body_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "null"
+    }
+   ]
+  },
+  {
+   "name": "profile_body_string",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "\"x\""
+    }
+   ]
+  },
+  {
+   "name": "profile_body_trailing_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "{\"fullName\":\"A\"} x"
+    }
+   ]
+  },
+  {
+   "name": "profile_body_with_a_byte_order_mark",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "﻿{\"expectedRevision\": \"3\", \"fullName\": \"Marked\", \"nickname\": \"Ace\", \"playingStyle\": \"Aggressive net player\", \"experienceYears\": 3, \"experienceMonths\": 0, \"socialLinks\": {\"facebook\": \"https://facebook.com/alice\", \"youtube\": \"https://youtube.com/@alice\"}}"
+    }
+   ]
+  },
+  {
+   "name": "profile_unknown_fields_are_ignored",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      },
+      "role": "admin",
+      "playerId": "d4000000-0000-4000-8000-000000000002",
+      "revision": 99
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_contacts_are_never_accepted",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      },
+      "email": "x@example.test",
+      "phone": "+639175550099"
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_keeps_the_picture",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      },
+      "picture": "https://example.test/other.png",
+      "avatarRef": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_answers_the_admin_change_note",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_of_a_player_with_no_rtr_id_answers_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000005",
+     "body": {
+      "expectedRevision": "2",
+      "fullName": "Eve Changed",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_of_a_player_with_an_rtr_id_is_a_card",
+   "scenario": "eve_with_id",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000005",
+     "body": {
+      "expectedRevision": "2",
+      "fullName": "Eve Changed",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_experience_not_decreasing_below_the_shown_value",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 2,
+      "experienceMonths": 11,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_twice_in_a_row_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "First",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Second",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_twice_with_the_new_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "First",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "4",
+      "fullName": "Second",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_race_of_two_saves",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "PATCH",
+       "path": "/api/me/profile",
+       "who": "f4000000-0000-4000-8000-000000000001",
+       "body": {
+        "expectedRevision": "3",
+        "fullName": "One",
+        "nickname": "Ace",
+        "playingStyle": "Aggressive net player",
+        "experienceYears": 3,
+        "experienceMonths": 0,
+        "socialLinks": {
+         "facebook": "https://facebook.com/alice",
+         "youtube": "https://youtube.com/@alice"
+        }
+       }
+      },
+      {
+       "method": "PATCH",
+       "path": "/api/me/profile",
+       "who": "f4000000-0000-4000-8000-000000000001",
+       "body": {
+        "expectedRevision": "3",
+        "fullName": "Two",
+        "nickname": "Ace",
+        "playingStyle": "Aggressive net player",
+        "experienceYears": 3,
+        "experienceMonths": 0,
+        "socialLinks": {
+         "facebook": "https://facebook.com/alice",
+         "youtube": "https://youtube.com/@alice"
+        }
+       }
+      }
+     ],
+     "redact": [
+      "profile.fullName"
+     ]
+    }
+   ],
+   "redact": {
+    "players": [
+     "full_name"
+    ]
+   }
+  },
+  {
+   "name": "profile_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": null,
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_disabled_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_google_gate_refuses_a_player_without_google",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740993",
+      "fullName": "Bob",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_google_gate_lets_a_player_with_google_in",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3",
+      "fullName": "Alice Reyes",
+      "nickname": "Ace",
+      "playingStyle": "Aggressive net player",
+      "experienceYears": 3,
+      "experienceMonths": 0,
+      "socialLinks": {
+       "facebook": "https://facebook.com/alice",
+       "youtube": "https://youtube.com/@alice"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_google_gate_is_open_while_the_flag_is_off",
+   "scenario": "base",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740993",
+      "fullName": "Bob",
+      "playingStyle": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_google_gate_is_open_before_the_deadline",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "9007199254740993",
+      "fullName": "Bob",
+      "playingStyle": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "profile_google_gate_runs_before_the_body",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/me/profile",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "not json"
+    }
+   ]
+  },
+  {
+   "name": "banner_pick_a_shown_banner",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_pick_by_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "b1000000-0000-4000-8000-000000000001",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_pick_when_the_player_has_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "bannerId": "court",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_the_same_one_with_a_stale_revision_is_fine",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "court",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_the_same_one_with_a_bad_revision_is_fine",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "court",
+      "expectedRevision": "abc"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_the_same_hidden_one_is_kept",
+   "scenario": "alice_hidden_banner",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "ember",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_hidden_one_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "ember",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_deleted_one_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "stripe",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_hidden_uuid_one_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "b1000000-0000-4000-8000-000000000002",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_unknown_one_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "nope",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_upper_case_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "NIGHT",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_long_word_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "aaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_with_a_newline_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night\n",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_upper_case_uuid_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "B1000000-0000-4000-8000-000000000001",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_empty_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_not_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": 5,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_stale_revision_beats_a_hidden_banner",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "ember",
+      "expectedRevision": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_revision_not_a_number",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "banner_twice_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "bannerId": "court",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_race_of_two_picks",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/me/profile-banner",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "bannerId": "night",
+        "expectedRevision": "9007199254740993"
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/me/profile-banner",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "bannerId": "court",
+        "expectedRevision": "9007199254740993"
+       }
+      }
+     ],
+     "redact": [
+      "profile.bannerId",
+      "profile.bannerKey"
+     ]
+    }
+   ],
+   "redact": {
+    "players": [
+     "banner_id"
+    ]
+   }
+  },
+  {
+   "name": "banner_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": null,
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "banner_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/profile-banner",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "bannerId": "night",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_turn_both_off",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "showProfileStats": false,
+      "showWeeklyPerformance": false,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_turn_one_on",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_weekly_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showWeeklyPerformance": false,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_nothing_changes_with_a_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": false,
+      "showWeeklyPerformance": true,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_nothing_changes_with_a_bad_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": false,
+      "expectedRevision": "bad"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_one_changes_one_does_not",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": false,
+      "showWeeklyPerformance": false,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_none_given_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_null_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": null,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": "true",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_number_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showWeeklyPerformance": 1,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_one_good_one_bad_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true,
+      "showWeeklyPerformance": "no",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true,
+      "expectedRevision": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_revision_not_a_number",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true,
+      "expectedRevision": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "[1]"
+    }
+   ]
+  },
+  {
+   "name": "stats_twice_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showProfileStats": true,
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "showWeeklyPerformance": false,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": null,
+     "body": {
+      "showProfileStats": true,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "stats_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/stats-visibility",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "showProfileStats": false,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  }
+ ]
+}

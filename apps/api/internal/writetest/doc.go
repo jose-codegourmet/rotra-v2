@@ -26,6 +26,10 @@
 //     set "goExpects" on the step with the status and error code, add "allow500" if the capture must record the
 //     crash, and write the reason in the plan's deviations log. The rows left behind are still compared.
 //
+// The app of a case file is admin or player. A Player file signs the players of its seed in (Env.RelinkPlayers makes a Go
+// sign-in identity for each account that has none, and Replay signs a step's "who", the account's auth subject, in with
+// Env.PlayerPass); an Admin file keeps its player accounts as the seed made them.
+//
 // What the snapshot holds: the SQL of each snapshot spec runs on both sides with the time zone set to UTC, so write
 // a unique ORDER BY and cast a bigint to text (a JSON number loses the digits above 2^53). The usual specs are the
 // tables the write touches, the audit events and the player notifications; a write that must not touch a table

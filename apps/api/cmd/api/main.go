@@ -25,6 +25,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/playerwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
@@ -125,10 +126,15 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		// The Player app's own writes: the profile, the privacy switches, notifications, clubs and the contact-change request.
+		playerWrites, err := playerwrites.Routes(playerwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		if err != nil {
+			return err
+		}
 		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
 		// they are served only where sign-in is.
 		signedInRoutes, err := signedin.Register(signedin.Deps{
-			Routes: []func(*signedin.Router){adminWrites},
+			Routes: []func(*signedin.Router){adminWrites, playerWrites},
 			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).

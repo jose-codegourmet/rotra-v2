@@ -1,0 +1,1230 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "player_contact_change_requests",
+   "sql": "SELECT id, player_id, field, source, status, proposed_value, original_value, original_contact_revision::text AS original_contact_revision, requested_at, submitted_by_admin_id, source_command_id, application_attempts, created_at, updated_at, revision::text AS revision FROM player_contact_change_requests ORDER BY source_command_id",
+   "redact": [
+    "id",
+    "created_at"
+   ]
+  },
+  {
+   "name": "player_private_contacts",
+   "sql": "SELECT player_id, phone_e164, email, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "player_logins",
+   "sql": "SELECT id, login_key, revision::text AS revision FROM auth_identities WHERE audience = 'player' ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at FROM admin_audit_events ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_accounts",
+   "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "email_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000001",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phone_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000002",
+      "field": "phone",
+      "value": "+639175550099"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "email_is_trimmed_and_lower_cased",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000003",
+      "field": "email",
+      "value": "  Bob.New@Example.TEST \t"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phone_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000004",
+      "field": "phone",
+      "value": " +639175550099 "
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phone_in_a_display_form_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000005",
+      "field": "phone",
+      "value": "0917 555 0142"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_without_the_plus_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000006",
+      "field": "phone",
+      "value": "639175550142"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_too_short_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000007",
+      "field": "phone",
+      "value": "+1234567"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_eight_digits_is_valid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000008",
+      "field": "phone",
+      "value": "+12345678"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phone_fifteen_digits_is_valid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000009",
+      "field": "phone",
+      "value": "+123456789012345"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "phone_sixteen_digits_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000010",
+      "field": "phone",
+      "value": "+1234567890123456"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_starting_with_zero_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000011",
+      "field": "phone",
+      "value": "+0123456789"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_with_a_letter_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000012",
+      "field": "phone",
+      "value": "+63917555O142"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_with_a_trailing_newline_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000013",
+      "field": "phone",
+      "value": "+639175550099\n"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "email_without_an_at_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000014",
+      "field": "email",
+      "value": "bob.example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_with_two_ats_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000015",
+      "field": "email",
+      "value": "a@b@c.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_with_a_space_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000016",
+      "field": "email",
+      "value": "bob new@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_with_a_no_break_space_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000017",
+      "field": "email",
+      "value": "bob new@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_at_the_start_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000018",
+      "field": "email",
+      "value": "@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_at_the_end_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000019",
+      "field": "email",
+      "value": "bob@"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_empty_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000020",
+      "field": "email",
+      "value": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_not_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000021",
+      "field": "email",
+      "value": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000022",
+      "field": "email"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_with_a_dotless_domain_is_valid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000023",
+      "field": "email",
+      "value": "bob@localhost"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "email_with_unicode_is_lower_cased_like_javascript",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000024",
+      "field": "email",
+      "value": "İSTANBUL@Example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "email_the_same_as_now_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000025",
+      "field": "email",
+      "value": "bob@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_the_same_as_now_in_capitals_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000026",
+      "field": "email",
+      "value": "BOB@EXAMPLE.TEST"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_the_same_as_now_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000027",
+      "field": "phone",
+      "value": "+639175550002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_of_another_player_is_a_conflict",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000028",
+      "field": "email",
+      "value": "dan@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "email_of_another_player_in_capitals_is_a_conflict",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000029",
+      "field": "email",
+      "value": "DAN@Example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "phone_of_another_player_is_a_conflict",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000030",
+      "field": "phone",
+      "value": "+639175550004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a_player_with_no_contact_row_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000007",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000032",
+      "field": "email",
+      "value": "gus@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "field_other_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000033",
+      "field": "name",
+      "value": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "field_upper_case_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000034",
+      "field": "EMAIL",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "field_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000035",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "command_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "command_not_a_uuid_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "not-a-uuid",
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "command_in_capitals_is_fine",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "C5000000-0000-4000-8000-000000000036",
+      "field": "email",
+      "value": "x@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "command_with_braces_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "{c5000000-0000-4000-8000-000000000037}",
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "command_without_hyphens_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000000040008000000000000038",
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "command_not_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": 5,
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "x"
+    }
+   ]
+  },
+  {
+   "name": "body_array",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "rawBody": "[]"
+    }
+   ]
+  },
+  {
+   "name": "body_unknown_fields_are_ignored",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000039",
+      "field": "email",
+      "value": "x@example.test",
+      "playerId": "d4000000-0000-4000-8000-000000000004",
+      "status": "applied"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_repeat_of_the_command_answers_the_same_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000040",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000040",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_repeat_with_another_value_still_answers_the_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000041",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000041",
+      "field": "email",
+      "value": "other@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_repeat_with_another_field_still_answers_the_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000042",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000042",
+      "field": "phone",
+      "value": "+639175550099"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_repeat_with_a_value_that_would_be_invalid_answers_the_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000043",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000043",
+      "field": "email",
+      "value": "nope"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_repeat_in_capitals_is_a_new_command_in_postgres_but_the_same_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000044",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "C5000000-0000-4000-8000-000000000044",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the_command_of_another_player_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000004",
+     "body": {
+      "commandId": "c2000000-0000-4000-8000-000000000001",
+      "field": "email",
+      "value": "dan.new@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "the_command_of_a_decided_request_answers_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "c2000000-0000-4000-8000-000000000003",
+      "field": "phone",
+      "value": "+639175550077"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a_second_request_while_one_is_open_is_a_conflict",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000045",
+      "field": "email",
+      "value": "bob.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000046",
+      "field": "phone",
+      "value": "+639175550099"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a_player_with_a_pending_request_cannot_open_another",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000003",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000047",
+      "field": "phone",
+      "value": "+639175550099"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a_player_with_a_decided_request_may_open_one",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000048",
+      "field": "email",
+      "value": "alice.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the_value_another_player_has_pending_is_not_reserved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000049",
+      "field": "email",
+      "value": "hal.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the_value_the_player_proposed_before_is_a_conflict_while_it_is_open",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000003",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000050",
+      "field": "email",
+      "value": "carla@gmail.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "an_invalid_value_is_checked_before_the_player_is_looked_up",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000007",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000051",
+      "field": "email",
+      "value": "nope"
+     }
+    }
+   ]
+  },
+  {
+   "name": "signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": null,
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000052",
+      "field": "email",
+      "value": "x@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "unknown_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000099",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000053",
+      "field": "email",
+      "value": "x@example.test"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "disabled_account",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000054",
+      "field": "email",
+      "value": "fay.new@example.test"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000055",
+      "field": "email",
+      "value": "bob.new@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "google_gate_lets_google_in",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/account/contact-change",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "c5000000-0000-4000-8000-000000000056",
+      "field": "email",
+      "value": "alice.new@example.test"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "race_of_two_different_commands_for_one_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/account/contact-change",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "commandId": "c5000000-0000-4000-8000-000000000058",
+        "field": "email",
+        "value": "bob.one@example.test"
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/account/contact-change",
+       "who": "f4000000-0000-4000-8000-000000000002",
+       "body": {
+        "commandId": "c5000000-0000-4000-8000-000000000059",
+        "field": "phone",
+        "value": "+639175550099"
+       }
+      }
+     ],
+     "redact": [
+      "request.id",
+      "request.field",
+      "request.proposedValue",
+      "request.originalValue"
+     ]
+    }
+   ],
+   "redact": {
+    "player_contact_change_requests": [
+     "source_command_id",
+     "proposed_value",
+     "field",
+     "original_value"
+    ]
+   }
+  }
+ ]
+}

@@ -15,7 +15,7 @@ func TestReadClubInviteCodeNormalizesLikeTheTypeScript(t *testing.T) {
 			t.Errorf("%q: got %q %v, want %q", in, got, ok, want)
 		}
 	}
-	for _, bad := range []string{"", "ABC", "ABCDEFGH1234567890", "abcd-1234", "abcd 1234", "abéd1234"} {
+	for _, bad := range []string{"", "ABC", "ABCDEFGH1234567890", "abcd-1234", "abcd 1234", "abéd1234", "ABCD-EFGH"} {
 		if _, ok := readClubInviteCode(bad); ok {
 			t.Errorf("%q must not look like a code", bad)
 		}

@@ -590,14 +590,15 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // The published rows carry no viewer flag in real mode (the public copy is cacheable, D-2026-11-09-09);
   // the signed-in read's participants do, and each row points at its participant, so your row is
   // marked here: the leaderboard highlights it and shows Your position.
-  const standings = finished && !unrecorded
-    ? p.results?.standings?.map((row) => ({
-        ...row,
-        isViewer:
-          row.isViewer ??
-          (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
-      }))
-    : undefined
+  const standings =
+    finished && !unrecorded
+      ? p.results?.standings?.map((row) => ({
+          ...row,
+          isViewer:
+            row.isViewer ??
+            (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
+        }))
+      : undefined
   const activeTab =
     tab === 'auto' || (tab === 'leaderboard' && !standings)
       ? standings

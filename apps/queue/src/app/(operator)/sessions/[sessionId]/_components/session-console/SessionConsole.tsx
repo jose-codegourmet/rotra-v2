@@ -21,8 +21,8 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
-import { Notice } from '@rotra/ui/notice'
 import { NotRecordedChip } from '@rotra/ui/not-recorded-chip'
+import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
 import { PageHeader } from '@rotra/ui/page-header'
@@ -403,9 +403,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           )}
         </TabsContent>
         <TabsContent value="players">{panel('players')}</TabsContent>
-        {unrecorded ? null : (
-          <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
-        )}
+        {unrecorded ? null : <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>}
         <TabsContent value="payments">
           <PaymentsPanel sessionId={sessionId} />
         </TabsContent>

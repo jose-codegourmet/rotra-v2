@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 63 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 64 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -391,6 +391,7 @@ NEW: 63 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | NEW |
 | [2026-11-19-player-invite-onboarding](2026-11-19-player-invite-onboarding.md) | Player app: fullscreen onboarding after an invite link, with play style, shots and favorite player | onboarding frame (header with progress, fixed footer), court-position cards, shot chips, favorite-player chips | NEW |
 | [2026-11-19-player-mobile-dock](2026-11-19-player-mobile-dock.md) | Player app: bottom dock for the main navigation on phones | top bar, mobile dock (new) | NEW |
+| [2026-11-19-player-shots-others](2026-11-19-player-shots-others.md) | Player app: shots step gets a graphic and Others (players add their own shots) | step banner, shot chips with Others | NEW |
 | [2026-11-19-queue-bagging-exempt-rings](2026-11-19-queue-bagging-exempt-rings.md) | Queue app: Bagging pairs and exemption chips show the level ring | picture with level ring (shared helper) | NEW |
 | [2026-11-19-queue-bigger-court-buttons](2026-11-19-queue-bigger-court-buttons.md) | Queue app: bigger court buttons in Put on court and Move match | court pick tile (new) | NEW |
 | [2026-11-19-queue-card-characters](2026-11-19-queue-card-characters.md) | Queue app: Rion and Tara drawn into the Mode and Scoring card art | art card (Mode and Scoring choices) | NEW |

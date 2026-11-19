@@ -1497,6 +1497,15 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 /* Request a match as a court: the viewer on the left with the Partner spot, opponent spots on the right. Empty spots are dashed “+” faces. */
 .mr-pitch { aspect-ratio: 134 / 72; }
 .mr-pitch.big { aspect-ratio: 134 / 96; }
+/* Owner, November 19, 2026: the request formats read as tick boxes, not a segmented switch. */
+.fmt-ticks { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.fmt-tick { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); background: var(--bg); color: var(--fg2); cursor: pointer; font: inherit; text-align: left; transition: border-color .15s, background .15s, color .15s; }
+.fmt-tick:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong)); }
+.fmt-tick b { font-size: 15px; font-weight: 700; }
+.fmt-tick .ft-box { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--fg3); background: transparent; }
+.fmt-tick .ft-box svg { width: 13px; height: 13px; }
+.fmt-tick[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--bg)); color: var(--fg); }
+.fmt-tick[aria-checked="true"] .ft-box { border-color: var(--accent); background: var(--accent); color: #0b0b0c; }
 .seg.mr-fmts button { min-width: 56px; padding: 0 10px; font-variant-numeric: tabular-nums; }
 .seg.mr-fmts button:disabled { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
 .mr-pitch .side { gap: 6px 10px; }
@@ -4090,8 +4099,8 @@ function viewSetup() {
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
       ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Generate matches has nothing to make. Only manual fun games would be possible.') : ''}
-      <div class="field"><span>Players can request</span><div class="seg mr-fmts" role="group" aria-label="Formats players can request">${REQ_FORMATS.map((k) => `<button aria-pressed="${!!(d.reqFormats || {})[k]}" data-act="toggleReqFormat" data-k="${k}">${REQ_LABEL[k]}</button>`).join('')}</div>
-      <span class="hint">Which kinds of games a signed-in player can ask for with Request a match. Greyed pills on their side are the ones you leave off here.${REQ_FORMATS.every((k) => !(d.reqFormats || {})[k]) ? ' With none on, players can\'t send match requests.' : ''}</span></div>
+      <div class="field"><span>Players can request <span class="muted" style="font-weight:400">· ${REQ_FORMATS.filter((k) => (d.reqFormats || {})[k]).length} of ${REQ_FORMATS.length} on</span></span><div class="fmt-ticks" role="group" aria-label="Formats players can request">${REQ_FORMATS.map((k) => { const on = !!(d.reqFormats || {})[k]; return `<button type="button" role="checkbox" aria-checked="${on}" class="fmt-tick" data-act="toggleReqFormat" data-k="${k}"><span class="ft-box" aria-hidden="true">${on ? I.check : ''}</span><b class="tnum">${REQ_LABEL[k]}</b></button>`; }).join('')}</div>
+      <span class="hint">Tick each kind of game a signed-in player can ask for with Request a match. Unticked ones show greyed out on their side.${REQ_FORMATS.every((k) => !(d.reqFormats || {})[k]) ? ' With none on, players can\'t send match requests.' : ''}</span></div>
       <div class="field"><span>Mode</span><div class="choices art-choices">${Object.entries(MODES).map(([k, m]) => artCard(CARD_ART[k], m.label, m.text, d.mode === k, `data-act="setDraft" data-k="mode" data-v="${k}"`)).join('')}</div>
       <span class="hint">An easy game means that player's team is favored to win. Modes are flexible pairing presets. You can always change a match yourself.</span></div>
       <div class="field"><span>Scoring</span>${(() => { const ex = d.id && S.sessions.find((x) => x.id === d.id), locked = !!ex && ex.status !== 'prepared', sel = SCORING[d.scoring] ? d.scoring : '31';

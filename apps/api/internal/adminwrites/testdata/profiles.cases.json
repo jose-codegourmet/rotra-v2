@@ -1,0 +1,2236 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "profiles.seed.sql",
+  "scenarios": {
+    "base": [],
+    "two_shown": [
+      "UPDATE profile_banners SET shown = false WHERE id IN ('dusk', 'b1000000-0000-4000-8000-000000000001')"
+    ],
+    "three_shown": [
+      "UPDATE profile_banners SET shown = false WHERE id = 'b1000000-0000-4000-8000-000000000001'"
+    ],
+    "no_default": [
+      "UPDATE profile_banners SET is_default = false"
+    ],
+    "night_default": [
+      "UPDATE profile_banners SET is_default = false WHERE id = 'court'",
+      "UPDATE profile_banners SET is_default = true WHERE id = 'night'"
+    ],
+    "no_default_no_court": [
+      "DELETE FROM profile_banners WHERE id = 'court'"
+    ],
+    "fifteen_shown": [
+      "UPDATE profile_characters SET shown = false WHERE id IN ('n', 'o', 'p')"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "profile_banners",
+      "sql": "SELECT id, image, shown, uploaded_at, number, deleted_at, is_default FROM profile_banners ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "profile_characters",
+      "sql": "SELECT id, image, shown, uploaded_at, number, deleted_at FROM profile_characters ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata FROM admin_audit_events ORDER BY action, target_id, occurred_at, metadata::text",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session_banner_patch",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": null,
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_banner_delete",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/night",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_banner_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_banner_default",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_character_patch",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": null,
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_character_delete",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_no_session_character_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": null
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_banner_patch",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "shown": false
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_banner_delete",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_banner_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_banner_default",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_character_patch",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "shown": false
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_character_delete",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin_character_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject_banner_patch",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "shown": false
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_show_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_show_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_then_show_again",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_same_value_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_the_default_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_a_shown_one_at_the_minimum_is_refused",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_the_default_refusal_comes_first",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_a_shown_one_above_the_minimum",
+      "scenario": "three_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_down_to_the_minimum",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_show_at_the_minimum",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_hide_follows_the_new_default",
+      "scenario": "night_default",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_unknown_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/nope",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_deleted_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/stripe",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000003",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_id_formats_are_not_in_the_library",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/Court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/has-dash",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/aaaaaaaaaaaaaaaaaaaaaaaaa",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/aaaaaaaaaaaaaaaaaaaaaaaa",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/B1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-00000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/a%20b",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/caf%C3%A9",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_court_is_unknown_once_removed",
+      "scenario": "no_default_no_court",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_object",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_shown_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": [
+              true
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"shown\":true} x"
+        }
+      ]
+    },
+    {
+      "name": "banner_a_bad_body_beats_an_unknown_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/nope",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/nope",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": "yes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_patch_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false,
+            "isDefault": true,
+            "id": "x",
+            "number": 99
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_a_hidden_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_a_shown_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_the_default_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_a_shown_one_at_the_minimum_is_refused",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/night",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_a_hidden_one_at_the_minimum",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_the_default_refusal_comes_first_on_delete",
+      "scenario": "two_shown",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_a_deleted_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/stripe",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/nope",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/Court",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/a%20b",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_ignores_a_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/ember",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_then_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/dusk",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/dusk/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_delete_the_old_default_after_a_new_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_a_deleted_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_a_deleted_hidden_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_one_that_is_back",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000002/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/nope/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/Court/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/a%20b/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000009/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_ignores_a_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "banner_restore_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/restore",
+          "who": "ad100000-0000-4000-8000-000000000002"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000001/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_again_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_then_undo",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/court/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_that_is_the_default",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/court/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_a_hidden_one_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/ember/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/b1000000-0000-4000-8000-000000000002/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_a_deleted_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/stripe/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/nope/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/Court/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/a%20b/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_with_no_default",
+      "scenario": "no_default",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_with_no_default_and_no_court",
+      "scenario": "no_default_no_court",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_court_with_no_default",
+      "scenario": "no_default",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/court/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_ignores_a_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "banner_make_default_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000002"
+        }
+      ]
+    },
+    {
+      "name": "banner_hidden_default_after_the_default_moved",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-banners/night/default",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-banners/court",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "banner_race_two_hides_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "banner_race_two_hides_of_one_by_two_admins",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000002",
+              "body": {
+                "shown": false
+              }
+            }
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "actor_admin_id"
+        ]
+      }
+    },
+    {
+      "name": "banner_race_two_deletes_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "DELETE",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            },
+            {
+              "method": "DELETE",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "banner_race_two_restores_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/profile-banners/stripe/restore",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            },
+            {
+              "method": "POST",
+              "path": "/api/profile-banners/stripe/restore",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "banner_race_two_default_sets_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/profile-banners/night/default",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            },
+            {
+              "method": "POST",
+              "path": "/api/profile-banners/night/default",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "character_hide_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_the_one_with_the_empty_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/_",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_show_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_then_show_again",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_same_value_changes_nothing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_at_the_minimum_is_refused",
+      "scenario": "fifteen_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_a_hidden_one_at_the_minimum",
+      "scenario": "fifteen_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_show_at_the_minimum",
+      "scenario": "fifteen_shown",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_hide_down_to_the_minimum",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/n",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/o",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/p",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/m",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_unknown_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/q",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/z",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_deleted_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_id_formats_are_not_in_the_library",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/A",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/ab",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/1",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a-b",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/C1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-00000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a%20b",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/caf%C3%A9",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_shown_absent",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "character_patch_shown_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_shown_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_shown_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_shown_object",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "character_patch_body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "character_patch_body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ]
+    },
+    {
+      "name": "character_patch_body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "character_patch_body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"shown\":true} x"
+        }
+      ]
+    },
+    {
+      "name": "character_a_bad_body_beats_an_unknown_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/z",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/z",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": "yes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_patch_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": false,
+            "number": 99,
+            "id": "x"
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_delete_a_shown_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_the_one_with_the_empty_id",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/_",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_a_hidden_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_an_upload",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_a_shown_one_at_the_minimum_is_refused",
+      "scenario": "fifteen_shown",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_a_hidden_one_at_the_minimum",
+      "scenario": "fifteen_shown",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_a_deleted_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/z",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/A",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a%20b",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_ignores_a_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "shown": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "character_delete_then_restore",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/a",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/a/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_delete_down_to_the_minimum",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/n",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/o",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/p",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/m",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_a_deleted_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_one_that_is_back",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/a/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/_/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000002/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_unknown",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/z/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/A/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/a%20b/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000009/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_ignores_a_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+          "who": "ad100000-0000-4000-8000-000000000002"
+        }
+      ]
+    },
+    {
+      "name": "character_restore_the_empty_id_after_a_delete",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/profile-characters/_",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        },
+        {
+          "method": "POST",
+          "path": "/api/profile-characters/_/restore",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    {
+      "name": "character_race_two_hides_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/profile-characters/a",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/profile-characters/a",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "character_race_two_deletes_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "DELETE",
+              "path": "/api/profile-characters/a",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            },
+            {
+              "method": "DELETE",
+              "path": "/api/profile-characters/a",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "character_race_two_restores_of_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            },
+            {
+              "method": "POST",
+              "path": "/api/profile-characters/c1000000-0000-4000-8000-000000000003/restore",
+              "who": "ad100000-0000-4000-8000-000000000001"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "both_libraries_at_once",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "PATCH",
+              "path": "/api/profile-banners/dusk",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            },
+            {
+              "method": "PATCH",
+              "path": "/api/profile-characters/a",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "shown": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

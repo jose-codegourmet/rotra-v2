@@ -69,6 +69,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerLicenses(rt)
 	s.registerClubNames(rt)
 	s.registerClubs(rt)
+	s.registerProfiles(rt)
 }
 
 // stamp is the clock as Prisma writes it: milliseconds, like a JavaScript Date.

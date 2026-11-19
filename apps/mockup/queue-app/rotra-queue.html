@@ -4352,7 +4352,15 @@ function liveSettings(s, est, present, allLink) {
   const reqOn = (() => { const a = reqAllowed(s); return REQ_FORMATS.filter((k) => a[k]).map((k) => REQ_LABEL[k]); })();
   // Owner, November 19, 2026: the Courts box looks like the Courts tab's cards (label, status, the court drawing), and the
   // times under each court are inputs: From, Until, and Follows session end.
-  const hm = (t) => { const d = new Date(t); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+  // Owner, November 19, 2026: every time field opens the time picker dialog (dtPicker), never a native time input.
+  const courtTimePickers = (c, follows) => {
+    const from = courtStart(s, c), until = courtUntil(s, c), day0 = dayStart(from);
+    return dtPicker({ k: `ct.from.${c.id}`, label: 'From', title: `${c.label} opens`, id: `ct-from-${c.id}`, value: from, days: [day0], ok: (t) => t < until,
+        set: (t) => { c.startsAt = t; commit(`${c.label} opens ${fmtTime(t)}`); } })
+      + dtPicker({ k: `ct.until.${c.id}`, label: 'Until', title: `${c.label} open until`, id: `ct-until-${c.id}`, value: until, days: [day0, addDays(day0, 1)], base: from, hideDays: true,
+        suffix: dayDiff(from, until) ? 'next day' : '', disabled: follows, ok: (t) => t > from && t <= from + 864e5,
+        set: (t) => { c.until = t; commit(`${c.label} open until ${fmtWhen(t, { lower: true })}`); } });
+  };
   const courtMini = (c) => {
     const m = courtMatches(s).find((x) => x.courts.includes(c.id));
     const st = m ? (m.status === 'active' ? chip('Playing', 'ok') : chip('Getting ready')) : !courtOpen(s, c) ? chip('Not open yet') : chip('Free');
@@ -4360,8 +4368,7 @@ function liveSettings(s, est, present, allLink) {
     return `<article class="ls-cc${m && m.status === 'active' ? ' playing' : ''}"><div class="between"><b>${esc(c.label)}</b>${st}</div>
       <div class="pitch ls-pitch${m ? '' : ' empty'}">${courtSVG(1)}${m ? courtSides(s, m) : '<span class="ls-free">FREE</span>'}</div>
       <div class="ls-times">
-        <label class="field"><span>From</span><input class="input" type="time" id="ct-from-${esc(c.id)}" value="${hm(courtStart(s, c))}" data-act-change="courtTime" data-id="${esc(c.id)}" data-k="from"></label>
-        <label class="field"><span>Until</span><input class="input" type="time" id="ct-until-${esc(c.id)}" value="${hm(courtUntil(s, c))}" data-act-change="courtTime" data-id="${esc(c.id)}" data-k="until" ${follows ? 'disabled' : ''}></label>
+        ${courtTimePickers(c, follows)}
       </div>
       <label class="row ls-follow" style="gap:8px;flex-wrap:nowrap"><input type="checkbox" ${follows ? 'checked' : ''} data-act-change="courtFollow" data-id="${esc(c.id)}"><span class="small">Follows session end</span></label>
     </article>`;
@@ -5871,7 +5878,7 @@ const SHEETS = {
     const has = (t) => times.includes(t) || t === sh.t;
     const btn = (part, v, label, on, sel) => `<button type="button" id="tp-${part}-${v}" class="tp-b ${sel ? 'on' : ''}" aria-pressed="${sel}" data-act="tpPick" data-part="${part}" data-v="${v}" ${on ? '' : 'disabled'}>${label}</button>`;
     return `<div class="scrim" data-act="closeSheet"></div><div class="sheet tp-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-      <header><h2 id="sheet-title" tabindex="-1">${esc(p.label)}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
+      <header><h2 id="sheet-title" tabindex="-1">${esc(p.title || p.label)}</h2><button class="btn xs ghost icon-btn" data-act="closeSheet" aria-label="Close">${I.x}</button></header>
       <div class="sb stack">
         <div class="tp-now tnum" aria-live="polite">${fmtTime(sh.t)}</div>
         <div class="seg tp-ampm" role="group" aria-label="AM or PM">${[['am', 'AM', false], ['pm', 'PM', true]].map(([v, l, isPm]) => `<button type="button" id="tp-meridiem-${v}" aria-pressed="${pm === isPm}" data-act="tpPick" data-part="meridiem" data-v="${v}" ${times.some((t) => (new Date(t).getHours() >= 12) === isPm) ? '' : 'disabled'}>${l}</button>`).join('')}</div>
@@ -7971,19 +7978,6 @@ const ACT = {
 };
 const CHANGE = {
   // Settings › Courts: a court's own times (owner, November 19, 2026). Times keep the court's day; an Until before From is the next day.
-  courtTime: (el) => {
-    const s = cur(), c = s.courts.find((x) => x.id === el.dataset.id); if (!c || !el.value) return;
-    const [h, mi] = el.value.split(':').map(Number), at = (base) => { const d = new Date(base); d.setHours(h, mi, 0, 0); return d.getTime(); };
-    if (el.dataset.k === 'from') {
-      const v = at(courtStart(s, c));
-      if (v >= courtUntil(s, c)) { toast(`${c.label} has to open before it closes.`); render(); return; }
-      c.startsAt = v; commit(`${c.label} opens ${fmtTime(v)}`);
-    } else {
-      let v = at(courtUntil(s, c)); if (v <= courtStart(s, c)) v += 864e5;
-      c.until = v; commit(`${c.label} open until ${fmtWhen(v, { lower: true })}`);
-    }
-    render();
-  },
   courtFollow: (el) => { const s = cur(), c = s.courts.find((x) => x.id === el.dataset.id); if (!c) return; c.until = el.checked ? null : courtUntil(s, c); commit(el.checked ? `${c.label} follows the session end` : `${c.label} has its own end time`); render(); },
   exemptAdd: (el) => { const s = cur(), pid = el.value; if (!pid || !R(s, pid)) return; s.exempt = [...exemptOf(s), pid]; commit(`${nm(pid)} added to the exemption list`); render(); },
   bagPick: (el) => { const sh = S.ui.sheet; sh[el.dataset.slot] = el.value; render(); },

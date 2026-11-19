@@ -277,7 +277,7 @@ textarea.input { min-height: 80px; resize: vertical; }
 .qview button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .qs-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .qs-nav { display: inline-flex; gap: 6px; }
-.qslide { --fade: 56px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0; padding: 2px 2px 10px; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.qslide { --fade: 56px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 8px; padding: 4px 8px 22px; overscroll-behavior-x: contain; scrollbar-width: thin; }
 .qslide > .qtile { flex: 0 0 min(300px, 86%); scroll-snap-align: start; }
 .qslide.m-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); }
 .qslide.m-l { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade)); mask-image: linear-gradient(to right, transparent, #000 var(--fade)); }
@@ -488,6 +488,12 @@ select.input.inline { width: auto; min-height: 42px; }
 .qgrid { display: grid; gap: 10px; }
 .qtile { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); min-width: 0; box-shadow: var(--shadow); }
 .qtile.ready { border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong)); }
+/* Owner artifact comment, November 19, 2026: a match that can go on a court now stands out. Brand rules: the accent border,
+   a light accent tint, the brand's accent glow (shadow-accent) and a label, so it never relies on colour alone. */
+.qtile.ready { border-color: var(--accent); background: linear-gradient(var(--accent-subtle), var(--accent-subtle)), var(--surface); box-shadow: var(--shadow), 0 0 16px color-mix(in srgb, var(--accent) 25%, transparent); margin-top: 8px; }
+.qt-ready { position: absolute; top: -10px; left: 12px; display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
+.qt-ready svg { width: 12px; height: 12px; }
+.qgrid .qtile:not(.ready), .qslide .qtile:not(.ready) { margin-top: 8px; }
 .qtile.attn { border-color: var(--warn); }
 .qtile.dragging { pointer-events: none; z-index: 5; opacity: .92; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); }
 .qtile.drop { outline: 2px dashed var(--accent); outline-offset: 2px; }
@@ -4748,6 +4754,7 @@ function queueCard(s, m, i, n, cols) {
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
+    ${!b ? `<span class="qt-ready">${I.check} Ready for court</span>` : ''}
     <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(matchLabel(m), 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
     ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}
     ${status}

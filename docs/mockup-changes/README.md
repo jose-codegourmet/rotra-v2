@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 15 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 16 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -396,5 +396,6 @@ NEW: 15 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-player-card-compact-games](2026-11-19-queue-player-card-compact-games.md) | Queue app: the live player card's game counts become one compact strip, Current / Total | player card | NEW |
 | [2026-11-19-queue-player-card-nickname-ring](2026-11-19-queue-player-card-nickname-ring.md) | Queue app: the live Players card shows the level as a ring and one name (club nickname, nickname, full name) | live player card (reuse the level ring used on public tiles and Add bagging pair) | NEW |
 | [2026-11-19-queue-players-not-here-waitlist](2026-11-19-queue-players-not-here-waitlist.md) | Queue app: the live Players tab filter adds Not here and Waitlist | segmented control, player cards, waitlist panel | NEW |
+| [2026-11-19-queue-ready-card-highlight](2026-11-19-queue-ready-card-highlight.md) | Queue app: a queued match that can go on a court now stands out | queue match card (ready state), pill label (new, small) | NEW |
 | [2026-11-19-queue-standings-no-gaps](2026-11-19-queue-standings-no-gaps.md) | Queue app: standings positions run on without gaps (1, 1, 2) | live-leaderboard, session-standings, leaderboard-share-card | NEW |
 <!-- status-index:end -->

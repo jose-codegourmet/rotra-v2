@@ -73,3 +73,16 @@ SELECT p.id, p.full_name, p.nickname, p.profile_state, a.rtr_id
 FROM players p
 LEFT JOIN player_id_allocations a ON a.player_id = p.id
 WHERE p.id = ANY(@ids::uuid[]);
+
+-- The Session done status after a lost response (readFinalizationStatus in packages/db/src/queue/finalization.ts): the one
+-- finalization of a session, by session id. The club is compared by the caller, as the TypeScript does.
+-- name: GetQueueFinalization :one
+SELECT session_id, club_id, command_id, state, stage, committed_at, completed_at, failed_stage, failure_code
+FROM session_finalizations
+WHERE session_id = @session_id;
+
+-- The downstream jobs of a finalization. The TypeScript names no order, so this names none.
+-- name: ListQueueFinalizationJobs :many
+SELECT kind, status, attempts, last_error_code
+FROM projection_jobs
+WHERE source_finalization_id = @session_id;

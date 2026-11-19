@@ -375,6 +375,70 @@
   "review_prepared_stream": [
    "UPDATE queue_sessions SET minimum_games = 1 WHERE id = 'a3000000-0000-4000-8000-000000000009'",
    "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
+  ],
+  "fin_done": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'slides', completed_at = TIMESTAMPTZ '2026-11-13 14:05:00.25+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 2, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_done_error": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'slides', completed_at = TIMESTAMPTZ '2026-11-13 14:05:00+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 3, TIMESTAMPTZ '2026-11-13 14:00:00+00', 'projection_failed', TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_unrecorded": [
+   "UPDATE session_finalizations SET state = 'done', stage = 'finishing', completed_at = TIMESTAMPTZ '2026-11-13 14:00:00.5+00' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_running": [
+   "UPDATE session_finalizations SET state = 'running', stage = 'checking', committed_at = NULL, facts_digest = NULL WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_micros": [
+   "UPDATE session_finalizations SET committed_at = TIMESTAMPTZ '2026-11-13 14:00:00.123987+00', completed_at = TIMESTAMPTZ '2026-11-13 14:00:01.9999+00', state = 'done' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'"
+  ],
+  "fin_exhausted": [
+   "UPDATE session_finalizations SET state = 'failed', stage = 'player_records', failed_stage = 'slides', failure_code = 'snapshot_error' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'failed', 8, TIMESTAMPTZ '2026-11-19 03:00:00+00', 'invalid', NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_not_due": [
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 05:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_running_job": [
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'running', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "UPDATE projection_jobs SET locked_at = TIMESTAMPTZ '2026-11-19 03:59:00+00' WHERE id = 'a8400000-0000-4000-8000-000000000001'"
+  ],
+  "fin_other_clubs": [
+   "INSERT INTO session_finalizations (session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, manifest_digest, accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, facts_digest, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'a3100000-0000-4000-8000-000000000002', 'done', 'slides', NULL, NULL, '[]'::jsonb, decode(repeat('00', 32), 'hex'), 1, 'fa000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-13 14:00:00+00', TIMESTAMPTZ '2026-11-13 14:00:00.5+00', TIMESTAMPTZ '2026-11-13 14:05:00+00', decode(repeat('01', 32), 'hex'), now())",
+   "INSERT INTO session_finalizations (session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, manifest_digest, accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, facts_digest, updated_at) VALUES ('a3000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000002', 'a3100000-0000-4000-8000-000000000005', 'committed', 'player_records', NULL, NULL, '[]'::jsonb, decode(repeat('00', 32), 'hex'), 1, 'fa000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-13 14:00:00+00', TIMESTAMPTZ '2026-11-13 14:00:00.5+00', NULL, decode(repeat('01', 32), 'hex'), now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000002', 'done', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_pending": [
+   "UPDATE session_finalizations SET state = 'committed', stage = 'player_records' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'club_session_summaries', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 0, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000004', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_lost_response": [
+   "UPDATE session_finalizations SET state = 'committed', stage = 'player_records' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_failed_retry": [
+   "UPDATE session_finalizations SET state = 'failed', stage = 'player_records', failed_stage = 'slides', failure_code = 'snapshot_error' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'failed', 2, TIMESTAMPTZ '2026-11-19 03:00:00+00', 'snapshot_error', NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000002', 'player_history', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'done', 1, TIMESTAMPTZ '2026-11-13 14:00:00+00', NULL, TIMESTAMPTZ '2026-11-13 14:01:00+00', TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000003', 'player_rank', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())"
+  ],
+  "fin_pending_expired": [
+   "UPDATE session_finalizations SET state = 'committed' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
+   "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
+   "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'"
   ]
  },
  "cases": [
@@ -3425,6 +3489,263 @@
    "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/done-review",
    "who": "c7000000-0000-4000-8000-000000000003",
    "scenario": "base"
+  },
+  {
+   "name": "finalization-signed-out",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": null,
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club2-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club3-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club4-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club5-s4",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-disabled",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000006",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "finalization-unprovisioned",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000007",
+   "scenario": "base",
+   "goExpects": {
+    "status": 401,
+    "code": "unauthenticated"
+   }
+  },
+  {
+   "name": "finalization-club1-s1-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s2-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s3-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s5-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s6-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s7-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s8-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-s9-none-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-unknown",
+   "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "finalization-club1-not-a-uuid",
+   "path": "/api/sessions/nope/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "goExpects": {
+    "status": 404,
+    "code": "not_found"
+   }
+  },
+  {
+   "name": "finalization-club1-s4-expired-still-answers",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "smash_expired"
+  },
+  {
+   "name": "finalization-club1-s4-later",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base",
+   "now": "2027-03-01T04:00:00.000Z"
+  },
+  {
+   "name": "finalization-club1-s4-done",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_done"
+  },
+  {
+   "name": "finalization-club2-s4-done-is-not-theirs",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_done"
+  },
+  {
+   "name": "finalization-club1-s4-done-with-error-text-kept",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_done_error"
+  },
+  {
+   "name": "finalization-club1-s4-unrecorded-done-no-jobs",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_unrecorded"
+  },
+  {
+   "name": "finalization-club1-s4-not-committed-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_running"
+  },
+  {
+   "name": "finalization-club1-s4-micros-cut-to-milliseconds",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_micros"
+  },
+  {
+   "name": "finalization-club1-s4-attempts-used-up-stays-failed",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_exhausted"
+  },
+  {
+   "name": "finalization-club1-s4-jobs-not-due-yet",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_not_due"
+  },
+  {
+   "name": "finalization-club1-s4-job-running-within-lease",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_running_job"
+  },
+  {
+   "name": "finalization-club2-s2-own-lapsed-still-answers",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club1-s2-another-clubs-is-not-found",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club2-s5-own",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/finalization",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "fin_other_clubs"
+  },
+  {
+   "name": "finalization-club1-s4-pending-jobs-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-pending-jobs-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending",
+   "goGolden": "finalization-club1-s4-pending-jobs-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-half-done-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_lost_response",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-half-done-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_lost_response",
+   "goGolden": "finalization-club1-s4-half-done-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-failed-due-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_failed_retry",
+   "noDrive": true
+  },
+  {
+   "name": "finalization-club1-s4-failed-due-as-typescript-serves-it",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_failed_retry",
+   "goGolden": "finalization-club1-s4-failed-due-no-drive",
+   "differs": true
+  },
+  {
+   "name": "finalization-club1-s4-pending-expired-no-drive",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "fin_pending_expired",
+   "noDrive": true
   }
  ]
 }

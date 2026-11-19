@@ -11,7 +11,7 @@ DELETE FROM player_match_facts; DELETE FROM session_players; DELETE FROM matches
 DELETE FROM club_name_change_requests; DELETE FROM club_license_terms; DELETE FROM club_accounts;
 DELETE FROM session_courts; DELETE FROM match_participations; DELETE FROM match_decisions; DELETE FROM match_court_usage;
 DELETE FROM session_waitlist; DELETE FROM session_join_requests; DELETE FROM session_drop_out_notices; DELETE FROM session_match_request_spots; DELETE FROM session_match_requests;
-DELETE FROM club_session_player_summaries; DELETE FROM session_finalizations; DELETE FROM active_court_holds; DELETE FROM session_payment_marks; DELETE FROM session_shuttle_plan_lines; DELETE FROM session_cost_estimates; DELETE FROM session_result_snapshots;
+DELETE FROM club_session_player_summaries; DELETE FROM projection_jobs; DELETE FROM session_finalizations; DELETE FROM active_court_holds; DELETE FROM session_payment_marks; DELETE FROM session_shuttle_plan_lines; DELETE FROM session_cost_estimates; DELETE FROM session_result_snapshots;
 DELETE FROM result_exports;
 DELETE FROM sync_conflict_operations; DELETE FROM sync_conflicts; DELETE FROM sync_operations; DELETE FROM device_session_streams;
 DELETE FROM club_entitlements; DELETE FROM club_expiry_cycles; DELETE FROM club_venues; DELETE FROM inventory_items; DELETE FROM club_assessments;

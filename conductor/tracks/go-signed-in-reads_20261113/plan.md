@@ -15,7 +15,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 3: Queue
 
-- [x] **3.1** Characterize + port club and session reads (club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests, done-review; `/finalization` left, see deviations)
+- [x] **3.1** Characterize + port club and session reads (club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests, done-review; `/finalization` read-only, see deviations)
 - [x] **3.2** Sync read (`/api/sync`, `/api/sessions/{id}/sync`)
 
 ## Phase 4: Switch
@@ -52,3 +52,4 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 4.1 | Only prefixes with no write route left are listed (B-60): Queue `/api/license,/api/sync,/api/players`; Player `/api/leaderboard,/api/rtr-ids,/api/invites,/api/players`; Admin `/api/audit-events,/api/sales,/api/license-operations` | `ROTRA_GO_MOVED_AREAS` forwards every method | The rest move with go-writes-admin-player and go-writes-queue; listed in docs/architecture.md |
 | 2026-11-19 | 4.1 | No manual per-app check run; the list is documented, not applied to any deployment | The beta project gets the full list in staging-verification; the local sign-in check needs the app-side pass wiring | Done in staging-verification |
 | 2026-11-19 | 4.1 | `GET /api/sessions/{id}/finalization` not ported | Runs `driveFinalizationJobs` before reading | Owner call |
+| 2026-11-19 | 3.1 | `GET /sessions/{id}/finalization` is registered in Go read-only; the pre-read `driveFinalizationJobs` (writes `session_result_snapshots` and `player_rank_current`) is NOT ported | Touches permanent results and ranking | Go answers the stored state, so a committed finalization with due jobs shows an earlier state than the TS; route unused until go-writes-queue decides where the in-request worker lives |

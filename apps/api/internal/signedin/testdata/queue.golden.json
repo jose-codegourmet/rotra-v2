@@ -16747,5 +16747,888 @@
         "message": "This club does not have an active license."
       }
     }
+  },
+  "finalization-signed-out": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "finalization-club1-s4": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club2-s4": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club3-s4": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club4-s4": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club5-s4": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-disabled": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "finalization-unprovisioned": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "finalization-club1-s1-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s2-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s3-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s5-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s6-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s7-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s8-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s9-none-yet": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-not-a-uuid": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "finalization-club1-s4-expired-still-answers": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-later": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-done": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-13T14:05:00.250Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 2,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club2-s4-done-is-not-theirs": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club1-s4-done-with-error-text-kept": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-13T14:05:00.000Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 3,
+          "lastErrorCode": "projection_failed"
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-unrecorded-done-no-jobs": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "finishing",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-13T14:00:00.500Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-not-committed-yet": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "running",
+      "stage": "checking",
+      "accepted": false,
+      "committedAt": null,
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-micros-cut-to-milliseconds": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.123Z",
+      "completedAt": "2026-11-13T14:00:01.999Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-attempts-used-up-stays-failed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "failed",
+      "stage": "player_records",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": "slides",
+      "failureCode": "snapshot_error",
+      "jobs": [
+        {
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "result_snapshot",
+          "status": "failed",
+          "attempts": 8,
+          "lastErrorCode": "invalid"
+        },
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-jobs-not-due-yet": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-job-running-within-lease": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "running",
+          "attempts": 1,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club2-s2-own-lapsed-still-answers": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000002",
+      "commandId": "a3100000-0000-4000-8000-000000000002",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-13T14:05:00.000Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s2-another-clubs-is-not-found": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "finalization-club2-s5-own": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000005",
+      "commandId": "a3100000-0000-4000-8000-000000000005",
+      "state": "committed",
+      "stage": "player_records",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": []
+    }
+  },
+  "finalization-club1-s4-pending-jobs-no-drive": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "player_records",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "result_snapshot",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-pending-jobs-as-typescript-serves-it": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-19T04:00:00.000Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-half-done-no-drive": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "player_records",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-half-done-as-typescript-serves-it": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-19T04:00:00.000Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-failed-due-no-drive": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "failed",
+      "stage": "player_records",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": "slides",
+      "failureCode": "snapshot_error",
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "failed",
+          "attempts": 2,
+          "lastErrorCode": "snapshot_error"
+        },
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-failed-due-as-typescript-serves-it": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "done",
+      "stage": "slides",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": "2026-11-19T04:00:00.000Z",
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 3,
+          "lastErrorCode": null
+        },
+        {
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 1,
+          "lastErrorCode": null
+        }
+      ]
+    }
+  },
+  "finalization-club1-s4-pending-expired-no-drive": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000004",
+      "commandId": "a3100000-0000-4000-8000-000000000004",
+      "state": "committed",
+      "stage": "checking",
+      "accepted": true,
+      "committedAt": "2026-11-13T14:00:00.500Z",
+      "completedAt": null,
+      "failedStage": null,
+      "failureCode": null,
+      "jobs": [
+        {
+          "kind": "result_snapshot",
+          "status": "pending",
+          "attempts": 0,
+          "lastErrorCode": null
+        }
+      ]
+    }
   }
 }

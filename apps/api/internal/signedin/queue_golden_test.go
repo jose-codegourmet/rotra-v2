@@ -25,6 +25,12 @@ type queueCases struct {
 		Now      *time.Time `json:"now"`
 		// Redact lists the dot-separated paths of random values (a freshly made invite code).
 		Redact []string `json:"redact"`
+		// NoDrive marks a case the capture ran with driveFinalizationJobs switched off (see queue_finalization.go).
+		NoDrive bool `json:"noDrive"`
+		// GoGolden names the case whose golden Go must match when the Route Handler's own answer (this case's golden) is
+		// the one the job drive produced. Differs says the two goldens are not equal: the drive made a visible change.
+		GoGolden string `json:"goGolden"`
+		Differs  bool   `json:"differs"`
 		// GoExpects is where Go answers differently from the Route Handler on purpose (see the deviations log).
 		GoExpects *struct {
 			Status int    `json:"status"`
@@ -87,6 +93,16 @@ func TestQueueReadsMatchRouteHandlers(t *testing.T) {
 			want, ok := golden[c.Name]
 			if !ok {
 				t.Fatalf("no golden for %s", c.Name)
+			}
+			if c.GoGolden != "" {
+				undriven, ok := golden[c.GoGolden]
+				if !ok {
+					t.Fatalf("no golden for %s", c.GoGolden)
+				}
+				if c.Differs && reflect.DeepEqual(decodeJSON(t, want.Body), decodeJSON(t, undriven.Body)) {
+					t.Errorf("the job drive changed nothing here: %s and %s are equal, so the case pins no difference", c.Name, c.GoGolden)
+				}
+				want = undriven
 			}
 			if c.GoExpects != nil {
 				if rec.Code != c.GoExpects.Status || errCode(t, rec) != c.GoExpects.Code {

@@ -37,6 +37,7 @@ var queuePaths = []string{
 	"/api/sessions/a3000000-0000-4000-8000-000000000001/payments", "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
 	"/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
 	"/api/sync", "/api/sessions/a3000000-0000-4000-8000-000000000001/sync", "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
+	"/api/sessions/a3000000-0000-4000-8000-000000000004/finalization",
 }
 
 // Only a provisioned, enabled club account reads, and only through the Queue app: another app's header, no pass, a bad

@@ -2,7 +2,7 @@
 // (apps/queue/src/app/api) and the real @rotra/db services (Prisma) against a throwaway local Postgres:
 //   GET /api/club  /club/invite  /club/players  /club/players/{id}  /delete-impact  /year-stats  /players?q=
 //   /inventory  /venues  /license  /sessions  /sessions/{id}  and per session /cost /matches /payments
-//   /requests /results /roster
+//   /requests /results /roster /finalization
 //
 //   docker run -d --rm --name rotra-capture-pg -e POSTGRES_PASSWORD=test -p 127.0.0.1:55439:5432 postgres:16-alpine
 //   source ~/.nvm/nvm.sh && nvm use
@@ -30,6 +30,17 @@ vi.mock('../../../../packages/db/src/auth/supabase.ts', async (importOriginal) =
   verifySubject: async () =>
     globalThis.__rotraSubject ? { provider: 'supabase', subject: globalThis.__rotraSubject } : null,
 }))
+
+// The finalization status read runs driveFinalizationJobs first (it writes results and ranking). A case with `noDrive`
+// switches it off: that is what the Go read answers. Every other case runs the real drive.
+vi.mock('../../../../packages/db/src/player/projections.ts', async (importOriginal) => {
+  const real = await importOriginal()
+  return {
+    ...real,
+    driveFinalizationJobs: (...args) =>
+      globalThis.__rotraNoDrive ? Promise.resolve([]) : real.driveFinalizationJobs(...args),
+  }
+})
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../../../..')
@@ -118,6 +129,7 @@ test('capture', async () => {
     // Date only: Prisma and the pg driver keep their timers.
     vi.useFakeTimers({ toFake: ['Date'], now: new Date(c.now ?? cases.now) })
     globalThis.__rotraSubject = c.who
+    globalThis.__rotraNoDrive = !!c.noDrive
     const res = await dispatch(c)
     vi.useRealTimers()
     const text = await res.text()

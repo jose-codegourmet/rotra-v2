@@ -21,7 +21,7 @@ cases = []
 scenarios = {"base": []}
 
 
-def case(name, path, club=None, scenario="base", go=None, now=None, redact=None):
+def case(name, path, club=None, scenario="base", go=None, now=None, redact=None, noDrive=False, goGolden=None, differs=False):
     c = {"name": name, "path": path, "who": SUBJECT[club] if club else None, "scenario": scenario}
     if go:
         c["goExpects"] = {"status": go[0], "code": go[1]}
@@ -29,6 +29,12 @@ def case(name, path, club=None, scenario="base", go=None, now=None, redact=None)
         c["now"] = now
     if redact:
         c["redact"] = redact
+    if noDrive:
+        c["noDrive"] = True
+    if goGolden:
+        c["goGolden"] = goGolden
+    if differs:
+        c["differs"] = True
     cases.append(c)
 
 
@@ -158,6 +164,10 @@ if os.path.exists(EXTRA):
 EXTRA2 = os.path.join(HERE, "gen-signedin-queue-cases-sync.py")
 if os.path.exists(EXTRA2):
     exec(open(EXTRA2).read())
+
+EXTRA3 = os.path.join(HERE, "gen-signedin-queue-cases-finalization.py")
+if os.path.exists(EXTRA3):
+    exec(open(EXTRA3).read())
 
 names = [c["name"] for c in cases]
 assert len(names) == len(set(names)), "duplicate case names: " + ", ".join(n for n in names if names.count(n) > 1)

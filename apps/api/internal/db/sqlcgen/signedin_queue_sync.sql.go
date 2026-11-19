@@ -23,6 +23,43 @@ func (q *Queries) CountQueueActiveMatches(ctx context.Context, sessionID pgtype.
 	return column_1, err
 }
 
+const getQueueFinalization = `-- name: GetQueueFinalization :one
+SELECT session_id, club_id, command_id, state, stage, committed_at, completed_at, failed_stage, failure_code
+FROM session_finalizations
+WHERE session_id = $1
+`
+
+type GetQueueFinalizationRow struct {
+	SessionID   pgtype.UUID
+	ClubID      pgtype.UUID
+	CommandID   pgtype.UUID
+	State       FinalizationState
+	Stage       FinalizationStage
+	CommittedAt pgtype.Timestamptz
+	CompletedAt pgtype.Timestamptz
+	FailedStage NullFinalizationStage
+	FailureCode pgtype.Text
+}
+
+// The Session done status after a lost response (readFinalizationStatus in packages/db/src/queue/finalization.ts): the one
+// finalization of a session, by session id. The club is compared by the caller, as the TypeScript does.
+func (q *Queries) GetQueueFinalization(ctx context.Context, sessionID pgtype.UUID) (GetQueueFinalizationRow, error) {
+	row := q.db.QueryRow(ctx, getQueueFinalization, sessionID)
+	var i GetQueueFinalizationRow
+	err := row.Scan(
+		&i.SessionID,
+		&i.ClubID,
+		&i.CommandID,
+		&i.State,
+		&i.Stage,
+		&i.CommittedAt,
+		&i.CompletedAt,
+		&i.FailedStage,
+		&i.FailureCode,
+	)
+	return i, err
+}
+
 const getQueueSyncCompleteness = `-- name: GetQueueSyncCompleteness :one
 SELECT
   (SELECT count(*) FROM device_session_streams s
@@ -127,6 +164,45 @@ func (q *Queries) ListQueueCompletedParticipations(ctx context.Context, sessionI
 			&i.JoinedOperationID,
 			&i.LeftOperationID,
 			&i.CreditTo,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listQueueFinalizationJobs = `-- name: ListQueueFinalizationJobs :many
+SELECT kind, status, attempts, last_error_code
+FROM projection_jobs
+WHERE source_finalization_id = $1
+`
+
+type ListQueueFinalizationJobsRow struct {
+	Kind          ProjectionKind
+	Status        ProjectionJobStatus
+	Attempts      int32
+	LastErrorCode pgtype.Text
+}
+
+// The downstream jobs of a finalization. The TypeScript names no order, so this names none.
+func (q *Queries) ListQueueFinalizationJobs(ctx context.Context, sessionID pgtype.UUID) ([]ListQueueFinalizationJobsRow, error) {
+	rows, err := q.db.Query(ctx, listQueueFinalizationJobs, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListQueueFinalizationJobsRow
+	for rows.Next() {
+		var i ListQueueFinalizationJobsRow
+		if err := rows.Scan(
+			&i.Kind,
+			&i.Status,
+			&i.Attempts,
+			&i.LastErrorCode,
 		); err != nil {
 			return nil, err
 		}

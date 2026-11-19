@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 5 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 6 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -385,6 +385,7 @@ NEW: 5 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · M
 | [2026-11-19-queue-console-tabs](2026-11-19-queue-console-tabs.md) | Queue app: the live console has six tabs: Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings | tab row and phone tab menu (as on preparation), match queue, generate matches workspace, session setup card | NEW |
 | [2026-11-19-queue-live-no-move-to-waitlist](2026-11-19-queue-live-no-move-to-waitlist.md) | Queue app: no Move to waitlist on the live Players card | player card, roster card | NEW |
 | [2026-11-19-queue-player-card-compact-games](2026-11-19-queue-player-card-compact-games.md) | Queue app: the live player card's game counts become one compact strip, Current / Total | player card | NEW |
+| [2026-11-19-queue-player-card-nickname-ring](2026-11-19-queue-player-card-nickname-ring.md) | Queue app: the live Players card shows the level as a ring and the nickname in place of the level text | live player card (reuse the level ring used on public tiles and Add bagging pair) | NEW |
 | [2026-11-19-queue-players-not-here-waitlist](2026-11-19-queue-players-not-here-waitlist.md) | Queue app: the live Players tab filter adds Not here and Waitlist | segmented control, player cards, waitlist panel | NEW |
 | [2026-11-19-queue-standings-no-gaps](2026-11-19-queue-standings-no-gaps.md) | Queue app: standings positions run on without gaps (1, 1, 2) | live-leaderboard, session-standings, leaderboard-share-card | NEW |
 <!-- status-index:end -->

@@ -162,8 +162,8 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 			}
 		}
 	}
-	if total != 256 {
-		t.Errorf("%d cases, want 256", total)
+	if total != 258 {
+		t.Errorf("%d cases, want 258", total)
 	}
 }
 

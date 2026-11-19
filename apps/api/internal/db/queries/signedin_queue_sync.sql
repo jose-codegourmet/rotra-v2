@@ -66,7 +66,9 @@ ORDER BY sp.confirmed_at ASC;
 -- name: ListQueueProfiledClubPlayers :many
 SELECT id, player_id, display_name, nickname
 FROM club_players
-WHERE club_id = @club_id AND removed_at IS NULL AND player_id IS NOT NULL;
+-- The TypeScript sets no order here (the database's own), so the candidate order is by id, a fixed order.
+WHERE club_id = @club_id AND removed_at IS NULL AND player_id IS NOT NULL
+ORDER BY id;
 
 -- name: ListQueueReviewProfiles :many
 SELECT p.id, p.full_name, p.nickname, p.profile_state, a.rtr_id

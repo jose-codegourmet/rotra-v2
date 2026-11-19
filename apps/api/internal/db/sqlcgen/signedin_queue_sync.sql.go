@@ -218,6 +218,7 @@ const listQueueProfiledClubPlayers = `-- name: ListQueueProfiledClubPlayers :man
 SELECT id, player_id, display_name, nickname
 FROM club_players
 WHERE club_id = $1 AND removed_at IS NULL AND player_id IS NOT NULL
+ORDER BY id
 `
 
 type ListQueueProfiledClubPlayersRow struct {
@@ -228,6 +229,7 @@ type ListQueueProfiledClubPlayersRow struct {
 }
 
 // The club's saved players that have a ROTRA profile (the candidates), then those profiles with their RTR IDs.
+// The TypeScript sets no order here (the database's own), so the candidate order is by id, a fixed order.
 func (q *Queries) ListQueueProfiledClubPlayers(ctx context.Context, clubID pgtype.UUID) ([]ListQueueProfiledClubPlayersRow, error) {
 	rows, err := q.db.Query(ctx, listQueueProfiledClubPlayers, clubID)
 	if err != nil {

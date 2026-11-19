@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 56 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 57 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -420,6 +420,7 @@ NEW: 56 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-queue-players-not-here-waitlist](2026-11-19-queue-players-not-here-waitlist.md) | Queue app: the live Players tab filter adds Not here and Waitlist | segmented control, player cards, waitlist panel | NEW |
 | [2026-11-19-queue-players-under-main-queue](2026-11-19-queue-players-under-main-queue.md) | Queue app: the Players picker sits under the Main Queue | Players pane (reuse as is) | NEW |
 | [2026-11-19-queue-prep-settings-tab](2026-11-19-queue-prep-settings-tab.md) | Queue app: preparation gets a Settings tab; the Edit preparation button is gone | preparation tab row and phone tab menu, settings cards (same style as the live console's Settings) | NEW |
+| [2026-11-19-queue-public-queue-compact](2026-11-19-queue-public-queue-compact.md) | Queue app: compact public Queue tiles with stacked players and a View match dialog | public queue tile, queue match dialog (new) | NEW |
 | [2026-11-19-queue-public-skill-rings](2026-11-19-queue-public-skill-rings.md) | Queue app: level rings on the public page's Courts now and Queue | court face (`pf`), queue face (`qf`) | NEW |
 | [2026-11-19-queue-ready-card-highlight](2026-11-19-queue-ready-card-highlight.md) | Queue app: a queued match that can go on a court now stands out | queue match card (ready state), pill label (new, small) | NEW |
 | [2026-11-19-queue-remove-regenerate](2026-11-19-queue-remove-regenerate.md) | Queue app: the Main Queue drops the Regenerate button | Main Queue header actions, attention notice | NEW |

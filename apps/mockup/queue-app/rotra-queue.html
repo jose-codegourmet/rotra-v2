@@ -1195,11 +1195,12 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .pc3-name { font-weight: 700; font-size: 13px; line-height: 1.2; overflow-wrap: anywhere; }
 .pc3-lv { font-size: 11px; color: var(--fg2); line-height: 1.3; }
 /* Owner request, November 9, 2026: a player card shows only games played and the night's total (played + queued). */
-.pc3-games { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.pc3-games > div { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg); min-width: 0; }
-.pc3-games b { font-size: 24px; line-height: 1; font-weight: 800; letter-spacing: -.5px; }
-.pc3-games span { font-size: 11px; color: var(--fg2); }
-.pc3-games .pg-total { background: var(--accent-subtle); }
+/* Owner artifact comment, November 19, 2026 ("to be more compact"): one slim strip, Current | Total, split by a hairline. */
+.pc3-games { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; padding: 6px 0; border-radius: var(--r-sm); background: var(--bg); }
+.pc3-games > i { align-self: stretch; background: var(--border-strong); }
+.pc3-games > div { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
+.pc3-games b { font-size: 18px; line-height: 1.1; font-weight: 800; }
+.pc3-games span { font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--fg2); }
 .pc3-games .pg-total b { color: var(--accent); }
 .pc3-st { color: var(--fg2); }
 .pc3 .switch { transform: scale(.8); transform-origin: right center; }
@@ -4657,7 +4658,7 @@ function playersPane(s) {
       return `<article class="pc3 ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name">${esc(x.p.name)}</div><div class="pc3-lv">${esc(lvLabel(x.r.level))}</div></div><button class="btn xs ghost icon-btn" data-act="openSetGames" data-pid="${x.r.pid}" aria-label="Set games played… ${esc(x.p.name)}" title="Set games played…">${I.edit}</button></div>
-        <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played"><b class="tnum">${x.g}</b><span>played</span></div><div class="pg-total"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>for the night</span></div></div>
+        <div class="pc3-games" aria-label="${x.g} games played, ${x.g + queuedCount(s, x.r.pid)} for the night"><div class="pg-played" title="Games played so far"><b class="tnum">${x.g}</b><span>Current</span></div><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;

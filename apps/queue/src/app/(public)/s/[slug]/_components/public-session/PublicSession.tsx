@@ -841,13 +841,13 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           onClose={() => setProfileOf(null)}
         />
       ) : null}
-      {signedIn && viewerAccount && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (
+      {signedIn && nightViewer && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (
         <SessionInviteSheet
           slug={slug}
-          playerId={viewerAccount.id}
+          playerId={nightViewer.id}
           open={inviteOpen}
           onOpenChange={setInviteOpen}
-          inviterName={viewerAccount.name}
+          inviterName={nightViewer.name}
           clubName={p.club.name}
           clubInitials={p.club.initials}
           clubLogoUrl={p.club.logoUrl}

@@ -4632,6 +4632,8 @@ function playersPane(s) {
   const held = (pid) => heldPresence?.filter === f.show && heldPresence.ids.includes(pid) && presencePending.has(pid);
   if (f.show === 'avail') rows = rows.filter((x) => (x.r.present && !x.a) || held(x.r.pid));
   if (f.show === 'present') rows = rows.filter((x) => x.r.present || held(x.r.pid));
+  // Owner artifact comment, November 19, 2026: "Add Not Here and Waitlist". Not here: roster players marked away. Waitlist: the waitlist itself.
+  if (f.show === 'away') rows = rows.filter((x) => !x.r.present || held(x.r.pid));
   const sorters = {
     wait: (a, b) => (a.a ? 1 : 0) - (b.a ? 1 : 0) || (b.r.present ? 1 : 0) - (a.r.present ? 1 : 0) || b.mins - a.mins,
     least: (a, b) => a.g - b.g || b.mins - a.mins,
@@ -4640,16 +4642,16 @@ function playersPane(s) {
   };
   rows.sort(sorters[f.sort] || sorters.wait);
   if (heldPresence?.filter === f.show && presencePending.size) rows.sort((a,b) => { const rank = (pid) => { const i = heldPresence.ids.indexOf(pid); return i < 0 ? Infinity : i; }; return rank(a.r.pid) - rank(b.r.pid); });
-  const counts = { avail: s.roster.filter((r) => r.present && !busyOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, all: s.roster.length };
+  const counts = { avail: s.roster.filter((r) => r.present && !busyOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, away: s.roster.filter((r) => !r.present).length, waitlist: (s.waitlist || []).length, all: s.roster.length };
   const plan = matchPlan(s, sel);
   const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
   const currentDrafts = draftState?.batches[draftState.tab]?.cards || [];
   return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="openSetGames">Set games for all…</button><button class="btn sm" data-act="openAdd">Add late player</button></div></div>
     <div class="row" style="gap:10px">
-      <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
-      <select class="input inline" id="pl-sort" data-act-change="plSet" data-k="sort" aria-label="Sort players">${[['wait', 'Sort: longest wait'], ['least', 'Sort: least games'], ['most', 'Sort: most games'], ['level', 'Sort: level, high to low']].map(([v, l]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['away', `Not here · ${counts.away}`], ['waitlist', `Waitlist · ${counts.waitlist}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
+      ${f.show === 'waitlist' ? '' : `<select class="input inline" id="pl-sort" data-act-change="plSet" data-k="sort" aria-label="Sort players">${[['wait', 'Sort: longest wait'], ['least', 'Sort: least games'], ['most', 'Sort: most games'], ['level', 'Sort: level, high to low']].map(([v, l]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`}
     </div>
-    ${rows.length ? `<div class="pgrid3">${rows.map((x) => {
+    ${f.show === 'waitlist' ? waitlistPanel(s) : rows.length ? `<div class="pgrid3">${rows.map((x) => {
       const i = sel.indexOf(x.r.pid);
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
@@ -4659,12 +4661,12 @@ function playersPane(s) {
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : ` · ${x.mins} min wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row"><button class="btn xs" data-act="stepDown" data-pid="${x.r.pid}" aria-label="Move ${esc(x.p.name)} to the waitlist">Move to waitlist</button>${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;
-    }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : 'No players yet.'}</div>`}
+    }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
       <div class="row" style="gap:6px;flex-wrap:nowrap;min-width:0"><span class="sel-faces">${sel.map((pid) => avatar(P(pid))).join('')}</span><span class="small"><b>${sel.length} selected</b> · ${esc(plan.label)}</span></div>
       <div class="row" style="flex-wrap:nowrap"><button class="btn sm ghost" data-act="selClear">Clear</button><button class="btn sm primary" data-act="makeMatch" ${plan.ok ? '' : 'disabled'}>Make match</button></div></div>` : ''}
     ${noShowPanel(s)}
-    ${(s.waitlist || []).length || !openSlots(s) ? waitlistPanel(s) : ''}
+    ${f.show !== 'waitlist' && ((s.waitlist || []).length || !openSlots(s)) ? waitlistPanel(s) : ''}
     <p class="small muted">Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.</p>`;
 }
 function boardPane(s) {

@@ -269,6 +269,20 @@ textarea.input { min-height: 80px; resize: vertical; }
 .ls-court > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ls-card .acts { margin-top: auto; }
 .lh-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); align-items: start; }
+/* Main Queue slide mode (owner artifact comment, November 19, 2026): one row that scrolls sideways and snaps per card, like an
+   Embla carousel. An edge fades out (gradient mask) only while there are more cards that way. Grid mode keeps the snake grid. */
+.qview { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); }
+.qview button { display: grid; place-items: center; width: 34px; height: 30px; border: 0; border-radius: calc(var(--r-sm) - 2px); background: transparent; color: var(--fg2); cursor: pointer; }
+.qview button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 0 0 1px var(--border-strong) inset; }
+.qview button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.qs-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.qs-nav { display: inline-flex; gap: 6px; }
+.qslide { --fade: 56px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0; padding: 2px 2px 10px; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.qslide > .qtile { flex: 0 0 min(300px, 86%); scroll-snap-align: start; }
+.qslide.m-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); }
+.qslide.m-l { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade)); mask-image: linear-gradient(to right, transparent, #000 var(--fade)); }
+.qslide.m-l.m-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); }
+@media (prefers-reduced-motion: no-preference) { .qslide { scroll-behavior: smooth; } }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -2411,6 +2425,10 @@ const LOGO = {"fullD": "<svg class=\"lg-d\" aria-hidden=\"true\" focusable=\"fal
 const rotraLogo = (kind = 'full', cls = '') => `<span class="rlogo rlogo-${kind}${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${kind === 'mini' ? LOGO.miniD + LOGO.miniL : kind === 'resp' ? `<span class="rl-full">${LOGO.fullD}${LOGO.fullL}</span><span class="rl-mini">${LOGO.miniD}${LOGO.miniL}</span>` : LOGO.fullD + LOGO.fullL}</span>`;
 const rotraLogoDark = (cls = '') => `<span class="rlogo rlogo-full rlogo-fixed${cls ? ` ${cls}` : ''}" role="img" aria-label="ROTRA">${LOGO.fullD}</span>`;
 const I = {
+  q_slide: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="14" rx="2"/><path d="M2 8v8M22 8v8"/></svg>',
+  q_grid: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',
+  q_prev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  q_next: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
   n_plus: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   n_pin: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   n_menu: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
@@ -4507,13 +4525,17 @@ function courtsPane(s) {
 
 function queuePane(s) {
   const list = waiting(s);
+  const qSlide = S.ui.qView !== 'grid';
   const att = attention(s).length;
   return `<div class="between"><h2>Main Queue</h2><div class="row acts"><button class="btn sm" data-act="openEditor">Add match</button><button class="btn sm" data-act="openSuggest">Suggest</button><button class="btn sm" data-act="pane" data-k="generate">Generate Queue</button><button class="btn sm ${att ? 'primary' : ''}" data-act="openRegen" ${list.length ? '' : 'disabled'}>Regenerate</button><button class="btn sm danger fill" data-act="openClearQueue" ${list.length ? '' : 'disabled'}>Clear queue</button></div></div>
     ${att ? notice('warn', `${att} waiting match${att > 1 ? 'es need' : ' needs'} attention. Edit the lineup to swap the player, or regenerate.`) : ''}
     <p class="small muted">One waiting list for every court. ${MODES[s.mode].label} mode guides suggestions; you can override any of it.</p>
-    ${list.length ? `<p class="small muted">Order runs in a snake: left to right, then back right to left on the next row. Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
+    ${list.length ? `<p class="small muted">${qSlide ? 'Order runs left to right. Swipe or scroll sideways, or use the arrows, to see more. Switch to grid mode to see them all.' : 'Order runs in a snake: left to right, then back right to left on the next row.'} Drag a card by ⠿ to reorder (arrow keys work on the handle too). Drag a player onto someone on the other team to switch sides. Any card marked ready can go on a court now, whatever its place.</p>
     ${(() => { const q = (S.ui.qSearch || '').trim().toLowerCase(); const n = q ? list.filter((m) => all(m).some((pid) => { const pp = P(pid); return pp && `${pp.name} ${pp.nick || ''} ${clubNickOf(pp)}`.toLowerCase().includes(q); })).length : 0; return `<label class="field"><span class="sr-only">Find a player in the queue</span><input class="input" id="queue-search" type="search" data-bind="ui.qSearch" data-rerender placeholder="Find a player in the queue" autocomplete="off" value="${esc(S.ui.qSearch || '')}">${q ? `<span class="small ${n ? '' : 'muted'}" aria-live="polite">${n ? `${n} queued match${n === 1 ? '' : 'es'} with ${esc(S.ui.qSearch.trim())}` : 'Not in any queued match'}</span>` : ''}</label>`; })()}
-    <div class="qgrid" style="grid-template-columns:repeat(${queueCols()}, minmax(0, 1fr))">${list.map((m, i) => queueCard(s, m, i, list.length, queueCols())).join('')}</div>`
+    <div class="qs-bar"><span class="small muted">${list.length} waiting</span><div class="row" style="gap:8px">${qSlide ? `<div class="qs-nav"><button type="button" class="btn sm icon-btn" data-act="qsStep" data-d="-1" aria-label="Previous matches" title="Previous">${I.q_prev}</button><button type="button" class="btn sm icon-btn" data-act="qsStep" data-d="1" aria-label="Next matches" title="Next">${I.q_next}</button></div>` : ''}
+      <div class="qview" role="group" aria-label="Main Queue view"><button type="button" aria-pressed="${qSlide}" data-act="qView" data-v="slide" aria-label="Slide mode" title="Slide mode">${I.q_slide}</button><button type="button" aria-pressed="${!qSlide}" data-act="qView" data-v="grid" aria-label="Grid mode" title="Grid mode">${I.q_grid}</button></div></div></div>
+    ${qSlide ? `<div class="qslide" id="qslide" tabindex="0" role="region" aria-label="Waiting matches, scroll sideways">${list.map((m, i) => queueCard(s, m, i, list.length, list.length)).join('')}</div>`
+      : `<div class="qgrid" style="grid-template-columns:repeat(${queueCols()}, minmax(0, 1fr))">${list.map((m, i) => queueCard(s, m, i, list.length, queueCols())).join('')}</div>`}`
       : `<div class="card empty">No waiting matches. Use Generate matches to create a few, or add one yourself.</div>`}`;
 }
 
@@ -6589,6 +6611,8 @@ const ACT = {
   useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
   openSessionQr: () => openSheet({ type: 'sessionQr', fmt: 'post' }),
   qrFmt: (d) => { if (S.ui.sheet?.type === 'sessionQr') { S.ui.sheet.fmt = d.k; render(); } },
+  qView: (d) => { S.ui.qView = d.v === 'grid' ? 'grid' : 'slide'; render(); },
+  qsStep: (d) => { const el = document.getElementById('qslide'); if (!el) return; const card = el.querySelector('.qtile'); const step = card ? card.offsetWidth + 10 : 300; el.scrollBy({ left: (+d.d || 1) * step, behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   lhCourt: (d) => { S.ui.lhCourt = d.v; render(); },
   ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else if (d.menu === 'dd-console') ACT.pane({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
   downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
@@ -8089,6 +8113,16 @@ function applyPrototypeRoute(url) {
 
 // ---------- Render ----------
 let lastSheetKey = null;
+// Main Queue slide mode: keep the scroll position across re-renders and fade an edge only when more cards are that way.
+let qsLeft = 0;
+function setupQueueSlide() {
+  const el = document.getElementById('qslide');
+  if (!el) return;
+  el.style.scrollBehavior = 'auto'; el.scrollLeft = qsLeft; el.style.scrollBehavior = '';
+  const mask = () => { const max = el.scrollWidth - el.clientWidth; el.classList.toggle('m-l', el.scrollLeft > 4); el.classList.toggle('m-r', el.scrollLeft < max - 4); };
+  el.addEventListener('scroll', () => { qsLeft = el.scrollLeft; mask(); }, { passive: true });
+  mask();
+}
 function render() {
   if (prototypeRouter?.unavailable) return;
   const a = document.activeElement;
@@ -8101,6 +8135,7 @@ function render() {
   const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (S.screen === 'setup' ? setupCourtDialog : '') + (sh ? SHEETS[sh.type](sh) : '');
   document.getElementById('app').innerHTML = html;
   setupSavedPlayerStats();
+  setupQueueSlide();
   document.body.style.overflow = sh ? 'hidden' : '';
   const key = sh ? `${sh.type}|${sh.step || ''}|${sh.pick ? 'p' : ''}|${sh.tab || ''}|${sh.picking ? 'k' : ''}` : null;
   if (sh && key !== lastSheetKey) {

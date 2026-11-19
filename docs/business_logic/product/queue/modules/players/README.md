@@ -225,3 +225,14 @@ to hide individual levels. All participant and waitlist names remain masked, inc
 - Login and invitation registration/claim return to the same public session and tab. Unsent request
   fields and its retry ID stay temporarily in that Queue tab's sessionStorage (30 minutes); they are
   cleared after send/cancel. No password, auth token or admission evidence is stored in this context.
+
+## Level restrictions on slots
+
+Owner, November 19, 2026 ([D-2026-11-19-12](../../../../../mvp/decisions.md#d-2026-11-19-12)): each session has one **restriction** on which levels may take a slot, set in session preparation: **all levels** (default), **beginners only**, **beginners to intermediate** (no advanced) or **slots per level** (a number of beginner, intermediate and advanced slots that add up to the session's slots). A level's band (Beginner, Intermediate, Advanced) decides.
+
+- A signed-in player whose level at the club is outside the restriction, or whose band's slots are full, **can't send a join request** from the public session page.
+- A player with **no level** at the club can request; the level the Queue Master picks when confirming counts, and the restriction is checked then.
+- The Queue Master **can still add or confirm** anyone outside the restriction after a warning (confirm or add a second time). Adding to the waitlist isn't checked.
+- Promoting an already-confirmed player from the waitlist into a slot isn't re-checked.
+- Slots per level count roster players by band; changing a player's level later doesn't remove them.
+

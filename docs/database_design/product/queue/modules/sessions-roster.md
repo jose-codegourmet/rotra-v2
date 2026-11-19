@@ -47,6 +47,8 @@ Duplicate offline entries can conflict on linking. Quarantine the link operation
 | `minimum_games` | Nonnegative integer; target, not closure constraint |
 | `minimum_is_calculated` | Boolean, default true. While true and the session is prepared, the server recomputes `minimum_games` from courts, scheduled length, roster count (or `expected_players`), and formats. Frozen at start |
 | `players_per_court` | Positive integer (default from `clubs.default_players_per_court`, 8); slots = this × non-removed courts |
+| `level_restriction` | Enum `all` (default) · `beginners` · `beginners_intermediate` · `slots_per_band` ([D-2026-11-19-12](../../../../mvp/decisions.md#d-2026-11-19-12), proposed) |
+| `beginner_slots`, `intermediate_slots`, `advanced_slots` | Nullable integers ≥ 0, set only with `slots_per_band`; their sum equals the session's slots when saved (check in the service, since slots follow the court count) |
 | `expected_players` | Nullable positive integer used before the roster has players |
 | `queue_revision` | Bigint for coherent reorder/regenerate commands |
 | `rules_version` | Proposed (B-22, Go stack): integer, the shared queue rules version stamped at Start; device and server run this version for the whole session. Not migrated yet |

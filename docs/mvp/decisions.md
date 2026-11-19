@@ -76,6 +76,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-19-09](#d-2026-11-19-09) | Embla Carousel for sliders | approved 2026-11-19 by the owner naming it (scope open) | mockup only (loaded from a CDN) | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-10](#d-2026-11-19-10) | Player Home for signed-in players | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-19-11](#d-2026-11-19-11) | Invite-link onboarding and getting-to-know answers | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-19-12](#d-2026-11-19-12) | Session level restrictions | approved 2026-11-19 by the owner | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1405,3 +1406,13 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Decision:** after accepting the club-created profile's registration link or a session game link, registration is a fullscreen four-step onboarding (details prefilled and required; where you play, shots you know, favorite player optional). Answers are public, shown in the profile's About and editable in Edit profile › Playing style. Stored in `players.personal_details` (proposed shape in the [identity tables](../database_design/product/player-information/modules/identity.md)).
 - **Open:** whether the club invite link (no session) gets the same onboarding (the mockup's registration form is shared, so it does today); the exact shot and player lists can grow; columns or JSONB.
 - **References:** [identity rules](../business_logic/product/player-information/modules/identity/README.md), [P-ONBOARD](../screens/product/modules/player-information/access-registration.md#p-onboard--fullscreen-onboarding-after-an-invite-link)
+
+<a id="d-2026-11-19-12"></a>
+### D-2026-11-19-12 — Session level restrictions
+- **Decision status:** approved by the owner, November 19, 2026: “add in the session preparation called restrictions: beginners only, beginners to intermediate only, all levels, 8 pax beginner – 8 pax intermediate & 8 pax advanced; think about it like what levels are allowed to be put in a slot”. Asked: the four options with editable slots per level that add up to the session's slots; a player outside it can't request but the Queue Master can override after a warning; a player with no level can request and the Queue Master's chosen level counts.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-queue-level-restrictions.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Queue](workstreams/queue.md)
+- **Decision:** one restriction per session (all levels · beginners only · beginners to intermediate · slots per level), by level band. Enforced on public join requests; a warning for the Queue Master's confirm and add. Stored on the session ([sessions and roster](../database_design/product/queue/modules/sessions-roster.md), proposed columns).
+- **Open:** what happens to slots per level when courts are added or removed during the session (the mockup keeps the numbers and only checks new players); whether Generate Queue should respect it (it doesn't today); whether visitors see the restriction before signing in (only in Details today).
+- **References:** [players rules](../business_logic/product/queue/modules/players/README.md#level-restrictions-on-slots), [Q-SETUP](../screens/product/modules/queue/session-setup.md), [public session](../screens/product/modules/queue/public-session.md)

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 39 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 40 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -394,6 +394,7 @@ NEW: 39 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-court-tap-opens-match](2026-11-19-queue-court-tap-opens-match.md) | Queue app: tapping a busy court's drawing opens the match | court card (reuse) | NEW |
 | [2026-11-19-queue-dialog-cards-level-ring](2026-11-19-queue-dialog-cards-level-ring.md) | Queue app: match dialog player cards show the level as the picture's ring, not as text | dialog player card (reuse the level ring from the Players cards) | NEW |
 | [2026-11-19-queue-drag-court-to-free](2026-11-19-queue-drag-court-to-free.md) | Queue app: drag a busy court's drawing onto a free court to move the match | court card (drag source and drop target), drag ghost (reuse the swap ghost) | NEW |
+| [2026-11-19-queue-exemption-picker](2026-11-19-queue-exemption-picker.md) | Queue app: the exemption list uses a player picker, not a select menu | player picker sheet (reuse the player tiles and level filter), dashed empty-state button | NEW |
 | [2026-11-19-queue-generate-exemption-list](2026-11-19-queue-generate-exemption-list.md) | Queue app: Generate Queue has an exemption list | card, select, player chip with remove (new, small) | NEW |
 | [2026-11-19-queue-history-filter-pills](2026-11-19-queue-history-filter-pills.md) | Queue app: Match History's court filter is a row of pills with count badges | filter pill with count badge (new) | NEW |
 | [2026-11-19-queue-leaderboard-rings](2026-11-19-queue-leaderboard-rings.md) | Queue app: the live Leaderboard's pictures show the level ring | leaderboard row pictures (reuse the level ring) | NEW |
@@ -404,7 +405,7 @@ NEW: 39 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-main-queue-slide-mode](2026-11-19-queue-main-queue-slide-mode.md) | Queue app: Main Queue cards slide sideways by default, with a grid mode switch | Main Queue card list (carousel, new), icon view switch (new), icon buttons (reuse) | NEW |
 | [2026-11-19-queue-match-card-tap-swaps](2026-11-19-queue-match-card-tap-swaps.md) | Queue app: in the match dialogs, a player's card swaps the player and the picture opens the profile | dialog player card (split: picture button + card button), swap icon (new) | NEW |
 | [2026-11-19-queue-match-category-gender](2026-11-19-queue-match-category-gender.md) | Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender | match card format chip, draft tile, court sheets (reuse); a segmented gender control (reuse the segmented control) | NEW |
-| [2026-11-19-queue-match-history-timeline](2026-11-19-queue-match-history-timeline.md) | Queue app: Match History stacks the courts; each court's matches run newest-first from the left, time on top | match court card (reuse), a time column (new, small) | NEW |
+| [2026-11-19-queue-match-history-timeline](2026-11-19-queue-match-history-timeline.md) | Queue app: Match History stacks the courts; each court's matches run newest-first from the top, time on top | match court card (reuse), a time column (new, small) | NEW |
 | [2026-11-19-queue-move-playing-match](2026-11-19-queue-move-playing-match.md) | Queue app: a playing match can move to a free court | court menu item, a button in the match sheet, the Move match sheet (reuse) | NEW |
 | [2026-11-19-queue-no-attention-border](2026-11-19-queue-no-attention-border.md) | Queue app: waiting matches that need attention lose the yellow border | queue match card (attention state) | NEW |
 | [2026-11-19-queue-pause-match](2026-11-19-queue-pause-match.md) | Queue app: Pause match takes a playing match back to Getting ready | court card, match sheet footer (reuse buttons; pause icon new) | NEW |

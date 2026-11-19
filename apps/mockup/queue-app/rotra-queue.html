@@ -331,6 +331,13 @@ body.court-dragging { cursor: grabbing; }
 .cp-dot svg { width: 12px; height: 12px; }
 .ex-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 3px; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg); font-size: 13px; }
 .ex-chip .avatar { width: 26px; height: 26px; font-size: 10px; }
+.ex-empty { display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px; border: 1.5px dashed var(--border-strong); border-radius: var(--r); background: transparent; color: var(--fg2); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.ex-empty:hover { border-color: var(--accent); color: var(--fg); }
+.ex-empty span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent); font-weight: 800; font-size: 18px; }
+.ex-tile { position: relative; }
+.ex-clear { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ex-check { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; }
+.ex-check svg { width: 12px; height: 12px; }
 .lv-ring { --ring: var(--border-strong); display: inline-flex; border-radius: 50%; }
 .lv-ring.lv-beginner { --ring: var(--lv-beg); } .lv-ring.lv-intermediate { --ring: var(--lv-int); } .lv-ring.lv-advanced { --ring: var(--lv-adv); }
 .lv-ring .avatar { outline: 2px solid var(--ring); outline-offset: 1px; }
@@ -4728,11 +4735,13 @@ const ringAvatar = (s, pid) => { const r = R(s, pid); return `<span class="lv-ri
 // still be put in matches by hand (Add match, Make match, Suggest). Kept per session.
 const exemptOf = (s) => (s.exempt || []).filter((pid) => R(s, pid));
 function exemptCard(s) {
-  const list = exemptOf(s), open = s.roster.filter((r) => !list.includes(r.pid)).sort((a, b) => nm(a.pid).localeCompare(nm(b.pid)));
+  // Owner artifact comment, November 19, 2026: "putting it in a select is just lazy". A player picker sheet instead.
+  const list = exemptOf(s);
   return `<section class="card stack" aria-labelledby="ex-h"><div class="between"><h3 id="ex-h" style="margin:0;font-size:16px">Exemption list${list.length ? ` · ${list.length}` : ''}</h3>
-      <label class="sr-only" for="ex-add">Add a player to the exemption list</label><select class="input inline" id="ex-add" data-act-change="exemptAdd"><option value="">Add a player…</option>${open.map((r) => `<option value="${r.pid}">${esc(nm(r.pid))}</option>`).join('')}</select></div>
+      <button type="button" class="btn sm${list.length ? '' : ' primary'}" data-act="openExempt">${list.length ? 'Edit list' : 'Choose players'}</button></div>
     <p class="small muted">Generate Queue leaves these players out. They stay on the roster, and you can still put them in a match yourself.</p>
-    ${list.length ? `<div class="row" style="gap:8px">${list.map((pid) => `<span class="ex-chip">${ringAvatar(s, pid)}<b>${esc(short(pid))}</b><button type="button" class="btn xs ghost icon-btn" data-act="exemptRemove" data-pid="${pid}" aria-label="Take ${esc(nm(pid))} off the exemption list" title="Remove">${I.x}</button></span>`).join('')}</div>` : '<p class="small muted">No one is exempt.</p>'}
+    ${list.length ? `<div class="row" style="gap:8px">${list.map((pid) => `<span class="ex-chip">${ringAvatar(s, pid)}<b>${esc(short(pid))}</b><button type="button" class="btn xs ghost icon-btn" data-act="exemptRemove" data-pid="${pid}" aria-label="Take ${esc(nm(pid))} off the exemption list" title="Remove">${I.x}</button></span>`).join('')}</div>`
+      : `<button type="button" class="ex-empty" data-act="openExempt"><span aria-hidden="true">+</span>No one is exempt. Choose players to leave out.</button>`}
   </section>`;
 }
 // #739 (proposed): the bagging pairs list, a guide for Generate matches.
@@ -5761,6 +5770,21 @@ const SHEETS = {
           <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div></div>
         ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditLive">Save changes</button>`);
+  },
+  // Exemption list picker: search, filter by level, tap players to toggle, then Save list.
+  exemptPick(sh) {
+    const s = cur(), q = (sh.q || '').trim().toLowerCase(), band = sh.band || 'all', sel = sh.sel || [];
+    const rows = s.roster.filter((r) => (!q || `${nm(r.pid)} ${short(r.pid)}`.toLowerCase().includes(q)) && (band === 'all' || (r.level != null && LEVELS[r.level].band.toLowerCase() === band)))
+      .sort((a, b) => (sel.includes(b.pid) ? 1 : 0) - (sel.includes(a.pid) ? 1 : 0) || nm(a.pid).localeCompare(nm(b.pid)));
+    const bands = [['all', 'All levels'], ...LEVEL_GROUPS.map((g) => [g.toLowerCase(), g])];
+    const tile = (r) => { const on = sel.includes(r.pid), g = gamesOf(s, r.pid);
+      return `<button type="button" class="ptile sm ex-tile${on ? ' on' : ''}" data-act="exToggle" data-pid="${r.pid}" aria-pressed="${on}" aria-label="${esc(nm(r.pid))}, ${esc(lvLabel(r.level))}, ${g} games${on ? ', exempt' : ''}">${on ? `<span class="ex-check" aria-hidden="true">${I.check}</span>` : ''}${ringAvatar(s, r.pid)}<span class="pt-name">${esc(short(r.pid))}</span><span class="pt-meta">${g} games${r.present ? '' : ' · away'}</span></button>`; };
+    return sheetShell('Exemption list', `<p class="small muted">Tap players to leave them out of Generate Queue. Tap again to include them.</p>
+      <input class="input" id="ex-q" type="search" placeholder="Search players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search players" data-autofocus>
+      <div class="between"><div class="seg sp-band" role="group" aria-label="Skill level">${bands.map(([k, l]) => `<button type="button" aria-pressed="${band === k}" data-act="sheetSet" data-k="band" data-v="${k}">${l}</button>`).join('')}</div>
+        <span class="small"><b>${sel.length}</b> exempt${sel.length ? ` · <button type="button" class="ex-clear" data-act="exClear">Clear all</button>` : ''}</span></div>
+      ${rows.length ? `<div class="sp-grid">${rows.map(tile).join('')}</div>` : '<p class="small muted">No player matches.</p>'}`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="exSave">Save list${sel.length ? ` · ${sel.length}` : ''}</button>`);
   },
   // #717 Set games played (D-SET-GAMES): one player or every roster player; the stored value is an adjustment, so games keep counting up afterwards.
   setGames(sh) {
@@ -7579,6 +7603,10 @@ const ACT = {
   // Owner artifact comment, November 19, 2026: "add a pause match button. because sometimes you accidentally press start match".
   // Pause match takes a playing match back to Getting ready on the same court(s): the clock clears and Start match starts it again.
   // Players, sides and substitutions stay; nothing is recorded.
+  openExempt: () => { const s = cur(); openSheet({ type: 'exemptPick', sel: exemptOf(s).slice(), q: '', band: 'all' }); },
+  exToggle: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'exemptPick') return; sh.sel = sh.sel.includes(d.pid) ? sh.sel.filter((p) => p !== d.pid) : [...sh.sel, d.pid]; render(); },
+  exClear: () => { const sh = S.ui.sheet; if (sh?.type !== 'exemptPick') return; sh.sel = []; render(); },
+  exSave: () => { const s = cur(), sh = S.ui.sheet; if (sh?.type !== 'exemptPick') return; s.exempt = sh.sel.filter((p) => R(s, p)); S.ui.sheet = null; commit(s.exempt.length ? `Exemption list saved · ${s.exempt.length} player${s.exempt.length === 1 ? '' : 's'}` : 'Exemption list cleared'); render(); },
   exemptRemove: (d) => { const s = cur(); s.exempt = exemptOf(s).filter((p) => p !== d.pid); commit(`${nm(d.pid)} taken off the exemption list`); render(); },
   pauseMatch: (d) => {
     const s = cur(), m = s.matches.find((x) => x.id === d.id);

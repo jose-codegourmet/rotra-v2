@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 58 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 59 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -383,6 +383,7 @@ NEW: 58 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | TICKETED — #944 |
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
+| [2026-11-19-auth-backgrounds](2026-11-19-auth-backgrounds.md) | Queue, Player and Admin apps: ROTRA background art on the auth pages | auth page frame | NEW |
 | [2026-11-19-court-colors](2026-11-19-court-colors.md) | Queue and Player apps: ROTRA court colours (dark theme) | every drawn court (court card, match card court, setup court picture, player game cards) | CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted |
 | [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | NEW |
 | [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | NEW |

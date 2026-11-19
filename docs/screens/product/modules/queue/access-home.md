@@ -15,6 +15,8 @@ ROTRA wordmark with “Queue”, then the sync status pill on the right: “Sync
 
 ## Q-LOGIN — Dedicated club login
 
+**Background art** (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-auth-backgrounds.md)): the sign-in page and every other page in the same frame (password and invite pages included) sits on full-bleed ROTRA art from Higgsfield: Rion, the Queue Master, courtside with his tablet, in the rotra.club flat vector style. The form card stays on the calm right side on wide screens, over a dark fade; on phones the art is darkened behind the centred card. Same art in both themes; the card keeps the theme's surface.
+
 **Entry:** signed-out Queue app. **Exit:** club home, or the license gate.
 
 Layout: ROTRA mark, “Run the game.”, heading **Club login**, form, and “Club access is set up and licensed by the ROTRA platform owner.”

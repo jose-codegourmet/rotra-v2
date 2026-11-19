@@ -6,6 +6,8 @@
 
 ## A-LOGIN — Platform-owner access
 
+**Background art** (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-auth-backgrounds.md)): the sign-in page and every other page in the same frame (password and invite pages included) sits on full-bleed ROTRA art from Higgsfield: an empty arena of courts seen from above, a few lit mint, in the rotra.club flat vector style. The form card stays on the calm right side on wide screens, over a dark fade; on phones the art is darkened behind the centred card. Same art in both themes; the card keeps the theme's surface.
+
 Admin is a separate internal audience. A club credential or registered player credential does not grant platform-owner privileges.
 
 Proposed credential form: email and password, following the existing Admin-auth baseline. The reset discussion did not choose a new Admin authentication/recovery method; final provider/session policy remains to be confirmed. Do not invent a public Admin registration, shared club gate password, MFA requirement, or named staff-role management feature.

@@ -32,6 +32,8 @@ A match moves through these steps (owner decision, November 6, 2026):
 
 The buttons stay **Start match** and **Match done**.
 
+**Pause match** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a Playing match can go back to **On court** (Getting ready) on the same court(s), for a match started by mistake. The start time clears and **Start match** starts it again; players, sides and substitutions stay, and nothing is recorded. It is not a timer pause.
+
 ## Start and completion
 
 Getting a match going takes two operator steps:

@@ -52,7 +52,7 @@ Each card has one of three states. The state is always written as a chip, so col
 |---|---|
 | Free | Plain card, chip **Free** (or **Not open yet** before its planned start) |
 | Getting ready (On court) | Normal border, chip **Getting ready**, the court drawing with the players, primary **Start match**, secondary **Open match** ([Q-ON-COURT](match-control.md#q-on-court--getting-ready)) |
-| Playing | **Steady accent border glow** (no pulse), chip **Playing** with the minutes, **Open match** ([Q-ACTIVE-MATCH](match-control.md)) |
+| Playing | **Steady accent border glow** (no pulse), chip **Playing** with the minutes, **Open match** ([Q-ACTIVE-MATCH](match-control.md)) and **Pause match** (back to Getting ready, for a match started by mistake; November 19, 2026) |
 
 **Tapping the court drawing** of a Getting ready or Playing court opens the same dialog as **Open match** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-court-tap-opens-match.md)). A player's face still opens their profile. The **Open match** button stays for keyboards and screen readers.
 

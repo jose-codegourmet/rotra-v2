@@ -13,6 +13,7 @@ DELETE FROM session_courts; DELETE FROM match_participations; DELETE FROM match_
 DELETE FROM session_waitlist; DELETE FROM session_join_requests; DELETE FROM session_drop_out_notices; DELETE FROM session_match_request_spots; DELETE FROM session_match_requests;
 DELETE FROM club_session_player_summaries; DELETE FROM session_finalizations; DELETE FROM active_court_holds; DELETE FROM session_payment_marks; DELETE FROM session_shuttle_plan_lines; DELETE FROM session_cost_estimates; DELETE FROM session_result_snapshots;
 DELETE FROM result_exports;
+DELETE FROM sync_conflict_operations; DELETE FROM sync_conflicts; DELETE FROM sync_operations; DELETE FROM device_session_streams;
 DELETE FROM club_entitlements; DELETE FROM club_expiry_cycles; DELETE FROM club_venues; DELETE FROM inventory_items; DELETE FROM club_assessments;
 DELETE FROM player_rank_current; DELETE FROM club_player_private_inputs; DELETE FROM club_players; DELETE FROM shared_player_entries;
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters; DELETE FROM players;

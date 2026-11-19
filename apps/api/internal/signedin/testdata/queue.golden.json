@@ -12802,5 +12802,3950 @@
         "message": "This club does not have an active license."
       }
     }
+  },
+  "sync-signed-out": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "sync-club1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club2": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club3": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club4": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club5": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-disabled": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "sync-unprovisioned": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "sync-club1-expired": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-later": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-28T04:00:00.123Z"
+    }
+  },
+  "sync-club1-open-stream": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-sealed-proven": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-sealed-prefix-short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-revoked-stream-alone-is-fine": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-open-conflict": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-resolved-conflict": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-operation-received": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-operation-waiting": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-operation-accepted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-operation-rejected": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-operation-conflicted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-prepared-session-open-stream": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000009"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-completed-sessions-are-ignored": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club2-finalizing-session-is-ignored": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-other-clubs-rows-are-ignored": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club3-own-open-stream": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000003"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-stray-club-id-counts": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-two-incomplete": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000001",
+        "a3000000-0000-4000-8000-000000000009"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sync-club1-one-proven-one-not": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "incompleteSessionIds": [
+        "a3000000-0000-4000-8000-000000000009"
+      ],
+      "checkedAt": "2026-11-19T04:00:00.000Z"
+    }
+  },
+  "sessionsync-signed-out": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "sessionsync-club1-s1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-s2": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-s3": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-s4": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-s5": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-s6": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-s7": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-s8": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-s9": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club2-own-s2": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club3-own-s3": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club3-unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club4-edge": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club5-no-row": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-not-a-uuid": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "sessionsync-disabled": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "sessionsync-club1-expired-live": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-expired-prepared": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-big-numbers": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "9007199254740993",
+          "contiguousSequence": "9007199254740993",
+          "highestReceivedSequence": "9007199254740995",
+          "sealedFinalSequence": "9007199254740993",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-many-streams-and-conflicts": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000002",
+          "generationNo": 2,
+          "downloadedRevision": "1",
+          "contiguousSequence": "0",
+          "highestReceivedSequence": "0",
+          "sealedFinalSequence": null,
+          "sealedAt": null,
+          "state": "open"
+        },
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "2",
+          "highestReceivedSequence": "3",
+          "sealedFinalSequence": null,
+          "sealedAt": null,
+          "state": "revoked"
+        },
+        {
+          "id": "a8100000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000003",
+          "generationNo": 3,
+          "downloadedRevision": "1",
+          "contiguousSequence": "5",
+          "highestReceivedSequence": "5",
+          "sealedFinalSequence": "5",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [
+        {
+          "id": "a8300000-0000-4000-8000-000000000001",
+          "category": "missing_prerequisite",
+          "detectedAt": "2026-11-19T02:15:00.500Z"
+        },
+        {
+          "id": "a8300000-0000-4000-8000-000000000002",
+          "category": "payload_mismatch",
+          "detectedAt": "2026-11-19T02:45:00.000Z"
+        },
+        {
+          "id": "a8300000-0000-4000-8000-000000000004",
+          "category": "contradictory_decision",
+          "detectedAt": "2026-11-19T03:15:00.000Z"
+        }
+      ],
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 3,
+        "pendingOperations": 2
+      }
+    }
+  },
+  "sessionsync-club1-stray-session-rows-of-other-club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "0",
+          "highestReceivedSequence": "0",
+          "sealedFinalSequence": null,
+          "sealedAt": null,
+          "state": "open"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club2-cannot-read-smash-streams": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "sessionsync-club1-completed-with-open-stream": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000004",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "0",
+          "highestReceivedSequence": "0",
+          "sealedFinalSequence": null,
+          "sealedAt": null,
+          "state": "open"
+        }
+      ],
+      "conflicts": [
+        {
+          "id": "a8300000-0000-4000-8000-000000000001",
+          "category": "missing_prerequisite",
+          "detectedAt": "2026-11-19T02:30:00.000Z"
+        }
+      ],
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 1,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-sealed-proven": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "2",
+          "highestReceivedSequence": "2",
+          "sealedFinalSequence": "2",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-sealed-prefix-short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "2",
+          "sealedFinalSequence": "2",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-revoked-only": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "3",
+          "highestReceivedSequence": "5",
+          "sealedFinalSequence": null,
+          "sealedAt": null,
+          "state": "revoked"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-resolved-conflict": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-open-conflict-hides-evidence": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [],
+      "conflicts": [
+        {
+          "id": "a8300000-0000-4000-8000-000000000001",
+          "category": "missing_prerequisite",
+          "detectedAt": "2026-11-19T02:30:00.000Z"
+        }
+      ],
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 1,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-operation-received": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "1",
+          "sealedFinalSequence": "1",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 1
+      }
+    }
+  },
+  "sessionsync-club1-operation-waiting": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "1",
+          "sealedFinalSequence": "1",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 1
+      }
+    }
+  },
+  "sessionsync-club1-operation-accepted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "1",
+          "sealedFinalSequence": "1",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-operation-rejected": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "1",
+          "sealedFinalSequence": "1",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "sessionsync-club1-operation-conflicted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "streams": [
+        {
+          "id": "a8100000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "deviceId": "a8000000-0000-4000-8000-000000000001",
+          "generationNo": 1,
+          "downloadedRevision": "1",
+          "contiguousSequence": "1",
+          "highestReceivedSequence": "1",
+          "sealedFinalSequence": "1",
+          "sealedAt": "2026-11-19T03:00:00.250Z",
+          "state": "sealed"
+        }
+      ],
+      "conflicts": [],
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      }
+    }
+  },
+  "donereview-signed-out": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "donereview-club1-s1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s2": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-s3": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-s4": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000004",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Cory Only",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s5": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-s6": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": []
+    }
+  },
+  "donereview-club1-s7": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": []
+    }
+  },
+  "donereview-club1-s8": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-s9": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+          "name": "Alice Reyes",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+          "name": "Bob Santos",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+          "name": "Una Alonzo",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+          "name": "Una Alonzo",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club2-own-s2": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
+  },
+  "donereview-club3-own-s3": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
+  },
+  "donereview-club3-unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club4-edge": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club5-no-row": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-unknown": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "donereview-club1-not-a-uuid": {
+    "status": 500,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "internal",
+        "message": "Something went wrong."
+      }
+    }
+  },
+  "donereview-disabled": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "wrong_account",
+        "message": "This account cannot use this app."
+      }
+    }
+  },
+  "donereview-club1-expired-live": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
+  },
+  "donereview-club1-expired-live-started": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-expired-prepared": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
+  },
+  "donereview-club1-started-term-live": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s4-expired": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
+  },
+  "donereview-club1-s1-open-stream": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "unsealed_streams"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-sealed-proven": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-sealed-short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "unsealed_streams"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-revoked": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-open-conflict": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "open_conflicts"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 1,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-resolved-conflict": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-many": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "unsealed_streams",
+        "open_conflicts",
+        "pending_operations"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 3,
+        "pendingOperations": 2
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-big": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-stray-club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "unsealed_streams"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-operation-received": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "pending_operations"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 1
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-operation-waiting": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "pending_operations"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 1
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-operation-accepted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-operation-rejected": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-operation-conflicted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-no-policy": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "no_ranking_policy"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-before-the-first-policy": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "no_ranking_policy"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-policy-starts-this-instant": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "no_ranking_policy"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-policy-starts-in-a-moment": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "no_ranking_policy"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-no-active-match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-everything-blocks": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches",
+        "unsealed_streams",
+        "open_conflicts",
+        "pending_operations",
+        "no_ranking_policy"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 1,
+        "pendingOperations": 1
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-minimum-0": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-minimum-1": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-minimum-2": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+          "name": "Alice Reyes",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+          "name": "Bob Santos",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+          "name": "Carla Dizon",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-minimum-5": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+          "name": "Alice Reyes",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+          "name": "Bob Santos",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+          "name": "Carla Dizon",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "games": 1
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-credit-outgoing": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-credit-incoming": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-credit-none": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-credit-dangling": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-invalid-match-gives-nothing": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+          "name": "Alice Reyes",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+          "name": "Bob Santos",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+          "name": "Carla Dizon",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-completed-without-decision": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+          "name": "Alice Reyes",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+          "name": "Bob Santos",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+          "name": "Carla Dizon",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-no-completed-matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+          "name": "Alice Reyes",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+          "name": "Bob Santos",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+          "name": "Carla Dizon",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-games-adjustment-is-not-counted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-no-record-games": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-released-and-no-show-leave-the-list": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-named-like-a-profile": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "name": "Alice Reyes",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0001"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-snapshot-matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Bob Santos",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+              "name": "Bob Santos",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0002"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-nickname-matches": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "name": "Alice Reyes",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0001"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-matches-club-nickname": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+              "name": "Bob Santos",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0002"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-matches-two-profiles": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-0000000000f1",
+              "name": "Dan Uy",
+              "identity": "unclaimed",
+              "rtrId": "RTR-PH-CEB-102926-0004"
+            },
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+              "name": "Carla Dizon",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0003"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-profile-unclaimed-has-rtr": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+              "name": "Erin Lim",
+              "identity": "unclaimed",
+              "rtrId": "RTR-PH-MNL-102926-0005"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-profile-without-rtr-id": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-0000000000f2",
+              "name": "Frank No Id",
+              "identity": "registered",
+              "rtrId": null
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-removed-profile-is-no-candidate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-other-clubs-profile-is-no-candidate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-blank-names-never-match": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-unicode-lowercase": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "name": "i̇lker",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0001"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+              "name": "οδος",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0002"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-guest-js-whitespace": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": [
+            {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "name": "Alice Reyes",
+              "identity": "registered",
+              "rtrId": "RTR-PH-CEB-102926-0001"
+            }
+          ]
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s1-no-guests": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": []
+    }
+  },
+  "donereview-club1-s1-guest-entries-confirmed-the-same-moment": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "active_matches"
+      ],
+      "activeMatches": 1,
+      "completeness": {
+        "proven": true,
+        "openStreams": 0,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+          "name": "Una Alonzo",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+          "name": "Cory Only",
+          "candidates": []
+        },
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+          "name": "No Phone Ned",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club1-s9-prepared": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "blocking": [
+        "unsealed_streams"
+      ],
+      "activeMatches": 0,
+      "completeness": {
+        "proven": false,
+        "openStreams": 1,
+        "openConflicts": 0,
+        "pendingOperations": 0
+      },
+      "belowMinimum": [
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+          "name": "Alice Reyes",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+          "name": "Bob Santos",
+          "games": 0
+        },
+        {
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+          "name": "Una Alonzo",
+          "games": 0
+        }
+      ],
+      "unresolvedGuests": [
+        {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+          "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+          "name": "Una Alonzo",
+          "candidates": []
+        }
+      ]
+    }
+  },
+  "donereview-club3-s8-invalid-expired": {
+    "status": 403,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
   }
 }

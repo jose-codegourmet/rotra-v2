@@ -36,6 +36,7 @@ var queuePaths = []string{
 	"/api/sessions/a3000000-0000-4000-8000-000000000001/matches", "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
 	"/api/sessions/a3000000-0000-4000-8000-000000000001/payments", "/api/sessions/a3000000-0000-4000-8000-000000000004/results",
 	"/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+	"/api/sync", "/api/sessions/a3000000-0000-4000-8000-000000000001/sync", "/api/sessions/a3000000-0000-4000-8000-000000000001/done-review",
 }
 
 // Only a provisioned, enabled club account reads, and only through the Queue app: another app's header, no pass, a bad
@@ -120,7 +121,7 @@ func TestQueueReadsStayInsideTheClub(t *testing.T) {
 	e := queueEnv(t)
 	birdie := e.clubPass(t, birdieSubject)
 	smashSession := "/api/sessions/a3000000-0000-4000-8000-000000000001"
-	for _, tail := range []string{"", "/roster", "/matches", "/cost", "/payments", "/results", "/requests"} {
+	for _, tail := range []string{"", "/roster", "/matches", "/cost", "/payments", "/results", "/requests", "/sync", "/done-review"} {
 		// Birdie Club's licence lapsed: the entitlement refusal comes only after the club's own lookup, so a session of
 		// another club is not found, never forbidden.
 		if w := e.do(req{path: smashSession + tail, app: "club", bearer: birdie}); w.Code != 404 || errCode(t, w) != "not_found" {

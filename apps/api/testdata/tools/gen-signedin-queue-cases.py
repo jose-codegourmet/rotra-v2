@@ -155,6 +155,9 @@ case("lookup-club1-bob-rank-none", "/api/players?q=bob@example.test", club=1,
 EXTRA = os.path.join(HERE, "gen-signedin-queue-cases-sessions.py")
 if os.path.exists(EXTRA):
     exec(open(EXTRA).read())
+EXTRA2 = os.path.join(HERE, "gen-signedin-queue-cases-sync.py")
+if os.path.exists(EXTRA2):
+    exec(open(EXTRA2).read())
 
 names = [c["name"] for c in cases]
 assert len(names) == len(set(names)), "duplicate case names: " + ", ".join(n for n in names if names.count(n) > 1)

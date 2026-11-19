@@ -15,8 +15,8 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 3: Queue
 
-- [~] **3.1** Characterize + port club and session reads (done: club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests; left: `/done-review`, `/finalization` after 3.2)
-- [ ] **3.2** Sync read
+- [x] **3.1** Characterize + port club and session reads (club, invite, venues, inventory, license, players, sessions, roster, matches, cost, payments, results, requests, done-review; `/finalization` left, see deviations)
+- [x] **3.2** Sync read (`/api/sync`, `/api/sessions/{id}/sync`)
 
 ## Phase 4: Switch
 
@@ -46,3 +46,6 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 3.1 | `/finalization` runs `driveFinalizationJobs` before reading; `/done-review` needs `sessionCompleteness` from sync | Not a plain read | Left out; `/finalization` is an owner call, `/done-review` follows 3.2 |
 | 2026-11-19 | 3.1 | `/api/public-sessions/{slug}/my-request` is a visitor read keyed on a receipt cookie | Not a club read | Stays on Next; `/api/public-sessions` cannot be moved as a whole prefix |
 | 2026-11-19 | 3.1 | `internal/rules/{sessioncost,payment}` are empty stubs; helpers are unexported in `signedin/queue_money.go` | Rules not edited here | Move later |
+| 2026-11-19 | 3.2 | The two sync reads make no entitlement check (TS has none); `done-review` ignores `record_games` (TS does) | Characterized | Ported as is, pinned |
+| 2026-11-19 | 3.2 | `incompleteSessionIds`, `belowMinimum` and guest candidates have no ORDER BY, as in the TS | Characterized | Production order not guaranteed |
+| 2026-11-19 | 3.2 | `normalizedName` hand-ports JS `toLocaleLowerCase` (dotted I, final sigma); captured on an en-US machine | No Go equivalent | Pinned in golden |

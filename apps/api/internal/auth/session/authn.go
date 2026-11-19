@@ -116,7 +116,7 @@ func newAuthenticator(r authnReader, v *pass.Verifier, ttl time.Duration, now fu
 }
 
 // Authenticate verifies the access pass for the audience (pinned per call: a club pass never opens the Admin
-// app), loads the account by its link to the identity and checks it can sign in, and in ModeWrite checks the
+// app), loads the account by its link to the identity and checks it can sign in, and in ModeWrite and ModeSessionRead checks the
 // session. It returns one of ErrExpired, ErrUnauthenticated, ErrWrongAccount, ErrSessionRevoked, or an
 // unexpected database error.
 //
@@ -148,7 +148,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, token string, aud stor
 	if ref.id != accountID || (aud == store.AudienceClub && (ref.clubID == nil || ref.clubID.String() != claims.ClubID)) {
 		return Principal{}, ErrUnauthenticated // the identity now belongs to another account than the pass names
 	}
-	if mode == ModeWrite {
+	if mode == ModeWrite || mode == ModeSessionRead {
 		if err := a.checkSession(ctx, sessionID, identityID); err != nil {
 			return Principal{}, err
 		}

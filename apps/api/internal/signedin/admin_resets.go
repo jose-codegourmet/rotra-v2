@@ -30,5 +30,5 @@ func (s *server) adminPasswordResets() http.Handler {
 		}
 		httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
 	})
-	return s.auth.Require(store.AudienceAdmin, session.ModeRead)(run)
+	return s.auth.Require(store.AudienceAdmin, session.ModeSessionRead)(run)
 }

@@ -81,10 +81,9 @@ func TestAdminReadsRefuseAnAdminDeactivatedAfterSigningIn(t *testing.T) {
 	}
 }
 
-// A revoked session is not refused by a read: reads trust a valid access pass for its 15 minutes and only writes check
-// the session row (B-27). This pins that. Next with Supabase checked the live session on every read, so this is a
-// deviation from the Route Handler that the owner decides on (see the report).
-func TestAdminReadsDoNotLookAtARevokedSession(t *testing.T) {
+// An Admin read checks the session row: a signed-out (revoked) session is refused with 401, an active one reads. The
+// Player and Queue apps keep trusting a valid pass for its 15 minutes.
+func TestAdminReadsCheckTheSession(t *testing.T) {
 	e := adminEnv(t)
 	id := uuid.MustParse(ownerSubject)
 	ident, err := e.st.GetIdentityByID(e.ctx, id)
@@ -99,11 +98,40 @@ func TestAdminReadsDoNotLookAtARevokedSession(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	for _, p := range adminPaths {
+		if w := e.do(req{path: p, app: "admin", bearer: iss.AccessPass}); w.Code != 200 {
+			t.Errorf("%s with an active session: %d %s", p, w.Code, w.Body.String())
+		}
+	}
 	if err := e.svc.SignOut(e.ctx, iss.Session.ID, nil); err != nil {
 		t.Fatal(err)
 	}
-	if w := e.do(req{path: "/api/feature-flags", app: "admin", bearer: iss.AccessPass}); w.Code != 200 {
-		t.Fatalf("a revoked session reads %d, pinned as 200 until the owner decides: %s", w.Code, w.Body.String())
+	for _, p := range adminPaths {
+		if w := e.do(req{path: p, app: "admin", bearer: iss.AccessPass}); w.Code != 401 || errCode(t, w) != "unauthenticated" {
+			t.Errorf("%s with a revoked session: %d %s", p, w.Code, w.Body.String())
+		}
+	}
+}
+
+// A session row that has expired is refused too, even though the pass itself is still valid.
+func TestAdminReadsRefuseAnExpiredSessionRow(t *testing.T) {
+	e := adminEnv(t)
+	id := uuid.MustParse(ownerSubject)
+	ident, err := e.st.GetIdentityByID(e.ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var account uuid.UUID
+	if err := e.pool.QueryRow(e.ctx, `SELECT id FROM admin_accounts WHERE auth_subject = $1`, id).Scan(&account); err != nil {
+		t.Fatal(err)
+	}
+	iss, err := e.svc.Issue(e.ctx, session.IssueInput{Identity: ident, AccountID: account, DeviceLabel: "Chrome on Android"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	e.exec(t, `UPDATE auth_sessions SET expires_at = now() - interval '1 day' WHERE id = $1`, iss.Session.ID)
+	if w := e.do(req{path: "/api/feature-flags", app: "admin", bearer: iss.AccessPass}); w.Code != 401 {
+		t.Fatalf("an expired session row reads %d: %s", w.Code, w.Body.String())
 	}
 }
 

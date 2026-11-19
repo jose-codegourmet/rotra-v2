@@ -41,7 +41,7 @@ func (s *server) admin(fn adminRead) http.Handler {
 		}
 		httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
 	})
-	return s.auth.Require(store.AudienceAdmin, session.ModeRead)(run)
+	return s.auth.Require(store.AudienceAdmin, session.ModeSessionRead)(run)
 }
 
 // registerAdmin adds the Admin app's reads. A path that another app answers too (clubs, ranking settings, players)

@@ -19,7 +19,7 @@ Superseded by: none
 
 ## Why
 
-- The owner decided in [#907](https://github.com/jose-codegourmet/rotra-v2/issues/907#issuecomment-6971444654): “Admin can set Verified by Admin or clear the override to return to automatic checks.” Both actions require an audited reason. The card shows the status and all three checks. [D-2026-11-16-02](../mvp/decisions.md#d-2026-11-16-02)
+- The owner decided in [#907](https://github.com/jose-codegourmet/rotra-v2/issues/907#issuecomment-6971444654): “Admin can set Verified by Admin or clear the override to return to automatic checks.” Both actions require an audited reason. The card shows the status and all three checks. [D-2026-11-16-02](../mvp/decisions/2026-11-16.md#d-2026-11-16-02)
 
 ## Like for like
 

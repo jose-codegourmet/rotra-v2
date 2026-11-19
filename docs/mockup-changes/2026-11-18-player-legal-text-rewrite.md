@@ -22,7 +22,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 18, 2026: a stronger, more complete version of both pages, in the same plain-language voice, that is also shown on rotra.club (`#privacy`, `#terms`) and covers clubs that request a quotation there.
-- Decision: [D-2026-11-18-02](../mvp/decisions.md#d-2026-11-18-02) (amends [D-2026-11-17-01](../mvp/decisions.md#d-2026-11-17-01)).
+- Decision: [D-2026-11-18-02](../mvp/decisions/2026-11-18.md#d-2026-11-18-02) (amends [D-2026-11-17-01](../mvp/decisions/2026-11-17.md#d-2026-11-17-01)).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -41,10 +41,10 @@ Superseded by: none
 - Business logic: docs/business_logic/product/player-information/modules/identity/README.md — "Privacy Policy and Terms of Service pages": the date, what each page now covers, where the text lives, and the age rule.
 - Database design: none needed (no new data is stored).
 - Screen docs: docs/screens/product/modules/player-information/legal.md — the date, the section lists, the placeholders and the rotra.club copies.
-- Decisions: docs/mvp/decisions.md — new D-2026-11-18-02; amendment note on D-2026-11-17-01.
+- Decisions: docs/mvp/decisions/README.md — new D-2026-11-18-02; amendment note on D-2026-11-17-01.
 
 ## Real app work
 - Built in the same change: the new text in `apps/player/src/app/(public)/privacy/content.ts` and `.../terms/content.ts`, word for word the mockup's `LEGAL`. No component or route change.
 
 ## Open for the owner
-- The text is a plain-language draft that a lawyer has not reviewed. The three placeholders and the other open points are listed under [D-2026-11-18-02](../mvp/decisions.md#d-2026-11-18-02).
+- The text is a plain-language draft that a lawyer has not reviewed. The three placeholders and the other open points are listed under [D-2026-11-18-02](../mvp/decisions/2026-11-18.md#d-2026-11-18-02).

@@ -36,7 +36,7 @@ When privacy changes, future downloads and refreshed caches must redact the valu
 
 Server access can be blocked immediately at expiry. A disconnected device cannot be remotely locked with certainty. Use scoped cached entitlement/start authorization and define clock/reconnection rules before implementing offline starts.
 
-> MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03), so offline start authorization is moot for MVP.
+> MVP: offline start is out of MVP under [D-2026-11-07-03](../../mvp/decisions/2026-11-07.md#d-2026-11-07-03), so offline start authorization is moot for MVP.
 
 ## Public-page deletion
 
@@ -46,11 +46,11 @@ A deletion worker locks/rechecks the current entitlement and exact expiry-cycle 
 
 Off Day exports stay private until explicitly authorized for sharing. Do not store all slides at guessable public asset URLs and rely only on hiding the link.
 
-**Decided November 11, 2026 ([D-2026-11-11-09](../../mvp/decisions.md#d-2026-11-11-09)):**
+**Decided November 11, 2026 ([D-2026-11-11-09](../../mvp/decisions/2026-11-11.md#d-2026-11-11-09)):**
 
 - Public pages have **no time limit while the club is licensed**; the six-month deletion after continuous expiry above is unchanged.
 - Every public page is **never indexed and never static**: served per request with `noindex, nofollow` (meta and `X-Robots-Tag`), disallowed in `robots.txt`; no static generation or ISR. The short per-request cache of D-2026-11-09-09 is allowed.
-- **Private retention, 90 days:** join requests (`session_join_requests`, they hold phone numbers), server request logs and generated exports are deleted 90 days after creation. `player_match_facts`, player IDs and rank evidence are never touched. The sweep has no scheduler for MVP (jobs parked, [D-2026-11-11-10](../../mvp/decisions.md#d-2026-11-11-10)); it runs by hand until then.
+- **Private retention, 90 days:** join requests (`session_join_requests`, they hold phone numbers), server request logs and generated exports are deleted 90 days after creation. `player_match_facts`, player IDs and rank evidence are never touched. The sweep has no scheduler for MVP (jobs parked, [D-2026-11-11-10](../../mvp/decisions/2026-11-11.md#d-2026-11-11-10)); it runs by hand until then.
 - The join-request receipt stays a browser-session cookie; a lost cookie means the visitor asks the club.
 
 Public-page restoration after actual deletion remains open. No automated club-wide purge is authorized by the six-month rule.

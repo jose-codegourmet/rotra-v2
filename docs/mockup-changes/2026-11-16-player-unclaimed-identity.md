@@ -36,7 +36,7 @@ Superseded by: none
 - **Owner artifact comment, same day (profile page of an unclaimed player):** the profile card on the left now shows the complete information under the name: the level chip and the standing chip ("#18 overall", or "Not on the leaderboard yet"), an **About** block (Saved by CLUB; Standing "#18 of 1,284 overall", or "No overall position yet. 7 of 10 standard matches in the last three months"), and the **Latest stats** block of the profile dialog (win rate, games, wins, losses for the year). The Clubs card lists the club that saved them instead of "No clubs yet." (`heroFacts`, `clubsOf`).
 
 ## Why
-- Owner decision [D-2026-11-16-04](../mvp/decisions.md#d-2026-11-16-04), November 16, 2026. On claiming: "they get
+- Owner decision [D-2026-11-16-04](../mvp/decisions/2026-11-16.md#d-2026-11-16-04), November 16, 2026. On claiming: "they get
   prompted to a dialog asking. which of the following identities are correct and is presented to them in a form of
   cards and they just pick which one". On being public: "thats the point of unclaimed. they get to be public. making
   sure that the real person must be eager enough to register so they can make it private".

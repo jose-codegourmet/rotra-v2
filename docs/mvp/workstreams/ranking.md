@@ -17,7 +17,7 @@ and generation weights.
 
 ## Out of scope / deferred
 
-- Anything beyond the ranking work agreed under the scope freeze ([D-04](../decisions.md#d-2026-11-07-04)).
+- Anything beyond the ranking work agreed under the scope freeze ([D-04](../decisions/2026-11-07.md#d-2026-11-07-04)).
 
 ## Current state
 
@@ -29,28 +29,28 @@ and generation weights.
 | Rank formula (blend, normalization, ties) | not implemented | Business doc says the engine is not specified (`ranking/README.md:3,39,70`) | #247 open (blocked) |
 | Recalculation on policy change | not implemented | `schedulePolicyRecalculation` (`projections.ts:409`) has no caller | #247 |
 | Ageing / 3-month window rechecks | not implemented | `scheduleAgeingJobs` (`projections.ts:383`) has no caller; no cron in `.github/workflows` | #247 |
-| Guest history attribution recompute | not implemented | `confirmHistoryAttribution` (`projections.ts:419`) has no caller | #244, #246, [D-03](../decisions.md#d-2026-11-07-03) |
+| Guest history attribution recompute | not implemented | `confirmHistoryAttribution` (`projections.ts:419`) has no caller | #244, #246, [D-03](../decisions/2026-11-07.md#d-2026-11-07-03) |
 | Session awards (Most Improved, Off Day…) | partially connected | `writeResultSnapshot` uses `awardBaseline`, labeled `prototype-reference` (`projections.ts:22`); runs in real mode with an unapproved formula | #247 open |
 | Queue fairness / generation | unknown | `packages/data/src/real/autoQueue.ts` exists; not audited; drafts use prototype weights ([queue.md](queue.md)) | #247 |
 | Retry failed projection job | not implemented (owner path) | `retryProjectionJob` (`:371`) has no caller; finalization `retryFailed` path exists (`route.ts:57`) | Ticket: needed |
 
 ## Remaining work
 
-- [x] Owner approval of the engine, ties, window, sparse data, award evidence: [D-2026-11-11-05](../decisions.md#d-2026-11-11-05) (rating by wins), November 11, 2026.
+- [x] Owner approval of the engine, ties, window, sparse data, award evidence: [D-2026-11-11-05](../decisions/2026-11-11.md#d-2026-11-11-05) (rating by wins), November 11, 2026.
 - [ ] #247 (unblocked): the constants (band edges, step sizes) and worked examples.
-- [ ] After #247: approved algorithm version, eligibility, recalculation on policy save, attribution recompute. Ageing is computed on read while jobs are parked ([D-2026-11-11-10](../decisions.md#d-2026-11-11-10)). Ticket: needed.
+- [ ] After #247: approved algorithm version, eligibility, recalculation on policy save, attribution recompute. Ageing is computed on read while jobs are parked ([D-2026-11-11-10](../decisions/2026-11-11.md#d-2026-11-11-10)). Ticket: needed.
 - [x] `prototype-reference` awards ship in MVP as is (D-05).
 - [ ] Owner path to retry a failed projection job. Ticket: needed.
 
 ## Related decisions
 
-- [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — confirmed guest identity feeds history attribution.
-- [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — ranking work is in the frozen scope.
-- [D-2026-11-11-05](../decisions.md#d-2026-11-11-05) — rating by wins, weighted by who you beat; awards and Generate matches weights approved as is.
+- [D-2026-11-07-03](../decisions/2026-11-07.md#d-2026-11-07-03) — confirmed guest identity feeds history attribution.
+- [D-2026-11-07-04](../decisions/2026-11-07.md#d-2026-11-07-04) — ranking work is in the frozen scope.
+- [D-2026-11-11-05](../decisions/2026-11-11.md#d-2026-11-11-05) — rating by wins, weighted by who you beat; awards and Generate matches weights approved as is.
 
 ## Blocking open decisions
 
-- None since November 11, 2026 ([D-2026-11-11-05](../decisions.md#d-2026-11-11-05)); #247 now carries only the constants and examples.
+- None since November 11, 2026 ([D-2026-11-11-05](../decisions/2026-11-11.md#d-2026-11-11-05)); #247 now carries only the constants and examples.
 - [Database open decisions](../../database_design/product/open-decisions.md) (numerical model, window length and timezone, award evidence) · [business open decisions](../../business_logic/product/open-decisions.md).
 - Hub open question 11. Period leaderboard rules were settled in D-2026-11-16-05.
 

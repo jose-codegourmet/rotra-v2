@@ -16,7 +16,7 @@ Superseded by: none
 - After: under the list there is a row with **Export play history** (secondary) and **Import play history…** (secondary, opens the file picker, `.json`), with the helper text “Changes made offline are saved on this device automatically. The file is a backup for moving a session to another device or recovering one that broke.” Export downloads `playhistory.json`; toast “Play history exported”. Import reads the file and toasts “Play history imported · N changes waiting to sync” (or “That file isn't a ROTRA play history.” on a bad file). Export is disabled when nothing is downloaded. Both work offline (the section is the one part of Club settings that does).
 
 ## Why
-- Owner answer of November 11, 2026 ([D-2026-11-11-04](../mvp/decisions.md#d-2026-11-11-04)): offline changes are saved automatically on the device; the file and its Import button are “for brute force sake (for non technical people)”.
+- Owner answer of November 11, 2026 ([D-2026-11-11-04](../mvp/decisions/2026-11-11.md#d-2026-11-11-04)): offline changes are saved automatically on the device; the file and its Import button are “for brute force sake (for non technical people)”.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

@@ -16,7 +16,7 @@ Superseded by: none
 - After: uploads are centre-cropped to **5:2** and saved at 1000 × 400; the tiles (and the loading skeleton) are 5:2; the drop zone says “cropped to 5:2”. Banners uploaded at 3:1 keep working, centre-cropped to fill.
 
 ## Why
-- The Player profile banner moved to 5:2, the ratio of the owner's banner photo (#765, November 12, 2026). Whether Admin follows was an open point; decided by the implementing agent so uploads match what players see ([D-2026-11-12-03](../mvp/decisions.md#d-2026-11-12-03)).
+- The Player profile banner moved to 5:2, the ratio of the owner's banner photo (#765, November 12, 2026). Whether Admin follows was an open point; decided by the implementing agent so uploads match what players see ([D-2026-11-12-03](../mvp/decisions/2026-11-12.md#d-2026-11-12-03)).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

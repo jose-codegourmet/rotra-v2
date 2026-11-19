@@ -1,12 +1,12 @@
 # Flow: create, claim, and recover a player account
 
-**Last verified:** 2026-11-16 for club entry by email ([D-2026-11-16-04](../../../../../../mvp/decisions.md#d-2026-11-16-04)); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-16 for club entry by email ([D-2026-11-16-04](../../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 ## Club entry to profile
 
 1. The operator adds/confirms a player and verifies their identity in person.
 2. Without an email, retain a saved club guest (a name only); bypass profile creation.
-3. With an email, the entry is an unclaimed player ([D-2026-11-16-04](../../../../../../mvp/decisions.md#d-2026-11-16-04), replacing the phone rule of [D-2026-11-11-03](../../../../../../mvp/decisions.md#d-2026-11-11-03)).
+3. With an email, the entry is an unclaimed player ([D-2026-11-16-04](../../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04), replacing the phone rule of [D-2026-11-11-03](../../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-03)).
 4. When the entry syncs, an email that already belongs to a ROTRA player (registered or unclaimed) links the entry to that person and their RTR ID. Otherwise the person gets a new RTR ID. Each club keeps its own name, nickname, picture and level for an unclaimed player.
 5. When the person registers, they keep that RTR ID, and every club's record under the email joins the account automatically. If more than one club saved the email, they pick one club's version as their starting profile.
 

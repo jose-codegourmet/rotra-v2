@@ -20,7 +20,7 @@ Superseded by: none
 - The compact profile cards (profile dialog, participant card) keep their small banner strip.
 
 ## Why
-- Jose, #765 (November 12, 2026): “re arrange the layout to not overlap the banner image”, “the banner image should have the same ratio as this photo” (2560 × 1024, 5:2), “add that if possible the edit banner is in the banner too like top right corner”, “make sure the banner picker is a dialog … same behavior as profile pic”. Open points decided by the implementing agent: [D-2026-11-12-03](../mvp/decisions.md#d-2026-11-12-03).
+- Jose, #765 (November 12, 2026): “re arrange the layout to not overlap the banner image”, “the banner image should have the same ratio as this photo” (2560 × 1024, 5:2), “add that if possible the edit banner is in the banner too like top right corner”, “make sure the banner picker is a dialog … same behavior as profile pic”. Open points decided by the implementing agent: [D-2026-11-12-03](../mvp/decisions/2026-11-12.md#d-2026-11-12-03).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -39,7 +39,7 @@ Superseded by: none
 - Business logic: docs/business_logic/product/player-information/modules/identity/README.md — the pick is made in the dialog; 5:2, nothing over the banner
 - Database design: none needed
 - Screen docs: docs/screens/product/modules/player-information/profile.md — Profile banner, Profile banner dialog, Edit profile Name preview
-- MVP: docs/mvp/decisions.md — D-2026-11-12-03
+- MVP: docs/mvp/decisions/README.md — D-2026-11-12-03
 
 ## Real app work
 - packages/ui: ProfileHero, PlayerIdentityCard, EditProfileForm, new BannerSheet (BannerPicker deleted). apps/player: `useBannerSheet` used by the profile page and Edit profile. Built in #765.

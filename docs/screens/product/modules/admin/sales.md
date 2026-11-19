@@ -24,4 +24,4 @@ Owner request, November 8, 2026: a sales page to track revenue, matches and sess
 ## Not decided yet
 - Whether revenue is shown by the day paid (as here) or spread over the days the license covers.
 - Whether free (tester) clubs are counted in sessions and matches (assumed yes) and shown on the list.
-- Where the numbers are calculated and how they are produced: see [D-2026-11-08-01](../../../../mvp/decisions.md#d-2026-11-08-01) (owner leans to Supabase/Postgres; no scheduled job assumed).
+- Where the numbers are calculated and how they are produced: see [D-2026-11-08-01](../../../../mvp/decisions/2026-11-08.md#d-2026-11-08-01) (owner leans to Supabase/Postgres; no scheduled job assumed).

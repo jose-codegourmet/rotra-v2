@@ -1,7 +1,7 @@
 # Track specification: Go API foundation
 
 **Track ID:** go-api-foundation_20261113 · **Type:** feature · **Priority:** critical (order 2 of 14) · **Created:** 2026-11-13
-**Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, B-34, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** rule-cases phases 1–3 (spike result, case runner) · **Decisions:** B-01, B-02, B-03, B-16, B-17, B-21, B-34, D-2026-11-14-01 ([register](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 

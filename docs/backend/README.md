@@ -6,7 +6,7 @@ This folder holds **backend decisions in progress**: proposals about how the ser
 hosted and run, and the backend questions that are still open. Product behavior stays in
 [business logic](../business_logic/product/README.md), tables stay in
 [database design](../database_design/product/README.md), and the decision register stays in
-[mvp/decisions.md](../mvp/decisions.md). This folder doesn't replace any of them.
+[mvp/decisions/README.md](../mvp/decisions/README.md). This folder doesn't replace any of them.
 
 ## Which source wins
 
@@ -16,7 +16,7 @@ Same rules as [ways-of-working §2](../ways-of-working.md#2-which-source-wins):
 |---|---|
 | How the backend is built and hosted **today** | [architecture.md](../architecture.md) and the code on `main` |
 | What a backend proposal asks for | The proposal in `decisions/` |
-| Whether a proposal is approved | Its D-id entry in [mvp/decisions.md](../mvp/decisions.md) |
+| Whether a proposal is approved | Its D-id entry in [mvp/decisions/README.md](../mvp/decisions/README.md) |
 | What is still undecided | [open-decisions.md](open-decisions.md). **Ask.** Never fill a gap yourself |
 
 A proposal changes nothing on its own. When the owner approves part of one, the same PR updates
@@ -38,7 +38,7 @@ docs/backend/
 
 | Proposal | D-id | Status |
 |---|---|---|
-| [Go API on Railway](decisions/2026-11-13-go-railway-backend/01-proposal.md) | [D-2026-11-13-01](../mvp/decisions.md#d-2026-11-13-01) | decided 2026-11-13 (B-01 to B-19) |
+| [Go API on Railway](decisions/2026-11-13-go-railway-backend/01-proposal.md) | [D-2026-11-13-01](../mvp/decisions/2026-11-13.md#d-2026-11-13-01) | decided 2026-11-13 (B-01 to B-19) |
 
 ## Other backend pages
 

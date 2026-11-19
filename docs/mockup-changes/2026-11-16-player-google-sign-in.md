@@ -34,7 +34,7 @@ Superseded by: none
 - Owner: "I think we have to consider players with no google accounts linked to their accounts".
 - Owner: "I think we should make it mandatory … if users without google is logging in there should be some sort of announcement in the top banner".
 - Owner: "announcements like this should be yellow bg".
-- Decision: [D-2026-11-16-01](../mvp/decisions.md#d-2026-11-16-01).
+- Decision: [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

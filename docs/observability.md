@@ -1,6 +1,6 @@
 # Observability
 
-**Last verified:** 2026-11-13 (planned Railway section) · Decision: [D-2026-11-11-01](mvp/decisions.md#d-2026-11-11-01)
+**Last verified:** 2026-11-13 (planned Railway section) · Decision: [D-2026-11-11-01](mvp/decisions/2026-11-11.md#d-2026-11-11-01)
 
 The Queue, Player and Admin apps send **OpenTelemetry traces** over OTLP: to **Grafana Cloud** in
 production and to a **local Grafana stack** during development. Telemetry is off unless
@@ -101,7 +101,7 @@ To turn production telemetry off, delete `OTEL_EXPORTER_OTLP_ENDPOINT` in Vercel
 
 ## Planned: Go API, Postgres and pictures on Railway
 
-**Decided, not built** ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01); setup in
+**Decided, not built** ([D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01); setup in
 [backend infrastructure](backend/infrastructure.md)). Everything goes to the **same Grafana Cloud
 stack** as the apps, so there's one place to look.
 

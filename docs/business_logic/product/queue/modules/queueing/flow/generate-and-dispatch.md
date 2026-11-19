@@ -16,7 +16,7 @@ Generate matches was formerly called Auto Queue; renamed 2026-11-06.
 
 1. The operator marks a player not present, or a lineup is incomplete.
 2. Affected waiting matches show Needs attention with the reason. An affected On court match shows the reason on its court, and Start match is disabled until the lineup is fixed (Replace player) or the match is sent back.
-3. The operator edits the lineup to swap in an available player, or selects Regenerate.
+3. The operator edits the lineup to swap in an available player. (Regenerate was removed from the Main Queue on November 19, 2026; step 4 describes the old action.)
 4. Regenerate rebuilds unprotected waiting matches and protected ones needing attention, in the same queue slots. It keeps healthy protected matches and every On court and Playing match.
 
 New arrivals do not authorize silently replacing the operator's protected queue edits. The operator controls queue changes.

@@ -40,7 +40,7 @@ flowchart TD
 ## Product navigation
 
 - **Queue:** top bar with sync status and a light/dark mode switch on every operator screen. A collapsible left nav on every operator screen (burger in the top bar on wide screens, icon rail when collapsed; on phones a bottom dock with Menu, a highlighted Create/Continue session, and Settings): Live session (while live), Dashboard, Saved players, Venues, Inventory, Club settings, License, This device. Sign out is in Club settings. Home dashboard: club header with Create session, now card, calendar. Club settings has its own left-hand menu (on phones a button that opens it as a left drawer, closing the main menu first) and is unavailable offline. Each session's public page is also its session link; guests reach it from wherever the club shares it, never from the operator app's navigation. The live console has Session / Queue / Players / Leaderboard views and a footer with Session done. License gates remain global. Public session pages are a separate audience.
-- **Player Information:** overall leaderboard and public profile reading; sign-in adds own profile, ID/QR, privacy, and contact requests. No World discovery entry.
+- **Player Information:** overall leaderboard and public profile reading; sign-in adds Home (`/home`: current session, upcoming sessions, clubs and stats), own profile, ID/QR, privacy, and contact requests. No World discovery entry.
 - **Admin:** clubs/licenses, players/contact requests, ranking configuration, feature flags. No speculative analytics dashboard is required.
 
 ## Surface inventory
@@ -97,10 +97,10 @@ Inventory total: **86 surfaces across 19 module specifications**, plus the share
 
 All apps use `/login`. Queue public session links use `/s/[slug]`; the rest of Queue is protected. The operator preview `/sessions/[sessionId]/public-page` is the one exception to the sign-in redirect: anyone but the owning club is sent to that session's `/s/[slug]` instead of `/login`.
 Admin routes except `/login` are protected. Player `/` (leaderboard) and `/players/[playerId]` are
-public; `/me` and its children are protected. The Foundation proxy wires these boundaries only;
+public; `/home` (P-HOME, November 19, 2026), `/me` and their children are protected. The Foundation proxy wires these boundaries only;
 sign-in forms and the remaining screens arrive in their product tickets.
 
-P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions.md#d-2026-11-08-02)): it
+P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decisions/2026-11-08.md#d-2026-11-08-02)): it
 needs a signed-in player, so signed out it goes to `/login` and returns there.
 
 P-VERIFICATION is `/profile/verification` and requires a signed-in player. Signed-out players go to `/login` and return to Verification after signing in.
@@ -112,8 +112,8 @@ While the `player_google_sign_in` flag is on (#919), the same routes show the in
 
 ### Player club routes (epic P07)
 
-Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.
+Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions/2026-11-12.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.
 
 ### Player legal routes
 
-Decided November 17, 2026 ([D-2026-11-17-01](../../mvp/decisions.md#d-2026-11-17-01)): `/privacy` (`P-PRIVACY`) and `/terms` (`P-TERMS`) in Player Information. Both are public (no sign-in) in mock and real mode, and static. The Google sign-in consent screen and P-LOGIN link to them. The prototype serves them under `/player/privacy` and `/player/terms`.
+Decided November 17, 2026 ([D-2026-11-17-01](../../mvp/decisions/2026-11-17.md#d-2026-11-17-01)): `/privacy` (`P-PRIVACY`) and `/terms` (`P-TERMS`) in Player Information. Both are public (no sign-in) in mock and real mode, and static. The Google sign-in consent screen and P-LOGIN link to them. The prototype serves them under `/player/privacy` and `/player/terms`.

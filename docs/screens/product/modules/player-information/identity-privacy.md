@@ -16,7 +16,7 @@ Loading/no ID yet: show pending allocation honestly. If the player has a stable 
 
 ## P-PROFILE-PRIVACY — Profile visibility and Player Information
 
-Two sections on **Privacy and contact**, directly above Phone privacy ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11), replacing the single **Private profile** switch of [D-2026-11-09-07](../../../../mvp/decisions.md#d-2026-11-09-07)).
+Two sections on **Privacy and contact**, directly above Phone privacy ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), replacing the single **Private profile** switch of [D-2026-11-09-07](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07)).
 
 **Profile visibility** is a three-choice radio group with helper text under each choice; the default is **Private**:
 
@@ -62,7 +62,7 @@ Validate contact format through the approved account rules. A conflict with anot
 
 Lost access to both phone and email requires a separate owner-assisted verification policy. Do not invent recovery access via a public QR code.
 
-## Sign-in methods (in Privacy and contact, [D-2026-11-16-01](../../../../mvp/decisions.md#d-2026-11-16-01))
+## Sign-in methods (in Privacy and contact, [D-2026-11-16-01](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-01))
 
 A card above Contact details. **Google:** "Connected · <google email>" (plus "(different from your ROTRA email)" when it differs) with a **Required** chip and **Change**, or "Not connected" with **Connect Google**. **Email and password:** "Password set · <email>", "Backup only until <deadline>" once Google is connected, or "Not used". Footer: "Google sign-in is required for every ROTRA player. Any Google account you own works, even with a different email. Your ROTRA email stays <email>." and a row "Account verification is in its own page." with the status chip as a button to P-VERIFICATION. A Google email already used by another account is refused with a toast.
 
@@ -70,7 +70,7 @@ The Sign-in methods card is shown while `player_google_sign_in` is on.
 
 ## P-VERIFICATION — Account verification
 
-Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)); signed-out visitors sign in first and come back. Opened from the own profile (status chip next to "This is you", **Verification** button after My player ID, **Verification** in the Your account panel), the Sign-in methods card in Privacy and contact, the yellow announcement, and the pinned notification.
+Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-02)); signed-out visitors sign in first and come back. Opened from the own profile (status chip next to "This is you", **Verification** button after My player ID, **Verification** in the Your account panel), the Sign-in methods card in Privacy and contact, the yellow announcement, and the pinned notification.
 
 - Header: back to **My profile**, "Verification", "Show that this ROTRA account is really yours. Only you and ROTRA Admin see these details."
 - **Your status** card: chip "Not verified · n of 3" (warn) / "Verified" / "Verified by Admin" (ok); "Finish these by <deadline>. n of 3 done." with a progress bar.
@@ -86,4 +86,4 @@ Own profile setting at `/profile/verification` ([D-2026-11-16-02](../../../../mv
 - A hidden-phone player can be identified by ID without revealing the phone.
 - Submitting a change request does not immediately alter login credentials.
 - Approval alone is not shown as Applied if provider synchronization failed.
-- Contact changes preserve the player's RTR ID/history. Only Admin can change an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)); what happens to a QR code already shared with the old ID is open.
+- Contact changes preserve the player's RTR ID/history. Only Admin can change an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)); what happens to a QR code already shared with the old ID is open.

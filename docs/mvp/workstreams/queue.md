@@ -42,14 +42,14 @@ session page; the November 6 prototype changes (epic #408).
 | Courts: add/edit/remove, open early, undo | implemented | `real/session-live.ts:126-202` → `api/.../courts/**` | #424, #436 closed |
 | Roster: add, remove, level, presence | implemented | `real/queue.ts:416-567`, `real/session-live.ts:232-269` → `api/.../roster/**`, `.../presence` | #10 open (no open sub-issues); #421, #426 closed |
 | Saved players (no session) | implemented | `club-player/mutations.ts:93,120` → `api/club/players` POST | #330 |
-| Club-only guests and unclaimed profiles (D-2026-11-11-03), live console header, Courts and time, Match requests after Start, phone grid view, avatar photo viewer | implemented in source (P08.4, P08.8, P08.9; #752, #756, #757, #758; not run against a database) | Player Information search lists registered players only and honours Hide me from Player Information; unclaimed records stay in their club, link automatically at registration, no identity check. Open: a real-mode marker for Lookup pending versus Unclaimed in Saved players; drop-out notices are not closed at Start ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)) | #748 |
+| Club-only guests and unclaimed profiles (D-2026-11-11-03), live console header, Courts and time, Match requests after Start, phone grid view, avatar photo viewer | implemented in source (P08.4, P08.8, P08.9; #752, #756, #757, #758; not run against a database) | Player Information search lists registered players only and honours Hide me from Player Information; unclaimed records stay in their club, link automatically at registration, no identity check. Open: a real-mode marker for Lookup pending versus Unclaimed in Saved players; drop-out notices are not closed at Start ([D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01)) | #748 |
 | Edit details (guests, unclaimed profiles) | implemented | `api/club/players/[clubPlayerId]` GET/PATCH → `db/src/queue/club-player-details.ts:68,98`; Level for this club is not saved here yet | #484, #486 |
 | Delete a saved player (D-DELETE-PLAYER) | implemented | `club-player/delete.ts:13,36` → `real/queue.ts:564,570` → `api/club/players/[clubPlayerId]/delete-impact`, DELETE → `db/src/queue/club-player-delete.ts:57,76` (soft delete, `club_players.removed_at` migration) | #487 |
 | Invite / registration link | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; unclaimed: 7-day single-use link, a new one cancels the previous one; guests: independent Player registration, no guest linkage (#490) | #478, #483, #485 |
 | Waitlist: give slot, fill, remove | implemented | `real/session-live.ts:277-293` → `api/.../waitlist/**` | #10 open |
 | Join requests (submit, confirm, decline) | implemented | `real/public-session.ts:19-49`; `real/session-live.ts:309,326` → `api/join-requests/[id]/{confirm,decline}` | #16 closed; #248 open |
 | Cost estimate, payments, mark all paid | implemented | `real/financials.ts` → `db/src/queue/financials.ts` | #17 closed; #245 open |
-| Payment amounts (Paid, Partial, Reimburse, Unpaid) | implemented | `session-payment/fetchers.ts:116` → `api/sessions/[sessionId]/payments/amount`; [D-05](../decisions.md#d-2026-11-07-05) | #479 |
+| Payment amounts (Paid, Partial, Reimburse, Unpaid) | implemented | `session-payment/fetchers.ts:116` → `api/sessions/[sessionId]/payments/amount`; [D-05](../decisions/2026-11-07.md#d-2026-11-07-05) | #479 |
 | Inventory | implemented | `real/queue.ts:210-250` → `api/inventory/**` | #17 closed |
 | Match queue: add, make, reorder, edit, swap, remove, regenerate | implemented | `real/match.ts:164-318` → `api/.../matches/**` → `db/src/queue/match-queue.ts` | #12 open (no open sub-issues) |
 | Generate matches drafts | partially connected | `real/autoQueue.ts:16-25`: drafts in module memory (lost on reload); only "Add to Main Queue" writes | #247 open |
@@ -61,7 +61,7 @@ session page; the November 6 prototype changes (epic #408).
 | Finalization, status, invalid session | implemented | `real/finalization.ts:99,109`, `real/match.ts:632` → `finalization.ts:306,420,474` | #14 closed; #243 open |
 | Results view, publish/unpublish | implemented | `real/match.ts:572-603` → `db/src/queue/results.ts:103,152` | #15 closed |
 | Download result images | partially connected | Client-side frames only; `requestResultExport`/`markExportRendered` (`results.ts:248,305`) have no route | none found |
-| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts`; masked names and aggregate skill mix ([D-06](../decisions.md#d-2026-11-07-06)); preview operator-only (#469); Request to join offers guest form or ROTRA Player login ([D-07](../decisions.md#d-2026-11-07-07)); a finished session's Match history for a signed-in Player from the Player app's `GET …/match-history` (own matches until shared, #850) | #16 closed; #469, #474, #475, #476, #850 |
+| Public session page `/s/[slug]` | implemented | `(public)/s/[slug]/page.tsx` → `real/public-session.ts`; masked names and aggregate skill mix ([D-06](../decisions/2026-11-07.md#d-2026-11-07-06)); preview operator-only (#469); Request to join offers guest form or ROTRA Player login ([D-07](../decisions/2026-11-07.md#d-2026-11-07-07)); a finished session's Match history for a signed-in Player from the Player app's `GET …/match-history` (own matches until shared, #850) | #16 closed; #469, #474, #475, #476, #850 |
 
 Notes: the session done review has no guest step (see [queue-offline.md](queue-offline.md)); the rank
 job records evidence only until #247; payment rules are still an open decision (#245).
@@ -98,9 +98,9 @@ Prisma column); the Checked in themselves mark has no server clearing rules yet.
 |---|---|---|---|
 | Requests · N with Join and Match tabs; Add to queue / Decline; drop-out notices; ROTRA-player join cards | implemented (mock app only) | commit `e64678bf` | #616 |
 | Checked in themselves / Left mark on roster rows, cards and live Players cards | implemented (mock app only) | commit `d7c92168` | #617 |
-| Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions.md#d-2026-11-09-11)) | #618 |
+| Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions/2026-11-09.md#d-2026-11-09-11)) | #618 |
 | Games played override (Set games played, one player or all; `session_players.games_adjustment`) | in progress (mock app + real-mode services; migration `20261111000300_roster_games_adjustment` applied 2026-11-11) | [mockup log](../../mockup-changes/2026-11-11-queue-set-games-played.md) | #717 |
-| Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` applied 2026-11-11) | [D-2026-11-11-02](../decisions.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
+| Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` applied 2026-11-11) | [D-2026-11-11-02](../decisions/2026-11-11.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
 
 ### Obvious Queue bugs (#466, 2026-11-07)
 
@@ -112,8 +112,8 @@ payment amounts with Partial/Reimburse (PRs #467–#481). **Still open:** Downlo
 ([#477](https://github.com/jose-codegourmet/rotra-v2/issues/477), blocked on #246); attaching a
 signed-in player to a join request; guest registration now exists through club invitations (#490);
 whether published results and profile pictures on the public page should also be masked.
-Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-2026-11-07-06),
-[D-07](../decisions.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club; superseded in part by [D-2026-11-16-04](../decisions.md#d-2026-11-16-04): four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database; not run in a browser), which also stores the club nickname of [D-2026-11-18-03](../decisions.md#d-2026-11-18-03)), [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) (answers to the November 11 leftovers).
+Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisions/2026-11-07.md#d-2026-11-07-06),
+[D-07](../decisions/2026-11-07.md#d-2026-11-07-07), [D-2026-11-11-03](../decisions/2026-11-11.md#d-2026-11-11-03) (guests and unclaimed profiles stay in their club; superseded in part by [D-2026-11-16-04](../decisions/2026-11-16.md#d-2026-11-16-04): four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database; not run in a browser), which also stores the club nickname of [D-2026-11-18-03](../decisions/2026-11-18.md#d-2026-11-18-03)), [D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01) (answers to the November 11 leftovers).
 
 ## Remaining work
 
@@ -127,12 +127,16 @@ Decisions: [D-05](../decisions.md#d-2026-11-07-05), [D-06](../decisions.md#d-202
 
 ## Related decisions
 
-- [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — setup and start online only (matches current real mode).
-- [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
-- [D-2026-11-07-05](../decisions.md#d-2026-11-07-05) — payment amounts.
-- [D-2026-11-07-06](../decisions.md#d-2026-11-07-06) — masked public names.
-- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — guest invites now open registration (#490); Request to join still offers guest entry or login.
-- [D-2026-11-14-02](../decisions.md#d-2026-11-14-02) — No show (cancelled): no fee, club-only, after Start only (#839).
+- [D-2026-11-07-03](../decisions/2026-11-07.md#d-2026-11-07-03) — setup and start online only (matches current real mode).
+- [D-2026-11-07-04](../decisions/2026-11-07.md#d-2026-11-07-04) — scope freeze.
+- [D-2026-11-07-05](../decisions/2026-11-07.md#d-2026-11-07-05) — payment amounts.
+- [D-2026-11-07-06](../decisions/2026-11-07.md#d-2026-11-07-06) — masked public names.
+- [D-2026-11-07-07](../decisions/2026-11-07.md#d-2026-11-07-07) — guest invites now open registration (#490); Request to join still offers guest entry or login.
+- [D-2026-11-14-02](../decisions/2026-11-14.md#d-2026-11-14-02) — No show (cancelled): no fee, club-only, after Start only (#839).
+- [D-2026-11-19-01](../decisions/2026-11-19.md#d-2026-11-19-01) — gender (optional) and the match category (mockup only).
+- [D-2026-11-19-02](../decisions/2026-11-19.md#d-2026-11-19-02) to [D-2026-11-19-09](../decisions/2026-11-19.md#d-2026-11-19-09) — the November 19 console round: tabs and Settings, Correct Queue Time Format, time picker standard, live match controls, Edit player, exemption list, Regenerate removed, Embla (all mockup only, tickets needed).
+- [D-2026-11-19-12](../decisions/2026-11-19.md#d-2026-11-19-12) — session level restrictions (all levels, beginners only, beginners to intermediate, slots per level).
+- [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (Mode and Scoring cards, sign-in).
 
 ## Blocking open decisions
 

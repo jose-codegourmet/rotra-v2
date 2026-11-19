@@ -31,12 +31,12 @@ Open items set aside on 2026-11-13. Not scheduled; each says when it must be pic
 
 | ID | Item | Comes from | Pick up before |
 |---|---|---|---|
-| BL-1 | What mock mode does per area once its TypeScript rules are deleted (fixture answers or no mock mode) | [D-2026-11-13-08](../docs/mvp/decisions.md#d-2026-11-13-08) | deleting that area's TypeScript copies on `go-stack` |
+| BL-1 | What mock mode does per area once its TypeScript rules are deleted (fixture answers or no mock mode) | [D-2026-11-13-08](../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-08) | deleting that area's TypeScript copies on `go-stack` |
 | BL-2 | Grace period and exact schedule checks for offline device time (owner OK) | [rule-cases Q2](./tracks/rule-cases_20261113/spec.md#owner-answers-2026-11-13), go-writes-queue R1a | go-writes-queue R1a |
 | BL-3 | Ticket for the lineup contract change (device sends lineups instead of `n`) | rule-cases Q3, go-writes-queue R1a | go-writes-queue R1a |
 | BL-4 | Mockup change: offline payments show the last synced amount due | rule-cases payments, go-writes-queue R3 | go-writes-queue R3 |
 | BL-5 | Create the `go-stack` branch off `main` (B-20) | beta-stack R1 | staging-verification R1 |
-| BL-6 | Service worker for the Queue app, so it and the rules `.wasm` load after an offline reload | [D-2026-11-14-01](../docs/mvp/decisions.md#d-2026-11-14-01), rule-cases G12 | real clubs relying on offline reloads |
+| BL-6 | Service worker for the Queue app, so it and the rules `.wasm` load after an offline reload | [D-2026-11-14-01](../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01), rule-cases G12 | real clubs relying on offline reloads |
 | BL-7 | Mockup change: "Sign in to sync N waiting changes", the revoked-device message, the sign-out warning with waiting changes, and the revoke dialog's offline-copy warning | [B-28](../docs/backend/open-decisions.md#settled) | go-sign-in R3 |
 | BL-8 | Mockup change + ticket: read-only switch for the cutover (one setting; writes refused with a "ROTRA is updating" message) | [B-35](../docs/backend/open-decisions.md#settled) | ship-and-retire R2 |
 | BL-9 | Backups and a restore drill: confirm what Railway Hobby includes, production schedule (suggested daily + weekly; point-in-time recovery after pricing), a timed restore drill on staging, a manual off-Railway `pg_dump` before ship and risky migrations | [B-40](../docs/backend/open-decisions.md#will-hurt-later) | ship-and-retire R1 |

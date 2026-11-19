@@ -121,7 +121,7 @@ func run() error {
 		routes = append(routes, recoveryService.Routes())
 		// The Admin app's writes (go-writes-admin-player). They go on the signed-in router: the apps share paths, and
 		// net/http registers a pattern once, so every write package adds its routes there.
-		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log})
 		if err != nil {
 			return err
 		}

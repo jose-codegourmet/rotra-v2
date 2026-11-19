@@ -1,0 +1,1959 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "clubs.seed.sql",
+  "scenarios": {
+    "base": [],
+    "empty": [
+      "DELETE FROM ranking_policy_versions"
+    ]
+  },
+  "snapshot": [
+    {
+      "name": "ranking_policy_versions",
+      "sql": "SELECT version, effective_at, assessment_weight_bp, performance_weight_bp, recent_standard_match_threshold, algorithm_version, created_by_admin_id, change_note, created_at FROM ranking_policy_versions ORDER BY version",
+      "redact": []
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata, EXISTS (SELECT 1 FROM ranking_policy_versions v WHERE v.id::text = target_id) AS target_is_a_version FROM admin_audit_events ORDER BY action, target_type, source_command_id NULLS FIRST, occurred_at, metadata::text, target_id",
+      "redact": [
+        "id",
+        "target_id"
+      ]
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id FROM player_notifications ORDER BY id",
+      "redact": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": null,
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000001",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_former_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000001",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_unknown_subject",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000001",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ]
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "saves_the_next_version",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000001",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000002",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "carries_the_algorithm_forward",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000003",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "trims_the_change_note",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000004",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "  \t Tighten the weights \n"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "empty_change_note_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000005",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": ""
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blank_change_note_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000006",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "   ﻿ "
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "missing_change_note_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000007",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "non_string_change_note_is_none",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000008",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": 12
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "unicode_change_note_kept",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000009",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Mas mataas na timbang – café 🏸"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000010",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split",
+            "effectiveAt": "2030-01-01T00:00:00Z",
+            "algorithmVersion": "hacked",
+            "createdByAdminId": "x",
+            "version": 9,
+            "performanceWeightPct": 1
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "assessment_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000011",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 0,
+            "performanceWeightBp": 10000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "assessment_all",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000012",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 10000,
+            "performanceWeightBp": 0,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "threshold_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000013",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 1,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "threshold_forty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000014",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 40,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "numbers_written_as_floats",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"commandId\":\"c2000000-0000-4000-8000-000000000015\",\"expectedVersion\":2.0,\"assessmentWeightBp\":7e3,\"performanceWeightBp\":3000.0,\"recentStandardMatchThreshold\":1E1}",
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "numbers_one_ulp_from_whole",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"commandId\":\"c2000000-0000-4000-8000-000000000016\",\"expectedVersion\":2,\"assessmentWeightBp\":7000.0000000000001,\"performanceWeightBp\":3000,\"recentStandardMatchThreshold\":10}",
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "first_version_of_an_empty_table",
+      "scenario": "empty",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000017",
+            "expectedVersion": null,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "first_version_expected_missing",
+      "scenario": "empty",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000018",
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "first_version_expected_zero_conflicts",
+      "scenario": "empty",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000019",
+            "expectedVersion": 0,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_version_expected_one_conflicts",
+      "scenario": "empty",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000020",
+            "expectedVersion": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "empty_table_carries_unapproved",
+      "scenario": "empty",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000021",
+            "expectedVersion": null,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ]
+    },
+    {
+      "name": "body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ]
+    },
+    {
+      "name": "body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[1]"
+        }
+      ]
+    },
+    {
+      "name": "body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ]
+    },
+    {
+      "name": "body_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "\"x\""
+        }
+      ]
+    },
+    {
+      "name": "body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"a\":1} x"
+        }
+      ]
+    },
+    {
+      "name": "body_with_a_byte_order_mark",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "﻿{\"commandId\": \"c2000000-0000-4000-8000-000000000022\", \"expectedVersion\": 2, \"assessmentWeightBp\": 7000, \"performanceWeightBp\": 3000, \"recentStandardMatchThreshold\": 10, \"changeNote\": \"Back to the original split\"}",
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "body_empty_object_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {}
+        }
+      ]
+    },
+    {
+      "name": "assessment_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000023",
+            "expectedVersion": 2,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000024",
+            "expectedVersion": 2,
+            "assessmentWeightBp": "7000",
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000025",
+            "expectedVersion": 2,
+            "assessmentWeightBp": null,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_negative",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000026",
+            "expectedVersion": 2,
+            "assessmentWeightBp": -1,
+            "performanceWeightBp": 10001,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_above_ten_thousand",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000027",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 10001,
+            "performanceWeightBp": -1,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_fraction",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000028",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000.5,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_huge",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000029",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 1e+300,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assessment_overflows_a_double",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{\"commandId\":\"c2000000-0000-4000-8000-000000000030\",\"expectedVersion\":2,\"assessmentWeightBp\":1e999,\"performanceWeightBp\":3000,\"recentStandardMatchThreshold\":10}"
+        }
+      ]
+    },
+    {
+      "name": "performance_missing_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000031",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "performance_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000032",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": "3000",
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "performance_negative",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000033",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 13000,
+            "performanceWeightBp": -3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "performance_fraction",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000034",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 2999.5,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_short",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000035",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 2999,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_short_by_a_hundredth_of_a_point",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000036",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 3333,
+            "performanceWeightBp": 6666,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_over",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000037",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3001,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_far_under",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000038",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 5000,
+            "performanceWeightBp": 4000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000039",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 0,
+            "performanceWeightBp": 0,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_twenty_thousand",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000040",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 10000,
+            "performanceWeightBp": 10000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_tiny",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000041",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 1,
+            "performanceWeightBp": 1,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_with_odd_float_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000042",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 1234,
+            "performanceWeightBp": 5678,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "total_not_shown_when_a_weight_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000043",
+            "expectedVersion": 2,
+            "assessmentWeightBp": -5,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000044",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000045",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": "10",
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_zero",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000046",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 0,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_forty_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000047",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 41,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_fraction",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000048",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10.5,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold_negative",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000049",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": -3,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "every_field_wrong_at_once",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000050",
+            "expectedVersion": 2,
+            "assessmentWeightBp": "a",
+            "performanceWeightBp": null,
+            "recentStandardMatchThreshold": 99,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "weights_and_threshold_wrong",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000051",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 9000,
+            "performanceWeightBp": 9000,
+            "recentStandardMatchThreshold": 0,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "invalid_comes_before_a_stale_version",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000052",
+            "expectedVersion": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 0,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "invalid_comes_before_the_command",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "not-a-uuid",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 0,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stale_version",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000054",
+            "expectedVersion": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "future_version",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000055",
+            "expectedVersion": 3,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_missing_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000056",
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_null_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000057",
+            "expectedVersion": null,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_string_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000058",
+            "expectedVersion": "2",
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_fraction_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000059",
+            "expectedVersion": 2.5,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_negative_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000060",
+            "expectedVersion": -1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "version_bool_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000061",
+            "expectedVersion": true,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stale_version_writes_nothing_then_a_fresh_save_works",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000062",
+            "expectedVersion": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000063",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "two_saves_in_a_row",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000064",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000065",
+            "expectedVersion": 3,
+            "assessmentWeightBp": 5000,
+            "performanceWeightBp": 5000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Even split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "second_save_with_the_old_version_conflicts",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000066",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000067",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry_returns_the_same_version",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000068",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000068",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_other_values_returns_the_first",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000069",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000069",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 5000,
+            "performanceWeightBp": 5000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Other"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_after_another_save_still_returns_the_first",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000070",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000071",
+            "expectedVersion": 3,
+            "assessmentWeightBp": 5000,
+            "performanceWeightBp": 5000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000070",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_by_the_other_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000072",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000072",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_the_stale_version_is_still_answered",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000073",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000073",
+            "expectedVersion": 1,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_an_upper_case_command",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000074",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "C2000000-0000-4000-8000-000000000074",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "retry_with_an_invalid_body_is_invalid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000075",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c2000000-0000-4000-8000-000000000075",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 0,
+            "changeNote": "Back to the original split"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_of_a_flag_event_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c0000000-0000-4000-8000-0000000000a1",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "command_of_a_club_event_is_unexpected",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "c0000000-0000-4000-8000-0000000000b2",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "allow500": true
+        }
+      ]
+    },
+    {
+      "name": "command_missing",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "not-a-uuid",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_a_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": 5,
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "allow500": true,
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command_in_braces_is_accepted",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/ranking-settings",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "commandId": "{c2000000-0000-4000-8000-000000000081}",
+            "expectedVersion": 2,
+            "assessmentWeightBp": 7000,
+            "performanceWeightBp": 3000,
+            "recentStandardMatchThreshold": 10,
+            "changeNote": "Back to the original split"
+          },
+          "redact": [
+            "version.id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "race_two_saves_two_commands",
+      "scenario": "base",
+      "steps": [
+        {
+          "parallel": [
+            {
+              "method": "POST",
+              "path": "/api/ranking-settings",
+              "who": "ad100000-0000-4000-8000-000000000001",
+              "body": {
+                "commandId": "c2000000-0000-4000-8000-000000000083",
+                "expectedVersion": 2,
+                "assessmentWeightBp": 7000,
+                "performanceWeightBp": 3000,
+                "recentStandardMatchThreshold": 10,
+                "changeNote": "Back to the original split"
+              },
+              "redact": [
+                "version.id"
+              ]
+            },
+            {
+              "method": "POST",
+              "path": "/api/ranking-settings",
+              "who": "ad100000-0000-4000-8000-000000000002",
+              "body": {
+                "commandId": "c2000000-0000-4000-8000-000000000084",
+                "expectedVersion": 2,
+                "assessmentWeightBp": 7000,
+                "performanceWeightBp": 3000,
+                "recentStandardMatchThreshold": 10,
+                "changeNote": "Back to the original split"
+              },
+              "redact": [
+                "version.id"
+              ]
+            }
+          ],
+          "redact": [
+            "version.id",
+            "version.createdByDisplayName"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "source_command_id",
+          "actor_admin_id"
+        ],
+        "ranking_policy_versions": [
+          "created_by_admin_id"
+        ]
+      }
+    }
+  ]
+}

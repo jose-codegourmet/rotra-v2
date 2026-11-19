@@ -18,6 +18,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
@@ -29,6 +30,8 @@ type Deps struct {
 	Pool *pgxpool.Pool
 	// Auth checks the access pass of each request; it comes from the sign-in session service.
 	Auth *session.Authenticator
+	// Hasher hashes the password of the club login Add club creates (the shared argon2id hasher of sign-in).
+	Hasher *password.Hasher
 	// Logger may be nil: then nothing is logged.
 	Logger *slog.Logger
 	// Now is the clock the rows are stamped with (Prisma stamps created, updated and occurred times with the
@@ -37,18 +40,19 @@ type Deps struct {
 }
 
 type server struct {
-	pool *pgxpool.Pool
-	auth *session.Authenticator
-	log  *slog.Logger
-	now  func() time.Time
+	pool   *pgxpool.Pool
+	auth   *session.Authenticator
+	hasher *password.Hasher
+	log    *slog.Logger
+	now    func() time.Time
 }
 
 // Routes returns what registers the Admin writes on the shared signedin router (signedin.Deps.Routes).
 func Routes(d Deps) (func(*signedin.Router), error) {
-	if d.Pool == nil || d.Auth == nil {
-		return nil, errors.New("adminwrites: routes need a pool and an authenticator")
+	if d.Pool == nil || d.Auth == nil || d.Hasher == nil {
+		return nil, errors.New("adminwrites: routes need a pool, an authenticator and a password hasher")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now}
+	s := &server{pool: d.Pool, auth: d.Auth, hasher: d.Hasher, log: d.Logger, now: d.Now}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -61,6 +65,10 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 // registerRoutes adds the Admin app's writes. A path that another app answers too is routed per app by the router.
 func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerFlags(rt)
+	s.registerRanking(rt)
+	s.registerLicenses(rt)
+	s.registerClubNames(rt)
+	s.registerClubs(rt)
 }
 
 // stamp is the clock as Prisma writes it: milliseconds, like a JavaScript Date.

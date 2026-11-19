@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/adminwrites"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/testpg"
@@ -17,10 +18,19 @@ import (
 
 func TestMain(m *testing.M) { testpg.Main(m) }
 
+// testHasher is the sign-in hasher with cheap parameters, as the sign-in service of the test environment has.
+func testHasher() *password.Hasher {
+	h, err := password.NewHasher(password.Params{MemoryKiB: 8 * 1024, Iterations: 1, Parallelism: 1, SaltLen: 16, KeyLen: 32}, 2)
+	if err != nil {
+		panic(err)
+	}
+	return h
+}
+
 // build registers the Admin writes the way main does: on the router signedin.Register builds, next to the reads
 // (the same path has a GET there and a POST here).
 func build(pool *pgxpool.Pool, auth *session.Authenticator, log *slog.Logger, now func() time.Time) func(*http.ServeMux) {
-	routes, err := adminwrites.Routes(adminwrites.Deps{Pool: pool, Auth: auth, Logger: log, Now: now})
+	routes, err := adminwrites.Routes(adminwrites.Deps{Pool: pool, Auth: auth, Hasher: testHasher(), Logger: log, Now: now})
 	if err != nil {
 		panic(err)
 	}

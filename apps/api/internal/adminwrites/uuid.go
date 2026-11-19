@@ -1,6 +1,9 @@
 package adminwrites
 
-import "github.com/jackc/pgx/v5/pgtype"
+import (
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
+)
 
 // pgUUID reads a UUID the way Postgres does, which is how the TypeScript services accept a command id (Prisma hands
 // the text on): optional braces around it, 32 hexadecimal digits in either case, and hyphens only after a group of
@@ -47,4 +50,10 @@ func hexVal(c byte) byte {
 		return c - 'a' + 10
 	}
 	return c - 'A' + 10
+}
+
+// newUUID is a version 7 UUID, as Prisma's uuid(7) default makes for a new row.
+func newUUID() (pgtype.UUID, error) {
+	id, err := uuid.NewV7()
+	return pgtype.UUID{Bytes: id, Valid: err == nil}, err
 }

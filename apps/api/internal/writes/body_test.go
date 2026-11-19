@@ -1,6 +1,7 @@
 package writes_test
 
 import (
+	"math"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -53,4 +54,51 @@ func asError(err error, into **writes.Error) bool {
 	e, ok := err.(*writes.Error)
 	*into = e
 	return ok
+}
+
+func TestNumberReadsADoubleLikeJavaScript(t *testing.T) {
+	b, err := read(`{"i":7000,"f":7000.5,"e":7e3,"big":1e999,"neg":-1e999,"tiny":1e-999,"s":"5","n":null,"t":true,"ulp":7000.0000000000001}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]float64{"i": 7000, "f": 7000.5, "e": 7000, "big": math.Inf(1), "neg": math.Inf(-1), "tiny": 0, "ulp": 7000} {
+		if got := b.Number(key); got != want {
+			t.Errorf("%s: %v, want %v", key, got, want)
+		}
+	}
+	for _, key := range []string{"s", "n", "t", "missing"} {
+		if got := b.Number(key); !math.IsNaN(got) {
+			t.Errorf("%s: %v, want NaN", key, got)
+		}
+	}
+	if v, ok := b.NumberOrNull("n"); ok || v != 0 {
+		t.Error("null is no value")
+	}
+	if v, ok := b.NumberOrNull("missing"); ok || v != 0 {
+		t.Error("missing is no value")
+	}
+	if v, ok := b.NumberOrNull("i"); !ok || v != 7000 {
+		t.Error("7000")
+	}
+	if v, ok := b.NumberOrNull("s"); !ok || !math.IsNaN(v) {
+		t.Error("a string is a value that is NaN")
+	}
+	if !b.Has("n") || b.Has("missing") {
+		t.Error("Has is `in`: null counts")
+	}
+}
+
+func TestObjectIsOnlyAJSONObject(t *testing.T) {
+	b, err := read(`{"o":{"a":"x"},"arr":[],"s":"free","n":null}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Object("o").Text("a") != "x" {
+		t.Error("an object")
+	}
+	for _, k := range []string{"arr", "s", "n", "missing"} {
+		if b.Object(k) != nil {
+			t.Errorf("%s is no object", k)
+		}
+	}
 }

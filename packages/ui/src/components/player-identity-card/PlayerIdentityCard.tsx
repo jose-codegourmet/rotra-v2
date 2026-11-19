@@ -150,19 +150,22 @@ export function PlayerIdentityCard({
             ) : null}
           </div>
         ) : null}
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
-            Player ID
-          </span>
-          <PlayerIdLine rtrId={profile.rtrId} id={idElementId} onCopy={onCopyId} />
-          <p className="text-xs text-fg2">
-            Shows the city and date this profile was first created. It isn't where{' '}
-            {isOwn
-              ? 'you live or which club you play for'
-              : 'this player lives or which club they play for'}
-            .
-          </p>
-        </div>
+        {/* A masked profile (real read) carries no Player ID. */}
+        {profile.rtrId ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
+              Player ID
+            </span>
+            <PlayerIdLine rtrId={profile.rtrId} id={idElementId} onCopy={onCopyId} />
+            <p className="text-xs text-fg2">
+              Shows the city and date this profile was first created. It isn't where{' '}
+              {isOwn
+                ? 'you live or which club you play for'
+                : 'this player lives or which club they play for'}
+              .
+            </p>
+          </div>
+        ) : null}
         {/* One full-width button per row (2026-11-13-player-profile-hero-like-card, pass 2). */}
         {isOwn ? (
           <div className="grid grid-cols-1 gap-2">

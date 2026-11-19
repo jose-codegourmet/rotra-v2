@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 66 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -385,6 +385,7 @@ NEW: 66 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
 | [2026-11-19-auth-backgrounds](2026-11-19-auth-backgrounds.md) | Queue, Player and Admin apps: ROTRA background art on the auth pages | auth page frame | NEW |
 | [2026-11-19-court-colors](2026-11-19-court-colors.md) | Queue and Player apps: ROTRA court colours (dark theme) | every drawn court (court card, match card court, setup court picture, player game cards) | CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted |
+| [2026-11-19-player-club-page-join-needs-invite-link](2026-11-19-player-club-page-join-needs-invite-link.md) | Player: the public club page shows Join only to visitors who arrived with an invite link | club-page-hero | NEW |
 | [2026-11-19-player-court-position-art](2026-11-19-player-court-position-art.md) | Player app: Higgsfield art on the Where you play cards | court-position card | NEW |
 | [2026-11-19-player-details-step-mobile](2026-11-19-player-details-step-mobile.md) | Player app: a faster, mobile-first Your details step with clear Required fields | details step, Required pill, optional fold, fixed Continue footer | NEW |
 | [2026-11-19-player-favorite-art](2026-11-19-player-favorite-art.md) | Player app: graphic on the favorite player step | step banner | NEW |

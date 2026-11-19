@@ -75,9 +75,13 @@ export const MAX_PENDING_REQUESTS_PER_SESSION = 60
  */
 function withResultPictures(
   results: Record<string, unknown> | null,
-  roster: { name: string; pictureUrl: string | null }[],
+  roster: { name: string; pictureUrl: string | null; masked: boolean }[],
 ) {
   if (!results) return results
+  // B-56: a registered player whose profile is not public stays masked in the results rows, in the same
+  // form as the participant list. Guests and unclaimed players show as the club shows them. A name that
+  // two roster entries share is masked when any of them is masked.
+  const maskedNames = new Set(roster.filter((entry) => entry.masked).map((entry) => entry.name))
   const seen = new Map<string, { pictureUrl: string | null; participant: number }>()
   const clash = new Set<string>()
   roster.forEach((entry, participant) => {
@@ -90,6 +94,7 @@ function withResultPictures(
     const match = typeof name === 'string' && !clash.has(name) ? seen.get(name) : undefined
     return {
       ...row,
+      ...(typeof name === 'string' && maskedNames.has(name) ? { name: maskPublicName(name) } : {}),
       pictureUrl: match?.pictureUrl ?? null,
       ...(match ? { participant: match.participant } : {}),
     }
@@ -102,6 +107,13 @@ function withResultPictures(
     out.awards = { ...awards, mvp: face(awards.mvp), mostImproved: face(awards.mostImproved) }
   }
   return out
+}
+
+/** A registered player who is not public is masked on the visitor's results (B-56, D-2026-11-09-07). */
+function isResultMasked(
+  player: { profileVisibility: string; profileState: string } | null | undefined,
+) {
+  return !!player && player.profileState !== 'unclaimed' && player.profileVisibility !== 'public'
 }
 
 /**
@@ -191,7 +203,11 @@ export async function readPublicSession(slug: string) {
         clubId: session.clubId,
         id: { in: [...roster.map((r) => r.clubPlayerId), ...waitlist.map((w) => w.clubPlayerId)] },
       },
-      select: { id: true, displayName: true, player: { select: { avatarRef: true } } },
+      select: {
+        id: true,
+        displayName: true,
+        player: { select: { avatarRef: true, profileVisibility: true, profileState: true } },
+      },
     })
     const byId = new Map(clubPlayers.map((p) => [p.id, p]))
     const capacity = await capacityOf(tx, session)
@@ -251,6 +267,7 @@ export async function readPublicSession(slug: string) {
               roster.map((entry) => ({
                 name: entry.nameSnapshot,
                 pictureUrl: byId.get(entry.clubPlayerId)?.player?.avatarRef ?? null,
+                masked: isResultMasked(byId.get(entry.clubPlayerId)?.player),
               })),
             )
           : null,

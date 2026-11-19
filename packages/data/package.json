@@ -60,6 +60,7 @@
     "./public-session/useSendDropOutNotice": "./src/public-session/useSendDropOutNotice.ts",
     "./public-session/useSessionInviteCode": "./src/public-session/useSessionInviteCode.ts",
     "./real/mode": "./src/real/mode.ts",
+    "./real/client": "./src/real/client.ts",
     "./queue-session/types": "./src/queue-session/queueSession.types.ts",
     "./fixtures/session-history": "./src/fixtures/sessionHistory.ts",
     "./queue-session/finalization": "./src/queue-session/finalization.ts",

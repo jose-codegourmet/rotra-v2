@@ -49,6 +49,8 @@ export type SessionRecordHeaderProps = SessionRecordHeaderBase &
     | {
         state: 'invalid'
         published?: boolean
+        /** Ignored: an invalid session shows only the Invalid session chip */
+        recorded?: boolean
         totals: SessionRecordTotals
       }
     | {

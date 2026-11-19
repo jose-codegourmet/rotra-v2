@@ -29,6 +29,8 @@ type Deps struct {
 	ApprovedAlgorithms []string
 	// QueueOrigins are the exact Queue origins that may call the credentialed stats read (the paired Queue pages).
 	QueueOrigins []string
+	// PasswordResets lists the Admin's password-reset requests (the recovery service). Nil leaves that route out.
+	PasswordResets PasswordResetReader
 }
 
 type server struct {
@@ -39,6 +41,7 @@ type server struct {
 	queueOrigins []string
 	approved     []string
 	viewer       *publicreads.ViewerReads
+	resets       PasswordResetReader
 }
 
 // Register builds the routes. They sit behind the proxy-secret guard like every route that is not in its open
@@ -47,7 +50,7 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("signedin: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms, resets: d.PasswordResets}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -59,5 +62,6 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	})
 	rt := NewRouter()
 	s.registerPlayer(rt)
+	s.registerAdmin(rt)
 	return rt.Mount, nil
 }

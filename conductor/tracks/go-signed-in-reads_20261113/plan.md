@@ -11,7 +11,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 2: Admin
 
-- [ ] **2.1** Characterize + port Admin lists and views
+- [x] **2.1** Characterize + port Admin lists and views
 
 ## Phase 3: Queue
 
@@ -34,3 +34,9 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 1.2 | Queue/Player origin pairing is not checked; `ROTRA_ALLOWED_ORIGINS` is used as the Queue origin list | Go cannot see the pairing | Owner: use a dedicated Queue-origins setting or confirm the env var holds Queue origins only |
 | 2026-11-19 | 1.2 | Go database role needs EXECUTE on `public.rotra_player_compare` | Migration revokes it from PUBLIC | Grant before switching `/compare` |
 | 2026-11-19 | 1.2 | my-night has no `recordGames` gate; access carries no standings; wire keys are `checkedIn`/`hasLeft` | Characterized from the TS | Ported as is |
+| 2026-11-19 | 2.1 | A read-mode Admin pass does not check the session row, so a revoked admin session still reads 200 | `ModeRead` by design; switching to `ModeWrite` is an auth decision | Owner to decide (R2: only an active admin can read) |
+| 2026-11-19 | 2.1 | An inactive or unknown admin answers 401 `unauthenticated` (TS: 403 `wrong_account`) | Go auth middleware | Owner to confirm |
+| 2026-11-19 | 2.1 | Malformed ids answer 404 where the TS crashes with 500 | Go validates ids first | Pinned in a Go test |
+| 2026-11-19 | 2.1 | Go role needs EXECUTE on `rotra_sales_*` and SELECT on the sales views and `admin_settings` | Migration revokes them from PUBLIC | Grant before switching `/api/sales` |
+| 2026-11-19 | 2.1 | `internal/rules/{sales,adminplayer,...}` are stubs; helpers live unexported in `signedin` | Rules packages not to be edited here | Move later (a copy) |
+| 2026-11-19 | 2.1 | `GET /api/players` has no query parameters in the TS, so none added | Characterized | Client filters |

@@ -26,6 +26,11 @@ func TestViewerReadsAreServedToTheSignedInPlayerAndTheVisitorOfThePlayerAppOnly(
 	paths := []string{"/api/leaderboard", "/api/leaderboard/search?q=ali", "/api/players/" + carlaID, "/api/players/" + carlaID + "/rank",
 		"/api/players/" + carlaID + "/games", "/api/rtr-ids/RTR-PH-CEB-102926-0001"}
 	for _, p := range paths {
+		// The Admin app has its own read of a player and of a player's games: it asks for its pass (see admin_golden_test.go).
+		adminCode := 404
+		if p == "/api/players/"+carlaID || p == "/api/players/"+carlaID+"/games" {
+			adminCode = 401
+		}
 		for _, c := range []struct {
 			name string
 			req  req
@@ -34,7 +39,7 @@ func TestViewerReadsAreServedToTheSignedInPlayerAndTheVisitorOfThePlayerAppOnly(
 			{"visitor of the Player app", req{path: p, app: "player"}, 200},
 			{"signed in", req{path: p, app: "player", bearer: e.accessPass(t, aliceSubject)}, 200},
 			{"no app header", req{path: p}, 404},
-			{"Admin app", req{path: p, app: "admin"}, 404},
+			{"Admin app", req{path: p, app: "admin"}, adminCode},
 			{"Queue app", req{path: p, app: "club"}, 404},
 			{"no proxy secret", req{path: p, app: "player", noSecret: true}, 404},
 		} {

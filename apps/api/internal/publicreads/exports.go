@@ -1,7 +1,10 @@
 package publicreads
 
 import (
+	"context"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -56,4 +59,40 @@ func PublicFirstName(name string) string {
 		return words[0]
 	}
 	return "Player"
+}
+
+// JSToNumber is Number(string): blank is 0, 0x/0o/0b literals parse, anything that is not a plain decimal is NaN.
+func JSToNumber(s string) float64 { return jsToNumber(s) }
+
+// JSToLower is String.prototype.toLowerCase.
+func JSToLower(s string) string { return jsToLower(s) }
+
+// PlayingStyle is playingStyle(): the string at personal_details.playingStyle, else empty.
+func PlayingStyle(details []byte) string { return playingStyleOf(details) }
+
+// CurrentExperienceMonths is currentExperienceMonths: the stored months counted up to now, false when none are stored.
+func CurrentExperienceMonths(months pgtype.Int4, recordedAt pgtype.Timestamptz, now time.Time) (int64, bool) {
+	return currentExperienceMonths(months, recordedAt, now)
+}
+
+// HistorySession is one session of a games read.
+type HistorySession = historySession
+
+// AdminPlayerHistory is readPlayerMatchHistory(playerId, { maskAlwaysPrivate: false }): the games of a player as
+// Admin sees them, every name in full. An unknown player has none.
+func AdminPlayerHistory(ctx context.Context, q *sqlcgen.Queries, playerID pgtype.UUID) ([]HistorySession, error) {
+	facts, err := q.ListPlayerFacts(ctx, playerID)
+	if err != nil {
+		return nil, fmt.Errorf("listing facts: %w", err)
+	}
+	return readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, false)
+}
+
+// AdminClubPlayerHistory is readClubPlayerMatchHistory: the games of one club record, scoped to that club.
+func AdminClubPlayerHistory(ctx context.Context, q *sqlcgen.Queries, clubID, clubPlayerID pgtype.UUID) ([]HistorySession, error) {
+	facts, err := q.ListClubPlayerFacts(ctx, sqlcgen.ListClubPlayerFactsParams{ClubID: clubID, ClubPlayerID: clubPlayerID})
+	if err != nil {
+		return nil, fmt.Errorf("listing club facts: %w", err)
+	}
+	return readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false)
 }

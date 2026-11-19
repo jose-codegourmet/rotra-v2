@@ -34,4 +34,9 @@ func (s *server) registerPlayer(rt *Router) {
 	rt.Handle("GET /api/players/{playerId}/rank", player, optional(s.viewer.Rank))
 	rt.Handle("GET /api/players/{playerId}/games", player, optional(s.viewer.Games))
 	rt.Handle("GET /api/rtr-ids/{rtrId}", player, optional(s.viewer.FindByRTR))
+	// The public club page and ranking settings are also Admin paths (Admin has its own reads of them). The Queue app
+	// shows the same club page (as a visitor), and has no ranking settings route.
+	rt.Handle("GET /api/clubs/{clubId}", player, s.viewer.ClubPage)
+	rt.Handle("GET /api/clubs/{clubId}", store.AudienceClub, s.viewer.ClubPage)
+	rt.Handle("GET /api/ranking-settings", player, s.viewer.RankingSettings)
 }

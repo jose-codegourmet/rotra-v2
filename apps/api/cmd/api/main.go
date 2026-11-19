@@ -125,6 +125,8 @@ func run() error {
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
 			Limiter: publicLimiter, QueueOrigins: cfg.AllowedOrigins,
+			// The Admin list of password-reset requests is the recovery service's read.
+			PasswordResets: recoveryService,
 		})
 		if err != nil {
 			return err

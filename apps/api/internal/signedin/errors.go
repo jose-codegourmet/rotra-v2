@@ -50,3 +50,9 @@ func readTx(ctx context.Context, pool *pgxpool.Pool, fn func(*sqlcgen.Queries) e
 	}()
 	return fn(sqlcgen.New(tx))
 }
+
+// Failures the TypeScript throws as plain Errors (an unexpected 500), kept as their own values so a test can see them.
+var (
+	errNoBars     = errors.New("sales period returned no bars")
+	errNoSettings = errors.New("admin settings row is missing")
+)

@@ -1,0 +1,910 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "subjects": {},
+  "reset": [],
+  "scenarios": {
+    "base": [],
+    "no_accounts": [
+      "DELETE FROM club_accounts"
+    ],
+    "no_terms": [
+      "DELETE FROM club_license_terms"
+    ],
+    "no_terms_no_sessions": [
+      "DELETE FROM club_license_terms",
+      "DELETE FROM queue_sessions"
+    ],
+    "cost_changed": [
+      "UPDATE admin_settings SET cost_per_session_minor = 2750"
+    ],
+    "no_ranks": [
+      "DELETE FROM player_rank_current",
+      "DELETE FROM player_private_contacts"
+    ],
+    "alice_private": [
+      "UPDATE players SET profile_visibility = 'always_private' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_google_differs": [
+      "UPDATE player_accounts SET google_email = 'alice.g@example.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000001'",
+      "INSERT INTO player_contact_change_requests (id, player_id, field, source, proposed_value, original_value, original_contact_revision, status, requested_at, source_command_id, submitted_by_admin_id, application_attempts, updated_at) VALUES ('b1000000-0000-4000-8000-0000000000a1', 'd4000000-0000-4000-8000-000000000001', 'email', 'owner', 'alice.g@example.test', 'alice@example.test', 1, 'pending', TIMESTAMPTZ '2026-11-17 01:00:00+00', 'b2000000-0000-4000-8000-0000000000a1', 'ad000000-0000-4000-8000-000000000001', 0, now())"
+    ],
+    "carla_three": [
+      "UPDATE player_private_contacts SET email = 'carla@gmail.test' WHERE player_id = 'd4000000-0000-4000-8000-000000000003'"
+    ],
+    "holder_gone": [
+      "DELETE FROM player_private_contacts WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+    ],
+    "no_requests": [
+      "DELETE FROM player_contact_change_requests"
+    ],
+    "club_renamed": [
+      "DELETE FROM admin_audit_events WHERE action = 'club.name_change_approved'",
+      "UPDATE admin_audit_events SET metadata = '{\"before\":7}'::jsonb WHERE id = 'ae000000-0000-4000-8000-000000000002'"
+    ],
+    "term_gone": [
+      "DELETE FROM club_license_terms WHERE id = 'a1000000-0000-4000-8000-000000000001'"
+    ],
+    "player_names_gone": [
+      "DELETE FROM players WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+    ]
+  },
+  "cases": [
+    {
+      "name": "guard_no_session",
+      "path": "/api/feature-flags",
+      "who": null,
+      "scenario": "base"
+    },
+    {
+      "name": "guard_player_pass",
+      "path": "/api/feature-flags",
+      "who": "f4000000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "guard_former_admin",
+      "path": "/api/feature-flags",
+      "who": "ad100000-0000-4000-8000-000000000003",
+      "scenario": "base",
+      "goExpects": {
+        "status": 401,
+        "code": "unauthenticated"
+      }
+    },
+    {
+      "name": "guard_unknown_subject",
+      "path": "/api/feature-flags",
+      "who": "ad100000-0000-4000-8000-0000000000ff",
+      "scenario": "base",
+      "goExpects": {
+        "status": 401,
+        "code": "unauthenticated"
+      }
+    },
+    {
+      "name": "flags",
+      "path": "/api/feature-flags",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "flags_second_admin",
+      "path": "/api/feature-flags",
+      "who": "ad100000-0000-4000-8000-000000000002",
+      "scenario": "base"
+    },
+    {
+      "name": "ranking_settings",
+      "path": "/api/ranking-settings",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_identity",
+      "path": "/api/clubs/identity",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "license_op_first",
+      "path": "/api/license-operations/e1000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "license_op_later",
+      "path": "/api/license-operations/e1000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "license_op_free",
+      "path": "/api/license-operations/e1000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "license_op_upper",
+      "path": "/api/license-operations/E1000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "license_op_unknown",
+      "path": "/api/license-operations/e1000000-0000-4000-8000-0000000000ee",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "banners_library",
+      "path": "/api/profile-banners",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "characters_library",
+      "path": "/api/profile-characters",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "clubs",
+      "path": "/api/clubs",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_1",
+      "path": "/api/clubs/c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_2",
+      "path": "/api/clubs/c9000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_3",
+      "path": "/api/clubs/c9000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_4",
+      "path": "/api/clubs/c9000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_upper_case_id",
+      "path": "/api/clubs/C9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_unknown",
+      "path": "/api/clubs/c9000000-0000-4000-8000-000000000009",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_not_36_chars",
+      "path": "/api/clubs/abc",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_after_flag_change_no_accounts",
+      "path": "/api/clubs",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_accounts"
+    },
+    {
+      "name": "sales_default",
+      "path": "/api/sales",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_empty_period",
+      "path": "/api/sales?period=",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_7d",
+      "path": "/api/sales?period=7d",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_30d",
+      "path": "/api/sales?period=30d",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_12m",
+      "path": "/api/sales?period=12m",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_bad_period",
+      "path": "/api/sales?period=90d",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "sales_manila_next_day",
+      "path": "/api/sales?period=7d",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "now": "2026-11-19T17:00:00.000Z"
+    },
+    {
+      "name": "sales_12m_new_year",
+      "path": "/api/sales?period=12m",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "now": "2027-01-01T01:00:00.000Z"
+    },
+    {
+      "name": "sales_without_terms",
+      "path": "/api/sales?period=30d",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_terms"
+    },
+    {
+      "name": "sales_without_sessions_or_terms_12m",
+      "path": "/api/sales?period=12m",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_terms_no_sessions"
+    },
+    {
+      "name": "club_sales_1",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_2",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_3",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_4",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_unknown",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000009",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_malformed",
+      "path": "/api/sales/clubs/not-a-uuid",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "club_sales_other_cost",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "cost_changed"
+    },
+    {
+      "name": "club_sales_new_year",
+      "path": "/api/sales/clubs/c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base",
+      "now": "2026-12-31T20:00:00.000Z"
+    },
+    {
+      "name": "players",
+      "path": "/api/players",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "players_no_ranks_no_contacts",
+      "path": "/api/players",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_ranks"
+    },
+    {
+      "name": "player_alice",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_bob",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_carla",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_dan_hidden_by_open_entry",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_erin",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000005",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_frank_no_rtr",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000006",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_gina",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000007",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_unknown",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000099",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_shared_una",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000007",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_shared_uri",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000008",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_shared_retired",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000009",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_shared_claimed",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000010",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_shared_empty",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000011",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_club_only_cory",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000021",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_club_only_dina",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000022",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_club_only_removed",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000023",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_club_only_no_phone",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000024",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_club_only_no_input",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000025",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_upper_case_id",
+      "path": "/api/players/D4000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "player_alice_after_password_event",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_alice",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_bob",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000002/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_carla",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000003/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_dan",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000004/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_erin",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000005/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_unknown",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000099/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_shared_una",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000007/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_shared_uri",
+      "path": "/api/players/a6000000-0000-4000-8000-000000000008/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_club_only_cory",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000021/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_club_only_dina",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000022/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_club_only_no_facts",
+      "path": "/api/players/c6000000-0000-4000-8000-000000000024/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_malformed",
+      "path": "/api/players/not-a-uuid/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_upper_case_id",
+      "path": "/api/players/D4000000-0000-4000-8000-000000000001/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "games_alice_always_private_player_visible",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001/games",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "alice_private"
+    },
+    {
+      "name": "verification_alice",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_bob",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000002/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_carla",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000003/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_dan_unclaimed",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000004/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_gina_no_contact",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000007/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_unknown",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000099/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_malformed",
+      "path": "/api/players/nope/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "verification_alice_mismatch_pending",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000001/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "alice_google_differs"
+    },
+    {
+      "name": "verification_carla_three_steps",
+      "path": "/api/players/d4000000-0000-4000-8000-000000000003/verification",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "carla_three"
+    },
+    {
+      "name": "contact_requests",
+      "path": "/api/contact-change-requests",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_1",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_2",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_3",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_4",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_5",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000005",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_6",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000006",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_7",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000007",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_8",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000008",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_9",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000009",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_10",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000010",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_unknown",
+      "path": "/api/contact-change-requests/b1000000-0000-4000-8000-000000000099",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_request_malformed",
+      "path": "/api/contact-change-requests/xyz",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "contact_requests_holder_gone",
+      "path": "/api/contact-change-requests",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "holder_gone"
+    },
+    {
+      "name": "contact_requests_empty",
+      "path": "/api/contact-change-requests",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_requests"
+    },
+    {
+      "name": "reset_page_default",
+      "path": "/api/password-reset-requests",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_1",
+      "path": "/api/password-reset-requests?page=1",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_2",
+      "path": "/api/password-reset-requests?page=2",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_3",
+      "path": "/api/password-reset-requests?page=3",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_0",
+      "path": "/api/password-reset-requests?page=0",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_neg1",
+      "path": "/api/password-reset-requests?page=-1",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_abc",
+      "path": "/api/password-reset-requests?page=abc",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_",
+      "path": "/api/password-reset-requests?page=",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_1dot5",
+      "path": "/api/password-reset-requests?page=1.5",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_100000",
+      "path": "/api/password-reset-requests?page=100000",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_100001",
+      "path": "/api/password-reset-requests?page=100001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_sp2",
+      "path": "/api/password-reset-requests?page=%202",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_1e1",
+      "path": "/api/password-reset-requests?page=1e1",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_0x10",
+      "path": "/api/password-reset-requests?page=0x10",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "reset_page_2_and_1",
+      "path": "/api/password-reset-requests?page=2&page=1",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club1",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club2",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club3",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club4",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club_unknown",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000009",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_player_alice",
+      "path": "/api/audit-events?targetType=player&targetId=d4000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_player_bob",
+      "path": "/api/audit-events?targetType=player&targetId=d4000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_player_dan",
+      "path": "/api/audit-events?targetType=player&targetId=d4000000-0000-4000-8000-000000000004",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_player_carla",
+      "path": "/api/audit-events?targetType=player&targetId=d4000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_request2",
+      "path": "/api/audit-events?targetType=contact_change_request&targetId=b1000000-0000-4000-8000-000000000002",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_request3",
+      "path": "/api/audit-events?targetType=contact_change_request&targetId=b1000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_request7",
+      "path": "/api/audit-events?targetType=contact_change_request&targetId=b1000000-0000-4000-8000-000000000007",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_request8",
+      "path": "/api/audit-events?targetType=contact_change_request&targetId=b1000000-0000-4000-8000-000000000008",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_request_unknown",
+      "path": "/api/audit-events?targetType=contact_change_request&targetId=b1000000-0000-4000-8000-000000000099",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club_malformed",
+      "path": "/api/audit-events?targetType=club&targetId=xyz",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club_upper",
+      "path": "/api/audit-events?targetType=club&targetId=C9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_missing_type",
+      "path": "/api/audit-events?targetId=c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_bad_type",
+      "path": "/api/audit-events?targetType=license&targetId=c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_missing_id",
+      "path": "/api/audit-events?targetType=club",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_no_query",
+      "path": "/api/audit-events",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "base"
+    },
+    {
+      "name": "audit_club1_names_changed",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "club_renamed"
+    },
+    {
+      "name": "audit_club1_term_gone",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "term_gone"
+    },
+    {
+      "name": "audit_player_alice_name_gone",
+      "path": "/api/audit-events?targetType=player&targetId=d4000000-0000-4000-8000-000000000001",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "player_names_gone"
+    },
+    {
+      "name": "audit_club3_no_account",
+      "path": "/api/audit-events?targetType=club&targetId=c9000000-0000-4000-8000-000000000003",
+      "who": "ad100000-0000-4000-8000-000000000001",
+      "scenario": "no_accounts"
+    }
+  ]
+}

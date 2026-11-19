@@ -121,10 +121,11 @@ func (s *server) myClubs() http.Handler {
 
 // verificationEmail is VerificationEmail: google_missing, match or mismatch.
 type verificationEmail struct {
-	Kind                string `json:"kind"`
-	RotraEmail          string `json:"rotraEmail,omitempty"`
-	GoogleEmail         string `json:"googleEmail,omitempty"`
-	PendingEmailRequest *bool  `json:"pendingEmailRequest,omitempty"`
+	Kind string `json:"kind"`
+	// Pointers, because an empty RotraEmail still goes on the wire (a player with no email) while google_missing has none.
+	RotraEmail          *string `json:"rotraEmail,omitempty"`
+	GoogleEmail         *string `json:"googleEmail,omitempty"`
+	PendingEmailRequest *bool   `json:"pendingEmailRequest,omitempty"`
 }
 
 // verificationDTO is AccountVerification.
@@ -143,6 +144,9 @@ type verificationDTO struct {
 type verification struct {
 	dto            verificationDTO
 	reminderReadAt pgtype.Timestamptz
+	// revision and phone are what Admin's read adds: the player's revision and the stored phone, trimmed.
+	revision int64
+	phone    string
 }
 
 func normalizeGoogleEmail(s string) string { return strings.ToLower(publicreads.JSTrim(s)) }
@@ -179,7 +183,7 @@ func readVerification(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) (*ver
 		dto.Email = verificationEmail{Kind: "google_missing"}
 	case rotra == google:
 		steps++
-		dto.Email = verificationEmail{Kind: "match", RotraEmail: rotra, GoogleEmail: google}
+		dto.Email = verificationEmail{Kind: "match", RotraEmail: &rotra, GoogleEmail: &google}
 	default:
 		pending := false
 		for _, c := range changes {
@@ -187,11 +191,11 @@ func readVerification(r *http.Request, q *sqlcgen.Queries, id pgtype.UUID) (*ver
 				pending = true
 			}
 		}
-		dto.Email = verificationEmail{Kind: "mismatch", RotraEmail: rotra, GoogleEmail: google, PendingEmailRequest: &pending}
+		dto.Email = verificationEmail{Kind: "mismatch", RotraEmail: &rotra, GoogleEmail: &google, PendingEmailRequest: &pending}
 	}
 	dto.CompletedSteps = steps
 	dto.Verified = byAdmin || steps == 3
-	return &verification{dto: dto, reminderReadAt: facts.VerificationReminderReadAt}, nil
+	return &verification{dto: dto, reminderReadAt: facts.VerificationReminderReadAt, revision: facts.Revision, phone: phone}, nil
 }
 
 // maskPhone is maskPhone in @rotra/schema/phone: '+639185550377' becomes '+63 918 ••• ••77'. Input with no

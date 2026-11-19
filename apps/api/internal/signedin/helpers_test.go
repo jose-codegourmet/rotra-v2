@@ -18,6 +18,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/recovery"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
@@ -58,6 +59,10 @@ type env struct {
 	handler http.Handler
 	// approved serves the same database with a rank algorithm approved (#247); none is in the product.
 	approved http.Handler
+	// adminIdentities is set once the Admin and Player test identities exist (see relinkAdmins).
+	adminIdentities bool
+	// noResets is the same server without the recovery service (the Admin password-reset list is left out).
+	noResets http.Handler
 }
 
 // queueOrigin is the paired Queue origin the stats read allows.
@@ -99,9 +104,17 @@ func newEnv(t *testing.T, now time.Time) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
-	build := func(approved []string) http.Handler {
+	resets, err := recovery.New(recovery.Deps{Pool: pool, Service: e.svc, Store: e.st, Clock: e.clk.Now, Logger: log})
+	if err != nil {
+		t.Fatal(err)
+	}
+	build := func(approved []string, withResets bool) http.Handler {
+		var reader signedin.PasswordResetReader
+		if withResets {
+			reader = resets
+		}
 		register, err := signedin.Register(signedin.Deps{
-			Pool: pool, Auth: e.svc.Authenticator(), Logger: log, Now: e.clk.Now,
+			Pool: pool, Auth: e.svc.Authenticator(), Logger: log, Now: e.clk.Now, PasswordResets: reader,
 			Limiter:            httpapi.NewRateLimiter(1_000_000, nil), // the limit has its own tests
 			ApprovedAlgorithms: approved, QueueOrigins: []string{queueOrigin},
 		})
@@ -110,8 +123,9 @@ func newEnv(t *testing.T, now time.Time) *env {
 		}
 		return httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: httpapi.NewReadiness(), ProxySecret: secret}, register)
 	}
-	e.handler = build(nil)
-	e.approved = build([]string{"rank-test-v1"})
+	e.handler = build(nil, true)
+	e.approved = build([]string{"rank-test-v1"}, true)
+	e.noResets = build(nil, false)
 	return e
 }
 
@@ -145,14 +159,20 @@ func (e *env) setup(t *testing.T, stmts ...[]string) {
 	}
 }
 
-// loadSeed applies a seed file from testdata.
-func (e *env) loadSeed(t *testing.T, name string) {
+// readSeed reads a seed file from testdata.
+func readSeed(t *testing.T, name string) string {
 	t.Helper()
 	b, err := os.ReadFile("testdata/" + name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	e.exec(t, string(b))
+	return string(b)
+}
+
+// loadSeed applies a seed file from testdata.
+func (e *env) loadSeed(t *testing.T, name string) {
+	t.Helper()
+	e.exec(t, readSeed(t, name))
 }
 
 // relinkPlayers turns the capture's 'supabase' player accounts into Go sign-in identities: one identity per

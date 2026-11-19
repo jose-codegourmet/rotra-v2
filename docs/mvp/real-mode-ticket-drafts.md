@@ -127,7 +127,7 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
 - **Update, November 18, 2026 (owner: “full version migration”):** **I'm here** and **I'm leaving** are
   real (`selfCheckIn`, `leaveSessionAsPlayer`; Player app routes `check-in` and `leave`), with the
   roster marks and the club's switch (migration `20261118000600_self_check_in`, applied to a local disposable database
-  2026-11-19; **shared database pending, applied right after merge**). Written and type-checked. Still open here: the
+  2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off)). Written and type-checked. Still open here: the
   drop-out notice (**I can't make it**) and the Session invite code.
 - **Update, November 19, 2026 (Q24.6, #968; owner approved the migration for the batch):**
   **I can't make it** and the Session invite code are real (`sendDropOutNotice`,
@@ -136,7 +136,7 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   under `requests/drop-outs/[noticeId]`; finishing, invalidating or cancelling closes open notices;
   My night reads `cantMakeItSent`, `canInvite` and `inviteCode`. Migration
   `20261118000700_drop_out_notices_session_invites`, applied to a local disposable database
-  2026-11-19, **shared database pending, applied right after merge**. Still open: resolving `?invite=` on a join request (“Invited by NAME”).
+  2026-11-19, **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off). Still open: resolving `?invite=` on a join request (“Invited by NAME”).
 
 ---
 

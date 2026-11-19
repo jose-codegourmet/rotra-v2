@@ -1,5 +1,6 @@
 'use client'
 
+import { groupStandings } from '@rotra/data/match/match.rules'
 import type { PublicStandingRow } from '@rotra/data/public-session/types'
 import { LeaderboardShareCard } from '@rotra/ui/leaderboard-share-card'
 import { SessionStandings } from '@rotra/ui/session-standings'
@@ -41,7 +42,8 @@ async function shareText(text: string, link: string) {
 
 /**
  * Finished session page › Leaderboard tab (2026-11-13 finished session and share leaderboard
- * logs): SessionStandings from the published standings, Your position › Share (the system share
+ * logs): SessionStandings from the published standings grouped into positions (players with the same
+ * wins and losses share one row, 1, 1, 3), Your position › Share (the system share
  * sheet with “I finished #N of M at SESSION · CLUB (NW NL). Played on ROTRA.”, or copied), and
  * Share leaderboard (ShareDialog with LeaderboardShareCard, the viewer's row highlighted).
  */
@@ -56,6 +58,20 @@ export function SessionLeaderboard({
 }: SessionLeaderboardProps) {
   const [sharing, setSharing] = useState(false)
   const mine = rows.find((row) => row.isViewer)
+  // One row per position (same wins and losses share it); every face opens its own profile.
+  const boardRows = groupStandings(
+    rows.map((row, i) => ({ ...row, key: String(i) })),
+    (row) => ({
+      id: row.key,
+      name: row.name,
+      pictureUrl: row.pictureUrl,
+      isViewer: row.isViewer,
+      onOpen:
+        onOpenParticipant && row.participant !== undefined
+          ? () => onOpenParticipant(row.participant as number)
+          : undefined,
+    }),
+  ).map((group) => ({ ...group, id: `position-${group.position}` }))
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(link)
@@ -68,20 +84,7 @@ export function SessionLeaderboard({
     <>
       <SessionStandings
         viewer={viewer}
-        rows={rows.map((row) => ({
-          id: String(row.position),
-          position: row.position,
-          name: row.name,
-          pictureUrl: row.pictureUrl,
-          wins: row.wins,
-          losses: row.losses,
-          games: row.games,
-          isViewer: row.isViewer,
-          onOpen:
-            onOpenParticipant && row.participant !== undefined
-              ? () => onOpenParticipant(row.participant as number)
-              : undefined,
-        }))}
+        rows={boardRows}
         onShareFinish={() => {
           if (!mine) return
           void shareText(

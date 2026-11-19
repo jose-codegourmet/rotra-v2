@@ -44,7 +44,19 @@ export type QueueSession = {
    * Missing means `prototypeDefaultRequestFormats(session)` (sessions saved before the setting).
    */
   requestFormats?: RequestFormats
+  /**
+   * **Record games** (D-2026-11-18-06): false runs the night and keeps no results. Missing means
+   * true (sessions saved before the switch). Read it through `recordsGames`. Fixed once started.
+   */
+  recordGames?: boolean
 }
+/**
+ * Whether the session keeps results: the one place the Record games default lives (missing reads
+ * as on). An unrecorded session has no winner, score, standings, awards, result slides or
+ * publication, and nothing of it goes to player records or ranking.
+ */
+export const recordsGames = (session: Pick<QueueSession, 'recordGames'>) =>
+  session.recordGames !== false
 /** One switch per format a Player may request (`MatchFormat` keys). */
 export type RequestFormats = Record<import('../match/match.types').MatchFormat, boolean>
 /**
@@ -106,6 +118,7 @@ export type QueueSessionInput = Pick<
   | 'minimumIsCalculated'
   | 'expectedPlayers'
   | 'requestFormats'
+  | 'recordGames'
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
@@ -151,7 +164,18 @@ export const FINALIZATION_STAGES: readonly FinalizationStage[] = [
   'player_records',
   'slides',
 ]
-/** One finalization per session; `committed` means the session is complete but later work failed. */
+/** An unrecorded session finishes in two steps: no player records to update, no slides to make. */
+export const UNRECORDED_FINALIZATION_STAGES: readonly FinalizationStage[] = [
+  'checking',
+  'finishing',
+]
+/** The steps Session done runs for this session, in order. */
+export const finalizationStagesFor = (session: Pick<QueueSession, 'recordGames'>) =>
+  recordsGames(session) ? FINALIZATION_STAGES : UNRECORDED_FINALIZATION_STAGES
+/**
+ * One finalization per session; `committed` means the session is complete but later work failed.
+ * An unrecorded session ends `done` at stage `finishing`.
+ */
 export type SessionFinalization = {
   sessionId: string
   commandId: string
@@ -178,6 +202,8 @@ export type SessionRecordSummary = {
   playerRecordsUpdatedAt: number | null
   venueName: string
   venueAddress: string
+  /** False when unrecorded ("Not recorded"): games count, wins and losses stay 0. Missing: true. */
+  recordGames?: boolean
   games: number
   invalidGames: number
   players: number

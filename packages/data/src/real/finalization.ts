@@ -86,7 +86,9 @@ type WireStatus = {
  */
 function finalizationOf(wire: WireStatus): SessionFinalization {
   const base = { sessionId: wire.sessionId, commandId: wire.commandId }
-  if (wire.state === 'done') return { ...base, state: 'done', stage: 'slides' }
+  // An unrecorded session (D-2026-11-18-06) is done at `finishing`: no player records, no slides.
+  if (wire.state === 'done')
+    return { ...base, state: 'done', stage: wire.stage === 'finishing' ? 'finishing' : 'slides' }
   if (!wire.accepted)
     return wire.state === 'failed'
       ? { ...base, state: 'failed', stage: wire.stage, failedStage: wire.failedStage ?? wire.stage }
@@ -101,6 +103,7 @@ function finalizationOf(wire: WireStatus): SessionFinalization {
 }
 
 const DONE_TOAST = 'Session finished · player records updated'
+const UNRECORDED_TOAST = 'Session finished · games not recorded'
 const PREPARING = 'Session finished; results are being prepared'
 
 export async function realFinalizeSession(input: { sessionId: string; commandId: string }) {
@@ -109,7 +112,8 @@ export async function realFinalizeSession(input: { sessionId: string; commandId:
     { method: 'POST', body: { commandId: input.commandId } },
   )
   const data = finalizationOf(status)
-  return accepted(data, data.state === 'done' ? DONE_TOAST : PREPARING)
+  const done = data.stage === 'finishing' ? UNRECORDED_TOAST : DONE_TOAST
+  return accepted(data, data.state === 'done' ? done : PREPARING)
 }
 
 /** Null until a finalization committed (a refused Session done leaves nothing to recover). */

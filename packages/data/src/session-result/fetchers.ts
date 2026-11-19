@@ -2,6 +2,7 @@ import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
+import { recordsGames } from '../queue-session/queueSession.types'
 import { realGetSessionPublication, realGetSessionResults, realPublishResults } from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import type {
@@ -10,20 +11,26 @@ import type {
   SessionResultSnapshot,
 } from './sessionResult.types'
 
-/** Q-RESULTS: the private snapshot; null until a valid finalization reached its `slides` stage. */
+/**
+ * Q-RESULTS: the private snapshot; null until a valid finalization reached its `slides` stage, and
+ * always null for an unrecorded session (no standings, awards or result slides).
+ */
 export async function getSessionResults(id: string): Promise<SessionResultSnapshot | null> {
   if (isRealDataMode()) return realGetSessionResults(id)
   await delay()
   const state = readMockState()
-  sessionIn(state, id)
+  if (!recordsGames(sessionIn(state, id))) return null
   return state.resultSnapshots[id] ?? null
 }
-/** Q-PUBLISH / public page: the current publication, or null while results are private. */
+/**
+ * Q-PUBLISH / public page: the current publication, or null while results are private. An
+ * unrecorded session has nothing to publish, so it is always null.
+ */
 export async function getSessionPublication(id: string): Promise<SessionPublication | null> {
   if (isRealDataMode()) return realGetSessionPublication(id)
   await delay()
   const state = readMockState()
-  sessionIn(state, id)
+  if (!recordsGames(sessionIn(state, id))) return null
   return state.publications[id] ?? null
 }
 const SLIDE_LABELS = { standings: 'Standings', awards: 'Awards' } as const
@@ -38,6 +45,9 @@ export function publishResults(input: PublishResultsInput) {
     const session = sessionIn(state, input.sessionId)
     if (session.state !== 'completed')
       throw new MockError('permission', 'Only a completed session can publish results.')
+    // The same refusal as a session with no snapshot: an unrecorded one never has result slides.
+    if (!recordsGames(session))
+      throw new MockError('permission', 'This session has no result slides yet.')
     const snapshot = state.resultSnapshots[input.sessionId]
     if (!snapshot) throw new MockError('permission', 'This session has no result slides yet.')
     // Prototype reference: Off Day alone also counts as a selection (confirmPublish is enabled by slides or Off Day).

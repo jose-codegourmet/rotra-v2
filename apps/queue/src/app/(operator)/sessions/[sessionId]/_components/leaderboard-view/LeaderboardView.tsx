@@ -1,30 +1,28 @@
 'use client'
 
-import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { groupStandings } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { LiveLeaderboard, type LiveLeaderboardRow } from '@rotra/ui/live-leaderboard'
-import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { LiveLeaderboard } from '@rotra/ui/live-leaderboard'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
+import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 
 export type LeaderboardViewProps = ConsoleViewProps
 
 /**
  * Q-LEADERBOARD, the console's Leaderboard view: LiveLeaderboard on useLiveStandings (the
- * computeStandings order: most wins, fewest losses, head-to-head) with each row's level from the
- * roster, the saved player's own picture (or character) like the Players view, and the session's
- * minimum games. Pictures open the player's profile through
- * onOpenProfile. A working view for the operator, never official history.
+ * computeStandings order: most wins, then fewest losses; players on the same wins and losses share
+ * one position, grouped with groupStandings) with each player's level from the roster and the
+ * session's minimum games. Every face opens that player's profile through onOpenProfile. A working view for the operator, never official history.
  */
 export function LeaderboardView({ sessionId, onOpenProfile }: LeaderboardViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const standings = useLiveStandings(sessionId)
-  // Pictures only: the standings never wait for this read.
-  const clubPlayers = useClubPlayers()
+  const { pictureOf } = useClubPlayerPictures()
 
   if (session.isError || roster.isError || standings.isError)
     return (
@@ -51,23 +49,13 @@ export function LeaderboardView({ sessionId, onOpenProfile }: LeaderboardViewPro
     )
 
   const rosterList = roster.data.roster
-  const rows: LiveLeaderboardRow[] = standings.data.map((r) => {
-    const entry = rosterList.find((p) => p.id === r.playerId)
-    const saved = clubPlayers.data?.players.find((p) => p.id === entry?.clubPlayerId)
+  const rows = groupStandings(standings.data, (r) => {
+    const p = rosterList.find((x) => x.id === r.playerId)
     return {
       playerId: r.playerId,
       name: r.name,
-      level: entry?.level ?? null,
-      photoUrl: saved
-        ? profilePictureSrc(
-            saved.picture,
-            saved.playerId ?? saved.id,
-            saved.pictureName ?? saved.fullName,
-          )
-        : undefined,
-      wins: r.wins,
-      losses: r.losses,
-      games: r.games,
+      level: p?.level ?? null,
+      photoUrl: pictureOf(p?.clubPlayerId),
     }
   })
   const openProfile = (rosterId: string) => {

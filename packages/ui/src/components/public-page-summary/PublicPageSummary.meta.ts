@@ -7,6 +7,7 @@ export const publicPageSummaryMeta = {
   usage: [
     'Use as the body of the Public page tab of a session record (Q-HISTORY). Pass the participant cards (ParticipantCard from PublicParticipants) as children; the component lays them out in the grid.',
     'Invalid sessions get the "Invalid sessions have no results to share." copy and no publish action.',
+    'Pass recorded={false} for an unrecorded session (Record games off): the Publish results button is not shown.',
     'Do not use on the public page itself: that page is built from PublicSessionHero, PublicSessionDetails, PublicParticipants and PublicResultsSection.',
   ],
   prototype: {

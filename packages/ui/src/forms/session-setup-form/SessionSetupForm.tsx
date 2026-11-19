@@ -79,6 +79,8 @@ export type SessionSetupFormProps = {
   /** Adds a Costs row to the review (Queue › Financials) */
   costsReviewLine?: string
   initialPage?: number
+  /** The session has started: Record games shows as a read-only On / Off chip */
+  recordGamesLocked?: boolean
   financials?: Omit<
     SessionFinancialsFieldsProps,
     'courts' | 'durationMinutes' | 'players' | 'venueRate'
@@ -117,6 +119,7 @@ export function SessionSetupForm({
   financialsSection,
   costsReviewLine,
   initialPage = 0,
+  recordGamesLocked = false,
   financials,
   ref,
 }: SessionSetupFormProps) {
@@ -125,6 +128,8 @@ export function SessionSetupForm({
     defaultValues: {
       ...sessionSetupDefaultValues(playersPerCourtDefault),
       ...initialValues,
+      // A session saved before Record games existed has no value and reads as on.
+      recordGames: initialValues?.recordGames ?? true,
       // A stored or restored number is the QM's own; empty follows the slot budget.
       expectedIsAuto: initialValues?.expectedIsAuto ?? !initialValues?.expectedPlayers?.trim(),
     },
@@ -282,6 +287,7 @@ export function SessionSetupForm({
     <SetupCourtsSection key="courts" editContext={editContext} />,
     <SetupFormatsSection
       key="formats"
+      recordGamesLocked={recordGamesLocked}
       allowedRequestFormats={values.requestFormats}
       onRequestFormatsChange={(formats) =>
         form.setValue('requestFormats', formats, { shouldDirty: true })

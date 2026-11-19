@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 export type PublicMatchHistoryItem = MatchCourtProps & { id: string }
 
 export type PublicMatchHistoryProps = {
+  /** False for an unrecorded session (Record games off): the heading and “This session's games were not recorded.” only. Omitted reads as recorded. */
+  recorded?: boolean
   /** False: a visitor, who sees “Log in with ROTRA Player to see the match history.” */
   signedIn: boolean
   tab: 'mine' | 'all'
@@ -28,8 +30,10 @@ const MUTED = 'm-0 text-[13px] text-fg2'
  * history courts logs; the prototype's pubHistory): the heading with the count big and green on
  * the right, **Yours · N** / **All · N**, then one MatchCourt per match, newest first. On All, when
  * the results are shared, **How the night went** (the replay) comes first and the list follows it.
+ * A session with Record games off shows only the heading and “This session's games were not recorded.”
  */
 export function PublicMatchHistory({
+  recorded = true,
   signedIn,
   tab,
   onTabChange,
@@ -40,6 +44,13 @@ export function PublicMatchHistory({
   replay,
 }: PublicMatchHistoryProps) {
   const heading = <h2>Match history</h2>
+  if (!recorded)
+    return (
+      <section aria-label="Match history" className="flex flex-col gap-3">
+        {heading}
+        <p className={MUTED}>This session's games were not recorded.</p>
+      </section>
+    )
   if (!signedIn)
     return (
       <section aria-label="Match history" className="flex flex-col gap-3">

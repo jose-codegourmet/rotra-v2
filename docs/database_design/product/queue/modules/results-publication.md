@@ -1,6 +1,6 @@
 # Finalized facts, awards, and publication
 
-**Last verified:** 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-19 for sessions with Record games off ([D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06), Q23.8 #976); 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed data structures, not proposed new award formulas.
 
@@ -31,13 +31,28 @@ Index `(player_id_at_finalization, played_at DESC, match_id)` for player history
 
 `session_result_snapshots`: one immutable generated snapshot per session/version, containing standings, MVP evidence, improvement/off-day eligibility and output, calculation version, exact prior-session IDs/baseline window, and generated time. It is private by default. Versioning supports reviewed algorithm changes, not result correction.
 
-Compute local standings from wins, losses, head-to-head when applicable, then name. Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
+Compute local standings from wins, then losses; players with the same wins and losses share a position and the next position skips the shared places ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05), mockup only; the code still breaks ties by head-to-head, then name). Include total games. No global rank score replaces this ordering. List only players with at least one counted game; partial participants and invalid matches contribute nothing, except a credited substitute (`credit_to`), whose game counts as a counted game for the session.
 
 The live console leaderboard uses the same ordering over the provisional projection and adds win % (wins ÷ games). It is a read model only.
 
 MVP needs at least two counted games. The nine-level [business reference formula](../../../../business_logic/product/queue/modules/results/README.md#reference-award-formula) uses a divisor of **2** in its level-index expected win chance; Most Improved uses +0.15 and Off Day −0.30 versus a baseline win rate. This corrects the stale divisor of 8; it does **not** approve production award math. Store the calculation version in the snapshot; final formulas and examples remain gated by [#247](https://github.com/jose-codegourmet/rotra-v2/issues/247).
 
 Most Improved/Off Day need five **previous** qualifying sessions at that same club within three months, excluding the current session. Guests qualify via club-player history. Store actual baseline IDs; a count alone cannot explain an award. Exact award math and which attendance constitutes a qualifying prior session remain open.
+
+## A session with Record games off
+
+Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied locally; shared database pending (applied after merge). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
+
+| Table | What Session done and later commands write |
+|---|---|
+| `session_finalizations` | The one row per session is still written (it is the repeat-safe record that the session finished): `state = done`, `stage = finishing`, `committed_at` and `completed_at` set together, `facts_digest` = the digest of an empty fact set. The same barriers apply, including an effective ranking policy, because `policy_version_id` is required |
+| `player_match_facts` | None. The decisions have no winner, so the fact guard would refuse them too |
+| `club_session_player_summaries` | None. The session record counts games from the match evidence instead; "has played at this club before" and the award baselines do not see the session |
+| `projection_jobs` | None, so no result snapshot, player history or rank job runs |
+| `session_result_snapshots` | None. The snapshot writer also returns without writing for such a session |
+| `session_publications`, `session_publication_events`, `result_exports` | None. Publish results and Download images answer "This session has no result slides yet." |
+
+Reads: the private results read returns nothing (as for an invalid session); the public session page carries `recordGames: false` and `results: null`; a Player's match history of the session has no matches and is never `shared`. Player history, ranking, the leaderboards and My sessions read facts, so the session is absent from them. The rules above are enforced by the services; the database enforces the column lock and the decision shape only.
 
 ## Optional public output
 

@@ -27,4 +27,15 @@ describe('sessionSetupDefaultValues', () => {
     })
     expect(parsed.success && parsed.data.expectedIsAuto).toBe(true)
   })
+
+  it('records games by default, and a value that is missing reads as on', () => {
+    expect(sessionSetupDefaultValues(8).recordGames).toBe(true)
+    const { recordGames: _omitted, ...saved } = sessionSetupDefaultValues(8)
+    const parsed = sessionSetupSchema.safeParse({
+      ...saved,
+      title: 'Thursday Open Play',
+      venue: { venueId: 'v1', name: 'Court', address: '' },
+    })
+    expect(parsed.success && parsed.data.recordGames).toBe(true)
+  })
 })

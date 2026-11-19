@@ -38,6 +38,8 @@ export type PublicSessionDetailsProps = {
   modeLabel: string
   /** "Mainly level-matched games, roughly 10% easy games." */
   modeDescription: string
+  /** Record games; false adds the Results row "Not recorded". Omitted reads as on. */
+  recorded?: boolean
   minimumGames: number
   /**
    * Payment per player in centavos (the custom amount or the break-even share): shown as the
@@ -86,6 +88,7 @@ export function PublicSessionDetails({
   formats,
   modeLabel,
   modeDescription,
+  recorded = true,
   minimumGames,
   amountDuePerPlayer,
   notes,
@@ -126,6 +129,21 @@ export function PublicSessionDetails({
                 </>
               ),
             },
+            ...(recorded
+              ? []
+              : [
+                  {
+                    label: 'Results',
+                    value: (
+                      <>
+                        Not recorded ·{' '}
+                        <span className="text-fg2">
+                          No results, standings or awards for this session.
+                        </span>
+                      </>
+                    ),
+                  },
+                ]),
             { label: 'Minimum', value: `${minimumGames} games per player` },
             ...(amountDuePerPlayer == null
               ? []

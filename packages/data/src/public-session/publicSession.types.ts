@@ -184,7 +184,16 @@ export type PublicSessionPage = {
   lastSyncedAt: number
   /** The operator's device has changes that have not synced yet */
   hasPendingChanges: boolean
-  /** null until results are published (always null for prepared, active and invalid sessions) */
+  /**
+   * **Record games** (D-2026-11-18-06): false when the session keeps no results, so the page says
+   * "Not recorded" (Details) and "This session's games were not recorded." (Match history). Missing
+   * reads as true (older wire shapes).
+   */
+  recordGames?: boolean
+  /**
+   * null until results are published (always null for prepared, active and invalid sessions, and
+   * for an unrecorded one)
+   */
   results: PublicSessionResults | null
   /**
    * Finished session only: false reads “Results for this session have not been shared.” Missing on

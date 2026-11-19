@@ -585,17 +585,20 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   // A finished session (2026-11-13-queue-finished-session-page): the Leaderboard tab exists only
   // once the club shared the Standings, and the page then opens on it.
   const finished = p.status === 'completed'
+  // Record games off (D-2026-11-18-06): no Leaderboard tab, no awards, Match history says so.
+  const unrecorded = p.recordGames === false
   // The published rows carry no viewer flag in real mode (the public copy is cacheable, D-2026-11-09-09);
   // the signed-in read's participants do, and each row points at its participant, so your row is
   // marked here: the leaderboard highlights it and shows Your position.
-  const standings = finished
-    ? p.results?.standings?.map((row) => ({
-        ...row,
-        isViewer:
-          row.isViewer ??
-          (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
-      }))
-    : undefined
+  const standings =
+    finished && !unrecorded
+      ? p.results?.standings?.map((row) => ({
+          ...row,
+          isViewer:
+            row.isViewer ??
+            (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
+        }))
+      : undefined
   const activeTab =
     tab === 'auto' || (tab === 'leaderboard' && !standings)
       ? standings
@@ -717,6 +720,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                   modeLabel={mode.label}
                   modeDescription={mode.text}
                   minimumGames={p.minimum}
+                  recorded={!unrecorded}
                   amountDuePerPlayer={p.amountDuePerPlayer}
                   notes={p.notes}
                   lastUpdatedLabel={time(p.lastSyncedAt)}
@@ -733,7 +737,9 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                   queueSlot={
                     // A finished session shows its Match history where the Queue was.
                     finished ? (
-                      signedRead ? (
+                      unrecorded ? (
+                        <MatchHistory history={null} recorded={false} />
+                      ) : signedRead ? (
                         <MatchHistory
                           history={signedRead.history}
                           onOpenParticipant={openParticipant}
@@ -775,7 +781,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                     ) : undefined
                   }
                 />
-                {finished ? (
+                {finished && !unrecorded ? (
                   p.results && (p.results.awards || p.results.offDay) ? (
                     <SessionAwards
                       results={p.results}

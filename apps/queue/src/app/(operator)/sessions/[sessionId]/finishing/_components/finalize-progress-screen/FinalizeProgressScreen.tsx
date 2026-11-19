@@ -3,8 +3,9 @@
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { queueSessionKeys } from '@rotra/data/queue-session/query-keys'
 import {
-  FINALIZATION_STAGES,
   type FinalizationStage,
+  finalizationStagesFor,
+  recordsGames,
   type SessionFinalization,
 } from '@rotra/data/queue-session/types'
 import { useFinalizationStatus } from '@rotra/data/queue-session/useFinalizationStatus'
@@ -21,7 +22,7 @@ import { sessionHref } from '@/lib/dates'
 
 export type FinalizeProgressScreenProps = { sessionId: string }
 
-/** The four UI stages of Q-FINALIZE-PROGRESS, in the order the mock finalization runs them. */
+/** The UI stages of Q-FINALIZE-PROGRESS, in the order the mock finalization runs them; an unrecorded session runs the first two. */
 const STAGE_LABELS: Record<FinalizationStage, string> = {
   checking: 'Checking session records',
   finishing: 'Finishing the session',
@@ -30,6 +31,7 @@ const STAGE_LABELS: Record<FinalizationStage, string> = {
 }
 
 const DONE_TOAST = 'Session finished · player records updated'
+const DONE_TOAST_UNRECORDED = 'Session finished · games not recorded'
 const PREPARING = 'Session finished; results are being prepared'
 const NOT_FINISHED = 'The session was not finished. It is still running.'
 const FAILED_BEFORE_COMMIT = "Finishing didn't complete. Nothing was finished; try again."
@@ -40,24 +42,28 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 /** Marks each stage done, current or pending from the finalization status; all pending before it starts. */
-function toStages(finalization: SessionFinalization | null): FinalizeStage[] {
+function toStages(
+  finalization: SessionFinalization | null,
+  stagesToRun: readonly FinalizationStage[],
+): FinalizeStage[] {
   const reached =
     finalization === null
       ? -1
       : finalization.state === 'done'
-        ? FINALIZATION_STAGES.length
-        : FINALIZATION_STAGES.indexOf(finalization.failedStage ?? finalization.stage)
-  return FINALIZATION_STAGES.map((stage, index) => ({
+        ? stagesToRun.length
+        : stagesToRun.indexOf(finalization.failedStage ?? finalization.stage)
+  return stagesToRun.map((stage, index) => ({
     label: STAGE_LABELS[stage],
     status: index < reached ? 'done' : index === reached ? 'current' : 'pending',
   }))
 }
 
 /**
- * Q-FINALIZE-PROGRESS: "Finishing TITLE" with the four stages from useFinalizationStatus, which
+ * Q-FINALIZE-PROGRESS: "Finishing TITLE" with the four stages (two when Record games is off) from useFinalizationStatus, which
  * polls while the finalization runs (and while the Session done request is still in flight). No
  * left nav or dock on this screen. When the status is done the results view replaces this route
- * and the toast "Session finished · player records updated" shows, once, so browser Back never
+ * and the toast "Session finished · player records updated" shows, once (an unrecorded session opens the
+ * session record instead, with "Session finished · games not recorded"), so browser Back never
  * re-runs anything.
  *
  * Failure states (Q07.7): a run that failed before commit keeps the session running and shows
@@ -89,7 +95,8 @@ export function FinalizeProgressScreen({ sessionId }: FinalizeProgressScreenProp
     : s.state === 'invalid'
       ? `/sessions/${sessionId}/record`
       : s.state === 'completed' && finalization?.state !== 'committed'
-        ? `/sessions/${sessionId}/results`
+        ? // Record games off: no result slides, so the session record opens instead.
+          `/sessions/${sessionId}/${recordsGames(s) ? 'results' : 'record'}`
         : (s.state === 'active' || s.state === 'prepared') && finalization?.state !== 'failed'
           ? sessionHref(s)
           : null
@@ -97,9 +104,13 @@ export function FinalizeProgressScreen({ sessionId }: FinalizeProgressScreenProp
   useEffect(() => {
     if (!target || left.current) return
     left.current = true
-    if (target.endsWith('/results') && watched.current) toast(DONE_TOAST)
+    if (watched.current && s) {
+      if (target.endsWith('/results')) toast(DONE_TOAST)
+      else if (target.endsWith('/record') && s.state === 'completed' && !recordsGames(s))
+        toast(DONE_TOAST_UNRECORDED)
+    }
     router.replace(target)
-  }, [target, router])
+  }, [target, router, s])
 
   const retry = () => {
     if (!finalization || finalize.isPending) return
@@ -129,7 +140,7 @@ export function FinalizeProgressScreen({ sessionId }: FinalizeProgressScreenProp
       ) : (
         <FinalizeProgress
           sessionTitle={s.title}
-          stages={toStages(finalization)}
+          stages={toStages(finalization, finalizationStagesFor(s))}
           statusLine={
             failedBeforeCommit
               ? NOT_FINISHED

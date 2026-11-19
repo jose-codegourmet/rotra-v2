@@ -59,6 +59,7 @@ type publicSessionDTO struct {
 	SlotBudget       int                  `json:"slotBudget"`
 	AcceptJoin       bool                 `json:"acceptJoinRequests"`
 	AlwaysRequire    bool                 `json:"alwaysRequireRequest"`
+	RecordGames      bool                 `json:"recordGames"`
 	LastSyncedAt     int64                `json:"lastSyncedAt"`
 	HasPending       bool                 `json:"hasPendingChanges"`
 	Results          *orderedObject       `json:"results"`
@@ -164,7 +165,8 @@ func (p *publicSessions) build(ctx context.Context, slug string) ([]byte, error)
 			return fmt.Errorf("listing waitlist: %w", err)
 		}
 		var results *orderedObject
-		if s.State == sqlcgen.QueueSessionStateCompleted {
+		// Record games off (D-2026-11-18-06): the session has no results, whatever rows exist.
+		if s.State == sqlcgen.QueueSessionStateCompleted && s.RecordGames {
 			raw, err := q.GetPublishedResults(ctx, s.ID)
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 				return fmt.Errorf("reading published results: %w", err)
@@ -224,6 +226,7 @@ func sessionPage(s sqlcgen.GetPublicSessionBySlugRow, labels []string, roster []
 		ParticipantCount: len(roster), Participants: participants, SkillMix: skillMix(levels), Waitlist: people,
 		OpenSlots: max(0, capacity-len(roster)), SlotBudget: capacity,
 		AcceptJoin: s.AcceptJoinRequests && takesRequests, AlwaysRequire: s.AlwaysRequireRequest,
+		RecordGames:  s.RecordGames,
 		LastSyncedAt: s.UpdatedAt.Time.UnixMilli(), HasPending: s.HasPendingChanges, Results: results,
 	}
 }

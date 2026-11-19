@@ -1,6 +1,7 @@
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
+import { NotRecordedChip } from '@rotra/ui/not-recorded-chip'
 import { Notice } from '@rotra/ui/notice'
 import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { sessionRecordHeaderVariants } from './SessionRecordHeader.variants'
@@ -41,11 +42,15 @@ export type SessionRecordHeaderProps = SessionRecordHeaderBase &
         state: 'completed'
         /** Results published to the public page */
         published?: boolean
+        /** Record games was off: a Not recorded chip replaces Results published / private. Omitted reads as recorded. */
+        recorded?: boolean
         totals: SessionRecordTotals
       }
     | {
         state: 'invalid'
         published?: boolean
+        /** Ignored: an invalid session shows only the Invalid session chip */
+        recorded?: boolean
         totals: SessionRecordTotals
       }
     | {
@@ -125,7 +130,9 @@ export function SessionRecordHeader(props: SessionRecordHeaderProps) {
         ) : (
           <>
             <Chip tone="accent">Completed</Chip>
-            {props.published ? (
+            {props.recorded === false ? (
+              <NotRecordedChip />
+            ) : props.published ? (
               <Chip tone="accent">Results published</Chip>
             ) : (
               <Chip tone="neutral">Results private</Chip>

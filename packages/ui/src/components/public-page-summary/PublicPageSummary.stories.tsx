@@ -86,3 +86,9 @@ export const InvalidPhone: Story = {
   args: { invalid: true, publication: null },
   globals: { viewport: { value: 'phone' } },
 }
+
+/** An unrecorded session (Record games off): Open public page only, no Publish results. */
+export const NotRecorded: Story = {
+  args: { recorded: false, publication: null },
+  globals: { viewport: { value: 'desktop' } },
+}

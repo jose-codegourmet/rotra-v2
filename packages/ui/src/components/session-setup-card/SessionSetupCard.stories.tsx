@@ -45,10 +45,14 @@ export const WithCosts: Story = {
     extraRows: [{ label: 'Costs', value: '₱3,060 estimated · ₱219 a player to break even' }],
   },
 }
+/** Record games off: "Off · no results kept" */
+export const RecordGamesOff: Story = { args: { recordGames: false } }
+export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 
 export const LiveSettings: Story = {
   args: {
+    recordGames: false,
     fixedAfterStart: true,
     courtLabels: queueSessionFixtures.courts
       .filter((court) => court.sessionId === queueSessionFixtures.sessions[0]?.id)

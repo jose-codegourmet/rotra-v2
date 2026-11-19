@@ -588,17 +588,21 @@ func WaitMinutes(p model.Player, matches []model.Match, startedAt *int64, now in
 	return diff / 60000
 }
 
-// Standing is one row of the live standings.
+// Standing is one row of the live standings. Position is shared by rows with the same wins and losses
+// and skips the shared places (1, 1, 3).
 type Standing struct {
 	PlayerID string `json:"playerId"`
 	Name     string `json:"name"`
 	Wins     int    `json:"wins"`
 	Losses   int    `json:"losses"`
 	Games    int64  `json:"games"`
+	Position int    `json:"position"`
 }
 
-// ComputeStandings ranks players with counted games: most wins, then fewest losses, then head-to-head
-// between the two, then name ([collate.Compare]). The sort is stable, so equal rows keep roster order.
+// ComputeStandings ranks players with counted games: most wins, then fewest losses (D-2026-11-18-05).
+// Rows with the same wins and losses share a position and the next position skips the shared places
+// (1, 1, 3). Nothing else separates players: the name ([collate.Compare]) only orders the rows inside a
+// shared position, and the sort is stable, so equal names keep roster order.
 func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 	rows := []Standing{}
 	for _, p := range roster {
@@ -620,21 +624,6 @@ func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 		}
 		rows = append(rows, Standing{PlayerID: p.ID, Name: p.NameSnapshot, Wins: wins, Losses: losses, Games: games})
 	}
-	headToHead := func(a, b string) int {
-		n := 0
-		for _, m := range matches {
-			ta, tb := CountedTeam(m, a), CountedTeam(m, b)
-			if ta == "" || tb == "" || m.Decision == nil || m.Decision.WinningTeam == nil || *m.Decision.WinningTeam == "" || ta == tb {
-				continue
-			}
-			if *m.Decision.WinningTeam == ta {
-				n--
-			} else {
-				n++
-			}
-		}
-		return n
-	}
 	slices.SortStableFunc(rows, func(a, b Standing) int {
 		if d := b.Wins - a.Wins; d != 0 {
 			return d
@@ -642,11 +631,15 @@ func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 		if d := a.Losses - b.Losses; d != 0 {
 			return d
 		}
-		if d := headToHead(a.PlayerID, b.PlayerID); d != 0 {
-			return d
-		}
 		return collate.Compare(a.Name, b.Name)
 	})
+	for i := range rows {
+		if i > 0 && rows[i].Wins == rows[i-1].Wins && rows[i].Losses == rows[i-1].Losses {
+			rows[i].Position = rows[i-1].Position
+		} else {
+			rows[i].Position = i + 1
+		}
+	}
 	return rows
 }
 

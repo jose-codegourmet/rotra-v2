@@ -135,6 +135,8 @@ async function writeResultSnapshot(tx: Tx, sessionId: string) {
   })
   if (existing) return existing
   const session = await tx.queueSession.findUniqueOrThrow({ where: { id: sessionId } })
+  // Record games off (D-2026-11-18-06): Session done enqueues no snapshot job; never write one.
+  if (!session.recordGames) return null
   const { ctx } = await matchContext(tx, session)
   const clubPlayers = await tx.clubPlayer.findMany({
     where: { clubId: session.clubId, id: { in: ctx.roster.map((r) => r.clubPlayerId) } },

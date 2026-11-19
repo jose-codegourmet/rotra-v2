@@ -2899,6 +2899,7 @@ type QueueSession struct {
 	CourtFillMode        CourtFillMode
 	AlwaysRequireRequest bool
 	RequestFormats       []MatchFormat
+	RecordGames          bool
 }
 
 type RankingPolicyVersion struct {

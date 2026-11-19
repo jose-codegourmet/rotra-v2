@@ -8,6 +8,7 @@ export const sessionSetupFormMeta = {
     'The container owns useCreateQueueSession / useUpdateQueueSession, the date and venue dialogs (set through the ref handle), the clash View it dialog and the toasts.',
     'getOccurrences and computeEstimate are the rules from @rotra/data passed in, so the form stays free of runtime data imports.',
     'Only page 1 is required; Next validates the current page, saving validates every page and opens the first with an error.',
+    'Record games (page 2, Formats and mode) is on by default and for a session saved before the option existed; pass recordGamesLocked once the session has started to show a read-only On / Off chip. The review lists it.',
     'Page 1 opens Edit Court N itself (a Sheet inside the form); the container wires nothing for it.',
   ],
   prototype: {

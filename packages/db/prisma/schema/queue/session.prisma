@@ -73,6 +73,10 @@ model QueueSession {
   alwaysRequireRequest Boolean           @default(false) @map("always_require_request")
   /// auto places the next eligible match on_court; it never starts a match.
   courtFillMode        CourtFillMode     @default(manual) @map("court_fill_mode")
+  /// Record games (D-2026-11-18-06): false = run only, keep nothing: Match done stores no winner or
+  /// score, and Session done writes no facts, summaries, result snapshot or publication. Existing
+  /// rows read true. Fixed once the session leaves prepared (trigger queue_sessions_record_games_lock).
+  recordGames          Boolean           @default(true) @map("record_games")
   /// Players can request (D-2026-11-09-05): the formats a signed-in Player may ask for with Request
   /// a match, in any order; empty = the session takes no match requests. New sessions get the
   /// prototype default (2 v 2, plus 1 v 1 when singles is on) from the create command.

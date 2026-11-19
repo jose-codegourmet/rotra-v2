@@ -3,6 +3,7 @@
 import { useClub } from '@rotra/data/club'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { groupStandings } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -10,7 +11,8 @@ import { Button } from '@rotra/ui/button'
 import { Icon } from '@rotra/ui/icon'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
 import { LeaderboardShareCard } from '@rotra/ui/leaderboard-share-card'
-import { LiveLeaderboard, type LiveLeaderboardRow } from '@rotra/ui/live-leaderboard'
+import { LiveLeaderboard } from '@rotra/ui/live-leaderboard'
+import { NotRecordedNotice } from '@rotra/ui/not-recorded-notice'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { ShareDialog } from '@rotra/ui/share-dialog'
@@ -35,7 +37,8 @@ const date = (at: number) =>
  * The Results tab of the session record (Q-HISTORY): "Standings" with Share leaderboard
  * (2026-11-13-share-leaderboard: ShareDialog with LeaderboardShareCard, no viewer row), Result
  * slides (the results route) and Download images (the export sheet), then the official standings
- * as the LiveLeaderboard record variant. An invalid session shows only the no-official-result notice.
+ * as the LiveLeaderboard record variant. An invalid session shows only the no-official-result notice;
+ * a session with Record games off shows only the not-recorded notice.
  */
 export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
   const invalid = record.state === 'invalid'
@@ -49,8 +52,21 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
 
   if (invalid)
     return <InvalidSessionNotice variant="results" reason={record.invalidReason ?? undefined} />
+  // Record games off: no standings, slides or images, only the notice.
+  if (record.recordGames === false) return <NotRecordedNotice variant="results" />
 
   const players = record.playerSummaries
+  const rows = standings.data?.map((r) => ({
+    playerId: r.playerId,
+    name: r.name,
+    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
+    position: r.position,
+    wins: r.wins,
+    losses: r.losses,
+    games: r.games,
+  }))
+  const openProfile = (sessionPlayerId: string) =>
+    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
   /** The saved player's own picture (or character), like the Queue tab */
   const pictureOf = (sessionPlayerId: string) => {
     const clubPlayerId = players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId
@@ -59,17 +75,15 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       ? (profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName) ?? null)
       : null
   }
-  const rows: LiveLeaderboardRow[] | undefined = standings.data?.map((r) => ({
-    playerId: r.playerId,
-    name: r.name,
-    level: players.find((p) => p.sessionPlayerId === r.playerId)?.level ?? null,
-    photoUrl: pictureOf(r.playerId) ?? undefined,
-    wins: r.wins,
-    losses: r.losses,
-    games: r.games,
-  }))
-  const openProfile = (sessionPlayerId: string) =>
-    setProfileId(players.find((p) => p.sessionPlayerId === sessionPlayerId)?.clubPlayerId ?? null)
+  // One row per position; every face keeps its own picture and opens that player's profile.
+  const boardRows = rows
+    ? groupStandings(rows, (r) => ({
+        playerId: r.playerId,
+        name: r.name,
+        level: r.level,
+        photoUrl: pictureOf(r.playerId) ?? undefined,
+      }))
+    : undefined
   const c = club.data
   const slug = session.data?.publicSlug
   const link =
@@ -109,7 +123,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       {standings.isError ? (
         <QueryError query={standings} title="Couldn't load the standings." />
       ) : rows ? (
-        <LiveLeaderboard variant="record" rows={rows} onOpenProfile={openProfile} />
+        <LiveLeaderboard variant="record" rows={boardRows ?? []} onOpenProfile={openProfile} />
       ) : (
         <div role="status" aria-busy aria-label="Loading the standings">
           <Skeleton className="h-56 rounded-lg" />
@@ -118,10 +132,10 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       {rows && c && link ? (
         <ShareDialog open={sharing} onOpenChange={setSharing} title="Share leaderboard">
           <LeaderboardShareCard
-            rows={rows.map((row, i) => ({
-              position: i + 1,
+            rows={rows.map((row) => ({
+              position: row.position,
               name: row.name,
-              pictureUrl: row.photoUrl ?? null,
+              pictureUrl: pictureOf(row.playerId),
               wins: row.wins,
               losses: row.losses,
               games: row.games,

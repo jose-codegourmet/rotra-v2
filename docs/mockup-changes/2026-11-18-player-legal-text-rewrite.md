@@ -1,6 +1,6 @@
 # Player app: fuller Privacy Policy and Terms of Service text
 
-Status: IN MOCK APP — PR #<n>
+Status: IN MOCK APP — PR #940
 Date: 2026-11-18
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › LEGAL, LEGAL_EFFECTIVE (P-PRIVACY, P-TERMS)

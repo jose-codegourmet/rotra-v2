@@ -240,10 +240,12 @@ export async function readPublicSession(slug: string) {
       slotBudget: capacity,
       acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),
       alwaysRequireRequest: session.alwaysRequireRequest,
+      /** Record games (D-2026-11-18-06): false = "Not recorded", no results or match history. */
+      recordGames: session.recordGames,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
       results:
-        session.state === 'completed'
+        session.state === 'completed' && session.recordGames
           ? withResultPictures(
               await readPublishedResults(session.id, tx),
               roster.map((entry) => ({
@@ -818,7 +820,8 @@ export async function readMyNight(context: PlayerContext, slug: string) {
  * Q-PUBLIC-JOIN › Match history (2026-11-13 finished session and match history courts logs) in real
  * mode: a finished session's matches for the signed-in Player, in the `PublicMatchHistory` shape
  * (`@rotra/data/public-session/types`), epoch-ms times, newest first, with the replay's courts and
- * bounds. `null` for any session that is not completed. Publication gate (results module ›
+ * bounds. `null` for any session that is not completed; no matches for one with Record games off
+ * (D-2026-11-18-06). Publication gate (results module ›
  * Publishing): until the club shares the results (a `published` publication with a public copy)
  * only the matches the Player played in are listed and `courtLabels` is empty; `total` always
  * counts every finished or invalid match. Faces follow the signed-in name rule, first name only;
@@ -838,6 +841,9 @@ export async function readPublicMatchHistory(
   return prisma.$transaction(async (tx) => {
     const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
     if (session.state !== 'completed') return null
+    // Record games off (D-2026-11-18-06): no match history or replay, so no matches, `total` 0
+    // and never `shared`, as in mock mode.
+    const recorded = session.recordGames
     const { ctx, roster: live } = await matchContext(tx, session)
     // Every entry, released and no show too, so a player who played and then left keeps their face.
     const [entries, courts] = await Promise.all([
@@ -878,7 +884,7 @@ export async function readPublicMatchHistory(
           confirmedAt: r.confirmedAt.getTime(),
         }),
       ),
-      matches: ctx.matches,
+      matches: recorded ? ctx.matches : [],
     })
     const people = await peopleFor(tx, entries, context.playerId)
     const levels = new Map(entries.map((r) => [r.id, levelCodeFor(r.skillLevelId)]))
@@ -917,7 +923,7 @@ export async function readPublicMatchHistory(
         }),
       )
       .sort((a, b) => b.number - a.number)
-    const shared = (await readPublishedResults(session.id, tx)) !== null
+    const shared = recorded && (await readPublishedResults(session.id, tx)) !== null
     return {
       shared,
       total: all.length,

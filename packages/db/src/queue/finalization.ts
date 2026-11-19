@@ -387,6 +387,12 @@ function summaries(
  * jobs. A retry with the same command returns the committed status; another command for an
  * already-finalized session gets the same status and never double-counts. Projection or slide
  * failures retry their jobs without repeating this.
+ *
+ * A session with Record games off (D-2026-11-18-06) runs the same barriers and commits the same one
+ * finalization row, already `done` at stage `finishing`, with the digest of an empty fact set. It
+ * writes no facts, no session summaries and no projection jobs, so no result snapshot, publication,
+ * player history or rank change can follow. The ranking policy barrier still applies: the row's
+ * `policy_version_id` is required.
  */
 export async function finalizeSession(
   context: ClubContext,
@@ -417,7 +423,8 @@ export async function finalizeSession(
           digest: s.sealedDigest ? Buffer.from(s.sealedDigest).toString('hex') : null,
         }))
         const warnings = { belowMinimum: await belowMinimum(tx, sessionId, session.minimumGames) }
-        const facts = await buildFacts(tx, sessionId)
+        const recorded = session.recordGames
+        const facts = recorded ? await buildFacts(tx, sessionId) : []
         const factsDigest = await sha256(
           JSON.stringify(
             facts
@@ -438,28 +445,32 @@ export async function finalizeSession(
             sessionId,
             clubId: context.clubId,
             commandId: input.commandId,
-            state: 'committed',
-            stage: 'player_records',
+            // Unrecorded: nothing runs after the commit, so the row is finished here.
+            state: recorded ? 'committed' : 'done',
+            stage: recorded ? 'player_records' : 'finishing',
             streamManifest: manifest,
             manifestDigest: await sha256(JSON.stringify(manifest)),
             acceptedSessionRevision: session.revision,
             policyVersionId: check.policy.id,
             startedAt: now,
             committedAt: now,
+            completedAt: recorded ? null : now,
             factsDigest,
           },
         })
-        if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
-        const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
-        await tx.clubSessionPlayerSummary.createMany({
-          data: summaries(
-            sessionId,
-            facts,
-            creditedKeys(await completedParticipations(tx, sessionId)),
-            roster,
-            now,
-          ),
-        })
+        if (recorded) {
+          if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
+          const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
+          await tx.clubSessionPlayerSummary.createMany({
+            data: summaries(
+              sessionId,
+              facts,
+              creditedKeys(await completedParticipations(tx, sessionId)),
+              roster,
+              now,
+            ),
+          })
+        }
         await dropUnstarted(tx, sessionId, now)
         // Finishing closes every open match request (kept on the record, hidden).
         await closeSessionMatchRequests(tx, sessionId, now)
@@ -468,6 +479,8 @@ export async function finalizeSession(
           data: { state: 'completed', finalizedAt: now, revision: { increment: 1 } },
         })
         await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
+        // No summaries, snapshot, history or rank work for an unrecorded session: no jobs at all.
+        if (!recorded) return { status: await statusDto(tx, finalization), warnings }
         await tx.projectionJob.create({
           data: {
             kind: 'club_session_summaries',

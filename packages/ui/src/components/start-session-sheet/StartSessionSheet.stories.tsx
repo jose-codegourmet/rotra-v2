@@ -38,6 +38,9 @@ export const Pending: Story = { args: { isPending: true } }
 export const Refused: Story = {
   args: { error: 'Thursday Open Play is already running. One session at a time.' },
 }
+/** Record games off: "Off · no results kept" */
+export const RecordGamesOff: Story = { args: { recordGames: false } }
+export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 
 /** On time: the planned window is today and not over, so no New end is asked for. */

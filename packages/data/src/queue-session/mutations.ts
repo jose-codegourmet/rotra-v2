@@ -161,6 +161,7 @@ export function createQueueSession(input: QueueSessionInput) {
         acceptJoinRequests: true,
         alwaysRequireRequest: false,
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
+        recordGames: input.recordGames ?? true,
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
@@ -230,6 +231,8 @@ export function updateQueueSession({
         expectedPlayers: values.expectedPlayers,
         playersPerCourt: budget,
         ...(values.requestFormats ? { requestFormats: values.requestFormats } : {}),
+        // Record games changes only here, while prepared: a started session refuses every edit.
+        ...(values.recordGames === undefined ? {} : { recordGames: values.recordGames }),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(

@@ -123,26 +123,29 @@
           "name": "Zoe",
           "wins": 2,
           "losses": 0,
-          "games": 2
+          "games": 2,
+          "position": 1
         },
         {
           "playerId": "Amy",
           "name": "Amy",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 2
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 2
         }
       ]
     },
     {
-      "name": "breaks equal wins by fewer losses before head-to-head",
+      "name": "breaks equal wins by fewer losses",
       "input": {
         "roster": [
           {
@@ -307,40 +310,45 @@
           "name": "Dan",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Eve",
           "name": "Eve",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Amy",
           "name": "Amy",
           "wins": 1,
           "losses": 1,
-          "games": 2
+          "games": 2,
+          "position": 3
         },
         {
           "playerId": "Zoe",
           "name": "Zoe",
           "wins": 1,
           "losses": 2,
-          "games": 3
+          "games": 3,
+          "position": 4
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 5
         }
       ]
     },
     {
-      "name": "uses opposing head-to-head before alphabetical order",
+      "name": "head-to-head does not separate players on the same wins and losses",
       "input": {
         "roster": [
           {
@@ -482,33 +490,37 @@
           "name": "Dan",
           "wins": 1,
           "losses": 0,
-          "games": 1
-        },
-        {
-          "playerId": "Zoe",
-          "name": "Zoe",
-          "wins": 1,
-          "losses": 1,
-          "games": 2
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Amy",
           "name": "Amy",
           "wins": 1,
           "losses": 1,
-          "games": 2
+          "games": 2,
+          "position": 2
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 1,
+          "games": 2,
+          "position": 2
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         }
       ]
     },
     {
-      "name": "uses name when wins, losses and head-to-head are tied",
+      "name": "the name only orders players inside a shared position",
       "input": {
         "roster": [
           {
@@ -604,28 +616,576 @@
           "name": "Amy",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Zoe",
           "name": "Zoe",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "Dan",
           "name": "Dan",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "name": "three players on the same wins and losses share one position and the next is numbered after all three (1, 2, 2, 2, 5)",
+      "input": {
+        "roster": [
+          {
+            "id": "Zoe",
+            "sessionId": "s",
+            "clubPlayerId": "Zoe",
+            "nameSnapshot": "Zoe",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Amy",
+            "sessionId": "s",
+            "clubPlayerId": "Amy",
+            "nameSnapshot": "Amy",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Ben",
+            "sessionId": "s",
+            "clubPlayerId": "Ben",
+            "nameSnapshot": "Ben",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Dan",
+            "sessionId": "s",
+            "clubPlayerId": "Dan",
+            "nameSnapshot": "Dan",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Eve",
+            "sessionId": "s",
+            "clubPlayerId": "Eve",
+            "nameSnapshot": "Eve",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          }
+        ],
+        "matches": [
+          {
+            "id": "game-90",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Zoe"],
+            "teamB": ["Amy"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-91",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy"],
+            "teamB": ["Ben"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-92",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben"],
+            "teamB": ["Zoe"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-93",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Dan"],
+            "teamB": ["Eve"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 1,
+          "losses": 0,
+          "games": 1,
+          "position": 1
+        },
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 1,
+          "losses": 1,
+          "games": 2,
+          "position": 2
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 1,
+          "losses": 1,
+          "games": 2,
+          "position": 2
+        },
+        {
+          "playerId": "Zoe",
+          "name": "Zoe",
+          "wins": 1,
+          "losses": 1,
+          "games": 2,
+          "position": 2
+        },
+        {
+          "playerId": "Eve",
+          "name": "Eve",
+          "wins": 0,
+          "losses": 1,
+          "games": 1,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "name": "two players on 4-2 share position 1 whoever won between them, and the next player is numbered 3 (1, 1, 3, 3, 5)",
+      "input": {
+        "roster": [
+          {
+            "id": "Amy",
+            "sessionId": "s",
+            "clubPlayerId": "Amy",
+            "nameSnapshot": "Amy",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Ben",
+            "sessionId": "s",
+            "clubPlayerId": "Ben",
+            "nameSnapshot": "Ben",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Cat",
+            "sessionId": "s",
+            "clubPlayerId": "Cat",
+            "nameSnapshot": "Cat",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Dan",
+            "sessionId": "s",
+            "clubPlayerId": "Dan",
+            "nameSnapshot": "Dan",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          },
+          {
+            "id": "Eve",
+            "sessionId": "s",
+            "clubPlayerId": "Eve",
+            "nameSnapshot": "Eve",
+            "nicknameSnapshot": null,
+            "present": true,
+            "presentChangedAt": 0,
+            "level": "intermediate_mid",
+            "levelLockedAt": 0,
+            "confirmedAt": 0
+          }
+        ],
+        "matches": [
+          {
+            "id": "game-94",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben"],
+            "teamB": ["Amy"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-95",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben"],
+            "teamB": ["Amy"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-96",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy"],
+            "teamB": ["Cat"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-97",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy"],
+            "teamB": ["Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-98",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy"],
+            "teamB": ["Eve"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-99",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Amy"],
+            "teamB": ["Eve"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-100",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Cat"],
+            "teamB": ["Ben"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-101",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Dan"],
+            "teamB": ["Ben"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-102",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben"],
+            "teamB": ["Cat"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          },
+          {
+            "id": "game-103",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 1,
+            "origin": "manual",
+            "manualProtected": true,
+            "teamA": ["Ben"],
+            "teamB": ["Dan"],
+            "courtIds": [],
+            "startedAt": 0,
+            "endedAt": 1,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 1
+            }
+          }
+        ]
+      },
+      "expected": [
+        {
+          "playerId": "Amy",
+          "name": "Amy",
+          "wins": 4,
+          "losses": 2,
+          "games": 6,
+          "position": 1
+        },
+        {
+          "playerId": "Ben",
+          "name": "Ben",
+          "wins": 4,
+          "losses": 2,
+          "games": 6,
+          "position": 1
+        },
+        {
+          "playerId": "Cat",
+          "name": "Cat",
+          "wins": 1,
+          "losses": 2,
+          "games": 3,
+          "position": 3
+        },
+        {
+          "playerId": "Dan",
+          "name": "Dan",
+          "wins": 1,
+          "losses": 2,
+          "games": 3,
+          "position": 3
+        },
+        {
+          "playerId": "Eve",
+          "name": "Eve",
+          "wins": 0,
+          "losses": 2,
+          "games": 2,
+          "position": 5
         }
       ]
     },
@@ -756,21 +1316,24 @@
           "name": "Amy",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 2
         },
         {
           "playerId": "Dan",
           "name": "Dan",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 2
         }
       ]
     },
@@ -879,28 +1442,32 @@
           "name": "Amy",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Zoe",
           "name": "Zoe",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Ben",
           "name": "Ben",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "Dan",
           "name": "Dan",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -1009,28 +1576,32 @@
           "name": "Ben",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Dan",
           "name": "Dan",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "Amy",
           "name": "Amy",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "Eve",
           "name": "Eve",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -1499,54 +2070,61 @@
           "name": "Aaron",
           "wins": 1,
           "losses": 0,
-          "games": 6
+          "games": 6,
+          "position": 1
         },
         {
           "playerId": "s-tonight-player-7",
           "name": "Dalton",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "s-tonight-player-5",
           "name": "Gab",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "s-tonight-player-9",
           "name": "Albion",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "s-tonight-player-8",
           "name": "Joeriz",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "s-tonight-player-4",
           "name": "Mikee Abellana",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "s-tonight-player-3",
           "name": "Raymark",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         }
       ]
     },
     {
-      "name": "a tie on wins, losses and head-to-head sorts accented and mixed-case names by name (ICU default locale)",
+      "name": "a shared position sorts accented and mixed-case names by name (ICU default locale)",
       "input": {
         "roster": [
           {
@@ -1630,28 +2208,32 @@
           "name": "Emile",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p1",
           "name": "Émile",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p3",
           "name": "emile",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "p4",
           "name": "Zoë",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -1764,42 +2346,48 @@
           "name": "emile",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Emile",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p1",
           "name": "Émile",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p6",
           "name": "zoe",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p5",
           "name": "Zoe",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p4",
           "name": "Zoë",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         }
       ]
     },
@@ -1888,28 +2476,32 @@
           "name": "ångel",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p1",
           "name": "Zed",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p3",
           "name": "Angel",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "p4",
           "name": "Ángel",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -1998,28 +2590,32 @@
           "name": "Angel",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p4",
           "name": "Ángel",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "ångel",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "p1",
           "name": "Zed",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -2096,14 +2692,16 @@
           "name": "amy",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Amy",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 2
         }
       ]
     },
@@ -2192,28 +2790,32 @@
           "name": "Sam",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Sam",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p3",
           "name": "Sam",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "p4",
           "name": "Sam",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -2326,42 +2928,48 @@
           "name": "Ana  Maria",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p1",
           "name": "Ana Maria",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Ana-Maria",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p4",
           "name": "ana maria",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p6",
           "name": "Ana10",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p5",
           "name": "Ana2",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         }
       ]
     },
@@ -2450,28 +3058,32 @@
           "name": "bea",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Zed",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p3",
           "name": "Ana",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         },
         {
           "playerId": "p4",
           "name": "Carl",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 3
         }
       ]
     },
@@ -2584,42 +3196,48 @@
           "name": "Çelik",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p2",
           "name": "Zofia",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p1",
           "name": "Žofia",
           "wins": 1,
           "losses": 0,
-          "games": 1
+          "games": 1,
+          "position": 1
         },
         {
           "playerId": "p4",
           "name": "Celik",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p6",
           "name": "Oyvind",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         },
         {
           "playerId": "p5",
           "name": "Øyvind",
           "wins": 0,
           "losses": 1,
-          "games": 1
+          "games": 1,
+          "position": 4
         }
       ]
     }

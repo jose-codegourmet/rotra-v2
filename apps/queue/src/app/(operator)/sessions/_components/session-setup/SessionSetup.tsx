@@ -13,7 +13,11 @@ import {
   estimateMinimum,
   sessionOccurrences,
 } from '@rotra/data/queue-session/queueSession.rules'
-import type { QueueSessionInput, RequestFormats } from '@rotra/data/queue-session/types'
+import {
+  type QueueSessionInput,
+  type RequestFormats,
+  recordsGames,
+} from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useQueueSessions } from '@rotra/data/queue-session/useQueueSessions'
@@ -200,6 +204,7 @@ export function SessionSetup(props: SessionSetupProps) {
         REQUEST_FORMAT_ORDER.map((format) => [format, values.requestFormats.includes(format)]),
       ) as RequestFormats,
       minimumGames: Number(values.minimumGames),
+      recordGames: values.recordGames,
       minimumIsCalculated: values.minimumIsCalculated,
       expectedPlayers: values.expectedPlayers,
       playersPerCourt: values.playersPerCourt,
@@ -275,6 +280,7 @@ export function SessionSetup(props: SessionSetupProps) {
         allowDoubles: s.allowDoubles,
         requestFormats: allowedRequestFormats(s),
         sessionMode: s.sessionMode,
+        recordGames: recordsGames(s),
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),
         expectedPlayers: s.expectedPlayers === null ? '' : String(s.expectedPlayers),
@@ -353,6 +359,7 @@ export function SessionSetup(props: SessionSetupProps) {
             onManageInventory: manageInventory,
           }}
           initialValues={initial}
+          recordGamesLocked={isEdit && !!existing.data && existing.data.state !== 'prepared'}
           playersPerCourtDefault={club.data?.defaultPlayersPerCourt}
           clubName={club.data?.name ?? ''}
           offline={offline}

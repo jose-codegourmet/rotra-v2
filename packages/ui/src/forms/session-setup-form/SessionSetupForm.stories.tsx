@@ -204,6 +204,30 @@ export const BothFormatsOff: Story = {
     await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
   },
 }
+export const RecordGamesOff: Story = {
+  args: { initialValues: { ...withVenue, recordGames: false } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
+  },
+}
+/** After Start: Record games is a read-only On / Off chip */
+export const RecordGamesLocked: Story = {
+  args: {
+    mode: 'edit',
+    initialValues: { ...withVenue, recordGames: false },
+    recordGamesLocked: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
+  },
+}
+export const ReviewRecordGamesOff: Story = {
+  args: { initialValues: { ...withVenue, recordGames: false } },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 3/ }))
+  },
+}
+export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
 export const SetByYou: Story = {
   args: { initialValues: { ...withVenue, minimumIsCalculated: false, minimumGames: '5' } },
   play: async ({ canvas, userEvent }) => {

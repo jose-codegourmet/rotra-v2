@@ -26,6 +26,8 @@ Session done requires an online club session, server validation, all known pendi
 
 Lock the club and session during final validation and finalization. If an upload changes the session revision before finalization, recheck the records and confirmation. Commit the final authoritative results and completion state together, with a stable finalization command ID; retries return the original result. Only this successful database commit makes the session done and permits a new session. Do not generate results from unmerged or invalid matches.
 
+A session with Record games off (`queue_sessions.record_games = false`, Q23.8 #976) commits the same single finalization, already `done` at stage `finishing`, and writes no facts, summaries or projection jobs ([results](results-publication.md#a-session-with-record-games-off)). A replayed Match done on such a session stores no winner or score, whatever the queued command carried.
+
 Reject late session operations from automatic application after Session done and preserve them for a future reviewed recovery process; reopening policy is not decided. A Queue Master may correct payment status after Session done via a separate audited update that cannot change match results. A confirmed online invalidation releases the club's active-session slot; it does not fabricate a successful Session done.
 
 ## Acceptance examples

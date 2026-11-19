@@ -1,4 +1,8 @@
-/** One ordered standings row of the result snapshot; positions are unique (no shared ranks). */
+/**
+ * One ordered standings row of the result snapshot. Players with the same wins and losses share a
+ * `position` and the next one skips the shared places (1, 1, 3; D-2026-11-18-05). A snapshot saved
+ * before that keeps the unique positions it was published with: stored standings are never recomputed.
+ */
 export type StandingRow = {
   position: number
   sessionPlayerId: string

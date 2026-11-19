@@ -73,6 +73,14 @@ export const NotCounted: Story = {
   ),
 }
 
+/** An unrecorded session (Record games off): games against the minimum, no W–L, no rank. */
+export const NotRecorded: Story = {
+  args: propsFor(
+    cardWhere(() => true),
+    { recorded: false, rank: undefined, wins: 0, losses: 0 },
+  ),
+}
+
 export const LongName: Story = {
   args: propsFor(
     cardWhere((c) => c.games > minimumGames),

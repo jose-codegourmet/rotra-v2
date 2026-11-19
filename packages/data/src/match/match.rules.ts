@@ -350,6 +350,12 @@ export function waitMinutes(
     Math.floor((now - Math.max(player.presentChangedAt ?? startedAt ?? now, ...ends)) / 60000),
   )
 }
+/**
+ * Session standings (D-2026-11-18-05): most wins, then fewest losses. Players with the same wins and
+ * the same losses share one `position`, and the next position skips the shared places (1, 1, 3).
+ * Nothing else separates players: the name only orders the rows inside a shared position. Read
+ * `position` from the row, never an array index.
+ */
 export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
   const rows = roster
     .map((p) => {
@@ -360,24 +366,74 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
         losses = games.filter(
           (m) => m.decision?.winningTeam && m.decision.winningTeam !== countedTeam(m, p.id),
         ).length
-      // Games is the shown count (#717 adjustment); wins, losses and head-to-head stay as recorded.
-      return { playerId: p.id, name: p.nameSnapshot, wins, losses, games: gamesPlayed(p, matches) }
+      // Games is the shown count (#717 adjustment); wins and losses stay as recorded.
+      return {
+        playerId: p.id,
+        name: p.nameSnapshot,
+        wins,
+        losses,
+        games: gamesPlayed(p, matches),
+        position: 0,
+      }
     })
     .filter((r) => r.games > 0)
-  const headToHead = (a: string, b: string) =>
-    matches.reduce((n, m) => {
-      const teamA = countedTeam(m, a),
-        teamB = countedTeam(m, b)
-      if (!teamA || !teamB || !m.decision?.winningTeam || teamA === teamB) return n
-      return n + (m.decision.winningTeam === teamA ? -1 : 1)
-    }, 0)
-  return rows.sort(
-    (a, b) =>
-      b.wins - a.wins ||
-      a.losses - b.losses ||
-      headToHead(a.playerId, b.playerId) ||
-      a.name.localeCompare(b.name),
-  )
+    .sort((a, b) => b.wins - a.wins || a.losses - b.losses || a.name.localeCompare(b.name))
+  rows.forEach((row, i) => {
+    const above = rows[i - 1]
+    row.position =
+      above && above.wins === row.wins && above.losses === row.losses ? above.position : i + 1
+  })
+  return rows
+}
+/** Games of a standings position: one number, or the range when its players counted different games. */
+export type StandingsGames = number | { min: number; max: number }
+/** One position of the standings tables: the players who share it, in standings order. */
+export type StandingsPosition<P> = {
+  position: number
+  players: P[]
+  /** Shared by every player in the position */
+  wins: number
+  losses: number
+  games: StandingsGames
+}
+type PositionedRow = { position: number; wins: number; losses: number; games: number }
+/**
+ * Standings rows grouped into positions for the tables: players on the same position become one row
+ * (their order kept), with the games as one number or {min, max} when they differ. `toPlayer` shapes
+ * each player for the screen; without it the rows themselves are the players.
+ */
+export function groupStandings<R extends PositionedRow>(rows: readonly R[]): StandingsPosition<R>[]
+export function groupStandings<R extends PositionedRow, P>(
+  rows: readonly R[],
+  toPlayer: (row: R) => P,
+): StandingsPosition<P>[]
+export function groupStandings<R extends PositionedRow, P>(
+  rows: readonly R[],
+  toPlayer?: (row: R) => P,
+) {
+  const groups: StandingsPosition<P | R>[] = []
+  const range = new Map<number, { min: number; max: number }>()
+  for (const row of rows) {
+    const player = toPlayer ? toPlayer(row) : row
+    const group = groups.find((g) => g.position === row.position)
+    const seen = range.get(row.position)
+    if (!group || !seen) {
+      range.set(row.position, { min: row.games, max: row.games })
+      groups.push({
+        position: row.position,
+        players: [player],
+        wins: row.wins,
+        losses: row.losses,
+        games: row.games,
+      })
+      continue
+    }
+    group.players.push(player)
+    seen.min = Math.min(seen.min, row.games)
+    seen.max = Math.max(seen.max, row.games)
+    group.games = seen.min === seen.max ? seen.min : { min: seen.min, max: seen.max }
+  }
+  return groups
 }
 /** Put on court: a ready waiting match on the right number of distinct, free, open courts. */
 export function canPlace(m: Match, courtIds: string[], ctx: MatchContext) {

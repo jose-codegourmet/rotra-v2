@@ -3713,7 +3713,10 @@ function replayBounds(s) {
 }
 // Artifact comment, November 13, 2026 ("like 'how the night went' in All, with a video-player-like control"): the same replay on the
 // finished session page's All tab, with names and faces following the page's masking rule.
-const pubCourtSides = (s, m) => { const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => { const p = P(pid); return pubFace(p, 'pf', `${pubNameText(p)}, Team ${team}`, `<span class="pf-face">${pubAvatarOf(p)}</span><span class="pf-n">${esc(pid === pubViewer()?.id ? 'You' : pubNameText(p).split(' ')[0])}</span>`); }).join('')}</div>`; return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`; };
+// Level ring on public faces (owner artifact comment, November 19, 2026: "please put the skill borders"); the ring is the only
+// level the public page shows (public-session.md).
+const pubLv = (s, pid) => { const r = R(s, pid); return `lv-${r ? rvBand(r) : 'none'}`; };
+const pubCourtSides = (s, m) => { const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => { const p = P(pid); return pubFace(p, `pf ${pubLv(s, pid)}`, `${pubNameText(p)}, Team ${team}`, `<span class="pf-face">${pubAvatarOf(p)}</span><span class="pf-n">${esc(pid === pubViewer()?.id ? 'You' : pubNameText(p).split(' ')[0])}</span>`); }).join('')}</div>`; return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`; };
 // A match's end for the replay: its recorded end, or — when a finished night never recorded one — the next start on that court or
 // 20 minutes, whichever comes first (fixes matches that looked "on court" for thousands of minutes).
 function mEnd(s, m) {
@@ -5399,7 +5402,7 @@ function refreshBar(s) {
 // D-2026-11-09-04: Courts now, inside Details. Players' names per D-02, "Started 7:31 PM", no score and no running time.
 function courtsNow(s) {
   // Owner request, November 9, 2026: the same court cards as the QM's console (court drawing, players on each side), read-only. Names follow D-02; no score and no running time.
-  const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => { const p = P(pid); return pubFace(p, 'pf', `${pubNameText(p)}, Team ${team}`, `<span class="pf-face">${pubAvatarOf(p)}</span><span class="pf-n">${esc(pubNameText(p).split(' ')[0])}</span>`); }).join('')}</div>`;
+  const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => { const p = P(pid); return pubFace(p, `pf ${pubLv(s, pid)}`, `${pubNameText(p)}, Team ${team}`, `<span class="pf-face">${pubAvatarOf(p)}</span><span class="pf-n">${esc(pubNameText(p).split(' ')[0])}</span>`); }).join('')}</div>`;
   const skip = new Set();
   const cards = s.courts.map((c) => {
     if (skip.has(c.id)) return '';
@@ -5530,7 +5533,7 @@ function viewPublic() {
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
     ${tab === 'details' && s.status === 'finalized' ? pubHistory(s, pub) : ''}${tab === 'details' && s.status !== 'finalized' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p>${(() => {
         const q = s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos);
-        const tile = (m, i) => `<article class="qtile pq pq-row${i === 0 ? ' next' : ''}" aria-label="Queue position ${i + 1}${i === 0 ? ', next match' : ''}"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${i === 0 ? chip('Next', 'warn') : ''}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => pubFace(P(pid), 'qf', pubNameText(P(pid)), `${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)).split(' ')[0])}</span>`)).join('')}</div>`).join('<div class="vs">VS</div>')}</article>`;
+        const tile = (m, i) => `<article class="qtile pq pq-row${i === 0 ? ' next' : ''}" aria-label="Queue position ${i + 1}${i === 0 ? ', next match' : ''}"><div class="qt-head"><span class="qt-pos">#${i + 1}</span>${i === 0 ? chip('Next', 'warn') : ''}</div>${[m.teamA, m.teamB].map((ids) => `<div class="qfaces">${ids.map((pid) => pubFace(P(pid), `qf ${pubLv(s, pid)}`, pubNameText(P(pid)), `${pubAvatarOf(P(pid))}<span class="qf-n">${esc(pubNameText(P(pid)).split(' ')[0])}</span>`)).join('')}</div>`).join('<div class="vs">VS</div>')}</article>`;
         if (!q.length) return '<p>No matches queued yet.</p>';
         return `<div class="pq-first">${tile(q[0], 0)}</div>${q.length > 1 ? `<div class="pq-scroll" tabindex="0" role="region" aria-label="Rest of the queue, #2 onward, scrolls"><div class="pq-grid">${q.slice(1).map((m, i) => tile(m, i + 1)).join('')}</div></div>` : ''}`;
       })()}` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}

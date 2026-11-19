@@ -586,7 +586,7 @@ e("email_for_a_player_with_a_google_account", [edit(JUNE, reason=R, email="june.
 e("race_two_profile_edits_with_one_revision", [{"parallel": [edit(HANA, reason=R, name="Hana A."), edit(HANA, reason=R, name="Hana B.")], "redact": ["player.name", "message"]}],
   redact={"admin_audit_events": ["metadata"], "players": ["full_name"]})
 e("race_two_profile_edits_of_two_players", [{"parallel": [edit(HANA, reason=R, name="Hana A."), edit(JUNE, reason=R, name="June A.")]}])
-e("race_two_identical_profile_edits", [{"parallel": [edit(HANA, reason=R, name="Hana A."), edit(HANA, reason=R, name="Hana A.")]}])
+# race_two_identical_profile_edits was removed: its answers depend on timing; TestRaceOfTwoProfileSavesOfOneRevision covers the race
 # ---- unclaimed people saved with an email: the shared entry ----
 SE = lambda eid, rev, **kw: step("PATCH", ep(eid), {"revision": rev, "values": {**BASE, "name": kw.pop("name", "Una Alonzo"), "nickname": kw.pop("nickname", "Uni"), "email": kw.pop("email", "una@example.test"),
                                                                               "phone": kw.pop("phone", "+639175550911"), "registrationPlace": kw.pop("registrationPlace", "PH-CEB"),

@@ -36,7 +36,7 @@ Vitest cases ported into Go tests under `apps/api/internal/rules/<area>` (a Vite
 
 ## Deviations log
 
-Owner rulings, 2026-11-20: Admin-set player password ends no session (match the TypeScript); a phone-change `check` applies the change in Go; registration keeps claim's rate budget and treats any audience's login email as taken (a separate budget needs a migration); Admin club password stays at 8 characters and the contact-change apply order stays login-then-contact (both as the TypeScript of their route); the password-reset review revision difference stays (the route takes no `expectedRevision`). Backlog: BL-11 to BL-13.
+Owner rulings, 2026-11-20: Admin-set player password ends no session (match the TypeScript); a phone-change `check` applies the change in Go; registration keeps claim's rate budget and treats any audience's login email as taken (a separate budget needs a migration); Admin club password stays at 8 characters and the contact-change apply order stays login-then-contact (both as the TypeScript of their route); the password-reset review revision difference stays (the route takes no `expectedRevision`). Backlog: BL-11 to BL-13. CI flake fixed: the golden case `race_two_identical_profile_edits` (its answers depend on which parallel edit wins) was removed; `TestRaceOfTwoProfileSavesOfOneRevision` covers that race.
 
 | Date | Task | Deviation | Reason | Resolution |
 |---|---|---|---|---|

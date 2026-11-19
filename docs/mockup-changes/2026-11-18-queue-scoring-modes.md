@@ -92,7 +92,7 @@ Done in #956 (November 18, 2026):
 - Business logic: [matches](../business_logic/product/queue/modules/matches/README.md) (score rules per mode, deuce, best of 3, refusal), [sessions](../business_logic/product/queue/modules/sessions/README.md) (Scoring setting), [open decisions](../business_logic/product/open-decisions.md).
 - Database design (proposal only): [matches and queue](../database_design/product/queue/modules/matches-queue.md), [sessions and roster](../database_design/product/queue/modules/sessions-roster.md), [results publication](../database_design/product/queue/modules/results-publication.md), [open decisions](../database_design/product/open-decisions.md).
 - Screen docs: [match control](../screens/product/modules/queue/match-control.md), [session setup](../screens/product/modules/queue/session-setup.md), [session console](../screens/product/modules/queue/session-console.md), [public session](../screens/product/modules/queue/public-session.md), [results and history](../screens/product/modules/queue/results-sharing.md), [dialogs](../screens/product/dialogs.md), [open decisions](../screens/product/open-decisions.md).
-- Terms and decisions: [product terms](../product-terms.md), [D-2026-11-18-04](../mvp/decisions.md#d-2026-11-18-04).
+- Terms and decisions: [product terms](../product-terms.md), [D-2026-11-18-04](../mvp/decisions/2026-11-18.md#d-2026-11-18-04).
 
 ## Real app work
 - `@rotra/ui`: the forms and sheets above, with stories for every mode and refusal.

@@ -17,7 +17,7 @@ Superseded by: none
 - Before → after for everyone else: unchanged. Guests, non-members, members on a live session, and members when the switch is on keep today's request flow and copy.
 
 ## Why
-- Owner, November 12, 2026 (#764): “whenever a player is already a club member. they should be able to join a upcoming session · on going sessions would be a request still · BY default, guests or non club members should request · But if already member they can join right away · BUT if QM sets the Session to be ALWAYS require a request.. then it should be mandatory · the default is ALLOW members to join upcoming sessions”. Decision [D-2026-11-12-02](../mvp/decisions.md#d-2026-11-12-02).
+- Owner, November 12, 2026 (#764): “whenever a player is already a club member. they should be able to join a upcoming session · on going sessions would be a request still · BY default, guests or non club members should request · But if already member they can join right away · BUT if QM sets the Session to be ALWAYS require a request.. then it should be mandatory · the default is ALLOW members to join upcoming sessions”. Decision [D-2026-11-12-02](../mvp/decisions/2026-11-12.md#d-2026-11-12-02).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

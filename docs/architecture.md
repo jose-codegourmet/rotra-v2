@@ -114,8 +114,8 @@ barrels anywhere.
 
 ### Shared queue rules: Go and WebAssembly
 
-**Decided, not built** ([D-2026-11-14-01](mvp/decisions.md#d-2026-11-14-01),
-[D-2026-11-13-08](mvp/decisions.md#d-2026-11-13-08)). The rules both the device (offline) and the
+**Decided, not built** ([D-2026-11-14-01](mvp/decisions/2026-11-14.md#d-2026-11-14-01),
+[D-2026-11-13-08](mvp/decisions/2026-11-13.md#d-2026-11-13-08)). The rules both the device (offline) and the
 server run (court fill, match checks, courts and time, game counts, roster and waitlist) have **one
 copy, in Go**, under `apps/api/internal/rules`. The server calls it directly; the device runs the same
 code built to WebAssembly (`apps/api/cmd/ruleswasm` → `packages/rules-wasm`, a `.wasm` file plus a
@@ -229,7 +229,7 @@ serialization/error contracts, account-scoped caches, and the Queue working copy
 engine. Mocks are not a fallback after a real write fails. The [command inventory](database_design/product/command-contracts.md)
 records the existing code surface and unresolved transport decisions; it does not approve API URLs.
 
-**No Supabase Realtime.** Screens refetch with TanStack Query. Live updates are decided for the Go API ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01), B-08) and not built yet; until then nothing pushes, and refresh stays the fallback afterwards.
+**No Supabase Realtime.** Screens refetch with TanStack Query. Live updates are decided for the Go API ([D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01), B-08) and not built yet; until then nothing pushes, and refresh stays the fallback afterwards.
 
 ---
 
@@ -278,7 +278,7 @@ In mock mode, sign-in is mocked like the prototypes (anything signs in) and `pro
 mock session. In real mode, Queue (club), Admin and Player sign-in use Supabase Auth (below); Player
 registration (`/api/claim/[token]`) and Admin-reviewed password reset (`/api/auth/{password-reset,reset-password}`; #491)
 are real too (#483). **No Facebook or any social login**, except Google sign-in for players behind the
-`player_google_sign_in` flag ([D-2026-11-16-01](mvp/decisions.md#d-2026-11-16-01)): written on Supabase Auth,
+`player_google_sign_in` flag ([D-2026-11-16-01](mvp/decisions/2026-11-16.md#d-2026-11-16-01)): written on Supabase Auth,
 not run against Google yet ([setup and design](backend/google-sign-in-setup.md)).
 
 **Server boundary (F07.20).** `ROTRA_DATA_MODE` (server-only, default `mock`) picks the path; there is
@@ -332,7 +332,7 @@ the visitor's status and a missing or non-matching receipt reads as null. Receip
 lost-receipt recovery stay open in #248. Sending needs internet; offline nothing is sent.
 
 **Device, sync and batch (#399, #477, #722).** Real mode has a durable device copy and an outbox
-([D-2026-11-11-04](mvp/decisions.md#d-2026-11-11-04), option A). The copy is raw IndexedDB
+([D-2026-11-11-04](mvp/decisions/2026-11-11.md#d-2026-11-11-04), option A). The copy is raw IndexedDB
 (`packages/data/src/device/deviceCopy.ts`, database `rotra-queue-device`, keys scoped by account id,
 stores `bodies`, `downloads`, `outbox`, `aliases`): `downloadSession` fetches every GET the session
 screens read and writes them with one download record in a single transaction, `realRequest` keeps
@@ -471,7 +471,7 @@ The Queue app must keep running a downloaded session without internet. Rules:
 
 - **Mock phase:** UI states only (offline banner, pending-sync counts, recovery and reconciliation
   screens), driven by a dev toggle in the mock store.
-- **Real mode (#399, #477, #722, [D-2026-11-11-04](mvp/decisions.md#d-2026-11-11-04)):** a
+- **Real mode (#399, #477, #722, [D-2026-11-11-04](mvp/decisions/2026-11-11.md#d-2026-11-11-04)):** a
   downloaded, started session keeps working offline. Reads come from the device copy; every write the
   offline rules allow is applied to the copy by the mock reducers and recorded in the IndexedDB
   outbox, replayed in order through the real adapters when the internet returns, with 409s reviewed
@@ -528,10 +528,10 @@ editing one changes nothing until it is pasted. See [email-templates.md](email-t
 | Prisma 7 vs 8 | Open; recommend 7 |
 | Real auth details (Supabase Auth setup for club usernames) | Open; auth epic |
 | Mock store persistence across reloads | In-memory for now |
-| Hosting | Next.js apps settled as below. The API and database move to Railway under [D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01) (not built yet). Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Functions run in `sin1` (Singapore) via `regions` in `vercel.json`, next to the Supabase database; Vercel's default was `iad1`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
+| Hosting | Next.js apps settled as below. The API and database move to Railway under [D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01) (not built yet). Settled: one Vercel project with [services](https://vercel.com/docs/services) (`vercel.json`), routed by host: `queue.rotra.club`, `player.rotra.club`, `admin.rotra.club`. Functions run in `sin1` (Singapore) via `regions` in `vercel.json`, next to the Supabase database; Vercel's default was `iad1`. Automatic Git deployments are disabled with `git.deploymentEnabled: false`. Deploy manually from `main` through `.github/workflows/deploy.yml`; the GitHub `production` environment restricts deployments to `main` and holds the deployment credentials. See [deployment setup](../README.md#production-deployments). Storybook is not deployed. What the bare domain shows is open |
 | App ports | Settled: 9000 / 9001 / 9002 (F01.1) |
 | Test runner for money and ranking math | Vitest (F05.1); also allowed for phone parsing and queue rules |
-| Backend runtime, hosting, sign-in, pictures and live updates | Decided 2026-11-13 ([D-2026-11-13-01](mvp/decisions.md#d-2026-11-13-01)): Go API + Postgres on Railway (Singapore), Go-owned sign-in, Railway Buckets, live updates, apps rewrite `/api/*` to the Go API. **Not built yet:** until each area moves, this page describes what runs. Follow-ups in [backend open decisions](backend/open-decisions.md) |
+| Backend runtime, hosting, sign-in, pictures and live updates | Decided 2026-11-13 ([D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01)): Go API + Postgres on Railway (Singapore), Go-owned sign-in, Railway Buckets, live updates, apps rewrite `/api/*` to the Go API. **Not built yet:** until each area moves, this page describes what runs. Follow-ups in [backend open decisions](backend/open-decisions.md) |
 
 
 ### Player access to a public Queue session (#569)

@@ -2,7 +2,7 @@
 
 Ticket Q20.7 (#839), epic Q20. Mockup change
 [2026-11-13-queue-no-show-cancelled](../../../../../docs/mockup-changes/2026-11-13-queue-no-show-cancelled.md);
-owner answers in [D-2026-11-14-02](../../../../../docs/mvp/decisions.md#d-2026-11-14-02). `migration.sql`
+owner answers in [D-2026-11-14-02](../../../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-02). `migration.sql`
 is the `prisma migrate diff` output for the new column (run against a disposable database migrated to
 the previous migration) plus one hand-written CHECK, under a header comment.
 

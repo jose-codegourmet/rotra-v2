@@ -30,7 +30,7 @@ Superseded by: none
 - Copy: as in the mockup and docs/screens/product/modules/admin/players-requests.md › A-PLAYER-EDIT.
 - Tokens: none new.
 - Known differences / Open:
-  - **Conflict:** the password field conflicts with approved decision **D-2026-11-07-01**, which says the player chooses their password and “the Admin never sees” it. D-2026-11-09-14 records the owner's beta-only approval but needs explicit owner sign-off and an end date before this is ticketed or built. docs/mvp/decisions.md was not edited by this change.
+  - **Conflict:** the password field conflicts with approved decision **D-2026-11-07-01**, which says the player chooses their password and “the Admin never sees” it. D-2026-11-09-14 records the owner's beta-only approval but needs explicit owner sign-off and an end date before this is ticketed or built. docs/mvp/decisions/README.md was not edited by this change.
   - Direct phone/email edits bypass the contact-change request flow (#564); decided 2026-11-10 (Option A): the open request for that field is marked “Superseded by an Admin edit” (rejected plus `supersededAt`), logged, and can no longer be approved or applied.
   - The repo mockup keeps the Password resets page (#491), which the artifact lacked.
 

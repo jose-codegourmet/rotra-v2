@@ -29,7 +29,7 @@ Superseded by: none
 ## Why
 - Owner, November 16, 2026: "I think there should be a KYC or a verification process … fill up google account, fill up phone number, fill up email (should match google account) … but the admin has a way to bypass that too by updating the player status".
 - Owner: "I think these KYC things should be a different setting in user profile".
-- Decision: [D-2026-11-16-02](../mvp/decisions.md#d-2026-11-16-02).
+- Decision: [D-2026-11-16-02](../mvp/decisions/2026-11-16.md#d-2026-11-16-02).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

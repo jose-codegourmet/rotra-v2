@@ -34,4 +34,4 @@ Superseded by: none
 - In ROTRA Player's profile card, **Open ROTRA profile** and the icon right of the name open the profile in the same tab (in-app navigation; the card closes). The name icon there is a forward arrow instead of the new-tab icon, and the button has no new-tab icon. Queue (and Admin) keep opening the ROTRA profile in a new tab, since it is another app.
 
 ## Pass 3 (artifact comment, November 13, 2026, on another player's profile page: “there should be share profile button”)
-- A public profile that isn't yours now has **Share profile** next to **Compare with me** in the identity card, opening the Share profile dialog for that player (link `/player/players/<id>`). Recorded as [D-2026-11-13-06](../mvp/decisions.md#d-2026-11-13-06).
+- A public profile that isn't yours now has **Share profile** next to **Compare with me** in the identity card, opening the Share profile dialog for that player (link `/player/players/<id>`). Recorded as [D-2026-11-13-06](../mvp/decisions/2026-11-13.md#d-2026-11-13-06).

@@ -1,6 +1,6 @@
 # Tech stack — backend
 
-> Target state from [D-2026-11-13-01](../docs/mvp/decisions.md#d-2026-11-13-01). Until an area moves,
+> Target state from [D-2026-11-13-01](../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01). Until an area moves,
 > [architecture.md](../docs/architecture.md) describes what runs.
 
 ## Today (being replaced, area by area)

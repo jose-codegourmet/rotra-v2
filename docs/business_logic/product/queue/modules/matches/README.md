@@ -1,6 +1,6 @@
 # Matches and result integrity
 
-**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and substitution game credit ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). Updated November 18, 2026 for scoring modes ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).
+**Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and substitution game credit ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). Updated November 18, 2026 for scoring modes ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).
 
 ## Formats
 
@@ -12,6 +12,8 @@
 | 5v5 | 5 v 5 | Operator only (Manual, Make match) | Two courts, shown as one merged playing area | Excluded |
 
 A session may mix singles and doubles. Players have one combined shared rank, not separate singles/doubles ratings.
+
+**Match category** (owner, November 19, 2026; [D-2026-11-19-01](../../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01); mockup only): from the players' genders. All men: **Men's**. All women: **Women's**. Both sides with the same mix of men and women (MW vs MW, MMW vs MMW): **Mixed**. Anything else (MM vs WW, MM vs MW, WW vs MW, uneven sides): **Genderless**. A player whose gender isn't given makes the match Genderless. Shown with the format (“Mixed Doubles”, “Women's Singles”, “Genderless 3v3 fun”) on queue cards, drafts, the court sheets and match lines. It is a label only; generation and ranking ignore it.
 
 Every match gets a **match number** in the order it was created in the session (Match 1, Match 2, …). Queue position is separate and changes as the queue moves.
 
@@ -25,10 +27,16 @@ A match moves through these steps (owner decision, November 6, 2026):
 |---|---|---|---|---|
 | Waiting | In the queue, no court | Yes (edit lineup) | Yes (edit lineup) | — |
 | On court | Placed on a court, not started yet | Yes | Yes: a plain lineup change (see [Substitutions](#substitutions)) | **Getting ready** |
-| Playing | Started with **Start match** | No | **Replace player** to fix a mistake (no substitution recorded), or **Substitute** with the game-credit choice | **Playing** |
+| Playing | Started with **Start match** | Yes, by dragging a player onto the other pair (owner, November 19, 2026; was No) | **Replace player** to fix a mistake (no substitution recorded), or **Substitute** with the game-credit choice | **Playing** |
 | Done / Invalid | Permanent outcome | No | No | — |
 
 The buttons stay **Start match** and **Match done**.
+
+**Swap partners while playing** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-swap-partners-playing.md)): in the match dialogs, dragging a player onto someone in the other pair swaps them (Getting ready and Playing alike). It records no substitution; the result follows the pairs as they are at Match done. Tapping a card brings in someone from outside: **Replace** (Getting ready) or **Substitute / Replace** (Playing).
+
+**Move a playing match** (owner, November 19, 2026; mockup only): a Playing match can move to a free court; it keeps playing and its start time stays. The court it leaves frees up (Auto Queue then fills it).
+
+**Pause match** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a Playing match can go back to **On court** (Getting ready) on the same court(s), for a match started by mistake. The start time clears and **Start match** starts it again; players, sides and substitutions stay, and nothing is recorded. It is not a timer pause.
 
 ## Start and completion
 
@@ -131,13 +139,13 @@ An invalid match frees court(s), records no game played, no win, no loss, no per
 
 See [completion flow](flow/complete-or-invalidate.md) and the [open decisions](../../../open-decisions.md).
 
-## Match request, player side ([D-2026-11-09-05](../../../../../mvp/decisions.md#d-2026-11-09-05))
+## Match request, player side ([D-2026-11-09-05](../../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-05))
 
 - A present, signed-in, confirmed Player sends **Request a match** from the session page: the format from six pills (2 v 2 default, 1 v 1, 1 v 2, 3 v 3, 4 v 4, 5 v 5), each enabled only when the session's **Players can request** setting allows it (owner request, November 9, 2026; defaults decided by the owner on November 10, 2026, option A: a new session allows 2 v 2, 1 v 1 when Singles is on, and no fun format until the QM turns it on; a session saved without a selection behaves the same until edited; real mode does not save the selection yet, with no Prisma column), and partners and opponents picked from present players, as many spots as the format needs (2 v 2: 1 partner and 2 opponents; 1 v 1: 1 opponent; 1 v 2: 2 opponents; 3 v 3 to 5 v 5: N−1 partners and N opponents), any spot left as “Anyone”. With no format allowed, the request can't be sent. Presence shows only inside that picker, and only to signed-in confirmed players; the picker also tells who is on a court (Playing) and who is not (Available), and can filter by skill group and sort by waiting time or games played (owner request, November 9, 2026). Players on a court or in a waiting match can still be picked.
 - After sending, the page shows “Match request sent · the QM decides” with **Cancel**. One open match request per player. The players named are not asked and not told; only the QM sees requests.
 - A **Match request** is distinct from a Join request. A request closes by itself when anyone named stops being present, or when the session ends; the record keeps it, hidden.
 
-## Match request, QM side ([D-2026-11-09-05](../../../../../mvp/decisions.md#d-2026-11-09-05))
+## Match request, QM side ([D-2026-11-09-05](../../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-05))
 
 - Open match requests show under **Requests · N › Match**, oldest first: “NAME asks for a doubles match”, then one line per spot (requester, partners, opponents, as many as the format needs) with that player's games against the minimum, their level, and “On Court 2” or “In queue #3” where it applies; an unnamed spot reads “Anyone”.
 - **Add to queue** makes it a waiting match at the end of the Main Queue, protected from regeneration like a manual match: the requester and partners on one side, the opponents on the other, each “Anyone” spot filled from present players not already named, fewest games (played plus queued) first. If not enough present players remain, nothing is added and the QM is told. The request becomes `added` and points at the match. **Decline** closes it as `declined`. Nothing tells the other players; the QM judges fairness, the server doesn't block requests.

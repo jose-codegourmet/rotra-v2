@@ -17,7 +17,7 @@ Superseded by: none
 - Profile banners: one shown banner carries a green **Default** chip under its tile (Court at first); every other shown banner has a ghost **Make default** button; hidden banners show neither. Make default applies at once: toast “NAME is now the default banner.” with **Undo**, Record of actions “Made NAME the default banner (was NAME).”. Clicking (hiding) or deleting the default is refused: “This is the default banner. Make another banner the default first.” The helper line adds “The **Default** banner shows on every profile that hasn't picked one, and on guests and unclaimed profiles.”
 
 ## Why
-- Owner, November 13, 2026: “Queue app should see the Profile with standings ( win rate and statistics ) same with admin app · and the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions.md#d-2026-11-13-03).
+- Owner, November 13, 2026: “Queue app should see the Profile with standings ( win rate and statistics ) same with admin app · and the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions/2026-11-13.md#d-2026-11-13-03).
 - Follow-up, same day: “can we make the stats to only reset every year”. Profile stats now count the calendar year and reset on January 1; the rank keeps its 90-day window.
 
 ## Like for like

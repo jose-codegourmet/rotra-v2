@@ -1,7 +1,7 @@
 # Go API on Railway: proposal
 
 Date: 2026-11-13 (Asia/Manila). **Status: DECIDED, November 13, 2026. B-01 to B-09 answered in the
-planning session and recorded as [D-2026-11-13-01](../../../mvp/decisions.md#d-2026-11-13-01).** Two answers go
+planning session and recorded as [D-2026-11-13-01](../../../mvp/decisions/2026-11-13.md#d-2026-11-13-01).** Two answers go
 further than this proposal asked: live updates are now in scope (B-08), and sign-in includes device
 sessions and offline device enrollment (B-04). See "Decision" below. Follow-ups B-10 to B-19 were
 answered the same day ([backend open decisions](../../open-decisions.md)). This document doesn't authorize
@@ -190,14 +190,14 @@ Each step is a ticket under an epic, in v2's usual order. Mock mode stays the de
 |---|---|
 | [Architecture §12](../../../architecture.md#12-open-architecture-decisions) Hosting (settled: Vercel + Supabase) | **Reopened** for the API and database only (B-03); the Next.js apps stay on Vercel |
 | [Architecture §5](../../../architecture.md#5-data-flow) Real mode: Route Handlers over `packages/db` | **Amended**: Route Handlers become rewrites to the Go API, area by area |
-| [D-2026-11-07-01](../../../mvp/decisions.md#d-2026-11-07-01), [D-2026-11-09-14](../../../mvp/decisions.md#d-2026-11-09-14) Admin-reviewed recovery | **Kept**; implemented in Go if B-04 is B |
-| [D-2026-11-08-03](../../../mvp/decisions.md#d-2026-11-08-03) Supabase Storage | **Amended** (B-06): Railway Buckets, presigned URLs |
-| [D-2026-11-09-10](../../../mvp/decisions.md#d-2026-11-09-10) keep current + previous | **Kept** |
-| [D-2026-11-08-04](../../../mvp/decisions.md#d-2026-11-08-04) pg_cron jobs; [D-2026-11-11-10](../../../mvp/decisions.md#d-2026-11-11-10) parked | **Kept** while parked (B-07) |
-| [D-2026-11-09-04](../../../mvp/decisions.md#d-2026-11-09-04) never live | **Amended** (B-08): live updates added; manual refresh stays as the fallback; what a player may see is unchanged |
-| [D-2026-11-09-09](../../../mvp/decisions.md#d-2026-11-09-09) cheap session page | **Amended** (B-08): "no polling, push or Realtime" gives way to live push; the cached snapshot and server-side sign-in check stay |
-| [D-2026-11-11-01](../../../mvp/decisions.md#d-2026-11-11-01) Observability | **Kept**; the Go API exports the same traces |
-| [D-2026-11-11-04](../../../mvp/decisions.md#d-2026-11-11-04) Offline outbox | **Amended** (B-04): device enrollment is built; the outbox and replay are kept as they are |
+| [D-2026-11-07-01](../../../mvp/decisions/2026-11-07.md#d-2026-11-07-01), [D-2026-11-09-14](../../../mvp/decisions/2026-11-09.md#d-2026-11-09-14) Admin-reviewed recovery | **Kept**; implemented in Go if B-04 is B |
+| [D-2026-11-08-03](../../../mvp/decisions/2026-11-08.md#d-2026-11-08-03) Supabase Storage | **Amended** (B-06): Railway Buckets, presigned URLs |
+| [D-2026-11-09-10](../../../mvp/decisions/2026-11-09.md#d-2026-11-09-10) keep current + previous | **Kept** |
+| [D-2026-11-08-04](../../../mvp/decisions/2026-11-08.md#d-2026-11-08-04) pg_cron jobs; [D-2026-11-11-10](../../../mvp/decisions/2026-11-11.md#d-2026-11-11-10) parked | **Kept** while parked (B-07) |
+| [D-2026-11-09-04](../../../mvp/decisions/2026-11-09.md#d-2026-11-09-04) never live | **Amended** (B-08): live updates added; manual refresh stays as the fallback; what a player may see is unchanged |
+| [D-2026-11-09-09](../../../mvp/decisions/2026-11-09.md#d-2026-11-09-09) cheap session page | **Amended** (B-08): "no polling, push or Realtime" gives way to live push; the cached snapshot and server-side sign-in check stay |
+| [D-2026-11-11-01](../../../mvp/decisions/2026-11-11.md#d-2026-11-11-01) Observability | **Kept**; the Go API exports the same traces |
+| [D-2026-11-11-04](../../../mvp/decisions/2026-11-11.md#d-2026-11-11-04) Offline outbox | **Amended** (B-04): device enrollment is built; the outbox and replay are kept as they are |
 | AGENTS.md non-negotiable 11 (no new dependencies, Server Actions or Realtime without a decision) | **Respected**: this proposal is that decision request; Go, Railway and any Go libraries need approval |
 
 ## Scope today (for sizing)
@@ -225,5 +225,5 @@ Each step is a ticket under an epic, in v2's usual order. Mock mode stays the de
 
 Nothing. B-10 to B-19 were answered on November 13 (side-by-side rollout, sign-in tables in
 [database design](../../../database_design/product/sign-in.md), live transport, no CDN, monitor Hobby, the
-rule-cases package [D-2026-11-13-02](../../../mvp/decisions.md#d-2026-11-13-02), monitoring, the `railway` dev
+rule-cases package [D-2026-11-13-02](../../../mvp/decisions/2026-11-13.md#d-2026-11-13-02), monitoring, the `railway` dev
 dependency for [Infrastructure as Code](../../infrastructure.md), beta domains, `pg_stat_statements`).

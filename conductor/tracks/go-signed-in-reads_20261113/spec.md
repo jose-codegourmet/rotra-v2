@@ -1,7 +1,7 @@
 # Track specification: Signed-in reads in Go
 
 **Track ID:** go-signed-in-reads_20261113 · **Type:** refactor · **Priority:** high (order 7 of 14) · **Created:** 2026-11-13
-**Depends on:** go-sign-in, go-public-reads · **Decisions:** B-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** go-sign-in, go-public-reads · **Decisions:** B-01 ([register](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -50,15 +50,15 @@ The TypeScript reads changed on `main` after go-public-reads was completed (Epic
 
 Already-ported reads that changed:
 
-- **Leaderboard ([D-2026-11-16-05](../../../docs/mvp/decisions.md#d-2026-11-16-05)):** `/api/leaderboard` and `/api/leaderboard/search` take `period` (annual, monthly, weekly) and rank by wins from recorded match facts (`readPeriodLeaderboard`). Search is now per viewer. `/api/leaderboard/me` is a signed-in read.
-- **Profile and RTR ID ([D-2026-11-16-04](../../../docs/mvp/decisions.md#d-2026-11-16-04)):** `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}` read the viewer (`readVisibleProfile`). An unclaimed player saved by one club shows that club's name and nickname for them and `unclaimedSavedBy`. The profile carries `leaderboardPlaces`.
+- **Leaderboard ([D-2026-11-16-05](../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-05)):** `/api/leaderboard` and `/api/leaderboard/search` take `period` (annual, monthly, weekly) and rank by wins from recorded match facts (`readPeriodLeaderboard`). Search is now per viewer. `/api/leaderboard/me` is a signed-in read.
+- **Profile and RTR ID ([D-2026-11-16-04](../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-04)):** `/api/players/{playerId}` and `/api/rtr-ids/{rtrId}` read the viewer (`readVisibleProfile`). An unclaimed player saved by one club shows that club's name and nickname for them and `unclaimedSavedBy`. The profile carries `leaderboardPlaces`.
 - **Public session page:** an unclaimed player with an open shared entry is shown in full, with the club's own name and nickname.
 - **Year game stats by RTR ID** (`GET /api/rtr-ids/{rtrId}/stats`, not in Go yet): an unclaimed player's games come from every club record under their shared entry.
 
 New signed-in reads:
 
-- `GET /api/me/notifications`, `GET /api/me/notifications/unread-count` ([D-2026-11-16-03](../../../docs/mvp/decisions.md#d-2026-11-16-03)).
-- `GET /api/me/verification` and Admin `GET /api/players/{playerId}/verification` ([D-2026-11-16-02](../../../docs/mvp/decisions.md#d-2026-11-16-02)); `/api/me/account` now carries the Google identity fields.
+- `GET /api/me/notifications`, `GET /api/me/notifications/unread-count` ([D-2026-11-16-03](../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-03)).
+- `GET /api/me/verification` and Admin `GET /api/players/{playerId}/verification` ([D-2026-11-16-02](../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-02)); `/api/me/account` now carries the Google identity fields.
 - `GET /api/invites/{clubId}` (P-INVITE and where a signed-in player stands on a session).
 - Queue and Admin player lists: lookup by exact RTR ID or email, the four player statuses, club nickname.
 
@@ -69,9 +69,9 @@ New signed-in reads:
 Epics Q24 (#962) and Q23 (#961) changed these reads on `main`. They are in scope for R1.
 
 - **Signed-in session page** (`GET /api/public-sessions/{slug}/access`, `readPlayerSessionAccess`): now carries **Courts now** (`courtsNow`, each court with `freeSince`).
-- **My night** (`GET /api/public-sessions/{slug}/my-night`, `readMyNight`): now carries the player's own self check-in marks (`selfCheckedInAt`, `leftAt`; [D-2026-11-09-03](../../../docs/mvp/decisions.md#d-2026-11-09-03), migration `20261118000600_self_check_in`) and their Session invite code (`inviteCode`, null until one is made).
-- **Record games** ([D-2026-11-18-06](../../../docs/mvp/decisions.md#d-2026-11-18-06), migration `20261119000100_session_record_games`): a session with `record_games` off has no results. Every signed-in read that shows results, standings or a result snapshot follows the flag, as the anonymous page already does in Go (`recordGames`).
-- **Shared standings positions** ([D-2026-11-18-05](../../../docs/mvp/decisions.md#d-2026-11-18-05)): players with the same wins and losses share a position. The Go rule (`computeStandings`) is already updated; reads that list standings use it.
+- **My night** (`GET /api/public-sessions/{slug}/my-night`, `readMyNight`): now carries the player's own self check-in marks (`selfCheckedInAt`, `leftAt`; [D-2026-11-09-03](../../../docs/mvp/decisions/2026-11-09.md#d-2026-11-09-03), migration `20261118000600_self_check_in`) and their Session invite code (`inviteCode`, null until one is made).
+- **Record games** ([D-2026-11-18-06](../../../docs/mvp/decisions/2026-11-18.md#d-2026-11-18-06), migration `20261119000100_session_record_games`): a session with `record_games` off has no results. Every signed-in read that shows results, standings or a result snapshot follows the flag, as the anonymous page already does in Go (`recordGames`).
+- **Shared standings positions** ([D-2026-11-18-05](../../../docs/mvp/decisions/2026-11-18.md#d-2026-11-18-05)): players with the same wins and losses share a position. The Go rule (`computeStandings`) is already updated; reads that list standings use it.
 - **Club read for Queue:** the club carries `selfCheckInEnabled` (default on).
 
 Not run against a database on the Go side: the anonymous page's updated golden case was merged but the Go database tests were not run after the merge.

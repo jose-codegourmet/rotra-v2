@@ -1,12 +1,14 @@
 # Player notifications
 
-**Surfaces:** `P-NOTIFICATIONS` and the top-bar bell. **Source:** [notifications module](../../../../business_logic/product/player-information/modules/notifications/README.md), [D-2026-11-16-03](../../../../mvp/decisions.md#d-2026-11-16-03). Mockup log: [2026-11-16-player-notifications](../../../../mockup-changes/2026-11-16-player-notifications.md).
+**Surfaces:** `P-NOTIFICATIONS` and the top-bar bell. **Source:** [notifications module](../../../../business_logic/product/player-information/modules/notifications/README.md), [D-2026-11-16-03](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-03). Mockup log: [2026-11-16-player-notifications](../../../../mockup-changes/2026-11-16-player-notifications.md).
 
 ## Bell
 
 Signed in only, in the top bar before the theme button. A red count badge shows unread notifications ("9+" above nine); none when all are read. Accessible name "Notifications" or "Notifications, n unread". Current page when on `/notifications`.
 
 ## P-NOTIFICATIONS — `/notifications`
+
+Gender reminder (owner, November 19, 2026; [D-2026-11-19-01](../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01)): an **Account** item “Add your gender” — “Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless.” — for players without a gender; it opens Edit profile › Name.
 
 - Header: "Notifications", then "n unread" or "You're all caught up."
 - Controls: segmented **All** / **Unread**; **Mark all as read** (disabled when nothing is unread; toast "All marked as read").

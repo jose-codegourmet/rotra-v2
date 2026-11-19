@@ -1,7 +1,7 @@
 # Record games: queue_sessions.record_games and the no-result decision
 
 Ticket Q23.8 (#976), epic Q23 (#961). Decision
-[D-2026-11-18-06](../../../../../docs/mvp/decisions.md#d-2026-11-18-06); mockup change
+[D-2026-11-18-06](../../../../../docs/mvp/decisions/2026-11-18.md#d-2026-11-18-06); mockup change
 [2026-11-18-queue-record-games-option](../../../../../docs/mockup-changes/2026-11-18-queue-record-games-option.md).
 The owner authorized the proposed column for the Q23 batch on November 19, 2026. `migration.sql` is
 the `prisma migrate diff` output for the new column plus hand-written SQL: two trigger functions and

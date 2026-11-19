@@ -11,7 +11,7 @@
 | Club sign-in | Allowed | Unavailable (“Signing in needs an internet connection.”) | — |
 | Create new session / save setup edits | Allowed with license | Form can be filled; Save disabled; draft cannot run | Requires online creation, not a reconstructed local event |
 | View active Session settings | Read-only preparation summary with existing live controls | Same summary from the downloaded session; existing offline guards still apply | Reconcile status; completed/invalid/cancelled sessions go to their record, finalizing sessions to finishing |
-| Start session | Allowed with levels set, license, no other active session; after the planned end or on another day, a new end after now is required first | Unavailable: start is online only ([D-2026-11-07-03](../../mvp/decisions.md#d-2026-11-07-03)) | — |
+| Start session | Allowed with levels set, license, no other active session; after the planned end or on another day, a new end after now is required first | Unavailable: start is online only ([D-2026-11-07-03](../../mvp/decisions/2026-11-07.md#d-2026-11-07-03)) | — |
 | Add/remove free court, set end time (any time after now; Extend 30/60 min shortcuts) | Allowed | Allowed locally | Sync; public end time changes after sync |
 | Planned end passed (overdue) | Header “Planned end passed N ago” in warning; banner with **Set end time** and **Session done**; dashboard live card says the same; never closes by itself | Same reminder; Session done disabled | Same reminder |
 | Download session to this device | Allowed. Real mode (#399): not connected until #246 and Q11 | Unavailable | Refresh from server while preserving local pending work |
@@ -72,7 +72,7 @@
 |---|---|---|---|
 | Name-only guest | Operator confirms slot and full level | No profile, account or RTR ID; games join an account only after the club adds an email | Saved club entry; no invented RTR ID |
 | Email supplied offline, Lookup pending | Can participate | Linked to the player with that email, or saved as unclaimed with a new RTR ID, on sync | Resolve online; no RTR ID offline |
-| Unclaimed ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04)) | Can participate | Email required; RTR ID from the day the club saved them; public; login not yet established | Exact RTR ID or exact email |
+| Unclaimed ([D-2026-11-16-04](../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)) | Can participate | Email required; RTR ID from the day the club saved them; public; login not yet established | Exact RTR ID or exact email |
 | Unclaimed, Details required | Can participate | Older record with a phone and no email; the Queue Master adds an email or deletes the record | The club's own Saved players |
 | Registered, phone visible to club | Can participate | Email + password login | Confirm phone or ID/QR |
 | Registered, phone hidden | Can participate | Same account; contacts absent publicly | ID/QR, no forced reveal |
@@ -92,7 +92,7 @@
 | Invalid match | On confirmed invalidation | None | No recorded game/win/loss | None |
 | Invalid session | Session-slot release policy unresolved | No official finalized credit | No official results/slides | None |
 | Cancelled session (never started) | No court was occupied | None | None; no games, standings or slides | None |
-| Match done in a session with Record games off ([D-2026-11-18-06](../../mvp/decisions.md#d-2026-11-18-06); mock app) | On confirmation, with no winner or score (“Finish match N?”) | Counts | No W/L, standings, slides or awards; the session shows **Not recorded** | None: nothing goes to player records or rankings |
+| Match done in a session with Record games off ([D-2026-11-18-06](../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); mock app) | On confirmation, with no winner or score (“Finish match N?”) | Counts | No W/L, standings, slides or awards; the session shows **Not recorded** | None: nothing goes to player records or rankings |
 
 ## Rank and award gates
 

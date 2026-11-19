@@ -7,7 +7,7 @@
 ## Types and identifiers
 
 - Internal IDs: UUIDs. Devices generate collision-resistant IDs for offline-created records and operations; validate and scope them server-side. Choose a supported UUID version during implementation.
-- RTR ID: separate business identifier, never a primary key or foreign key. Only Admin changes it ([D-2026-11-16-04](../../mvp/decisions.md#d-2026-11-16-04), built in P15.8): the new value replaces the old one on `shared_player_entries` and `player_id_allocations` in one transaction, with no alias.
+- RTR ID: separate business identifier, never a primary key or foreign key. Only Admin changes it ([D-2026-11-16-04](../../mvp/decisions/2026-11-16.md#d-2026-11-16-04), built in P15.8): the new value replaces the old one on `shared_player_entries` and `player_id_allocations` in one transaction, with no alias.
 - Times: `timestamptz` for instants, with distinct `occurred_at` and server `received_at` on offline operations. Device timestamps are not authoritative ordering or proof of license validity.
 - Sync sequence/revisions: positive `bigint`; transmit losslessly, for example as decimal strings. Do not assume JavaScript numbers represent arbitrary bigint values exactly.
 - Counts/scores: nonnegative integer. Optional scores are null, not zero-by-default.

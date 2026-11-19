@@ -6,7 +6,7 @@ export const finishMatchSheetMeta = {
     'The no-result variant of the Match done sheet, for a session with Record games off: "Finish match N?", the two teams and the line that no result is entered. Cancel and the primary "Match done".',
   usage: [
     'Open it from Match done instead of the MatchResultForm sheet when the session has Record games off; it asks for no winner and no score.',
-    'onConfirm ends the match with no result; the game still counts toward each player\'s games and the court becomes available. Pass isPending and error from the commit.',
+    "onConfirm ends the match with no result; the game still counts toward each player's games and the court becomes available. Pass isPending and error from the commit.",
     'A recorded session keeps MatchResultForm then ConfirmResultSheet.',
   ],
   prototype: {

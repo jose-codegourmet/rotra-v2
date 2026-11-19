@@ -12,8 +12,8 @@ import {
   formatMinutes,
   formatsLabel,
   MODE_OPTIONS,
-  recordGamesLabel,
   REPEAT_LABEL,
+  recordGamesLabel,
   slotBudget,
 } from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'

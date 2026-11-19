@@ -212,7 +212,11 @@ export const RecordGamesOff: Story = {
 }
 /** After Start: Record games is a read-only On / Off chip */
 export const RecordGamesLocked: Story = {
-  args: { mode: 'edit', initialValues: { ...withVenue, recordGames: false }, recordGamesLocked: true },
+  args: {
+    mode: 'edit',
+    initialValues: { ...withVenue, recordGames: false },
+    recordGamesLocked: true,
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))
   },

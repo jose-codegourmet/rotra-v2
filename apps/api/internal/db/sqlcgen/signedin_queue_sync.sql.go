@@ -218,6 +218,7 @@ const listQueueProfiledClubPlayers = `-- name: ListQueueProfiledClubPlayers :man
 SELECT id, player_id, display_name, nickname
 FROM club_players
 WHERE club_id = $1 AND removed_at IS NULL AND player_id IS NOT NULL
+ORDER BY id
 `
 
 type ListQueueProfiledClubPlayersRow struct {
@@ -228,6 +229,7 @@ type ListQueueProfiledClubPlayersRow struct {
 }
 
 // The club's saved players that have a ROTRA profile (the candidates), then those profiles with their RTR IDs.
+// The TypeScript sets no order here (the database's own), so the candidate order is by id, a fixed order.
 func (q *Queries) ListQueueProfiledClubPlayers(ctx context.Context, clubID pgtype.UUID) ([]ListQueueProfiledClubPlayersRow, error) {
 	rows, err := q.db.Query(ctx, listQueueProfiledClubPlayers, clubID)
 	if err != nil {
@@ -298,6 +300,7 @@ const listQueueReviewRoster = `-- name: ListQueueReviewRoster :many
 SELECT id, name_snapshot
 FROM session_players
 WHERE session_id = $1 AND released_at IS NULL AND no_show_at IS NULL
+ORDER BY id
 `
 
 type ListQueueReviewRosterRow struct {
@@ -330,7 +333,7 @@ const listQueueSyncOpenConflicts = `-- name: ListQueueSyncOpenConflicts :many
 SELECT id, category, detected_at
 FROM sync_conflicts
 WHERE session_id = $1 AND state = 'open'
-ORDER BY detected_at ASC
+ORDER BY detected_at ASC, id ASC
 `
 
 type ListQueueSyncOpenConflictsRow struct {
@@ -365,7 +368,7 @@ SELECT id, session_id, device_id, generation_no, downloaded_revision, contiguous
        sealed_final_sequence, sealed_at, state
 FROM device_session_streams
 WHERE session_id = $1
-ORDER BY enrolled_at ASC
+ORDER BY enrolled_at ASC, id ASC
 `
 
 type ListQueueSyncStreamsRow struct {
@@ -418,7 +421,7 @@ SELECT sp.id, sp.club_player_id, sp.name_snapshot, cp.display_name, cp.nickname
 FROM session_players sp
 JOIN club_players cp ON cp.id = sp.club_player_id
 WHERE sp.session_id = $1 AND sp.released_at IS NULL AND sp.no_show_at IS NULL AND cp.player_id IS NULL
-ORDER BY sp.confirmed_at ASC
+ORDER BY sp.confirmed_at ASC, sp.id ASC
 `
 
 type ListQueueUnresolvedGuestEntriesRow struct {

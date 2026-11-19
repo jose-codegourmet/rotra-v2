@@ -169,10 +169,10 @@ func matchView(m sqlcgen.ListSessionMatchRowsRow, parts []sqlcgen.ListSessionPar
 		}
 	}
 	courtIDs := []string{}
-	switch {
-	case m.State == sqlcgen.MatchStateOnCourt || m.State == sqlcgen.MatchStateActive:
+	switch m.State {
+	case sqlcgen.MatchStateOnCourt, sqlcgen.MatchStateActive:
 		courtIDs = append(courtIDs, holds...)
-	case m.State == sqlcgen.MatchStateWaiting:
+	case sqlcgen.MatchStateWaiting:
 	default:
 		for _, u := range usage {
 			if !u.ReleasedAt.Valid || (m.DecisionSourceOperationID.Valid && u.ReleaseOperationID == m.DecisionSourceOperationID) {

@@ -2,8 +2,10 @@ package signedin_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -127,10 +129,45 @@ func TestQueueReadsMatchRouteHandlers(t *testing.T) {
 			for _, path := range c.Redact {
 				redact(t, gotBody, path)
 			}
-			if !reflect.DeepEqual(gotBody, decodeJSON(t, want.Body)) {
+			wantBody := decodeJSON(t, want.Body)
+			// Lists the TypeScript leaves unordered (see unorderedLists) are put in key order on both sides first.
+			sortUnordered(gotBody)
+			sortUnordered(wantBody)
+			if !reflect.DeepEqual(gotBody, wantBody) {
 				g, _ := json.Marshal(gotBody)
 				t.Errorf("body\n got %s\nwant %s", g, want.Body)
 			}
 		})
+	}
+}
+
+// unorderedLists are the response lists the TypeScript reads with no total order (the database's own, which differs
+// between machines and shows up on tied timestamps), each with the key that puts them in a fixed order. Go orders
+// them by (confirmed_at, id); the golden test compares them as sets.
+var unorderedLists = map[string]string{
+	"candidates":       "clubPlayerId",
+	"unresolvedGuests": "sessionPlayerId",
+	"belowMinimum":     "sessionPlayerId",
+}
+
+// sortUnordered puts every unordered list in key order, anywhere in a decoded body.
+func sortUnordered(v any) {
+	switch x := v.(type) {
+	case map[string]any:
+		for k, child := range x {
+			if list, ok := child.([]any); ok && unorderedLists[k] != "" {
+				key := unorderedLists[k]
+				sort.SliceStable(list, func(i, j int) bool {
+					a, _ := list[i].(map[string]any)
+					b, _ := list[j].(map[string]any)
+					return fmt.Sprint(a[key]) < fmt.Sprint(b[key])
+				})
+			}
+			sortUnordered(child)
+		}
+	case []any:
+		for _, child := range x {
+			sortUnordered(child)
+		}
 	}
 }

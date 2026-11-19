@@ -88,7 +88,7 @@ type corsWriter struct {
 }
 
 func (c *corsWriter) WriteHeader(status int) {
-	h := c.ResponseWriter.Header()
+	h := c.Header()
 	h.Set("Vary", "Origin, Cookie")
 	if c.allowed {
 		h.Set("Access-Control-Allow-Origin", c.origin)

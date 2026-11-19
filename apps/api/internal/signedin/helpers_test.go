@@ -93,7 +93,7 @@ func newEnv(t *testing.T, now time.Time) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var logOut io.Writer = io.Discard
+	logOut := io.Writer(io.Discard)
 	if os.Getenv("ROTRA_TEST_LOG") != "" {
 		logOut = os.Stderr // set it to see why a route answered 500
 	}

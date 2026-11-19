@@ -53,14 +53,6 @@ type queueMatchDTO struct {
 
 func isoMs(ms int64) string { return httpapi.ToIso(msTime(ms)) }
 
-func isoMsPtr(ms *int64) *string {
-	if ms == nil {
-		return nil
-	}
-	s := isoMs(*ms)
-	return &s
-}
-
 // sessionMatchViews is sessionMatches in the rule shape: the session's matches in number order (a discarded draft is
 // left out), each with the rows it was read from.
 func sessionMatchViews(r *http.Request, q *sqlcgen.Queries, sessionID pgtype.UUID) ([]model.Match, []sqlcgen.ListSessionMatchRowsRow, error) {

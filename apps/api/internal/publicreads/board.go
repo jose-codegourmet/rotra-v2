@@ -196,7 +196,7 @@ func (b *board) standingsOf(p period) []standing {
 		if _, ok := names[f.player]; !ok {
 			continue
 		}
-		if !(f.at >= previousStart && f.at <= b.nowMs) {
+		if f.at < previousStart || f.at > b.nowMs {
 			continue
 		}
 		totals := previous

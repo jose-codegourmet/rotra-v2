@@ -298,6 +298,15 @@ textarea.input { min-height: 80px; resize: vertical; }
    Faces keep opening the profile; the Open match button stays for keyboards and screen readers. */
 .open-pitch { cursor: pointer; transition: filter .15s; }
 .open-pitch:hover { filter: brightness(1.08); }
+/* Set games played: Now on the left, To on the right (owner artifact comment, November 19, 2026). */
+.gcmp { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 8px; }
+.gcmp-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px 8px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); text-align: center; min-width: 0; }
+.gcmp-side > b { font-size: 30px; line-height: 1.1; font-weight: 800; color: var(--fg2); }
+.gcmp-side.to { border-color: var(--border-strong); }
+.gcmp-side.to.changed { border-color: var(--accent); background: var(--accent-subtle); }
+.gcmp-step { display: flex; align-items: center; gap: 8px; }
+.gcmp-step b { font-size: 30px; line-height: 1.1; font-weight: 800; min-width: 36px; text-align: center; }
+.gcmp-arrow { display: grid; place-items: center; color: var(--fg3); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -5672,8 +5681,17 @@ const SHEETS = {
       return sheetShell('Set games played', `${who}<p>${line}</p><p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
         `<button class="btn" data-act="setGamesBack" data-autofocus>Back</button><button class="btn primary" data-act="confirmSetGames">Set games</button>`);
     }
-    return sheetShell('Set games played', `${who}
-      <div class="stepcard"><span id="set-games-label">Games played</span><div class="row"><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="set-games-label">${sh.games}</b><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
+    // Owner artifact comment, November 19, 2026: a comparison box, now on the left and "to" on the right.
+    const nowAll = one ? null : (() => { const c = s.roster.map((r) => gamesOf(s, r.pid)); return c.length ? (Math.min(...c) === Math.max(...c) ? `${c[0]}` : `${Math.min(...c)}–${Math.max(...c)}`) : '0'; })();
+    const nowV = one ? current : nowAll, changed = one ? sh.games !== current : true;
+    return sheetShell('Set games played', `${who.replace(/<dt>Games played now<\/dt><dd class="tnum">\d+<\/dd>/, '')}
+      <div class="gcmp" role="group" aria-labelledby="set-games-label"><span class="sr-only" id="set-games-label">Games played</span>
+        <div class="gcmp-side"><span class="label">Now</span><b class="tnum">${nowV}</b><span class="small muted">${one ? 'games played' : 'games each'}</span></div>
+        <span class="gcmp-arrow" aria-hidden="true">${I.q_next}</span>
+        <div class="gcmp-side to${changed ? ' changed' : ''}"><span class="label">To</span>
+          <div class="gcmp-step"><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite">${sh.games}</b><button class="btn sm icon-btn" data-act="setGamesDelta" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div>
+          <span class="small muted">${one ? (sh.games === current ? 'No change yet' : `${sh.games > current ? '+' : '−'}${Math.abs(sh.games - current)} game${Math.abs(sh.games - current) === 1 ? '' : 's'}`) : 'for every player'}</span></div>
+      </div>
       <p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="setGamesNext">Next</button>`);
   },

@@ -5319,14 +5319,13 @@ function swapPicker(s, m, sh, outLabel, extra = '', actions = '', title = '', sw
   // the actions on the left; All players on the right.
   return `<div class="sp-split"><div class="sp-left">${title ? `<p class="sp-title" aria-hidden="true">${title}</p>` : ''}<section class="sp-sec"><h3>${outLabel}</h3><div class="sp-grid">${all(m).map((pid) => tile(pid, 'out', sh.out === pid, false, `Team ${m.teamA.includes(pid) ? 'A' : 'B'}`)).join('')}</div></section>
     ${swapRow ? (() => {
-      // Owner artifact comment, November 19, 2026: a second row, "Swap from match": take a player from a queued match; the player
-      // coming out takes their place there. Matches that already have the player coming out can't swap.
-      const rows = waiting(s).flatMap((w) => all(w).filter((pid) => !lineup.has(pid) && R(s, pid)?.present && !busyOf(s, pid)).map((pid) => ({ w, pid })))
-        .filter((x, i, arr) => arr.findIndex((y) => y.pid === x.pid) === i).slice(0, 8);
-      const pos = (w) => waiting(s).indexOf(w) + 1;
-      return `<section class="sp-sec"><h3>Swap from match</h3>${rows.length ? `<div class="sp-grid">${rows.map(({ w, pid }) => tile(pid, 'in', sh.in === pid && sh.from === w.id, !!sh.out && all(w).includes(sh.out), `In #${pos(w)} · Match ${w.seq}`)
-        .replace(`data-act="sheetSet" data-k="in" data-v="${pid}"`, `data-act="pickSwapIn" data-pid="${pid}" data-mid="${w.id}"`)).join('')}</div>
-        <p class="small muted">${sh.from && sh.in ? `${esc(short(sh.out || ''))}${sh.out ? ' takes' : 'The player coming out takes'} ${esc(short(sh.in))}'s place in queued match ${esc(String(s.matches.find((x) => x.id === sh.from)?.seq || ''))}.` : 'The player coming out takes their place in that queued match.'}</p>` : '<p class="small muted">No queued player can swap right now.</p>'}</section>`; })() : ''}
+      // Owner artifact comments, November 19, 2026: a second row, "Swap from match": the player coming out swaps places with one of
+      // their opponents in this same match (e.g. with Dani or Sam), so the pairs change; nobody new comes in.
+      if (!sh.out) return '<section class="sp-sec"><h3>Swap from match</h3><p class="small muted">Choose who\'s coming out to see who they can swap with.</p></section>';
+      const opp = m.teamA.includes(sh.out) ? m.teamB : m.teamA;
+      return `<section class="sp-sec"><h3>Swap from match</h3><div class="sp-grid">${opp.map((pid) => tile(pid, 'in', sh.in === pid && sh.from === 'match', false, `Team ${m.teamA.includes(pid) ? 'A' : 'B'} · opponent`)
+        .replace(`data-act="sheetSet" data-k="in" data-v="${pid}"`, `data-act="pickSwapIn" data-pid="${pid}" data-mid="match"`).replace('ptile sm busy', 'ptile sm')).join('')}</div>
+        <p class="small muted">${sh.from === 'match' && sh.in ? `${esc(short(sh.out))} and ${esc(short(sh.in))} swap places: each joins the other's partner.` : 'Swaps the player coming out with one of their opponents, so the pairs change. Nobody new comes in.'}</p></section>`; })() : ''}
     <section class="sp-sec"><h3>Suggestion</h3>${free.length ? `<div class="sp-grid">${(() => { const top = free.slice(0, 7), pick = sh.in && !sh.from && !top.some((r) => r.pid === sh.in) && free.find((r) => r.pid === sh.in); return (pick ? [pick, ...top.slice(0, 6)] : top).map((r) => tile(r.pid, 'in', sh.in === r.pid && !sh.from, false)).join(''); })()}${other}</div>` : `${other}<p class="small muted">No present player is free right now.</p>`}</section>
     ${extra}<div class="row sp-acts">${actions}</div></div>${!sh.all ? '</div>' : narrow ? `</div><!--sp-stack--><div class="sp-stack-scrim" data-act="spOther"></div><div class="sp-stack" role="dialog" aria-modal="true" aria-label="All players"><div class="between sp-stack-h"><b>All players</b><button class="btn xs ghost icon-btn" data-act="spOther" aria-label="Back to the suggestions">${I.x}</button></div>` : ''}${!sh.all ? '' : `
     <div class="sp-right"><section class="sp-sec"><h3>All players</h3><input class="input sp-q" id="sp-q" type="search" placeholder="Search players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search players">${filters}
@@ -7309,7 +7308,7 @@ const ACT = {
     let v = d.v === '' ? null : d.v;
     if (el.hasAttribute('data-num') && v != null) v = +v;
     sh[d.k] = v;
-    if (d.k === 'in') sh.from = null;
+    if (d.k === 'in' || (d.k === 'out' && sh.from === 'match')) { sh.from = null; if (d.k === 'out') sh.in = null; }
     if (d.k === 'tab') { sh.q = ''; sh.pick = null; sh.err = ''; sh.level = null; }
     if (d.k === 'mode') sh.err = '';
     if (d.k === 'band' || d.k === 'sort') sh.pg = 0;
@@ -7489,17 +7488,22 @@ const ACT = {
   confirmReplace: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
     const r = m && R(s, sh.in);
+    // Swap from match: the player coming out and an opponent trade places in this match.
+    if (m && sh.from === 'match') {
+      const ta = m.teamA.includes(sh.out) ? 'teamA' : 'teamB', tb = ta === 'teamA' ? 'teamB' : 'teamA';
+      if (!['oncourt', 'active'].includes(m.status) || !m[ta].includes(sh.out) || !m[tb].includes(sh.in)) { toast('Something changed. Review the match again.'); render(); return; }
+      const ia = m[ta].indexOf(sh.out), ib = m[tb].indexOf(sh.in);
+      m[ta][ia] = sh.in; m[tb][ib] = sh.out; m.protected = true;
+      S.ui.sheet = { type: m.status === 'active' ? 'match' : 'onCourt', id: m.id };
+      commit(`Match ${m.seq}: ${short(sh.out)} and ${short(sh.in)} swapped places`); render(); return;
+    }
     if (!m || !['oncourt', 'active'].includes(m.status) || !all(m).includes(sh.out) || all(m).includes(sh.in) || !r || !r.present || busyOf(s, sh.in)) { toast('Something changed. Review the match again.'); render(); return; }
-    const w = sh.from ? waiting(s).find((x) => x.id === sh.from) : null;
-    if (sh.from && (!w || !all(w).includes(sh.in) || all(w).includes(sh.out))) { toast('Something changed. Review the match again.'); render(); return; }
     const team = m.teamA.includes(sh.out) ? 'teamA' : 'teamB';
     m[team] = m[team].map((p) => (p === sh.out ? sh.in : p));
     m.protected = true;
-    // Swap from match: the player coming out takes the incoming player's place in that queued match.
-    if (w) { const wt = w.teamA.includes(sh.in) ? 'teamA' : 'teamB'; w[wt] = w[wt].map((p) => (p === sh.in ? sh.out : p)); w.protected = true; }
     const playing = m.status === 'active';
     S.ui.sheet = { type: playing ? 'match' : 'onCourt', id: m.id };
-    commit(w ? `Match ${m.seq}: ${short(sh.in)} in for ${short(sh.out)} · ${short(sh.out)} moves to queued match ${w.seq}` : `Match ${m.seq}: ${short(sh.in)} in for ${short(sh.out)} · ${playing ? 'replaced (mistake fixed)' : 'lineup changed'}`); render();
+    commit(`Match ${m.seq}: ${short(sh.in)} in for ${short(sh.out)} · ${playing ? 'replaced (mistake fixed)' : 'lineup changed'}`); render();
   },
   openMoveCourt: (d) => openSheet({ type: 'moveCourt', id: d.id, courts: [] }),
   confirmMove: () => {

@@ -1,6 +1,6 @@
 # Signed-in reads in Go
 
-**go-signed-in-reads_20261113** · order 7 · high · in progress · depends on: go-sign-in, go-public-reads
+**go-signed-in-reads_20261113** · order 7 · high · complete · depends on: go-sign-in, go-public-reads
 
 - [Spec](./spec.md)
 - [Plan](./plan.md)

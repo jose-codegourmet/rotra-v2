@@ -20,7 +20,7 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Switch
 
-- [~] **4.1** (prefix list decided and documented; manual per-app check not run) Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
+- [x] **4.1** Add this track's `/api/*` prefixes to the `ROTRA_GO_MOVED_AREAS` list (local now; the beta project gets the full list in staging-verification; remove a prefix to undo); manual check per app, locally
 
 ## Deviations log
 
@@ -50,6 +50,19 @@ Ticket: #876 (one issue for the whole track, under epic #869).
 | 2026-11-19 | 3.2 | `incompleteSessionIds`, `belowMinimum` and guest candidates have no ORDER BY, as in the TS | Characterized | Production order not guaranteed |
 | 2026-11-19 | 3.2 | `normalizedName` hand-ports JS `toLocaleLowerCase` (dotted I, final sigma); captured on an en-US machine | No Go equivalent | Pinned in golden |
 | 2026-11-19 | 4.1 | Only prefixes with no write route left are listed (B-60): Queue `/api/license,/api/sync,/api/players`; Player `/api/leaderboard,/api/rtr-ids,/api/invites,/api/players`; Admin `/api/audit-events,/api/sales,/api/license-operations` | `ROTRA_GO_MOVED_AREAS` forwards every method | The rest move with go-writes-admin-player and go-writes-queue; listed in docs/architecture.md |
-| 2026-11-19 | 4.1 | No manual per-app check run; the list is documented, not applied to any deployment | The beta project gets the full list in staging-verification; the local sign-in check needs the app-side pass wiring | Done in staging-verification |
+| 2026-11-19 | 4.1 | The list is documented and checked locally, not applied to any deployment | The beta project gets the full list in staging-verification | Done there |
+| 2026-11-19 | 4.1 | App-side sign-in cannot go through Go yet (`/api/auth/*` not moved), so the check attached Go-issued passes as a Bearer | Sign-in moves in go-sign-in | Forwarding carries Authorization and Cookie through |
 | 2026-11-19 | 4.1 | `GET /api/sessions/{id}/finalization` not ported | Runs `driveFinalizationJobs` before reading | Owner call |
 | 2026-11-19 | 3.1 | `GET /sessions/{id}/finalization` is registered in Go read-only; the pre-read `driveFinalizationJobs` (writes `session_result_snapshots` and `player_rank_current`) is NOT ported | Touches permanent results and ranking | Go answers the stored state, so a committed finalization with due jobs shows an earlier state than the TS; route unused until go-writes-queue decides where the in-request worker lives |
+
+## Local check, 2026-11-19 (4.1)
+
+Throwaway `postgres:16-alpine` with all Prisma migrations, the Go API built from this branch (commit `e32a967b`), and Queue, Player and Admin (`next dev`, ports 9000 to 9002) in real mode with the moved lists from [architecture.md](../../../docs/architecture.md). Passes came from Go sign-in and were sent as a Bearer. curl only; no browser click-through.
+
+| Check | Result |
+|---|---|
+| Listed prefixes (Queue `/api/license`, `/api/sync`, `/api/players`; Player `/api/leaderboard`, `/api/leaderboard/me`, `/api/invites/{id}`, `/api/ranking-settings`; Admin `/api/audit-events`, `/api/sales`, `/api/license-operations/{id}`) | Reached Go (new Go log line and Go's `x-request-id`) |
+| Unlisted prefixes (Queue `/api/sessions`, `/api/club`, `/api/venues`; Player `/api/me/account`, `/api/public-sessions`; Admin `/api/clubs`, `/api/players`, `/api/feature-flags`) | Not forwarded; Next handlers answered |
+| Signed-in listed reads with a Go pass / without | 200 / 401 (Player `/api/invites/{id}` is optional-viewer: 200 for both) |
+| Direct to Go with app header, secret and Bearer (Admin 4, Queue 4, Player 3 routes) | All 200; 401 without a Bearer |
+| Not covered | Browser click-through, Vercel and Railway, writes |

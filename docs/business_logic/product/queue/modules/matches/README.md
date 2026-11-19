@@ -34,6 +34,8 @@ The buttons stay **Start match** and **Match done**.
 
 **Swap partners while playing** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-swap-partners-playing.md)): in the match dialogs, dragging a player onto someone in the other pair swaps them (Getting ready and Playing alike). It records no substitution; the result follows the pairs as they are at Match done. Tapping a card brings in someone from outside: **Replace** (Getting ready) or **Substitute / Replace** (Playing).
 
+**Move a playing match** (owner, November 19, 2026; mockup only): a Playing match can move to a free court; it keeps playing and its start time stays. The court it leaves frees up (Auto Queue then fills it).
+
 **Pause match** (owner, November 19, 2026; mockup only; [log](../../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a Playing match can go back to **On court** (Getting ready) on the same court(s), for a match started by mistake. The start time clears and **Start match** starts it again; players, sides and substitutions stay, and nothing is recorded. It is not a timer pause.
 
 ## Start and completion

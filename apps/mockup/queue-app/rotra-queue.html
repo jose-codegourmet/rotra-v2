@@ -4506,6 +4506,7 @@ function courtMenu(s, c, busy) {
   const item = (act, label, why, cls = '') => `<button role="menuitem" class="${cls}" data-act="${act}" data-id="${c.id}" ${why ? 'disabled' : ''}><span>${label}</span>${why ? `<span class="why">${why}</span>` : ''}</button>`;
   return `<div class="cmenu"><button class="btn xs ghost icon-btn" data-act="toggleCourtMenu" data-id="${c.id}" aria-haspopup="menu" aria-expanded="${open}" aria-label="More for ${esc(c.label)}">${I.more}</button>${open ? `<div class="cmenu-list" role="menu" aria-label="${esc(c.label)}">
     ${(() => { const m = courtMatches(s).find((x) => x.status === 'oncourt' && x.courts.includes(c.id)); if (!m) return ''; const n = swapCandidate(s, m); return item('openSwap', n ? `Swap with #${waiting(s).indexOf(n) + 1} · Match ${n.seq}` : 'Swap with the queue', n ? '' : 'No other waiting match is ready'); })()}
+    ${(() => { /* Owner artifact comment, November 19, 2026: a playing match can move to a vacant court. */ const m = courtMatches(s).find((x) => x.status === 'active' && x.courts.includes(c.id)); if (!m) return ''; const ok = freeCourts(s).length >= courtsNeeded(m); return `<button role="menuitem" data-act="openMoveCourt" data-id="${m.id}" ${ok ? '' : 'disabled'}><span>Move to a free court</span>${ok ? '' : '<span class="why">No court is free</span>'}</button>`; })()}
     ${item('openCourtLabel', 'Change court label', '')}
     ${item('editCourt', busy ? 'Change time' : 'Edit', '')}
     ${openedEarly(s, c) ? item('undoEarly', 'Undo early open', busy ? 'A match is on this court' : '') : ''}
@@ -6188,7 +6189,7 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const need = courtsNeeded(m);
     const sel = sh.courts || [];
-    return sheetShell(`Move match ${m.seq}`, `<p class="small muted">Now on ${esc(courtsOf(s, m))}. It stays getting ready on the new court.</p>
+    return sheetShell(`Move match ${m.seq}`, `<p class="small muted">Now on ${esc(courtsOf(s, m))}. ${m.status === 'active' ? 'It keeps playing on the new court; its time doesn\'t restart.' : 'It stays getting ready on the new court.'}</p>
       <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Move to'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('') || '<span class="small muted">No other court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>`,
       `<button class="btn" data-act="openMatch" data-id="${m.id}">Back</button><button class="btn primary" data-act="confirmMove" ${sel.length !== need ? 'disabled' : ''}>Move match</button>`);
   },
@@ -6205,6 +6206,7 @@ const SHEETS = {
         // tap a card to bring in a player from outside.
         return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div><p class="small muted" style="margin:0">Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring in someone from outside (substitute or replace), or their picture to see their profile.</p>`; })()}
       ${(m.subs || []).map((x) => `<p class="small muted">Substitution: ${esc(subLine(x, m))}.</p>`).join('')}
+      <div class="row"><button class="btn sm" data-act="openMoveCourt" data-id="${m.id}" ${freeCourts(s).length >= courtsNeeded(m) ? '' : 'disabled title="No court is free"'}>Move to a free court</button></div>
       <p class="small muted">The court stays in use until you confirm a winner or mark the match invalid. Closing this doesn't end the game.</p>`,
       `<button class="btn" data-act="pauseMatch" data-id="${m.id}">${I.q_pause} Pause match</button><button class="btn danger" data-act="openInvalid" data-id="${m.id}">Mark invalid</button><button class="btn primary" data-act="openResult" data-id="${m.id}">Match done</button>`);
   },
@@ -7542,10 +7544,11 @@ const ACT = {
   openMoveCourt: (d) => openSheet({ type: 'moveCourt', id: d.id, courts: [] }),
   confirmMove: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
-    if (!m || m.status !== 'oncourt' || sh.courts.length !== courtsNeeded(m) || sh.courts.some((c) => !freeCourts(s).some((f) => f.id === c))) { toast('Something changed. Review the match again.'); render(); return; }
+    if (!m || !['oncourt', 'active'].includes(m.status) || sh.courts.length !== courtsNeeded(m) || sh.courts.some((c) => !freeCourts(s).some((f) => f.id === c))) { toast('Something changed. Review the match again.'); render(); return; }
     const from = courtsOf(s, m);
     m.courts = sh.courts.slice();
-    S.ui.sheet = { type: 'onCourt', id: m.id }; commit(`Match ${m.seq} moved from ${from} to ${courtsOf(s, m)} · getting ready${autoNote(s, autoFill(s))}`); render();
+    const playing = m.status === 'active';
+    S.ui.sheet = { type: playing ? 'match' : 'onCourt', id: m.id }; commit(`Match ${m.seq} moved from ${from} to ${courtsOf(s, m)} · ${playing ? 'still playing' : 'getting ready'}${autoNote(s, autoFill(s))}`); render();
   },
   // Manual Queue | Auto Queue, per session. Switching Auto on fills every free open court now, in court order.
   setCourtFill: (d) => {

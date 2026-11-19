@@ -16,6 +16,8 @@ Superseded by: none
 - Inside, one small card per court, laid out like the Courts tab: the court label, a status chip (Playing, Getting ready,
   Free, Not open yet), and the court drawing with its players (grey with “FREE” when free). A playing court has the
   accent border and glow.
+- The court cards stretch to fill the row, with no empty columns left over (owner's follow-up the same day: “the boxes
+  should just span out the empty space in this container”).
 - Under each drawing the times are inputs, not text:
   - **From** and **Until** time fields; **Follows session end** checkbox (on: Until is greyed out and follows the session's
     end; off: the court gets its own end time).

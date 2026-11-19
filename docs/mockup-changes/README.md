@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 64 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 65 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -387,6 +387,7 @@ NEW: 64 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-court-colors](2026-11-19-court-colors.md) | Queue and Player apps: ROTRA court colours (dark theme) | every drawn court (court card, match card court, setup court picture, player game cards) | CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted |
 | [2026-11-19-player-court-position-art](2026-11-19-player-court-position-art.md) | Player app: Higgsfield art on the Where you play cards | court-position card | NEW |
 | [2026-11-19-player-details-step-mobile](2026-11-19-player-details-step-mobile.md) | Player app: a faster, mobile-first Your details step with clear Required fields | details step, Required pill, optional fold, fixed Continue footer | NEW |
+| [2026-11-19-player-favorite-art](2026-11-19-player-favorite-art.md) | Player app: graphic on the favorite player step | step banner | NEW |
 | [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | NEW |
 | [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | NEW |
 | [2026-11-19-player-invite-onboarding](2026-11-19-player-invite-onboarding.md) | Player app: fullscreen onboarding after an invite link, with play style, shots and favorite player | onboarding frame (header with progress, fixed footer), court-position cards, shot chips, favorite-player chips | NEW |

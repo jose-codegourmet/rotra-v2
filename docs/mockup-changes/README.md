@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 42 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 43 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -421,6 +421,7 @@ NEW: 42 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-session-link-split](2026-11-19-queue-session-link-split.md) | Queue app: Session link and the join switches are separate boxes | card (reuse), switch (reuse) | NEW |
 | [2026-11-19-queue-set-games-compare](2026-11-19-queue-set-games-compare.md) | Queue app: Set games played shows Now and To side by side | comparison box (new): two panels with an arrow between, the right one holding the stepper | NEW |
 | [2026-11-19-queue-settings-court-cards](2026-11-19-queue-settings-court-cards.md) | Queue app: Settings › Courts shows court cards with editable times | small court card (reuse the court drawing and status chips), time inputs, checkbox | NEW |
+| [2026-11-19-queue-settings-layout](2026-11-19-queue-settings-layout.md) | Queue app: the live Settings tab is rearranged into an even grid | settings cards (also used by the preparation Settings tab) | NEW |
 | [2026-11-19-queue-standings-no-gaps](2026-11-19-queue-standings-no-gaps.md) | Queue app: standings positions run on without gaps (1, 1, 2) | live-leaderboard, session-standings, leaderboard-share-card | NEW |
 | [2026-11-19-queue-swap-partners-playing](2026-11-19-queue-swap-partners-playing.md) | Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside | dialog player card (reuse), drag swap (reuse) | NEW |
 | [2026-11-19-queue-upcoming-compact-cards](2026-11-19-queue-upcoming-compact-cards.md) | Queue app: the Courts tab's upcoming queued matches use compact cards | queue match card, compact variant (new): overlapping avatar stack with level rings | NEW |

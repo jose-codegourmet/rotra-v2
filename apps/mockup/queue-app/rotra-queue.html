@@ -252,14 +252,16 @@ textarea.input { min-height: 80px; resize: vertical; }
 .el-step b { font-size: 22px; min-width: 32px; text-align: center; }
 /* Settings tab, live (owner artifact comment, November 19, 2026: readable layout, some areas as cards). */
 .ls-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.ls-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); align-items: start; }
+.ls-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+@media (max-width: 760px) { .ls-grid { grid-template-columns: minmax(0, 1fr); } }
 .ls-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .ls-card > .between h3 { margin: 0; font-size: 15px; }
 .ls-rows { display: flex; flex-direction: column; }
-.ls-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border); min-width: 0; }
+.ls-row { display: grid; grid-template-columns: minmax(96px, 32%) minmax(0, 1fr); align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border); min-width: 0; }
 .ls-row:first-child { border-top: 0; padding-top: 0; }
 .ls-row > span:first-child { color: var(--fg2); font-size: 13px; flex: none; }
-.ls-row > div { text-align: right; min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+.ls-row > div { min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 2px; }
+.ls-row > div > span:first-child { font-weight: 600; }
 .ls-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .ls-stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--bg); min-width: 0; }
 .ls-stat b { font-size: 22px; line-height: 1.1; font-weight: 800; }
@@ -352,12 +354,13 @@ body.court-dragging { cursor: grabbing; }
 .cfilter button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ls-card.ls-wide { grid-column: 1 / -1; }
 /* Owner artifact comment, November 19, 2026: the court cards stretch to fill the row (auto-fit, no empty columns). */
-.ls-courts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.ls-courts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); }
 .ls-cc { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); min-width: 0; }
 .ls-cc.playing { border-color: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 22%, transparent); }
 .ls-pitch { position: relative; }
 .ls-free { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--fg3); }
-.ls-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ls-times { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.ls-times .field { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 8px; }
 .ls-times .input { min-width: 0; }
 .ls-follow input { width: 16px; height: 16px; accent-color: var(--accent); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
@@ -4328,7 +4331,7 @@ function prepOverview(s) {
     ${linkCard(s)}`;
 }
 // Settings tab during a live session: the setup summary as cards (owner artifact comment, November 19, 2026).
-function liveSettings(s, est, present) {
+function liveSettings(s, est, present, allLink) {
   const fixed = chip('Fixed after start');
   const row = (k, v, note) => `<div class="ls-row"><span>${k}</span><div><span>${v}</span>${note ? `<span class="small muted">${note}</span>` : ''}</div></div>`;
   const reqOn = (() => { const a = reqAllowed(s); return REQ_FORMATS.filter((k) => a[k]).map((k) => REQ_LABEL[k]); })();
@@ -4362,9 +4365,11 @@ function liveSettings(s, est, present) {
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${peso(c.perHead)}</b><span>Each player pays${c.custom ? ' (custom)' : ''}</span></div><div class="ls-stat"><b class="tnum">${peso(c.total)}</b><span>Estimated total</span></div></div>
       <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div>
       <div class="row acts"><button class="btn sm" data-act="openPayments">Payments</button></div></section>`; })() : '';
-  const notes = s.notes ? `<section class="card ls-card" aria-labelledby="ls-notes-h"><h3 id="ls-notes-h" style="margin:0;font-size:15px">Notes</h3><p class="small" style="margin:0;white-space:pre-line">${esc(s.notes)}</p></section>` : '';
-  return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div></div>
-    <div class="ls-grid">${courts}${players}${rules}${money}${notes}</div></section>`;
+  const notes = `<section class="card ls-card" aria-labelledby="ls-notes-h"><div class="between"><h3 id="ls-notes-h">Notes</h3></div><p class="small${s.notes ? '' : ' muted'}" style="margin:0;white-space:pre-line">${s.notes ? esc(s.notes) : 'No notes for tonight.'}</p></section>`;
+  // Owner, November 19, 2026 ("all over the place"): courts in one row, then a 2×2 grid of even-height cards
+  // (Game rules | Players, Costs | Notes), labels and values in two aligned columns.
+  return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div>${allLink ? `<button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button>` : ''}</div>
+    <div class="ls-grid">${courts}${rules}${players}${money}${notes}</div></section>`;
 }
 // Settings tab before start (owner artifact comment, November 19, 2026): the setup as cards, each with Edit opening that step
 // of the session editor. Replaces the header's Edit preparation button.
@@ -4579,7 +4584,7 @@ function viewConsole() {
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
       : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
       : pane === 'history' && recordedOf(s) ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
-      : pane === 'settings' ? `<section class="stack" aria-label="Settings">${prepOverview(s)}<div><button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button></div></section>`
+      : pane === 'settings' ? `<section class="stack" aria-label="Settings">${liveSettings(s, sessionEstimate(s), s.roster.filter((r) => r.present).length, true)}${linkCard(s)}</section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
       <section class="stack live-sec" aria-label="Courts">${courtsPane(s)}</section>

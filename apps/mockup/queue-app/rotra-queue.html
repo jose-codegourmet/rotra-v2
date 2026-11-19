@@ -375,6 +375,7 @@ body.court-dragging { cursor: grabbing; }
 .ls-times { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
 .ls-times .field { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 8px; }
 .ls-times .input { min-width: 0; }
+.ls-times .dt-field { max-width: none; }
 .ls-follow input { width: 16px; height: 16px; accent-color: var(--accent); }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
@@ -4360,8 +4361,10 @@ function liveSettings(s, est, present, allLink) {
     return dtPicker({ k: `ct.from.${c.id}`, label: 'From', title: `${c.label} opens`, id: `ct-from-${c.id}`, value: from, days: [day0], ok: (t) => t < until,
         set: (t) => { c.startsAt = t; commit(`${c.label} opens ${fmtTime(t)}`); } })
       + dtPicker({ k: `ct.until.${c.id}`, label: 'Until', title: `${c.label} open until`, id: `ct-until-${c.id}`, value: until, days: [day0, addDays(day0, 1)], base: from, hideDays: true,
-        suffix: dayDiff(from, until) ? 'next day' : '', disabled: follows, ok: (t) => t > from && t <= from + 864e5,
-        set: (t) => { c.until = t; commit(`${c.label} open until ${fmtWhen(t, { lower: true })}`); } });
+        suffix: dayDiff(from, until) ? 'next day' : '', ok: (t) => t > from && t <= from + 864e5,
+        // Owner, November 19, 2026: Until is always editable. A time other than the session end unticks Follows session end;
+        // picking the session end itself ticks it again.
+        set: (t) => { if (t === s.end) { c.until = null; commit(`${c.label} follows the session end`); } else { c.until = t; commit(`${c.label} open until ${fmtWhen(t, { lower: true })}`); } } });
   };
   const courtMini = (c) => {
     const m = courtMatches(s).find((x) => x.courts.includes(c.id));

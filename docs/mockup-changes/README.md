@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 47 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 48 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -424,6 +424,7 @@ NEW: 47 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-settings-court-widths](2026-11-19-queue-settings-court-widths.md) | Queue app: Settings court cards fill the width, 350 px minimum on wide boxes, two a row on small ones | settings court cards | NEW (superseded by 2026-11-19-queue-settings-courts-slider.md (phones only)) |
 | [2026-11-19-queue-settings-courts-slider](2026-11-19-queue-settings-courts-slider.md) | Queue app: Settings courts are a one-court slider on phones (Embla Carousel) | settings court cards; a court slider (Embla Carousel) | NEW |
 | [2026-11-19-queue-settings-layout](2026-11-19-queue-settings-layout.md) | Queue app: the live Settings tab is rearranged into an even grid | settings cards (also used by the preparation Settings tab) | NEW |
+| [2026-11-19-queue-settings-until-editable](2026-11-19-queue-settings-until-editable.md) | Queue app: Settings court Until is always editable and drives Follows session end; time fields fill the card | settings court cards, time field | NEW |
 | [2026-11-19-queue-share-dialog](2026-11-19-queue-share-dialog.md) | Queue app: one Share button on the session header opens a share dialog | header Share button, Share this session dialog (choice tiles) | NEW |
 | [2026-11-19-queue-standings-no-gaps](2026-11-19-queue-standings-no-gaps.md) | Queue app: standings positions run on without gaps (1, 1, 2) | live-leaderboard, session-standings, leaderboard-share-card | NEW |
 | [2026-11-19-queue-swap-partners-playing](2026-11-19-queue-swap-partners-playing.md) | Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside | dialog player card (reuse), drag swap (reuse) | NEW |

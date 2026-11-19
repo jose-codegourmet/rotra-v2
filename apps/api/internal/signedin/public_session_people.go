@@ -155,7 +155,7 @@ func playerStanding(ctx context.Context, q *sqlcgen.Queries, playerID, sessionID
 		st.WaitlistPosition = &pos
 	}
 	// A confirmed request whose place the Queue Master has since removed is history, not a status.
-	if hasRequest && !(request.Status == sqlcgen.JoinRequestStatusConfirmed && !inSession) {
+	if hasRequest && (request.Status != sqlcgen.JoinRequestStatusConfirmed || inSession) {
 		index := -1
 		if request.Status == sqlcgen.JoinRequestStatusConfirmed && request.ClubPlayerID.Valid {
 			index = slices.IndexFunc(ordered, func(w sqlcgen.ListSessionWaitlistRowsRow) bool { return w.ClubPlayerID == request.ClubPlayerID })

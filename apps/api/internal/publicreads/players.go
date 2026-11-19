@@ -143,7 +143,7 @@ func (p *players) readPublicProfile(ctx context.Context, q *sqlcgen.Queries, id 
 		return err
 	}
 	out.profileDTO, out.LeaderboardPlaces = dto, []place{}
-	if dto.ProfileVisibility == string(sqlcgen.ProfileVisibilityAlwaysPrivate) && !(v.ok && v.id.String() == raw) {
+	if dto.ProfileVisibility == string(sqlcgen.ProfileVisibilityAlwaysPrivate) && (!v.ok || v.id.String() != raw) {
 		return nil
 	}
 	b, err := readBoard(ctx, q, periodYear, p.now().UnixMilli())

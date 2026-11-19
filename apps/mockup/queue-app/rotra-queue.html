@@ -484,13 +484,18 @@ select.input.inline { width: auto; min-height: 42px; }
 .sg-p:hover { background: var(--elev); border-color: var(--border-strong); }
 .sg-p.sg-split { position: relative; cursor: pointer; }
 .sg-split .sg-av { position: relative; z-index: 1; border-radius: 50%; }
-.sg-split .sg-av:hover .avatar { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sg-split .sg-av:hover .avatar { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent); }
 .sg-split .sg-main { all: unset; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 1; min-width: 0; cursor: pointer; }
 .sg-split .sg-main::after { content: ''; position: absolute; inset: 0; border-radius: var(--r); }
 .sg-split .sg-main:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sg-split .sg-swap { color: var(--fg3); display: grid; place-items: center; flex: none; }
 .sg-split:hover .sg-swap { color: var(--accent); }
 .sg-p .avatar { width: 52px; height: 52px; font-size: 17px; }
+/* Owner artifact comment, November 19, 2026: the level shows as the picture's ring (as on Players cards), not as text. */
+.sg-p { --ring: var(--border-strong); }
+.sg-p.lv-beginner { --ring: var(--lv-beg); } .sg-p.lv-intermediate { --ring: var(--lv-int); } .sg-p.lv-advanced { --ring: var(--lv-adv); }
+.sg-p .avatar { outline: 3px solid var(--ring); outline-offset: 2px; }
+.sg-p { padding-left: 12px; }
 .sg-p .main { min-width: 0; display: flex; flex-direction: column; }
 .sg-p b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sg-p .small { line-height: 1.35; }
@@ -2539,9 +2544,9 @@ const faceTeam = (s, ids, label, swap, card) => `<div class="sg-team" role="grou
   const p = P(pid), r = R(s, pid), g = gamesOf(s, pid);
   if (card) {
     const c = card(pid);
-    return `<div class="sg-p sg-split" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)}><button type="button" class="face-btn sg-av" data-act="openProfile" data-id="${pid}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="View profile">${avatar(p)}</button><button type="button" class="sg-main" ${c.attrs} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. ${c.label}${swap ? '. Left or right arrow switches sides' : ''}" title="${c.label}"><span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r ? r.level : null))}</span><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span><span class="sg-swap" aria-hidden="true">${I.swap}</span></button></div>`;
+    return `<div class="sg-p sg-split lv-${r ? rvBand(r) : 'none'}" title="${esc(lvLabel(r ? r.level : null))}" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)}><button type="button" class="face-btn sg-av" data-act="openProfile" data-id="${pid}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="View profile">${avatar(p)}</button><button type="button" class="sg-main" ${c.attrs} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. ${c.label}${swap ? '. Left or right arrow switches sides' : ''}" title="${c.label}"><span class="main"><b>${esc(p.name)}</b><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span><span class="sg-swap" aria-hidden="true">${I.swap}</span></button></div>`;
   }
-  return `<button class="sg-p" data-act="openProfile" data-id="${pid}" data-back="1" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. View profile${swap ? '. Left or right arrow switches sides' : ''}">${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r ? r.level : null))}</span><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span></button>`;
+  return `<button class="sg-p lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" data-back="1" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. View profile${swap ? '. Left or right arrow switches sides' : ''}">${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span></button>`;
 }).join('')}</div>`;
 // A player's picture as a button that opens their profile (Back returns to an open dialog).
 const faceBtn = (p) => `<button class="face-btn" data-act="openProfile" data-id="${p.id}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="${esc(p.name)}">${avatar(p)}</button>`;

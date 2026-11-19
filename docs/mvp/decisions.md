@@ -65,6 +65,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-18-04](#d-2026-11-18-04) | Scoring modes: a scoring mode per Queue Session and a match result that follows it | approved in part 2026-11-18 (details open) | mockup only | #944 (#955, #956) | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-05](#d-2026-11-18-05) | Session standings: players with the same wins and losses share a position | approved 2026-11-18 (details open) | mockup only | #961 | [Queue](workstreams/queue.md) |
 | [D-2026-11-18-06](#d-2026-11-18-06) | Record games: a Queue Session can run without recording its games | approved in part 2026-11-18 (details open) | in progress: mock app; real mode written (#976), migration applied to the shared database 2026-11-19 | #961 | [Queue](workstreams/queue.md) |
+| [D-2026-11-19-01](#d-2026-11-19-01) | Gender (optional) and the match category | approved 2026-11-19 (details open) | mockup only | — |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1264,3 +1265,23 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
   - History attribution for the claimed record's earlier games (one attribution per joined record) stays open, as in [D-2026-11-16-04](#d-2026-11-16-04).
 - **Amends:** [D-2026-11-16-04](#d-2026-11-16-04) (“A guest's games never join an account by themselves. They come along only after the club makes the guest unclaimed by adding an email.”) and the guest invitation note of November 8, 2026 (#490: “Registration keeps the guest record unlinked”) for a guest's own link.
 - **References:** [players module](../business_logic/product/queue/modules/players/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [players and roster screens](../screens/product/modules/queue/players-roster.md), [registration screens](../screens/product/modules/player-information/access-registration.md), [product terms](../product-terms.md), `packages/db/src/player/claim.ts` › `issueClaimLink`, `completeRecordClaim`.
+
+<a id="d-2026-11-19-01"></a>
+### D-2026-11-19-01 — Gender (optional) and the match category
+- **Decision status:** approved (owner, November 19, 2026: “determining if an account is a Male or Female”; recording: “it should be optional to not mess up the database but it will require a notification that they need to fill it up”; existing records: “they will be Genderless for now and newer records will determine what kind of doubles matches were being played”; visibility: “Also on public profiles”; other formats: the same rule as doubles). The open items below are not decided.
+- **Implementation status:** mockup only ([Queue log](../mockup-changes/2026-11-19-queue-match-category-gender.md), [Player log](../mockup-changes/2026-11-19-player-gender.md), [Admin log](../mockup-changes/2026-11-19-admin-player-gender.md)).
+- **Ticket:** none yet.
+- **Roadmap:** MVP — [Queue](workstreams/queue.md), Player Information
+- **Decision:**
+  - A player has an optional **gender**: **Male** or **Female**, or not given. Existing records start as not given.
+  - A registered player sets it on their own account (registration and Edit profile). The Queue Master sets it for guests and unclaimed players they keep (Add player › New player, Edit details). A registered player's gender is theirs; a club can't change it.
+  - Players who haven't added it get a **reminder**: an Account notification and a notice on their own profile, until they add it.
+  - Gender is **public**: shown on the player's profile, Admin's player detail and the Queue Master's profile card.
+  - Every match has a **match category**: **Men's** (all men), **Women's** (all women), **Mixed** (both sides have the same mix of men and women, e.g. MW vs MW), otherwise **Genderless** (e.g. MM vs WW, MM vs MW, WW vs MW). A match with any player whose gender isn't given is **Genderless**. The label is the category plus the format: Men's Doubles, Mixed Doubles, Women's Singles, Genderless 3v3 fun.
+  - The category is a label only: Generate Queue, ranking and leaderboards don't use it yet.
+- **Open:**
+  - Whether the category is stored on the finished match (fixed at Match done) or worked out when shown. The mockup works it out from the current players.
+  - Whether gender ever becomes required, and when.
+  - Whether Admin can edit a player's gender, and whether a player can change it after setting it.
+  - Whether Generate Queue, standings or leaderboards should split or filter by category later.
+- **References:** [matches module](../business_logic/product/queue/modules/matches/README.md), [identity module](../business_logic/product/player-information/modules/identity/README.md), [identity design](../database_design/product/player-information/modules/identity.md), [sessions and roster design](../database_design/product/queue/modules/sessions-roster.md), [product terms › Match category](../product-terms.md).

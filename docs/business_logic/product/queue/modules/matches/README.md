@@ -13,6 +13,8 @@
 
 A session may mix singles and doubles. Players have one combined shared rank, not separate singles/doubles ratings.
 
+**Match category** (owner, November 19, 2026; [D-2026-11-19-01](../../../../../mvp/decisions.md#d-2026-11-19-01); mockup only): from the players' genders. All men: **Men's**. All women: **Women's**. Both sides with the same mix of men and women (MW vs MW, MMW vs MMW): **Mixed**. Anything else (MM vs WW, MM vs MW, WW vs MW, uneven sides): **Genderless**. A player whose gender isn't given makes the match Genderless. Shown with the format (“Mixed Doubles”, “Women's Singles”, “Genderless 3v3 fun”) on queue cards, drafts, the court sheets and match lines. It is a label only; generation and ranking ignore it.
+
 Every match gets a **match number** in the order it was created in the session (Match 1, Match 2, …). Queue position is separate and changes as the queue moves.
 
 Fun-game wins/losses count in session standings and may contribute to local MVP. Completing the whole fun game counts toward the minimum. Fun games never contribute to long-term player-performance rating or standard-match leaderboard eligibility.

@@ -1706,6 +1706,23 @@ function migrateLevels() {
 }
 const FORMATS = { singles: [1, 1], doubles: [2, 2], '1v2': [1, 2], '3v3': [3, 3], '4v4': [4, 4], '5v5': [5, 5] };
 const FORMAT_LABEL = { singles: 'Singles', doubles: 'Doubles', '1v2': '1v2 fun', '3v3': '3v3 fun', '4v4': '4v4 fun', '5v5': '5v5 fun' };
+// Match category (owner, November 19, 2026). All men: Men's. All women: Women's. Both sides with the same mix of men and
+// women: Mixed. Anything else, or any player whose gender isn't given: Genderless. The label is the category plus the format.
+const GENDER_LABEL = { male: 'Male', female: 'Female' };
+function matchCategory(m) {
+  const gs = (ids) => (ids || []).map((id) => (id && P(id)?.gender) || null);
+  const a = gs(m.teamA), b = gs(m.teamB), all = [...a, ...b];
+  if (!all.length || all.some((g) => !g)) return 'Genderless';
+  if (all.every((g) => g === 'male')) return "Men's";
+  if (all.every((g) => g === 'female')) return "Women's";
+  const mixed = (t) => t.includes('male') && t.includes('female'), key = (t) => t.slice().sort().join();
+  return mixed(a) && mixed(b) && key(a) === key(b) ? 'Mixed' : 'Genderless';
+}
+const matchLabel = (m) => `${matchCategory(m)} ${FORMAT_LABEL[m.format]}`;
+// Gender (optional) control for the Queue Master's own records: guests and unclaimed players.
+const genderField = (id, path, v) => `<div class="field"><span id="${id}-l">Gender (optional)</span><div class="seg" role="group" aria-labelledby="${id}-l">${[['male', 'Male'], ['female', 'Female'], ['', 'Not given']].map(([k, l]) => `<button type="button" aria-pressed="${(v || '') === k}" data-act="setGender" data-path="${path}" data-v="${k}">${l}</button>`).join('')}</div>
+  <span class="hint">Sets the match category: Men's, Women's, Mixed or Genderless. Matches with a player whose gender isn't given count as Genderless.</span></div>`;
+const genderText = (p) => GENDER_LABEL[p.gender] || (p.identity === 'registered' ? 'Not given yet · ROTRA reminds them to add it' : 'Not given');
 const FUN = ['1v2', '3v3', '4v4', '5v5'];
 // Match requests (owner request, November 9, 2026): every format is a pill, 2v2 first and default; the session's
 // "Players can request" switches decide which pills are enabled. Unset: the standard formats follow Singles/Doubles, fun games are off.
@@ -1943,6 +1960,9 @@ if (!S || S.v !== 4) S = freshState();
 S.ui.sheet = null; S.ui.courtMenu = null; S.syncing = false; S.ui.login.pending = false;
 if (S.screen === 'finalizing') S.screen = 'console';
 migrateLevels();
+// Owner, November 19, 2026: gender is optional for now. Sample genders for the fixtures; a few stay unset to show Genderless.
+const GENDER_SEED = { p1: 'male', p2: 'female', p3: 'male', p4: 'female', p5: 'male', p6: 'female', p7: 'male', p8: 'female', p9: 'male', p10: 'female', p11: 'male', p14: 'male', p15: 'female', p16: 'male', p18: 'female', p19: 'male', p21: 'female', p22: 'male', p23: 'female', p24: 'male', p25: 'female', p26: 'male', p28: 'male', p29: 'female', p30: 'male' };
+(S.players || []).forEach((p) => { if (p.gender === undefined) p.gender = GENDER_SEED[p.id] ?? null; });
 // Older saves used entranceOn/entranceFee for the custom payment; the entrance fee is now a separate misc cost.
 const oldFin = (f) => ({ courtFee: f.courtFee ?? null, entryFee: null, custom: !!f.entranceOn, payFee: f.entranceOn ? f.entranceFee : null, shuttles: f.shuttles || [] });
 (S.sessions || []).forEach((x) => { if (x.finance && 'entranceOn' in x.finance) x.finance = oldFin(x.finance); });
@@ -4385,14 +4405,14 @@ function courtsPane(s) {
         // On court: placed, getting ready. Normal border; the Queue Master starts it.
         const b = blockOf(s, m);
         return `<div class="court oncourt ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Getting ready' : 'Getting ready'))}
-        <p class="small muted">${FORMAT_LABEL[m.format]} · Match ${m.seq} · waiting to start</p>
+        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · waiting to start</p>
         ${b ? `<span class="status-line warn">${I.alert} ${esc(b.text)}</span>` : ''}
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="startOnCourt" data-id="${m.id}" ${b ? `disabled title="${esc(b.text)}"` : ''}>Start match</button><button class="btn sm" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
       }
       const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
       const subs = (m.subs || []).length;
       return `<div class="court busy ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
-        <p class="small muted">${FORMAT_LABEL[m.format]} · Match ${m.seq} · ${mins} min${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
+        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${mins} min${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
     }
     const notStarted = !courtOpen(s, c);
@@ -4406,7 +4426,7 @@ function courtsPane(s) {
       // 5v5 needs a second court, so it goes through the Put on court sheet.
       const put = courtsNeeded(eligible) === 2 ? `data-act="openDispatch" data-id="${eligible.id}" data-court="${c.id}"` : `data-act="placeOnCourt" data-id="${eligible.id}" data-court="${c.id}"`;
       body = `${first && first.id !== eligible.id ? `<p class="small muted">Skipped #1: ${esc(blockOf(s, first).text)}.</p>` : ''}
-        <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${FORMAT_LABEL[eligible.format]}</p>
+        <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${matchLabel(eligible)}</p>
         <p class="small">${esc(listNames(eligible.teamA))} <span class="muted">vs</span> ${esc(listNames(eligible.teamB))}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" ${put}>Put on court</button>${list.length > 1 ? `<button class="btn sm" data-act="openChooseMatch" data-court="${c.id}">Pick another</button>` : ''}</div>`;
     } else {
@@ -4505,9 +4525,9 @@ function draftTile(s, m, batch, selected) {
     return [played ? `<span class="qchip">${played} played</span>` : '', queued ? `<span class="qchip">${queued} queued</span>` : '', suggested > 1 ? `<span class="qchip">${suggested} suggested</span>` : '', busyOf(s, p) ? `<span class="qchip warn">${busyOf(s, p).status === 'oncourt' ? 'On court' : 'Playing now'}</span>` : ''].join('');
   };
   const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span><span class="qchips">${chips(p)}</span></div>`).join('')}</div>`;
-  return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(FORMAT_LABEL[m.format])}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
+  return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(matchLabel(m))}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
     ${pick ? `<span class="sel-badge" aria-hidden="true">${pick}</span>` : ''}
-    <div class="qt-head">${chip('Draft')}${chip(FORMAT_LABEL[m.format], 'solid')}</div>
+    <div class="qt-head">${chip('Draft')}${chip(matchLabel(m), 'solid')}</div>
     ${faces(m.teamA)}<div class="vs">VS</div>${faces(m.teamB)}
     ${status}
   </article>`;
@@ -4645,7 +4665,7 @@ function queueCard(s, m, i, n, cols) {
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
-    <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(FORMAT_LABEL[m.format], 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
+    <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(matchLabel(m), 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
     ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}
     ${status}
     <div class="row qt-actions">
@@ -5565,6 +5585,7 @@ const SHEETS = {
           ${needsEmail(p) ? notice('warn', '<b>Details required.</b> An unclaimed player needs an email. Add their email in Edit details, or delete the player.') : ''}
           <div class="pp-sec"><span class="label">About</span>
             <dl class="kv">
+              <dt>Gender</dt><dd>${esc(genderText(p))}</dd>
               <dt>Registered in</dt><dd>${city ? esc(city) : 'Not registered yet'}</dd>
               <dt>Joined</dt><dd>${joinedViaText(p)}</dd>
             </dl></div>
@@ -5768,6 +5789,7 @@ const SHEETS = {
       ${picEditor(p)}
       ${needsEmail(p) ? notice('warn', '<b>Details required.</b> An unclaimed player needs an email. Add their email here, or delete the player.') : claim ? notice('', 'What you fill in here is filled in for them when they open their invite link. They can still change it and only need to choose a password.') : ''}
       <div class="fgrid">${input('ep-name', 'Full or display name', 'name')}${input('ep-nick', 'Nickname (optional)', 'nick')}</div>
+      ${genderField('ep-gender', 'd', d.gender)}
       <label class="field"><span>Level for this club (optional)</span>${selectLevel('ep-level', d.level, 'data-bind="ui.sheet.d.level" data-num')}</label>
       ${p.email ? `<div class="field"><span>Email</span><p class="small">On file and kept private. It can't be changed here. Wrong email? Delete this player and add them again.</p></div>`
         : input('ep-email', claim ? 'Email' : 'Email (optional)', 'email', { type: 'email', im: 'email', ph: 'name@example.com', hint: claim ? "Check it with the player. It can't be changed after you save. Never shown publicly." : "Add an email to save them as an unclaimed player. They get an RTR ID, and their games here follow them when they register. It can't be changed after you save. Never shown publicly." })}
@@ -5904,6 +5926,7 @@ const SHEETS = {
     } else {
       body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
+        ${genderField('add-gender', 'sheet', sh.gender)}
         <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly.</span></label>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
@@ -5936,7 +5959,7 @@ const SHEETS = {
     const need = courtsNeeded(m);
     const sel = sh.courts || [];
     const b = blockOf(s, m);
-    return sheetShell(`Put match ${m.seq} on court`, `<div class="row">${chip(FORMAT_LABEL[m.format], 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}</div>
+    return sheetShell(`Put match ${m.seq} on court`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}</div>
       <div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`)}</div>
       <p class="small muted">Drag a player onto someone on the other team to switch sides.</p>
       <div class="field"><span>${need === 2 ? 'Choose two free courts' : 'Court'}</span><div class="row">${freeCourts(s).map((c) => `<button class="btn sm" aria-pressed="${sel.includes(c.id)}" data-act="pickCourt" data-id="${c.id}">${esc(c.label)}</button>`).join('') || '<span class="small muted">No court is free.</span>'}</div>${need === 2 ? '<span class="hint">5v5 uses two courts as one match.</span>' : ''}</div>
@@ -5950,7 +5973,7 @@ const SHEETS = {
     const s = cur();
     const m = s.matches.find((x) => x.id === sh.id);
     const b = blockOf(s, m);
-    return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))} · Getting ready`, `<div class="row">${chip(FORMAT_LABEL[m.format], 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}${chip('Getting ready')}</div>
+    return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))} · Getting ready`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}${chip('Getting ready')}</div>
       <div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`)}</div>
       <p class="small muted">Drag a player onto someone on the other team to switch sides. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
       ${b ? notice('bad', `${esc(b.text)}. Replace the player or send the match back to the queue.`) : ''}
@@ -6007,7 +6030,7 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))}`, `
-      <p class="small muted">${FORMAT_LABEL[m.format]} · started ${fmtWhen(m.startedAt, { lower: true })} · ${mins} min in · Scoring · ${scoringDef(s).label}</p>
+      <p class="small muted">${matchLabel(m)} · started ${fmtWhen(m.startedAt, { lower: true })} · ${mins} min in · Scoring · ${scoringDef(s).label}</p>
       ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in. */
         const tap = (h) => h.replace(/data-act="openProfile" data-id="([^"]+)" data-back="1"/g, `data-act="playerAction" data-mid="${m.id}" data-pid="$1"`).replace(/\. View profile/g, '. Substitute or replace');
         return `<div class="qteams">${tap(faceTeam(s, m.teamA, 'Team A'))}<span class="vs">VS</span>${tap(faceTeam(s, m.teamB, 'Team B'))}</div><p class="small muted" style="margin:0">Tap a player to substitute or replace them.</p>`; })()}
@@ -6161,7 +6184,7 @@ const SHEETS = {
     if (sh.error || !sh.lineup) return sheetShell('Suggested match', notice('warn', esc(sh.error || 'No valid match right now.')), '<button class="btn" data-act="closeSheet">Close</button>');
     const m = sh.lineup;
     const below = all(m).filter((p) => gamesOf(s, p) < s.minimum);
-    return sheetShell('Suggested match', `<div class="row">${chip(FORMAT_LABEL[m.format], 'solid')}${chip(MODES[s.mode].label + ' mode')}</div>
+    return sheetShell('Suggested match', `<div class="row">${chip(matchLabel(m), 'solid')}${chip(MODES[s.mode].label + ' mode')}</div>
       <div class="qteams">${faceTeam(s, m.teamA, 'Team A', 'sg')}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', 'sg')}</div>
       <p class="small muted">Drag a player onto someone on the other team to switch sides.</p>
       <div class="card stack tight"><span class="label">Why this lineup</span>
@@ -6208,7 +6231,7 @@ const SHEETS = {
     return sheetShell(`Put a match on ${esc(courtLabel(s, sh.court))}`, `<p class="small muted">Any ready match can go next. Queue order is a suggestion, not a rule. A match only stays locked while one of its players is still on court or isn't present. It goes on court getting ready; you start it from the court.</p>
       <div class="stack tight">${list.map((m, i) => {
         const b = blockOf(s, m);
-        return `<div class="opt" style="cursor:default"><span class="qt-pos">#${i + 1}</span><div class="main"><b>${esc(listNames(m.teamA))} <span class="muted">vs</span> ${esc(listNames(m.teamB))}</b><div class="small ${b ? 'muted' : ''}" style="${b ? '' : 'color:var(--accent)'}">${FORMAT_LABEL[m.format]} · ${b ? esc(b.text) : 'Ready to go on court'}</div></div><button class="btn xs ${b ? '' : 'primary'}" data-act="${courtsNeeded(m) === 2 ? 'openDispatch' : 'placeOnCourt'}" data-id="${m.id}" data-court="${sh.court}" ${b ? 'disabled' : ''}>Put on court</button></div>`;
+        return `<div class="opt" style="cursor:default"><span class="qt-pos">#${i + 1}</span><div class="main"><b>${esc(listNames(m.teamA))} <span class="muted">vs</span> ${esc(listNames(m.teamB))}</b><div class="small ${b ? 'muted' : ''}" style="${b ? '' : 'color:var(--accent)'}">${matchLabel(m)} · ${b ? esc(b.text) : 'Ready to go on court'}</div></div><button class="btn xs ${b ? '' : 'primary'}" data-act="${courtsNeeded(m) === 2 ? 'openDispatch' : 'placeOnCourt'}" data-id="${m.id}" data-court="${sh.court}" ${b ? 'disabled' : ''}>Put on court</button></div>`;
       }).join('')}</div>`, '<button class="btn" data-act="closeSheet">Close</button>');
   },
   nextMatch(sh) {
@@ -6222,7 +6245,7 @@ const SHEETS = {
     const card = (m, i) => {
       const a = esc(listNames(m.teamA)), b = esc(listNames(m.teamB)), pos = order.indexOf(m) + 1;
       return `<article class="nm-card" data-nm-i="${i}" aria-label="Match ${i + 1} of ${cands.length}">
-        <div class="nm-head"><span class="qt-pos">#${pos}</span>${chip(FORMAT_LABEL[m.format], 'solid')}${i === 0 ? chip('Next in line', 'warn') : ''}<span class="grow"></span><span class="small muted tnum">${i + 1} of ${cands.length}</span></div>
+        <div class="nm-head"><span class="qt-pos">#${pos}</span>${chip(matchLabel(m), 'solid')}${i === 0 ? chip('Next in line', 'warn') : ''}<span class="grow"></span><span class="small muted tnum">${i + 1} of ${cands.length}</span></div>
         ${faces(m.teamA)}<div class="vs">VS</div>${faces(m.teamB)}
         <button class="btn primary" data-act="pickNextMatch" data-id="${m.id}" aria-label="Put match #${pos} on ${court}: ${a} vs ${b}" ${i === 0 ? 'data-autofocus' : ''}>Pick this</button></article>`;
     };
@@ -6816,7 +6839,7 @@ const ACT = {
   },
   openEditPlayer: (d) => {
     const p = P(d.id);
-    openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });
+    openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', gender: p.gender || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });
   },
   // Club-set picture for a guest or unclaimed profile: applies at once, like the club logo (D-2026-11-09-10).
   picChar: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = { kind: 'char', seed: +d.k }; commit(`Picture updated · ${p.name}`); render(); },
@@ -6832,7 +6855,7 @@ const ACT = {
     const exp = expError(d); if (exp) err.exp = exp;
     sh.err = err;
     if (Object.keys(err).length) { render(); return; }
-    Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), sugg: d.level, style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+    Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, sugg: d.level, style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
     if (d.phone.trim()) p.noPhone = false;
     // One email is one person: an email that is already a saved player asks before the two records become one.
     const same = email ? savedByEmail(email, p.id) : null;
@@ -7142,6 +7165,7 @@ const ACT = {
   removeRoster: (d) => { const s = cur(); s.roster = s.roster.filter((r) => r.pid !== d.pid); save(); render(); toast(`${nm(d.pid)} removed from the roster`); },
   openAdd: () => openSheet({ type: 'add', tab: 'saved', q: '' }),
   openAddSaved: () => openSheet({ type: 'add', tab: 'global', q: '', club: true }),
+  setGender: (d) => { const sh = S.ui.sheet; if (!sh) return; if (d.path === 'd') sh.d.gender = d.v; else sh.gender = d.v; render(); },
   sheetSet: (d, el) => {
     const sh = S.ui.sheet;
     let v = d.v === '' ? null : d.v;
@@ -7191,7 +7215,7 @@ const ACT = {
     if (email && !emailOk(email)) { sh.err = 'Enter an email address, like name@example.com, or leave it empty.'; render(); return; }
     const same = email ? savedByEmail(email) : null;
     if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
-    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
+    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
     if (sh.club) {
       // Saved players › Add player: a level only if one was chosen.
       np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;

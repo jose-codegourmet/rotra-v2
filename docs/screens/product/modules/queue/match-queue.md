@@ -18,7 +18,7 @@ Attention notice: “N waiting matches need attention. Edit the lineup to swap t
 
 **Queue card:**
 
-- Head: position “#P”, format chip, origin (**Generated**, **Suggested**, or a lock icon for Manual · protected), flow arrow, drag handle ⠿.
+- Head: position “#P”, format chip (with the match category in front: “Mixed Doubles”, “Men's Doubles”, “Genderless 3v3 fun”; [D-2026-11-19-01](../../../../mvp/decisions.md#d-2026-11-19-01); [log](../../../../mockup-changes/2026-11-19-queue-match-category-gender.md)), origin (**Generated**, **Suggested**, or a lock icon for Manual · protected), flow arrow, drag handle ⠿.
 - Team A pictures and short names, “VS”, Team B. Tapping a picture opens the profile. Pictures are 44 px with 15 px names (46 px on touch screens).
 - **Wait timer** under each name during a live session: “M min” (then “N h”, then “long time ago”; owner, November 19, 2026, [Correct Queue Time Format](../../../../mockup-changes/2026-11-19-queue-correct-time-format.md)) since the player's last game ended, or since they were marked present if they haven't played (the same “M min wait” as the Players view). Under 10 min plain, **10–15 min** warning color, **16 min or more** error color; the number is always shown, so color is never the only signal. A player who is on court or playing shows **On court** or **Playing**, and an absent player shows **Not here**, instead of a timer. It refreshes with the console (every 30 seconds). The player's accessible name adds “waiting M min”.
 - Status line: **✓ Ready to start**; **⚠ reason** for needs attention (warning style, card highlighted); **ⓘ reason** for blocked or waiting for courts.

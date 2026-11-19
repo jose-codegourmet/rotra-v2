@@ -380,7 +380,19 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .ob-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font: inherit; font-weight: 600; cursor: pointer; }
 .ob-chip svg { width: 14px; height: 14px; }
 .ob-chip[aria-checked="true"] { border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); }
-.ob-form .wrap { padding-top: 24px; padding-bottom: 48px; }
+.ob-form .wrap { padding-top: 20px; padding-bottom: 120px; }
+/* Owner artifact comment, November 19, 2026: players found Your details hard to get through, couldn't tell required from
+   optional, and fill it on their phones in a hurry. Required fields first with a Required pill; optional ones folded away;
+   a fixed Continue; 16 px inputs so phones don't zoom. */
+.req-pill { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .2px; vertical-align: 1px; color: var(--accent); background: var(--accent-subtle); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.ob-details { gap: 14px; }
+.ob-sec { gap: 16px; }
+.ob-sec-h { font-size: 17px; }
+.ob-more summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; min-height: 44px; }
+.ob-more summary::-webkit-details-marker { display: none; }
+.ob-more[open] summary svg { transform: rotate(90deg); }
+.ob .input { min-height: 48px; font-size: 16px; }
+@media (max-width: 640px) { .ob-form .wrap { padding-left: 12px; padding-right: 12px; } .ob-sec.card { padding: 16px; } .ob-form .page-head h1 { font-size: 24px; } }
 @media (max-width: 640px) {
   .top .nav { display: none; }
   .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: center; gap: 4px;
@@ -2540,7 +2552,7 @@ const editDirty = () => S.ui.edit && JSON.stringify(S.ui.edit) !== JSON.stringif
 function field(id, label, path, value, err, o = {}) {
   const tag = o.area ? `<textarea class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" maxlength="${o.max || 280}" ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>${esc(value)}</textarea>`
     : `<input class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" value="${esc(value)}" ${o.type ? `type="${o.type}"` : ''} ${o.inputmode ? `inputmode="${o.inputmode}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} ${o.exp ? `data-exp="${o.exp}"` : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>`;
-  return `<label class="field" for="${id}"><span>${label}${o.req ? ' <span style="color:var(--error)" aria-hidden="true">*</span>' : ''}${o.pub ? ' · <span class="hint">public</span>' : ''}</span>${tag}${err ? `<span class="err" id="${id}-err">${esc(err)}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
+  return `<label class="field" for="${id}"><span>${label}${o.req ? ' <span class="req-pill">Required</span>' : ''}${o.pub ? ' · <span class="hint">public</span>' : ''}</span>${tag}${err ? `<span class="err" id="${id}-err">${esc(err)}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
 }
 // Personal fields in three groups. Edit profile shows one group per section; the claim form shows all three.
 const fieldsBasics = (base, d, e, pre) => `<div class="fgrid">${field(`${pre}-name`, 'Full name', `${base}.name`, d.name, e.name, { req: true, pub: true, ac: 'name' })}${field(`${pre}-nick`, 'Nickname', `${base}.nick`, d.nick, e.nick, { pub: true, hint: 'Optional' })}</div>${genderSelect(base, d, pre)}`;
@@ -2910,25 +2922,30 @@ function viewClaim(standalone = false) {
   }
   S.ui.fullscreen = true;
   return `<main class="ob ob-form">${obTop(1)}<div class="wrap slim"><div class="page-head"><span class="label">${standalone || viaEmail ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Your details</h1>
-    <p class="muted">${standalone ? (gMode ? 'Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.' : 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.') : gMode ? "Your club filled in what it knows. Check it and change anything that's wrong." : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p>
+    <p class="muted">Check what ${standalone && !viaEmail ? 'you need to fill in' : 'your club filled in'}. Only fields marked <span class="req-pill">Required</span> are needed to continue; the rest can wait.</p>
     <div class="row">${standalone ? '<button type="button" class="btn xs ghost" data-act="regBack">← Other ways to sign up</button>' : '<button type="button" class="btn xs ghost" data-act="claimMethodBack">← Use another Google account</button>'}</div></div>
-    <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
+    <form class="stack ob-details" data-form="${standalone ? 'register' : 'claim'}" novalidate>
       ${standalone && S.ui.registerMatch ? notice('warn', `A ROTRA account or profile already uses this phone number or email. Is it yours?<div class="row"><button type="button" class="btn primary" data-act="go" data-to="login">Yes, sign in</button><button type="button" class="btn" data-act="go" data-to="forgot">Recover account</button><button type="button" class="btn" data-act="registerNo">No, edit my details</button></div><p>If you have not registered yet, ask your club for your profile's registration link. Otherwise contact ROTRA for help.</p>`) : ''}
       ${S.ui.claimFail ? notice('bad', esc(S.ui.claimFail)) : ''}
       ${un ? notice('', `You picked <b>${esc(CLUB_DIR[un.records[gId.pick].club].name)}</b>'s version of you as your starting profile. Change anything that's wrong. Your player ID stays <span class="mono">${esc(un.rtr)}</span>.`) : ''}
       ${viaEmail ? notice('', `<b>Lahug Smash Club already saved a profile with this email.</b> Its details are filled in below. Your player ID stays <span class="mono">${esc(a.rtr)}</span> and your games carry over.`) : ''}
-      <div class="stack tight"><span class="label">Contact · private</span>
-        ${gMode ? `<div class="field"><span>Signs in with</span>${gChip(gId)}<span class="hint">This becomes your ROTRA email. Never shown publicly.</span></div>` : ''}
-        ${a.phone ? `<div class="field"><span>Phone number</span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile and can't be changed here. Not your number? Ask the club or ROTRA for help.</span></div>`
-          : field('cl-phone', 'Phone number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: standalone ? 'Your mobile number. It is never shown publicly.' : 'This profile has no phone yet. Add your mobile number.' })}
-        ${gMode ? '' : `${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'Used for password resets. Never shown publicly.' })}
-        <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span style="color:var(--error)" aria-hidden="true">*</span></label>
+      <section class="card stack ob-sec"><h2 class="ob-sec-h">Needed to continue</h2>
+        ${field('cl-name', 'Full name', 'ui.claim.name', C.name, e.name, { req: true, pub: true, ac: 'name', hint: 'Shows to signed-in ROTRA players on sessions you join.' })}
+        ${gMode ? `<div class="field"><span>Signs in with</span>${gChip(gId)}<span class="hint">This becomes your ROTRA email. Private.</span></div>` : ''}
+        ${a.phone ? `<div class="field"><span>Phone number <span class="hint">· already on file</span></span><input class="input mono" id="cl-phone" value="${esc(maskPhone(a.phone))}" readonly aria-describedby="cl-phone-h"><span class="hint" id="cl-phone-h">Linked to this profile. Not your number? Ask the club or ROTRA.</span></div>`
+          : field('cl-phone', 'Mobile number', 'ui.claim.phone', C.phone, e.phone, { req: true, type: 'tel', inputmode: 'tel', ac: 'tel', ph: '0917 555 0142', hint: 'Private. Never shown publicly.' })}
+        ${gMode ? '' : `${field('cl-email', 'Email', 'ui.claim.email', C.email, e.email, { req: true, type: 'email', ac: 'email', inputmode: 'email', hint: 'For password resets. Private.' })}
+        <div class="field"><label for="cl-pass" style="font-size:13px;font-weight:600;color:var(--fg2)">Password <span class="req-pill">Required</span></label>
           <div class="row nowrap"><input class="input${e.pass ? ' bad' : ''}" id="cl-pass" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass" value="${esc(C.pass)}">
           <button type="button" class="btn sm" data-act="toggleShow" data-k="claim" aria-pressed="${!!C.show}" aria-label="${C.show ? 'Hide passwords' : 'Show passwords'}">${C.show ? 'Hide' : 'Show'}</button></div>${e.pass ? `<span class="err">${esc(e.pass)}</span>` : ''}</div>
-        <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label>`}</div>
-      ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span style="color:var(--error)" aria-hidden="true">*</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
-      <div class="stack" style="padding-top:12px;border-top:1px solid var(--border)"><span class="label">About you</span>${personalFields('ui.claim', C, e, 'cl')}</div>
-      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : 'Continue'}</button></div>
+        <label class="field" for="cl-pass2"><span>Confirm password <span class="req-pill">Required</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label>`}
+        ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span class="req-pill">Required</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
+      </section>
+      <details class="card ob-sec ob-more" ${['nick', 'expY', 'expM', 'since', ...Object.keys(SOCIAL)].some((k) => e[k]) ? 'open' : ''}><summary><span class="stack tight"><b>Optional · add now or later</b><span class="small muted">Nickname, gender, experience and links${standalone && !viaEmail ? '' : ', prefilled from your club'}</span></span>${I.fwd}</summary>
+        <div class="stack" style="gap:16px;padding-top:12px">${field('cl-nick', 'Nickname', 'ui.claim.nick', C.nick, e.nick, { pub: true, hint: 'Optional' })}${genderSelect('ui.claim', C, 'cl')}${fieldsExp('ui.claim', C, e, 'cl')}
+          <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks('ui.claim', C, e, 'cl')}</fieldset>
+          <p class="small muted" style="margin:0">You can change all of these later in Edit profile.</p></div></details>
+      <div class="ob-foot"><div class="ob-foot-in"><span class="small muted">Next: 3 quick questions</span><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : 'Continue'}</button></div></div>
     </form></div></main>`;
 }
 function regLabel() {

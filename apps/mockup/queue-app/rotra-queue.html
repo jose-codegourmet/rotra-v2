@@ -333,6 +333,7 @@ body.court-dragging { cursor: grabbing; }
 .lv-ring { --ring: var(--border-strong); display: inline-flex; border-radius: 50%; }
 .lv-ring.lv-beginner { --ring: var(--lv-beg); } .lv-ring.lv-intermediate { --ring: var(--lv-int); } .lv-ring.lv-advanced { --ring: var(--lv-adv); }
 .lv-ring .avatar { outline: 2px solid var(--ring); outline-offset: 1px; }
+.lb-stack .lv-ring .avatar { outline-width: 3px; }
 .sel-faces .lv-ring + .lv-ring { margin-left: 4px; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
@@ -4942,7 +4943,7 @@ function boardPane(s) {
   return `<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th><th class="n">Win %</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)), lvs = [...new Set(g.rows.map((r) => { const lv = R(s, r.pid); return lvLabel(lv ? lv.level : null); }))]; return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td>
-        <td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map(faceBtn).join('')}</span><div style="min-width:0"><b>${tiedNames(ps.map((p) => p.name))}</b><div class="small muted">${esc(lvs.join(', '))}</div></div></div></td>
+        <td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map((p) => { const r = R(s, p.id); return faceBtn(p).replace('class="face-btn"', `class="face-btn lv-ring lv-${r ? rvBand(r) : 'none'}"`); }).join('')}</span><div style="min-width:0"><b>${tiedNames(ps.map((p) => p.name))}</b><div class="small muted">${esc(lvs.join(', '))}</div></div></div></td>
         <td class="n tnum"><b>${g.w}</b></td><td class="n tnum">${g.l}</td><td class="n tnum">${groupGames(g)}<span class="muted">/${s.minimum}</span></td><td class="n tnum">${g.w + g.l ? Math.round((g.w / (g.w + g.l)) * 100) : 0}%</td></tr>`; }).join('')}
     </tbody></table></div>` : '<div class="card empty">No completed games yet. Standings appear after the first confirmed result.</div>'}`;
 }

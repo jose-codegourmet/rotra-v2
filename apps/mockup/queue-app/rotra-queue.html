@@ -271,10 +271,11 @@ textarea.input { min-height: 80px; resize: vertical; }
 .lh-stack { display: flex; flex-direction: column; gap: 18px; }
 .lh-court { display: flex; flex-direction: column; gap: 10px; }
 .lh-court h3 { margin: 0; font-size: 15px; }
-.lh-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); }
-.lh-row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: start; }
-.lh-time { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-top: 6px; border-right: 2px solid var(--accent); padding-right: 8px; align-self: stretch; }
+.lh-rows { list-style: none; margin: 0; padding: 0 0 8px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; }
+.lh-row { flex: 0 0 min(380px, 86%); display: flex; flex-direction: column; gap: 6px; scroll-snap-align: start; }
+.lh-time { display: flex; align-items: baseline; gap: 6px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
 .lh-time b { font-size: 14px; }
+.lh-time .chip { margin-left: auto; }
 /* Main Queue slide mode (owner artifact comment, November 19, 2026): one row that scrolls sideways and snaps per card, like an
    Embla carousel. An edge fades out (gradient mask) only while there are more cards that way. Grid mode keeps the snake grid. */
 .qview { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); }
@@ -3397,7 +3398,7 @@ function liveHistoryPane(s) {
   const list = played.filter((m) => f === 'all' || m.courts.includes(f)).sort((a, b) => (b.endedAt || 0) - (a.endedAt || 0));
   const inv = played.filter((m) => m.status === 'invalid').length;
   const seg = `<div class="seg" role="group" aria-label="Court">${[['all', `All courts · ${played.length}`], ...s.courts.map((c) => [c.id, `${esc(c.label)} · ${played.filter((m) => m.courts.includes(c.id)).length}`])].map(([k, l]) => `<button type="button" aria-pressed="${f === k}" data-act="lhCourt" data-v="${k}">${l}</button>`).join('')}</div>`;
-  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, court by court, in play order. The start time and length are on the left. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
+  return `<div class="between"><div><h2>Match History</h2><p class="small muted">Tonight's finished matches, court by court. Each court's row starts with the latest match on the left; scroll sideways for earlier ones. Start time and length sit on top of each match. Winners are highlighted.${inv ? ` ${inv} invalid.` : ''}</p></div></div>
     ${seg}
     ${list.length ? lhTimeline(s, list, f) : `<div class="card empty">${played.length ? 'No finished matches on this court yet.' : 'No finished matches yet. They show here after Match done.'}</div>`}`;
 }
@@ -3407,9 +3408,9 @@ function liveHistoryPane(s) {
 function lhTimeline(s, list, f) {
   const cols = f === 'all' ? s.courts : s.courts.filter((c) => c.id === f);
   return `<div class="lh-stack">${cols.map((c) => {
-    const ms = list.filter((m) => m.courts.includes(c.id)).sort((a, b) => a.startedAt - b.startedAt);
+    const ms = list.filter((m) => m.courts.includes(c.id)).sort((a, b) => b.startedAt - a.startedAt); // newest on the left
     return `<section class="lh-court" aria-labelledby="lh-${esc(c.id)}"><div class="between"><h3 id="lh-${esc(c.id)}">${esc(c.label)}</h3><span class="small muted">${ms.length} match${ms.length === 1 ? '' : 'es'}</span></div>
-      ${ms.length ? `<ol class="lh-rows">${ms.map((m) => `<li class="lh-row"><div class="lh-time"><b class="tnum">${fmtTime(m.startedAt).replace(/\s?[AP]M$/i, '')}</b><span class="small muted">${queueTime(Math.max(0, Math.round(((m.endedAt || m.startedAt) - m.startedAt) / 60000)))}</span></div>${historyMatch(s, m)}</li>`).join('')}</ol>` : '<p class="small muted">No finished matches on this court yet.</p>'}</section>`;
+      ${ms.length ? `<ol class="lh-rows">${ms.map((m) => `<li class="lh-row"><div class="lh-time"><b class="tnum">${fmtTime(m.startedAt)}</b><span class="small muted">· ${queueTime(Math.max(0, Math.round(((m.endedAt || m.startedAt) - m.startedAt) / 60000)))}</span>${m === ms[0] ? '<span class="chip ok">Latest</span>' : ''}</div>${historyMatch(s, m)}</li>`).join('')}</ol>` : '<p class="small muted">No finished matches on this court yet.</p>'}</section>`;
   }).join('')}</div>`;
 }
 // Session record tabs. Results is the default; the replay scrubber lives there.

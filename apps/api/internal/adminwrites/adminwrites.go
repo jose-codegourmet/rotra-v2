@@ -41,6 +41,7 @@ type Deps struct {
 
 type server struct {
 	pool   *pgxpool.Pool
+	st     *store.Store
 	auth   *session.Authenticator
 	hasher *password.Hasher
 	log    *slog.Logger
@@ -52,7 +53,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil || d.Hasher == nil {
 		return nil, errors.New("adminwrites: routes need a pool, an authenticator and a password hasher")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, hasher: d.Hasher, log: d.Logger, now: d.Now}
+	s := &server{pool: d.Pool, st: store.New(d.Pool), auth: d.Auth, hasher: d.Hasher, log: d.Logger, now: d.Now}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -70,6 +71,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerClubNames(rt)
 	s.registerClubs(rt)
 	s.registerProfiles(rt)
+	s.registerPlayers(rt)
 }
 
 // stamp is the clock as Prisma writes it: milliseconds, like a JavaScript Date.

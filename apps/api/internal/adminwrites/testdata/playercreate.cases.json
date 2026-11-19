@@ -1,0 +1,3188 @@
+{
+  "now": "2026-11-19T04:00:00.000Z",
+  "app": "admin",
+  "seed": "players.seed.sql",
+  "scenarios": {
+    "base": []
+  },
+  "snapshot": [
+    {
+      "name": "players",
+      "sql": "SELECT id, full_name, nickname, avatar_ref, avatar_previous_ref, profile_state, hide_phone_from_clubs, profile_visibility, show_profile_stats, banner_id, experience_months, experience_recorded_at, personal_details, details_version, updated_at, revision::text AS revision, verification_override, verification_override_by, verification_override_at FROM players ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "player_private_contacts",
+      "sql": "SELECT player_id, phone_e164, email, phone_verified_at, email_verified_at, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_accounts",
+      "sql": "SELECT player_id, contact_sync_status, contact_sync_version::text AS contact_sync_version, disabled_at, google_email, verification_reminder_read_at, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_social_links",
+      "sql": "SELECT player_id, provider, url, updated_at FROM player_social_links ORDER BY player_id, provider",
+      "redact": []
+    },
+    {
+      "name": "player_id_allocations",
+      "sql": "SELECT player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date::text AS sync_date, sequence FROM player_id_allocations ORDER BY player_id",
+      "redact": []
+    },
+    {
+      "name": "player_id_counters",
+      "sql": "SELECT location_code_id, sync_date::text AS sync_date, last_sequence FROM player_id_counters ORDER BY location_code_id, sync_date",
+      "redact": []
+    },
+    {
+      "name": "shared_player_entries",
+      "sql": "SELECT id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date::text AS sync_date, sequence, claimed_player_id, retired_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "club_players",
+      "sql": "SELECT id, club_id, player_id, shared_entry_id, display_name, nickname, added_at, removed_at, updated_at, revision::text AS revision, EXISTS (SELECT 1 FROM admin_audit_events a WHERE a.action = 'player.created' AND a.target_id = club_players.id::text) AS audited, EXISTS (SELECT 1 FROM club_player_private_inputs i WHERE i.club_player_id = club_players.id AND i.club_id = club_players.club_id) AS has_input FROM club_players ORDER BY club_id, display_name, added_at, id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "club_player_private_inputs",
+      "sql": "SELECT club_player_id, club_id, phone_e164, email, preset_fields, captured_at, state, resolved_player_id, resolved_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_id, phone_e164, captured_at, club_player_id",
+      "redact": [
+        "club_player_id"
+      ]
+    },
+    {
+      "name": "player_contact_change_requests",
+      "sql": "SELECT id, player_id, field, status, proposed_value, reviewed_by_admin_id, reviewed_at, rejected_at, superseded_at, resolution_note, updated_at, revision::text AS revision FROM player_contact_change_requests ORDER BY id",
+      "redact": []
+    },
+    {
+      "name": "admin_player_email_edits",
+      "sql": "SELECT id, player_id, admin_id, original_email, proposed_email, contact_revision::text AS contact_revision, state, updated_at FROM admin_player_email_edits ORDER BY player_id, proposed_email, state, id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "admin_audit_events",
+      "sql": "SELECT id, actor_admin_id, action, target_type, target_id, source_command_id, occurred_at, metadata - 'operationId' AS metadata, (metadata ? 'operationId') AS has_operation FROM admin_audit_events ORDER BY action, occurred_at, metadata::text, target_id",
+      "redact": [
+        "id"
+      ]
+    },
+    {
+      "name": "audit_operations",
+      "sql": "SELECT count(*) AS events, count(DISTINCT metadata->>'operationId') AS operations FROM admin_audit_events WHERE metadata ? 'operationId'",
+      "redact": []
+    },
+    {
+      "name": "player_notifications",
+      "sql": "SELECT id, player_id, kind, title, body, target, source_type, (source_id IN (SELECT id FROM admin_audit_events)) AS source_is_audit, read_at FROM player_notifications ORDER BY player_id, kind, source_type, title",
+      "redact": [
+        "id"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "guard_no_session_add",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": null,
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "guard_former_admin_add",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000003",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "guard_unknown_subject_add",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-0000000000ff",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "goExpects": {
+            "status": 401,
+            "code": "unauthenticated"
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "guard_beats_a_bad_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": null,
+          "rawBody": "not json"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_with_a_phone_only",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_by_the_second_admin",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000002",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_with_a_nickname_and_an_email",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "Nin",
+            "phone": "0917 555 0199",
+            "email": "nina@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_trims_the_name_and_the_nickname",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "  Nina   Park \n",
+            "nickname": "  Nin\t",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_lowercases_the_email",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "  Nina.Park+Club@Example.TEST ",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_an_email_in_the_private_input_only_may_repeat",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "una@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_in_manila",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "MNL",
+            "clubId": "c9000000-0000-4000-8000-000000000002",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_in_davao",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "DVO",
+            "clubId": "c9000000-0000-4000-8000-000000000003",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_to_a_club_with_no_account",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000004",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_ignores_allow_duplicate",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": true
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_ignores_unknown_fields",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false,
+            "rtrId": "RTR-PH-CEB-102926-0099",
+            "playerId": "d4000000-0000-4000-8000-000000000001"
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_unicode_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Zoë Ångström 😀",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_name_of_60_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_nickname_of_60_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_number_of_a_removed_record_is_free",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550923",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_number_of_a_record_of_another_club_is_free",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550912",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_two_players_in_one_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Omar Diaz",
+            "nickname": "",
+            "phone": "0917 555 0198",
+            "email": "omar@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_plus_63",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+63 917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_63",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "639175550199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_hyphens",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917-555-0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_e164",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_padded",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "  09175550199  ",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_same_number_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Other Nina",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_same_number_in_another_form_twice",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Other Nina",
+            "nickname": "",
+            "phone": "+63 917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_number_a_club_record_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0921",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_number_a_club_record_has_in_the_other_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550912",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_number_a_registered_player_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0001",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_number_an_unclaimed_player_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550004",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_an_email_a_registered_player_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "alice@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_an_email_in_another_case_a_registered_player_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "BOB@Example.Test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_an_email_an_unclaimed_player_has",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "dan@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_number_registered_comes_before_the_saved_one",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550001",
+            "email": "dan@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_registered_email_beats_the_saved_number",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550921",
+            "email": "alice@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_place_is_not_the_clubs",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "MNL",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_place_is_not_the_clubs_in_davao",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000003",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_a_place_from_the_list_but_not_the_clubs",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "TAG",
+            "clubId": "c9000000-0000-4000-8000-000000000002",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_place_is_checked_before_the_phone",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+639175550001",
+            "email": "",
+            "place": "MNL",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_unknown_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-0000000000ff",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_club_id_is_not_a_uuid",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "not-a-club",
+            "allowDuplicate": false
+          },
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          },
+          "allow500": true
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_club_id_in_upper_case",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "C9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_club_id_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_club_id_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "  ",
+            "allowDuplicate": false
+          },
+          "goExpects": {
+            "status": 422,
+            "code": "invalid"
+          },
+          "allow500": true
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_club_comes_before_the_phone",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "",
+            "email": "",
+            "place": "CEB",
+            "clubId": "",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_empty_with_an_unknown_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-0000000000ff",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "   ",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_short_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 019",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_long_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 01999",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_no_zero_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_us_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "+1 917 555 0142",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_letters_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0O99",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_landline_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "02 8555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_dots_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917.555.0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_plus_in_the_middle_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "09+175550199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_no_at_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nina.example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_no_domain_dot_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nina@example",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_spaces_inside_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "ni na@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_two_ats_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "a@b@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_trailing_dot_domain_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nina@example.",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_leading_dot_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": ".nina@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_double_dot_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "ni..na@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_tld_of_one_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nina@example.t",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_unicode_local_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nín@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_with_an_apostrophe_and_a_plus",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "o'neil+club@example.test",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_of_a_subdomain",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "nina@mail.example.co.ph",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_lower_case_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "ceb",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_unknown_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "XYZ",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_empty_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_padded_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": " CEB ",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_number_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": 1,
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_null_is_refused",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": null,
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_spaces",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "   ",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_61_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_a_non_breaking_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": " ",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_zero_width_space_is_not_white_space",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "​",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_61_characters_after_trimming_is_60",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": " nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn ",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_60_emoji",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_61_emoji",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_spaces_is_refused_as_an_email",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "   ",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_30_emoji",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_nickname_of_61_characters",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_nickname_spaces_is_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "   ",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          },
+          "redact": [
+            "player.id"
+          ]
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_name",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_nickname",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_phone",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_email",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_place",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_clubId",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_missing_allowDuplicate",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001"
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": 5,
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": null,
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_the_wrong_type_list",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": [
+              "x"
+            ],
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_nickname_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": 5,
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_nickname_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": null,
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": 917,
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": null,
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_phone_of_the_wrong_type_bool",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": true,
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": 5,
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_email_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": null,
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_clubId_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": 5,
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_clubId_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": null,
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_allowDuplicate_of_the_wrong_type_str",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": "no"
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_allowDuplicate_of_the_wrong_type_NoneType",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": null
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_allowDuplicate_of_the_wrong_type_int",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": 0
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_place_of_the_wrong_type_dict",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "Nina Park",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": {},
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_name_of_the_wrong_type_dict",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": {
+              "a": 1
+            },
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_everything_wrong_names_the_first_message_of_each_field",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "",
+            "nickname": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "phone": "x",
+            "email": "x",
+            "place": "x",
+            "clubId": 1,
+            "allowDuplicate": 1
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_the_schema_is_checked_before_the_club",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "name": "",
+            "nickname": "",
+            "phone": "0917 555 0199",
+            "email": "",
+            "place": "CEB",
+            "clubId": "",
+            "allowDuplicate": false
+          }
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_empty",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": ""
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_not_json",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "not json"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_array",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "[]"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_null",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "null"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_string",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "\"x\""
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_body_trailing_text",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "rawBody": "{} x"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    },
+    {
+      "name": "add_no_body",
+      "scenario": "base",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/players",
+          "who": "ad100000-0000-4000-8000-000000000001"
+        }
+      ],
+      "redact": {
+        "admin_audit_events": [
+          "target_id"
+        ]
+      }
+    }
+  ]
+}

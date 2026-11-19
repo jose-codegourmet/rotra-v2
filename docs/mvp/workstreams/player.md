@@ -71,6 +71,7 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
 - [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
 - [D-2026-11-19-10](../decisions.md#d-2026-11-19-10) — Home for signed-in players (current session, upcoming sessions, clubs, stats).
+- [D-2026-11-19-11](../decisions.md#d-2026-11-19-11) — fullscreen onboarding after an invite link; where you play, shots, favorite player.
 
 ## Blocking open decisions
 

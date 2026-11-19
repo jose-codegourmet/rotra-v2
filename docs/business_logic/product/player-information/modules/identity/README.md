@@ -67,11 +67,13 @@ Registration includes:
 - Email; **required**.
 - Optional Facebook identity/link, potentially preset by the operator.
 - Optional Instagram, YouTube, and LinkedIn links.
-- Getting-to-know information such as playing style.
+- Getting-to-know answers, all **optional** and public ([D-2026-11-19-11](../../../../../mvp/decisions.md#d-2026-11-19-11)): **where you play** (one of Front court, Back court, All-round), **shots you know** (any of a fixed list: Netting, Smash, Jump smash, Drop, Slice, Clear, Drive, Lift, Net kill, Push, Block, Backhand clear) and **favorite badminton player** (one of a fixed list of professionals, or Others with a typed name, 40 characters at most). They replace the free-text playing style.
 - Optional playing experience, entered as years + months or as **playing since** (month, year); either fills the other, and it is kept as playing since so it stays current (owner, November 8, 2026).
 - **Registration prefill (owner, November 8, 2026):** the registration form starts from what the club entered (name, nickname, email, playing style, experience, links); the player can change any of it and sets a password. A profile with no phone on file asks the player for one at registration; a number already on another profile is refused.
 
-Experience can inform the initial operator assessment but is not automatic ranking credit. The exact playing-style field list and social-link visibility are open.
+Experience can inform the initial operator assessment but is not automatic ranking credit. The getting-to-know field list is settled ([D-2026-11-19-11](../../../../../mvp/decisions.md#d-2026-11-19-11)); social-link visibility is open.
+
+**Onboarding after an invite link (owner, November 19, 2026; [D-2026-11-19-11](../../../../../mvp/decisions.md#d-2026-11-19-11)):** a player who accepts the club-created profile's registration link or a session game link registers through a fullscreen onboarding of four steps: their details (the registration form, prefilled from what the club saved; required), then where they play, shots they know and favorite player (each skippable). The account is created when the details are sent, so leaving afterwards keeps it; skipped answers can be added later in Edit profile.
 
 ## Login and recovery
 

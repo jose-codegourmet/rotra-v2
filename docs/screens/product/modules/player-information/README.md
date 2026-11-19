@@ -4,7 +4,7 @@
 
 | Module | Surfaces |
 |---|---|
-| [Access and registration](access-registration.md) | Google sign-in (mandatory), email login for password accounts, club and session invite landings, operator-issued profile claim, email password recovery |
+| [Access and registration](access-registration.md) | Google sign-in (mandatory), email login for password accounts, club and session invite landings, operator-issued profile claim, fullscreen onboarding after an invite link (P-ONBOARD), email password recovery |
 | [Profile](profile.md) | Signed-in Home (P-HOME), public identity, own profile, permitted personal editing |
 | [Identity and privacy](identity-privacy.md) | RTR ID/QR, profile visibility (Public · Private · Always private), Hide from Player Information, hidden phone, approved contact-change request, sign-in methods, account verification (P-VERIFICATION) |
 | [Notifications](notifications.md) | Bell and notifications page (P-NOTIFICATIONS), ROTRA announcements |
@@ -36,4 +36,4 @@ Layout and copy choices it makes, recorded here as **proposals** (the business r
 | P-CONTACT-REQUEST | Phone input mask: once the field holds only phone characters, digits are grouped as typed (`0917 555 0142`, `+63 917 555 0142`). Email text is left as typed. The mask is display only; normalization still follows the identity rules. |
 | P-CLAIM | Registration form prefilled from the club's details, all editable; phone typable only when the profile has none (November 8, 2026). Two steps: **Is this you?** (name, nickname, RTR ID, email partly hidden as `j•••••@example.com`; a masked phone before November 16, 2026, [D-2026-11-16-04](../../../../mvp/decisions.md#d-2026-11-16-04)) with **Yes, this is me** / **This isn't me**, then the registration form. The preset phone is read-only with a help hint. No password minimum is set; the confirmation must match. |
 
-Placeholders for decisions that remain open (see [open decisions](../../open-decisions.md)): links are shown publicly; playing style is free text; fun and partial games appear in a separate history tab; the eligibility window is described only as "the last three months". The prototype's **Prototype** button, timers and fictional data are not product features.
+Placeholders for decisions that remain open (see [open decisions](../../open-decisions.md)): links are shown publicly; fun and partial games appear in a separate history tab; the eligibility window is described only as "the last three months". The prototype's **Prototype** button, timers and fictional data are not product features.

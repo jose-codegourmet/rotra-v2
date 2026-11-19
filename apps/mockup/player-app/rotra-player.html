@@ -361,6 +361,26 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
    notifications and light/dark mode button on the top right". Phones get a bottom dock; the top bar keeps the logo, bell,
    theme switch (and the prototype button). */
 .dock { display: none; }
+/* P-ONBOARD: fullscreen steps after an invite link (owner, November 19, 2026). No top bar or dock. */
+.ob { min-height: 100dvh; display: flex; flex-direction: column; }
+.ob-top { position: sticky; top: 0; z-index: 5; display: flex; flex-direction: column; gap: 10px; padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.ob-brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(640px, 100%); margin: 0 auto; }
+.ob-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: min(640px, 100%); margin: 0 auto; }
+.ob-bar i { height: 4px; border-radius: 4px; background: var(--border-strong); }
+.ob-bar i.on { background: var(--accent); }
+.ob-in { flex: 1; width: min(640px, 100%); margin: 0 auto; padding: 32px 16px 120px; display: flex; flex-direction: column; gap: 20px; }
+.ob-in h1 { font-size: 26px; }
+.ob-foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.ob-foot-in { width: min(640px, 100%); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ob-opts { display: grid; gap: 10px; }
+.ob-opt { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; padding: 16px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font: inherit; cursor: pointer; }
+.ob-opt b { font-size: 16px; }
+.ob-opt[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-subtle); }
+.ob-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ob-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font: inherit; font-weight: 600; cursor: pointer; }
+.ob-chip svg { width: 14px; height: 14px; }
+.ob-chip[aria-checked="true"] { border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); }
+.ob-form .wrap { padding-top: 24px; padding-bottom: 48px; }
 @media (max-width: 640px) {
   .top .nav { display: none; }
   .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: center; gap: 4px;
@@ -1329,7 +1349,7 @@ const seedClubs = () => [{ id: 'c1', via: 'club_link' }, { id: 'c2', via: 'added
 function seedAccounts() {
   return {
     u1: { id: 'u1', name: 'Miguel Santos', nick: 'Migs', rtr: 'RTR-PH-CEB-031526-0001', phone: '+639175550142', email: 'migs.santos@example.com', phoneHidden: true, profilePrivate: false, claimed: true, photo: true, emailConfirmed: true, clubs: seedClubs(),
-      style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', expY: '4', expM: '6',
+      style: 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.', courtPos: 'front', skills: ['netting', 'drive', 'netkill', 'drop'], fav: 'lcw', favOther: '', expY: '4', expM: '6',
       social: { facebook: 'https://facebook.com/migs.santos.badminton', instagram: 'https://instagram.com/migs.smash', youtube: '', linkedin: '' }, level: 5 },
     u2: { id: 'u2', name: 'Jomar dela Cruz', nick: 'Jom', rtr: 'RTR-PH-CEB-040226-0007', phone: '+639185550377', email: 'jomar.dc@example.com', phoneHidden: false, profilePrivate: false, claimed: false, photo: false,
       style: '', expY: '', expM: '', social: { facebook: 'https://facebook.com/jomar.dc', instagram: '', youtube: '', linkedin: '' }, level: 3 },
@@ -1902,7 +1922,7 @@ function viewProfile() {
   const st = rankStatus(p, pos);
   const games = p.sessions.flatMap((s) => s.games.filter((g) => g.kind === 'counted').map((g) => ({ g, s })));
   const links = Object.entries(p.social || {}).filter(([, v]) => v);
-  const missing = own && (!p.style || !p.expY);
+  const missing = own && (!p.courtPos || !p.expY);
   return `<main class="wrap"><div class="prof">
     <aside class="side stack">
       <section class="card hero p-hero">
@@ -1928,7 +1948,9 @@ function viewProfile() {
       ${recentGamesCard(p)}
       <section class="card stack"><h2>About</h2>
         ${p.gender || own ? `<div class="stack tight"><span class="label">Gender</span><p>${p.gender ? GENDER_LABEL[p.gender] : '<span class="muted">Not added</span>'}</p></div>` : ''}
-        <div class="stack tight"><span class="label">Playing style</span><p>${p.style ? esc(p.style) : `<span class="muted">${own ? 'You haven\'t' : 'This player hasn\'t'} added a playing style yet.</span>`}</p></div>
+        <div class="stack tight"><span class="label">Where they play</span><p>${p.courtPos ? esc(courtLabel(p.courtPos)) : `<span class="muted">${own ? 'You haven\'t' : 'This player hasn\'t'} added this yet.</span>`}</p></div>
+        ${(p.skills || []).length ? `<div class="stack tight"><span class="label">Shots</span><div class="row" style="gap:6px">${p.skills.map((k) => chip(esc((SKILLS.find(([x]) => x === k) || [k, k])[1]))).join('')}</div></div>` : ''}
+        ${favLabel(p) ? `<div class="stack tight"><span class="label">Favorite player</span><p>${esc(favLabel(p))}</p></div>` : ''}
         <div class="stack tight"><span class="label">Experience</span><p>${expText(p) || '<span class="muted">Not added</span>'}</p>${expText(p) ? '<span class="hint">Self-reported. Clubs may use it for a first assessment; it doesn\'t add rank points.</span>' : ''}</div>
         ${links.length ? `<div class="stack tight"><span class="label">Links</span><div class="links">${links.map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener noreferrer">${I.ext}<span>${esc(v.replace(/^https?:\/\/(www\.)?/, ''))}</span><small>${SOCIAL[k].label}</small></a>`).join('')}</div></div>` : ''}
       </section>
@@ -2513,7 +2535,7 @@ function viewAccount() {
 }
 
 // ---------- P-EDIT-PROFILE ----------
-const editFields = (p) => ({ name: p.name, nick: p.nick || '', gender: p.gender || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', sinceM: p.sinceM ?? '', sinceY: p.sinceY ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
+const editFields = (p) => ({ name: p.name, nick: p.nick || '', gender: p.gender || '', style: p.style || '', courtPos: p.courtPos || '', skills: [...(p.skills || [])], fav: p.fav || '', favOther: p.favOther || '', expY: p.expY ?? '', expM: p.expM ?? '', sinceM: p.sinceM ?? '', sinceY: p.sinceY ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
 const editDirty = () => S.ui.edit && JSON.stringify(S.ui.edit) !== JSON.stringify(S.ui.editOrig);
 function field(id, label, path, value, err, o = {}) {
   const tag = o.area ? `<textarea class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" maxlength="${o.max || 280}" ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>${esc(value)}</textarea>`
@@ -2527,7 +2549,23 @@ const GENDER_LABEL = { male: 'Male', female: 'Female' };
 const genderSelect = (base, d, pre) => `<label class="field" for="${pre}-gender"><span>Gender · <span class="hint">public</span></span><select class="input" id="${pre}-gender" data-bind="${base}.gender">
     <option value="" ${d.gender ? '' : 'selected'}>Not added yet</option><option value="male" ${d.gender === 'male' ? 'selected' : ''}>Male</option><option value="female" ${d.gender === 'female' ? 'selected' : ''}>Female</option></select>
     <span class="hint">Optional for now. Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless.</span></label>`;
-const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style', `${base}.style`, d.style, e.style, { area: true, pub: true, hint: 'Optional. How you play, in a sentence or two.' })}
+// Play style, skills and favorite player (owner, November 19, 2026): asked in the onboarding after an invite link, public on
+// the profile, editable in Edit profile › Playing style. They replace the free-text Playing style. All optional.
+const COURT_POS = [['front', 'Front court', 'Net play, pushes and quick kills at the front.'], ['back', 'Back court', 'Clears, smashes and drops from the back.'], ['all', 'All-round', 'Comfortable anywhere on court.']];
+const SKILLS = [['netting', 'Netting'], ['smash', 'Smash'], ['jump', 'Jump smash'], ['drop', 'Drop'], ['slice', 'Slice'], ['clear', 'Clear'], ['drive', 'Drive'], ['lift', 'Lift'], ['netkill', 'Net kill'], ['push', 'Push'], ['block', 'Block'], ['backhand', 'Backhand clear']];
+const FAV_PLAYERS = [['lindan', 'Lin Dan'], ['lcw', 'Lee Chong Wei'], ['axelsen', 'Viktor Axelsen'], ['momota', 'Kento Momota'], ['taufik', 'Taufik Hidayat'], ['chenlong', 'Chen Long'], ['marin', 'Carolina Marín'], ['tty', 'Tai Tzu-ying'], ['anseyoung', 'An Se-young'], ['other', 'Others']];
+const gameOf = (d) => ({ courtPos: d.courtPos || '', skills: [...(d.skills || [])], fav: d.fav || '', favOther: d.fav === 'other' ? String(d.favOther || '').trim() : '' });
+const courtLabel = (k) => (COURT_POS.find(([x]) => x === k) || [])[1] || '';
+const favLabel = (p) => (p.fav === 'other' ? p.favOther : (FAV_PLAYERS.find(([x]) => x === p.fav) || [])[1]) || '';
+const pickCourt = (base, d) => `<div class="ob-opts" role="radiogroup" aria-label="Where you play">${COURT_POS.map(([k, l, t]) => `<button type="button" class="ob-opt" role="radio" aria-checked="${d.courtPos === k}" data-act="pickSet" data-path="${base}.courtPos" data-v="${k}"><b>${l}</b><span class="small muted">${t}</span></button>`).join('')}</div>`;
+const pickSkills = (base, d) => `<div class="ob-chips" role="group" aria-label="Shots you know">${SKILLS.map(([k, l]) => `<button type="button" class="ob-chip" role="checkbox" aria-checked="${(d.skills || []).includes(k)}" data-act="pickToggle" data-path="${base}.skills" data-v="${k}">${(d.skills || []).includes(k) ? I.check : ''}${l}</button>`).join('')}</div>`;
+const pickFav = (base, d, e, pre) => `<div class="ob-chips" role="radiogroup" aria-label="Favorite badminton player">${FAV_PLAYERS.map(([k, l]) => `<button type="button" class="ob-chip" role="radio" aria-checked="${d.fav === k}" data-act="pickSet" data-path="${base}.fav" data-v="${k}">${d.fav === k ? I.check : ''}${l}</button>`).join('')}</div>
+    ${d.fav === 'other' ? field(`${pre}-favOther`, 'Player\'s name', `${base}.favOther`, d.favOther || '', e.favOther, { req: true, ph: 'Who do you look up to?' }) : ''}`;
+const fieldsPicks = (base, d, e, pre) => `<div class="field"><span>Where you play · <span class="hint">public</span></span>${pickCourt(base, d)}</div>
+    <div class="field"><span>Shots you know · <span class="hint">public</span></span>${pickSkills(base, d)}<span class="hint">Pick all that apply.</span></div>
+    <div class="field"><span>Favorite badminton player · <span class="hint">public</span></span>${pickFav(base, d, e, pre)}</div>`;
+const fieldsGame = (base, d, e, pre) => `${fieldsPicks(base, d, e, pre)}${fieldsExp(base, d, e, pre)}`;
+const fieldsExp = (base, d, e, pre) => `
     <div class="field"><span>Experience · <span class="hint">public</span></span><div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
       ${field(`${pre}-expY`, 'Years', `${base}.expY`, d.expY, e.expY, { inputmode: 'numeric', ph: '0', exp: pre })}${field(`${pre}-expM`, 'Months', `${base}.expM`, d.expM, e.expM, { inputmode: 'numeric', ph: '0', exp: pre })}</div>
       <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><label class="field" for="${pre}-sinceM"><span>Playing since</span><select class="input" id="${pre}-sinceM" data-bind="${base}.sinceM" data-exp="${pre}"><option value="">Month</option>${MONTH_NAMES.map((n, i) => `<option value="${i + 1}" ${String(d.sinceM) === String(i + 1) ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
@@ -2536,7 +2574,7 @@ const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style'
 const fieldsLinks = (base, d, e, pre) => `<p class="hint">Optional. Links describe you to others; you can't sign in with them. Whether links are public is still being decided.</p>
     <div class="stack">${Object.entries(SOCIAL).map(([k, s]) => field(`${pre}-${k}`, s.label, `${base}.${k}`, d[k], e[k], { type: 'url', ph: s.eg, inputmode: 'url' })).join('')}</div>`;
 function personalFields(base, d, e, pre) {
-  return `${fieldsBasics(base, d, e, pre)}${fieldsGame(base, d, e, pre)}
+  return `${fieldsBasics(base, d, e, pre)}${fieldsExp(base, d, e, pre)}
     <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="label" style="margin-bottom:8px">Links</legend>${fieldsLinks(base, d, e, pre)}</fieldset>`;
 }
 // Edit profile sections: a menu on the left on wide screens, tabs across the top on phones. All sections share
@@ -2548,7 +2586,7 @@ const DEFAULT_BANNER = 'court';
 const bannerOf = (p) => BANNERS.some(([k]) => k === p.banner) ? p.banner : DEFAULT_BANNER;
 const EDIT_TABS = [
   { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick', 'gender'], body: fieldsBasics },
-  { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM', 'sinceM', 'sinceY'], body: fieldsGame },
+  { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['courtPos', 'skills', 'fav', 'favOther', 'expY', 'expM', 'sinceM', 'sinceY'], body: fieldsGame },
   { id: 'links', label: 'Links', intro: 'Social pages shown on your profile.', keys: Object.keys(SOCIAL), body: fieldsLinks },
   { id: 'account', label: 'Account', intro: 'Private details you sign in with, and your permanent player ID.', keys: [] },
 ];
@@ -2870,7 +2908,8 @@ function viewClaim(standalone = false) {
         <button class="btn ghost block" data-act="openNoGoogle">I don't have a Google account</button>
         <p class="small muted" style="margin:0">Your Google email becomes your ROTRA email and is already confirmed.</p></section>`);
   }
-  return `<main class="wrap slim"><div class="page-head"><span class="label">${standalone || viaEmail ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Finish registering</h1>
+  S.ui.fullscreen = true;
+  return `<main class="ob ob-form">${obTop(1)}<div class="wrap slim"><div class="page-head"><span class="label">${standalone || viaEmail ? esc(regLabel()) : 'Registration link from Lahug Smash Club'}</span><h1>Your details</h1>
     <p class="muted">${standalone ? (gMode ? 'Your Google account is connected. Add your mobile number to finish. Your full name shows to signed-in ROTRA players on sessions you join.' : 'Create your ROTRA account with your phone and email. Your full name shows to signed-in ROTRA players on sessions you join.') : gMode ? "Your club filled in what it knows. Check it and change anything that's wrong." : "Your club filled in what it knows. Check it, change anything that's wrong, and choose a password."}</p>
     <div class="row">${standalone ? '<button type="button" class="btn xs ghost" data-act="regBack">← Other ways to sign up</button>' : '<button type="button" class="btn xs ghost" data-act="claimMethodBack">← Use another Google account</button>'}</div></div>
     <form class="card stack" data-form="${standalone ? 'register' : 'claim'}" novalidate style="gap:16px">
@@ -2889,8 +2928,8 @@ function viewClaim(standalone = false) {
         <label class="field" for="cl-pass2"><span>Confirm password <span style="color:var(--error)" aria-hidden="true">*</span></span><input class="input${e.pass2 ? ' bad' : ''}" id="cl-pass2" type="${C.show ? 'text' : 'password'}" autocomplete="new-password" data-bind="ui.claim.pass2" value="${esc(C.pass2)}">${e.pass2 ? `<span class="err">${esc(e.pass2)}</span>` : ''}</label>`}</div>
       ${adminLink ? `<label class="field" for="cl-city"><span>City or province <span style="color:var(--error)" aria-hidden="true">*</span></span><select class="input${e.city ? ' bad' : ''}" id="cl-city" data-bind="ui.claim.city" ${e.city ? 'aria-invalid="true" aria-describedby="cl-city-err"' : ''}><option value="">Choose one</option>${PLACES.map(([c, n]) => `<option value="${c}" ${C.city === c ? 'selected' : ''}>${n}</option>`).join('')}</select>${e.city ? `<span class="err" id="cl-city-err">${esc(e.city)}</span>` : '<span class="hint">Used in your player ID.</span>'}</label>` : ''}
       <div class="stack" style="padding-top:12px;border-top:1px solid var(--border)"><span class="label">About you</span>${personalFields('ui.claim', C, e, 'cl')}</div>
-      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : standalone ? 'Create account' : 'Complete registration'}</button></div>
-    </form></main>`;
+      <div class="row end"><button class="btn primary" type="submit" ${S.ui.claimPending ? 'disabled' : ''}>${S.ui.claimPending ? (standalone ? 'Creating…' : 'Completing…') : 'Continue'}</button></div>
+    </form></div></main>`;
 }
 function regLabel() {
   const x = S.ui.regCtx, club = x.club && CLUB_DIR[x.club], ses = x.session && SESSION_DIR[x.session];
@@ -2920,6 +2959,39 @@ function viewJoinClub() {
       ${already ? notice('', `You're already in ${esc(club.name)}.`) : ''}
       <div class="row">${already ? `<button class="btn primary" data-act="openProfile" data-id="${a.id}">Go to my profile</button>` : `<button class="btn primary" data-act="joinClub">Join ${esc(club.name)}</button><button class="btn" data-act="openProfile" data-id="${a.id}">Not now</button>`}</div>
     </section></main>`;
+}
+// ---------- P-ONBOARD (owner, November 19, 2026) ----------
+// After a player accepts an invite link (the club-created profile's registration link, or a session game link), registering is a
+// fullscreen, four-step onboarding: 1 Your details (the registration form, prefilled from what the club saved), 2 Where you play,
+// 3 Shots you know, 4 Favorite badminton player. Details are required; steps 2 to 4 each have Skip and can be changed later in
+// Edit profile. The account is created when step 1 is sent, so leaving after it keeps the account.
+function startOnboard(id, next) {
+  const a = S.accounts[id];
+  S.ui.ob = { id, next, step: 1, err: '', d: { courtPos: a.courtPos || '', skills: [...(a.skills || [])], fav: a.fav || '', favOther: a.favOther || '' } };
+  S.screen = 'onboard'; S.ui.sheet = null; render(); window.scrollTo(0, 0);
+}
+function finishOnboard() {
+  const o = S.ui.ob, a = S.accounts[o.id];
+  Object.assign(a, gameOf(o.d));
+  S.ui.ob = null; go(o.next);
+}
+const OB_STEPS = ['Your details', 'Where you play', 'Shots you know', 'Favorite player'];
+const obTop = (n) => `<div class="ob-top"><div class="ob-brand">${rotraLogo('resp', 'brand-logo')}<span class="small muted">Step ${n} of 4 · ${OB_STEPS[n - 1]}</span></div>
+  <div class="ob-bar" role="progressbar" aria-label="Onboarding" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${n}">${OB_STEPS.map((_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div></div>`;
+function viewOnboard() {
+  const o = S.ui.ob, a = o && S.accounts[o.id];
+  if (!a) return viewBoard();
+  S.ui.fullscreen = true;
+  const base = 'ui.ob.d', d = o.d;
+  const Q = [
+    ['How do you play, ' + esc(firstName(a)) + '?', 'Pick where you\'re most at home on court.', pickCourt(base, d)],
+    ['Which shots do you have?', 'Pick all that apply. Clubs see these when they plan matches.', pickSkills(base, d)],
+    ['Who\'s your favorite badminton player?', 'Pick one, or choose Others and type a name.', pickFav(base, d, { favOther: o.err }, 'ob')],
+  ][o.step - 1];
+  return `<main class="ob">${obTop(o.step + 1)}
+    <div class="ob-in"><div class="stack tight"><h1>${Q[0]}</h1><p class="muted">${Q[1]}</p></div>${Q[2]}<p class="small muted">Shows on your public profile. You can change it any time in Edit profile.</p></div>
+    <div class="ob-foot"><div class="ob-foot-in">${o.step > 1 ? '<button type="button" class="btn ghost" data-act="obBack">Back</button>' : '<span></span>'}
+      <div class="row" style="gap:8px"><button type="button" class="btn ghost" data-act="obSkip">Skip</button><button type="button" class="btn primary" data-act="obNext">${o.step === 3 ? 'Finish' : 'Continue'}</button></div></div></div></main>`;
 }
 function viewClaimDone() {
   const p = profileOf('u2');
@@ -3656,6 +3728,7 @@ const SHEETS = {
         ${r.status === 'applying' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Finish applying</button><button class="btn xs" data-act="reqAdvance" data-v="failed">Applying fails</button>' : ''}
         ${r.status === 'failed' ? '<button class="btn xs" data-act="reqAdvance" data-v="applied">Retry succeeds</button>' : ''}</div>`;
     return sheetWrap('Prototype', `<p class="small muted">Try the states the Player Information app has to handle. None of these controls are part of the real app.</p>
+      <div class="demo-sec"><span class="label">Invite links and onboarding (November 19, 2026)</span><div class="row"><button class="btn xs primary" data-act="openClaim" data-v="valid">Account created by the QM (Jomar)</button><button class="btn xs primary" data-act="openRegister" data-club="c1" data-session="s-thu-open" data-invite="k7m2">Session game link (new player)</button></div><p class="small muted">Accept the link, then the fullscreen onboarding: your details (prefilled), where you play, shots you know, favorite player.</p></div>
       <div class="demo-sec"><span class="label">New design: Google sign-in and invites</span>
         <div class="row"><button class="btn xs" data-act="demoLogin">Sign-in page</button><button class="btn xs" data-act="openRegister" data-club="c1">Club invite</button><button class="btn xs" data-act="openRegister" data-club="c1" data-session="s-thu-open" data-invite="k7m2">Session invite (from Migs)</button><button class="btn xs" data-act="openRegister">Admin link</button></div>
         <span class="label">Signed in as Migs</span><div class="row"><button class="btn xs" data-act="openJoin" data-club="c3">Club invite</button><button class="btn xs" data-act="openJoin" data-club="c3" data-session="s-sat-doubles" data-invite="p4x9">Session invite (from Kat)</button><button class="btn xs" data-act="openJoin" data-club="c2" data-session="s-fri-smash">Session he's waitlisted for</button></div>
@@ -3722,6 +3795,8 @@ function validatePersonal(d) {
   if (!d.name.trim()) e.name = 'Enter your full name.';
   else if (d.name.trim().length > 60) e.name = 'Keep your name to 60 characters or fewer.';
   if (d.nick.trim().length > 24) e.nick = 'Keep your nickname to 24 characters or fewer.';
+  if (d.fav === 'other' && !String(d.favOther || '').trim()) e.favOther = 'Type the player\'s name, or pick another answer.';
+  else if (String(d.favOther || '').trim().length > 40) e.favOther = 'Keep the name to 40 characters or fewer.';
   const y = String(d.expY).trim(), m = String(d.expM).trim();
   if (y && (!/^\d+$/.test(y) || +y > 80)) e.expY = 'Enter whole years from 0 to 80.';
   if (m && (!/^\d+$/.test(m) || +m > 11)) e.expM = 'Enter months from 0 to 11.';
@@ -3735,7 +3810,7 @@ function validatePersonal(d) {
   });
   return e;
 }
-const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), sinceM: d.sinceM || '', sinceY: String(d.sinceY || '').trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, style: (d.style || '').trim(), ...gameOf(d), expY: String(d.expY).trim(), expM: String(d.expM).trim(), sinceM: d.sinceM || '', sinceY: String(d.sinceY || '').trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
 
 function copyText(text, el) {
   const fallback = () => {
@@ -3828,6 +3903,11 @@ const ACT = {
   sessionPage: (el) => toast(`Opens the public page for ${el.dataset.title} (see the Queue prototype)`),
   copyRtr: (el) => copyText(el.dataset.v, el),
   copyId: (el) => { const p = profileOf(el.dataset.id); copyText(p.rtr, document.getElementById(el.dataset.big ? 'rtr-big' : `rtr-${p.id}`)); },
+  pickSet: (el) => { const cur = el.dataset.path.split('.').reduce((o, k) => o && o[k], S); setPath(el.dataset.path, cur === el.dataset.v ? '' : el.dataset.v); render(); },
+  pickToggle: (el) => { const arr = el.dataset.path.split('.').reduce((o, k) => o && o[k], S) || []; setPath(el.dataset.path, arr.includes(el.dataset.v) ? arr.filter((x) => x !== el.dataset.v) : [...arr, el.dataset.v]); render(); },
+  obNext: () => { const o = S.ui.ob; if (o.step === 3) { const err = validatePersonal({ name: 'x', nick: '', ...o.d }); if (err.favOther) { o.err = err.favOther; render(); return; } } o.err = ''; if (o.step < 3) { o.step += 1; render(); window.scrollTo(0, 0); return; } finishOnboard(); },
+  obSkip: () => { const o = S.ui.ob; o.err = ''; if (o.step === 1) o.d.courtPos = ''; if (o.step === 2) o.d.skills = []; if (o.step === 3) { o.d.fav = ''; o.d.favOther = ''; } if (o.step < 3) { o.step += 1; render(); window.scrollTo(0, 0); return; } finishOnboard(); },
+  obBack: () => { const o = S.ui.ob; o.err = ''; if (o.step > 1) { o.step -= 1; render(); } },
   signOut: () => { S.me = null; S.ui.sheet = null; S.ui.edit = null; go('board'); toast('Signed out'); },
   demoSignIn: () => { S.ui.sheet = null; signIn('u1'); },
   openEdit: () => { S.ui.edit = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.editTab = 'basics'; go('edit'); },
@@ -4097,7 +4177,7 @@ function finishClaim(C) {
   a.email = C.email.trim(); a.claimed = true;
   if (!a.phone) a.phone = toE164(C.phone);
   S.claim = 'valid'; S.ui.claim = null; S.ui.claimConfirmed = false; S.me = 'u2';
-  go('claimDone');
+  startOnboard('u2', 'claimDone');
 }
 
 const FORM = {
@@ -4227,7 +4307,7 @@ const FORM = {
       }
       applyPersonal(acct, C);
       S.accounts[id] = acct; S.me = id; S.ui.regDone = { id, club: un && un.records.some((r) => r.club === ctx.club) ? null : ctx.club, session: ctx.session, joined: un ? un.records.map((r) => r.club) : null }; S.ui.claim = null; S.ui.regStep = 'choose'; S.ui.gReg = null;
-      S.screen = 'registerDone'; window.scrollTo(0, 0);
+      startOnboard(id, 'registerDone');
     });
   },
   request: () => ACT.submitRequest(),
@@ -4416,11 +4496,13 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { onboard: viewOnboard, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;
-  document.getElementById('app').innerHTML = topBar() + (views[S.screen] || viewBoard)() + (sh ? SHEETS[sh.type](sh) : '');
+  S.ui.fullscreen = false;
+  const body = (views[S.screen] || viewBoard)();
+  document.getElementById('app').innerHTML = (S.ui.fullscreen ? '' : topBar()) + body + (sh ? SHEETS[sh.type](sh) : '');
   document.body.style.overflow = sh ? 'hidden' : '';
   if (sh && sh.type !== lastSheet) {
     const t = document.getElementById('sheet-title');

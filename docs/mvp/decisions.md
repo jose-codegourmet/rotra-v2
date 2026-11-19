@@ -75,6 +75,7 @@ Product rules and existing open-decision documents remain authoritative for thei
 | [D-2026-11-19-08](#d-2026-11-19-08) | Regenerate is removed from the Main Queue | approved 2026-11-19 (rules cleanup open) | mockup only | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-09](#d-2026-11-19-09) | Embla Carousel for sliders | approved 2026-11-19 by the owner naming it (scope open) | mockup only (loaded from a CDN) | needed | [Queue](workstreams/queue.md) |
 | [D-2026-11-19-10](#d-2026-11-19-10) | Player Home for signed-in players | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
+| [D-2026-11-19-11](#d-2026-11-19-11) | Invite-link onboarding and getting-to-know answers | approved 2026-11-19 by the owner | mockup only | needed | [Player](workstreams/player.md) |
 | [D-2026-11-18-07](#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](workstreams/queue.md), [Player](workstreams/player.md) |
 
 ## Status conventions
@@ -1394,3 +1395,13 @@ Moved to the [Admin workstream](workstreams/admin.md#admin-implementation-gap-in
 - **Decision:** P-HOME at `/home`, protected. Sign-in lands there unless sent from another page; the ROTRA logo opens it for signed-in players. It shows the current (live) session, upcoming sessions (with Finished), the player's clubs and their stats (shared rank card, weekly performance). Visitors keep the leaderboard at `/` as the public home. The own profile drops My sessions and Your clubs; other profiles keep Clubs.
 - **Open:** none.
 - **References:** [profile screens](../screens/product/modules/player-information/profile.md#p-home--signed-in-home), [navigation](../screens/product/navigation.md)
+
+<a id="d-2026-11-19-11"></a>
+### D-2026-11-19-11 — Invite-link onboarding and getting-to-know answers
+- **Decision status:** approved by the owner, November 19, 2026: “they need to be in a fullscreen onboarding process where their details are prefilled; the onboard should ask play style (front or back court player), skills they know (netting, smash, drop, slice, jump smash and etc), favorite badminton player (Lin Dan, Lee Chong Wei and etc, then others)”. Asked: the steps replace the one-page registration form; play style is one of Front court, Back court or All-round; the three questions are skippable; answers are public on the profile and replace the free-text playing style.
+- **Implementation status:** mockup only ([log](../mockup-changes/2026-11-19-player-invite-onboarding.md)).
+- **Ticket:** needed
+- **Roadmap:** MVP — [Player](workstreams/player.md)
+- **Decision:** after accepting the club-created profile's registration link or a session game link, registration is a fullscreen four-step onboarding (details prefilled and required; where you play, shots you know, favorite player optional). Answers are public, shown in the profile's About and editable in Edit profile › Playing style. Stored in `players.personal_details` (proposed shape in the [identity tables](../database_design/product/player-information/modules/identity.md)).
+- **Open:** whether the club invite link (no session) gets the same onboarding (the mockup's registration form is shared, so it does today); the exact shot and player lists can grow; columns or JSONB.
+- **References:** [identity rules](../business_logic/product/player-information/modules/identity/README.md), [P-ONBOARD](../screens/product/modules/player-information/access-registration.md#p-onboard--fullscreen-onboarding-after-an-invite-link)

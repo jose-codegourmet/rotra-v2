@@ -185,3 +185,15 @@ The player is signed in right away; success shows the new player ID and **Go to 
 **Email confirmation banner.** While the signed-in account has not confirmed its email, every page shows: “Confirm your email. We sent a link to <email>. Some actions wait until it's confirmed.” with **Resend email** (toast “Email sent again”). The prototype also has **Mark confirmed**; it is not part of the real app. A contact-change request is refused with “Confirm your email first.” until then.
 
 **Join <club>? page** — a signed-in player opening `/register/[clubId]`: title “Join <club>?”, text “You're added to <club>'s saved players. The club can put you in its sessions and record your games. You can leave any time from your profile.”, buttons **Join <club>** (toast “You joined <club>”) and **Not now**. If the player is already in that club: notice “You're already in <club>.” with **Go to my profile**.
+
+## P-ONBOARD — Fullscreen onboarding after an invite link
+
+Owner, November 19, 2026 ([D-2026-11-19-11](../../../../mvp/decisions.md#d-2026-11-19-11); [log](../../../../mockup-changes/2026-11-19-player-invite-onboarding.md)): once a player accepts the club-created profile's registration link (**Is this you?** → Google) or a session game link (P-INVITE → Google, or no Google), registering is fullscreen: no top bar or dock, a header with the ROTRA logo, “Step N of 4 · <step>” and a four-segment progress bar.
+
+1. **Your details** — the registration form (P-CLAIM's fields), titled “Your details”, prefilled from what the club saved; required fields as before; the button reads **Continue** (“Completing…” / “Creating…” while sending). Sending it creates the account.
+2. **Where you play** — “How do you play, NAME?” / “Pick where you're most at home on court.”: three cards, one pick: **Front court** (“Net play, pushes and quick kills at the front.”), **Back court** (“Clears, smashes and drops from the back.”), **All-round** (“Comfortable anywhere on court.”). Tapping the picked card clears it.
+3. **Shots you know** — “Which shots do you have?” / “Pick all that apply. Clubs see these when they plan matches.”: tick chips Netting, Smash, Jump smash, Drop, Slice, Clear, Drive, Lift, Net kill, Push, Block, Backhand clear.
+4. **Favorite player** — “Who's your favorite badminton player?” / “Pick one, or choose Others and type a name.”: Lin Dan, Lee Chong Wei, Viktor Axelsen, Kento Momota, Taufik Hidayat, Chen Long, Carolina Marín, Tai Tzu-ying, An Se-young, **Others** (opens **Player's name**, required with Others: “Type the player's name, or pick another answer.”).
+
+Steps 2 to 4 say “Shows on your public profile. You can change it any time in Edit profile.” A fixed footer holds **Back** (steps 3 and 4), **Skip** (clears that step's answer and moves on) and **Continue** / **Finish**. Finish (or Skip on step 4) opens the existing done page: **Registration complete** for the club-created profile, the registration-complete page (with **Back to the session**) for a session link.
+

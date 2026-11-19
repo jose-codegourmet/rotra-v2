@@ -21,7 +21,10 @@ Superseded by: none
     row.
   - **Eye button:** at the top right (“View match”), it opens a dialog:
     - title “Queue #N · <match label>”;
-    - the match drawn on a court, the same as Courts now (two courts tall for more than six players);
+    - the match drawn on a court, the same as Courts now. More than six players draw **two separate courts** with a gap
+      between them, a **Uses 2 courts** chip and “N players over two courts, each team split between them.” Each team's
+      first half plays on the first court and the rest on the second, with wider spacing between players (owner
+      follow-up the same day: “make it more obvious like 2 courts and add spaces between players”);
     - “Next on a court.” or “Waiting in queue.”, then “The Queue Master can still change it.”;
     - **Close**.
 

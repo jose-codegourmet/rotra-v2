@@ -1548,6 +1548,8 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .pqc .qf { position: relative; }
 .pqc .qf:nth-child(1) { z-index: 5; } .pqc .qf:nth-child(2) { z-index: 4; } .pqc .qf:nth-child(3) { z-index: 3; } .pqc .qf:nth-child(4) { z-index: 2; } .pqc .qf:nth-child(5) { z-index: 1; }
 .qtile.pqc .qf .avatar { width: 34px; height: 34px; font-size: 11px; outline-width: 2px; outline-offset: 0; box-shadow: 0 0 0 2px var(--surface); }
+.qm-pitch { position: relative; display: grid; gap: 12px; }
+.qm-pitch .side { gap: 16px 26px; align-content: space-evenly; padding: 10px 14px; }
 .pqc .pq-eye { position: absolute; top: 6px; right: 6px; }
 @media (max-width: 640px) { .qtile.pq-row.pqc { grid-template-columns: 34px auto auto auto; } .pqc .qt-head { grid-row: auto; align-self: center; } .pqc .vs { text-align: center; } .pqc .pq-team { flex-wrap: wrap; row-gap: 4px; } }
 .pq-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
@@ -6202,7 +6204,11 @@ const SHEETS = {
     if (!m) return sheetShell('Match', '<p class="muted">This match has left the queue.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
     const n = all(m).length;
     return sheetShell(`Queue #${sh.pos} · ${esc(matchLabel(m))}`, `<div class="stack">
-      <div class="pitch${n > 6 ? ' tall' : ''}" role="img" aria-label="${esc(`Team A ${m.teamA.map((x) => pubNameText(P(x))).join(', ')} versus Team B ${m.teamB.map((x) => pubNameText(P(x))).join(', ')}`)}">${courtSVG(n > 6 ? 2 : 1)}${pubCourtSides(s, m)}</div>
+      ${n > 6 ? `<div class="row" style="gap:8px">${chip('Uses 2 courts', 'warn')}<span class="small muted">${n} players over two courts, each team split between them.</span></div>` : ''}
+      <!-- Owner artifact comment, November 19, 2026: "make it more obvious like 2 courts and add spaces between players". A big match
+           draws two separate courts with a gap; players are spread out over them. -->
+      <div class="qm-pitch${n > 6 ? ' two' : ''}" role="img" aria-label="${esc(`Team A ${m.teamA.map((x) => pubNameText(P(x))).join(', ')} versus Team B ${m.teamB.map((x) => pubNameText(P(x))).join(', ')}`)}">${n > 6 ? (() => { const half = (t) => [t.slice(0, Math.ceil(t.length / 2)), t.slice(Math.ceil(t.length / 2))], [a1, a2] = half(m.teamA), [b1, b2] = half(m.teamB);
+        return [[a1, b1], [a2, b2]].map(([a, b]) => `<div class="pitch">${courtSVG(1)}${pubCourtSides(s, { teamA: a, teamB: b })}</div>`).join(''); })() : `<div class="pitch">${courtSVG(1)}${pubCourtSides(s, m)}</div>`}</div>
       <p class="small muted">${+sh.pos === 1 ? 'Next on a court.' : 'Waiting in queue.'} The Queue Master can still change it.</p></div>`, '<button class="btn" data-act="closeSheet">Close</button>');
   },
   pubProfile(sh) {

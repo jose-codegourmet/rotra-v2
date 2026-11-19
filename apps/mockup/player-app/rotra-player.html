@@ -1176,6 +1176,8 @@ const UNCLAIMED_BY_EMAIL = {
 };
 
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+// Sample genders for the named players (the same people as in the Queue prototype). Everyone else hasn't added one yet.
+const FIXED_GENDER = { 2: 'male', 17: 'female', 40: 'male', 62: 'male', 96: 'male', 155: 'female', 200: 'male', 339: 'female', 702: 'male', 860: 'female' };
 const BASE = [];
 for (let i = 0; i < 1283; i++) {
   const h = hashStr(`lb${i}`);
@@ -1187,7 +1189,7 @@ for (let i = 0; i < 1283; i++) {
     id: `b${i}`, name, nick, photo: (h >>> 24) % 6 !== 0, level: levelAt(origPos), recent: 10 + ((h >>> 4) % 16),
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
     profilePrivate: PRIVATE_SEED.has(i) || ALWAYS_SEED.has(i), alwaysPrivate: ALWAYS_SEED.has(i), hiddenDir: HIDDEN_SEED.has(i),
-    unclaimed: i in UNCLAIMED_SEED, savedBy: UNCLAIMED_SEED[i] || null,
+    unclaimed: i in UNCLAIMED_SEED, savedBy: UNCLAIMED_SEED[i] || null, gender: FIXED_GENDER[i] || null,
   });
 }
 
@@ -1276,6 +1278,8 @@ function seedNotifs() {
   const m = 60000, h = 60 * m, d = 24 * h, now = Date.now();
   return {
     u1: [
+      // Owner, November 19, 2026: gender is optional for now, and players who haven't added it get this reminder.
+      { id: 'n0', kind: 'account', at: now - 5 * m, title: 'Add your gender', body: 'Clubs use it to name your matches: Men\'s, Women\'s or Mixed Doubles. Until you add it, your matches count as Genderless.', to: 'editGender', read: false },
       { id: 'n1', kind: 'session', at: now - 25 * m, title: 'You\'re in Thursday Open Play', body: 'Lahug Smash Club confirmed your spot. Thu · 7:00–10:00 PM.', to: 'sessions', read: false },
       { id: 'n2', kind: 'invite', at: now - 3 * h, title: 'Kat invited you to play', body: 'Saturday Doubles Night at Mandaue Shuttle Society.', to: 'invite', read: false },
       { id: 'n3', kind: 'session', at: now - 20 * h, title: 'Results are up for Sunday Night Queue', body: 'You played 6 games. See how they counted.', to: 'history', read: false },
@@ -1339,6 +1343,7 @@ Object.assign(S.ui, { sheet: null, pendingGo: null, resetArmed: false });
 if (S.accounts?.u1 && !S.accounts.u1.clubs) { S.accounts.u1.clubs = seedClubs(); S.accounts.u1.emailConfirmed = true; }
 S.ui.regCtx = S.ui.regCtx || { club: null, session: null, invite: null };
 S.ui.regStep = S.ui.regStep || 'choose'; S.ui.gPending = false; S.gDeadline = S.gDeadline || 'before'; S.notifs = S.notifs || seedNotifs();
+if (S.notifs.u1 && !S.notifs.u1.some((x) => x.id === 'n0')) S.notifs.u1.unshift(seedNotifs().u1[0]);
 S.ui.claimPending = false; S.ui.editPending = false; S.ui.reqPending = false; S.ui.privacyPending = false; S.ui.profilePending = false; S.ui.dirPending = false;
 if (S.board === 'loading') S.board = 'ok';
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable: keep working in memory */ } }
@@ -1886,6 +1891,7 @@ function viewProfile() {
       ${!S.online && own ? notice('warn', 'Saved copy. Your rank and games may have changed since this device was last online.') : ''}
       ${p.state === 'processing' ? notice('warn', `<b>Updating from Sunday Night Queue.</b> Lahug Smash Club finished the session last night. This is ${own ? 'your' : 'the'} last calculated rank until the update is ready.`) : ''}
       ${isUnclaimed(p) && !own ? notice('', `<b>Not registered yet.</b> ${esc(savedByName(p))} saved this player, so this is the club's version of them. The profile is public until they register with ROTRA.`) : ''}
+      ${own && !p.gender ? notice('warn', `<b>Add your gender.</b> Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add gender</button>`) : ''}
       ${missing ? notice('', `Add your playing style and experience so clubs know your game. It's optional. <button class="btn xs" data-act="openEdit" style="margin-left:4px">Add details</button>`) : ''}
       ${eligibility(p, own, st)}
       ${weeklyPerf(p, true)}
@@ -1893,6 +1899,7 @@ function viewProfile() {
       ${latestSessionsCard(p)}
       ${recentGamesCard(p)}
       <section class="card stack"><h2>About</h2>
+        ${p.gender || own ? `<div class="stack tight"><span class="label">Gender</span><p>${p.gender ? GENDER_LABEL[p.gender] : '<span class="muted">Not added</span>'}</p></div>` : ''}
         <div class="stack tight"><span class="label">Playing style</span><p>${p.style ? esc(p.style) : `<span class="muted">${own ? 'You haven\'t' : 'This player hasn\'t'} added a playing style yet.</span>`}</p></div>
         <div class="stack tight"><span class="label">Experience</span><p>${expText(p) || '<span class="muted">Not added</span>'}</p>${expText(p) ? '<span class="hint">Self-reported. Clubs may use it for a first assessment; it doesn\'t add rank points.</span>' : ''}</div>
         ${links.length ? `<div class="stack tight"><span class="label">Links</span><div class="links">${links.map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener noreferrer">${I.ext}<span>${esc(v.replace(/^https?:\/\/(www\.)?/, ''))}</span><small>${SOCIAL[k].label}</small></a>`).join('')}</div></div>` : ''}
@@ -2452,7 +2459,7 @@ function viewAccount() {
 }
 
 // ---------- P-EDIT-PROFILE ----------
-const editFields = (p) => ({ name: p.name, nick: p.nick || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', sinceM: p.sinceM ?? '', sinceY: p.sinceY ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
+const editFields = (p) => ({ name: p.name, nick: p.nick || '', gender: p.gender || '', style: p.style || '', expY: p.expY ?? '', expM: p.expM ?? '', sinceM: p.sinceM ?? '', sinceY: p.sinceY ?? '', facebook: p.social.facebook || '', instagram: p.social.instagram || '', youtube: p.social.youtube || '', linkedin: p.social.linkedin || '' });
 const editDirty = () => S.ui.edit && JSON.stringify(S.ui.edit) !== JSON.stringify(S.ui.editOrig);
 function field(id, label, path, value, err, o = {}) {
   const tag = o.area ? `<textarea class="input${err ? ' bad' : ''}" id="${id}" data-bind="${path}" maxlength="${o.max || 280}" ${err ? `aria-invalid="true" aria-describedby="${id}-err"` : ''}>${esc(value)}</textarea>`
@@ -2460,7 +2467,12 @@ function field(id, label, path, value, err, o = {}) {
   return `<label class="field" for="${id}"><span>${label}${o.req ? ' <span style="color:var(--error)" aria-hidden="true">*</span>' : ''}${o.pub ? ' · <span class="hint">public</span>' : ''}</span>${tag}${err ? `<span class="err" id="${id}-err">${esc(err)}</span>` : o.hint ? `<span class="hint">${o.hint}</span>` : ''}</label>`;
 }
 // Personal fields in three groups. Edit profile shows one group per section; the claim form shows all three.
-const fieldsBasics = (base, d, e, pre) => `<div class="fgrid">${field(`${pre}-name`, 'Full name', `${base}.name`, d.name, e.name, { req: true, pub: true, ac: 'name' })}${field(`${pre}-nick`, 'Nickname', `${base}.nick`, d.nick, e.nick, { pub: true, hint: 'Optional' })}</div>`;
+const fieldsBasics = (base, d, e, pre) => `<div class="fgrid">${field(`${pre}-name`, 'Full name', `${base}.name`, d.name, e.name, { req: true, pub: true, ac: 'name' })}${field(`${pre}-nick`, 'Nickname', `${base}.nick`, d.nick, e.nick, { pub: true, hint: 'Optional' })}</div>${genderSelect(base, d, pre)}`;
+// Gender (owner, November 19, 2026): optional for now, public, and it sets the match category. Male or Female.
+const GENDER_LABEL = { male: 'Male', female: 'Female' };
+const genderSelect = (base, d, pre) => `<label class="field" for="${pre}-gender"><span>Gender · <span class="hint">public</span></span><select class="input" id="${pre}-gender" data-bind="${base}.gender">
+    <option value="" ${d.gender ? '' : 'selected'}>Not added yet</option><option value="male" ${d.gender === 'male' ? 'selected' : ''}>Male</option><option value="female" ${d.gender === 'female' ? 'selected' : ''}>Female</option></select>
+    <span class="hint">Optional for now. Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless.</span></label>`;
 const fieldsGame = (base, d, e, pre) => `${field(`${pre}-style`, 'Playing style', `${base}.style`, d.style, e.style, { area: true, pub: true, hint: 'Optional. How you play, in a sentence or two.' })}
     <div class="field"><span>Experience · <span class="hint">public</span></span><div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
       ${field(`${pre}-expY`, 'Years', `${base}.expY`, d.expY, e.expY, { inputmode: 'numeric', ph: '0', exp: pre })}${field(`${pre}-expM`, 'Months', `${base}.expM`, d.expM, e.expM, { inputmode: 'numeric', ph: '0', exp: pre })}</div>
@@ -2481,7 +2493,7 @@ const BANNERS = [['court', 'Court'], ['night', 'Night'], ['dusk', 'Dusk'], ['emb
 const DEFAULT_BANNER = 'court';
 const bannerOf = (p) => BANNERS.some(([k]) => k === p.banner) ? p.banner : DEFAULT_BANNER;
 const EDIT_TABS = [
-  { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick'], body: fieldsBasics },
+  { id: 'basics', label: 'Name', intro: 'How you appear on the leaderboard and your profile.', keys: ['name', 'nick', 'gender'], body: fieldsBasics },
   { id: 'game', label: 'Playing style', intro: 'Help clubs and other players know your game.', keys: ['style', 'expY', 'expM', 'sinceM', 'sinceY'], body: fieldsGame },
   { id: 'links', label: 'Links', intro: 'Social pages shown on your profile.', keys: Object.keys(SOCIAL), body: fieldsLinks },
   { id: 'account', label: 'Account', intro: 'Private details you sign in with, and your permanent player ID.', keys: [] },
@@ -3669,7 +3681,7 @@ function validatePersonal(d) {
   });
   return e;
 }
-const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), sinceM: d.sinceM || '', sinceY: String(d.sinceY || '').trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
+const applyPersonal = (a, d) => Object.assign(a, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, style: d.style.trim(), expY: String(d.expY).trim(), expM: String(d.expM).trim(), sinceM: d.sinceM || '', sinceY: String(d.sinceY || '').trim(), social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
 
 function copyText(text, el) {
   const fallback = () => {
@@ -3929,7 +3941,8 @@ const ACT = {
     if (id === 'ann-admin') { S.ui.adminNoteRead = true; go('verify'); return; }
     const x = myNotifs().find((y) => y.id === id); if (!x) return;
     x.read = true;
-    if (x.to === 'invite') { setRegCtx('c3', 's-sat-doubles', 'p4x9'); go('joinSession'); }
+    if (x.to === 'editGender') { S.ui.edit = null; S.ui.editErr = {}; S.ui.editFail = ''; S.ui.editTab = 'basics'; go('edit'); }
+    else if (x.to === 'invite') { setRegCtx('c3', 's-sat-doubles', 'p4x9'); go('joinSession'); }
     else if (x.to.startsWith('club:')) go('club', x.to.slice(5));
     else if (['sessions', 'history', 'rank'].includes(x.to)) go(x.to, S.me);
     else go(x.to);

@@ -8,6 +8,8 @@ Signed in only, in the top bar before the theme button. A red count badge shows 
 
 ## P-NOTIFICATIONS — `/notifications`
 
+Gender reminder (owner, November 19, 2026; [D-2026-11-19-01](../../../../mvp/decisions.md#d-2026-11-19-01)): an **Account** item “Add your gender” — “Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless.” — for players without a gender; it opens Edit profile › Name.
+
 - Header: "Notifications", then "n unread" or "You're all caught up."
 - Controls: segmented **All** / **Unread**; **Mark all as read** (disabled when nothing is unread; toast "All marked as read").
 - Groups: **New** (pinned announcements and the last 24 hours) and **Earlier**, each a card list.

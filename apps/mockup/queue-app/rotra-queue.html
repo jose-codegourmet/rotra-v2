@@ -293,6 +293,11 @@ textarea.input { min-height: 80px; resize: vertical; }
    Faces keep opening the profile; the Open match button stays for keyboards and screen readers. */
 .open-pitch { cursor: pointer; transition: filter .15s; }
 .open-pitch:hover { filter: brightness(1.08); }
+.open-pitch { cursor: grab; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.court-ghost { border-radius: 8px; opacity: .9; }
+body.court-dragging [data-free-court] { outline: 2px dashed var(--accent); outline-offset: 2px; }
+body.court-dragging [data-free-court].court-drop { background: var(--accent-subtle); outline-style: solid; }
+body.court-dragging { cursor: grabbing; }
 /* Set games played: Now on the left, To on the right (owner artifact comment, November 19, 2026). */
 .gcmp { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 8px; }
 .gcmp-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px 8px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); text-align: center; min-width: 0; }
@@ -4580,7 +4585,7 @@ function courtsPane(s) {
       body = `<p class="small muted">${need && freeN < need ? 'Not enough free players.' : list.length ? `No waiting match can go on: ${esc(blockOf(s, first).text)}.` : 'The queue is empty.'}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm" data-act="openEditor">Add match</button></div>`;
     }
-    return `<div class="court"><div class="ct"><div><h3>${esc(c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${notStarted ? chip('Not open yet') : freeChip(s, c, Date.now(), Math.max(courtStart(s, c) || 0, s.startedAt || 0))}${courtMenu(s, c, false)}</div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not open yet' : 'Free'}</span></div>${body}</div>`;
+    return `<div class="court" ${notStarted ? '' : `data-free-court="${c.id}"`}><div class="ct"><div><h3>${esc(c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${notStarted ? chip('Not open yet') : freeChip(s, c, Date.now(), Math.max(courtStart(s, c) || 0, s.startedAt || 0))}${courtMenu(s, c, false)}</div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not open yet' : 'Free'}</span></div>${body}</div>`;
   }).join('');
   const closed = s.courts.filter((c) => !courtOpen(s, c));
   const fill = courtFill(s);
@@ -8162,6 +8167,62 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: false });
 document.addEventListener('touchend', () => { if (pdrag && pdrag.touch) pdEnd(true); });
 document.addEventListener('touchcancel', () => { if (pdrag && pdrag.touch) pdEnd(false); });
+// Owner artifact comment, November 19, 2026: drag a busy court's drawing onto a free court to move that match there (Getting
+// ready or Playing). Mouse: start dragging after 6 px. Touch: press and hold, then drag. A tap still opens the match.
+let cdrag = null;
+function cdLift() {
+  const d = cdrag, r = d.el.getBoundingClientRect(), g = d.el.cloneNode(true);
+  g.classList.add('swap-ghost', 'court-ghost'); g.removeAttribute('data-act'); g.setAttribute('aria-hidden', 'true');
+  Object.assign(g.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  document.body.appendChild(g); d.g = g; d.on = true; document.body.classList.add('court-dragging');
+  if (d.touch && navigator.vibrate) navigator.vibrate(10);
+}
+function cdMove(x, y) {
+  const d = cdrag; d.g.style.transform = `translate(${x - d.x}px, ${y - d.y}px)`;
+  const el = document.elementFromPoint(x, y), t = el && el.closest('[data-free-court]');
+  if (d.over && d.over !== t) d.over.classList.remove('court-drop');
+  d.over = t || null; if (t) t.classList.add('court-drop');
+}
+function cdEnd(apply) {
+  const d = cdrag; if (!d) return; cdrag = null; clearTimeout(d.timer);
+  if (!d.on) return;
+  d.g.remove(); document.body.classList.remove('court-dragging'); if (d.over) d.over.classList.remove('court-drop');
+  swallowClick = true; setTimeout(() => { swallowClick = false; }, 400);
+  if (!apply || !d.over) return;
+  const s = cur(), m = s.matches.find((x) => x.id === d.id), cid = d.over.dataset.freeCourt;
+  if (!m) return;
+  // A two-court match needs a second free court: open Move match with this one picked.
+  if (courtsNeeded(m) > 1) { openSheet({ type: 'moveCourt', id: m.id, courts: [cid] }); return; }
+  S.ui.sheet = { type: 'moveCourt', id: m.id, courts: [cid] }; curAct = 'confirmMove'; ACT.confirmMove();
+  S.ui.sheet = null; render();
+}
+document.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'touch' || e.button !== 0) return;
+  const el = e.target.closest && e.target.closest('.open-pitch');
+  if (el) cdrag = { el, id: el.dataset.id, x: e.clientX, y: e.clientY, on: false };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!cdrag || cdrag.touch) return;
+  if (!cdrag.on) { if (Math.hypot(e.clientX - cdrag.x, e.clientY - cdrag.y) < 6) return; cdLift(); }
+  cdMove(e.clientX, e.clientY);
+});
+document.addEventListener('pointerup', () => { if (cdrag && !cdrag.touch) cdEnd(true); });
+document.addEventListener('pointercancel', () => { if (cdrag && !cdrag.touch) cdEnd(false); });
+document.addEventListener('touchstart', (e) => {
+  const el = e.target.closest && e.target.closest('.open-pitch');
+  if (!el || e.touches.length > 1) return;
+  const p = e.touches[0];
+  cdrag = { el, id: el.dataset.id, x: p.clientX, y: p.clientY, on: false, touch: true };
+  cdrag.timer = setTimeout(() => { if (cdrag && cdrag.el === el) cdLift(); }, 300);
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  if (!cdrag || !cdrag.touch) return;
+  const p = e.touches[0];
+  if (!cdrag.on) { if (Math.hypot(p.clientX - cdrag.x, p.clientY - cdrag.y) > 8) cdEnd(false); return; }
+  e.preventDefault(); cdMove(p.clientX, p.clientY);
+}, { passive: false });
+document.addEventListener('touchend', () => { if (cdrag && cdrag.touch) cdEnd(true); });
+document.addEventListener('touchcancel', () => { if (cdrag && cdrag.touch) cdEnd(false); });
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);

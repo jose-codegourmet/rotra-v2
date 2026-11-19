@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 27 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 28 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -389,6 +389,7 @@ NEW: 27 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-correct-time-format](2026-11-19-queue-correct-time-format.md) | Queue app: Correct Queue Time Format: waiting times and the overdue line cap at hours, then “long time ago” | one shared time formatter (no new component) | NEW |
 | [2026-11-19-queue-court-tap-opens-match](2026-11-19-queue-court-tap-opens-match.md) | Queue app: tapping a busy court's drawing opens the match | court card (reuse) | NEW |
 | [2026-11-19-queue-dialog-cards-level-ring](2026-11-19-queue-dialog-cards-level-ring.md) | Queue app: match dialog player cards show the level as the picture's ring, not as text | dialog player card (reuse the level ring from the Players cards) | NEW |
+| [2026-11-19-queue-drag-court-to-free](2026-11-19-queue-drag-court-to-free.md) | Queue app: drag a busy court's drawing onto a free court to move the match | court card (drag source and drop target), drag ghost (reuse the swap ghost) | NEW |
 | [2026-11-19-queue-live-edit-player](2026-11-19-queue-live-edit-player.md) | Queue app: the live Players card's pencil opens one Edit player form | sheet; reuse the club nickname field, the picture editor from Edit details, the games stepper from D-SET-GAMES, the segmented control | NEW |
 | [2026-11-19-queue-live-match-history](2026-11-19-queue-live-match-history.md) | Queue app: the live console has a Match History tab | console tab and phone menu item; the session record's match court card (reuse); segmented court filter | NEW |
 | [2026-11-19-queue-live-no-move-to-waitlist](2026-11-19-queue-live-no-move-to-waitlist.md) | Queue app: no Move to waitlist on the live Players card | player card, roster card | NEW |

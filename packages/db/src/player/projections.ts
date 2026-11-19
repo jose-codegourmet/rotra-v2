@@ -513,7 +513,11 @@ function courtPlayer(
   if (!player?.idAllocation) return { name: entry.nameSnapshot, picture: null, playerId: null }
   // The one masking rule (B-54): a masked player has no player ID that opens the profile.
   if (maskAlwaysPrivate && isMasked(player.profileVisibility, viewerId, player.id))
-    return { name: maskPublicName(entry.nameSnapshot), picture: player.avatarRef ?? null, playerId: null }
+    return {
+      name: maskPublicName(entry.nameSnapshot),
+      picture: player.avatarRef ?? null,
+      playerId: null,
+    }
   return { name: entry.nameSnapshot, picture: player.avatarRef ?? null, playerId: player.id }
 }
 

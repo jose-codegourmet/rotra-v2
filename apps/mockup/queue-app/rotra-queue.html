@@ -308,6 +308,15 @@ body.court-dragging { cursor: grabbing; }
 .gcmp-step b { font-size: 30px; line-height: 1.1; font-weight: 800; min-width: 36px; text-align: center; }
 .gcmp-arrow { display: grid; place-items: center; color: var(--fg3); }
 .mq-players { margin-top: 12px; padding-top: 20px; border-top: 1px solid var(--border); }
+.qtile.compact { gap: 8px; }
+.qtile.compact .vs { margin: -2px 0; font-size: 10px; }
+.qstack-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.qstack { display: flex; padding-left: 8px; flex: none; }
+.qs-f { --ring: var(--border-strong); margin-left: -8px; padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; }
+.qs-f.lv-beginner { --ring: var(--lv-beg); } .qs-f.lv-intermediate { --ring: var(--lv-int); } .qs-f.lv-advanced { --ring: var(--lv-adv); }
+.qs-f .avatar { width: 34px; height: 34px; font-size: 12px; outline: 2px solid var(--ring); outline-offset: 0; box-shadow: 0 0 0 3px var(--surface); }
+.qs-f:hover { position: relative; z-index: 1; }
+.qs-names { font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stepcard { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
 .stepcard > span { font-size: 13px; color: var(--fg2); }
 .stepcard .row { justify-content: space-between; flex-wrap: nowrap; gap: 6px; }
@@ -4781,13 +4790,13 @@ function generateDrafts(s, tab, count, target, fixed) {
 // One row of the next queued matches on the Session tab; the last tile opens the full Queue tab.
 function upcomingPane(s) {
   const list = waiting(s);
-  const cols = queueCols();
+  const cols = queueCols(300); // compact cards: at least 300 px
   const shown = list.slice(0, Math.max(1, cols - 1));
   const rest = list.length - shown.length;
   const att = attention(s).length;
   return `<div class="between"><h2>Upcoming queued matches</h2><span class="small muted">${list.length} waiting${att ? ` · <span style="color:var(--warn)">${att} need attention</span>` : ''}</span></div>
     <div class="qgrid" style="grid-template-columns:repeat(${cols}, minmax(0, 1fr))">
-      ${shown.length ? shown.map((m, i) => queueCard(s, m, i, list.length, cols)).join('') : `<div class="card empty" style="grid-column:span ${Math.max(1, cols - 1)}">No matches queued yet.</div>`}
+      ${shown.length ? shown.map((m, i) => queueCard(s, m, i, list.length, cols, true)).join('') : `<div class="card empty" style="grid-column:span ${Math.max(1, cols - 1)}">No matches queued yet.</div>`}
       <button class="qtile qmore" data-act="pane" data-k="queue" aria-label="More queues: open the Main Queue tab"><span class="plus" aria-hidden="true">→</span><b>More queues</b><span class="small muted">${rest > 0 ? `+${rest} more waiting` : list.length ? 'Reorder, add or regenerate' : 'Add or generate matches'}</span></button>
     </div>`;
 }
@@ -4800,7 +4809,7 @@ function queueCols(tileMin = QUEUE_TILE_MIN) {
   const rail = !hasShell() || narrowScreen() ? 0 : navMin ? 68 : 232;
   return Math.max(1, Math.floor((vw - rail - 2 * pad + QUEUE_GAP) / (tileMin + QUEUE_GAP)));
 }
-function queueCard(s, m, i, n, cols) {
+function queueCard(s, m, i, n, cols, compact = false) {
   const b = blockOf(s, m);
   // Owner request, November 9, 2026: searching for a player highlights their cards in the Main Queue and softens the rest.
   const qs = (S.ui.qSearch || '').trim().toLowerCase();
@@ -4821,8 +4830,12 @@ function queueCard(s, m, i, n, cols) {
     return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span>`;
   };
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
-  const faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
-  return `<article class="qtile ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
+  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}${waitLabel(p)}. View profile. Left or right arrow switches sides">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
+  // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
+  // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
+  const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(', ')}</span></div>`;
+  if (compact) faces = stack;
+  return `<article class="qtile${compact ? ' compact' : ''} ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
     ${!b ? `<span class="qt-ready">${I.check} Ready for court</span>` : ''}
     <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(matchLabel(m), 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
     ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}

@@ -1,7 +1,7 @@
 # Track specification: Shared queue rules (one Go copy, run on the device as WebAssembly)
 
 **Track ID:** rule-cases_20261113 · **Type:** chore · **Priority:** critical (order 1 of 14) · **Created:** 2026-11-13 · **Refined:** 2026-11-14
-**Depends on:** phases 1–3 nothing; phases 4–6 go-api-foundation (the Go module) · **Decisions:** D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-02, B-20, B-21, B-22, B-23, B-37 ([register](../../../docs/mvp/decisions.md#d-2026-11-14-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** phases 1–3 nothing; phases 4–6 go-api-foundation (the Go module) · **Decisions:** D-2026-11-13-02, D-2026-11-13-08, D-2026-11-14-01, B-02, B-20, B-21, B-22, B-23, B-37 ([register](../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -13,7 +13,7 @@ answer, or the Queue Master gets a false Q-CONFLICT, a different court fill, or 
 Two copies of those rules (TypeScript and Go) drift in ways example cases don't catch: name sorting
 (`localeCompare` in `computeStandings` vs Go byte order), unstable sorts, Go map order, rounding,
 time zones, null vs missing. So the shared rules get **one copy, in Go**: the server calls it directly,
-and a WebAssembly build of the same code runs on the device ([D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01)).
+and a WebAssembly build of the same code runs on the device ([D-2026-11-14-01](../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01)).
 
 A spike comes first. If WebAssembly doesn't meet the pass marks, the track falls back to two copies
 with guards (see [Fallback](#fallback-if-the-spike-fails)).
@@ -64,7 +64,7 @@ Money and ranking rules here still need owner sign-off on the Go port (stop and 
 
 Some of these rules also run in the browser today (the setup form's cost and minimum previews, form
 checks in `@rotra/schema`, mock mode). Those TypeScript copies are **deleted on the `go-stack` branch**
-(B-20), and the screens that ran them are updated there to ask the API instead ([D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2026-11-13-08)).
+(B-20), and the screens that ran them are updated there to ask the API instead ([D-2026-11-13-08](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-08)).
 `main` keeps them until `go-stack` merges at ship.
 
 ### Payments offline
@@ -370,7 +370,7 @@ R0 records the fallback choice; R6 and R7 are then replaced by guards 2 and 4.
 
 - **Q1 / Q4 (2026-11-13). Money is Go only.** Cost and payment rules move to bucket 2. See [Payments offline](#payments-offline).
 - **One copy per rule (2026-11-13).** TypeScript copies of bucket 2 rules are deleted on `go-stack` (B-20).
-- **WebAssembly (2026-11-14).** Bucket 1 also gets one copy: Go, built to WebAssembly for the device, behind the spike gate ([D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01)).
+- **WebAssembly (2026-11-14).** Bucket 1 also gets one copy: Go, built to WebAssembly for the device, behind the spike gate ([D-2026-11-14-01](../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01)).
 
 ### Q2. Time on replay (decided)
 
@@ -397,8 +397,8 @@ its own. The Queue Master can already add any lineup by hand (`queue.make`), so 
 The Auto Queue, Regenerate and Suggest requests send lineups instead of `n`; commands already queued in
 the old shape keep the old path until they drain. Contract change ticketed in go-writes-queue (backlog BL-3).
 
-All answers are recorded as [D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2026-11-13-08) and
-[D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01).
+All answers are recorded as [D-2026-11-13-08](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-08) and
+[D-2026-11-14-01](../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01).
 
 ## Branches and PRs
 

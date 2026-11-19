@@ -1,6 +1,6 @@
 # Player notifications
 
-**Last verified:** 2026-11-18 · **Status:** Mock and real modes implemented in source. See [D-2026-11-16-03](../../../../../mvp/decisions.md#d-2026-11-16-03).
+**Last verified:** 2026-11-18 · **Status:** Mock and real modes implemented in source. See [D-2026-11-16-03](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-03).
 
 **Reference prototype:** [`rotra-player.html`](../../../../../../apps/mockup/player-app/rotra-player.html) › Notifications ([log](../../../../../mockup-changes/2026-11-16-player-notifications.md)).
 

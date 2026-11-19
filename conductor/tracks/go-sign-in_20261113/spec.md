@@ -1,7 +1,7 @@
 # Track specification: Sign-in owned by Go
 
 **Track ID:** go-sign-in_20261113 · **Type:** feature · **Priority:** critical (order 6 of 14) · **Created:** 2026-11-13
-**Depends on:** beta-stack · **Decisions:** B-04, B-11, D-2026-11-07-01, D-2026-11-09-14 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** beta-stack · **Decisions:** B-04, B-11, D-2026-11-07-01, D-2026-11-09-14 ([register](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -78,7 +78,7 @@ Each app's `proxy.ts` session check verifies the Go access pass locally with Go'
 
 ## Moved to go-sign-in-catch-up
 
-Sign-in work that landed on `main` after this track was built is not part of this track: Google sign-in for players ([D-2026-11-16-01](../../../docs/mvp/decisions.md#d-2026-11-16-01)) and the check of a guest's invite link ([D-2026-11-18-07](../../../docs/mvp/decisions.md#d-2026-11-18-07)) are in [go-sign-in-catch-up](../go-sign-in-catch-up_20261119/spec.md). What is left here is task 5.2 only.
+Sign-in work that landed on `main` after this track was built is not part of this track: Google sign-in for players ([D-2026-11-16-01](../../../docs/mvp/decisions/2026-11-16.md#d-2026-11-16-01)) and the check of a guest's invite link ([D-2026-11-18-07](../../../docs/mvp/decisions/2026-11-18.md#d-2026-11-18-07)) are in [go-sign-in-catch-up](../go-sign-in-catch-up_20261119/spec.md). What is left here is task 5.2 only.
 
 ## Scope
 

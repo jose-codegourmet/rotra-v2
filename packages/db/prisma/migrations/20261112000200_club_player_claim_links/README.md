@@ -1,6 +1,6 @@
 # Registration invites for a club's unclaimed record
 
-Ticket P08.9 (#757). Decision [D-2026-11-11-03](../../../../../docs/mvp/decisions.md#d-2026-11-11-03)
+Ticket P08.9 (#757). Decision [D-2026-11-11-03](../../../../../docs/mvp/decisions/2026-11-11.md#d-2026-11-11-03)
 (guests and unclaimed profiles stay in their club). The owner signed off the feature on November 12,
 2026. `migration.sql` is the `prisma migrate diff` shape for the new model followed by hand-written
 CHECKs, the partial unique index, RLS and REVOKEs.

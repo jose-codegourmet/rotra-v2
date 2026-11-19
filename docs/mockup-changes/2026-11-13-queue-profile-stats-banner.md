@@ -16,7 +16,7 @@ Superseded by: none
 - Both cards (and the guest / always-private variant): the banner was always the green Court gradient → it's the player's own banner (Court, Night, Dusk, Ember, Sun, Stripe). Guests, unclaimed profiles and registered players with no pick show the default banner (Court in the prototype; Admin sets it).
 
 ## Why
-- Owner, November 13, 2026: “Queue app should see the Profile with standings ( win rate and statistics ) same with admin app · and the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions.md#d-2026-11-13-03).
+- Owner, November 13, 2026: “Queue app should see the Profile with standings ( win rate and statistics ) same with admin app · and the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions/2026-11-13.md#d-2026-11-13-03).
 - Follow-up, same day: “can we make the stats to only reset every year”. Profile stats now count the calendar year and reset on January 1; the rank keeps its 90-day window.
 
 ## Like for like

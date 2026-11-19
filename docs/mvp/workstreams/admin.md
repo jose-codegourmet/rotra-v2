@@ -12,11 +12,11 @@ Admin manages clubs and access.
 
 Admin sign-in; clubs, licenses, pricing and club-name requests; player directory, history and account verification;
 configuration (feature flags, ranking settings); audit; contact-change review; the manual player reset
-link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
+link ([D-2026-11-07-01](../decisions/2026-11-07.md#d-2026-11-07-01)).
 
 ## Out of scope / deferred
 
-- Club accent persistence: **not for MVP** (#395 closed, [D-2026-11-11-10](../decisions.md#d-2026-11-11-10)).
+- Club accent persistence: **not for MVP** (#395 closed, [D-2026-11-11-10](../decisions/2026-11-11.md#d-2026-11-11-10)).
 - Rank calculation itself → [ranking.md](ranking.md).
 
 ## Current state
@@ -43,8 +43,8 @@ link ([D-2026-11-07-01](../decisions.md#d-2026-11-07-01)).
 | Contact-change approve / apply / retry / status | implemented (#575) | `real/contact-change.ts` → `POST api/contact-change-requests/[requestId]/approve\|retry\|check` → `reviewContactChange`, `applyContactChange`, `reconcileContactChange` (`db/src/player/contact-change.ts`) with the Supabase admin adapter; gap: no audit line for a failed or retried application | #575; approval evidence still open in #244 |
 | Admin-reviewed player reset link | implemented in #491; schema applied | `/requests/password-resets`, protected API, request table + audit, provider recovery token | #491 |
 | Registration link from a player's Admin profile | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only (Queue issuance is real since #483, see [player.md](player.md)) | none found; MVP scope: hub open question 9 |
-| Admin edits everything on a player + profile character library (A07, epic #589) | registered Player full-form edit implemented in source; club-only records excluded from real-mode edit | [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) | #644–#650 |
-| Profile banners (A-BANNERS), character picker 15 per page, image-library upload progress bar, Admin avatar full-photo viewer, license period (no start date), unclaimed club records in Players | implemented in source (P08.4, P08.6, P08.8, P08.9; #752, #754, #756, #757, #758); the `profile-banners` Storage bucket was created 2026-11-12; Admin › Players lists unclaimed club records under their club as “Not registered yet” with no RTR ID; Admin › Add player still creates an unclaimed `players` row with an RTR ID (open, [D-2026-11-12-01](../decisions.md#d-2026-11-12-01)); not run against a database | [D-2026-11-11-11](../decisions.md#d-2026-11-11-11), [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) | #748 |
+| Admin edits everything on a player + profile character library (A07, epic #589) | registered Player full-form edit implemented in source; club-only records excluded from real-mode edit | [D-2026-11-09-13](../decisions/2026-11-09.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions/2026-11-09.md#d-2026-11-09-14) | #644–#650 |
+| Profile banners (A-BANNERS), character picker 15 per page, image-library upload progress bar, Admin avatar full-photo viewer, license period (no start date), unclaimed club records in Players | implemented in source (P08.4, P08.6, P08.8, P08.9; #752, #754, #756, #757, #758); the `profile-banners` Storage bucket was created 2026-11-12; Admin › Players lists unclaimed club records under their club as “Not registered yet” with no RTR ID; Admin › Add player still creates an unclaimed `players` row with an RTR ID (open, [D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01)); not run against a database | [D-2026-11-11-11](../decisions/2026-11-11.md#d-2026-11-11-11), [D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01) | #748 |
 | Club accent persistence | not implemented / deferred candidate | `real/admin.ts:88-89` hardcodes `accent: false`; no `accent` in `prisma/schema` | #395 open (blocked) |
 
 ## Admin implementation gap index
@@ -76,15 +76,15 @@ duplicate issues merely because a related epic is open.
 
 ## Related decisions
 
-- [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — Admin issues the manual reset link.
-- [D-2026-11-09-13](../decisions.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions.md#d-2026-11-09-14) — profile character library; Admin edits everything.
-- [D-2026-11-16-04](../decisions.md#d-2026-11-16-04) — unclaimed players have an email and an RTR ID; Admin can edit the email and change the RTR ID (registration place and date), which cascades; mockup, components, mock data and the Admin screens wired (#923, #926); real mode built in P15.8 (#927): the Players list carries unclaimed entries and Details required, the email edit and the RTR ID change (registered and unclaimed) replace the old RTR ID on every record with no alias; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database.
-- [D-2026-11-11-11](../decisions.md#d-2026-11-11-11) — profile banners, 15 per page, upload progress, avatar photo viewer.
-- [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
+- [D-2026-11-07-01](../decisions/2026-11-07.md#d-2026-11-07-01) — Admin issues the manual reset link.
+- [D-2026-11-09-13](../decisions/2026-11-09.md#d-2026-11-09-13), [D-2026-11-09-14](../decisions/2026-11-09.md#d-2026-11-09-14) — profile character library; Admin edits everything.
+- [D-2026-11-16-04](../decisions/2026-11-16.md#d-2026-11-16-04) — unclaimed players have an email and an RTR ID; Admin can edit the email and change the RTR ID (registration place and date), which cascades; mockup, components, mock data and the Admin screens wired (#923, #926); real mode built in P15.8 (#927): the Players list carries unclaimed entries and Details required, the email edit and the RTR ID change (registered and unclaimed) replace the old RTR ID on every record with no alias; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database.
+- [D-2026-11-11-11](../decisions/2026-11-11.md#d-2026-11-11-11) — profile banners, 15 per page, upload progress, avatar photo viewer.
+- [D-2026-11-07-04](../decisions/2026-11-07.md#d-2026-11-07-04) — scope freeze.
 
 ## Blocking open decisions
 
-- #244 contact-change approval evidence and audit lines for failed or retried application (application itself is real, #575). #377, #380 and #395 were decided November 11, 2026 ([D-2026-11-11-06](../decisions.md#d-2026-11-11-06), [D-07](../decisions.md#d-2026-11-11-07), [D-10](../decisions.md#d-2026-11-11-10)).
+- #244 contact-change approval evidence and audit lines for failed or retried application (application itself is real, #575). #377, #380 and #395 were decided November 11, 2026 ([D-2026-11-11-06](../decisions/2026-11-11.md#d-2026-11-11-06), [D-07](../decisions/2026-11-11.md#d-2026-11-11-07), [D-10](../decisions/2026-11-11.md#d-2026-11-11-10)).
 - [Database open decisions](../../database_design/product/open-decisions.md) · [business open decisions](../../business_logic/product/open-decisions.md) · [screen open decisions](../../screens/product/open-decisions.md).
 - Hub open questions 9, 10, 13, 14.
 

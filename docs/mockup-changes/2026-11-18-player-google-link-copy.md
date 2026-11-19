@@ -16,7 +16,7 @@ Superseded by: none
 - The mockup's `gDisconnect` action (nothing in the prototype called it) is removed, so no Google disconnect exists anywhere in the prototype.
 
 ## Why
-- A copy correction to match [D-2026-11-16-01](../mvp/decisions.md#d-2026-11-16-01): Google "can be changed but not disconnected". The first log ([2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md)) shipped the older line. Owner, November 18, 2026: follow the decision, not the mockup.
+- A copy correction to match [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01): Google "can be changed but not disconnected". The first log ([2026-11-16-player-google-sign-in](2026-11-16-player-google-sign-in.md)) shipped the older line. Owner, November 18, 2026: follow the decision, not the mockup.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

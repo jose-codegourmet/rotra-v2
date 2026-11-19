@@ -20,7 +20,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 17, 2026: two public pages on the Player app, `https://player.rotra.club/privacy` and `https://player.rotra.club/terms`, so the Google sign-in consent screen can link to them.
-- Decision: [D-2026-11-17-01](../mvp/decisions.md#d-2026-11-17-01).
+- Decision: [D-2026-11-17-01](../mvp/decisions/2026-11-17.md#d-2026-11-17-01).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -44,4 +44,4 @@ Superseded by: none
 - Built in the same change: `@rotra/ui/legal-document`, the `below` slot on AuthCard, `legalLinks` on SignInForm, the `/privacy` and `/terms` routes in `apps/player/src/app/(public)/`, and the line on `/login`. `apps/player/src/proxy.ts` protects only `/me`, `/profile` and compare, so both pages are public in mock and real mode without a change.
 
 ## Open for the owner
-- The text is a plain-language draft that a lawyer has not reviewed. The other open points are listed under [D-2026-11-17-01](../mvp/decisions.md#d-2026-11-17-01).
+- The text is a plain-language draft that a lawyer has not reviewed. The other open points are listed under [D-2026-11-17-01](../mvp/decisions/2026-11-17.md#d-2026-11-17-01).

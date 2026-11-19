@@ -1,7 +1,7 @@
 # Track specification: Ship the Go stack and retire Supabase
 
 **Track ID:** ship-and-retire_20261113 · **Type:** chore · **Priority:** medium (order 14 of 14) · **Created:** 2026-11-13
-**Depends on:** all earlier tracks · **Decisions:** B-10, B-20, B-35, B-36, B-42, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** all earlier tracks · **Decisions:** B-10, B-20, B-35, B-36, B-42, D-2026-11-13-08, D-2026-11-14-01 ([register](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 
@@ -47,7 +47,7 @@ Remove moved Route Handlers and `packages/db` services; move the regression suit
 
 **Accepted when:**
 
-- [ ] TypeScript copies of Go-only rules deleted on `go-stack` and gone from `main` after the merge ([D-2026-11-13-08](../../../docs/mvp/decisions.md#d-2026-11-13-08); [rule map](../rule-cases_20261113/spec.md#where-the-rules-live)); the shared queue and matchmaking rules run from the Go WebAssembly build (rule-cases R7, [D-2026-11-14-01](../../../docs/mvp/decisions.md#d-2026-11-14-01)), with no TypeScript copy left
+- [ ] TypeScript copies of Go-only rules deleted on `go-stack` and gone from `main` after the merge ([D-2026-11-13-08](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-08); [rule map](../rule-cases_20261113/spec.md#where-the-rules-live)); the shared queue and matchmaking rules run from the Go WebAssembly build (rule-cases R7, [D-2026-11-14-01](../../../docs/mvp/decisions/2026-11-14.md#d-2026-11-14-01)), with no TypeScript copy left
 - [ ] UI updated on `go-stack` where a screen ran a deleted rule: setup form previews, `@rotra/schema` form checks, offline payments amount, mock mode per area. Each through the mockup first (mockup change on `main`)
 - [ ] `ROTRA_GO_MOVED_AREAS` is gone from code, `.env.example` and every Vercel project; every `/api/*` reaches Go and an app without `ROTRA_GO_API_URL` fails at start
 - [ ] No app file imports `@rotra/db`; deleting `packages/db` breaks no `proxy.ts` or page (B-51)

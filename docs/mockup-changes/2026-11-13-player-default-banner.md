@@ -17,7 +17,7 @@ Superseded by: none
 - Profile card **Stats · last 90 days** → **Stats · 2026** (the current calendar year, reset on January 1); empty “No games yet” → “No games yet this year”. Share profile: **Last 90 days** → **In 2026**, empty “No games yet this year”. The rank still uses the 90-day window.
 
 ## Why
-- Owner, November 13, 2026: “the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions.md#d-2026-11-13-03).
+- Owner, November 13, 2026: “the default banner image should be controllable via admin control”. Decision [D-2026-11-13-03](../mvp/decisions/2026-11-13.md#d-2026-11-13-03).
 - Follow-up, same day: “can we make the stats to only reset every year”. Profile stats now count the calendar year and reset on January 1; the rank keeps its 90-day window.
 
 ## Like for like

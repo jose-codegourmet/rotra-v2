@@ -21,7 +21,7 @@ Superseded by: 2026-11-16-queue-unclaimed-email-lookup.md (in part)
 - History filter "ROTRA profile": only registered players count as "Has a ROTRA profile".
 
 ## Why
-- Owner, November 11, 2026: "guest should stay in the club's saved players and registered players live in rotra's saved players", "Unclaimed profiles should never be found in other clubs. they should only live in club". Owner choices: same phone in two clubs → keep separate; RTR ID only on registration; on registration the records link automatically. See [D-2026-11-11-03](../mvp/decisions.md#d-2026-11-11-03).
+- Owner, November 11, 2026: "guest should stay in the club's saved players and registered players live in rotra's saved players", "Unclaimed profiles should never be found in other clubs. they should only live in club". Owner choices: same phone in two clubs → keep separate; RTR ID only on registration; on registration the records link automatically. See [D-2026-11-11-03](../mvp/decisions/2026-11-11.md#d-2026-11-11-03).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

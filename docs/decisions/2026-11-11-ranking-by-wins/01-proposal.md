@@ -1,7 +1,7 @@
 # Ranking by wins: proposal
 
-Date: 2026-11-11 (Asia/Manila). **Status: DECIDED, November 11, 2026 — all recommended options approved by the owner; recorded as [D-2026-11-11-05](../../mvp/decisions.md#d-2026-11-11-05).** Constants and worked examples follow in #247. Written for the product owner after a
-discussion on November 11, 2026. It is recorded in [mvp/decisions.md](../../mvp/decisions.md) and the ranking business module. It does not
+Date: 2026-11-11 (Asia/Manila). **Status: DECIDED, November 11, 2026 — all recommended options approved by the owner; recorded as [D-2026-11-11-05](../../mvp/decisions/2026-11-11.md#d-2026-11-11-05).** Constants and worked examples follow in #247. Written for the product owner after a
+discussion on November 11, 2026. It is recorded in [mvp/decisions/README.md](../../mvp/decisions/README.md) and the ranking business module. It does not
 authorize database work or code by itself; #247 carries the constants and worked examples.
 
 Ticket: #247 (F07.6, ranking math). Replaces the "70% club assessments / 30% match performance" idea
@@ -119,7 +119,7 @@ if approved.
 
 ## Next step after approval
 
-- Record the decision in `mvp/decisions.md` and update the docs listed above in one PR.
+- Record the decision in `mvp/decisions/README.md` and update the docs listed above in one PR.
 - Write worked examples for #247: a level-matched night, an upset, a padded win, a returning player, a
   Provisional newcomer, a substituted game, an invalid session.
 - Pick the actual constants (band edges, step sizes) in that same ticket, with the examples.

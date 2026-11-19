@@ -7,8 +7,8 @@ Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/queue/src/app/api/`, 
 ## Goal
 
 The Queue Master can keep running an active Queue Session without internet, within the boundaries of
-[D-2026-11-07-03](../decisions.md#d-2026-11-07-03). Offline is mandatory for MVP; an online-only public
-launch is not approved ([D-04](../decisions.md#d-2026-11-07-04)).
+[D-2026-11-07-03](../decisions/2026-11-07.md#d-2026-11-07-03). Offline is mandatory for MVP; an online-only public
+launch is not approved ([D-04](../decisions/2026-11-07.md#d-2026-11-07-04)).
 
 ## In scope
 
@@ -48,7 +48,7 @@ temporary number until its replay; collision-free numbers across two offline dev
 ## Remaining work
 
 - [x] Durable read-only device copy + session download in real mode (#477). Offline writes/outbox: #722.
-- [x] Outbox in IndexedDB, local apply through the existing reducers, replay through the existing real adapters, 409 → Q-CONFLICT, `playhistory.json` export/import in This device. #722 ([D-2026-11-11-04](../decisions.md#d-2026-11-11-04)); the device-stream routes (`uploadOperations`/`sealStream`) are not built for MVP.
+- [x] Outbox in IndexedDB, local apply through the existing reducers, replay through the existing real adapters, 409 → Q-CONFLICT, `playhistory.json` export/import in This device. #722 ([D-2026-11-11-04](../decisions/2026-11-11.md#d-2026-11-11-04)); the device-stream routes (`uploadOperations`/`sealStream`) are not built for MVP.
 - [x] Add downloaded club players and guests offline. #722.
 - [x] Interruption answer + conflict review in real mode (refused outbox commands). #722. Two-device match conflicts: #246 (decision).
 - [ ] Guest reconciliation at Session done: the review read and notice landed (#722); the confirm-a-match merge service, create-unclaimed-player (RTR ID) service and the sheet's actions need a ticket and an owner answer on recording the link (no column today).
@@ -58,8 +58,8 @@ temporary number until its replay; collision-free numbers across two offline dev
 
 ## Related decisions
 
-- [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — offline boundaries and guest reconciliation.
-- [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — offline mandatory for MVP.
+- [D-2026-11-07-03](../decisions/2026-11-07.md#d-2026-11-07-03) — offline boundaries and guest reconciliation.
+- [D-2026-11-07-04](../decisions/2026-11-07.md#d-2026-11-07-04) — offline mandatory for MVP.
 
 ## Blocking open decisions
 

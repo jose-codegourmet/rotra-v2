@@ -26,7 +26,7 @@ Superseded by: none
 - Owner, November 19, 2026, in the session: an account should say Male or Female, because MM vs MM is Men's Doubles,
   WW vs WW Women's Doubles, MW vs MW Mixed Doubles, and MM vs WW, MM vs MW, WW vs MW are Genderless Doubles. Optional
   for now, with a reminder; records without one count as Genderless; public; the same rule for every format.
-  [D-2026-11-19-01](../mvp/decisions.md#d-2026-11-19-01).
+  [D-2026-11-19-01](../mvp/decisions/2026-11-19.md#d-2026-11-19-01).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -46,4 +46,4 @@ Superseded by: none
 - docs/business_logic/product/queue/modules/matches/README.md (Match category)
 - docs/screens/product/modules/queue/match-queue.md, players-roster.md
 - docs/database_design/product/queue/modules/sessions-roster.md (`club_players.gender`, proposed)
-- docs/product-terms.md (Gender, Match category); docs/mvp/decisions.md (D-2026-11-19-01)
+- docs/product-terms.md (Gender, Match category); docs/mvp/decisions/README.md (D-2026-11-19-01)

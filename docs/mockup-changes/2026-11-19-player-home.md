@@ -52,4 +52,4 @@ Superseded by: none
 - screens/product/modules/player-information/profile.md (new P-HOME section; My sessions and Clubs card moved)
 - screens/product/modules/player-information/ranking-history.md (Share result location)
 - screens/product/navigation.md (`/home` protected)
-- mvp/decisions.md (D-2026-11-19-10), mvp/workstreams/player.md
+- mvp/decisions/README.md (D-2026-11-19-10), mvp/workstreams/player.md

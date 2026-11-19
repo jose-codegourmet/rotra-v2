@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-11-18. **Status:** real mode is **written but not run against Google**: no
 sign-in has been tried, because the Google Cloud OAuth client and the Supabase provider (#896) are
-not set up yet. Decision: [D-2026-11-16-01](../mvp/decisions.md#d-2026-11-16-01). Ticket: #922.
+not set up yet. Decision: [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01). Ticket: #922.
 Built on Supabase Auth in the Player app's real mode; it moves to the Go API with B-04 (#875).
 
 Everything here is off while the platform feature flag `player_google_sign_in` is off.

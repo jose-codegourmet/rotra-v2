@@ -2,7 +2,7 @@
 
 A Playwright suite that runs whole club nights through the three apps in **real mode**, against a
 throwaway **local** Supabase. It checks that every player gets their fair share of games when
-real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions.md#d-2026-11-12-05).
+real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions/2026-11-12.md#d-2026-11-12-05).
 
 - Apps run on ports 9100 (Queue), 9101 (Player) and 9102 (Admin).
 - Database: `rotra_disposable_e2e` on `127.0.0.1:54322`. Supabase: `http://127.0.0.1:54321`. The

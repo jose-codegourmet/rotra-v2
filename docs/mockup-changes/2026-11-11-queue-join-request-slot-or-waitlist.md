@@ -39,7 +39,7 @@ Superseded by: none
 - Business logic: docs/business_logic/product/queue/modules/players/README.md — “Join requests from the session link”: the choice, the full-slots rule, Join from waitlist and how confirmation honours each choice.
 - Database design: docs/database_design/product/queue/modules/sessions-roster.md — `session_join_requests.placement` (`slot` · `waitlist` · `from_waitlist`), migration `20261111000200`.
 - Screen docs: docs/screens/product/modules/queue/public-session.md (Q-PUBLIC-JOIN, Join signed in), docs/screens/product/modules/queue/session-setup.md (Requests card › Join tab).
-- Decisions: docs/mvp/decisions.md D-2026-11-11-02.
+- Decisions: docs/mvp/decisions/README.md D-2026-11-11-02.
 
 ## Real app work
 - Built in the same change (#706): `SessionJoinRequest.placement`; `JoinRequestForm`, `JoinRequestCard`, `JoinRequestsPanel` as in the reuse plan; mock store and real mode (`sendJoinRequest`, `joinSessionAsPlayer` with the placement, `confirmJoinRequest` honouring it; Prisma enum + column in `roster.prisma`, migration drafted, not applied).

@@ -11,7 +11,7 @@
 Public without sign-in. **Top annual** is the default. The **Top annual · Top monthly · Top weekly**
 switch sits below the page title with the period and comparison, e.g. “2026 · compared with last
 year”, “November 2026 · compared with last month” or “Nov 16 to Nov 22 · compared with last week”.
-Labels use the calendar in Asia/Manila. [Decision](../../../../mvp/decisions.md#d-2026-11-16-05) ·
+Labels use the calendar in Asia/Manila. [Decision](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05) ·
 [Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md).
 
 The selected period drives the podium, **Your position** card, search and list. Each row shows the
@@ -40,12 +40,12 @@ A row or podium place opens the profile dialog. For visitors, a **Private** play
 a button and the name cannot be found by search. A private RTR ID shows the same “Profile not found”
 as an unknown ID. **Always private** players keep their public picture and banner, with a masked
 name and only the private dialog available to other viewers. Their own row is shown in full.
-[Private visibility](../../../../mvp/decisions.md#d-2026-11-09-07) ·
-[Always private](../../../../mvp/decisions.md#d-2026-11-11-11).
+[Private visibility](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07) ·
+[Always private](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11).
 
 An unclaimed player saved by one club is public and has a **Not registered yet** chip on their
 leaderboard row. Their row opens the profile dialog. A person saved by more than one club joins the
-list after registering. [Unclaimed players](../../../../mvp/decisions.md#d-2026-11-16-04).
+list after registering. [Unclaimed players](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04).
 
 **Who appears here** explains standard matches, the calendar resets, tie-breaking by win rate,
 excluded matches and sessions, movement marks and unclaimed players. **How ranks work** opens the
@@ -107,7 +107,7 @@ If a public session page expires/deletes, preserve player history with a truthfu
 
 ### Share cards
 
-Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08)). One sheet, **Share rank**, **Share result** or **Share games**, with a **Post | Story** switch (4:5, 1080 × 1350; 9:16, 1080 × 1920) above the fixed dark brand card. The card is drawn on the device and looks the same in both themes. Its footer carries “ROTRA · Run the game.” and a small corner QR that opens the player's profile (`/player/players/<id>`). Hint: “The QR opens your profile. Private profiles ask visitors to log in.” (the same sheet also carries **Share profile**, whose card and link field are in [profile.md](profile.md#p-own-profile--signed-in-owner-view)) Buttons: **Copy link**, then **Share** when the browser supports Web Share (the phone's share sheet with the image), otherwise **Download image** (PNG).
+Own profile only ([D-2026-11-09-08](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-08)). One sheet, **Share rank**, **Share result** or **Share games**, with a **Post | Story** switch (4:5, 1080 × 1350; 9:16, 1080 × 1920) above the fixed dark brand card. The card is drawn on the device and looks the same in both themes. Its footer carries “ROTRA · Run the game.” and a small corner QR that opens the player's profile (`/player/players/<id>`). Hint: “The QR opens your profile. Private profiles ask visitors to log in.” (the same sheet also carries **Share profile**, whose card and link field are in [profile.md](profile.md#p-own-profile--signed-in-owner-view)) Buttons: **Copy link**, then **Share** when the browser supports Web Share (the phone's share sheet with the image), otherwise **Download image** (PNG).
 
 **Share dialog layout (owner, November 13, 2026; [log](../../../../mockup-changes/2026-11-13-share-dialog.md)).** Every Share button (profile, rank, result, games) opens one dialog: **three size tiles** side by side, each a live scaled preview — **Story** (9:16, “Facebook and Instagram stories”), **Facebook post** (4:5, “Facebook feed”, selected first) and **Square** (1:1, “Instagram feed”); tapping a tile selects it (accent border); **Download <size>** saves the selected size (Story 1080 × 1920, Facebook post 1080 × 1350, Square 1080 × 1080) and **Share** opens the system share sheet where there is one. Then a big **OR** divider, then the link as one read-only field with the **copy icon inside it** on the right (no separate Copy button; toast “Link copied”). Footer: **Close**. Square shows 2 game rows (Story 4, Facebook post 3).
 
@@ -115,11 +115,11 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions.md#d-2026-11-09-08
 
 **Save to Photos on iPhone and iPad (owner, November 15, 2026; [log](../../../../mockup-changes/2026-11-15-share-save-to-photos.md)).** Safari on iPhone and iPad saves downloads to the Files app. There, where the system share sheet takes files, every share dialog shows **Save to Photos** in place of **Download N images**, next to **Share**, with the hint “Save to Photos opens the share menu. Tap **Save Image** there.” (**Save N Images** when several are picked). It opens the system share sheet with the picked PNGs; its **Save Image** puts them in Photos. The full-screen view's button reads **Save to Photos** too. Android and computers keep **Download**. A web page can't write to Photos directly, and can't open the Instagram or Facebook story editor.
 
-- **Share profile** ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11)): on a readable profile or its dialog. The card shows the level (or **Not ranked yet**), the **Top annual** place if present, and this calendar year's wins. The **Profile link** field and copy icon sit below the images.
+- **Share profile** ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)): on a readable profile or its dialog. The card shows the level (or **Not ranked yet**), the **Top annual** place if present, and this calendar year's wins. The **Profile link** field and copy icon sit below the images.
 - **Share rank:** on the own profile when ranked. The card shows the level, the **Top annual** place if present, and the skill ladder.
 - **Share result:** in Home's Upcoming sessions card (Finished) and on each session group in Match history. Card: session title, date and club, “#N in Standings”, “G games · W–L”.
 - **Share games:** on each session group in Match history. Card: date and club, avatar groups for each team with a prominent score between them, and “Total W–L”. Post shows 3 games, Story 4, then “+N more games”. A missing score shows an em dash and “Winner recorded”.
-- **Your own games, any time** (since November 13, 2026, [D-2026-11-13-06](../../../../mvp/decisions.md#d-2026-11-13-06)): **Share performance** (one card: session title, date · club, your counted record big as “W–L” with “N% won”, then Games, Won, Lost and, once published, Standing “#N”; also in the session matches dialog footer on your own profile) and **Share games** show on every session of your own history, and each counted game has a share icon (**Share game**, one game). **Share result** still appears only after the Queue Master publishes; before that the row says “Share result opens once the club shares the Standings.”
+- **Your own games, any time** (since November 13, 2026, [D-2026-11-13-06](../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-06)): **Share performance** (one card: session title, date · club, your counted record big as “W–L” with “N% won”, then Games, Won, Lost and, once published, Standing “#N”; also in the session matches dialog footer on your own profile) and **Share games** show on every session of your own history, and each counted game has a share icon (**Share game**, one game). **Share result** still appears only after the Queue Master publishes; before that the row says “Share result opens once the club shares the Standings.”
 - **Names on images:** other players show as a visitor would see them. Private and Always private players and guests are masked (first letter plus `***` per word), public registered players in full, whoever is signed in.
 - **Story** shows 4 avatar rows; **Post** shows 3. Both keep scores prominent and names secondary.
 

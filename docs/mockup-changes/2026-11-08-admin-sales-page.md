@@ -21,14 +21,14 @@ Components: sales-stat-card, admin-nav
   sessions started.
 
 ## Open questions for the owner
-- **Decided in [D-2026-11-08-01](../mvp/decisions.md#d-2026-11-08-01) (owner delegated, 2026-11-08): revenue in the month paid; free clubs count in sessions and matches; nothing else on the page for MVP; Postgres views computed on read, no cron or Edge Function.** The questions below are kept for history.
+- **Decided in [D-2026-11-08-01](../mvp/decisions/2026-11-08.md#d-2026-11-08-01) (owner delegated, 2026-11-08): revenue in the month paid; free clubs count in sessions and matches; nothing else on the page for MVP; Postgres views computed on read, no cron or Edge Function.** The questions below are kept for history.
 - Revenue by the date paid, or spread over the days each license covers?
 - Free (tester) clubs: counted in sessions and matches? (Assumed yes.)
 - Anything else on the page, such as renewals due, new clubs this month, or churn?
 
 ## Where the numbers are calculated
 - Owner note, same day: Supabase (Postgres) rather than Next.js. Discussion and the AI recommendation live in
-  docs/mvp/decisions.md, D-2026-11-08-01 (proposed, not approved).
+  docs/mvp/decisions/README.md, D-2026-11-08-01 (proposed, not approved).
 
 ## Docs updated
 - Business logic: none yet; the page only reads what is already recorded

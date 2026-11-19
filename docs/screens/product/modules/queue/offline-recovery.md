@@ -23,7 +23,7 @@ Do not label “all synced” merely because the latest upload returned successf
 
 Supported offline actions on a downloaded, already started session: create/edit waiting matches, generate pairings, change presence, add downloaded club players and new guests, add/remove free courts, extend time, start matches, substitute, confirm winners, and mark matches invalid. Saving must survive a page/view change and normal app interruption; implementation must verify durable storage.
 
-Online-only: new-session creation, session start ([D-2026-11-07-03](../../../../mvp/decisions.md#d-2026-11-07-03)), first download, global player search, uncached global identity lookup/claim-link issuance, and Session done (after complete sync and Queue Master review of every unresolved guest). Contact approval and global rank calculation are server-backed, not offline features.
+Online-only: new-session creation, session start ([D-2026-11-07-03](../../../../mvp/decisions/2026-11-07.md#d-2026-11-07-03)), first download, global player search, uncached global identity lookup/claim-link issuance, and Session done (after complete sync and Queue Master review of every unresolved guest). Contact approval and global rank calculation are server-backed, not offline features.
 
 | State | Content and recovery |
 |---|---|

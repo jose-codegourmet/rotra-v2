@@ -51,7 +51,7 @@ Owner request, November 8, 2026. A **Sales** tab after License: what this club p
 - **Month by month** table (stacked rows on a phone): Month, Paid, Sessions, Matches, Paid per session, Est. cost (sessions times the cost per session) and Left over (paid minus est. cost; negatives show with a minus sign), and a small bar chart of the amount paid each month.
 - A closing sentence says what the club leaves over, or how much the estimated cost exceeds what it paid, over the six months.
 - Payments count in the month they were recorded as paid, so a yearly payment lands in one month. Sessions and matches are sample figures in the prototype. The cost per session is a **placeholder (₱15)** until the owner sets it; the real figure, what it includes and whether it is shown are open. Route: the club page with `?tab=sales`.
-- Where these numbers are calculated is an open decision: see [D-2026-11-08-01](../../../../mvp/decisions.md#d-2026-11-08-01).
+- Where these numbers are calculated is an open decision: see [D-2026-11-08-01](../../../../mvp/decisions/2026-11-08.md#d-2026-11-08-01).
 
 ## A-CLUB-PRICE — Change a club's price
 
@@ -65,7 +65,7 @@ Entry: selected club detail. The platform owner has collected payment outside RO
 |---|---|
 | Club | Read-only selected identity; review before commit |
 | Plan | Monthly or yearly; each choice shows the club's price for it |
-| Covers | Read-only computed period ([D-2026-11-11-06](../../../../mvp/decisions.md#d-2026-11-11-06)): starts the day after the current term ends, else today; ends after one month or one year. Hint when a term is current: “A renewal starts the day after the current term ends.” No start-date field ([log](../../../../mockup-changes/2026-11-11-admin-license-no-start-date.md)) |
+| Covers | Read-only computed period ([D-2026-11-11-06](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-06)): starts the day after the current term ends, else today; ends after one month or one year. Hint when a term is current: “A renewal starts the day after the current term ends.” No start-date field ([log](../../../../mockup-changes/2026-11-11-admin-license-no-start-date.md)) |
 | Date paid | Required, not in the future (paid clubs) |
 | Amount | Filled in from the club's price for the chosen plan, editable for this payment. A free club shows **Amount: Free** with no date paid or amount fields; the term is recorded at ₱0 |
 | Note/reference | Optional owner-typed text, kept as a **Note**. Payment history shows the generated `LIC-####` as **Reference** with the note under it |

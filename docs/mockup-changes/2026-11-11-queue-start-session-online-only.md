@@ -16,7 +16,7 @@ Superseded by: none
 - After: offline, the sticky bar is disabled with the reason “Starting needs an internet connection.”, and the sheet shows a warning notice “Starting needs an internet connection.” with its primary **Start session** disabled. Other blockers (other active session, missing levels, license) are unchanged.
 
 ## Why
-- Decision [D-2026-11-07-03](../mvp/decisions.md#d-2026-11-07-03): Start session is online only. Downloading stays for running an already started session offline.
+- Decision [D-2026-11-07-03](../mvp/decisions/2026-11-07.md#d-2026-11-07-03): Start session is online only. Downloading stays for running an already started session offline.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

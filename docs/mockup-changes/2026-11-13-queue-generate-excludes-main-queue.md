@@ -17,7 +17,7 @@ Superseded by: none
 - Auto Queue court filling, Suggest and Regenerate are unchanged.
 
 ## Why
-- Owner decision, November 13, 2026 ([D-2026-11-13-07](../mvp/decisions.md#d-2026-11-13-07)): Generate matches must never count players who are already in the Main Queue as available; with too few free players it makes fewer matches and says how many were left out.
+- Owner decision, November 13, 2026 ([D-2026-11-13-07](../mvp/decisions/2026-11-13.md#d-2026-11-13-07)): Generate matches must never count players who are already in the Main Queue as available; with too few free players it makes fewer matches and says how many were left out.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

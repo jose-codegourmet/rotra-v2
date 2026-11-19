@@ -1,6 +1,6 @@
 # Backend infrastructure on Railway
 
-**Last verified:** 2026-11-13 against Railway's docs · **Decision:** [D-2026-11-13-01](../mvp/decisions.md#d-2026-11-13-01)
+**Last verified:** 2026-11-13 against Railway's docs · **Decision:** [D-2026-11-13-01](../mvp/decisions/2026-11-13.md#d-2026-11-13-01)
 
 **Status:** Target setup, not built. Nothing here exists in Railway or in the repo yet. What runs
 today is in [architecture §12](../architecture.md#12-open-architecture-decisions).
@@ -124,7 +124,7 @@ Rules this sets:
   that needs both a frontend and a backend part is two PRs; the backend one merges first.
 - **Rule cases are shared.** `packages/rule-cases/**` counts as backend for CI. The frontend side of a
   case change is checked by `make check` (its Vitest runs), as for every change.
-- **The rules `.wasm` is shared too** ([D-2026-11-14-01](../mvp/decisions.md#d-2026-11-14-01)).
+- **The rules `.wasm` is shared too** ([D-2026-11-14-01](../mvp/decisions/2026-11-14.md#d-2026-11-14-01)).
   `packages/rules-wasm/**` counts as backend for CI, so a Go rule change and its rebuilt `.wasm` merge
   in one PR. `make check` checks the frontend side: the fingerprint of the Go rule files and the cases
   through the wrapper. The apps publish `rules-manifest.json`; the Go API stamps new Queue Sessions

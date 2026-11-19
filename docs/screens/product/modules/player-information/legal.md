@@ -1,6 +1,6 @@
 # Player legal pages
 
-**Surfaces:** `P-PRIVACY`, `P-TERMS`. **Source:** [D-2026-11-17-01](../../../../mvp/decisions.md#d-2026-11-17-01), amended by [D-2026-11-18-02](../../../../mvp/decisions.md#d-2026-11-18-02), [identity module](../../../../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages). Mockup logs: [2026-11-17-player-legal-pages](../../../../mockup-changes/2026-11-17-player-legal-pages.md), [2026-11-18-player-legal-text-rewrite](../../../../mockup-changes/2026-11-18-player-legal-text-rewrite.md).
+**Surfaces:** `P-PRIVACY`, `P-TERMS`. **Source:** [D-2026-11-17-01](../../../../mvp/decisions/2026-11-17.md#d-2026-11-17-01), amended by [D-2026-11-18-02](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-02), [identity module](../../../../business_logic/product/player-information/modules/identity/README.md#privacy-policy-and-terms-of-service-pages). Mockup logs: [2026-11-17-player-legal-pages](../../../../mockup-changes/2026-11-17-player-legal-pages.md), [2026-11-18-player-legal-text-rewrite](../../../../mockup-changes/2026-11-18-player-legal-text-rewrite.md).
 
 The Google sign-in consent screen links to both pages (`https://player.rotra.club/privacy` and `https://player.rotra.club/terms`). P-LOGIN links to them too.
 

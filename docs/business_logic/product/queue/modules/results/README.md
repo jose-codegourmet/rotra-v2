@@ -12,7 +12,7 @@ Partial (substituted) games and invalid matches do not count, except that a part
 
 ## Finalization versus publishing
 
-Session done requires internet and complete, reconciled records. Unclaimed players (saved with an email, [D-2026-11-16-04](../../../../../mvp/decisions.md#d-2026-11-16-04)) and their RTR IDs are already matched/created as soon as their entries successfully sync; they do not wait for Session done (owner decision, October 28, 2026). A valid finalization automatically contributes eligible session performance to Player Information, whether or not the club publishes anything.
+Session done requires internet and complete, reconciled records. Unclaimed players (saved with an email, [D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)) and their RTR IDs are already matched/created as soon as their entries successfully sync; they do not wait for Session done (owner decision, October 28, 2026). A valid finalization automatically contributes eligible session performance to Player Information, whether or not the club publishes anything.
 
 While finishing, the operator sees four stages: checking session records, finishing the session, updating player records, preparing result slides. The results view then opens.
 
@@ -37,11 +37,11 @@ Order by:
 1. Most wins.
 2. Fewest losses.
 
-**Shared positions (owner, November 18, 2026, [D-2026-11-18-05](../../../../../mvp/decisions.md#d-2026-11-18-05); [log](../../../../../mockup-changes/2026-11-18-queue-shared-standings-positions.md); mockup only).** Players with the same wins and the same losses share one position. Positions run on without gaps: two players at 1 are followed by 2 (1, 1, 2), so the standings table's rows read 1, 2, 3 … (owner artifact comment, November 19, 2026, [log](../../../../../mockup-changes/2026-11-19-queue-standings-no-gaps.md); this replaces the November 18 answer “1, 1, 3”). Head-to-head no longer separates anyone, and the name only orders the players inside a shared position. On the standings tables a shared position is one row with the players' pictures stacked; share images and the Standings slide keep one row per player and show the shared number.
+**Shared positions (owner, November 18, 2026, [D-2026-11-18-05](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); [log](../../../../../mockup-changes/2026-11-18-queue-shared-standings-positions.md); mockup only).** Players with the same wins and the same losses share one position. Positions run on without gaps: two players at 1 are followed by 2 (1, 1, 2), so the standings table's rows read 1, 2, 3 … (owner artifact comment, November 19, 2026, [log](../../../../../mockup-changes/2026-11-19-queue-standings-no-gaps.md); this replaces the November 18 answer “1, 1, 3”). Head-to-head no longer separates anyone, and the name only orders the players inside a shared position. On the standings tables a shared position is one row with the players' pictures stacked; share images and the Standings slide keep one row per player and show the shared number.
 
 Only players with at least one counted game are listed; players who never completed a counted game are left out. Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. The standings rule (`computeStandings`, in TypeScript and Go) returns this order and each row's shared position (Q23.4, #972); the Queue screens still draw one row per player until they are wired to it (Q23.6). Results published before the change keep the standings they were published with: stored standings are never recomputed.
 
-A session with **Record games** off has no standings, result slides or awards at all ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [sessions](../sessions/README.md#record-games)).
+A session with **Record games** off has no standings, result slides or awards at all ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [sessions](../sessions/README.md#record-games)).
 
 Guests participate in standings. Fun-game wins/losses count. A partial game counts for neither substituted player unless the operator gave the game to one of them; that player gets the game, the win or loss, and minimum credit for the session. Invalid matches count for no one.
 
@@ -79,11 +79,11 @@ The operator chooses when to publish, online only. The publish review states the
 - **Standings** and **Awards**, both selected by default the first time, or the previously published selection when updating.
 - **Include Off Day**, always **off** each time the review opens, even if Off Day was shared before. It names who would appear.
 
-Publishing needs at least one selection. The operator can publish again later to change the selection (**Update publication**). There is **no Unpublish**: republishing with a new selection is the only change after publication (decided November 11, 2026, [D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
+Publishing needs at least one selection. The operator can publish again later to change the selection (**Update publication**). There is **no Unpublish**: republishing with a new selection is the only change after publication (decided November 11, 2026, [D-2026-11-11-09](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-09)).
 
-Published slides appear on the public session page: Standings on the **Leaderboard** tab (with the viewer's position), Awards and Off Day under Details, which also lists the session's **Match history** in place of the Queue (owner, November 13, 2026, [D-2026-11-13-05](../../../../../mvp/decisions.md#d-2026-11-13-05)). Until publication a signed-in player sees only their own record and matches. Before publication the page says "Results for this session have not been shared."
+Published slides appear on the public session page: Standings on the **Leaderboard** tab (with the viewer's position), Awards and Off Day under Details, which also lists the session's **Match history** in place of the Queue (owner, November 13, 2026, [D-2026-11-13-05](../../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-05)). Until publication a signed-in player sees only their own record and matches. Before publication the page says "Results for this session have not been shared."
 
-Publishing does not delay profile, performance, or global leaderboard updates after valid finalization. Public session-page lifetime follows [license retention rules](../../../admin/modules/clubs-licenses/README.md): no time limit while the club is licensed. Public pages are **never indexed and never static**: served per request with `noindex, nofollow`, disallowed in `robots.txt`, no static generation or ISR ([D-2026-11-11-09](../../../../../mvp/decisions.md#d-2026-11-11-09)).
+Publishing does not delay profile, performance, or global leaderboard updates after valid finalization. Public session-page lifetime follows [license retention rules](../../../admin/modules/clubs-licenses/README.md): no time limit while the club is licensed. Public pages are **never indexed and never static**: served per request with `noindex, nofollow`, disallowed in `robots.txt`, no static generation or ISR ([D-2026-11-11-09](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-09)).
 
 ## Image downloads
 

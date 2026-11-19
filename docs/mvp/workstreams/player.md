@@ -8,7 +8,7 @@ Paths: `real/` = `packages/data/src/real/`, `api/` = `apps/player/src/app/api/`,
 ## Goal
 
 Player Information exposes identities/history. Players can sign in, claim their account and recover
-access. Recovery follows [D-2026-11-07-01](../decisions.md#d-2026-11-07-01), updated by #491: Admin reviews submitted requests and provides links without automatic email.
+access. Recovery follows [D-2026-11-07-01](../decisions/2026-11-07.md#d-2026-11-07-01), updated by #491: Admin reviews submitted requests and provides links without automatic email.
 
 ## In scope
 
@@ -42,13 +42,13 @@ password recovery through Admin-reviewed requests (#491).
 | Session read / proxy guard | implemented | `auth/fetchers.ts:27` → `real/player.ts:23` → `api/auth/session` → `handleSessionRead('player')`; `apps/player/src/proxy.ts` | #483 |
 | Logout | implemented | `auth/fetchers.ts:71` → `real/player.ts:32` → `api/auth/sign-out` → `handleSignOut('player')` | #483 |
 | Registration / account claim (`/claim/[token]`) | implemented | `player-account/fetchers.ts:89,174` → `real/player.ts:39,47` → `api/claim/[token]` GET/POST → `db/src/player/{claim,account-access}.ts` (`readClaimLink`, `registerFromClaim`); prefilled from the club, phone typable when none on file (#484). The "processing" re-check (`checkClaimStatus`, `player-account/fetchers.ts:211`) is mock only | #483, #484 |
-| Claim-link issuance — Queue (Saved players › Invite) | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → Queue `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; 7 days (`CLAIM_LINK_DAYS = 7`), a new link cancels the previous one (#485); since November 18, 2026 a guest gets the same kind of link for their own record ([D-2026-11-18-07](../decisions.md#d-2026-11-18-07), written, not run against a database yet; before: independent registration at `/register/[clubId]`, #490) | #483, #485 |
+| Claim-link issuance — Queue (Saved players › Invite) | implemented | `club-player/fetchers.ts:165` → `real/queue.ts:550` → Queue `api/club/players/[clubPlayerId]/registration-link` → `db/src/player/claim.ts:44`; 7 days (`CLAIM_LINK_DAYS = 7`), a new link cancels the previous one (#485); since November 18, 2026 a guest gets the same kind of link for their own record ([D-2026-11-18-07](../decisions/2026-11-18.md#d-2026-11-18-07), written, not run against a database yet; before: independent registration at `/register/[clubId]`, #490) | #483, #485 |
 | Claim-link issuance — Admin | not implemented | `admin-player/mutations.ts:229` `issueRegistrationLink` mock only | none found |
 | Forgot Password screen | implemented in #491; schema applied | `/api/auth/password-reset` saves an Admin review request; no automatic email | #491 |
 | Reset password (`/reset-password/[token]`) | implemented in #491; schema applied | Reviewed digest + provider expiry/single use, mapped player check, new password chosen by player | #491 |
 | Guest registration (without an existing-profile claim link) | implemented | `/register/[clubId]` → `useGuestRegistration` → `/api/register/[clubId]` → `db/src/player/guest-registration.ts`; unique contacts, recoverable claim staging, no guest linkage. Once the account exists the new player is saved to the originating club (`addPlayerToClub` in `my-clubs.ts`, D-2026-11-09-06, #707); a failed join does not fail the registration. Local database + simulated-provider flow verified; production provider not exercised | #490, #707 |
-| Club invite code (`/register/[clubId]?k=<code>`) | implemented in source (P08.7, #755; not run against a database) | One `clubs.invite_code` column, every club backfilled in `20261112000100`; the server checks `k` and Regenerate link replaces it; a plain link without a valid code is refused ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)). Open: the public club page's Join button sends the current code to anyone who opens the page | #707, #712, #755 |
-| Profile visibility (Public · Private · Always private), Hide me from Player Information, profile banners | implemented in source (P08.5, P08.6; #753, #754) | `players.profile_visibility`, `hidden_from_directory`, `banner_id`; the hide flag applies to Queue Add player › Player Information and RTR ID search only; an always-private leaderboard row keeps position, picture and banner and hides the level; banner default = first shown banner; the banner dialog cannot show a banner Admin later hid ([D-2026-11-12-01](../decisions.md#d-2026-11-12-01)); the banner is 5:2 with nothing over it, picked in a dialog from the banner pencil ([D-2026-11-12-03](../decisions.md#d-2026-11-12-03)) | #715, #753, #754, #765 |
+| Club invite code (`/register/[clubId]?k=<code>`) | implemented in source (P08.7, #755; not run against a database) | One `clubs.invite_code` column, every club backfilled in `20261112000100`; the server checks `k` and Regenerate link replaces it; a plain link without a valid code is refused ([D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01)). Open: the public club page's Join button sends the current code to anyone who opens the page | #707, #712, #755 |
+| Profile visibility (Public · Private · Always private), Hide me from Player Information, profile banners | implemented in source (P08.5, P08.6; #753, #754) | `players.profile_visibility`, `hidden_from_directory`, `banner_id`; the hide flag applies to Queue Add player › Player Information and RTR ID search only; an always-private leaderboard row keeps position, picture and banner and hides the level; banner default = first shown banner; the banner dialog cannot show a banner Admin later hid ([D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01)); the banner is 5:2 with nothing over it, picked in a dialog from the banner pencil ([D-2026-11-12-03](../decisions/2026-11-12.md#d-2026-11-12-03)) | #715, #753, #754, #765 |
 
 ## Remaining work
 
@@ -62,18 +62,18 @@ password recovery through Admin-reviewed requests (#491).
 
 ## Related decisions
 
-- [D-2026-11-07-01](../decisions.md#d-2026-11-07-01) — manual password recovery.
-- [D-2026-11-07-03](../decisions.md#d-2026-11-07-03) — guest identity reconciliation.
-- [D-2026-11-11-03](../decisions.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration; built in P08.9 (#757). Superseded in part by D-2026-11-16-04.
-- [D-2026-11-16-04](../decisions.md#d-2026-11-16-04) — four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927): registration keeps the RTR ID and joins every club record by the ROTRA or Google email, phone linking stays; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database; not run against Supabase Auth or in a browser.
-- [D-2026-11-17-01](../decisions.md#d-2026-11-17-01) — Privacy Policy (`/privacy`) and Terms of Service (`/terms`) pages, public and static; built in the mockup and apps/player together; legal review and details open.
-- [D-2026-11-12-01](../decisions.md#d-2026-11-12-01) — answers to the leftover questions of the November 11 round.
-- [D-2026-11-07-07](../decisions.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
-- [D-2026-11-07-04](../decisions.md#d-2026-11-07-04) — scope freeze.
-- [D-2026-11-19-10](../decisions.md#d-2026-11-19-10) — Home for signed-in players (current session, upcoming sessions, clubs, stats).
-- [D-2026-11-19-11](../decisions.md#d-2026-11-19-11) — fullscreen onboarding after an invite link; where you play, shots, favorite player.
-- [D-2026-11-19-13](../decisions.md#d-2026-11-19-13) — bottom dock on phones; the logo is Home.
-- [D-2026-11-19-14](../decisions.md#d-2026-11-19-14) — Higgsfield art inside the apps (sign-in, onboarding).
+- [D-2026-11-07-01](../decisions/2026-11-07.md#d-2026-11-07-01) — manual password recovery.
+- [D-2026-11-07-03](../decisions/2026-11-07.md#d-2026-11-07-03) — guest identity reconciliation.
+- [D-2026-11-11-03](../decisions/2026-11-11.md#d-2026-11-11-03) — guests and unclaimed profiles stay in their club; RTR ID on registration; built in P08.9 (#757). Superseded in part by D-2026-11-16-04.
+- [D-2026-11-16-04](../decisions/2026-11-16.md#d-2026-11-16-04) — four player statuses; an unclaimed player needs an email, gets an RTR ID when saved and is found by other clubs by exact RTR ID or email; mockups, components and mock data built (#923); real mode built in P15.8 (#927): registration keeps the RTR ID and joins every club record by the ROTRA or Google email, phone linking stays; migration `20261118000500_shared_player_entries` written and applied locally, not yet to the shared database; not run against Supabase Auth or in a browser.
+- [D-2026-11-17-01](../decisions/2026-11-17.md#d-2026-11-17-01) — Privacy Policy (`/privacy`) and Terms of Service (`/terms`) pages, public and static; built in the mockup and apps/player together; legal review and details open.
+- [D-2026-11-12-01](../decisions/2026-11-12.md#d-2026-11-12-01) — answers to the leftover questions of the November 11 round.
+- [D-2026-11-07-07](../decisions/2026-11-07.md#d-2026-11-07-07) — original login-only invite superseded by independent guest registration in #490.
+- [D-2026-11-07-04](../decisions/2026-11-07.md#d-2026-11-07-04) — scope freeze.
+- [D-2026-11-19-10](../decisions/2026-11-19.md#d-2026-11-19-10) — Home for signed-in players (current session, upcoming sessions, clubs, stats).
+- [D-2026-11-19-11](../decisions/2026-11-19.md#d-2026-11-19-11) — fullscreen onboarding after an invite link; where you play, shots, favorite player.
+- [D-2026-11-19-13](../decisions/2026-11-19.md#d-2026-11-19-13) — bottom dock on phones; the logo is Home.
+- [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (sign-in, onboarding).
 
 ## Blocking open decisions
 

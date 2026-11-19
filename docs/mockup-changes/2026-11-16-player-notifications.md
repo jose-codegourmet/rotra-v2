@@ -22,7 +22,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 16, 2026: "and also we should have a notifications module for player app".
-- Decision: [D-2026-11-16-03](../mvp/decisions.md#d-2026-11-16-03).
+- Decision: [D-2026-11-16-03](../mvp/decisions/2026-11-16.md#d-2026-11-16-03).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

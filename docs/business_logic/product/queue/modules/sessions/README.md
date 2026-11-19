@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -76,11 +76,11 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 ### Scoring mode
 
-**Owner, November 18, 2026 ([D-2026-11-18-04](../../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).** One session-wide setting that says how games are scored tonight. Five modes: **16/31** (default), **16/31, no deuce**, **11/21**, **11/21 × 3** and **21 × 3**. The valid scores, deuce and best of 3 are in [Matches](../matches/README.md#scoring-modes-owner-november-18-2026-mockup-only). A session saved before this setting reads as 16/31. In the prototype the mode is fixed after Start (a placeholder: whether it can change is open). It shows on Preparation, the console, the playing-match view, the Start session summary and the public Details.
+**Owner, November 18, 2026 ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only).** One session-wide setting that says how games are scored tonight. Five modes: **16/31** (default), **16/31, no deuce**, **11/21**, **11/21 × 3** and **21 × 3**. The valid scores, deuce and best of 3 are in [Matches](../matches/README.md#scoring-modes-owner-november-18-2026-mockup-only). A session saved before this setting reads as 16/31. In the prototype the mode is fixed after Start (a placeholder: whether it can change is open). It shows on Preparation, the console, the playing-match view, the Start session summary and the public Details.
 
 ### Record games
 
-**Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
+**Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
 While it is **off**, the session is run only and nothing is kept:
 
@@ -149,7 +149,7 @@ An empty roster or no present players does not block the start.
 
 Starting locks every roster level and starts no match. The console opens on the Session view.
 
-**Join requests end at Start (owner decision, November 11, 2026, [D-2026-11-11-11](../../../../../mvp/decisions.md#d-2026-11-11-11); [log](../../../../../mockup-changes/2026-11-11-queue-match-requests-live-only.md)).** Starting closes every pending join request (kept on the record as `closed`, not declined; the Start toast adds “· N join requests closed”), and from then on the public page offers no **Request to join**: it says “The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.” A late player is added by the Queue Master ([Players › Join requests](../players/README.md#join-requests-from-the-session-link)). Drop-out notices only exist before Start; match requests only after it.
+**Join requests end at Start (owner decision, November 11, 2026, [D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11); [log](../../../../../mockup-changes/2026-11-11-queue-match-requests-live-only.md)).** Starting closes every pending join request (kept on the record as `closed`, not declined; the Start toast adds “· N join requests closed”), and from then on the public page offers no **Request to join**: it says “The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.” A late player is added by the Queue Master ([Players › Join requests](../players/README.md#join-requests-from-the-session-link)). Drop-out notices only exist before Start; match requests only after it.
 
 **Late or other-day start (owner decision, November 6, 2026).** When now is after the planned end, or on a
 different calendar day than the planned start, Start session first asks for a **New end**: "This session was

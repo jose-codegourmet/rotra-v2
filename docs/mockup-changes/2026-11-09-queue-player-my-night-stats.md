@@ -34,7 +34,7 @@ Superseded by: none
 - Shares work with: 2026-11-09-queue-player-my-night, 2026-11-09-queue-session-invite
 
 ## Docs updated
-- Business logic: none in business_logic; note that docs/mvp/decisions.md D-2026-11-09-08 still says confirmed and waitlisted players can invite without the “before the start” limit (decision register, left for the owner)
+- Business logic: none in business_logic; note that docs/mvp/decisions/README.md D-2026-11-09-08 still says confirmed and waitlisted players can invite without the “before the start” limit (decision register, left for the owner)
 - Database design: none
 - Screen docs: docs/screens/product/modules/queue/public-session.md — My night card
 - Terms: none

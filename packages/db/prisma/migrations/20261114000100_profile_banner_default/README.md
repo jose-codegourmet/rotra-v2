@@ -1,6 +1,6 @@
 # Admin picks the default profile banner
 
-Ticket P10.6 (#820), epic #814. Decision [D-2026-11-13-03](../../../../../docs/mvp/decisions.md#d-2026-11-13-03)
+Ticket P10.6 (#820), epic #814. Decision [D-2026-11-13-03](../../../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-03)
 (the default banner image is controlled in Admin). `migration.sql` is the `prisma migrate diff` output
 for the new column (run against a disposable database migrated to the previous migration) followed by
 the hand-written partial unique index and the Court seed.

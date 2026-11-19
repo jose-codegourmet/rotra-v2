@@ -66,4 +66,4 @@ Superseded by: none
 - business_logic/product/queue/modules/players/README.md (Level restrictions on slots)
 - database_design/product/queue/modules/sessions-roster.md (`level_restriction` and the band slot columns, proposed)
 - screens/product/modules/queue/session-setup.md (Restrictions), public-session.md (Not open to your level)
-- mvp/decisions.md (D-2026-11-19-12), mvp/workstreams/queue.md
+- mvp/decisions/README.md (D-2026-11-19-12), mvp/workstreams/queue.md

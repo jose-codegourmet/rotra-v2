@@ -34,7 +34,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 16, 2026: "leaderboards should be top annual, top monthly, top weekly. there should also be top or bottom icons if player has recently ranked up or ranked down or show \"new\". hovering on icon should show tooltip if when was that person's place before?"
-- Owner choices the same day: ordered by wins in the period; Top annual replaces the overall list; compared with the previous period. Decision: [D-2026-11-16-05](../mvp/decisions.md#d-2026-11-16-05).
+- Owner choices the same day: ordered by wins in the period; Top annual replaces the overall list; compared with the previous period. Decision: [D-2026-11-16-05](../mvp/decisions/2026-11-16.md#d-2026-11-16-05).
 
 - Owner, November 16, 2026 (follow-up): "we should make leaderboards to be top 50 only and should not show the skill level for now just show # of wins".
 

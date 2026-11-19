@@ -1,8 +1,8 @@
 # Offline operation and recovery
 
-**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html); online boundaries updated November 7, 2026 for MVP by [D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03).
+**Status:** Confirmed v1 target rules. This is a core requirement, not an optional later enhancement. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html); online boundaries updated November 7, 2026 for MVP by [D-2026-11-07-03](../../../../../mvp/decisions/2026-11-07.md#d-2026-11-07-03).
 
-## Owner decisions — November 11, 2026 (#722, [D-2026-11-11-04](../../../../../mvp/decisions.md#d-2026-11-11-04))
+## Owner decisions — November 11, 2026 (#722, [D-2026-11-11-04](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-04))
 
 - **Engine (option A).** Every change made offline on a downloaded, started session is recorded as a
   command (name, arguments, `operationId`) in an IndexedDB **outbox** and applied locally by running the
@@ -56,7 +56,7 @@ They describe the target, not functionality currently implemented.
 | Generate/edit waiting matches, start/finish/invalidate games, substitute players, presence, extend time, add/remove free courts | Works on a downloaded session while offline |
 | Add a player during an active session | Works offline for downloaded club players and newly entered guests; global ROTRA player search is online only |
 | Sync saved work | Automatic when internet returns |
-| Session done and final result slides | Online only: needs reconnection, complete sync, and Queue Master review of every unresolved guest ([D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03)) |
+| Session done and final result slides | Online only: needs reconnection, complete sync, and Queue Master review of every unresolved guest ([D-2026-11-07-03](../../../../../mvp/decisions/2026-11-07.md#d-2026-11-07-03)) |
 | Publish results | Online only |
 | Tick players paid / not paid | Works offline; syncs like other changes |
 | Club settings (view or change club details, name-change request, password, license) | Online only; offline the page is unavailable |
@@ -100,7 +100,7 @@ The top bar always shows sync status:
 | Offline · N waiting to sync | Offline with N changes saved on this device |
 | Working offline | Offline with nothing waiting |
 
-Every change made offline is confirmed as "Saved on this device, waiting to sync". When the connection returns, ROTRA syncs automatically and reports how many changes synced. The console shows an offline notice, and Session done stays disabled until the device is online, all available changes have synced, missing-device risk is acknowledged where applicable, and the Queue Master has reviewed every unresolved guest (confirm a match or create a new unclaimed player; never auto-linked by name; see [D-2026-11-07-03](../../../../../mvp/decisions.md#d-2026-11-07-03)).
+Every change made offline is confirmed as "Saved on this device, waiting to sync". When the connection returns, ROTRA syncs automatically and reports how many changes synced. The console shows an offline notice, and Session done stays disabled until the device is online, all available changes have synced, missing-device risk is acknowledged where applicable, and the Queue Master has reviewed every unresolved guest (confirm a match or create a new unclaimed player; never auto-linked by name; see [D-2026-11-07-03](../../../../../mvp/decisions/2026-11-07.md#d-2026-11-07-03)).
 
 The primary operating device keeps the session moving offline. Public pages see the last synced information. Profile lookup, permanent RTR identity allocation, and cross-product updates cannot pretend to complete without connectivity.
 

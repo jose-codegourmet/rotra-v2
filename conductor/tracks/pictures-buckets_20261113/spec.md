@@ -1,7 +1,7 @@
 # Track specification: Pictures on Cloudflare R2 (Railway Buckets as the fallback)
 
 **Track ID:** pictures-buckets_20261113 · **Type:** refactor · **Priority:** medium (order 12 of 14) · **Created:** 2026-11-13 · **Refined:** 2026-11-14 (B-31)
-**Depends on:** go-writes-admin-player · **Decisions:** B-06, B-13, B-31, D-2026-11-09-10 ([register](../../../docs/mvp/decisions.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
+**Depends on:** go-writes-admin-player · **Decisions:** B-06, B-13, B-31, D-2026-11-09-10 ([register](../../../docs/mvp/decisions/2026-11-13.md#d-2026-11-13-01), [backend open decisions](../../../docs/backend/open-decisions.md))
 
 ## Why
 

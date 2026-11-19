@@ -1,6 +1,6 @@
 # Private session results, publishing, exports, and history
 
-**Last verified:** 2026-11-18 for scoring modes in the session record ([D-2026-11-18-04](../../../../mvp/decisions.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-10-28 for settled documentation reconciliation.
+**Last verified:** 2026-11-18 for scoring modes in the session record ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-10-28 for settled documentation reconciliation.
 
 **Surfaces:** `Q-RESULTS`, `Q-STANDINGS-SLIDE`, `Q-AWARDS-SLIDE`, `Q-OFF-DAY-SLIDE`, `Q-PUBLISH`, `Q-EXPORT`, `Q-HISTORY`.
 
@@ -22,7 +22,7 @@ Results are read-only. No manual MVP selection or Off Day editing.
 
 ## Q-STANDINGS-SLIDE — Slide 1
 
-Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 2 since November 19, 2026; was 1, 1, 3); the slide keeps one row per player with the shared number ([D-2026-11-18-05](../../../../mvp/decisions.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
+Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 2 since November 19, 2026; was 1, 1, 3); the slide keeps one row per player with the shared number ([D-2026-11-18-05](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
 
 ## Q-AWARDS-SLIDE — Slide 2
 
@@ -81,7 +81,7 @@ Below the totals, tabs: **Public page**, **Results** (default, “N games”), *
 | Players | A card per roster player, most games first: picture, name, level, rank chip, **games against the minimum**, W–L, and **Above minimum** / **Met minimum** / **N short**. Header: “Minimum N games · M below it”. Invalid sessions show “Not counted” |
 | Financials | The saved cost estimate: court cost with the calculation, shuttle lines, entrance fees (₱fee × players · misc) when set, total, break-even per player, what players paid (custom amount or break-even), and expected collection with profit / loss / breaks even. “No cost estimate was saved for this session.” when none. Includes the manual paid / not-paid checklist; ROTRA does not collect money. Payment updates never edit permanent match results |
 
-**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** Instead of **Results published** / **Results private** the header chip is a warn **Not recorded**. Games still shows the number of finished matches. The tabs stay:
+**Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** Instead of **Results published** / **Results private** the header chip is a warn **Not recorded**. Games still shows the number of finished matches. The tabs stay:
 
 - **Public page:** the same Details and participants; **Open public page** only, no **Publish results** / **Update publication**.
 - **Results:** only the notice “This session's games were not recorded. It has no results, standings, result slides or awards, and it doesn't count toward player records or rankings.” No Share leaderboard, Result slides or Download images.
@@ -89,7 +89,7 @@ Below the totals, tabs: **Public page**, **Results** (default, “N games”), *
 - **Players:** each card shows games against the minimum and the minimum chip (**Above minimum** / **Met minimum** / **N short**), with no rank chip and no W–L. The header line “Minimum N games · M below it” stays.
 - **Financials:** unchanged.
 
-Open: whether the session shows in the club's records and on a player's own session list (mockup: in the club's records, marked Not recorded; the Player app is unchanged), and what finishing it writes to the database ([D-2026-11-18-06](../../../../mvp/decisions.md#d-2026-11-18-06)). The Result slides route, if opened by address, has nothing to show for this session.
+Open: whether the session shows in the club's records and on a player's own session list (mockup: in the club's records, marked Not recorded; the Player app is unchanged), and what finishing it writes to the database ([D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)). The Result slides route, if opened by address, has nothing to show for this session.
 
 **Replay (How the night ran tab).** A card showing every court as it looked at one moment: each busy court drawn with its players stacked on each side of the net (tap a player for their profile) and “#match · N min”, free courts greyed. Under it a play/pause button, the current time, a timeline slider from the first match start to the last match end, and the end time; a summary reads “7:55 PM · 2 games on court · 7 finished so far”. Dragging the slider moves through the night; **Play** advances one session minute every 120 ms (a three-hour night in about 20 seconds) and stops at the end. Matches on court at that moment are highlighted in the court columns below. The slider has an accessible name and reports the time as its value.
 

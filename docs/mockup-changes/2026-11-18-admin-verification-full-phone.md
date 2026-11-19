@@ -16,7 +16,7 @@ Superseded by: none
 - After: it reads “On file · +63 917 555 0142”: the full number, grouped with `showPhone`, like every other phone in Admin. “Not on file” is unchanged.
 
 ## Why
-- Admin always sees the full number ([D-2026-11-16-06](../mvp/decisions.md#d-2026-11-16-06)). The card was the one place in Admin that still masked it. Asked whether it should show the full phone instead, the owner answered on November 18, 2026: “Yes, show full”.
+- Admin always sees the full number ([D-2026-11-16-06](../mvp/decisions/2026-11-16.md#d-2026-11-16-06)). The card was the one place in Admin that still masked it. Asked whether it should show the full phone instead, the owner answered on November 18, 2026: “Yes, show full”.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

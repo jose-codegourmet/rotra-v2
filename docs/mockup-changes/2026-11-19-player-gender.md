@@ -22,7 +22,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 19, 2026: optional for now, with a notification asking players to fill it in; shown on public profiles.
-  [D-2026-11-19-01](../mvp/decisions.md#d-2026-11-19-01).
+  [D-2026-11-19-01](../mvp/decisions/2026-11-19.md#d-2026-11-19-01).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.

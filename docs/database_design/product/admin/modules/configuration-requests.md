@@ -12,7 +12,7 @@ Versions are append-only so results explain which configuration produced them. W
 
 ## `feature_flags`
 
-Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026). The table starts with the flags ROTRA's own features ship with, added by a migration with value false: `player_google_sign_in` ([D-2026-11-18-01](../../../../mvp/decisions.md#d-2026-11-18-01), November 18, 2026; it used to start empty). Such a row has no created-by or updated-by admin (both columns are nullable; null until an admin changes it), and the migration inserts it only if it is missing. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
+Proposed minimal record: stable key PK (`^[a-z][a-z0-9_]{2,39}$`, immutable once created); unique name (up to 50 characters); description; boolean value (default false); revision; created-by/updated-by admin and times. Flags are created by the platform owner in Admin (October 27, 2026). The table starts with the flags ROTRA's own features ship with, added by a migration with value false: `player_google_sign_in` ([D-2026-11-18-01](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-01), November 18, 2026; it used to start empty). Such a row has no created-by or updated-by admin (both columns are nullable; null until an admin changes it), and the migration inserts it only if it is missing. No "affects" column: the description says what a flag does. Do not add audience targeting, billing tiers, or arbitrary JSON execution rules without a feature-flag specification.
 
 Downloaded sessions need the relevant approved settings version. How flag changes affect an already-offline session is unresolved; a DB update cannot guarantee immediate remote application.
 
@@ -21,13 +21,13 @@ Downloaded sessions need the relevant approved settings version. How flag change
 One Admin settings row (fixed key `id = 1`, CHECK; seeded by the migration): cost per session in
 centavos ≥ 0 (default 1500, the ₱15 placeholder until the owner sets the real figure), currency
 `PHP`, nullable updated-by admin FK, updated time and revision. Admin Sales reads it
-([D-2026-11-08-01](../../../../mvp/decisions.md#d-2026-11-08-01)); the club Sales tab applies the
+([D-2026-11-08-01](../../../../mvp/decisions/2026-11-08.md#d-2026-11-08-01)); the club Sales tab applies the
 current value to every month shown. RLS on; no public-client privileges.
 
 Sales reports are read-only views/functions over existing rows (`rotra_sales_*`, migration
 `20261108000300_admin_sales_reports`), computed on read in Manila days; no totals table.
 
-## `profile_characters` ([D-2026-11-09-13](../../../../mvp/decisions.md#d-2026-11-09-13))
+## `profile_characters` ([D-2026-11-09-13](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-13))
 
 The character library players pick from, managed only by the platform owner in Admin › Settings ›
 Profile characters (mockup log 2026-11-09-admin-profile-characters).
@@ -44,7 +44,7 @@ order), no created-by column: every change writes an `admin_audit_events` row
 `{ number }`). Seeded with the 24 mock characters, same ids, images and order.
 
 Rules on the server (`packages/db/src/admin/profile-characters.ts`, one advisory lock per write):
-at least 8 rows stay shown today, to become **15** per [D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11) (hide/delete refusals use the mock's copy); restore of a row already back
+at least 8 rows stay shown today, to become **15** per [D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11) (hide/delete refusals use the mock's copy); restore of a row already back
 is a conflict. Images are PNG/JPEG/WebP up to 1 MB, cropped square in the browser, bytes checked on
 the server, stored in the public bucket `profile-characters` at `<id>.<ext>` (created by hand; see
 [identity](../../player-information/modules/identity.md#profile-picture-storage-542)). The keep-two
@@ -53,11 +53,11 @@ picture rule (D-2026-11-09-10) does not apply.
 RLS on; no anon/authenticated/PUBLIC privileges. The public read of shown rows is served by the
 Player and Admin servers (`GET /api/profile-characters/shown`), not by client RLS.
 
-## `profile_banners` ([D-2026-11-11-11](../../../../mvp/decisions.md#d-2026-11-11-11))
+## `profile_banners` ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11))
 
 **Built** (migration `20261112000100_round2_profiles_banners_invites`, P08.1; Prisma `ProfileBanner`). The banner library players pick from, managed only by the platform owner in Admin › Settings › Profile banners (mockup log 2026-11-11-admin-profile-banners). Modelled exactly on `profile_characters`: `id` text PK (a seeded lowercase key `^[a-z]{1,24}$` or a lowercase UUID the Admin client picks, CHECK); `image` text (`''` for a seeded, token-drawn banner, else `data:image/%` or `https://%`, CHECK); `shown` boolean (default true); `uploaded_at` timestamptz (upload order, strictly increasing); `number` int, unique, > 0 (Admin labels “Banner N”); `deleted_at` timestamptz, nullable (soft delete so Undo works and `players.banner_id` keeps resolving). Index `(uploaded_at, number)`. **No `name` column**: the six seeded rows are the keys `court`, `night`, `dusk`, `ember`, `sun`, `stripe` (numbers 1–6, `image` `''`), and the apps draw them and their labels from theme tokens by key; an upload shows as “Banner N”. Every change writes an `admin_audit_events` row (`profile_banner.added|shown|hidden|deleted|restored`).
 
-**Built** ([D-2026-11-13-03](../../../../mvp/decisions.md#d-2026-11-13-03); migration `20261114000100_profile_banner_default`, P10.6 #820; Prisma `ProfileBanner.isDefault`): `is_default` boolean, not null, default false, with the partial unique index `profile_banners_one_default` (`WHERE is_default`) so at most one row is the default; the migration marks `court` while it is shown and not deleted. The Admin server keeps the default shown and not deleted: hiding or deleting the default is refused (“This is the default banner. Make another banner the default first.”), checked before the 2-shown rule. **Make default** (`POST /api/profile-banners/[id]/default`) refuses a hidden banner (“Show this banner before making it the default.”), clears the old row and sets the new one in one transaction under the `profile_banners` lock, and writes `profile_banner.default_set` with `{ number, previousId, previousNumber }`. A player with `players.banner_id` null, every guest or unclaimed profile, and every club card resolves to this row (else Court while shown, else the first shown banner).
+**Built** ([D-2026-11-13-03](../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-03); migration `20261114000100_profile_banner_default`, P10.6 #820; Prisma `ProfileBanner.isDefault`): `is_default` boolean, not null, default false, with the partial unique index `profile_banners_one_default` (`WHERE is_default`) so at most one row is the default; the migration marks `court` while it is shown and not deleted. The Admin server keeps the default shown and not deleted: hiding or deleting the default is refused (“This is the default banner. Make another banner the default first.”), checked before the 2-shown rule. **Make default** (`POST /api/profile-banners/[id]/default`) refuses a hidden banner (“Show this banner before making it the default.”), clears the old row and sets the new one in one transaction under the `profile_banners` lock, and writes `profile_banner.default_set` with `{ number, previousId, previousNumber }`. A player with `players.banner_id` null, every guest or unclaimed profile, and every club card resolves to this row (else Court while shown, else the first shown banner).
 
 Rules on the server (not in the database): at least **2** rows stay shown; images are PNG/JPEG/WebP up to **2 MB**, centred-cropped to 5:2 in the browser, bytes checked on the server, stored in a public Storage bucket `profile-banners` created by hand like `profile-characters` (D-2026-11-08-03). **Players never upload**: a player's profile stores only `players.banner_id` (nullable text FK to `profile_banners.id`, ON DELETE RESTRICT), which keeps resolving after the banner is hidden or deleted. The keep-two picture rule does not apply. RLS on; no anon/authenticated/PUBLIC privileges; the public read of shown rows is served by the Player and Admin servers, not by client RLS.
 
@@ -81,10 +81,10 @@ Admin Edit profile (email only, #564) is another entry point: it inserts a reque
 
 UUID PK; actor admin FK; action; target type/ID; source command ID; timestamp; redacted before/after metadata. Append-only application access. Index actor/time and target/time for review.
 
-Do not log passwords, raw claim/reset tokens, or unnecessary contact values. **Admin-set password (MVP or beta only, [D-2026-11-09-14](../../../../mvp/decisions.md#d-2026-11-09-14)):** the edit-player save may set a registered player's password through the auth provider; record only `player.password_set_by_admin` (actor, target, time), never the value, and remove the capability after the beta. This conflicts with [D-2026-11-07-01](../../../../mvp/decisions.md#d-2026-11-07-01) and needs owner sign-off before any build. The same save records one `player.profile_updated` event listing every changed field (picture, profile fields, privacy switches, phone, email) with redacted before/after and the reason. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
+Do not log passwords, raw claim/reset tokens, or unnecessary contact values. **Admin-set password (MVP or beta only, [D-2026-11-09-14](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-14)):** the edit-player save may set a registered player's password through the auth provider; record only `player.password_set_by_admin` (actor, target, time), never the value, and remove the capability after the beta. This conflicts with [D-2026-11-07-01](../../../../mvp/decisions/2026-11-07.md#d-2026-11-07-01) and needs owner sign-off before any build. The same save records one `player.profile_updated` event listing every changed field (picture, profile fields, privacy switches, phone, email) with redacted before/after and the reason. Club actions identify club account/device elsewhere; shared credentials cannot prove the human operator's identity.
 
 Setting or clearing **Verified by Admin** for a registered player records the actor, player, time,
-action and required reason using the existing audit metadata ([D-2026-11-16-02](../../../../mvp/decisions.md#d-2026-11-16-02)).
+action and required reason using the existing audit metadata ([D-2026-11-16-02](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-02)).
 
 Business sources: [configuration](../../../../business_logic/product/admin/modules/configuration/README.md), [player management](../../../../business_logic/product/admin/modules/player-management/README.md).
 

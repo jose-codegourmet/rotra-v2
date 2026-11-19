@@ -73,4 +73,4 @@ Superseded by: none
 - database_design/product/player-information/modules/identity.md (`personal_details` proposed shape)
 - screens/product/modules/player-information/access-registration.md (P-ONBOARD), profile.md (Edit profile and About),
   README.md (module table, placeholders)
-- mvp/decisions.md (D-2026-11-19-11), mvp/workstreams/player.md
+- mvp/decisions/README.md (D-2026-11-19-11), mvp/workstreams/player.md

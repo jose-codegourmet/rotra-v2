@@ -358,7 +358,16 @@ body.court-dragging { cursor: grabbing; }
 /* Owner, November 19, 2026: courts take all the width. Two a row in smaller boxes; from 1000 px wide, as many as fit at 350 px or more. */
 .ls-courts { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @container lscourts (min-width: 1000px) { .ls-courts { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); } }
-@container lscourts (max-width: 520px) { .ls-courts .ls-cc { padding: 8px; gap: 8px; } .ls-courts .ls-times .field { grid-template-columns: minmax(0, 1fr); gap: 2px; } .ls-courts .ls-times .input { padding: 6px 8px; font-size: 13px; min-height: 36px; } .ls-courts .ls-times input::-webkit-calendar-picker-indicator { display: none; } .ls-courts .ls-cc .chip { font-size: 10px; } .ls-courts .ls-cc > .between { flex-wrap: wrap; gap: 4px; } }
+.ls-dots { display: none; }
+/* Phones (640 px and narrower): one court a slide, the next one peeking, with dots. Embla runs the drag and snapping. */
+@media (max-width: 640px) {
+  .ls-embla { overflow: hidden; margin: 0 -2px; padding: 2px; }
+  .ls-embla .ls-courts { display: flex; gap: 0; touch-action: pan-y pinch-zoom; }
+  .ls-embla .ls-cc { flex: 0 0 86%; min-width: 0; margin-right: 12px; }
+  .ls-dots { display: flex; justify-content: center; gap: 6px; }
+  .ls-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: var(--border-strong); cursor: pointer; transition: width .2s, background .2s; }
+  .ls-dots button[aria-current="true"] { width: 22px; background: var(--accent); }
+}
 .ls-cc { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); min-width: 0; }
 .ls-cc.playing { border-color: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 22%, transparent); }
 .ls-pitch { position: relative; }
@@ -1833,6 +1842,8 @@ html { overscroll-behavior-y: contain; }
 <div id="app"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
+<!-- Owner, November 19, 2026: the Settings courts are an Embla carousel on phones. -->
+<script src="https://cdn.jsdelivr.net/npm/embla-carousel@8.5.2/embla-carousel.umd.js"></script>
 <script>
 (() => {
 'use strict';
@@ -4356,7 +4367,7 @@ function liveSettings(s, est, present, allLink) {
     </article>`;
   };
   const courts = `<section class="card ls-card ls-wide" aria-labelledby="ls-courts-h"><div class="between"><h3 id="ls-courts-h">Courts · ${s.courts.length}</h3><button class="btn sm" data-act="openAdjust">Courts and time</button></div>
-      <div class="ls-courts">${s.courts.map(courtMini).join('')}</div></section>`;
+      <div class="ls-embla"><div class="ls-courts">${s.courts.map(courtMini).join('')}</div></div><div class="ls-dots" role="group" aria-label="Courts"></div></section>`;
   const players = `<section class="card ls-card" aria-labelledby="ls-pl-h"><div class="between"><h3 id="ls-pl-h">Players</h3></div>
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.roster.length}</b><span>Confirmed</span></div><div class="ls-stat"><b class="tnum">${present}</b><span>Present</span></div></div>
       <div class="ls-rows">${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off', reqOn.length ? 'Formats players can ask for' : 'Players can\'t request matches')}</div>
@@ -8476,6 +8487,21 @@ function setupQueueSlide() {
   el.addEventListener('scroll', () => { qsLeft = el.scrollLeft; mask(); }, { passive: true });
   mask();
 }
+// Settings courts on phones: an Embla carousel, one court a slide. Rebuilt after every render; remembers the slide.
+let lsEmbla = null, lsSlide = 0, lsMq = null;
+function setupCourtSlider() {
+  if (lsEmbla) { lsEmbla.destroy(); lsEmbla = null; }
+  if (!lsMq && window.matchMedia) { lsMq = matchMedia('(max-width: 640px)'); lsMq.addEventListener('change', setupCourtSlider); }
+  const vp = document.querySelector('.ls-embla');
+  if (!vp || !window.EmblaCarousel || !lsMq || !lsMq.matches) return;
+  const names = [...vp.querySelectorAll('.ls-cc > .between b')].map((b) => b.textContent);
+  lsEmbla = EmblaCarousel(vp, { align: 'start', containScroll: 'trimSnaps', startIndex: Math.min(lsSlide, names.length - 1) });
+  const dots = vp.parentElement.querySelector('.ls-dots');
+  dots.innerHTML = lsEmbla.scrollSnapList().map((_, k) => `<button type="button" aria-label="Show ${esc(names[k] || `court ${k + 1}`)}"></button>`).join('');
+  [...dots.children].forEach((d, k) => d.addEventListener('click', () => lsEmbla.scrollTo(k)));
+  const paint = () => { lsSlide = lsEmbla.selectedScrollSnap(); [...dots.children].forEach((d, k) => d.setAttribute('aria-current', String(k === lsSlide))); };
+  lsEmbla.on('select', paint); paint();
+}
 function render() {
   if (prototypeRouter?.unavailable) return;
   const a = document.activeElement;
@@ -8489,6 +8515,7 @@ function render() {
   document.getElementById('app').innerHTML = html;
   setupSavedPlayerStats();
   setupQueueSlide();
+  setupCourtSlider();
   document.body.style.overflow = sh ? 'hidden' : '';
   const key = sh ? `${sh.type}|${sh.step || ''}|${sh.pick ? 'p' : ''}|${sh.tab || ''}|${sh.picking ? 'k' : ''}` : null;
   if (sh && key !== lastSheetKey) {

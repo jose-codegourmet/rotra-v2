@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 18 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
+NEW: 19 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -393,6 +393,7 @@ NEW: 18 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 3 · 
 | [2026-11-19-queue-live-no-move-to-waitlist](2026-11-19-queue-live-no-move-to-waitlist.md) | Queue app: no Move to waitlist on the live Players card | player card, roster card | NEW |
 | [2026-11-19-queue-live-settings-cards](2026-11-19-queue-live-settings-cards.md) | Queue app: the live Settings tab shows the setup as cards | card, chip, a stat tile and a label-value row (new, small), button row | NEW |
 | [2026-11-19-queue-main-queue-slide-mode](2026-11-19-queue-main-queue-slide-mode.md) | Queue app: Main Queue cards slide sideways by default, with a grid mode switch | Main Queue card list (carousel, new), icon view switch (new), icon buttons (reuse) | NEW |
+| [2026-11-19-queue-match-card-tap-swaps](2026-11-19-queue-match-card-tap-swaps.md) | Queue app: in the match dialogs, a player's card swaps the player and the picture opens the profile | dialog player card (split: picture button + card button), swap icon (new) | NEW |
 | [2026-11-19-queue-match-category-gender](2026-11-19-queue-match-category-gender.md) | Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender | match card format chip, draft tile, court sheets (reuse); a segmented gender control (reuse the segmented control) | NEW |
 | [2026-11-19-queue-pause-match](2026-11-19-queue-pause-match.md) | Queue app: Pause match takes a playing match back to Getting ready | court card, match sheet footer (reuse buttons; pause icon new) | NEW |
 | [2026-11-19-queue-player-card-compact-games](2026-11-19-queue-player-card-compact-games.md) | Queue app: the live player card's game counts become one compact strip, Current / Total | player card | NEW |

@@ -28,6 +28,8 @@ One row per waiting match: “#P”, teams, “FORMAT · Ready to start” or th
 
 ## Q-ON-COURT — Getting ready
 
+**Player cards (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-match-card-tap-swaps.md)):** tapping a player's card opens **Replace player** for that player; tapping their picture opens their profile. Each card shows a swap icon on the right. Dragging onto the other team still switches sides.
+
 **Entry:** **Open match** on a court card showing **Getting ready**. The card's own primary **Start match** starts the match in one tap without opening this sheet.
 
 Sheet for “Match N · Court X” with the **Getting ready** chip:
@@ -44,6 +46,8 @@ If a player in this match is marked not present, the sheet and the court card sh
 Players in a Getting ready match are busy: other matches that include them show “NAME is on Court X”.
 
 ## Q-ACTIVE-MATCH — Playing control
+
+**Player cards (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-match-card-tap-swaps.md)):** tapping a player's card opens **Change NAME?** (Substitute or Replace); tapping their picture opens their profile. Help line: “Tap a player's card to substitute or replace them, or their picture to see their profile.”
 
 Elapsed times here and on the court cards follow Correct Queue Time Format: “N min”, then “N h”, from 24 hours “started long time ago” (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-correct-time-format.md)).
 

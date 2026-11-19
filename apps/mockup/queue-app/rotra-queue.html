@@ -482,6 +482,14 @@ select.input.inline { width: auto; min-height: 42px; }
 .sg-team .tl { font-size: 12px; font-weight: 700; color: var(--fg2); text-transform: uppercase; letter-spacing: 0.04em; }
 .sg-p { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
 .sg-p:hover { background: var(--elev); border-color: var(--border-strong); }
+.sg-p.sg-split { position: relative; cursor: pointer; }
+.sg-split .sg-av { position: relative; z-index: 1; border-radius: 50%; }
+.sg-split .sg-av:hover .avatar { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sg-split .sg-main { all: unset; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 1; min-width: 0; cursor: pointer; }
+.sg-split .sg-main::after { content: ''; position: absolute; inset: 0; border-radius: var(--r); }
+.sg-split .sg-main:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sg-split .sg-swap { color: var(--fg3); display: grid; place-items: center; flex: none; }
+.sg-split:hover .sg-swap { color: var(--accent); }
 .sg-p .avatar { width: 52px; height: 52px; font-size: 17px; }
 .sg-p .main { min-width: 0; display: flex; flex-direction: column; }
 .sg-p b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2439,6 +2447,7 @@ const rotraLogoDark = (cls = '') => `<span class="rlogo rlogo-full rlogo-fixed${
 const I = {
   q_slide: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="14" rx="2"/><path d="M2 8v8M22 8v8"/></svg>',
   q_grid: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',
+  swap: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h14"/><path d="M17 20l4-4-4-4"/><path d="M21 16H7"/></svg>',
   q_pause: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>',
   q_prev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
   q_next: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
@@ -2524,8 +2533,14 @@ const pname = (s, pid) => { const r = R(s, pid); return `<span class="pn"><b>${e
 // With a swap scope, each card can also be dragged onto a player on the other team to switch sides.
 const SWAP_TIP = 'Drag onto a player on the other team, or press the left or right arrow, to switch sides';
 const swapAttrs = (scope, team, i, pid) => scope ? `data-swap="${scope}" data-team="${team}" data-i="${i}"${pid ? ` data-pid="${pid}" title="${SWAP_TIP}"` : ''}` : '';
-const faceTeam = (s, ids, label, swap) => `<div class="sg-team" role="group" aria-label="${label}"><span class="tl">${label}</span>${ids.map((pid, i) => {
+// Owner artifact comment, November 19, 2026: in the match dialogs, tapping a player's card changes that player (swap); tapping the
+// picture opens their profile. `card(pid)` gives the card's action attributes; without it the whole card opens the profile.
+const faceTeam = (s, ids, label, swap, card) => `<div class="sg-team" role="group" aria-label="${label}"><span class="tl">${label}</span>${ids.map((pid, i) => {
   const p = P(pid), r = R(s, pid), g = gamesOf(s, pid);
+  if (card) {
+    const c = card(pid);
+    return `<div class="sg-p sg-split" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)}><button type="button" class="face-btn sg-av" data-act="openProfile" data-id="${pid}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="View profile">${avatar(p)}</button><button type="button" class="sg-main" ${c.attrs} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. ${c.label}${swap ? '. Left or right arrow switches sides' : ''}" title="${c.label}"><span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r ? r.level : null))}</span><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span><span class="sg-swap" aria-hidden="true">${I.swap}</span></button></div>`;
+  }
   return `<button class="sg-p" data-act="openProfile" data-id="${pid}" data-back="1" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. View profile${swap ? '. Left or right arrow switches sides' : ''}">${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r ? r.level : null))}</span><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span></button>`;
 }).join('')}</div>`;
 // A player's picture as a button that opens their profile (Back returns to an open dialog).
@@ -6071,8 +6086,9 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const b = blockOf(s, m);
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))} · Getting ready`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}${chip('Getting ready')}</div>
-      <div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`)}</div>
-      <p class="small muted">Drag a player onto someone on the other team to switch sides. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
+      ${(() => { const card = (pid) => ({ attrs: `data-act="replaceFor" data-mid="${m.id}" data-pid="${pid}"`, label: 'Replace player' });
+        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div>`; })()}
+      <p class="small muted">Tap a player's card to replace them, or their picture to see their profile. Drag a player onto someone on the other team to switch sides. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
       ${b ? notice('bad', `${esc(b.text)}. Replace the player or send the match back to the queue.`) : ''}
       ${(() => { const n = swapCandidate(s, m), at = n ? waiting(s).indexOf(n) + 1 : 0; return `<div class="row"><button class="btn sm" data-act="openReplace" data-id="${m.id}">Replace player</button><button class="btn sm" data-act="openMoveCourt" data-id="${m.id}">Move to another court</button><button class="btn sm" data-act="openSwap" data-id="${m.id}" ${n ? '' : 'disabled'}>${n ? `Swap with #${at}` : 'Swap with the queue'}</button></div>
       <p class="small muted">${n ? `Swap: Match ${n.seq} (${esc(listNames(n.teamA))} vs ${esc(listNames(n.teamB))}) goes on ${esc(courtsOf(s, m))}, and this match takes its place at #${at} in the queue.` : 'Swap: no other waiting match is ready for this court.'}</p>`; })()}`,
@@ -6128,9 +6144,10 @@ const SHEETS = {
     const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))}`, `
       <p class="small muted">${matchLabel(m)} · started ${fmtWhen(m.startedAt, { lower: true })}${queueTime(mins) === LONG_AGO ? '' : ` · ${queueTime(mins)} in`} · Scoring · ${scoringDef(s).label}</p>
-      ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in. */
-        const tap = (h) => h.replace(/data-act="openProfile" data-id="([^"]+)" data-back="1"/g, `data-act="playerAction" data-mid="${m.id}" data-pid="$1"`).replace(/\. View profile/g, '. Substitute or replace');
-        return `<div class="qteams">${tap(faceTeam(s, m.teamA, 'Team A'))}<span class="vs">VS</span>${tap(faceTeam(s, m.teamB, 'Team B'))}</div><p class="small muted" style="margin:0">Tap a player to substitute or replace them.</p>`; })()}
+      ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in.
+        November 19, 2026: the card does that; the picture opens the profile. */
+        const card = (pid) => ({ attrs: `data-act="playerAction" data-mid="${m.id}" data-pid="${pid}"`, label: 'Substitute or replace' });
+        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', null, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', null, card)}</div><p class="small muted" style="margin:0">Tap a player's card to substitute or replace them, or their picture to see their profile.</p>`; })()}
       ${(m.subs || []).map((x) => `<p class="small muted">Substitution: ${esc(subLine(x, m))}.</p>`).join('')}
       <p class="small muted">The court stays in use until you confirm a winner or mark the match invalid. Closing this doesn't end the game.</p>`,
       `<button class="btn" data-act="pauseMatch" data-id="${m.id}">${I.q_pause} Pause match</button><button class="btn danger" data-act="openInvalid" data-id="${m.id}">Mark invalid</button><button class="btn primary" data-act="openResult" data-id="${m.id}">Match done</button>`);
@@ -7443,6 +7460,7 @@ const ACT = {
   pickPlayerAction: (d) => { const sh = S.ui.sheet; openSheet(d.k === 'sub' ? { type: 'sub', id: sh.id, out: sh.pid, in: null, credit: 'none', step: '' } : { type: 'replace', id: sh.id, out: sh.pid, in: null }); },
   openPlaying: (d) => openSheet({ type: 'match', id: d.id }),
   openReplace: (d) => openSheet({ type: 'replace', id: d.id, out: null, in: null }),
+  replaceFor: (d) => openSheet({ type: 'replace', id: d.mid, out: d.pid, in: null }),
   confirmReplace: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
     const r = m && R(s, sh.in);

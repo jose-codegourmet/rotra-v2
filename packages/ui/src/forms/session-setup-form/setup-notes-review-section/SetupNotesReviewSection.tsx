@@ -1,5 +1,6 @@
 'use client'
 
+import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { KeyValueList } from '@rotra/ui/key-value-list'
@@ -99,6 +100,7 @@ export function SetupNotesReviewSection({
       ),
     },
     { label: 'Formats', value: row(`${formatsLabel(values)} · ${mode_?.label ?? ''}`, 1) },
+    { label: 'Scoring', value: row(scoringMode(values.scoring).label, 1) },
     {
       label: 'Record games',
       value: row(recordGamesLabel(values.recordGames !== false), 1),

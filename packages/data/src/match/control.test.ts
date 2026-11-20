@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createConsoleFixtures } from '../fixtures/consoleSessions'
+import { createSessionHistoryFixtures } from '../fixtures/sessionHistory'
 import { setMockLatencyEnabled } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { sessionScoring } from '../queue-session/queueSession.types'
 import {
   completeMatch,
   invalidateMatch,
@@ -13,7 +15,13 @@ import {
   substitutePlayer,
   swapWithQueue,
 } from './control'
-import { countedGames, freeCourts, matchStatus, waitingMatches } from './match.rules'
+import {
+  countedGames,
+  freeCourts,
+  matchStatus,
+  validateResult,
+  waitingMatches,
+} from './match.rules'
 import { matchContext, regenerateQueue } from './queue.mutations'
 
 // Match 1 is Playing on Court 1 (players 0–3); match 2 (players 0, 4, 6, 7) waits on it;
@@ -358,5 +366,118 @@ describe('Substitute with who gets this game', () => {
     expect(gained(player(9))).toBe(0)
     expect(gained(out)).toBe(0)
     expect(gained(partner)).toBe(0)
+  })
+})
+
+describe('Match done follows the scoring mode (Q22)', () => {
+  const useScoring = (scoring?: '31' | '21x3' | '21') =>
+    mockStore.update((s) => {
+      s.sessions = [{ ...fixture.session, scoring }]
+    })
+
+  it('reads a session with no scoring mode as 16/31', async () => {
+    useScoring(undefined)
+    await expect(
+      completeMatch({
+        matchId: playing!.id,
+        winningTeam: 'A',
+        teamAScore: 21,
+        teamBScore: 17,
+        operationId: 'old',
+      }),
+    ).rejects.toMatchObject({
+      kind: 'permission',
+      message: 'Enter the losing score as a whole number from 0 to 29.',
+    })
+    await completeMatch({
+      matchId: playing!.id,
+      winningTeam: 'A',
+      teamAScore: 31,
+      teamBScore: 24,
+      operationId: 'ok',
+    })
+    expect(matchIn(playing!.id).decision).toMatchObject({ teamAScore: 31, teamBScore: 24 })
+    expect(matchIn(playing!.id).decision?.games).toBeUndefined()
+  })
+
+  it('refuses game scores in a one-game mode and keeps a winner-only result', async () => {
+    useScoring('21')
+    await expect(
+      completeMatch({
+        matchId: playing!.id,
+        winningTeam: 'A',
+        games: [{ a: 21, b: 10 }],
+        operationId: 'games',
+      }),
+    ).rejects.toMatchObject({ kind: 'permission' })
+    await completeMatch({ matchId: playing!.id, winningTeam: 'B', operationId: 'winner' })
+    expect(matchIn(playing!.id).decision).toMatchObject({
+      winningTeam: 'B',
+      teamAScore: null,
+      teamBScore: null,
+    })
+  })
+
+  it('stores every game of a best of 3 and the games won', async () => {
+    useScoring('21x3')
+    await expect(
+      completeMatch({
+        matchId: playing!.id,
+        winningTeam: 'B',
+        games: [
+          { a: 21, b: 18 },
+          { a: 15, b: 21 },
+          { a: 21, b: 19 },
+        ],
+        operationId: 'wrong',
+      }),
+    ).rejects.toMatchObject({
+      message: 'The games say Team A won, but Team B is picked. Fix one of them.',
+    })
+    const done = await completeMatch({
+      matchId: playing!.id,
+      games: [
+        { a: 21, b: 18 },
+        { a: 15, b: 21 },
+        { a: 23, b: 21 },
+      ],
+      operationId: 'bo3',
+    })
+    expect(done.message).toContain('Team A wins match 1')
+    expect(matchIn(playing!.id).decision).toMatchObject({
+      winningTeam: 'A',
+      teamAScore: 2,
+      teamBScore: 1,
+      games: [
+        { a: 21, b: 18 },
+        { a: 15, b: 21 },
+        { a: 23, b: 21 },
+      ],
+    })
+  })
+})
+
+describe('seeded scores follow each session’s mode (Q22)', () => {
+  it('passes the mode’s result check for every finished history match', () => {
+    const { histories } = createSessionHistoryFixtures(Date.UTC(2026, 10, 20, 12))
+    const sunday = histories.find((h) => h.session.id === 'h2')!
+    expect(sessionScoring(sunday.session)).toBe('21x3')
+    expect(sunday.matches.some((m) => m.decision?.games?.length)).toBe(true)
+    for (const h of histories)
+      for (const m of h.matches) {
+        const d = m.decision
+        if (!d || d.kind !== 'completed' || !d.winningTeam) continue
+        expect(
+          validateResult({
+            scoring: sessionScoring(h.session),
+            winner: d.winningTeam,
+            scoreA: d.teamAScore,
+            scoreB: d.teamBScore,
+            games: d.games,
+          }),
+        ).toEqual({ winner: d.winningTeam, error: null })
+        if (sessionScoring(h.session) === '31' && d.teamAScore != null)
+          expect(Math.max(d.teamAScore, d.teamBScore ?? 0)).toBeGreaterThanOrEqual(31)
+      }
   })
 })

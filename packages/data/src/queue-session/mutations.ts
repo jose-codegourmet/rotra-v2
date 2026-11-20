@@ -1,4 +1,5 @@
 import { courtWindowError } from '@rotra/schema/court-window'
+import { scoringOf } from '@rotra/schema/scoring'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -162,6 +163,7 @@ export function createQueueSession(input: QueueSessionInput) {
         alwaysRequireRequest: false,
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
         recordGames: input.recordGames ?? true,
+        scoring: scoringOf(input.scoring),
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
@@ -233,6 +235,8 @@ export function updateQueueSession({
         ...(values.requestFormats ? { requestFormats: values.requestFormats } : {}),
         // Record games changes only here, while prepared: a started session refuses every edit.
         ...(values.recordGames === undefined ? {} : { recordGames: values.recordGames }),
+        // Scoring too (Q22): missing keeps the stored mode; an unknown value reads as 16/31.
+        ...(values.scoring === undefined ? {} : { scoring: scoringOf(values.scoring) }),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(

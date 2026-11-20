@@ -1,3 +1,4 @@
+import type { ScoringKey } from '@rotra/schema/scoring'
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
@@ -159,6 +160,11 @@ export type PublicSessionPage = {
   courts: string[]
   formats: { singles: boolean; doubles: boolean }
   mode: SessionMode
+  /**
+   * The session's scoring mode (Q22). Missing reads as 16/31 (`scoringOf`): sessions saved before
+   * the setting, and real mode, which does not store it yet.
+   */
+  scoring?: ScoringKey
   minimum: number
   notes?: string | null
   /** Total before the anonymous 12-tile server cap. */
@@ -289,8 +295,11 @@ export type PublicHistoryMatch = {
   teamA: PublicMatchPlayer[]
   teamB: PublicMatchPlayer[]
   winningTeam: 'A' | 'B' | null
+  /** One game: the points. Best of 3 with `games`: the games each team won. */
   teamAScore: number | null
   teamBScore: number | null
+  /** Best of 3 (Q22): every game score, Team A first; null when none were entered. */
+  games?: { a: number; b: number }[] | null
   invalid: boolean
 }
 /**

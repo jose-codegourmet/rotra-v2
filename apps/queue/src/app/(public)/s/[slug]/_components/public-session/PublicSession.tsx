@@ -28,6 +28,7 @@ import { useSessionPageAccount } from '@rotra/data/public-session/useSessionPage
 import { useSessionPageSignOut } from '@rotra/data/public-session/useSessionPageSignOut'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
+import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -719,6 +720,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                   formats={p.formats}
                   modeLabel={mode.label}
                   modeDescription={mode.text}
+                  scoringLabel={scoringMode(p.scoring).label}
+                  scoringDescription={scoringMode(p.scoring).text}
                   minimumGames={p.minimum}
                   recorded={!unrecorded}
                   amountDuePerPlayer={p.amountDuePerPlayer}

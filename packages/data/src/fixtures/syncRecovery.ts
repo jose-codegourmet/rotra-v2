@@ -67,14 +67,14 @@ export const syncConflictsFixture: SyncConflict[] = consoleSessionFixture.matche
           deviceLabel: 'Device 1',
           order: 12 + index,
           winner: 'A' as const,
-          score: { teamA: 21, teamB: 18 },
+          score: { teamA: 31, teamB: 28 },
         },
         {
           ...teams,
           deviceLabel: 'Device 2',
           order: 5 + index,
           winner: 'B' as const,
-          score: { teamA: 18, teamB: 21 },
+          score: { teamA: 28, teamB: 31 },
         },
       ],
     }

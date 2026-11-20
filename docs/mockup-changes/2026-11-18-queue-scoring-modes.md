@@ -1,6 +1,6 @@
 # Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs
 
-Status: TICKETED — #944
+Status: IN MOCK APP — #944
 Date: 2026-11-18
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › session setup (part "Formats and mode" and the review), Preparation › Setup card, the console header, the playing-match sheet, sheet `result` (both steps), Match history on the console record and on the public finished-session page, the public session page › Details, the Start session sheet; helpers `SCORING`, `scoringOf()`, `resultCheck()`, `scoreEntry()`, `scoreParts()`, `seedScore()`
@@ -100,3 +100,11 @@ Done in #956 (November 18, 2026):
   `games` on a match; the refusal rule as one shared function. The stored shape of a best-of-3 score needs the
   owner's go-ahead before any database change (#944).
 - Real mode: store and read both with the session and the match record.
+- Built in the mock app: #984 (data, `@rotra/schema/scoring`, the Go rule and its cases), #985 (result
+  dialog and confirm sheet), #986 (setup picker), #987 (Scoring rows and game scores on the components),
+  #988 (wiring in `apps/queue`: setup review, Preparation Setup card, Start session sheet, console header chip,
+  playing-match sheet, Match done, console record Match history and Public page Details, public session page
+  Details and Match history).
+- Not yet in real mode: the database stores no scoring mode and no game scores (waits for the owner's
+  go-ahead on the migration). A real session reads as 16/31, the create and update routes ignore `scoring`,
+  and Match done keeps the winner and one score, checked as 16/31.

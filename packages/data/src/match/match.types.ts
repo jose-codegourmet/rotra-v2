@@ -32,8 +32,14 @@ export type Match = {
   decision: {
     kind: 'completed' | 'invalid'
     winningTeam: 'A' | 'B' | null
+    /** One game: the points. Best of 3 with `games`: the games each team won. */
     teamAScore: number | null
     teamBScore: number | null
+    /**
+     * Best of 3 only (Q22): every game played, in order, Team A's points then Team B's. Missing or
+     * null on one-game modes, winner-only results and matches saved before scoring modes.
+     */
+    games?: { a: number; b: number }[] | null
     confirmedAt: number
   } | null
 }

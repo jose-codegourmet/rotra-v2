@@ -15,9 +15,14 @@ export type ConfirmResultSheetProps = {
   teamANames: string[]
   /** Team B's short names in lineup order */
   teamBNames: string[]
-  /** The final score; both null when no score was entered (never 0–0) */
+  /**
+   * The final score; both null when no score was entered (never 0–0). Best of 3 with game scores:
+   * the games won ("2–1")
+   */
   teamAScore: number | null
   teamBScore: number | null
+  /** Best of 3: every game played, in order, Team A's points first; null or empty for one game */
+  games?: { a: number; b: number }[] | null
   /** The occupied court labels: one, or two for 5v5 */
   courtLabels: string[]
   /** Commit the permanent result (useCompleteMatch) */
@@ -32,7 +37,8 @@ export type ConfirmResultSheetProps = {
 
 /**
  * D-WINNER: the review step "Confirm match result". Winner card (Team A: names, Against Team B:
- * names, the score as "21–17 (Team A–Team B)" or "No score entered", the court(s)), the permanent
+ * names, the score as "31–24 (Team A–Team B)", best of 3 "2–1 · 21–18, 15–21, 21–19 (Team A–Team B)",
+ * or "No score entered", the court(s)), the permanent
  * warning, Back to result and the primary "Confirm Team A wins" (never a neutral Save).
  */
 export function ConfirmResultSheet({
@@ -43,6 +49,7 @@ export function ConfirmResultSheet({
   teamBNames,
   teamAScore,
   teamBScore,
+  games,
   courtLabels,
   onConfirm,
   onBack,
@@ -53,6 +60,7 @@ export function ConfirmResultSheet({
   const winners = winningTeam === 'A' ? teamANames : teamBNames
   const losers = winningTeam === 'A' ? teamBNames : teamANames
   const hasScore = teamAScore !== null && teamBScore !== null
+  const gameScores = games?.length ? games.map((g) => `${g.a}–${g.b}`).join(', ') : null
   const twoCourts = courtLabels.length > 1
 
   return (
@@ -76,7 +84,8 @@ export function ConfirmResultSheet({
               <p className="m-0 tabular-nums">
                 <b>
                   {teamAScore}–{teamBScore}
-                </b>{' '}
+                </b>
+                {gameScores ? ` · ${gameScores}` : null}{' '}
                 <span className="text-[13px] text-fg2">(Team A–Team B)</span>
               </p>
             ) : (

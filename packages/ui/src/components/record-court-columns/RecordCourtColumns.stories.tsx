@@ -48,3 +48,28 @@ export const EmptyCourt: Story = {
   name: 'A court with no matches',
   args: { columns: [...columns, { label: `Court ${labels.length + 1}`, matches: [] }] },
 }
+
+/** Best of 3 (Q22): "2–1" in the score box and every game score in a pill under the match pill. */
+export const BestOfThreeGames: Story = {
+  name: 'Best of 3 with game scores',
+  args: {
+    columns: columns.map((column) => ({
+      ...column,
+      matches: column.matches.map((m, index) =>
+        index === 0 && !m.invalid
+          ? {
+              ...m,
+              winningTeam: 'A' as const,
+              score: { teamA: 2, teamB: 1 },
+              games: [
+                { a: 21, b: 18 },
+                { a: 15, b: 21 },
+                { a: 21, b: 19 },
+              ],
+            }
+          : m,
+      ),
+    })),
+  },
+}
+export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }

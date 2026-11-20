@@ -1,5 +1,6 @@
 import { courtWindowError, sessionWindowError } from '@rotra/schema/court-window'
 import { dateField, timeField } from '@rotra/schema/date'
+import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import {
   CUSTOM_FEE_ERROR,
   sessionFinancialsSchema,
@@ -72,6 +73,8 @@ export const sessionSetupSchema = z
     /** Players can request: the formats a signed-in Player may ask for with Request a match */
     requestFormats: z.array(z.enum(REQUEST_FORMAT_VALUES)),
     sessionMode: z.enum(['chill', 'fair', 'hard']),
+    /** How games are scored (one of the five keys). A session saved before this field reads as 16/31. */
+    scoring: z.enum(['31', '31nd', '21', '21x3', '21x3nd']).default(DEFAULT_SCORING),
     /** Record games: off runs the night and keeps no results. A session saved before this field reads as on. */
     recordGames: z.boolean().default(true),
     minimumIsCalculated: z.boolean(),
@@ -144,6 +147,7 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'allowDoubles',
     'requestFormats',
     'sessionMode',
+    'scoring',
     'recordGames',
     'minimumIsCalculated',
     'minimumGames',

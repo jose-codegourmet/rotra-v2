@@ -17,6 +17,7 @@ import {
   type QueueSessionInput,
   type RequestFormats,
   recordsGames,
+  sessionScoring,
 } from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -65,6 +66,16 @@ import { QueryError } from '../../../_components/query-error/QueryError'
 export type SessionSetupProps =
   | { mode: 'create'; date?: string; venueId?: string }
   | { mode: 'edit'; sessionId: string }
+
+/** The Mode and Scoring card illustrations, served from apps/queue/public/art/session-setup. */
+const CARD_ART = {
+  chill: '/art/session-setup/chill.webp',
+  fair: '/art/session-setup/fair.webp',
+  hard: '/art/session-setup/hard.webp',
+  p31: '/art/session-setup/p31.webp',
+  p21: '/art/session-setup/p21.webp',
+  p21x3: '/art/session-setup/p21x3.webp',
+}
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const hhmm = (at: number) => {
@@ -198,6 +209,7 @@ export function SessionSetup(props: SessionSetupProps) {
       scheduledStartAt: start,
       scheduledEndAt: end,
       sessionMode: values.sessionMode,
+      scoring: values.scoring,
       allowSingles: values.allowSingles,
       allowDoubles: values.allowDoubles,
       requestFormats: Object.fromEntries(
@@ -280,6 +292,7 @@ export function SessionSetup(props: SessionSetupProps) {
         allowDoubles: s.allowDoubles,
         requestFormats: allowedRequestFormats(s),
         sessionMode: s.sessionMode,
+        scoring: sessionScoring(s),
         recordGames: recordsGames(s),
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),
@@ -360,6 +373,8 @@ export function SessionSetup(props: SessionSetupProps) {
           }}
           initialValues={initial}
           recordGamesLocked={isEdit && !!existing.data && existing.data.state !== 'prepared'}
+          scoringLocked={isEdit && !!existing.data && existing.data.state !== 'prepared'}
+          cardArt={CARD_ART}
           playersPerCourtDefault={club.data?.defaultPlayersPerCourt}
           clubName={club.data?.name ?? ''}
           offline={offline}

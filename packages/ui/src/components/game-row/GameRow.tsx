@@ -85,6 +85,7 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
       right={right}
       winner={won ? 'left' : 'right'}
       score={game.score ?? null}
+      gameScores={game.gameScores}
       mine
       notCounted={partial}
       note={game.note ?? undefined}

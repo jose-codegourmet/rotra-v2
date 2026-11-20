@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPeso } from '@rotra/schema/money'
+import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -27,6 +28,7 @@ import { sessionSetupDefaultValues } from './SessionSetupForm.defaultValues'
 import {
   durationMinutes,
   isEnterSubmitTarget,
+  type SetupCardArt,
   setupSubmitAction,
   slotBudget,
 } from './SessionSetupForm.helpers'
@@ -81,6 +83,10 @@ export type SessionSetupFormProps = {
   initialPage?: number
   /** The session has started: Record games shows as a read-only On / Off chip */
   recordGamesLocked?: boolean
+  /** The session has started: Scoring is read-only */
+  scoringLocked?: boolean
+  /** Illustration URLs for the Mode and Scoring cards (apps/queue/public/art/session-setup) */
+  cardArt?: SetupCardArt
   financials?: Omit<
     SessionFinancialsFieldsProps,
     'courts' | 'durationMinutes' | 'players' | 'venueRate'
@@ -120,6 +126,8 @@ export function SessionSetupForm({
   costsReviewLine,
   initialPage = 0,
   recordGamesLocked = false,
+  scoringLocked = false,
+  cardArt,
   financials,
   ref,
 }: SessionSetupFormProps) {
@@ -130,6 +138,8 @@ export function SessionSetupForm({
       ...initialValues,
       // A session saved before Record games existed has no value and reads as on.
       recordGames: initialValues?.recordGames ?? true,
+      // A session saved before Scoring existed has no value and reads as 16/31.
+      scoring: initialValues?.scoring ?? DEFAULT_SCORING,
       // A stored or restored number is the QM's own; empty follows the slot budget.
       expectedIsAuto: initialValues?.expectedIsAuto ?? !initialValues?.expectedPlayers?.trim(),
     },
@@ -288,6 +298,8 @@ export function SessionSetupForm({
     <SetupFormatsSection
       key="formats"
       recordGamesLocked={recordGamesLocked}
+      scoringLocked={scoringLocked}
+      cardArt={cardArt}
       allowedRequestFormats={values.requestFormats}
       onRequestFormatsChange={(formats) =>
         form.setValue('requestFormats', formats, { shouldDirty: true })

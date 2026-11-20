@@ -76,3 +76,15 @@ export const RequestsSome: Story = { args: { requestFormatLabels: ['2 v 2', '1 v
 export const RequestsNone: Story = { args: { requestFormatLabels: [] } }
 export const RequestsSomeLight: Story = { ...RequestsSome, globals: { theme: 'light' } }
 export const RequestsNoneLight: Story = { ...RequestsNone, globals: { theme: 'light' } }
+
+/** A Scoring row: the mode label; a session saved before the setting reads 16/31. */
+export const ScoringBestOfThree: Story = {
+  args: {
+    scoringLabel: '11/21 × 3',
+    scoringDescription: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.',
+  },
+}
+export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }
+export const ScoringFixedAfterStart: Story = {
+  args: { scoringLabel: '16/31, no deuce', fixedAfterStart: true },
+}

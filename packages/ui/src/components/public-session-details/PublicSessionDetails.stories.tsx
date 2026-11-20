@@ -172,3 +172,6 @@ export const VisitorNoCourtsNow: Story = {
     ),
   },
 }
+
+export const ScoringBestOfThree: Story = { args: { scoringLabel: '11/21 × 3' } }
+export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }

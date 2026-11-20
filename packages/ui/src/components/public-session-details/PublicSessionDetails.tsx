@@ -1,4 +1,5 @@
 import { formatPeso } from '@rotra/schema/money'
+import { SCORING } from '@rotra/schema/scoring'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { CourtCard } from '@rotra/ui/court-card'
@@ -38,6 +39,8 @@ export type PublicSessionDetailsProps = {
   modeLabel: string
   /** "Mainly level-matched games, roughly 10% easy games." */
   modeDescription: string
+  /** The scoring mode's label ("16/31", "11/21 × 3"); omitted reads as 16/31 */
+  scoringLabel?: string
   /** Record games; false adds the Results row "Not recorded". Omitted reads as on. */
   recorded?: boolean
   minimumGames: number
@@ -88,6 +91,7 @@ export function PublicSessionDetails({
   formats,
   modeLabel,
   modeDescription,
+  scoringLabel = SCORING['31'].label,
   recorded = true,
   minimumGames,
   amountDuePerPlayer,
@@ -129,6 +133,7 @@ export function PublicSessionDetails({
                 </>
               ),
             },
+            { label: 'Scoring', value: scoringLabel },
             ...(recorded
               ? []
               : [

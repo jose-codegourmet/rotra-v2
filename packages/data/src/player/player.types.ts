@@ -32,6 +32,8 @@ export type PlayerGame = {
   counting: 'counted' | 'fun' | 'partial'
   result: 'won' | 'lost'
   score: string | null
+  /** Best of 3 (Q22): every game score read from the player's side ("21–18"), play order; `score` then holds games won. */
+  gameScores?: string[]
   note?: string
   /**
    * Faces on the game court (2026-11-13 game row log), in the order of `partners` / `opponents`.

@@ -9,6 +9,8 @@ export type RecordCourtColumn = {
   /** The court's matches in the order they started */
   matches: (Omit<MatchRecordCardProps, 'onSelectPlayer' | 'courtLabel' | 'className'> & {
     id: string
+    /** Best of 3 (Q22): every game, Team A first; `score` then holds the games won */
+    games?: { a: number; b: number }[] | null
   })[]
 }
 
@@ -83,6 +85,7 @@ export function RecordCourtColumns({
                       invalid || !m.winningTeam ? null : m.winningTeam === 'A' ? 'left' : 'right'
                     }
                     score={m.score ? `${m.score.teamA}–${m.score.teamB}` : null}
+                    gameScores={m.games?.map((g) => `${g.a}–${g.b}`)}
                     invalid={invalid}
                     now={m.highlighted}
                   />

@@ -92,3 +92,13 @@ export const NotRecorded: Story = {
   args: { recorded: false, publication: null },
   globals: { viewport: { value: 'desktop' } },
 }
+
+/** Scoring (Q22): the session's scoring mode after Mode. */
+export const ScoringBestOfThree: Story = {
+  args: { details: { ...meta.args.details, scoring: '11/21 × 3' } },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const ScoringBestOfThreeLight: Story = {
+  ...ScoringBestOfThree,
+  globals: { theme: 'light', viewport: { value: 'desktop' } },
+}

@@ -28,26 +28,49 @@ async function lockPhone(tx: Tx, phoneE164: string) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`phone:${phoneE164}`}))`
 }
 
+/** Where a new RTR ID takes its place from (`allocateRtrId`). */
+export type RtrIdPlace =
+  /** The creating club: its founding city */
+  | string
+  /**
+   * The Admin link (no club, D-2026-11-09-06): the founding city the player picked. Null when they
+   * picked none, which only an email with an open shared entry may do (it keeps that RTR ID).
+   */
+  | { locationCodeId: string | null }
+
+/** The Admin link's city question ("Pick your city or province."), as the form shows it. */
+export const CITY_REQUIRED = 'Pick your city or province.'
+
 /**
  * Allocates the permanent RTR ID for a new player in the caller's transaction: one atomic counter
- * step for the creating club's founding city and sync day, then the immutable allocation row.
- * When an open shared entry has one of `emails` (the registering ROTRA or Google email), the player
- * keeps that entry's RTR ID instead (D-2026-11-16-04, P15.8): the allocation copies it.
+ * step for the founding city and sync day, then the immutable allocation row. The city is the
+ * creating club's founding city, or for the Admin link (no club) the one the player picked; the
+ * allocation then has no creating club. When an open shared entry has one of `emails` (the
+ * registering ROTRA or Google email), the player keeps that entry's RTR ID instead
+ * (D-2026-11-16-04, P15.8): the allocation copies it, and no city is needed.
  */
 export async function allocateRtrId(
   tx: Tx,
   playerId: string,
-  clubId: string,
+  place: RtrIdPlace,
   at: Date,
   emails: (string | null | undefined)[] = [],
 ) {
   const adopted = await adoptEntryAllocation(tx, playerId, emails)
   if (adopted) return adopted
-  const club = await tx.club.findUniqueOrThrow({
-    where: { id: clubId },
-    select: { foundingLocation: true },
-  })
-  const location = club.foundingLocation
+  const clubId = typeof place === 'string' ? place : null
+  const location =
+    typeof place === 'string'
+      ? (
+          await tx.club.findUniqueOrThrow({
+            where: { id: place },
+            select: { foundingLocation: true },
+          })
+        ).foundingLocation
+      : place.locationCodeId
+        ? await tx.locationCode.findUnique({ where: { id: place.locationCodeId } })
+        : null
+  if (!location) throw new ServiceError('invalid', { cityCode: CITY_REQUIRED })
   const syncDate = rtrSyncDate(at)
   const sequence = await nextPlayerSequence(tx, location.id, syncDate)
   const rtrId = formatRtrId(location.countryCode, location.cityCode, syncDate, sequence)

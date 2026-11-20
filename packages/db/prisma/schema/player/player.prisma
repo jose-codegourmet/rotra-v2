@@ -187,8 +187,9 @@ enum PlayerClaimLinkState {
 model PlayerClaimLink {
   id            String               @id @default(uuid(7)) @db.Uuid
   playerId      String               @map("player_id") @db.Uuid
-  /// The issuing club; its club_accounts row is the issuing account.
-  issuingClubId String               @map("issuing_club_id") @db.Uuid
+  /// The issuing club; its club_accounts row is the issuing account. Null only for the staging link
+  /// of a registration from the Admin link, which has no club (D-2026-11-20-01).
+  issuingClubId String?              @map("issuing_club_id") @db.Uuid
   /// SHA-256 of the opaque token.
   tokenDigest   Bytes                @unique @map("token_digest")
   state         PlayerClaimLinkState @default(active)
@@ -201,7 +202,7 @@ model PlayerClaimLink {
   revision      BigInt               @default(1)
 
   player      Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
-  issuingClub Club   @relation(fields: [issuingClubId], references: [id], onDelete: Restrict)
+  issuingClub Club?  @relation(fields: [issuingClubId], references: [id], onDelete: Restrict)
 
   @@index([playerId, issuedAt(sort: Desc)])
   @@index([issuingClubId, issuedAt(sort: Desc)])

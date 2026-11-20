@@ -211,7 +211,7 @@ ran. The services and routes were not run against a database.
 
 **Hosted: applied 2026-11-19** (`prisma db execute` + `migrate resolve`); also applied to a local disposable database.
 
-## D-2026-11-20-01 — Record games off takes a winner again (November 20, 2026)
+## D-2026-11-20-02 — Record games off takes a winner again (November 20, 2026)
 
 Disposable local database `rotra_disposable_d20261120` on a throwaway PostgreSQL 16.15 cluster
 (127.0.0.1:55432, removed after the run), `scripts/disposable-db.sh all` with Node 22 (Node 24 was not

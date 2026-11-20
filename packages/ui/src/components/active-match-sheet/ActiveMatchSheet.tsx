@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Sheet } from '@rotra/ui/sheet'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -33,6 +34,8 @@ export type ActiveMatchSheetProps = {
   teamB: TeamLineupPlayer[]
   /** The session's minimum games */
   minimumGames: number
+  /** The session's scoring mode label ("16/31"); shows "· Scoring · 16/31" on the line. Omitted reads as 16/31. */
+  scoringLabel?: string
   /** Every substitution made so far, oldest first */
   substitutions?: ActiveMatchSubstitution[]
   /** A player was tapped: opens "Change NAME?" (Substitute or Replace, PlayerActionSheet) */
@@ -83,6 +86,7 @@ export function ActiveMatchSheet({
   teamA,
   teamB,
   minimumGames,
+  scoringLabel = SCORING['31'].label,
   substitutions = [],
   onSelectPlayer,
   onMarkInvalid,
@@ -106,7 +110,8 @@ export function ActiveMatchSheet({
       }
     >
       <p className="m-0 text-[13px] text-fg2">
-        {FORMAT_LABEL[format]} · started {formatTime(startedAt)} · {minutesIn} min in
+        {FORMAT_LABEL[format]} · started {formatTime(startedAt)} · {minutesIn} min in · Scoring ·{' '}
+        {scoringLabel}
       </p>
       <TeamLineup
         teamA={teamA}

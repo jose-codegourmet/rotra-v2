@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 68 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -380,7 +380,7 @@ NEW: 68 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-18-queue-club-nickname](2026-11-18-queue-club-nickname.md) | Queue app: a club nickname the Queue Master sets for a registered player, shown on Queue Master screens only | player-profile-sheet, saved-player-card, club-nickname-form (new) | TICKETED — #900 |
 | [2026-11-18-queue-guest-invite-claims-record](2026-11-18-queue-guest-invite-claims-record.md) | Queue app: a guest's invite link is their own, and registering through it claims that guest's record | player-profile-sheet, invite-sheet, claim-identity-check | IN PROGRESS — #966 |
 | [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 (superseded by 2026-11-20-queue-record-games-not-ranked.md (what Off does: games are recorded as usual; only their wins stay out of the leaderboards and win rate)) |
-| [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | TICKETED — #944 |
+| [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | IN MOCK APP — #944 |
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
 | [2026-11-19-auth-backgrounds](2026-11-19-auth-backgrounds.md) | Queue, Player and Admin apps: ROTRA background art on the auth pages | auth page frame | NEW |
@@ -417,7 +417,7 @@ NEW: 68 · TICKETED: 8 · IN PROGRESS: 1 · IN MOCK APP: 188 · CANCELLED: 4 · 
 | [2026-11-19-queue-match-card-tap-swaps](2026-11-19-queue-match-card-tap-swaps.md) | Queue app: in the match dialogs, a player's card swaps the player and the picture opens the profile | dialog player card (split: picture button + card button), swap icon (new) | NEW |
 | [2026-11-19-queue-match-category-gender](2026-11-19-queue-match-category-gender.md) | Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender | match card format chip, draft tile, court sheets (reuse); a segmented gender control (reuse the segmented control) | NEW |
 | [2026-11-19-queue-match-history-timeline](2026-11-19-queue-match-history-timeline.md) | Queue app: Match History stacks the courts; each court's matches run newest-first from the top, time on top | match court card (reuse), a time column (new, small) | NEW |
-| [2026-11-19-queue-mode-scoring-cards](2026-11-19-queue-mode-scoring-cards.md) | Queue app: Mode and Scoring cards get illustrations; Scoring picks the points first, then Deuce | illustrated choice card (art on top, title, text, check badge), Deuce switch row, scoring summary line | NEW |
+| [2026-11-19-queue-mode-scoring-cards](2026-11-19-queue-mode-scoring-cards.md) | Queue app: Mode and Scoring cards get illustrations; Scoring picks the points first, then Deuce | illustrated choice card (art on top, title, text, check badge), Deuce switch row, scoring summary line | IN MOCK APP — #944 |
 | [2026-11-19-queue-more-menu-no-settings](2026-11-19-queue-more-menu-no-settings.md) | Queue app: the live console's ⋯ menu drops Session settings | console header More menu | NEW |
 | [2026-11-19-queue-move-playing-match](2026-11-19-queue-move-playing-match.md) | Queue app: a playing match can move to a free court | court menu item, a button in the match sheet, the Move match sheet (reuse) | NEW |
 | [2026-11-19-queue-no-attention-border](2026-11-19-queue-no-attention-border.md) | Queue app: waiting matches that need attention lose the yellow border | queue match card (attention state) | NEW |

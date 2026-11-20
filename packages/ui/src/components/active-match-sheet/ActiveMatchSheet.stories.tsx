@@ -57,6 +57,12 @@ export const WithCreditedOutgoing: Story = {
       firstSub && secondSub ? [firstSub, { ...secondSub, creditTo: 'outgoing' as const }] : [],
   },
 }
+/** The line ends "· Scoring · <label>". */
+export const ScoringBestOfThree: Story = { args: { scoringLabel: '11/21 × 3' } }
+export const ScoringBestOfThreeLight: Story = {
+  ...ScoringBestOfThree,
+  globals: { theme: 'light' },
+}
 export const Phone: Story = {
   args: propsFor(activeMatchFixtures.withSubstitutions),
   globals: { viewport: { value: 'phone' } },

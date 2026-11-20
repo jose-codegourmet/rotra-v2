@@ -35,8 +35,11 @@ export type RecordMatch = {
   teamA: RecordPlayer[]
   teamB: RecordPlayer[]
   winningTeam: 'A' | 'B' | null
+  /** One game: the points. Best of 3 with `games`: the games each team won. */
   teamAScore: number | null
   teamBScore: number | null
+  /** Best of 3 (Q22): every game score, Team A first; null when none were entered. */
+  games?: { a: number; b: number }[] | null
   invalid: boolean
   substitutions: number
   /** One entry per substitution, oldest first, with who got the game (QM choice) */
@@ -110,6 +113,7 @@ export function sessionRecordHistory(input: {
     winningTeam: m.decision?.winningTeam ?? null,
     teamAScore: m.decision?.teamAScore ?? null,
     teamBScore: m.decision?.teamBScore ?? null,
+    games: m.decision?.games?.length ? m.decision.games : null,
     invalid: m.state === 'invalid',
     substitutions: m.substitutions.length,
     substitutionCredits: m.substitutions.map((sub) => ({

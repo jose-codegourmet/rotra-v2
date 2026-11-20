@@ -79,6 +79,26 @@ export const WithEyebrow: Story = {
   },
 }
 
+const ART_MODES: Choice[] = MODES.map((m) => ({ ...m, art: `/art/session-setup/${m.value}.webp` }))
+
+/** Illustrated cards (Mode on the session form): art on top, check badge and glow when picked */
+export const WithArt: Story = {
+  render: () => {
+    const [value, setValue] = useState('fair')
+    return (
+      <ChoiceGroup
+        type="single"
+        aria-label="Session mode"
+        choices={ART_MODES}
+        value={value}
+        onChange={setValue}
+      />
+    )
+  },
+}
+
+export const WithArtLight: Story = { ...WithArt, globals: { theme: 'light' } }
+
 export const Disabled: Story = { args: { disabled: true } }
 
 export const Phone: Story = { render: Single.render, globals: { viewport: { value: 'phone' } } }

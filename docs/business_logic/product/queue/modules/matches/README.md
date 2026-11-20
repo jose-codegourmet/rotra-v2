@@ -71,6 +71,8 @@ Scores are optional supporting data, never a condition for ordinary game complet
 
 Each Queue Session has one **Scoring mode**, picked in setup ([Sessions](../sessions/README.md#scoring-mode)). It decides which game scores are valid and how many games a match has. The match result dialog asks only for what the mode needs.
 
+Built in the mockup and the mock app (#984 to #988). Real mode does not store the mode or game scores yet: a real session reads as 16/31 and Match done keeps the winner and one score.
+
 | Mode | Games | Game to | Deuce |
 |---|---|---|---|
 | 16/31 (default) | One | 31, change sides at 16 | Yes |

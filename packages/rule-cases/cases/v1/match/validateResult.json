@@ -4,7 +4,7 @@
   "version": 1,
   "cases": [
     {
-      "name": "a winner alone",
+      "name": "a winner alone (no scoring: 16/31)",
       "input": {
         "winner": "A"
       },
@@ -14,11 +14,21 @@
       }
     },
     {
+      "name": "a winner alone for B",
+      "input": {
+        "winner": "B"
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
       "name": "no winner and no score",
       "input": {},
       "expected": {
         "winner": null,
-        "error": "Pick a winner or enter the final score."
+        "error": "Pick the winner."
       }
     },
     {
@@ -30,25 +40,41 @@
       },
       "expected": {
         "winner": null,
-        "error": "Pick a winner or enter the final score."
+        "error": "Pick the winner."
       }
     },
     {
-      "name": "a score decides the winner",
+      "name": "an unknown scoring mode reads as 16/31",
       "input": {
+        "scoring": "15",
+        "winner": "A",
         "scoreA": 21,
         "scoreB": 17
       },
       "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 29."
+      }
+    },
+    {
+      "name": "16/31: a score with the winner",
+      "input": {
+        "scoring": "31",
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 24
+      },
+      "expected": {
         "winner": "A",
         "error": null
       }
     },
     {
-      "name": "a score decides for B",
+      "name": "16/31: no scoring given, a score with the winner",
       "input": {
+        "winner": "B",
         "scoreA": 10,
-        "scoreB": 21
+        "scoreB": 31
       },
       "expected": {
         "winner": "B",
@@ -56,23 +82,46 @@
       }
     },
     {
-      "name": "a score that agrees with the picked winner",
+      "name": "16/31: a zero losing score",
       "input": {
-        "winner": "B",
-        "scoreA": 10,
-        "scoreB": 21
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 0
       },
       "expected": {
-        "winner": "B",
+        "winner": "A",
         "error": null
       }
     },
     {
-      "name": "a score that disagrees with the picked winner",
+      "name": "16/31: a losing score of 29",
+      "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 29
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "16/31: a score without a picked winner",
+      "input": {
+        "scoreA": 31,
+        "scoreB": 24
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick the winner."
+      }
+    },
+    {
+      "name": "16/31: a score that disagrees with the picked winner",
       "input": {
         "winner": "A",
         "scoreA": 10,
-        "scoreB": 21
+        "scoreB": 31
       },
       "expected": {
         "winner": null,
@@ -80,78 +129,831 @@
       }
     },
     {
-      "name": "a tied score",
+      "name": "16/31: a winner short of 31",
       "input": {
+        "winner": "A",
         "scoreA": 21,
-        "scoreB": 21
+        "scoreB": 17
       },
       "expected": {
         "winner": null,
-        "error": "A tie can’t decide a winner. Correct the score, or clear it and pick a winner."
+        "error": "Enter the losing score as a whole number from 0 to 29."
       }
     },
     {
-      "name": "a tied score of zero",
+      "name": "16/31: 31–30 goes to deuce",
       "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": null,
+        "error": "At 30–30 the game goes to deuce. Turn on Went to deuce and type both scores."
+      }
+    },
+    {
+      "name": "16/31: 30–31 for B goes to deuce",
+      "input": {
+        "winner": "B",
+        "scoreA": 30,
+        "scoreB": 31
+      },
+      "expected": {
+        "winner": null,
+        "error": "At 30–30 the game goes to deuce. Turn on Went to deuce and type both scores."
+      }
+    },
+    {
+      "name": "16/31: 31–31",
+      "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 31
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 32–30."
+      }
+    },
+    {
+      "name": "16/31: 30–30",
+      "input": {
+        "winner": "A",
+        "scoreA": 30,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 32–30."
+      }
+    },
+    {
+      "name": "16/31: a tie below the target",
+      "input": {
+        "winner": "A",
         "scoreA": 0,
         "scoreB": 0
       },
       "expected": {
         "winner": null,
-        "error": "A tie can’t decide a winner. Correct the score, or clear it and pick a winner."
+        "error": "Enter the losing score as a whole number from 0 to 29."
       }
     },
     {
-      "name": "only one score",
+      "name": "16/31: a deuce game 32–30",
       "input": {
-        "scoreA": 21
-      },
-      "expected": {
-        "winner": null,
-        "error": "Enter both scores as whole numbers, or clear them."
-      }
-    },
-    {
-      "name": "only the other score",
-      "input": {
-        "scoreB": 21
-      },
-      "expected": {
-        "winner": null,
-        "error": "Enter both scores as whole numbers, or clear them."
-      }
-    },
-    {
-      "name": "a negative score",
-      "input": {
-        "scoreA": -1,
-        "scoreB": 21
-      },
-      "expected": {
-        "winner": null,
-        "error": "Enter both scores as whole numbers, or clear them."
-      }
-    },
-    {
-      "name": "a fractional score",
-      "input": {
-        "scoreA": 21.5,
-        "scoreB": 10
-      },
-      "expected": {
-        "winner": null,
-        "error": "Enter both scores as whole numbers, or clear them."
-      }
-    },
-    {
-      "name": "a zero score for the loser",
-      "input": {
-        "scoreA": 21,
-        "scoreB": 0
+        "winner": "A",
+        "scoreA": 32,
+        "scoreB": 30
       },
       "expected": {
         "winner": "A",
         "error": null
+      }
+    },
+    {
+      "name": "16/31: a long deuce game 43–45 has no cap",
+      "input": {
+        "winner": "B",
+        "scoreA": 43,
+        "scoreB": 45
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "16/31: a deuce game that leads by 3",
+      "input": {
+        "winner": "A",
+        "scoreA": 33,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 32–30."
+      }
+    },
+    {
+      "name": "16/31: a deuce game that leads by 1",
+      "input": {
+        "winner": "A",
+        "scoreA": 32,
+        "scoreB": 31
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 32–30."
+      }
+    },
+    {
+      "name": "16/31: a deuce score that disagrees with the picked winner",
+      "input": {
+        "winner": "A",
+        "scoreA": 30,
+        "scoreB": 32
+      },
+      "expected": {
+        "winner": null,
+        "error": "The score says Team B won, but Team A is picked. Fix one of them."
+      }
+    },
+    {
+      "name": "16/31: only one score",
+      "input": {
+        "winner": "A",
+        "scoreA": 31
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 29."
+      }
+    },
+    {
+      "name": "16/31: only the other score",
+      "input": {
+        "winner": "A",
+        "scoreB": 20
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 29."
+      }
+    },
+    {
+      "name": "16/31: a negative score",
+      "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": -1
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 29."
+      }
+    },
+    {
+      "name": "16/31: a fractional score",
+      "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 20.5
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 29."
+      }
+    },
+    {
+      "name": "16/31: game scores in a one-game mode",
+      "input": {
+        "winner": "A",
+        "games": [
+          {
+            "a": 31,
+            "b": 20
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "This scoring mode has one game. Enter one score, not game scores."
+      }
+    },
+    {
+      "name": "16/31: an empty games list is no game scores",
+      "input": {
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 20,
+        "games": []
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "16/31, no deuce: a losing score of 30",
+      "input": {
+        "scoring": "31nd",
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "16/31, no deuce: 31–31",
+      "input": {
+        "scoring": "31nd",
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 31
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 30."
+      }
+    },
+    {
+      "name": "16/31, no deuce: a deuce score is refused",
+      "input": {
+        "scoring": "31nd",
+        "winner": "A",
+        "scoreA": 32,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter the losing score as a whole number from 0 to 30."
+      }
+    },
+    {
+      "name": "16/31, no deuce: no winner",
+      "input": {
+        "scoring": "31nd",
+        "scoreA": 31,
+        "scoreB": 30
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick the winner."
+      }
+    },
+    {
+      "name": "16/31, no deuce: a winner alone",
+      "input": {
+        "scoring": "31nd",
+        "winner": "B"
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21: a score with the winner",
+      "input": {
+        "scoring": "21",
+        "winner": "B",
+        "scoreA": 15,
+        "scoreB": 21
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21: a losing score of 19",
+      "input": {
+        "scoring": "21",
+        "winner": "A",
+        "scoreA": 21,
+        "scoreB": 19
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21: 21–20 goes to deuce",
+      "input": {
+        "scoring": "21",
+        "winner": "A",
+        "scoreA": 21,
+        "scoreB": 20
+      },
+      "expected": {
+        "winner": null,
+        "error": "At 20–20 the game goes to deuce. Turn on Went to deuce and type both scores."
+      }
+    },
+    {
+      "name": "11/21: a deuce game 22–20",
+      "input": {
+        "scoring": "21",
+        "winner": "A",
+        "scoreA": 22,
+        "scoreB": 20
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21: a deuce game 29–31",
+      "input": {
+        "scoring": "21",
+        "winner": "B",
+        "scoreA": 29,
+        "scoreB": 31
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21: a deuce game that leads by 4",
+      "input": {
+        "scoring": "21",
+        "winner": "A",
+        "scoreA": 24,
+        "scoreB": 20
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 22–20."
+      }
+    },
+    {
+      "name": "11/21: a 31-point score",
+      "input": {
+        "scoring": "21",
+        "winner": "A",
+        "scoreA": 31,
+        "scoreB": 20
+      },
+      "expected": {
+        "winner": null,
+        "error": "A deuce game ends when one pair leads by 2, like 22–20."
+      }
+    },
+    {
+      "name": "11/21: a score that disagrees with the picked winner",
+      "input": {
+        "scoring": "21",
+        "winner": "B",
+        "scoreA": 21,
+        "scoreB": 15
+      },
+      "expected": {
+        "winner": null,
+        "error": "The score says Team A won, but Team B is picked. Fix one of them."
+      }
+    },
+    {
+      "name": "11/21 × 3: a winner alone",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A"
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21 × 3: no winner and no games",
+      "input": {
+        "scoring": "21x3"
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick the winner."
+      }
+    },
+    {
+      "name": "11/21 × 3: 2–0 decides the winner",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 15
+          }
+        ]
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21 × 3: 2–1 with the winner picked",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 15,
+            "b": 21
+          },
+          {
+            "a": 21,
+            "b": 19
+          }
+        ]
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21 × 3: 1–2 for B with deuce games",
+      "input": {
+        "scoring": "21x3",
+        "winner": "B",
+        "games": [
+          {
+            "a": 23,
+            "b": 21
+          },
+          {
+            "a": 20,
+            "b": 22
+          },
+          {
+            "a": 10,
+            "b": 21
+          }
+        ]
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21 × 3: the passed games won are not read",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A",
+        "scoreA": 0,
+        "scoreB": 5,
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 15
+          }
+        ]
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "11/21 × 3: the games disagree with the picked winner",
+      "input": {
+        "scoring": "21x3",
+        "winner": "B",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 15,
+            "b": 21
+          },
+          {
+            "a": 21,
+            "b": 19
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "The games say Team A won, but Team B is picked. Fix one of them."
+      }
+    },
+    {
+      "name": "11/21 × 3: one game is not a decided match",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick who won each game. One pair must win 2 games to decide the match."
+      }
+    },
+    {
+      "name": "11/21 × 3: a 1–1 split with no third game",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 15,
+            "b": 21
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick who won each game. One pair must win 2 games to decide the match."
+      }
+    },
+    {
+      "name": "11/21 × 3: a third game after 2–0",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 15
+          },
+          {
+            "a": 10,
+            "b": 21
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick who won each game. One pair must win 2 games to decide the match."
+      }
+    },
+    {
+      "name": "11/21 × 3: four games",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 15,
+            "b": 21
+          },
+          {
+            "a": 21,
+            "b": 19
+          },
+          {
+            "a": 21,
+            "b": 5
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Pick who won each game. One pair must win 2 games to decide the match."
+      }
+    },
+    {
+      "name": "11/21 × 3: a game with a missing score",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": null
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter a score for every game played, or clear them all."
+      }
+    },
+    {
+      "name": "11/21 × 3: games won without game scores",
+      "input": {
+        "scoring": "21x3",
+        "winner": "A",
+        "scoreA": 2,
+        "scoreB": 1
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter a score for every game played, or clear them all."
+      }
+    },
+    {
+      "name": "11/21 × 3: game 2 at 21–20 goes to deuce",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 20
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 2: At 20–20 the game goes to deuce. Turn on Deuce for this game and type both scores."
+      }
+    },
+    {
+      "name": "11/21 × 3: game 3 deuce leads by 1",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 15,
+            "b": 21
+          },
+          {
+            "a": 23,
+            "b": 22
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 3: A deuce game ends when one pair leads by 2, like 22–20."
+      }
+    },
+    {
+      "name": "11/21 × 3: game 2 tied",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 21
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 2: A deuce game ends when one pair leads by 2, like 22–20."
+      }
+    },
+    {
+      "name": "11/21 × 3: game 1 short of 21",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 19,
+            "b": 17
+          },
+          {
+            "a": 21,
+            "b": 15
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 1: Enter the losing score as a whole number from 0 to 19."
+      }
+    },
+    {
+      "name": "11/21 × 3: game 2 not a whole number",
+      "input": {
+        "scoring": "21x3",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 15.5
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 2: Enter the losing score as a whole number from 0 to 19."
+      }
+    },
+    {
+      "name": "21 × 3: 2–1 with a 20 losing score",
+      "input": {
+        "scoring": "21x3nd",
+        "games": [
+          {
+            "a": 21,
+            "b": 20
+          },
+          {
+            "a": 19,
+            "b": 21
+          },
+          {
+            "a": 21,
+            "b": 0
+          }
+        ]
+      },
+      "expected": {
+        "winner": "A",
+        "error": null
+      }
+    },
+    {
+      "name": "21 × 3: a winner alone",
+      "input": {
+        "scoring": "21x3nd",
+        "winner": "B"
+      },
+      "expected": {
+        "winner": "B",
+        "error": null
+      }
+    },
+    {
+      "name": "21 × 3: game 1 deuce score is refused",
+      "input": {
+        "scoring": "21x3nd",
+        "games": [
+          {
+            "a": 22,
+            "b": 20
+          },
+          {
+            "a": 21,
+            "b": 15
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 1: Enter the losing score as a whole number from 0 to 20."
+      }
+    },
+    {
+      "name": "21 × 3: game 2 at 21–21",
+      "input": {
+        "scoring": "21x3nd",
+        "winner": "A",
+        "games": [
+          {
+            "a": 21,
+            "b": 18
+          },
+          {
+            "a": 21,
+            "b": 21
+          }
+        ]
+      },
+      "expected": {
+        "winner": null,
+        "error": "Game 2: Enter the losing score as a whole number from 0 to 20."
+      }
+    },
+    {
+      "name": "21 × 3: a one-game score without game scores",
+      "input": {
+        "scoring": "21x3nd",
+        "winner": "A",
+        "scoreA": 21,
+        "scoreB": 15
+      },
+      "expected": {
+        "winner": null,
+        "error": "Enter a score for every game played, or clear them all."
       }
     }
   ]

@@ -48,6 +48,12 @@ export type MatchCourtProps = {
   winner: 'left' | 'right' | null
   /** The score read from the left side, “21–17”; null shows “No score” */
   score: string | null
+  /**
+   * Best of 3 (Q22): every game score read from the left side, in play order (`["21–18", "15–21", "21–19"]`).
+   * `score` then holds the games won ("2–1"). Each shows in a small pill on its own line under the corner pill.
+   * Omit or leave empty for a one-game score or "No score".
+   */
+  gameScores?: string[]
   /** Invalid: desaturated court, Invalid chip, no score */
   invalid?: boolean
   /** The viewer's own match: Won / Lost; otherwise “◀ Won” or “Won ▶” */
@@ -112,6 +118,7 @@ export function MatchCourt({
   right,
   winner,
   score,
+  gameScores,
   invalid = false,
   mine = false,
   now = false,
@@ -176,6 +183,8 @@ export function MatchCourt({
   const leftWon = winner === 'left'
   const ring = !invalid && !notCounted
   const playerVariant = cornerLabel !== undefined
+  const games = invalid || !score ? [] : (gameScores ?? [])
+  const hasGames = games.length > 0
   return (
     <article
       data-now={now || undefined}
@@ -186,22 +195,37 @@ export function MatchCourt({
         aria-label={ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`}
         className={cn(
           'relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 transition-shadow motion-reduce:transition-none',
-          playerVariant ? 'pt-2.5 max-[480px]:min-h-[100px]' : 'pt-3 max-[480px]:min-h-[112px]',
+          hasGames
+            ? 'min-h-40 pt-10 max-[480px]:min-h-36'
+            : playerVariant
+              ? 'pt-2.5 max-[480px]:min-h-[100px]'
+              : 'pt-3 max-[480px]:min-h-[112px]',
           now &&
             'shadow-[0_0_0_3px_var(--accent),0_0_18px_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]',
         )}
       >
         <MatchCourtArt />
-        {playerVariant ? (
-          <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
-            {cornerLabel}
-          </span>
-        ) : (
-          <span className="absolute top-2 left-2 z-2 rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
-            #{number} · {timeLabel}
-            {fun ? ' · Fun' : ''}
-          </span>
-        )}
+        <div className="pointer-events-none absolute top-2 right-2 left-2 z-2 flex flex-col items-start gap-1">
+          {playerVariant ? (
+            <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
+              {cornerLabel}
+            </span>
+          ) : (
+            <span className="rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
+              #{number} · {timeLabel}
+              {fun ? ' · Fun' : ''}
+            </span>
+          )}
+          {hasGames ? (
+            <span
+              title="Game scores"
+              className="mx-auto rounded-full bg-court-level-label px-2 font-mono text-[11px] font-bold whitespace-nowrap text-on-photo/90 tabular-nums max-[480px]:text-[10px]"
+            >
+              <span className="sr-only">Game scores </span>
+              {games.join(' · ')}
+            </span>
+          ) : null}
+        </div>
         {action}
         <div className={side}>{left.map((p) => face(p, ring && leftWon))}</div>
         <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">

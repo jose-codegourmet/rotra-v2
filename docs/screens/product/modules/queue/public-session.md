@@ -37,8 +37,8 @@ Afterwards the same visitor sees a status card instead: **Request sent** (“…
 | Courts | Count and labels |
 | Formats | “Doubles”, “Singles + Doubles”, or “No standard format” |
 | Mode | Name and description (“Fair · Mainly level-matched games, roughly 10% easy games.”) |
-| Scoring | The session's scoring mode label (“16/31”); mockup only, November 18, 2026 |
-| Results | Only when Record games is off (mockup and mock app, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)): “Not recorded · No results, standings or awards for this session.” Shown after Scoring (after Mode while Scoring is not built) and before Minimum. No row for a recorded session |
+| Scoring | The session's scoring mode label and its rule (“16/31 · One game to 31. Change sides at 16. Deuce at 30–30.”); mockup and mock app (#988). Real mode shows 16/31 until the scoring mode is stored |
+| Results | Only when Record games is off (mockup and mock app, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)): “Not recorded · No results, standings or awards for this session.” Shown after Scoring and before Minimum. No row for a recorded session |
 | Minimum | “N games per player” |
 | Payment | “₱X per player · paid at the venue” (the session's payment per player: custom amount, or break-even); “Free” when the amount is 0; the row is omitted when no estimate is saved. Added November 9, 2026 on the owner's request |
 
@@ -62,7 +62,7 @@ No phone, email, identity-verification state, presence, games, operator notes, o
 
 For finished sessions, a **Results** section below the tabs shows the published Standings and/or Awards slides, and Off Day only if explicitly included (without its private band). Before publication: “Results for this session have not been shared.” — never claim there were no games.
 
-**Replaced November 20, 2026 ([D-2026-11-20-01](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01); [log](../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only):** with Record games off the games are recorded as usual; only their wins stay out of the leaderboards and win rate. The finished page works as for a recorded session (Leaderboard, awards, match history); Details shows a **Rankings · Not ranked** tile instead of the Results row. The November 18 text below is what the mock app still runs.
+**Replaced November 20, 2026 ([D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); [log](../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only):** with Record games off the games are recorded as usual; only their wins stay out of the leaderboards and win rate. The finished page works as for a recorded session (Leaderboard, awards, match history); Details shows a **Rankings · Not ranked** tile instead of the Results row. The November 18 text below is what the mock app still runs.
 
 **Record games off (owner, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../mockup-changes/2026-11-18-queue-record-games-option.md); mock app).** Once finished, the page has no **Leaderboard** tab (so it opens on Details), no Awards or Off Day section, and no “Results for this session have not been shared.” card. **Match history** keeps its heading and reads only “This session's games were not recorded.”, for a visitor and a signed-in Player alike (no Yours / All switch, no replay, no Log in line). While the session is live the page is unchanged apart from the Results row. Open: what the finished public page should show ([D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)). A recorded session shows none of this.
 

@@ -238,7 +238,8 @@ export async function readClaimLink(token: string) {
         : 'valid'
   return {
     status,
-    clubName: link.issuingClub.name,
+    // No issuing club only for an Admin-link registration's staging link (D-2026-11-20-01).
+    clubName: link.issuingClub?.name ?? 'ROTRA',
     preview: {
       playerId: link.player.id,
       fullName: link.player.fullName,

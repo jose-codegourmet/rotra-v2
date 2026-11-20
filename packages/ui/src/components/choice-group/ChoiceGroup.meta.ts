@@ -8,6 +8,7 @@ export const choiceGroupMeta = {
     'Use type="single" when exactly one option applies (Chill / Fair / Hard); a second tap does not clear it.',
     'Use type="multiple" for independent options shown as cards.',
     'Use eyebrow for a small label above the title, as the winner choice shows "Team A".',
+    'Pass art (an image URL, 16:9) on each choice for illustrated cards: the art sits on top, dims until hover or picked, and a picked card gets the accent border, glow and check badge. Mode and Scoring on the session form use it; the app supplies the URLs.',
     'For short labels with no description use SegmentedControl.',
   ],
   prototype: {

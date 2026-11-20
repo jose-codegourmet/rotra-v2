@@ -30,7 +30,7 @@ Superseded by: none
 - Owner, November 20, 2026: "when games are not recorded they are still gonna have leaderboards, the games will
   still be recorded but the wins will not be counted for the ranking"; then: "the only difference is those wins
   wont be part of the recorded wins for leaderboard, it wont affect the winrate". Keep the name **Record games**.
-- Decision: D-2026-11-20-01 (replaces "run only, keep nothing" in D-2026-11-18-06).
+- Decision: D-2026-11-20-02 (replaces "run only, keep nothing" in D-2026-11-18-06).
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -59,8 +59,8 @@ Superseded by: none
 - Database design: matches-queue.md, results-publication.md, sessions-roster.md, offline-sync.md, open-decisions.md
   (all as **proposed**). Migration `20261120000100_record_games_ranks_only` written and checked on a local disposable database only; not on the shared database.
 - Screen docs: session-setup.md, session-console.md, match-control.md, session-finalization.md,
-  results-sharing.md, public-session.md (a note that D-2026-11-20-01 replaces the Off behavior)
-- Decision: D-2026-11-20-01
+  results-sharing.md, public-session.md (a note that D-2026-11-20-02 replaces the Off behavior)
+- Decision: D-2026-11-20-02
 
 ## Real app work
 - Mock app: undo the Off branches from #973 / #975 (console tabs, result sheet, finishing, session record, public

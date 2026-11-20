@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -424,7 +424,8 @@ passes the wider CHECK (it accepts everything the old one did). Checked on a dis
 (`rotra_disposable_q238` on the local Supabase Postgres, 127.0.0.1:54322): rebuild with no drift, seed,
 80/80 checks. Not applied to the shared database.
 
-## D-2026-11-20-01 — Record games off takes a winner again
+<<<<<<< HEAD
+## D-2026-11-20-02 — Record games off takes a winner again
 
 `20261120000100_record_games_ranks_only`. **Status: written; applied to a local disposable database
 2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
@@ -433,3 +434,19 @@ session's `record_games`. The trigger, `match_decisions_kind_check` (still the N
 and every table, column and row are unchanged, so no-result rows written under the November 19 rule
 stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
 ([verification](verification.md)).
+=======
+## P12.7 — Registration from the Admin link (D-2026-11-20-01)
+
+`20261120000100_admin_link_registration` (#922; owner answer of November 20, 2026). **Written only:
+not applied to any database, not checked on a disposable one.** Two NOT NULL constraints dropped and
+one trigger function replaced; no table, column or row is added, dropped, moved or rewritten, and
+every existing row keeps its club.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `player_id_allocations` (changed) | unchanged | `creating_club_id` nullable: null means the RTR ID came from the Admin link, its place the founding city the player picked (`location_code_id`, as for every allocation). `player_id_allocations_guard()` now compares `creating_club_id` with `IS NOT DISTINCT FROM`, so Admin's RTR ID change also works on such a row; DELETE still refused | unchanged (`RESTRICT`) |
+| `player_claim_links` (changed) | unchanged | `issuing_club_id` nullable: null only for the staging link of an Admin-link registration; a link a club issues always has its club | unchanged (`RESTRICT`) |
+
+Apply it before deploying the code that writes these nulls (the Admin-link registration, password
+and Google, in real mode). The guard function stays revoked from PUBLIC. No grant, RLS or index change.
+>>>>>>> origin/main

@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup and mock app, #988; real mode reads 16/31 until the migration); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -26,7 +26,7 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 |---|---|
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). The end is on the session date or the next day, chosen with day buttons (never guessed), after the start and at most 24 hours later. The duration is shown |
 | 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
-| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup only, November 18, 2026): one of five scoring modes, default 16/31 |
+| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup and mock app, November 18, 2026; real mode reads 16/31 until the migration): one of five scoring modes, default 16/31 |
 | 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
 | 3 · Notes and review | Optional notes shown on the public page, plus a summary with an Edit link per section |
@@ -82,7 +82,7 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 **Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
-While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-01](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only — the mock app and real mode still run the November 18 rule “run only, keep nothing”):
+While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-02](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only — the mock app and real mode still run the November 18 rule “run only, keep nothing”):
 
 - Everything works as in a recorded session: the queue, courts, presence, payments and minimum games; **Match done** with a winner and score; the Leaderboard, Match History, standings, result slides, awards and Publish results; player records and each player's history in the Player app.
 - **The only difference:** the wins and losses are not part of the Top annual / monthly / weekly leaderboards' wins, the win rate or the shared rank ([ranking](../../../player-information/modules/ranking/README.md)).

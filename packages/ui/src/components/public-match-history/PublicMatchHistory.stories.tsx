@@ -61,3 +61,25 @@ export const AllNotShared: Story = { args: { tab: 'all', shared: false, items: [
 export const YoursEmpty: Story = { args: { mineCount: 0, items: [] } }
 export const Visitor: Story = { args: { signedIn: false } }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
+
+/** Best of 3 (Q22): a viewer on Team B sees every game score flipped (here read from the left side). */
+export const BestOfThreeGames: Story = {
+  args: {
+    items: [
+      {
+        id: 'm4',
+        number: 15,
+        timeLabel: '9:05–9:40 PM',
+        left: [face('Jose Buctuanon', 'You'), face('Maya Santos')],
+        right: [face('Ben Cruz'), face('Y*** R***')],
+        winner: 'left',
+        score: '2–1',
+        gameScores: ['21–18', '15–21', '21–19'],
+        mine: true,
+      },
+      ...items,
+    ],
+  },
+  globals: { theme: 'dark' },
+}
+export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }

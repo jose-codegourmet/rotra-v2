@@ -1266,7 +1266,7 @@ for (let i = 0; i < 1283; i++) {
 }
 
 const G = (fmt, partner, opp, res, score, kind = 'counted', note = '') => ({ fmt, partner, opp, res, score, kind, note });
-// Owner, November 20, 2026 (D-2026-11-20-01): a session the club ran with Record games off is "not ranked". Its games stay in the
+// Owner, November 20, 2026 (D-2026-11-20-02): a session the club ran with Record games off is "not ranked". Its games stay in the
 // player's record with the night's win or loss, but they never count toward the leaderboards' wins, the win rate or rank.
 const NOT_RANKED_NOTE = 'Not ranked session · doesn\'t count toward win rate or the leaderboards';
 const U = (fmt, partner, opp, res, score) => G(fmt, partner, opp, res, score, 'unranked', NOT_RANKED_NOTE);

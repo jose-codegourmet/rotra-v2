@@ -8,7 +8,8 @@ import { cookies } from 'next/headers'
 
 /**
  * P-INVITE (#922): the invite card for a club link (`?k=<code>`) or a session link
- * (`?session=<slug>`), and where a signed-in viewer stands. Private and never cached. Not found
+ * (`?session=<slug>`, with `&invite=<code>` naming the inviting player when it is that session's
+ * Session invite code), and where a signed-in viewer stands. Private and never cached. Not found
  * while `player_google_sign_in` is off.
  */
 export async function GET(request: Request, ctx: RouteContext<'/api/invites/[clubId]'>) {
@@ -23,6 +24,7 @@ export async function GET(request: Request, ctx: RouteContext<'/api/invites/[clu
           clubId,
           sessionSlug: search.get('session') || null,
           clubInviteCode: search.get('k') || null,
+          sessionInviteCode: search.get('invite') || null,
         },
         viewerId,
       ),

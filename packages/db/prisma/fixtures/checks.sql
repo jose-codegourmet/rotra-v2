@@ -173,7 +173,7 @@ SELECT pg_temp.expect_rejected('score that disagrees with the winner', $q$
 SELECT pg_temp.expect_accepted('winner-only decision with null scores', $q$
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', 'B', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
--- Record games (Q23.8 #976; D-2026-11-20-01: an unrecorded session takes a winner like any other). S2 is active and recorded, S3 is prepared. The unrecorded checks turn S2
+-- Record games (Q23.8 #976; D-2026-11-20-02: an unrecorded session takes a winner like any other). S2 is active and recorded, S3 is prepared. The unrecorded checks turn S2
 -- off with the lock trigger disabled for that one statement (rolled back with the check).
 SELECT pg_temp.expect_accepted('record games turned off while prepared (#976)', $q$
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a3' $q$);
@@ -182,13 +182,13 @@ SELECT pg_temp.expect_rejected('record games changed after start (#976)', $q$
 SELECT pg_temp.expect_rejected('no-result decision on a recorded session (#976)', $q$
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
-SELECT pg_temp.expect_rejected('no-result decision on an unrecorded session (D-2026-11-20-01)', $q$
+SELECT pg_temp.expect_rejected('no-result decision on an unrecorded session (D-2026-11-20-02)', $q$
   ALTER TABLE queue_sessions DISABLE TRIGGER queue_sessions_record_games_lock;
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a2';
   ALTER TABLE queue_sessions ENABLE TRIGGER queue_sessions_record_games_lock;
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
-SELECT pg_temp.expect_accepted('winner on an unrecorded session (D-2026-11-20-01)', $q$
+SELECT pg_temp.expect_accepted('winner on an unrecorded session (D-2026-11-20-02)', $q$
   ALTER TABLE queue_sessions DISABLE TRIGGER queue_sessions_record_games_lock;
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a2';
   ALTER TABLE queue_sessions ENABLE TRIGGER queue_sessions_record_games_lock;

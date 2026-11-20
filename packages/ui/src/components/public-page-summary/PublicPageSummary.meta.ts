@@ -5,6 +5,7 @@ export const publicPageSummaryMeta = {
   description:
     'The session record\'s Public page tab: what anyone with the session link sees. Details, "Results on the page" (shared slides, Off Day shared or private, publish time; "Not shared yet"; or the invalid copy), Open public page and Publish results / Update publication, then the Participants grid.',
   usage: [
+    'details.scoring is the Scoring row after Mode (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31.',
     'Use as the body of the Public page tab of a session record (Q-HISTORY). Pass the participant cards (ParticipantCard from PublicParticipants) as children; the component lays them out in the grid.',
     'Invalid sessions get the "Invalid sessions have no results to share." copy and no publish action.',
     'Pass recorded={false} for an unrecorded session (Record games off): the Publish results button is not shown.',

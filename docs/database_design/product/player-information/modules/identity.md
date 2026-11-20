@@ -1,6 +1,6 @@
 # Identity, contacts, accounts, and RTR IDs
 
-**Last verified:** 2026-11-18 for unclaimed players with an email and an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); built in P15.8, migration `20261118000500_shared_player_entries`, applied to the shared database on November 18, 2026 (38 copied nicknames cleared)); 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migrations `20261112000100_round2_profiles_banners_invites`, P08.1, and `20261112000200_club_player_claim_links`, P08.9); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-20 for registration from the Admin link (nullable creating and issuing club, migration `20261120000100_admin_link_registration`, written only; [D-2026-11-20-01](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01)); 2026-11-18 for unclaimed players with an email and an RTR ID ([D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); built in P15.8, migration `20261118000500_shared_player_entries`, applied to the shared database on November 18, 2026 (38 copied nicknames cleared)); 2026-11-12 for visibility, hide-from-directory, banner and club-only unclaimed profiles (migrations `20261112000100_round2_profiles_banners_invites`, P08.1, and `20261112000200_club_player_claim_links`, P08.9); 2026-11-07 for player login mapping and claim-link rules (#244); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed logical schema. Player account mapping and claim-link rules are decided (2026-11-07, #244); email verification, password policy and contact-change enforcement remain unresolved.
 
@@ -137,7 +137,7 @@ Claiming is not permission to edit contact identity directly. Initial email comp
 
 `player_social_links`: player FK, provider (Facebook/Instagram/YouTube/LinkedIn), URL, timestamps; unique `(player_id, provider)`. Do not treat these URLs as proof of identity or auth subjects. Public visibility remains subject to the profile-field decision.
 
-**Google sign-in ([D-2026-11-16-01](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-01)); written in #922, migration `20261118000200_player_google_sign_in` not applied yet, not run against Google.** The Google identity lives in Supabase Auth (`auth.identities`, provider `google`) on the same auth user as any password identity; `player_accounts` still maps one auth subject to one player. ROTRA keeps no Google tokens. Columns on `player_accounts`: `google_email` (trimmed and lowercased by a CHECK, nullable, unique when set: one Google account per ROTRA account) and `google_linked_at` (set together with it, by a CHECK); has-password is read from the auth user, not stored. **`google_email` is ROTRA's own record of "Google is connected"**: Supabase links a new Google identity to an existing user with the same verified email by itself, so an identity in `auth.identities` alone is never a connection. The callback signs in only when `google_email` already equals the Google email, asks **Connect Google to your account?** otherwise, and writes `google_email` only after that answer; a session started by Google is refused for an account whose `google_email` is null ([how](../../../../backend/google-sign-in-setup.md)). A Google sign-in with no matching identity never creates a player outside the registration sources. The deadline is configuration, not a column per player: December 31, 2026 for now as one swappable value (owner, November 18, 2026); whether it becomes an Admin setting or an environment value is open.
+**Google sign-in ([D-2026-11-16-01](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-01)); written in #922, migration `20261118000200_player_google_sign_in` applied to the shared database (owner, November 20, 2026), not run against Google.** The Google identity lives in Supabase Auth (`auth.identities`, provider `google`) on the same auth user as any password identity; `player_accounts` still maps one auth subject to one player. ROTRA keeps no Google tokens. Columns on `player_accounts`: `google_email` (trimmed and lowercased by a CHECK, nullable, unique when set: one Google account per ROTRA account) and `google_linked_at` (set together with it, by a CHECK); has-password is read from the auth user, not stored. **`google_email` is ROTRA's own record of "Google is connected"**: Supabase links a new Google identity to an existing user with the same verified email by itself, so an identity in `auth.identities` alone is never a connection. The callback signs in only when `google_email` already equals the Google email, asks **Connect Google to your account?** otherwise, and writes `google_email` only after that answer; a session started by Google is refused for an account whose `google_email` is null ([how](../../../../backend/google-sign-in-setup.md)). A Google sign-in with no matching identity never creates a player outside the registration sources. The deadline is configuration, not a column per player: December 31, 2026 for now as one swappable value (owner, November 18, 2026); whether it becomes an Admin setting or an environment value is open.
 
 ## Account verification ([D-2026-11-16-02](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-02))
 
@@ -147,7 +147,7 @@ Migration `20261118000300_player_verification_override` adds the three nullable 
 
 ## Registration links
 
-`player_claim_links`: UUID PK; player FK; issuing club/account; unique opaque token digest; issued/expiry/consumed/revoked times; claim-state/version metadata. Store a digest rather than a reusable plaintext secret.
+`player_claim_links`: UUID PK; player FK; issuing club/account (nullable since `20261120000100_admin_link_registration`, only for the staging link of a registration from the Admin link, which has no club); unique opaque token digest; issued/expiry/consumed/revoked times; claim-state/version metadata. Store a digest rather than a reusable plaintext secret.
 
 `club_player_claim_links` (P08.9): the same columns keyed by `(club_id, club_player_id)` → `club_players` instead of a player, for a club's own unclaimed record. One token namespace: a claim read looks the digest up in both tables.
 
@@ -189,7 +189,7 @@ not part of registration.
 The existing `player_claim_links` table stages a newly submitted registration so provider failures
 and lost responses can retry. The browser retains a random retry secret and a contact fingerprint
 for this tab (no password or plain contacts); the database stores only the secret's SHA-256 digest.
-A retry must use the same club and contacts. Registration uses the existing seven-day expiry,
+A retry must use the same club (none for the Admin link) and contacts. Registration uses the existing seven-day expiry,
 provider operation keyed by player ID, single consumption, and email/password sign-in. No schema
 migration is required. Matching contacts or an existing provider email produce a generic account
 confirmation prompt before a new profile is staged. Phone/email uniqueness remains the race backstop.
@@ -200,14 +200,14 @@ confirmation prompt before a new profile is staged. Phone/email uniqueness remai
 
 `player_id_counters`: PK `(location_code_id, sync_date)` and positive `last_sequence`. Date grouping must use an agreed server timezone. The location identity includes country so identically spelled city codes in different countries do not collide.
 
-`player_id_allocations`: PK/FK `player_id`; unique `rtr_id` (append-only except Admin's place-and-date change under [D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04), see below); creating club FK; founding-location FK; frozen country/city strings; `sync_date`; sequence; allocation timestamp. Unique `(location_code_id, sync_date, sequence)`.
+`player_id_allocations`: PK/FK `player_id`; unique `rtr_id` (append-only except Admin's place-and-date change under [D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04), see below); creating club FK (nullable since `20261120000100_admin_link_registration`: null for a registration from the Admin link, whose place is the founding city the player picked; [D-2026-11-20-01](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01)); founding-location FK; frozen country/city strings; `sync_date`; sequence; allocation timestamp. Unique `(location_code_id, sync_date, sequence)`.
 
 Allocation transaction:
 
 1. Normalize/resolve the phone and lock its existing identity or safely race on the unique phone constraint.
 2. Reuse an existing profile/allocation; never create another ID for the same identity.
 3. For a new eligible profile, increment that founding city's counter using a single atomic database operation, then insert the allocation in the same transaction.
-4. Format `RTR-PH-CEB-102926-0001` using the **sync day** and club founding city. Internal UUIDs never use this string.
+4. Format `RTR-PH-CEB-102926-0001` using the **sync day** and club founding city (for the Admin link, no club: the founding city the player picked from the Admin-managed `location_codes`). Internal UUIDs never use this string.
 5. On a uniqueness race, retry from identity resolution; do not publish a losing allocation or use `MAX(sequence)+1`.
 
 IDs stay the same through contact/address changes; those do not rerun allocation. *Built in P15.8 for [D-2026-11-16-04](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04):* an Admin change of the registration place or date writes a new `rtr_id` (same sequence number, unique check: “Another player already has this RTR ID. Choose another place or date.”) and replaces the old string on `shared_player_entries` and `player_id_allocations`, the only records holding it; allocation also runs when a club first saves an unclaimed person's email (into `shared_player_entries`), and registration copies that allocation; retired IDs are never reused. Do not assume gap-free sequences or truncate values over four digits; overflow presentation is open.

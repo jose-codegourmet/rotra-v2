@@ -3,7 +3,7 @@ import type { MockSession } from '../auth/auth.types'
 import { signIn } from '../auth/fetchers'
 import { foundingCities } from '../fixtures/foundingCities'
 import { checkMockSave, requireOnline } from '../mock/bridge'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
@@ -30,9 +30,11 @@ export type GuestRegistrationResult =
 
 /**
  * The club's registration route; `?session=` when the visitor came from a session link (#689),
- * `?k=` with the club invite link's code, which the server checks (#712).
+ * `?k=` with the club invite link's code, which the server checks (#712). No club: the Admin
+ * link's own route, `/api/register`.
  */
 function registerPath(clubId: string, sessionSlug?: string | null, inviteCode?: string | null) {
+  if (!clubId) return '/api/register'
   const search = new URLSearchParams()
   if (sessionSlug) search.set('session', sessionSlug)
   if (inviteCode) search.set('k', inviteCode)
@@ -46,7 +48,9 @@ export async function getGuestRegistrationClub(
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {
-  if (isRealDataMode() && !clubId) throw new NotConnectedError()
+  // The Admin link (no club) has nothing to read: no club name, no session.
+  if (isRealDataMode() && !clubId)
+    return { clubName: null, sessionTitle: null, sessionPageUrl: null }
   if (isRealDataMode())
     return realRequest<{
       clubName: string | null
@@ -87,7 +91,7 @@ export async function completeGuestRegistration(input: {
   values: RegistrationValues
 }): Promise<GuestRegistrationResult> {
   const parsed = registrationRequestSchema.parse(input)
-  if (isRealDataMode() && !input.clubId) throw new NotConnectedError()
+  // The Admin link (no club) posts the picked city with the form; the player joins no club.
   if (isRealDataMode())
     return realRequest(registerPath(input.clubId, input.sessionSlug, input.inviteCode), {
       method: 'POST',

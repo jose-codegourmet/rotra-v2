@@ -76,3 +76,18 @@ export const PlayerVariantPhone: Story = {
   },
   globals: { theme: 'dark', viewport: { value: 'phone' } },
 }
+
+/** Best of 3 (Q22): "2–1" in the score box, every game score in a pill under the match pill. */
+export const BestOfThreeGames: Story = {
+  args: { score: '2–1', gameScores: ['21–18', '15–21', '21–19'] },
+}
+export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }
+export const BestOfThreeTwoGames: Story = {
+  args: { score: '2–0', gameScores: ['21–18', '21–15'], mine: false },
+}
+export const BestOfThreePhone: Story = {
+  ...BestOfThreeGames,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+/** Winner picked, no score entered: no game pill. */
+export const BestOfThreeNoScore: Story = { args: { score: null, gameScores: [] } }

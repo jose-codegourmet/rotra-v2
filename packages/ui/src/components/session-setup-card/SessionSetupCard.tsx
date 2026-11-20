@@ -1,3 +1,4 @@
+import { SCORING } from '@rotra/schema/scoring'
 import { Card } from '@rotra/ui/card'
 import { recordGamesLabel } from '@rotra/ui/forms/session-setup-form/helpers'
 import { KeyValueList } from '@rotra/ui/key-value-list'
@@ -9,6 +10,10 @@ export type SessionSetupCardProps = {
   formatsLabel: string
   modeLabel: string
   modeDescription: string
+  /** The scoring mode's label ("16/31", "11/21 × 3", from SCORING in @rotra/schema/scoring); omitted reads as 16/31 (a session saved before the setting) */
+  scoringLabel?: string
+  /** The scoring mode's rule ("One game to 31. Change sides at 16. Deuce at 30–30."), shown after the label like the Mode row */
+  scoringDescription?: string
   /** Record games; omitted reads as on (a session saved before the option existed) */
   recordGames?: boolean
   minimumGames: number
@@ -42,6 +47,8 @@ export function SessionSetupCard({
   formatsLabel,
   modeLabel,
   modeDescription,
+  scoringLabel = SCORING['31'].label,
+  scoringDescription,
   recordGames = true,
   minimumGames,
   minimum,
@@ -93,6 +100,23 @@ export function SessionSetupCard({
               value: (
                 <>
                   {modeLabel} · <span className="text-fg2">{modeDescription}</span>
+                  {fixedAfterStart ? (
+                    <span className="text-[13px] text-fg2"> · Fixed after start</span>
+                  ) : null}
+                </>
+              ),
+            },
+            {
+              label: 'Scoring',
+              value: (
+                <>
+                  {scoringLabel}
+                  {scoringDescription ? (
+                    <>
+                      {' '}
+                      · <span className="text-fg2">{scoringDescription}</span>
+                    </>
+                  ) : null}
                   {fixedAfterStart ? (
                     <span className="text-[13px] text-fg2"> · Fixed after start</span>
                   ) : null}

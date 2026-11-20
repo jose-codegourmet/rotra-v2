@@ -1,4 +1,4 @@
--- Record games off keeps the night's results (D-2026-11-20-01, replacing "run only, keep nothing" in
+-- Record games off keeps the night's results (D-2026-11-20-02, replacing "run only, keep nothing" in
 -- D-2026-11-18-06). An unrecorded session's Match done now stores a winner and score like any other
 -- session; only the leaderboard, win-rate and rank reads skip the session (service side, by
 -- queue_sessions.record_games).

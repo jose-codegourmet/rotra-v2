@@ -26,7 +26,7 @@ Superseded by: none
 
 ## Why
 - Owner, November 20, 2026: "the only difference is those wins wont be part of the recorded wins for leaderboard,
-  it wont affect the winrate". Decision: D-2026-11-20-01.
+  it wont affect the winrate". Decision: D-2026-11-20-02.
 
 ## Like for like
 - Compare at: 375 px and 1280 px, dark and light.
@@ -46,7 +46,7 @@ Superseded by: none
 - Business logic: player-information/modules/ranking/README.md (what counts; leaderboards)
 - Database design: through the Queue log (facts are written; reads skip `record_games = false`)
 - Screen docs: player-information/README.md (P-MATCH-HISTORY tabs)
-- Decision: D-2026-11-20-01
+- Decision: D-2026-11-20-02
 
 ## Real app work
 - `apps/player` and `@rotra/data`: a not-ranked kind on history games; the leaderboard, win-rate and rank reads

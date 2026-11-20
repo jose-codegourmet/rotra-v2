@@ -155,6 +155,8 @@ export function MatchHistory({ history, onOpenParticipant, recorded = true }: Ma
           : ('right' as const)
         : null,
       score: leftScore != null && rightScore != null ? `${leftScore}–${rightScore}` : null,
+      // Best of 3 (Q22): every game score, flipped with the teams like the score.
+      gameScores: m.games?.map((g) => (flip ? `${g.b}–${g.a}` : `${g.a}–${g.b}`)),
       invalid: m.invalid,
       mine,
       now: tab === 'all' && !!replay && onCourtAt(m, t),

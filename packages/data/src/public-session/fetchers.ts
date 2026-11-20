@@ -8,6 +8,7 @@ import {
   courtFreeSince,
   courtNames,
   holdsCourt,
+  sharePositions,
   waitMinutes,
 } from '../match/match.rules'
 import type { Match } from '../match/match.types'
@@ -127,7 +128,9 @@ function publishedResults(
   viewerClubPlayerIds?: ReadonlySet<string>,
 ): PublicSessionResults | null {
   const publication = state.publications[sessionId],
-    snapshot = state.resultSnapshots[sessionId],
+    saved = state.resultSnapshots[sessionId],
+    // Shown with shared positions without gaps (owner, November 20, 2026); the saved rows never change.
+    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) },
     session = state.sessions.find((s) => s.id === sessionId)
   // An unrecorded session has no results, whatever rows exist for it.
   if (!publication || !snapshot || (session && !recordsGames(session))) return null

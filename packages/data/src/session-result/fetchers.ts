@@ -1,3 +1,4 @@
+import { sharePositions } from '../match/match.rules'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
@@ -20,7 +21,9 @@ export async function getSessionResults(id: string): Promise<SessionResultSnapsh
   await delay()
   const state = readMockState()
   if (!recordsGames(sessionIn(state, id))) return null
-  return state.resultSnapshots[id] ?? null
+  const snapshot = state.resultSnapshots[id]
+  // Saved rows never change; shown with shared positions without gaps (owner, November 20, 2026).
+  return snapshot ? { ...snapshot, standings: sharePositions(snapshot.standings) } : null
 }
 /**
  * Q-PUBLISH / public page: the current publication, or null while results are private. An

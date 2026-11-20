@@ -5,6 +5,7 @@ import {
   courtFreeSince,
   courtNames,
   holdsCourt,
+  sharePositions,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
@@ -95,7 +96,11 @@ function withResultPictures(
     }
   }
   const out: Record<string, unknown> = { ...results }
-  if (Array.isArray(out.standings)) out.standings = out.standings.map(face)
+  // Published copies saved before shared positions (or with gaps) show 1, 1, 2 (owner, November 20, 2026).
+  if (Array.isArray(out.standings))
+    out.standings = sharePositions(
+      out.standings as { wins: number; losses: number; position: number }[],
+    ).map(face)
   if (Array.isArray(out.offDay)) out.offDay = out.offDay.map(face)
   if (out.awards && typeof out.awards === 'object') {
     const awards = out.awards as Record<string, unknown>

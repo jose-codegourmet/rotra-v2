@@ -59,23 +59,23 @@ const history = (
   }))
 
 describe('session standings', () => {
-  it('shares a position between players on the same wins and losses (1, 2, 2, 4)', () => {
+  it('shares a position between players on the same wins and losses (1, 2, 2, 3)', () => {
     const rows = sessionStandings(roster, [
       game(['Zoe'], ['Amy']),
       game(['Amy'], ['Ben']),
       game(['Dan'], ['Zoe']),
     ])
     // Dan 1–0, then Amy and Zoe both 1–1: Zoe beat Amy, but head-to-head separates no one and the
-    // name only orders them inside the shared position. Ben 0–1 is numbered after both.
+    // name only orders them inside the shared position. Ben 0–1 takes the next number.
     expect(rows.map((r) => [r.position, r.name])).toEqual([
       [1, 'Dan'],
       [2, 'Amy'],
       [2, 'Zoe'],
-      [4, 'Ben'],
+      [3, 'Ben'],
     ])
     expect(rows[2]).toMatchObject({ clubPlayerId: 'club-Zoe', wins: 1, losses: 1, games: 2 })
   })
-  it('shares one position three ways and numbers the next after all three (1, 2, 2, 2, 5)', () => {
+  it('shares one position three ways and gives the next record the next number (1, 2, 2, 2, 3)', () => {
     const rows = sessionStandings(roster, [
       game(['Zoe'], ['Amy']),
       game(['Amy'], ['Ben']),
@@ -87,10 +87,10 @@ describe('session standings', () => {
       [2, 'Amy', 1, 1],
       [2, 'Ben', 1, 1],
       [2, 'Zoe', 1, 1],
-      [5, 'Eve', 0, 1],
+      [3, 'Eve', 0, 1],
     ])
   })
-  it('puts two players on 4–2 at position 1 and the next player at 3', () => {
+  it('puts two players on 4–2 at position 1 and the next player at 2', () => {
     const wins = (winner: string, ...losers: string[]) => losers.map((l) => game([winner], [l]))
     const rows = sessionStandings(roster, [
       // Ben beat Amy twice, yet they share the position.
@@ -102,9 +102,9 @@ describe('session standings', () => {
     expect(rows.map((r) => [r.position, r.name, r.wins, r.losses])).toEqual([
       [1, 'Amy', 4, 2],
       [1, 'Ben', 4, 2],
-      [3, 'Dan', 1, 2],
-      [3, 'Zoe', 1, 2],
-      [5, 'Eve', 0, 2],
+      [2, 'Dan', 1, 2],
+      [2, 'Zoe', 1, 2],
+      [3, 'Eve', 0, 2],
     ])
   })
   it('leaves out players without a counted game, partials and invalid matches', () => {

@@ -1,7 +1,8 @@
 /**
  * One ordered standings row of the result snapshot. Players with the same wins and losses share a
- * `position` and the next one skips the shared places (1, 1, 3; D-2026-11-18-05). A snapshot saved
- * before that keeps the unique positions it was published with: stored standings are never recomputed.
+ * `position` and the next record takes the next number (1, 1, 2; D-2026-11-18-05, no gaps since
+ * November 20, 2026). Stored rows are never rewritten; reads pass them through `sharePositions`, so
+ * snapshots saved earlier (unique 1, 2, 3… or 1, 1, 3) show the same way (owner, November 20, 2026).
  */
 export type StandingRow = {
   position: number

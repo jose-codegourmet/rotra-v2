@@ -770,8 +770,8 @@ func WaitMinutes(p model.Player, matches []model.Match, startedAt *int64, now in
 	return diff / 60000
 }
 
-// Standing is one row of the live standings. Position is shared by rows with the same wins and losses
-// and skips the shared places (1, 1, 3).
+// Standing is one row of the live standings. Position is shared by rows with the same wins and losses;
+// the next record takes the next number, without gaps (1, 1, 2).
 type Standing struct {
 	PlayerID string `json:"playerId"`
 	Name     string `json:"name"`
@@ -782,8 +782,8 @@ type Standing struct {
 }
 
 // ComputeStandings ranks players with counted games: most wins, then fewest losses (D-2026-11-18-05).
-// Rows with the same wins and losses share a position and the next position skips the shared places
-// (1, 1, 3). Nothing else separates players: the name ([collate.Compare]) only orders the rows inside a
+// Rows with the same wins and losses share a position and the next record takes the next number, without
+// gaps (1, 1, 2; owner, November 19, 2026). Nothing else separates players: the name ([collate.Compare]) only orders the rows inside a
 // shared position, and the sort is stable, so equal names keep roster order.
 func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 	rows := []Standing{}
@@ -816,10 +816,14 @@ func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 		return collate.Compare(a.Name, b.Name)
 	})
 	for i := range rows {
-		if i > 0 && rows[i].Wins == rows[i-1].Wins && rows[i].Losses == rows[i-1].Losses {
+		// No gaps (owner, November 19, 2026): the next record takes the next number (1, 1, 2).
+		switch {
+		case i == 0:
+			rows[i].Position = 1
+		case rows[i].Wins == rows[i-1].Wins && rows[i].Losses == rows[i-1].Losses:
 			rows[i].Position = rows[i-1].Position
-		} else {
-			rows[i].Position = i + 1
+		default:
+			rows[i].Position = rows[i-1].Position + 1
 		}
 	}
 	return rows

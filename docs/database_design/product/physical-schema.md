@@ -427,7 +427,7 @@ passes the wider CHECK (it accepts everything the old one did). Checked on a dis
 <<<<<<< HEAD
 ## D-2026-11-20-02 — Record games off takes a winner again
 
-`20261120000100_record_games_ranks_only`. **Status: written; applied to a local disposable database
+`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
 2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
 of `match_decisions_record_games_guard()` only: every completed decision needs a winner, whatever the
 session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)

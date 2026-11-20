@@ -57,7 +57,7 @@ Superseded by: none
 - Business logic: queue/modules/sessions/README.md (Record games), queue/modules/results/README.md,
   player-information/modules/ranking/README.md
 - Database design: matches-queue.md, results-publication.md, sessions-roster.md, offline-sync.md, open-decisions.md
-  (all as **proposed**). Migration `20261120000100_record_games_ranks_only` written and checked on a local disposable database only; not on the shared database.
+  (all as **proposed**). Migration `20261120000200_record_games_ranks_only` written and checked on a local disposable database only; not on the shared database.
 - Screen docs: session-setup.md, session-console.md, match-control.md, session-finalization.md,
   results-sharing.md, public-session.md (a note that D-2026-11-20-02 replaces the Off behavior)
 - Decision: D-2026-11-20-02
@@ -67,4 +67,4 @@ Superseded by: none
   page); keep the switch.
 - Real mode (`packages/db`): Match done on an unrecorded session stores the winner and score; finishing runs as for
   any session; the leaderboard, win-rate and rank reads skip facts from sessions with `record_games = false`. The migration
-  `20261120000100_record_games_ranks_only` is written (local only; shared database needs sign-off).
+  `20261120000200_record_games_ranks_only` is written (local only; shared database needs sign-off).

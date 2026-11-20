@@ -424,6 +424,17 @@ passes the wider CHECK (it accepts everything the old one did). Checked on a dis
 (`rotra_disposable_q238` on the local Supabase Postgres, 127.0.0.1:54322): rebuild with no drift, seed,
 80/80 checks. Not applied to the shared database.
 
+<<<<<<< HEAD
+## D-2026-11-20-02 — Record games off takes a winner again
+
+`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
+2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
+of `match_decisions_record_games_guard()` only: every completed decision needs a winner, whatever the
+session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)
+and every table, column and row are unchanged, so no-result rows written under the November 19 rule
+stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
+([verification](verification.md)).
+=======
 ## P12.7 — Registration from the Admin link (D-2026-11-20-01)
 
 `20261120000100_admin_link_registration` (#922; owner answer of November 20, 2026). **Written only:
@@ -438,3 +449,4 @@ every existing row keeps its club.
 
 Apply it before deploying the code that writes these nulls (the Admin-link registration, password
 and Google, in real mode). The guard function stays revoked from PUBLIC. No grant, RLS or index change.
+>>>>>>> origin/main

@@ -2,6 +2,7 @@ import { delay } from '../mock/latency'
 import type { MockState } from '../mock/store'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { slotCapacity } from '../queue-session/queueSession.rules'
 import { realGetSessionCostEstimate } from '../real/financials'
 import { isRealDataMode } from '../real/mode'
 import { estimateSessionCost } from './sessionCost.rules'
@@ -14,7 +15,11 @@ export function sessionCostIn(state: MockState, id: string) {
   const estimate = estimateSessionCost(saved, {
     courts,
     durationMinutes: Math.round((session.scheduledEndAt - session.scheduledStartAt) / 60000),
-    players: state.roster.filter((p) => p.sessionId === id).length || session.expectedPlayers || 1,
+    // Before anyone joins: the expected count, else the slots (the form's "follows your slots").
+    players:
+      state.roster.filter((p) => p.sessionId === id).length ||
+      session.expectedPlayers ||
+      slotCapacity(courts, session.playersPerCourt),
     inventory: state.inventory.filter((i) => i.clubId === session.clubId),
   })
   const shuttleLines = saved.shuttles.map((line, index) => ({

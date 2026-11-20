@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 65 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -379,7 +379,7 @@ NEW: 65 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · 
 | [2026-11-18-player-legal-text-rewrite](2026-11-18-player-legal-text-rewrite.md) | Player app: fuller Privacy Policy and Terms of Service text | legal-document | IN MOCK APP — PR #940 |
 | [2026-11-18-queue-club-nickname](2026-11-18-queue-club-nickname.md) | Queue app: a club nickname the Queue Master sets for a registered player, shown on Queue Master screens only | player-profile-sheet, saved-player-card, club-nickname-form (new) | TICKETED — #900 |
 | [2026-11-18-queue-guest-invite-claims-record](2026-11-18-queue-guest-invite-claims-record.md) | Queue app: a guest's invite link is their own, and registering through it claims that guest's record | player-profile-sheet, invite-sheet, claim-identity-check | IN PROGRESS — #966 |
-| [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 |
+| [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 (superseded by 2026-11-20-queue-record-games-not-ranked.md (what Off does: games are recorded as usual; only their wins stay out of the leaderboards and win rate)) |
 | [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | IN MOCK APP — #944 |
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
 | [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | NEW |
@@ -449,4 +449,6 @@ NEW: 65 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · 
 | [2026-11-19-queue-swap-partners-playing](2026-11-19-queue-swap-partners-playing.md) | Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside | dialog player card (reuse), drag swap (reuse) | NEW |
 | [2026-11-19-queue-time-picker-standard](2026-11-19-queue-time-picker-standard.md) | Queue app: every time input opens the time picker dialog (Settings court times included) | date-and-time picker (time field + time dialog) | NEW |
 | [2026-11-19-queue-upcoming-compact-cards](2026-11-19-queue-upcoming-compact-cards.md) | Queue app: the Courts tab's upcoming queued matches use compact cards | queue match card, compact variant (new): overlapping avatar stack with level rings | NEW |
+| [2026-11-20-player-not-ranked-games](2026-11-20-player-not-ranked-games.md) | Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate | game-row (note), session-row, chip, notice, tabs | NEW |
+| [2026-11-20-queue-record-games-not-ranked](2026-11-20-queue-record-games-not-ranked.md) | Queue app: Record games off records the games as usual; only their wins stay out of the leaderboards and win rate | session-setup-form, session-setup-card, chip, notice, confirm-result-sheet, public-session-details | NEW |
 <!-- status-index:end -->

@@ -1,4 +1,5 @@
 import 'server-only'
+import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import {
   amountDuePerHead,
   estimateSessionCost,
@@ -212,7 +213,12 @@ async function estimateFor(tx: Tx, session: QueueSession) {
   const estimate = estimateSessionCost(input, {
     courts: courts.length,
     durationMinutes,
-    players: roster.length || session.expectedPlayers || 0,
+    // Before anyone joins: the expected count, else the slots (the form's "follows your slots"),
+    // never 1 player.
+    players:
+      roster.length ||
+      session.expectedPlayers ||
+      slotCapacity(courts.length, session.playersPerCourt),
     inventory,
   })
   return {

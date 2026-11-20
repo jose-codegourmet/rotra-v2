@@ -2020,11 +2020,13 @@ const CARD_ART = {
 const scoringOf = (s) => (s && SCORING[s.scoring] ? s.scoring : '31');
 const scoringDef = (s) => SCORING[scoringOf(s)];
 // Owner, November 18, 2026: "the QM has the option record the session games or not. but the default is recorded".
-// Off: the queue, courts and minimum games still run, but no result is entered and nothing is kept (no standings, result
-// slides or awards; nothing goes to player records or rankings). Set on the session form, fixed once the session starts.
+// Set on the session form, fixed once the session starts.
 // Sessions saved before this change have no `recorded`: they read as recorded.
+// Owner, November 20, 2026: off still records the games like any session (winner and score, Leaderboard, Match History,
+// result slides, awards, publishing, and the games on each player's record). The only difference: its wins don't count
+// toward the ROTRA leaderboards or anyone's win rate.
 const recordedOf = (s) => !s || s.recorded !== false;
-const NOT_RECORDED = "<b>This session's games were not recorded.</b> It has no results, standings, result slides or awards, and it doesn't count toward player records or rankings.";
+const NOT_RANKED = "<b>This session isn't ranked.</b> Its games and results are recorded as usual, but its wins don't count toward the ROTRA leaderboards or anyone's win rate.";
 // Score of a finished match for display: { main, games } or null. Old matches only have scoreA/scoreB. `flip` shows Team B first.
 function scoreParts(m, flip) {
   if (!m || m.scoreA == null || m.scoreB == null) return null;
@@ -3609,7 +3611,7 @@ function viewHistory() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="stack tight"><span class="label">Session record · read-only</span>${sessTitle(s)}<p class="muted small">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
-    <div class="row">${invalid ? chip('Invalid session', 'bad') : chip('Completed', 'ok')}${invalid ? '' : !recordedOf(s) ? chip('Not recorded', 'warn') : chip(s.published ? 'Results published' : 'Results private', s.published ? 'ok' : '')}</div>
+    <div class="row">${invalid ? chip('Invalid session', 'bad') : chip('Completed', 'ok')}${invalid ? '' : chip(s.published ? 'Results published' : 'Results private', s.published ? 'ok' : '')}${invalid || recordedOf(s) ? '' : chip('Not ranked', 'warn')}</div>
     <div class="tiles4">
       <div class="card"><span class="label">Games</span><b class="big tnum">${invalid ? '—' : done.length}</b>${!invalid && played.length !== done.length ? `<span class="small muted">${played.length - done.length} invalid</span>` : ''}</div>
       <div class="card"><span class="label">Players</span><b class="big tnum">${s.roster.length}</b><span class="small muted">of ${capacityOf(s)} slots${s.roster.length > capacityOf(s) ? ` · ${s.roster.length - capacityOf(s)} additional players admitted` : ''}</span></div>
@@ -3643,9 +3645,8 @@ function cancelledRecord(s) {
 }
 function histResultsPane(s, { invalid, played }) {
   if (invalid) return notice('bad', `<b>This session has no official result.</b> ${esc(s.invalidReason || '')} It doesn't count toward player records or rankings, and there are no standings or result slides. Its partial records aren't shown as match history.`);
-  if (!recordedOf(s)) return notice('', NOT_RECORDED);
   const st = standings(s);
-  return `<div class="between"><h2>Standings</h2><div class="row">${st.length ? `<button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button>` : ''}<button class="btn sm" data-act="go" data-to="results">Result slides</button><button class="btn sm" data-act="openExport">Download images</button></div></div>
+  return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div class="between"><h2>Standings</h2><div class="row">${st.length ? `<button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button>` : ''}<button class="btn sm" data-act="go" data-to="results">Result slides</button><button class="btn sm" data-act="openExport">Download images</button></div></div>
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)); return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td><td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map(faceBtn).join('')}</span><b>${tiedNames(ps.map((p) => p.name))}</b></div></td><td class="n tnum"><b>${g.w}</b></td><td class="n tnum">${g.l}</td><td class="n tnum">${groupGames(g)}</td></tr>`; }).join('')}
     </tbody></table></div>` : '<div class="card empty">No counted games were recorded in this session.</div>'}`;
@@ -3653,7 +3654,6 @@ function histResultsPane(s, { invalid, played }) {
 // Its own tab: the replay card plus every match by court, in play order.
 function histNightPane(s, { invalid, played }) {
   if (invalid) return notice('bad', '<b>This session has no official result,</b> so there is no match history or replay. Its partial records aren\'t shown.');
-  if (!recordedOf(s)) return notice('', `${NOT_RECORDED} There is no match history or replay.`);
   return `<div class="stack"><div><h2>How the night ran</h2><p class="small muted">Play or drag the timeline to see the courts at any moment. Every match is listed below by court, in the order it was played; winners are highlighted.</p></div>
       ${replayCard(s)}
       <div class="hist-courts" style="--cols:${s.courts.length}">${s.courts.map((c) => {
@@ -3669,7 +3669,7 @@ function histPlayersPane(s, { invalid }) {
   return `<div class="between"><h2>Players</h2><span class="small muted">${invalid ? 'Not counted' : `Minimum ${s.minimum} games · ${below} below it`}</span></div>
     <div class="pgrid2">${rows.map(({ r, p, g, x }) => `<article class="pcard2"><div class="pc-top">${avatar(p, 'xl')}${x ? `<span class="chip ${x.rank <= 3 ? 'ok' : ''}">#${x.rank}</span>` : ''}</div>
       <div class="stack tight" style="gap:2px"><span class="pc-name">${esc(p.name)}</span><span class="small muted">${esc(lvLabel(r.level))}</span></div>
-      ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div>${recordedOf(s) ? `<div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div>` : ''}</div>
+      ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div><div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div></div>
       ${g > s.minimum ? chip('Above minimum', 'ok') : g === s.minimum ? chip('Met minimum') : chip(`${s.minimum - g} short`, 'warn')}`}
     </article>`).join('')}</div>`;
 }
@@ -3679,7 +3679,7 @@ function histPublicPane(s, { invalid }) {
   const playerSignedIn = !!S.ui.playerSignedIn;
   const fullRoster = playerSignedIn && !!S.ui.playerConfirmed;
   return `<div class="between"><div><h2>Public page</h2><p class="small muted">What anyone with the session link sees. No sign-in needed.</p></div>
-      <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button>${invalid || !recordedOf(s) ? '' : `<button class="btn sm primary" data-act="openPublish">${pub ? 'Update publication' : 'Publish results'}</button>`}</div></div>
+      <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button>${invalid ? '' : `<button class="btn sm primary" data-act="openPublish">${pub ? 'Update publication' : 'Publish results'}</button>`}</div></div>
     <div class="grid2">
       <section class="card stack"><h3>Details</h3><dl class="kv">
         <dt>When</dt><dd>${fmtDate(s.start)}, ${fmtRange(s.start, s.end)}</dd><dt>Venue</dt><dd>${esc(s.venue)}</dd>
@@ -4189,7 +4189,7 @@ function viewSetup() {
               <div class="score-sum">${I.check}<span><b>${SCORING[sel].label}</b> · ${SCORING[sel].text}</span></div>`; })() + `<span class="hint">How games are scored tonight. The match result dialog asks only for what this needs.</span>`; })()}</div>
       <div class="field">${(() => { const ex = d.id && S.sessions.find((x) => x.id === d.id), locked = !!ex && ex.status !== 'prepared', on = d.recorded !== false;
         return `<div class="between"><span>Record games</span>${locked ? chip(on ? 'On' : 'Off') : sw(on, 'toggleDraft', 'data-k="recorded"', 'Record games')}</div>
-          <span class="hint">${on ? 'Results, standings, result slides and awards are kept, and games count toward player records.' : "Games aren't recorded: Match done asks for no result. The queue, courts and minimum games still work, but there are no standings, result slides or awards, and nothing goes to player records or rankings."}${locked ? " Record games can't change after Start." : ''}</span>`; })()}</div>`,
+          <span class="hint">${on ? 'Results, standings, result slides and awards are kept, and wins count toward the ROTRA leaderboards and win rate.' : "Games and results are recorded as usual, but wins don't count toward the ROTRA leaderboards or anyone's win rate."}${locked ? " Record games can't change after Start." : ''}</span>`; })()}</div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
       <div class="fgrid">
         ${rosterN ? `<div class="field"><span>Players</span><span>${rosterN} on the roster</span><span class="hint">Updates as you add or remove players.</span></div>`
@@ -4211,7 +4211,7 @@ function viewSetup() {
           <dt>Formats</dt><dd>${fmtFormats(d)} · ${MODES[d.mode].label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Levels</dt><dd>${restrictText(d)} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Scoring</dt><dd>${(SCORING[d.scoring] || SCORING['31']).label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
-          <dt>Record games</dt><dd>${d.recorded !== false ? 'On' : 'Off · no results kept'} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
+          <dt>Record games</dt><dd>${d.recorded !== false ? 'On' : 'Off · not ranked'} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Minimum</dt><dd>${d.minAuto ? est.low : esc(d.minimum)} games per player ${d.minAuto ? '(calculated)' : ''} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Costs</dt><dd>${(() => { const c = financeCalc(d, d.courts.length, durMins, nPlayers); return `${peso(c.total)} total · players pay ${peso(c.perHead)}${c.custom ? ' (custom)' : ' (break-even)'} · ${resultText(c)}`; })()}</dd>
         </dl></div>`,
@@ -4468,7 +4468,7 @@ function prepOverview(s) {
         <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Levels</dt><dd>${restrictText(s)}</dd>
         <dt>Scoring</dt><dd>${scoringDef(s).label} · <span class="muted">${scoringDef(s).text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
-        <dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · no results kept'}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · not ranked'}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
@@ -4522,7 +4522,7 @@ function liveSettings(s, est, present, allLink) {
       <div class="ls-rows">${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off', reqOn.length ? 'Formats players can ask for' : 'Players can\'t request matches')}</div>
       <div class="row acts"><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm${reqCount(s) ? ' attn' : ''}" data-act="openRequests">Match requests · ${reqCount(s)}</button></div></section>`;
   const rules = `<section class="card ls-card" aria-labelledby="ls-rules-h"><div class="between"><h3 id="ls-rules-h">Game rules</h3>${fixed}</div>
-      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? 'calculated' : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? 'calculated' : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · not ranked'}</span></div></div>
       <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}</div></section>`;
   const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
     return `<section class="card ls-card" aria-labelledby="ls-money-h"><div class="between"><h3 id="ls-money-h">Costs</h3></div>
@@ -4550,7 +4550,7 @@ function prepSettings(s) {
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.courts.length}</b><span>Courts booked</span></div><div class="ls-stat"><b class="tnum">${capacityOf(s)}</b><span>Slots · ${per} a court</span></div></div>
       <div class="ls-rows">${s.courts.map((c) => row(esc(c.label), fmtWhenRange(courtStart(s, c), courtUntil(s, c)), c.until ? 'Set time' : 'Follows session end')).join('')}</div></section>`;
   const rules = `<section class="card ls-card" aria-labelledby="ps-rules-h">${head('ps-rules-h', 'Game rules', 1)}
-      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? `calculated (${est.low}–${est.high})` : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? `calculated (${est.low}–${est.high})` : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · not ranked'}</span></div></div>
       <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off')}</div></section>`;
   const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
     return `<section class="card ls-card" aria-labelledby="ps-money-h">${head('ps-money-h', 'Costs', 2)}
@@ -4708,7 +4708,7 @@ function viewConsole() {
   const endSt = endStatus(s);
   return `<main class="wrap">
     <div class="between">
-      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}${recordedOf(s) ? '' : chip('Not recorded', 'warn')}</div>
+      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}${recordedOf(s) ? '' : chip('Not ranked', 'warn')}</div>
         ${sessTitle(s)}<p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
         ${(() => { const n = reqCount(s), open = S.ui.courtMenu === 'live-more'; return `<div class="row live-acts" style="flex:none;justify-content:flex-end;gap:8px">
           <button class="btn sm${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>
@@ -4730,9 +4730,9 @@ function viewConsole() {
         ['queue', 'Main Queue', waiting(s).length, ' waiting'],
         ['generate', 'Generate Queue', null, ''],
         ['roster', 'Players', `${s.roster.filter((r) => r.present).length}/${s.roster.length}`, ' present'],
-        recordedOf(s) && ['board', 'Leaderboard', lead, ''],
+        ['board', 'Leaderboard', lead, ''],
         // Owner artifact comment, November 19, 2026: "please add Match History".
-        recordedOf(s) && ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
+        ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
         ['settings', 'Settings', null, ''],
       ].filter(Boolean);
       const on = tabs.some(([k]) => k === pane) ? pane : 'live';
@@ -4745,8 +4745,8 @@ function viewConsole() {
       // Owner, November 19, 2026: the Players picker sits under the Main Queue, so matches can be made while watching the queue.
       : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section><section class="stack mq-players" aria-label="Players">${playersPane(s)}</section>`
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
-      : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
-      : pane === 'history' && recordedOf(s) ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
+      : pane === 'board' ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
+      : pane === 'history' ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
       : pane === 'settings' ? `<section class="stack" aria-label="Settings">${liveSettings(s, sessionEstimate(s), s.roster.filter((r) => r.present).length, true)}${linkCard(s)}</section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
@@ -5182,9 +5182,8 @@ function playersPane(s) {
     <p class="small muted">Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.</p>`;
 }
 function boardPane(s) {
-  if (!recordedOf(s)) return notice('', NOT_RECORDED);
   const st = standings(s);
-  return `<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
+  return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th><th class="n">Win %</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)), lvs = [...new Set(g.rows.map((r) => { const lv = R(s, r.pid); return lvLabel(lv ? lv.level : null); }))]; return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td>
         <td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map((p) => { const r = R(s, p.id); return faceBtn(p).replace('class="face-btn"', `class="face-btn lv-ring lv-${r ? rvBand(r) : 'none'}"`); }).join('')}</span><div style="min-width:0"><b>${tiedNames(ps.map((p) => p.name))}</b><div class="small muted">${esc(lvs.join(', '))}</div></div></div></td>
@@ -5226,7 +5225,6 @@ function restInfo(s, pid) {
 
 // ---------- Results (Q-RESULTS) ----------
 function standings(s) {
-  if (!recordedOf(s)) return [];
   const done = s.matches.filter((m) => m.status === 'done');
   const rows = s.roster.map((r) => {
     let w = 0, l = 0;
@@ -5334,8 +5332,7 @@ function viewResults() {
 // ---------- Q-FINALIZE-PROGRESS ----------
 function viewFinalizing() {
   const st = S.ui.finalStage || 0;
-  // Record games off: nothing goes to player records and there are no slides, so those two steps are not run.
-  const steps = recordedOf(cur()) ? ['Checking session records', 'Finishing the session', 'Updating player records', 'Preparing result slides'] : ['Checking session records', 'Finishing the session'];
+  const steps = ['Checking session records', 'Finishing the session', 'Updating player records', 'Preparing result slides'];
   return `<main class="wrap narrow"><section class="card stack"><h1>Finishing ${esc(cur().title)}</h1>
     <ol class="list" style="list-style:none;padding:0;margin:0">${steps.map((t, k) => `<li class="li"><span style="width:18px;${k < st ? 'color:var(--accent)' : 'color:var(--fg2)'}">${k < st ? I.check : k === st ? '…' : '·'}</span><span class="main ${k <= st ? '' : 'muted'}">${t}</span></li>`).join('')}</ol>
     <p class="small muted" aria-live="polite">${st >= steps.length ? 'Done.' : steps[st] + '…'}</p></section></main>`;
@@ -5402,7 +5399,6 @@ function pubLeaderboard(s, pub) {
     <p class="small muted">Wins first, then fewer losses. Players with the same wins and losses share a position. Counted games only.</p></section>`;
 }
 function pubHistory(s, pub) {
-  if (!recordedOf(s)) return '<section class="stack" id="pub-history" aria-label="Match history"><h2>Match history</h2><p class="small muted">This session\'s games were not recorded.</p></section>';
   if (!pubSignedIn()) return '<section class="stack" id="pub-history" aria-label="Match history"><h2>Match history</h2><p class="small muted">Log in with ROTRA Player to see the match history.</p></section>';
   // Artifact comment, same day: two tabs, Yours and All, and the count big and green.
   const me = pubViewer()?.id, played = s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').sort((a, b) => b.seq - a.seq);
@@ -5421,7 +5417,7 @@ const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid
 const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
 const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
 // Results the public page may show: the publication, or the proto-bar's published/unpublished override on a finished session.
-const pubResults = (s) => !recordedOf(s) ? null : (S.ui.pubPubOverride === 'hide' ? null : S.ui.pubPubOverride === 'show' ? s.published || { slides: [0, 1], offDay: false, at: s.finalizedAt || Date.now() } : s.published);
+const pubResults = (s) => (S.ui.pubPubOverride === 'hide' ? null : S.ui.pubPubOverride === 'show' ? s.published || { slides: [0, 1], offDay: false, at: s.finalizedAt || Date.now() } : s.published);
 // Prototype audience options for the current session; a stage is offered only when a roster row is in it.
 function pubStageOptions(s) {
   const live = s.status === 'active';
@@ -5604,7 +5600,7 @@ function viewPublic() {
         ${tile('Scoring', scoringDef(s).label, scoringDef(s).text)}
         ${tile('Minimum', `${s.minimum} games`, 'per player')}
         ${due == null ? '' : tile('Payment', due ? `${peso(due)}` : 'Free', due ? 'per player · paid at the venue' : '')}
-        ${recordedOf(s) ? '' : tile('Results', 'Not recorded', 'No results, standings or awards for this session.')}
+        ${recordedOf(s) ? '' : tile('Rankings', 'Not ranked', "Wins here don't count toward the ROTRA leaderboards or win rate.")}
       </div>
       ${s.notes ? `<div class="card stack tight"><span class="pf-l">Notes</span><p style="margin:0">${esc(s.notes)}</p></div>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`; })()
@@ -5620,7 +5616,7 @@ function viewPublic() {
         return `<div class="pq-first">${tile(q[0], 0)}</div>${q.length > 1 ? `<div class="pq-scroll" tabindex="0" role="region" aria-label="Rest of the queue, #2 onward, scrolls"><div class="pq-grid">${q.slice(1).map((m, i) => tile(m, i + 1)).join('')}</div></div>` : ''}`;
       })()}` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
     ${s.status === 'finalized' && tab === 'details' ? (pub ? (pub.slides.includes(1) || pub.offDay ? pubAwards(s, pub) : '')
-      : recordedOf(s) ? '<section class="card empty">Results for this session have not been shared.</section>' : '') : ''}
+      : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </div></main>`;
 }
 
@@ -6460,7 +6456,7 @@ const SHEETS = {
     const s = cur(), now = Date.now(), late = startNeedsEnd(s, now);
     const endPicker = late ? `${notice('warn', `This session was planned for ${plannedFor(s)}. Set a new end time to start.`)}
       ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'st-end', value: sh.endAt, days: daysBetween(now, now + 864e5), base: dayStart(now), ok: (t) => t > now && t <= now + 864e5, set: (t) => { sh.endAt = t; }, autofocus: true })}` : '';
-    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Levels</dt><dd>${restrictText(s)}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · no results kept'}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
+    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Levels</dt><dd>${restrictText(s)}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · not ranked'}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
       ${notice('', "Every player's level locks now. Players you add later get a level when you add them, and it locks too.")}
       ${!S.online ? notice('warn', 'Starting needs an internet connection.') : ''}`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart" ${!S.online || (late && !(sh.endAt > now)) ? 'disabled' : ''}>Start session</button>`);
@@ -6569,9 +6565,6 @@ const SHEETS = {
     const s = cur();
     const m = s.matches.find((x) => x.id === sh.id);
     const sc = scoringDef(s), T = sc.target, nmT = (x) => esc(listNames(x === 'A' ? m.teamA : m.teamB));
-    if (!recordedOf(s)) return sheetShell(`Finish match ${m.seq}?`, `<p>Games aren't recorded in this session, so no result is entered. The game still counts toward each player's games.</p>
-        <dl class="kv"><dt>Team A</dt><dd>${nmT('A')}</dd><dt>Team B</dt><dd>${nmT('B')}</dd></dl>`,
-        '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="confirmUnrecorded" data-autofocus>Match done</button>');
     if (sh.step === 'review') {
       const r = sh.res, w = r.winner, p = scoreParts(r, false);
       return sheetShell('Confirm match result', `
@@ -7936,16 +7929,6 @@ const ACT = {
     sh.res = r; sh.winner = r.winner; sh.err = ''; sh.step = 'review'; render();
   },
   clearScores: () => { const sh = S.ui.sheet; [sh, ...(sh.g || [])].forEach((o) => { o.lose = ''; o.a = ''; o.b = ''; }); sh.err = ''; render(); },
-  // A session with Record games off: the match ends with no winner and no score.
-  confirmUnrecorded: () => {
-    const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
-    if (!m || m.status !== 'active' || recordedOf(s)) { closeSheet(); return; }
-    m.status = 'done'; m.winner = null; m.endedAt = Date.now();
-    const first = m.courts[0];
-    const placed = autoFill(s, { only: s.courts.map((c) => c.id).filter((id) => id !== first) });
-    S.ui.sheet = { type: 'nextMatch', court: first, seq: m.seq, err: '' };
-    commit(`Match ${m.seq} done · ${courtsOf(s, m)} free${autoNote(s, placed)}`); render();
-  },
   confirmResult: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id), r = sh.res;
     if (m.status !== 'active') { closeSheet(); return; }
@@ -8140,8 +8123,8 @@ const ACT = {
     S.ui.sheet = null; S.ui.finalStage = 0; S.screen = 'finalizing'; render();
     const tick = () => {
       S.ui.finalStage += 1; render();
-      if (S.ui.finalStage < (recordedOf(s) ? 4 : 2)) setTimeout(tick, 650);
-      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'games not recorded'; s.status = 'finalized'; s.finalizedAt = Date.now(); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go(rec ? 'results' : 'history'); toast(`Session finished · ${note}`); }, 500);
+      if (S.ui.finalStage < 4) setTimeout(tick, 650);
+      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'player records updated, not ranked'; s.status = 'finalized'; s.finalizedAt = Date.now(); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go('results'); toast(`Session finished · ${note}`); }, 500);
     };
     setTimeout(tick, 650);
   },

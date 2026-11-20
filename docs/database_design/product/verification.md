@@ -210,3 +210,16 @@ winner, is rejected on an unrecorded session. `prisma validate`, `prisma generat
 ran. The services and routes were not run against a database.
 
 **Hosted: applied 2026-11-19** (`prisma db execute` + `migrate resolve`); also applied to a local disposable database.
+
+## D-2026-11-20-02 — Record games off takes a winner again (November 20, 2026)
+
+Disposable local database `rotra_disposable_d20261120` on a throwaway PostgreSQL 16.15 cluster
+(127.0.0.1:55432, removed after the run), `scripts/disposable-db.sh all` with Node 22 (Node 24 was not
+installed in the session): 41 migrations through `20261120000200_record_games_ranks_only` (after merging main) rebuild with
+no drift between the database and the Prisma schema. SQL-only objects: 212 check constraints, 31
+triggers (unchanged: the migration replaces only the body of `match_decisions_record_games_guard`).
+Integrity checks: 80 passed, 0 failed. Two checks flipped for the new rule: a no-result decision on an
+unrecorded session is now rejected ("needs a winner"), and a winner on an unrecorded session is now
+accepted. The services and routes were not run against a database. **Not applied to the shared
+database.**
+

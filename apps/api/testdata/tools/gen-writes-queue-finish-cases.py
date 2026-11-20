@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes apps/api/internal/queuewrites/testdata/finish.cases.json: the session-level commands of the Queue app (Set end time, Extend,
-Cancel session, Mark session invalid). Session done (finalization) is not here: its in-request job drive writes result snapshots, player
-history and ranks, which are not ported (see the plan's deviations log).
+Cancel session, Mark session invalid). Session done (finalization) is the finalize group (gen-writes-queue-finalize-cases.py): its in-request job drive writes the result
+snapshot, the player history and the ranks.
 
 Run it, then the capture (capture-writes-queue.test.mjs -t finish), which writes finish.golden.json from the real TypeScript.
 Usage: python3 apps/api/testdata/tools/gen-writes-queue-finish-cases.py

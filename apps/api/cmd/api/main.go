@@ -141,7 +141,12 @@ func run() error {
 			return err
 		}
 		// The Queue app's writes (go-writes-queue): the roster burst batch so far.
-		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins})
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret})
+		if err != nil {
+			return err
+		}
+		// GET finalization runs the projection jobs of a committed Session done before it reads, as the Route Handler does.
+		driveFinalization, err := queuewrites.DriveFinalization(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
 		if err != nil {
 			return err
 		}
@@ -152,7 +157,7 @@ func run() error {
 			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
-			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins,
+			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins, DriveFinalization: driveFinalization,
 			// The Admin list of password-reset requests is the recovery service's read.
 			PasswordResets: recoveryService,
 		})

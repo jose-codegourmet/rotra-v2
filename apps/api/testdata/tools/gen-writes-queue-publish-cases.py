@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Writes apps/api/internal/queuewrites/testdata/publish.cases.json: Publish results (POST /api/sessions/{id}/results/publication) of the Queue app.
-The result snapshot it reads is written by the finalization drive, which is not ported, so the cases seed one (a scenario).
+The result snapshot it reads is written by the finalization drive (see the finalize group), so these cases seed one (a scenario).
 
 Run it, then the capture (capture-writes-queue.test.mjs -t publish), which writes publish.golden.json from the real TypeScript.
 Usage: python3 apps/api/testdata/tools/gen-writes-queue-publish-cases.py

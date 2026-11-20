@@ -31,6 +31,7 @@
 package queuewrites
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -57,6 +58,9 @@ type Deps struct {
 	Now func() time.Time
 	// QueueOrigins are the exact Queue app origins that may call the Player routes of a public session (ROTRA_QUEUE_ORIGINS).
 	QueueOrigins []string
+	// VisitorReceiptSecret is ROTRA_VISITOR_RECEIPT_SECRET: the key of the visitor's join request receipt. Empty leaves the visitor routes answering
+	// 503 where they need it, as the Route Handlers do. It is never logged.
+	VisitorReceiptSecret string
 }
 
 type server struct {
@@ -66,6 +70,8 @@ type server struct {
 	now  func() time.Time
 	// queueOrigins are the origins the Player routes of a public session answer to.
 	queueOrigins []string
+	// visitorSecret is Deps.VisitorReceiptSecret.
+	visitorSecret string
 }
 
 // Routes returns what registers the Queue writes on the shared signedin router (signedin.Deps.Routes).
@@ -73,7 +79,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("queuewrites: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, visitorSecret: d.VisitorReceiptSecret}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -102,6 +108,8 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerResultsPublication(rt)
 	s.registerInventory(rt)
 	s.registerPayments(rt)
+	s.registerFinalization(rt)
+	s.registerVisitor(rt)
 }
 
 // at is `new Date()`: the clock in milliseconds.
@@ -116,4 +124,19 @@ func (s *server) club(cmd func(r *http.Request, club pgtype.UUID) (writes.Result
 		return cmd(r, pgtype.UUID{Bytes: p.AccountID, Valid: true})
 	}
 	return s.auth.Require(store.AudienceClub, session.ModeWrite)(writes.Handle(s.log, run))
+}
+
+// DriveFinalization returns what GET finalization runs before it reads: the projection jobs of a committed Session done (signedin.Deps.DriveFinalization).
+func DriveFinalization(d Deps) (func(ctx context.Context, club, session pgtype.UUID), error) {
+	if d.Pool == nil || d.Auth == nil {
+		return nil, errors.New("queuewrites: the drive needs a pool and an authenticator")
+	}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now}
+	if s.log == nil {
+		s.log = slog.New(slog.DiscardHandler)
+	}
+	if s.now == nil {
+		s.now = time.Now
+	}
+	return s.DriveFinalization, nil
 }

@@ -44,6 +44,12 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
   path or trailing slash, validated at start). CORS headers are sent on the two stream routes only, only for a listed origin.
 - `ROTRA_QUEUE_ORIGINS` (optional): same format; the Queue app origins that may call the credentialed Player stats read
   (`GET /api/rtr-ids/{rtrId}/stats` with cookies). Separate from `ROTRA_ALLOWED_ORIGINS`; unset means no Queue origin is allowed.
+- `ROTRA_VISITOR_RECEIPT_SECRET` (optional, a secret; set in Railway, never in the repo): the key of the receipt a Queue visitor holds for
+  their join request, an HMAC-SHA256 of `join-request:<requestId>` (base64url, no padding) kept in the httpOnly cookie
+  `rotra_join_request`. Use the same value the Next apps used, so a receipt issued before the move still matches. It is read as given (no
+  trimming), compared in constant time and never logged. Unset: `POST /api/public-sessions/{slug}/join-request` answers 503
+  `unavailable` once the body and the slug are valid, and `GET .../my-request` answers 503 only for a request holding a cookie, as the Route
+  Handlers do.
 
 ## Housekeeping (B-34)
 
@@ -152,8 +158,24 @@ decision commits its `sync_conflicts` row and then answers 409, which is why `de
 server generates lineups from `n` with `internal/queuewrites/queuegen` (a port of queue.rules.ts and autoQueue.rules.ts; TypeScript-only rules
 until the device sends its own lineups, BL-3), pinned by a grid captured from the real TypeScript (`capture-queuegen.test.mjs`). `fillCourts` is
 the one Auto Queue fill: the court commands now call it too. Session-level commands (slice 2.4, `session_finish.go`, golden `finish`): Set end
-time, Extend, Cancel session and Mark session invalid; Publish results (`results_publication.go`, golden `publish`, with a result snapshot the cases seed: the finalization drive that writes it is not ported, so `POST finalization` is not either). The Player's match request, its cancel and Move me to the waitlist are in
+time, Extend, Cancel session and Mark session invalid; Publish results (`results_publication.go`, golden `publish`, with a result snapshot the cases seed; Session done, which writes it, is below). The Player's match request, its cancel and Move me to the waitlist are in
 `public_match_request.go` (golden `pubmr`). A race whose winner is not decided is in `race_match_test.go`.
+
+Session done (slice 4, `finalization.go`, `finalization_jobs.go`, `finalization_snapshot.go`, `finalization_rank.go`, golden `finalize`, cases from
+`gen-writes-queue-finalize-cases.py`): `POST /api/sessions/{id}/finalization` commits the one finalization row, the facts, the session summaries and the
+jobs in one transaction under the session lock, then drives the jobs in the same request (result snapshot, player history, player rank: claimed with
+SKIP LOCKED, each in its own transaction, three rounds, a failed job backs off 30 s doubling to an hour and stops after eight attempts). `GET` of the same
+path is the signedin package's route; it runs the same drive first through `signedin.Deps.DriveFinalization` (`queuewrites.DriveFinalization`, wired in
+`cmd/api/main.go`). The rules are `internal/rules/sessionresult` (standings, awards, the award baseline; the expected win chance reads the captured
+`10 ** y` table), pinned by the Vitest cases, a captured grid of 140 sessions and the finalize golden. The finalization sign-off list is in the plan's
+deviations log. The job list of the status and the belowMinimum warning are compared as sets (`Step.Unordered`: a path whose array order the TypeScript does not
+decide). Rank notifications are keyed by the job id; the cases seed a rank row, a ranking policy that takes effect late (a trigger the
+case file installs) and job rows in every state to reach each branch of the drive.
+
+The Queue visitor routes (`visitor.go`, goldens `visitor` and `visitor-nosecret`, cases from `gen-writes-queue-visitor-cases.py`): Request to join
+(`POST /api/public-sessions/{slug}/join-request`) and My request (`GET .../my-request`), registered for the Queue app (`X-Rotra-App: club`) with no
+pass. The receipt cookie is written as Next writes it (`Path`, `Secure` when the request came over https, `HttpOnly`, `SameSite=lax`); the capture
+reads Next's own serializer through the `next/headers` stub, and a step may send a `cookie`.
 
 Money (slice 3.1, `inventory.go`, `payments.go`, `money_cost.go`, golden `money`, cases from `gen-writes-queue-money-cases.py`, capture with `TZ=UTC`): the
 club's inventory (add or edit, stock step, remove), the payment batch, the amount received and Mark all paid, and the cost estimate that Create

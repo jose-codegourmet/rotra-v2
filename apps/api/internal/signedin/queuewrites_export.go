@@ -231,3 +231,11 @@ func StandingOf(ctx context.Context, q *sqlcgen.Queries, playerID, sessionID pgt
 	}
 	return PlayerStanding{InSession: st.InSession, WaitlistClubPlayerID: st.waitlistClubPlayer, RequestPending: st.JoinRequest != nil && st.JoinRequest.Status == "pending"}, nil
 }
+
+// Shortfall is a roster entry below the session's minimum games (the belowMinimum warning of Session done).
+type Shortfall = reviewShortfall
+
+// BelowMinimum is belowMinimum: the live roster entries with fewer counted games than the target; a target of zero lists nobody.
+func BelowMinimum(ctx context.Context, q *sqlcgen.Queries, session pgtype.UUID, minimum int32) ([]Shortfall, error) {
+	return belowMinimum(ctx, q, session, minimum)
+}

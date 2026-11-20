@@ -1,0 +1,1087 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "app": "club",
+ "snapshotDiff": true,
+ "seed": "queue.seed.sql",
+ "scenarios": {
+  "base": [],
+  "s1_cancelled": [
+   "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-19 02:00:00+00', cancel_reason = 'rain' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_closed_to_requests": [
+   "UPDATE queue_sessions SET accept_join_requests = false WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_has_sixty_requests": [
+   "INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, created_at, updated_at, revision) SELECT ('a3400000-0000-4000-8000-0000000' || lpad(i::text, 5, '0'))::uuid, 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Waiting ' || i, 'unsure', 'slot', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1 FROM generate_series(100, 159) AS i"
+  ],
+  "s2_free_slot": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000003'"
+  ],
+  "s1_confirmed_on_the_waitlist": [
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000011', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000012', 2, TIMESTAMPTZ '2026-11-19 00:30:00+00', TIMESTAMPTZ '2026-11-19 00:30:00+00', TIMESTAMPTZ '2026-11-19 00:30:00+00')"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "queue_sessions",
+   "sql": "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, minimum_games, updated_at FROM queue_sessions ORDER BY id"
+  },
+  {
+   "name": "session_players",
+   "sql": "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, self_checked_in_at, left_at, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"
+  },
+  {
+   "name": "session_waitlist",
+   "sql": "SELECT id, session_id, club_player_id, skill_level_id, added_at, demoted_at, demoted_confirmed_at, created_at, updated_at, revision::text AS revision FROM session_waitlist ORDER BY id"
+  },
+  {
+   "name": "session_join_requests",
+   "sql": "SELECT id, session_id, name, nickname, phone_e164, status, placement, requested_at, decided_at, decided_by_device_id, club_player_id, player_id, invite_code_id, stated_band, created_at, updated_at, revision::text AS revision FROM session_join_requests ORDER BY id"
+  }
+ ],
+ "cases": [
+  {
+   "name": "join_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "join_without_a_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "join_without_a_request_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "name": "Vic",
+      "statedBand": "beginner"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_request_id_that_is_not_a_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "nope",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_an_upper_case_request_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "A3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_placement_that_is_not_offered",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": "from_waitlist"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_an_unknown_placement",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": "front"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_placement_that_is_not_text_reads_slot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_null_placement_reads_slot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_without_a_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "statedBand": "beginner"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "   ",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_name_that_is_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": 5,
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_name_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "  Vic Tor  ",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_without_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Vic"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_level_that_is_not_offered",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "Beginner"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_every_level_is_taken",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Vic beginner",
+      "statedBand": "beginner"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000102",
+      "name": "Vic intermediate",
+      "statedBand": "intermediate"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000103",
+      "name": "Vic advanced",
+      "statedBand": "advanced"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000104",
+      "name": "Vic unsure",
+      "statedBand": "unsure"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_slot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_waitlist_place",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": "waitlist"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_nickname_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "nickname": "  Vicky  "
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_blank_nickname_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "nickname": "   "
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_nickname_that_is_not_text_is_none",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "nickname": 7
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_body_with_more_fields_ignores_them",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "phone": "+639175550999",
+      "clubPlayerId": "x",
+      "status": "confirmed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_unknown_slug",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/no-such-session/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_slug_in_capitals_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/PREP-OPEN/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_validation_comes_before_the_slug",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/no-such-session/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_prepared_session_of_another_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/other-prepared/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_session_that_has_started",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_session_that_ended",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/last-week/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_cancelled_session",
+   "scenario": "s1_cancelled",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_session_closed_to_requests",
+   "scenario": "s1_closed_to_requests",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_full_session_takes_no_slot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-full/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_full_session_takes_a_waitlist_place",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-full/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": "waitlist"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_full_session_with_a_free_slot",
+   "scenario": "s2_free_slot",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-full/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_sixty_pending_requests_is_the_limit",
+   "scenario": "s1_has_sixty_requests",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_waitlist_place_is_not_a_slot_so_the_limit_still_holds",
+   "scenario": "s1_has_sixty_requests",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate",
+      "placement": "waitlist"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_retry_returns_the_same_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_retry_with_the_name_trimmed_the_same_way",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Vic",
+      "statedBand": "intermediate"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "  Vic  ",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_retry_with_another_name_conflicts",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Someone Else",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_id_of_an_existing_request_of_another_session_conflicts",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000007",
+      "name": "Second Sam",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_id_of_an_existing_request_in_this_session_with_its_name_answers",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000001",
+      "name": "Walk In Wendy",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_id_of_an_existing_request_with_another_name_conflicts",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000001",
+      "name": "Walk In Wally",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_the_existing_request_of_a_started_session_answers_before_any_state_check",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000008",
+      "name": "Kai Guest",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_confirmed_request_answers_its_waitlist_place",
+   "scenario": "s1_confirmed_on_the_waitlist",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000005",
+      "name": "Done Dina",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_a_declined_request_answers_its_status",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000004",
+      "name": "Declined Dave",
+      "statedBand": "intermediate"
+     }
+    }
+   ]
+  },
+  {
+   "name": "mine_without_a_cookie",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "mine_a_cookie_that_is_not_ours",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "other=1"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_malformed_cookie_no_dot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=abc"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_malformed_cookie_three_parts",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a.b.c"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_malformed_cookie_empty_receipt",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101."
+    }
+   ]
+  },
+  {
+   "name": "mine_a_malformed_cookie_empty_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=.abc"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_malformed_cookie_only_a_dot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=."
+    }
+   ]
+  },
+  {
+   "name": "mine_the_join_before_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join-request",
+     "who": null,
+     "body": {
+      "requestId": "a3400000-0000-4000-8000-000000000101",
+      "name": "Visitor Vic",
+      "statedBand": "intermediate"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_pending_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoE"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_declined_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000004.B-cx-dxhbFU-8EXEpLQjHAZj7OBxu7QStF1qjpoP7II"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_confirmed_request_on_the_waitlist",
+   "scenario": "s1_confirmed_on_the_waitlist",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000005.785aOjbGHI-bDD9z5ndnvrh3xAXrtVlPOUsXL5udHY8"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_confirmed_request_not_on_the_waitlist",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000005.785aOjbGHI-bDD9z5ndnvrh3xAXrtVlPOUsXL5udHY8"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_waitlist_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000003.hb1Ol-8w3IMGQGckJ5qr74KDmNeIeeuhutcbDwOzUa0"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_player_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000002.gT7prk3Xv0eJT4JsYKbAr1pKRmAEVkxaL0Xh4Lo7hRc"
+    }
+   ]
+  },
+  {
+   "name": "mine_the_receipt_of_another_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.hb1Ol-8w3IMGQGckJ5qr74KDmNeIeeuhutcbDwOzUa0"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_wrong_receipt",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNox"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_receipt_of_the_wrong_length",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoEx"
+    }
+   ]
+  },
+  {
+   "name": "mine_an_unknown_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000109.hPyDJ_tzeQIhvN75MnUSUjMXPxQBVMOyk_7TWtx7tEg"
+    }
+   ]
+  },
+  {
+   "name": "mine_another_sessions_slug",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-full/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoE"
+    }
+   ]
+  },
+  {
+   "name": "mine_unknown_slug",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/no-such-session/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoE"
+    }
+   ]
+  },
+  {
+   "name": "mine_a_request_id_that_is_not_a_uuid_with_a_valid_receipt",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "rotra_join_request=nope.lE5RnwjTn6TOkAk4nerb7_KNkI0UWkvMeHH6aSsEx1w",
+     "allow500": true,
+     "goExpects": {
+      "status": 200,
+      "code": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "mine_the_cookie_among_others",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/public-sessions/prep-open/my-request",
+     "who": null,
+     "cookie": "a=1; rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoE; b=2"
+    }
+   ]
+  }
+ ]
+}

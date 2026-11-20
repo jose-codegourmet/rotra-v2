@@ -61,6 +61,8 @@ type Step struct {
 	// Headers are sent with the request. A value of "" leaves a default header out (the Content-Type a body gets). The Player's
 	// session page calls come from the paired Queue origin, so a step there sends Origin.
 	Headers map[string]string `json:"headers"`
+	// Cookie is the Cookie header the request sends (the visitor routes keep their receipt in one).
+	Cookie string `json:"cookie"`
 	// Parallel sends these steps at the same moment; the other fields of this step are then not used.
 	Parallel []Step `json:"parallel"`
 	// Redact lists the dotted paths in the response body whose value is generated ("a.b", "list.*.id"). On a
@@ -69,6 +71,9 @@ type Step struct {
 	// RedactOptional lets Redact name paths an answer may not have: a route that answers a success or a refusal to
 	// the same request (registration). A path an answer has is still redacted.
 	RedactOptional bool `json:"redactOptional"`
+	// Unordered lists dotted paths in the response body of arrays whose order the route does not decide (a list the TypeScript reads with no
+	// ORDER BY). Both sides are sorted by the canonical JSON of each element before they are compared.
+	Unordered []string `json:"unordered"`
 	// IgnoreHeaders lists response headers that are not compared, by name: the ones only Go sets, with a generated
 	// value (the session cookies of a registration, which the Route Handler sets through Supabase). The capture
 	// drops them from the golden too, and a test of its own asserts them.

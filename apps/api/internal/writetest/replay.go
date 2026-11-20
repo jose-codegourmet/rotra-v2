@@ -148,6 +148,12 @@ func saveStep(t *testing.T, label string, got stepAnswer, s Step, vars map[strin
 // request builds the request of a step. It signs the account in first, so the pass is issued at the case's instant.
 func (e *Env) request(t *testing.T, app string, s Step) Request {
 	r := Request{Method: s.Method, Path: s.Path, App: app, Headers: s.Headers}
+	if s.Cookie != "" {
+		r.Headers = map[string]string{"Cookie": s.Cookie}
+		for k, v := range s.Headers {
+			r.Headers[k] = v
+		}
+	}
 	if s.Who != nil {
 		switch app {
 		case "player":
@@ -250,6 +256,11 @@ func compareOne(t *testing.T, label string, got answer, want GoldenStep, s Step)
 		t.Errorf("%s: headers %v, want %v", label, gotHeaders, wantHeaders)
 	}
 	g, w := normalize(t, label, got.body, s.Redact, s.RedactOptional), normalize(t, label+" (golden)", want.Body, nil, false)
+	for _, side := range []any{g, w} {
+		if err := SortUnordered(side, s.Unordered); err != nil {
+			t.Errorf("%s: %v", label, err)
+		}
+	}
 	if !reflect.DeepEqual(g, w) {
 		t.Errorf("%s: body\n got %s\nwant %s", label, canonical(g), canonical(w))
 	}
@@ -426,4 +437,28 @@ func Snapshot(t testing.TB, e *Env, specs []SnapshotSpec, extra map[string][]str
 		out[spec.Name] = list
 	}
 	return out
+}
+
+// SortUnordered sorts the arrays at the dotted paths (Step.Unordered) by the canonical JSON of their elements, in place.
+func SortUnordered(v any, paths []string) error {
+	for _, path := range paths {
+		node := v
+		for _, seg := range strings.Split(path, ".") {
+			m, ok := node.(map[string]any)
+			if !ok {
+				node = nil
+				break
+			}
+			node = m[seg]
+		}
+		if node == nil {
+			continue // an error answer has no such list
+		}
+		list, ok := node.([]any)
+		if !ok {
+			return fmt.Errorf("unordered %q: not an array", path)
+		}
+		sort.SliceStable(list, func(i, j int) bool { return canonical(list[i]) < canonical(list[j]) })
+	}
+	return nil
 }

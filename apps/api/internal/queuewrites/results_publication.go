@@ -21,7 +21,7 @@ import (
 )
 
 // Publish results (packages/db/src/queue/results.ts publishResults, POST results/publication). The public page reads only the copy this
-// builds from an allowlist of the private snapshot. The snapshot itself is written by the finalization drive, which is not ported.
+// builds from an allowlist of the private snapshot. The snapshot itself is written by the finalization drive (finalization_snapshot.go).
 
 func (s *server) registerResultsPublication(rt *signedin.Router) {
 	rt.Handle("POST /api/sessions/{sessionId}/results/publication", store.AudienceClub, s.club(s.publishResults))

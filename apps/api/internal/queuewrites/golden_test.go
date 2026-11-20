@@ -44,14 +44,13 @@ func TestPublicSessionWritesGolden(t *testing.T) { writetest.Replay(t, "testdata
 // commits the sync conflict row it quarantines the attempt in; the golden rows pin that.
 func TestMatchControlGolden(t *testing.T) { writetest.Replay(t, "testdata", "match", build) }
 
-// Session-level commands: Set end time, Extend, Cancel session and Mark session invalid. Session done (finalization) is not ported: its route
-// also drives the projection jobs (result snapshot, player history, ranks), which write permanent results.
+// Session-level commands: Set end time, Extend, Cancel session and Mark session invalid. Session done is TestFinalizeGolden.
 func TestSessionFinishGolden(t *testing.T) { writetest.Replay(t, "testdata", "finish", build) }
 
 // The signed-in Player's match request (send, cancel) and Move me to the waitlist on a public session, from the paired Queue origin.
 func TestPublicMatchRequestGolden(t *testing.T) { writetest.Replay(t, "testdata", "pubmr", build) }
 
-// Publish results. The result snapshot it reads is written by the finalization drive, which is not ported, so the cases seed one. The ids a
+// Publish results. The result snapshot it reads is written by the finalization drive (TestFinalizeGolden); these cases seed one. The ids a
 // first publish makes (the publication, its key, the event) are random and hidden by the case files (Case.redact).
 func TestPublishResultsGolden(t *testing.T) { writetest.Replay(t, "testdata", "publish", build) }
 
@@ -60,3 +59,18 @@ func TestPublishResultsGolden(t *testing.T) { writetest.Replay(t, "testdata", "p
 // Amounts are integer centavos. A database now() (a column default, the stock step's updated_at) shows as "database now()" in the rows; the
 // ids of a shuttle plan line (a version 7 UUID) are pinned by their version. A race whose winner is not decided is in race_money_test.go.
 func TestMoneyGolden(t *testing.T) { writetest.Replay(t, "testdata", "money", build) }
+
+// Session done and the projection jobs it drives, POST and GET /api/sessions/{id}/finalization. The stream list, the job list and a few
+// arrays the TypeScript reads with no order are compared as sets (the cases name them with "unordered").
+func TestFinalizeGolden(t *testing.T) { writetest.Replay(t, "testdata", "finalize", buildWithReads) }
+
+// The Queue visitor routes: Request to join (POST join-request) and My request (GET my-request), with the receipt in an httpOnly cookie. The
+// capture sets the receipt secret to "capture-visitor-receipt-secret"; the Set-Cookie text is the one Next writes. The nosecret file is the same
+// routes with the secret unset, which the TypeScript answers with 503 where it needs the receipt.
+func TestVisitorGolden(t *testing.T) {
+	writetest.Replay(t, "testdata", "visitor", buildVisitor("capture-visitor-receipt-secret"))
+}
+
+func TestVisitorWithNoSecretGolden(t *testing.T) {
+	writetest.Replay(t, "testdata", "visitor-nosecret", buildVisitor(""))
+}

@@ -1,0 +1,2401 @@
+{
+  "join_body_not_json": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_without_a_body": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_without_a_request_id": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_request_id_that_is_not_a_uuid": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_an_upper_case_request_id": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101.48RkBbPO8UYB38y15oBY3MRzzsrdb-_96pt2PWkkX40; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_placement_that_is_not_offered": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "placement": "Pick Join a slot or Be waitlisted."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_an_unknown_placement": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "placement": "Pick Join a slot or Be waitlisted."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_placement_that_is_not_text_reads_slot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_null_placement_reads_slot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_without_a_name": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "name": "Enter your name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_blank_name": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "name": "Enter your name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_name_that_is_not_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "name": "Enter your name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_name_is_trimmed": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic Tor",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic Tor",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_without_a_level": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "statedBand": "Choose a level."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_level_that_is_not_offered": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "statedBand": "Choose a level."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_every_level_is_taken": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic beginner",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000102.qcYpG1nUyRW505XplZpDNEbtYb7pBigEjUxrcWYWE50; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000102",
+          "name": "Vic intermediate",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000103.AVigd4c0ABm6YmZv2ff257hALJeCsMLrhXUpVfLvPzg; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000103",
+          "name": "Vic advanced",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000104.CtEiZgq_HrpCZBJjxjczIyq3z6p0QtWKIyfgkGd_9KU; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000104",
+          "name": "Vic unsure",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic beginner",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "beginner",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        },
+        {
+          "id": "a3400000-0000-4000-8000-000000000102",
+          "name": "Vic intermediate",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        },
+        {
+          "id": "a3400000-0000-4000-8000-000000000103",
+          "name": "Vic advanced",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "advanced",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        },
+        {
+          "id": "a3400000-0000-4000-8000-000000000104",
+          "name": "Vic unsure",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "unsure",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_slot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_waitlist_place": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "waitlist"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "waitlist",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_nickname_is_trimmed": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": "Vicky",
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_blank_nickname_is_none": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_nickname_that_is_not_text_is_none": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_body_with_more_fields_ignores_them": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_unknown_slug": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_slug_in_capitals_is_not_found": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_validation_comes_before_the_slug": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "name": "Enter your name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_prepared_session_of_another_club": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/other-prepared; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000009",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_session_that_has_started": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "request": "The session has started, so online join requests are closed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_session_that_ended": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "request": "This session is not taking requests."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_cancelled_session": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "request": "This session is cancelled."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_session_closed_to_requests": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "request": "This session is not taking requests."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_full_session_takes_no_slot": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "placement": "All slots are taken. Join the waitlist instead."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_full_session_takes_a_waitlist_place": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-full; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "waitlist"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "waitlist",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_full_session_with_a_free_slot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-full; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_sixty_pending_requests_is_the_limit": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_waitlist_place_is_not_a_slot_so_the_limit_still_holds": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_retry_returns_the_same_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_retry_with_the_name_trimmed_the_same_way": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_retry_with_another_name_conflicts": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_id_of_an_existing_request_of_another_session_conflicts": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_id_of_an_existing_request_in_this_session_with_its_name_answers": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000001.LpBF59H8k4pW9e57-BeRNeq-2Iu19RDIKrsjLI-jNoE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_id_of_an_existing_request_with_another_name_conflicts": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_the_existing_request_of_a_started_session_answers_before_any_state_check": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000008.dPQQHEZH3C2P_uG5qD85Z9XMU17mHkxjgx8CavfFfkw; Path=/api/public-sessions/live-now; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000008",
+          "name": "Kai Guest",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "from_waitlist"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_confirmed_request_answers_its_waitlist_place": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000005.785aOjbGHI-bDD9z5ndnvrh3xAXrtVlPOUsXL5udHY8; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000005",
+          "name": "Done Dina",
+          "status": "confirmed",
+          "waitlistPosition": 1,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "join_a_declined_request_answers_its_status": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000004.B-cx-dxhbFU-8EXEpLQjHAZj7OBxu7QStF1qjpoP7II; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000004",
+          "name": "Declined Dave",
+          "status": "declined",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_without_a_cookie": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_cookie_that_is_not_ours": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_malformed_cookie_no_dot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_malformed_cookie_three_parts": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_malformed_cookie_empty_receipt": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_malformed_cookie_empty_id": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_malformed_cookie_only_a_dot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_the_join_before_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie",
+          "set-cookie": "rotra_join_request=a3400000-0000-4000-8000-000000000101._96hGElYf2D7Y_Da1yrBe4dLxttXqoRbD1JKlQNFuQE; Path=/api/public-sessions/prep-open; HttpOnly; SameSite=lax"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000101",
+          "name": "Visitor Vic",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "intermediate",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_pending_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_declined_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000004",
+          "name": "Declined Dave",
+          "status": "declined",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_confirmed_request_on_the_waitlist": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000005",
+          "name": "Done Dina",
+          "status": "confirmed",
+          "waitlistPosition": 1,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_confirmed_request_not_on_the_waitlist": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000005",
+          "name": "Done Dina",
+          "status": "confirmed",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_waitlist_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000003",
+          "name": "Waiting Wade",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "waitlist"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_player_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000002",
+          "name": "Ann Reyes",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_the_receipt_of_another_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_wrong_receipt": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_receipt_of_the_wrong_length": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_an_unknown_request": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_another_sessions_slug": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_unknown_slug": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_a_request_id_that_is_not_a_uuid_with_a_valid_receipt": {
+    "steps": [
+      {
+        "status": 500,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "internal",
+            "message": "Something went wrong."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  },
+  "mine_the_cookie_among_others": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "requestId": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "waitlistPosition": null,
+          "placement": "slot"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": []
+    }
+  }
+}

@@ -7,7 +7,7 @@ BEGIN;
 SET LOCAL session_replication_role = replica;
 
 -- ---- start clean: the file is also the reset between cases, so it removes what it inserts ----
-DELETE FROM player_notifications; DELETE FROM admin_audit_events;
+DELETE FROM player_notifications; DELETE FROM admin_audit_events; DELETE FROM player_rank_current; DELETE FROM sync_operations; DELETE FROM device_session_streams;
 DELETE FROM session_publication_events; DELETE FROM session_publications; DELETE FROM result_exports; DELETE FROM session_result_snapshots; DELETE FROM projection_jobs;
 DELETE FROM player_history_attributions; DELETE FROM club_session_player_summaries; DELETE FROM session_finalizations; DELETE FROM sync_conflicts; DELETE FROM club_session_reservations; DELETE FROM match_decisions;
 DELETE FROM player_match_facts; DELETE FROM active_court_holds; DELETE FROM active_player_holds; DELETE FROM match_court_usage; DELETE FROM match_participations; DELETE FROM match_decisions; DELETE FROM matches;

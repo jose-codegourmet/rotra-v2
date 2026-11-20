@@ -16,8 +16,8 @@ import (
 )
 
 // Session-level commands: Set end time and Extend (applySessionEnd in session-preparation.ts), Cancel session (session-cancel.ts) and Mark
-// session invalid (finalization.ts invalidateSession). Session done (finalization) is not here: its route also drives the projection jobs
-// that write result snapshots, player history and ranks (packages/db/src/player/projections.ts), which are not ported.
+// session invalid (finalization.ts invalidateSession). Session done is in finalization.go: its route also drives the projection jobs
+// that write the result snapshot, the player history and the ranks (packages/db/src/player/projections.ts).
 
 func (s *server) registerSessionFinish(rt *signedin.Router) {
 	const session = "/api/sessions/{sessionId}"

@@ -18,6 +18,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, vi } from 'vitest'
+import { jar, resetJar } from './next-headers-stub.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 export const root = resolve(here, '../../../..')
@@ -91,6 +92,7 @@ function resolveRoute(apiDir, path) {
 }
 
 async function send(apiDir, step) {
+  resetJar(step.cookie)
   const { url, dir, params } = resolveRoute(apiDir, step.path)
   const route = await import(`${dir}/route.ts`)
   const handler = route[step.method]
@@ -125,9 +127,24 @@ async function answer(apiDir, step, subject, label, { redact = step.redact ?? []
     throw new Error(`${label}: ${error.message} (status ${res.status}, body ${text.slice(0, 200)})`)
   }
   const saved = savePaths(body, step.save ?? {}, label)
+  sortUnordered(body, step.unordered ?? [])
   const ignored = (step.ignoreHeaders ?? []).map((h) => h.toLowerCase())
   const headers = Object.fromEntries([...res.headers.entries()].filter(([k]) => !ignored.includes(k.toLowerCase())).sort())
+  // A cookie a handler set through next/headers (the visitor routes): Next writes it to the response as Set-Cookie.
+  const setCookies = jar.response.getSetCookie()
+  if (setCookies.length) headers['set-cookie'] = setCookies.join(', ')
   return { status: res.status, headers, body, hits, saved }
+}
+
+/** Step.unordered: dotted paths of arrays whose order is not decided; each is sorted by its elements' canonical JSON (the same as writetest.SortUnordered). */
+function sortUnordered(body, paths) {
+  for (const path of paths) {
+    let node = body
+    for (const seg of path.split('.')) node = node == null ? undefined : node[seg]
+    if (node == null) continue // an error answer has no such list
+    if (!Array.isArray(node)) throw new Error(`unordered "${path}": not an array`)
+    node.sort((a, b) => (canonical(a) < canonical(b) ? -1 : canonical(a) > canonical(b) ? 1 : 0))
+  }
 }
 
 /** Step.save: name -> dotted path in the answer (a number segment is an array index), read before anything is redacted. */

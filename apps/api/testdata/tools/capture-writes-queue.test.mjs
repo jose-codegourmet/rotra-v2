@@ -7,8 +7,10 @@
 //   prep       session preparation and courts (create, edit, join switches, start, delete, the court commands); run with TZ=UTC
 //   match      match control and the queue of waiting matches (place, start, send back, move, swap, replace, substitute, result, invalid, add, edit, remove, reorder, Auto queue, Regenerate)
 //   money      inventory, the payment switches and the cost estimate saved beside a session (Create session, Edit preparation); run with TZ=UTC
+//   visitor    the Queue visitor routes: join-request and my-request (the receipt cookie); visitor-nosecret is the same with no secret set
+//   finalize   Session done and its projection jobs (result snapshot, player history, player rank), POST and GET
 //   finish     Set end time, Extend, Cancel session, Mark session invalid
-//   publish    Publish results (the result snapshot is seeded: the finalization drive that writes it is not ported)
+//   publish    Publish results (the result snapshot is seeded; the finalize group runs the drive that writes it)
 //   pubmr      the Player's match request, its cancel and Move me to the waitlist (app player)
 //
 //   docker run -d --rm --name rotra-capture-pg -e POSTGRES_PASSWORD=test -p 127.0.0.1:55439:5432 postgres:16-alpine
@@ -111,4 +113,21 @@ test('pubjoin', async () => {
 // Run this group with TZ=UTC too: the dates of a repeating series, saved with their cost estimates, read the zone.
 test('money', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'money', apiDir })
+})
+
+// Session done and the projection jobs it drives (GET and POST /api/sessions/{id}/finalization).
+test('finalize', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'finalize', apiDir })
+})
+
+// The Queue visitor routes (join-request, my-request): the receipt is an HMAC under ROTRA_VISITOR_RECEIPT_SECRET, kept in an httpOnly cookie.
+// The cookie a handler sets is read back from the stub of next/headers, so the golden pins the Set-Cookie text Next writes.
+test('visitor', async () => {
+  process.env.ROTRA_VISITOR_RECEIPT_SECRET = 'capture-visitor-receipt-secret'
+  await captureWrites({ db: capture.db, testdata, name: 'visitor', apiDir })
+})
+
+test('visitor-nosecret', async () => {
+  delete process.env.ROTRA_VISITOR_RECEIPT_SECRET
+  await captureWrites({ db: capture.db, testdata, name: 'visitor-nosecret', apiDir })
 })

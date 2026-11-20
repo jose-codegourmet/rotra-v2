@@ -1,11 +1,13 @@
 package signedin
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
@@ -34,6 +36,9 @@ type Deps struct {
 	// Routes add more handlers to the shared router before it is mounted: the write packages (adminwrites, ...)
 	// register here. net/http panics on a duplicate pattern, so every app's handler for a path must be on this one router.
 	Routes []func(*Router)
+	// DriveFinalization runs the projection jobs of a committed Session done before GET finalization answers, as the Route Handler does
+	// (driveFinalizationJobs). It never fails the read. Nil runs nothing: the read answers the stored state.
+	DriveFinalization func(ctx context.Context, club, session pgtype.UUID)
 }
 
 type server struct {
@@ -45,6 +50,8 @@ type server struct {
 	approved     []string
 	viewer       *publicreads.ViewerReads
 	resets       PasswordResetReader
+	// driveFinalization runs the jobs of a committed Session done before the status read; nil runs none.
+	driveFinalization func(ctx context.Context, club, session pgtype.UUID)
 }
 
 // Register builds the routes. They sit behind the proxy-secret guard like every route that is not in its open
@@ -53,7 +60,7 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("signedin: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms, resets: d.PasswordResets}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms, resets: d.PasswordResets, driveFinalization: d.DriveFinalization}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

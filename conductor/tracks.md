@@ -24,6 +24,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 12 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
 | 13 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–12) | 5 / 10 |
 | 14 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
+| 15 | [ ] | [env-setup_20261121](./tracks/env-setup_20261121/) — Environment variables: what is missing and how to set it (run before 13) | chore | high | go-writes-queue | 3 / 9 |
 
 ## Backlog
 

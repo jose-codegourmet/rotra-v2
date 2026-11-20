@@ -1,0 +1,19 @@
+{
+  "id": "env-setup_20261121",
+  "title": "Environment variables: what is missing and how to set it",
+  "type": "chore",
+  "priority": "high",
+  "order": 15,
+  "status": "pending",
+  "created": "2026-11-21",
+  "updated": "2026-11-21",
+  "depends_on": "go-writes-queue",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 0
+  }
+}

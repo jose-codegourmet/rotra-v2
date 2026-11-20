@@ -53,6 +53,7 @@ import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
+import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
@@ -90,8 +91,10 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const myAccount = useMyAccount(isOwn ? playerId : null),
     contactRequest = useMyContactChangeRequest(isOwn ? playerId : null),
     signOut = useSignOut('player')
+  // D-2026-11-18-01: verification (and its chip and buttons) only while Google sign-in is on.
+  const googleSignIn = usePlayerGoogleSignInEnabled()
   const verification = useMyAccountVerification(
-    session.data?.account.id === playerId ? playerId : null,
+    googleSignIn && session.data?.account.id === playerId ? playerId : null,
   )
   const openVerification = () => router.push('/profile/verification')
   // Clubs show on every readable profile (#766); the read applies the profile's access rule.
@@ -272,8 +275,8 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               }
               onEdit={() => router.push('/profile/edit')}
               onOpenPlayerId={() => router.push('/profile/player-id')}
-              verification={verification.data ?? undefined}
-              onOpenVerification={isOwn ? openVerification : undefined}
+              verification={googleSignIn ? (verification.data ?? undefined) : undefined}
+              onOpenVerification={googleSignIn && isOwn ? openVerification : undefined}
               onShare={sharing.openProfile}
             />
             {pictureEditor.sheet}
@@ -293,7 +296,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                   ) : null
                 }
                 onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
-                onOpenVerification={openVerification}
+                onOpenVerification={googleSignIn ? openVerification : undefined}
                 onSignOut={leaveSignedOut}
               />
             ) : null}

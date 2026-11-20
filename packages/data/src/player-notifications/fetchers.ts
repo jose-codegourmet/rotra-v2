@@ -1,5 +1,7 @@
 import { accountVerificationIn } from '../account-verification/mockVerification'
 import { getSession } from '../auth/fetchers'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '../feature-flag/featureFlag.keys'
+import { isMockFlagForcedOn } from '../feature-flag/mockFlagOverride'
 import { checkMockSave, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -19,6 +21,11 @@ import {
 import type { PlayerNotification } from './playerNotifications.types'
 
 function mockReminder(state: MockState, playerId: string, now: number): PlayerNotification | null {
+  // D-2026-11-18-01: no verification reminder while Google sign-in for players is off.
+  const googleOn =
+    isMockFlagForcedOn(PLAYER_GOOGLE_SIGN_IN_FLAG) ||
+    state.featureFlags.some((flag) => flag.key === PLAYER_GOOGLE_SIGN_IN_FLAG && flag.on)
+  if (!googleOn) return null
   const verification = accountVerificationIn(state, playerId)
   if (!verification || verification.verified) return null
 

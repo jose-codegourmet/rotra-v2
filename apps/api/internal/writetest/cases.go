@@ -22,7 +22,11 @@ type CaseFile struct {
 	Scenarios map[string][]string `json:"scenarios"`
 	// Snapshot says what is read back after the steps of every case.
 	Snapshot []SnapshotSpec `json:"snapshot"`
-	Cases    []Case         `json:"cases"`
+	// SnapshotDiff pins only what the steps changed: the golden holds, per snapshot name, the rows that are new or differ from
+	// the state the case started in, and under "<name> (removed)" the rows that went away. A write that must not touch a
+	// table is still pinned (nothing is listed). It keeps the golden file of a seed with many rows readable.
+	SnapshotDiff bool   `json:"snapshotDiff"`
+	Cases        []Case `json:"cases"`
 }
 
 // SnapshotSpec is one table, or one query, whose rows are pinned after a case.
@@ -70,6 +74,16 @@ type Step struct {
 	GoExpects *GoExpects `json:"goExpects"`
 	// Allow500 lets the capture record a crash of the TypeScript (it fails on a 500 otherwise).
 	Allow500 bool `json:"allow500"`
+	// Now moves the clock to this instant before the step (and before its pass is issued): a retry five minutes
+	// later shows which stamps move. The clock stays there for the steps after it.
+	Now *time.Time `json:"now"`
+	// Snapshot also reads the snapshot after this step and pins it in the golden step ("no second write" is the same
+	// rows before and after the retry). The case's final snapshot is always read.
+	Snapshot bool `json:"snapshot"`
+	// Save keeps values of this step's answer for the steps after it: name -> dotted path in the response body
+	// ("results.0.rosterEntry.id"; a number is an array index). A later step writes `{{name}}` in its path, body or
+	// raw body. Each side saves from its own answer, so a generated id needs no fixed value. Not for a parallel step.
+	Save map[string]string `json:"save"`
 }
 
 // GoExpects is the status and error code Go answers on purpose.
@@ -94,6 +108,8 @@ type GoldenStep struct {
 	Headers  map[string]string `json:"headers,omitempty"`
 	Body     json.RawMessage   `json:"body,omitempty"`
 	Parallel []GoldenStep      `json:"parallel,omitempty"`
+	// DB is the snapshot after this step, only where the step asks for it (Step.Snapshot).
+	DB map[string][]json.RawMessage `json:"db,omitempty"`
 }
 
 // ReadJSON reads a file of testdata into v.

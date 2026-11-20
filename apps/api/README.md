@@ -108,6 +108,26 @@ The capture fakes `Date` only: Prisma stamps `@default(now())` and `@updatedAt` 
 application clock, so those are pinned, and Go writes them from its own clock (`Deps.Now`). Only truly generated values
 (an audit event id) are redacted.
 
+## Queue writes (go-writes-queue)
+
+`internal/queuewrites` serves the Queue app's writes (`X-Rotra-App: club`) on the same shared router, behind the club pass
+check in write mode. It holds the helpers every later Queue write is built on: `inSession` (lock the club's session row, check
+access: an entitlement, or a live session a licence term started), `rosterCommand` (that, then the open states, then the tail every
+roster change has: close the match requests that name someone no longer present, bump the session revision, recompute a calculated
+minimum), `requireRevision` / `requireState`, `derivedID` and the roster building blocks `place`, `promoteWaiter`, `assessEntry`,
+`createClubPlayer`, `clubPlayerForProfile`. The roster read and DTOs are exported from `signedin` (`queuewrites_export.go`) so a
+write answers what the read sends.
+
+The offline contract has no table of its own: a command repeats safely in its own way (`club_assessments.source_operation_id` plus rows
+whose ID is derived from the operation id; a request decision on the request's status), so a retry recomputes its answer and still
+bumps the session revision. `GET /api/sync` is read-only (see `internal/signedin/queue_sync.go`).
+
+Cases that need more than one request use the multi-step fields of the write harness (`internal/writetest/doc.go`): `now` moves the clock
+before a step, `snapshot` pins the rows after it, `save` and `{{name}}` pass a generated id to a later step, and the case file's
+`snapshotDiff` pins only the rows the steps changed. `testdata/tools/gen-writes-queue-cases.py` writes the cases, the capture is
+`testdata/tools/capture-writes-queue.test.mjs` (same recipe as the groups above), and `queue.seed.sql` is the seed. A race whose winner is
+not decided is tested in `race_test.go`, not pinned.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

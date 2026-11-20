@@ -28,6 +28,7 @@ import (
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/playerwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/queuewrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/telemetry"
 )
@@ -139,10 +140,15 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		// The Queue app's writes (go-writes-queue): the roster burst batch so far.
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		if err != nil {
+			return err
+		}
 		// The signed-in reads of the Player, Admin and Queue apps (go-signed-in-reads). They need the pass check, so
 		// they are served only where sign-in is.
 		signedInRoutes, err := signedin.Register(signedin.Deps{
-			Routes: []func(*signedin.Router){adminWrites, playerWrites},
+			Routes: []func(*signedin.Router){adminWrites, playerWrites, queueWrites},
 			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).

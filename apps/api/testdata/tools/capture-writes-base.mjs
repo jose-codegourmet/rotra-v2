@@ -118,9 +118,31 @@ async function answer(apiDir, step, subject, label, { redact = step.redact ?? []
   } catch (error) {
     throw new Error(`${label}: ${error.message} (status ${res.status}, body ${text.slice(0, 200)})`)
   }
+  const saved = savePaths(body, step.save ?? {}, label)
   const ignored = (step.ignoreHeaders ?? []).map((h) => h.toLowerCase())
   const headers = Object.fromEntries([...res.headers.entries()].filter(([k]) => !ignored.includes(k.toLowerCase())).sort())
-  return { status: res.status, headers, body, hits }
+  return { status: res.status, headers, body, hits, saved }
+}
+
+/** Step.save: name -> dotted path in the answer (a number segment is an array index), read before anything is redacted. */
+function savePaths(body, save, label) {
+  const out = {}
+  for (const [name, path] of Object.entries(save)) {
+    let node = body
+    for (const seg of path.split('.')) node = node == null ? undefined : node[seg]
+    if (typeof node !== 'string' && typeof node !== 'number') throw new Error(`${label}: save "${name}": no text or number at "${path}"`)
+    out[name] = String(node)
+  }
+  return out
+}
+
+/** Step.save: writes the saved values into a step's path and bodies; a name that was not saved is an error. */
+function substituteStep(step, vars, label) {
+  const text = JSON.stringify(step).replace(/\{\{(\w+)\}\}/g, (_, name) => {
+    if (!(name in vars)) throw new Error(`${label}: {{${name}}} was not saved by an earlier step`)
+    return vars[name]
+  })
+  return JSON.parse(text)
 }
 
 /** The same rules as writetest.RedactPaths: dotted path, "*" for array elements, a path with no value is an error. */
@@ -187,6 +209,19 @@ async function snapshot(db, specs, extra = {}) {
   return out
 }
 
+/** SnapshotDiff: the rows that are new or differ from the base, and under "<name> (removed)" the rows that went away. */
+function diffSnapshots(now, base) {
+  if (!base) return now
+  const out = {}
+  for (const name of Object.keys(now)) {
+    const was = new Set(base[name].map(canonical))
+    const is = new Set(now[name].map(canonical))
+    out[name] = now[name].filter((r) => !was.has(canonical(r)))
+    out[`${name} (removed)`] = base[name].filter((r) => !is.has(canonical(r)))
+  }
+  return out
+}
+
 /**
  * Runs every case of `<testdata>/<name>.cases.json` and writes `<testdata>/<name>.golden.json`.
  * `apiDir` is the app's `src/app/api` folder (the Route Handlers). `beforeCase(case)` runs after the reseed, before the
@@ -207,9 +242,15 @@ export async function captureWrites({ db, testdata, name, apiDir, beforeCase }) 
       await db.query('SET session_replication_role = DEFAULT')
     }
     if (beforeCase) await beforeCase(c)
+    const base = cf.snapshotDiff ? await snapshot(db, cf.snapshot, c.redact) : null
+    const read = async () => diffSnapshots(await snapshot(db, cf.snapshot, c.redact), base)
     vi.useFakeTimers({ toFake: ['Date'], now: new Date(c.now ?? cf.now) })
     const steps = []
-    for (const step of c.steps) {
+    const vars = {}
+    for (const raw of c.steps) {
+      const label = `${c.name} step ${steps.length + 1}`
+      const step = substituteStep(raw, vars, label)
+      if (step.now) vi.setSystemTime(new Date(step.now))
       if (step.parallel?.length) {
         // The step's redact applies to every answer that has the path; each path must match in at least one.
         const redact = step.redact ?? []
@@ -219,16 +260,17 @@ export async function captureWrites({ db, testdata, name, apiDir, beforeCase }) 
         redact.forEach((path, k) => {
           if (!all.some((a) => a.hits[k] > 0)) throw new Error(`${c.name}: redacting "${path}": no answer has a value there`)
         })
-        const sorted = all.map(({ hits, ...rest }) => rest)
+        const sorted = all.map(({ hits, saved, ...rest }) => rest)
         sorted.sort((a, b) => a.status - b.status || canonical(a.body).localeCompare(canonical(b.body)))
-        steps.push({ parallel: sorted })
+        steps.push({ parallel: sorted, ...(step.snapshot ? { db: await read() } : {}) })
       } else {
-        const { hits, ...one } = await answer(apiDir, step, step.who, `${c.name} step ${steps.length + 1}`)
-        steps.push(one)
+        const { hits, saved, ...one } = await answer(apiDir, step, step.who, label)
+        Object.assign(vars, saved)
+        steps.push({ ...one, ...(step.snapshot ? { db: await read() } : {}) })
       }
     }
     vi.useRealTimers()
-    golden[c.name] = { steps, db: await snapshot(db, cf.snapshot, c.redact) }
+    golden[c.name] = { steps, db: await read() }
   }
   writeFileSync(`${testdata}/${name}.golden.json`, `${JSON.stringify(golden, null, 2)}\n`)
   expect(Object.keys(golden).length).toBe(cf.cases.length)

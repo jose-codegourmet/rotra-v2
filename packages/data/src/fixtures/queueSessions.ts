@@ -54,6 +54,8 @@ export function createQueueFixtures(now = Date.now()) {
     publicSlug: publicSlugFor('s-tonight'),
     acceptJoinRequests: true,
     alwaysRequireRequest: false,
+    // The live example plays the default 16/31 (Q22).
+    scoring: '31',
   }
   const history = createSessionHistoryFixtures(now)
   const sessions: QueueSession[] = [tonight, ...history.sessions]

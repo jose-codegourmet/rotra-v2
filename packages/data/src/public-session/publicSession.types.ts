@@ -289,8 +289,11 @@ export type PublicHistoryMatch = {
   teamA: PublicMatchPlayer[]
   teamB: PublicMatchPlayer[]
   winningTeam: 'A' | 'B' | null
+  /** One game: the points. Best of 3 with `games`: the games each team won. */
   teamAScore: number | null
   teamBScore: number | null
+  /** Best of 3 (Q22): every game score, Team A first; null when none were entered. */
+  games?: { a: number; b: number }[] | null
   invalid: boolean
 }
 /**

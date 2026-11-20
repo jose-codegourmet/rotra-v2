@@ -1,3 +1,4 @@
+import { DEFAULT_SCORING, SCORING, type ScoringKey } from '@rotra/schema/scoring'
 import type { Match } from '../match/match.types'
 import { PLAYING_LEVELS } from '../player/player.types'
 import { publicSlugFor } from '../queue-session/queueSession.rules'
@@ -30,6 +31,8 @@ export type SessionHistorySpec = {
   venueIndex: number
   /** Record games off: every match ends with no winner or score; no player records are written. */
   unrecorded?: boolean
+  /** The session's scoring mode (Q22); missing is 16/31. Seed scores follow it. */
+  scoring?: ScoringKey
 }
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, i) => from + i)
@@ -62,6 +65,8 @@ export const sessionHistorySpecs: SessionHistorySpec[] = [
     published: false,
     seed: 22,
     venueIndex: 0,
+    // Best of 3 to 21 with deuce, like the prototype: game scores sit in `decision.games`.
+    scoring: '21x3',
   },
   {
     id: 'h3',
@@ -107,6 +112,44 @@ export function seededRng(seed: number) {
   }
 }
 const MINUTE = 60000
+/**
+ * The prototype's seedScore(): a believable finished score for the mode. `lose` is the old random
+ * 9–19; no randomness is consumed here. One game: the winner has the target (a deuce game when
+ * `lose` is 16); best of 3: two or three game scores, and the games each team won.
+ */
+export function seedScore(
+  key: ScoringKey,
+  aWins: boolean,
+  lose: number,
+): { teamAScore: number; teamBScore: number; games?: { a: number; b: number }[] } {
+  const mode = SCORING[key],
+    T = mode.target
+  if (mode.games === 1) {
+    const deuce = mode.deuce && lose === 16
+    const w = deuce ? T + 1 : T,
+      l = deuce ? T - 1 : Math.min(lose + (T - 21), T - 2)
+    return { teamAScore: aWins ? w : l, teamBScore: aWins ? l : w }
+  }
+  // [who takes the game (true: the match winner), the game loser's score]. A split goes to a third.
+  const wl = Math.min(lose, T - 2),
+    plan: [boolean, number][] =
+      lose % 3 === 0
+        ? [
+            [true, wl],
+            [false, Math.max(wl - 3, 0)],
+            [true, Math.max(wl - 1, 0)],
+          ]
+        : [
+            [true, wl],
+            [true, Math.max(wl - 2, 0)],
+          ]
+  const games = plan.map(([byWinner, l]) => (byWinner === aWins ? { a: T, b: l } : { a: l, b: T }))
+  return {
+    teamAScore: games.filter((g) => g.a > g.b).length,
+    teamBScore: games.filter((g) => g.b > g.a).length,
+    games,
+  }
+}
 export type SessionHistory = {
   session: QueueSession
   courts: SessionCourt[]
@@ -181,6 +224,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     alwaysRequireRequest: false,
     // Sessions saved before the switch carry no value and read as recorded.
     ...(recorded ? {} : { recordGames: false }),
+    scoring: spec.scoring ?? DEFAULT_SCORING,
   }
   const games: Record<string, number> = {},
     free: Record<string, number> = {},
@@ -261,8 +305,9 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
       decision: {
         kind: invalid ? 'invalid' : 'completed',
         winningTeam: invalid || !recorded ? null : aWins ? 'A' : 'B',
-        teamAScore: withScore ? (aWins ? 21 : lose) : null,
-        teamBScore: withScore ? (aWins ? lose : 21) : null,
+        teamAScore: null,
+        teamBScore: null,
+        ...(withScore ? seedScore(spec.scoring ?? DEFAULT_SCORING, aWins, lose) : {}),
         confirmedAt: endedAt,
       },
     })

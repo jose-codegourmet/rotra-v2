@@ -1,3 +1,8 @@
+import {
+  validateResult as checkResult,
+  type ResultCheck,
+  type ResultValues,
+} from '@rotra/schema/scoring'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
@@ -530,42 +535,13 @@ export function swapTarget(m: Match, ctx: MatchContext): SwapTarget | null {
   const match = waiting[index]
   return match ? { match, position: index + 1 } : null
 }
-export type ResultInput = {
-  winner?: 'A' | 'B' | null
-  scoreA?: number | null
-  scoreB?: number | null
-}
-export function validateResult(
-  input: ResultInput,
-): { winner: 'A' | 'B'; error: null } | { winner: null; error: string } {
-  const { winner, scoreA, scoreB } = input
-  if (scoreA != null || scoreB != null) {
-    if (
-      scoreA == null ||
-      scoreB == null ||
-      !Number.isInteger(scoreA) ||
-      !Number.isInteger(scoreB) ||
-      scoreA < 0 ||
-      scoreB < 0
-    )
-      return { winner: null, error: 'Enter both scores as whole numbers, or clear them.' }
-    if (scoreA === scoreB)
-      return {
-        winner: null,
-        error: 'A tie can’t decide a winner. Correct the score, or clear it and pick a winner.',
-      }
-    const byScore = scoreA > scoreB ? 'A' : 'B'
-    if (winner && winner !== byScore)
-      return {
-        winner: null,
-        error: `The score says Team ${byScore} won, but Team ${winner} is picked. Fix one of them.`,
-      }
-    return { winner: byScore, error: null }
-  }
-  return winner === 'A' || winner === 'B'
-    ? { winner, error: null }
-    : { winner: null, error: 'Pick a winner or enter the final score.' }
-}
+/**
+ * The mode's result check (Q22, shared rule): one game needs the picked winner and a score the
+ * session's scoring mode can produce; best of 3 takes every game score in `games`. Missing scoring
+ * reads as 16/31. Lives in `@rotra/schema/scoring` so the result form and the data layer share it.
+ */
+export type ResultInput = ResultValues
+export const validateResult = (input: ResultInput): ResultCheck => checkResult(input)
 export function substitutionCandidates(m: Match, roster: SessionPlayer[], matches: Match[]) {
   return roster.filter(
     (p) =>

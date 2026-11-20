@@ -96,8 +96,9 @@ export function createConsoleFixtures(now = Date.now()) {
   completed.decision = {
     kind: 'completed',
     winningTeam: 'A',
-    teamAScore: 21,
-    teamBScore: 17,
+    // 16/31 (the session's default): the winner has 31.
+    teamAScore: 31,
+    teamBScore: 27,
     confirmedAt: now - 600000,
   }
   const matches = [playing, blocked, ready, absent, completed, scoreless, invalid],

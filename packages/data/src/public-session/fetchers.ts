@@ -585,6 +585,7 @@ function projectHistory(
       winningTeam: m.winningTeam,
       teamAScore: m.teamAScore,
       teamBScore: m.teamBScore,
+      games: m.games,
       invalid: m.invalid,
     }))
     .sort((a, b) => b.number - a.number)

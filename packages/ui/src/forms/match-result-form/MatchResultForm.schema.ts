@@ -19,7 +19,9 @@ const wholeNumber = (value: string): number | null => {
 /**
  * Q-MATCH-DONE: pick the winner, or enter the final score (both whole numbers ≥ 0, the higher wins,
  * no tie, no fixed target such as 21). Blank scores are no score, never 0–0. A valid score sets the
- * winner; a picked winner must agree with it. Mirrors validateResult() in @rotra/data/match/match.rules.
+ * winner; a picked winner must agree with it. Not yet mode-aware: the data layer now refuses what
+ * the session's scoring mode can't produce (validateResult in @rotra/schema/scoring); the form
+ * follows in the result-form ticket (Q22).
  * The "pick" problem sits on `winner`, the score problems on `scoreA`; the form shows one line.
  */
 export const matchResultSchema = z

@@ -59,13 +59,17 @@ export type MatchContext = {
   now?: number
 }
 
+/** A result as entered, checked against the session's scoring mode (Go `match.ResultInput`). */
 export type ResultInput = {
-  format: MatchFormat
-  kind: 'completed' | 'invalid'
-  winningTeam: Team | null
-  teamAScore: number | null
-  teamBScore: number | null
+  /** Scoring mode key ('31' | '31nd' | '21' | '21x3' | '21x3nd'); missing or unknown is 16/31 */
+  scoring?: string | null
+  winner?: Team | null
+  scoreA?: number | null
+  scoreB?: number | null
+  /** Best of 3 only: every game played; scoreA / scoreB are then not read */
+  games?: { a: number | null; b: number | null }[] | null
 }
+export type ResultCheck = { winner: Team; error: null } | { winner: null; error: string }
 
 export type SwapTarget = Record<string, unknown> & { id?: string }
 export type Placement = { matchId: string; courtIds: string[] }

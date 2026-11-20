@@ -150,6 +150,8 @@ the club entitlement check (`inPageSession`). The match request rules no other c
 the real TypeScript: `testdata/tools/capture-matchrequest-lineup.test.mjs`). A step of the write harness may send `headers` (an Origin, or a
 Content-Type left out with ""), and the capture runs the Player's Route Handlers on the Player origin (`ROTRA_CAPTURE_ORIGIN`).
 
+The Player's sign-out (`POST /api/public-sessions/{slug}/sign-out`, golden `signout`) is `signin.SignOut(deps, player)` behind the same origin and content type checks (`Deps.PlayerSignOut`; nil leaves the route out). The capture has no Supabase, so its provider call is a stand-in and the golden does not compare `Set-Cookie`; `signout_test.go` pins the revoked session and the cleared cookies.
+
 Match control and the queue (slice 2.3, `match_control.go`, `match_queue.go`, golden `match`, cases from `gen-writes-queue-match-cases.py`):
 Put on court, Start, Send back, Move, Swap, Replace player, Substitute, Team wins / No result and Invalid, Add match (manual, selection,
 suggested, reviewed drafts), edit, remove and reorder a waiting match, Auto queue and Regenerate. `matchCommand` runs each one; `loadMatch` reads a

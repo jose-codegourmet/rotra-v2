@@ -39,6 +39,9 @@ vi.mock('../../../../packages/db/src/auth/supabase.ts', async (importOriginal) =
     const subject = currentSubject()
     return subject ? { provider: 'supabase', subject } : null
   },
+  // There is no live Supabase: the sign-out (signout group) gets a stand-in whose signOut clears nothing. Its cookie clearing is the
+  // provider's and is not part of the golden.
+  createSupabaseServer: () => ({ auth: { signOut: async () => ({ error: null }) } }),
 }))
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -96,6 +99,16 @@ test('pubmr', async () => {
   process.env.ROTRA_CAPTURE_ORIGIN = 'http://localhost:9001'
   try {
     await captureWrites({ db: capture.db, testdata, name: 'pubmr', apiDir: resolve(root, 'apps/player/src/app/api') })
+  } finally {
+    delete process.env.ROTRA_CAPTURE_ORIGIN
+  }
+})
+
+// The Player's sign-out from the Queue session page (the provider call is the stand-in above).
+test('signout', async () => {
+  process.env.ROTRA_CAPTURE_ORIGIN = 'http://localhost:9001'
+  try {
+    await captureWrites({ db: capture.db, testdata, name: 'signout', apiDir: resolve(root, 'apps/player/src/app/api') })
   } finally {
     delete process.env.ROTRA_CAPTURE_ORIGIN
   }

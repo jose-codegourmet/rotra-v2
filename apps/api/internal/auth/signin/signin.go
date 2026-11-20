@@ -62,6 +62,24 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	}, nil
 }
 
+// SignOut is the sign-out of one app as a plain handler, for a route of another package that signs the app out
+// (the Player's sign-out on a public Queue Session page). It is the handler of POST /api/auth/sign-out for aud: it
+// revokes the session the access pass, or else the refresh cookie, names and clears both cookies. It needs a session
+// service and a verifier; the store is not used.
+func SignOut(d Deps, aud store.Audience) (http.Handler, error) {
+	if d.Service == nil || d.Verifier == nil {
+		return nil, errors.New("signin: a sign-out needs a session service and a verifier")
+	}
+	h := &handlers{svc: d.Service, verifier: d.Verifier, now: d.Clock, log: d.Logger}
+	if h.now == nil {
+		h.now = time.Now
+	}
+	if h.log == nil {
+		h.log = slog.New(slog.DiscardHandler)
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { h.signOut(w, r, aud) }), nil
+}
+
 // forApp resolves the audience from the app header. A missing or unknown value is the generic 404: no audience
 // is guessed.
 func (h *handlers) forApp(next func(http.ResponseWriter, *http.Request, store.Audience)) http.Handler {

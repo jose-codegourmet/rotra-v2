@@ -61,6 +61,9 @@ type Deps struct {
 	// VisitorReceiptSecret is ROTRA_VISITOR_RECEIPT_SECRET: the key of the visitor's join request receipt. Empty leaves the visitor routes answering
 	// 503 where they need it, as the Route Handlers do. It is never logged.
 	VisitorReceiptSecret string
+	// PlayerSignOut is the Player app's sign-out (signin.SignOut with the player app): the sign-out route of a public Queue Session
+	// runs it after its origin and content type checks. Nil leaves that route (and its preflight) unregistered.
+	PlayerSignOut http.Handler
 }
 
 type server struct {
@@ -72,6 +75,8 @@ type server struct {
 	queueOrigins []string
 	// visitorSecret is Deps.VisitorReceiptSecret.
 	visitorSecret string
+	// playerSignOut is Deps.PlayerSignOut.
+	playerSignOut http.Handler
 }
 
 // Routes returns what registers the Queue writes on the shared signedin router (signedin.Deps.Routes).
@@ -79,7 +84,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("queuewrites: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, visitorSecret: d.VisitorReceiptSecret}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, visitorSecret: d.VisitorReceiptSecret, playerSignOut: d.PlayerSignOut}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

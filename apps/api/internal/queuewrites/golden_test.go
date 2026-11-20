@@ -74,3 +74,10 @@ func TestVisitorGolden(t *testing.T) {
 func TestVisitorWithNoSecretGolden(t *testing.T) {
 	writetest.Replay(t, "testdata", "visitor-nosecret", buildVisitor(""))
 }
+
+// The Player's sign-out from the Queue session page (POST /api/public-sessions/{slug}/sign-out and its preflight): the origin and content
+// type checks, the CORS headers and the answer of the sign-in package's sign-out. The capture has no Supabase, so the Set-Cookie header
+// is not compared; TestPlayerSignOutRevokesTheSession pins what the Go sign-out does to the session and the cookies.
+func TestPlayerSignOutGolden(t *testing.T) {
+	writetest.ReplayFull(t, "testdata", "signout", buildSignOut)
+}

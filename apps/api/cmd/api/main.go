@@ -141,7 +141,12 @@ func run() error {
 			return err
 		}
 		// The Queue app's writes (go-writes-queue): the roster burst batch so far.
-		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret})
+		// The Player's sign-out on a public Queue Session page is the sign-in package's own sign-out for the Player app.
+		playerSignOut, err := signin.SignOut(signin.Deps{Service: svc, Verifier: verifier, Logger: log}, authstore.AudiencePlayer)
+		if err != nil {
+			return err
+		}
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret, PlayerSignOut: playerSignOut})
 		if err != nil {
 			return err
 		}

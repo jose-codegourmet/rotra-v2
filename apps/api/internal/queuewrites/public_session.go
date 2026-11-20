@@ -54,6 +54,13 @@ func (s *server) registerPublicSession(rt *signedin.Router) {
 		rt.Handle("POST "+path, store.AudiencePlayer, s.fromQueueOrigin(s.player(cmd)))
 		rt.Handle("OPTIONS "+path, store.AudiencePlayer, http.HandlerFunc(s.preflight))
 	}
+	// Sign out is the Player app's own sign-out, behind the same origin and content type checks. It needs no pass: a caller with none
+	// is answered as the sign-in package answers it (200, nothing revoked).
+	if s.playerSignOut != nil {
+		const path = "/api/public-sessions/{slug}/sign-out"
+		rt.Handle("POST "+path, store.AudiencePlayer, s.fromQueueOrigin(s.playerSignOut))
+		rt.Handle("OPTIONS "+path, store.AudiencePlayer, http.HandlerFunc(s.preflight))
+	}
 }
 
 // player is handleAccountRequest('player', ...) for a write: the pass check in write mode, then the Google deadline gate (none of these

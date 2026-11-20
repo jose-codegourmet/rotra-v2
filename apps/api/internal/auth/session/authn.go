@@ -108,6 +108,9 @@ type Authenticator struct {
 	sessions *ttlCache[sessionEntry]
 }
 
+// Verifier is the pass verifier the Authenticator checks with (the sign-out routes read the pass the same way).
+func (a *Authenticator) Verifier() *pass.Verifier { return a.verifier }
+
 func newAuthenticator(r authnReader, v *pass.Verifier, ttl time.Duration, now func() time.Time, log *slog.Logger) *Authenticator {
 	return &Authenticator{
 		verifier: v, r: r, now: now, log: log,

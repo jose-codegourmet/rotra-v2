@@ -1,0 +1,271 @@
+{
+  "sign_out_signed_in": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_signed_in_with_no_body": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_with_a_json_charset": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_ignores_the_body": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_signed_out": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_without_an_origin": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_from_another_origin": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_not_json_is_forbidden": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_without_a_content_type": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "http://localhost:9000",
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "sign_out_from_another_origin_signed_out": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "preflight_sign_out": {
+    "steps": [
+      {
+        "status": 204,
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-headers": "Content-Type",
+          "access-control-allow-methods": "POST",
+          "access-control-allow-origin": "http://localhost:9000",
+          "access-control-max-age": "600",
+          "cache-control": "private, no-store",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "__raw": ""
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "preflight_sign_out_from_another_origin": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "preflight_sign_out_without_an_origin": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  }
+}

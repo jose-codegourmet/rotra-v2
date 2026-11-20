@@ -1,18 +1,28 @@
 # Google sign-in for players: owner setup (#896) and how the code uses Supabase Auth
 
-**Last verified:** 2026-11-18. **Status:** real mode is **written but not run against Google**: no
+**Last verified:** 2026-11-20. **Status:** real mode is **written but not run against Google**: no
 sign-in has been tried, because the Google Cloud OAuth client and the Supabase provider (#896) are
-not set up yet. Decision: [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01). Ticket: #922.
+not set up yet. Migration `20261118000200_player_google_sign_in` is applied to the shared database
+(owner, November 20, 2026); `20261120000100_admin_link_registration` is written, not applied.
+Decisions: [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01),
+[D-2026-11-20-01](../mvp/decisions/2026-11-20.md#d-2026-11-20-01). Ticket: #922.
 Built on Supabase Auth in the Player app's real mode; it moves to the Go API with B-04 (#875).
 
 Everything here is off while the platform feature flag `player_google_sign_in` is off.
 
 ## What the owner sets up (no secret goes in the repo)
 
-1. **Apply the migration first.** `packages/db/prisma/migrations/20261118000200_player_google_sign_in`
-   adds `player_accounts.google_email` and `google_linked_at`. The Player app reads these columns on
-   every signed-in request, flag on or off, so the code must not be deployed before the migration
-   is applied.
+1. **Migrations, before the code is deployed and before the flag is turned on.**
+   - `20261118000200_player_google_sign_in` adds `player_accounts.google_email` and
+     `google_linked_at`. The Player app reads these columns on every signed-in request, flag on or
+     off. **Applied to the shared database** (owner, November 20, 2026).
+   - `20261118000700_drop_out_notices_session_invites` holds `session_invite_codes`, which the
+     invite card reads to name the inviting player. Applied to the shared database on November 19,
+     2026 ([sessions and roster design](../database_design/product/queue/modules/sessions-roster.md#session_invite_codes)).
+   - `20261120000100_admin_link_registration` lets an RTR ID and a registration's staging link have
+     no club (registration from the Admin link). **Written, not applied: apply it before deploying
+     this code and before turning the flag on.** Until it is applied, a registration from the Admin
+     link in real mode (password or Google) fails with an error and saves nothing.
 2. **Google Cloud OAuth client** (Web application). Authorized redirect URI: the Supabase project's
    own callback, `https://<project-ref>.supabase.co/auth/v1/callback` (local Supabase:
    `http://127.0.0.1:<api port>/auth/v1/callback`). Scopes: `openid`, `email`, `profile` only.
@@ -43,8 +53,9 @@ and `SUPABASE_SECRET_KEY` it already has, and builds the callback URL from the r
 | The screen reads what was decided (once) | `…/api/auth/google/outcome` |
 | **Connect Google and sign in** (the player's yes) | `…/api/auth/google/link` |
 | Google registration from a club or session invite | `…/api/register/[clubId]/google` |
+| Google registration from the Admin link (no club; the form's city) | `…/api/register/google` |
 | Claim with Google | `…/api/claim/[token]/google` |
-| Invite card and the viewer's standing | `…/api/invites/[clubId]` |
+| Invite card (naming the inviting player for a Session invite code, `&invite=`) and the viewer's standing | `…/api/invites/[clubId]` |
 | Rules | `packages/db/src/player/google-sign-in.ts`; provider calls in `packages/db/src/auth/google-oauth.ts` |
 
 - **ROTRA's record decides.** Google is connected only when `player_accounts.google_email` is set.
@@ -70,17 +81,41 @@ and `SUPABASE_SECRET_KEY` it already has, and builds the callback URL from the r
 - **The outcome crosses the redirect in cookies, never the URL:** no email, code or token is put in
   a ROTRA URL. The result cookie is display only; anything that grants something is checked again
   against the session or the held Google sign-in.
+- **The Admin link** (`/register`, no club): the invite card needs nothing saved. The form asks for
+  a city or province (the founding cities A-ADD-CLUB offers, `PH-CEB` and so on); the server finds
+  it in `location_codes` and the RTR ID takes that place (`allocateRtrId` with the picked city, no
+  creating club). An email clubs already saved keeps its RTR ID and needs no city. The player joins
+  no club; club records that the phone or email links still join the account. The password
+  registration from the Admin link (flag off) uses the same rules through `POST /api/register`.
+- **A session invite names the inviter** when the link's `invite` is that session's Session invite
+  code (`session_invite_codes`, made by `POST /api/public-sessions/[slug]/invite-code`): the card
+  says who invited, the inviter sees their own invite, and **Continue to request to join** carries
+  the code on to Queue. An unknown or another session's code shows no inviter, never an error.
 - **Deadline gate:** the date is the one value in
   `packages/data/src/google-sign-in/googleSignIn.config.ts`. After it, Route Handlers refuse a
   player with no Google (except `/api/me/account`, `/api/leaderboard/me`, the Google routes, the
   session read and sign-out), and `proxy.ts` sends their page loads to `/connect-google` (leaving
   `/`, `/privacy`, `/terms` open) from a hint cookie the session read keeps.
 
+## Accepted risk (owner, November 20, 2026)
+
+- **An unconfirmed password account registered with someone else's Gmail address.** When the
+  Gmail's real owner picks that Google account, its email equals the account's ROTRA email, so they
+  are asked **Connect Google to your account?** for that account, and a yes signs them in to it.
+  The owner accepts this as built: few of the accounts registered before November 20, 2026 could be
+  like this. Nothing extra is checked.
+
+## By design
+
+- **No Google at claim for an already-registered profile.** A registration link for a profile that
+  is already registered shows "already registered" and **Sign in** (P-CLAIM), never the form, and a
+  person who already has an account can't attach a record through a link
+  ([D-2026-11-18-07](../mvp/decisions/2026-11-18.md#d-2026-11-18-07)). They sign in and connect
+  Google from Sign-in methods.
+
 ## Not built, or not in real mode yet
 
-- Registration from the **Admin link** (no club): an RTR ID needs a creating club today, as with
-  password registration in real mode.
-- The **inviting player** on a session invite: session invite codes are not stored, so the card
-  never names an inviter.
+- The Queue Master seeing "Invited by <name>" on a join request: the Queue join does not save
+  `session_join_requests.invite_code_id` yet (the invite card does name the inviter).
 - Rate limits and a sign-in audit trail of their own: Supabase's limits apply; the Go API's
   (B-04) replace them.

@@ -1,9 +1,9 @@
 import { googleRegistrationSchema } from '@rotra/data/google-sign-in/registration-schema'
 import { registerWithGoogle } from '@rotra/db/player/google-sign-in'
-import { ServiceError } from '@rotra/db/service/errors'
 import { handleVisitorRequest } from '@rotra/db/service/handler'
 import { readJsonBody } from '@rotra/db/service/request'
 import { googleJar } from '@/app/api/auth/google/googleJar'
+import { invalidRegistration, registrationDetails } from '../../registrationBody'
 
 /**
  * Google registration from a club or session invite (#922). The body holds the form only: the
@@ -16,34 +16,16 @@ export async function POST(request: Request, ctx: RouteContext<'/api/register/[c
   return handleVisitorRequest('player.google-sign-in', async () => {
     const body = await readJsonBody(request)
     const parsed = googleRegistrationSchema.safeParse(body.values)
-    if (!parsed.success)
-      throw new ServiceError(
-        'invalid',
-        Object.fromEntries(
-          parsed.error.issues.map((issue) => [String(issue.path.at(-1)), issue.message]),
-        ),
-      )
-    const values = parsed.data
+    if (!parsed.success) throw invalidRegistration(parsed.error.issues)
+    const { phone, cityCode: _cityCode, ...personal } = parsed.data
     const result = await registerWithGoogle(
       await googleJar(request),
       clubId,
       {
-        phoneE164: values.phone,
+        phoneE164: phone,
         // The identity card picked when several clubs saved the Google email (D-2026-11-16-04)
         identityRecordId: typeof body.identityRecordId === 'string' ? body.identityRecordId : null,
-        details: {
-          fullName: values.fullName,
-          nickname: values.nickname || null,
-          playingStyle: values.playingStyle,
-          experienceYears: values.experienceYears ? Number(values.experienceYears) : null,
-          experienceMonths: values.experienceMonths ? Number(values.experienceMonths) : null,
-          socialLinks: {
-            facebook: values.facebook,
-            instagram: values.instagram,
-            youtube: values.youtube,
-            linkedin: values.linkedin,
-          },
-        },
+        details: registrationDetails(personal),
       },
       search.get('session') || null,
       search.get('k') || null,

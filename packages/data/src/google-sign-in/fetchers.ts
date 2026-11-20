@@ -52,7 +52,7 @@ import type {
 // mode (#922) goes through the Player app's Route Handlers over Supabase Auth: a real Google sign-in
 // is a redirect, so by the time these run the OAuth callback has already decided the outcome and
 // the server holds the verified Google account. The `google` a screen passes is display only there;
-// the server never trusts it. Not connected in real mode: the Admin link (no club) and the dev stand-ins.
+// the server never trusts it. Not connected in real mode: the dev stand-ins.
 
 const OFFLINE = "You're offline. Google sign-in needs an internet connection."
 const GOOGLE_FAILED = "Couldn't finish with Google. Try again."
@@ -184,14 +184,10 @@ export async function connectGoogle(google: GoogleIdentity): Promise<ConnectGoog
 export async function registerWithGoogle(
   input: GoogleRegistrationInput,
 ): Promise<GoogleRegistrationResult> {
+  // Real mode: the Admin link (no club) sends the picked city, which gives the RTR ID its place.
   if (isRealDataMode()) {
-    // The Admin link has no club to give the RTR ID its city yet, as with password registration.
-    if (!input.clubId) throw new NotConnectedError()
-    return realRegisterWithGoogle({
-      ...input,
-      clubId: input.clubId,
-      values: googleRegistrationSchema.parse(input.values),
-    })
+    const values = googleRegistrationSchema.parse(input.values)
+    return realRegisterWithGoogle({ ...input, values })
   }
   await delay(1000)
   requireOnline()
@@ -535,11 +531,25 @@ export async function getInviteLanding(
   signal?: AbortSignal,
 ): Promise<InviteLanding> {
   if (isRealDataMode()) {
-    if (!link.clubId) throw new NotConnectedError()
+    if (!link.clubId) {
+      // The Admin link: the card needs nothing saved; a signed-in viewer is sent to their profile.
+      const signedIn = await getSession('player')
+      return {
+        card: { kind: 'admin' },
+        viewer: signedIn
+          ? { status: 'ready', playerId: signedIn.account.id, name: signedIn.account.name }
+          : { status: 'visitor' },
+      }
+    }
     const landing = await realGetInviteLanding({ ...link, clubId: link.clubId }, signal)
-    // The server doesn't know the Queue app's origin as this browser sees it.
-    if (landing.card.kind === 'session')
-      landing.card.continueUrl = `${queueSessionUrl(landing.card.session.slug)}?join=1`
+    // The server doesn't know the Queue app's origin as this browser sees it. A Session invite code
+    // the server found (it named the inviter) goes on to the request, as in mock mode.
+    if (landing.card.kind === 'session') {
+      const code = landing.card.inviter ? (link.sessionInviteCode ?? '').trim().toLowerCase() : ''
+      landing.card.continueUrl = `${queueSessionUrl(landing.card.session.slug)}?join=1${
+        code ? `&invite=${encodeURIComponent(code)}` : ''
+      }`
+    }
     return landing
   }
   await delay(250, signal)

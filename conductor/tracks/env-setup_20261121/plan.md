@@ -2,7 +2,7 @@
 
 **Track ID:** env-setup_20261121 · **Spec:** [spec.md](./spec.md)
 
-Ticket: not created yet (one issue for the whole track, under epic #869, when the owner approves the track).
+Ticket: #997 (one issue for the whole track, under epic #869).
 
 ## Phase 1: Audit (read only)
 

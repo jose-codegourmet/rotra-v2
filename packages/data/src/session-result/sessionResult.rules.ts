@@ -17,7 +17,7 @@ import type {
 
 /**
  * Standings order and positions are the live leaderboard's (match.rules computeStandings): players on
- * the same wins and losses share a position (1, 1, 3). This only adds each row's club player.
+ * the same wins and losses share a position, without gaps (1, 1, 2). This only adds each row's club player.
  */
 export function sessionStandings(roster: SessionPlayer[], matches: Match[]): StandingRow[] {
   return computeStandings(roster, matches).map((r) => ({

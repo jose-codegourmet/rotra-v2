@@ -1,4 +1,5 @@
 import 'server-only'
+import { sharePositions } from '@rotra/data/match/match.rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -150,7 +151,9 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
     const mine = new Set(ids)
     const saved = published ? publication?.publishedSnapshot?.standings : undefined
     const standings = Array.isArray(saved)
-      ? (saved as { clubPlayerId?: unknown; position?: unknown }[])
+      ? sharePositions(
+          saved as { clubPlayerId?: unknown; position: number; wins: number; losses: number }[],
+        )
       : []
     const standing = standings.find(
       (row) => typeof row.clubPlayerId === 'string' && mine.has(row.clubPlayerId),

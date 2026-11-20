@@ -357,7 +357,8 @@ export function waitMinutes(
 }
 /**
  * Session standings (D-2026-11-18-05): most wins, then fewest losses. Players with the same wins and
- * the same losses share one `position`, and the next position skips the shared places (1, 1, 3).
+ * the same losses share one `position`, and the next record takes the next number, without gaps
+ * (1, 1, 2; owner, November 19, 2026).
  * Nothing else separates players: the name only orders the rows inside a shared position. Read
  * `position` from the row, never an array index.
  */
@@ -383,12 +384,28 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
     })
     .filter((r) => r.games > 0)
     .sort((a, b) => b.wins - a.wins || a.losses - b.losses || a.name.localeCompare(b.name))
-  rows.forEach((row, i) => {
-    const above = rows[i - 1]
-    row.position =
-      above && above.wins === row.wins && above.losses === row.losses ? above.position : i + 1
-  })
-  return rows
+  return sharePositions(rows)
+}
+/**
+ * Standings positions without gaps (owner, November 19, 2026): players with the same wins and losses
+ * share one position, and the next record takes the next number (1, 1, 2). `rows` must already be in
+ * standings order. Also applied when showing saved standings, so results saved before shared
+ * positions (unique 1, 2, 3…) or with gaps (1, 1, 3) show the same way; the saved rows never change.
+ */
+export function sharePositions<R extends { wins: number; losses: number; position: number }>(
+  rows: readonly R[],
+): R[] {
+  const out: R[] = []
+  for (const row of rows) {
+    const above = out[out.length - 1]
+    const position = !above
+      ? 1
+      : above.wins === row.wins && above.losses === row.losses
+        ? above.position
+        : above.position + 1
+    out.push({ ...row, position })
+  }
+  return out
 }
 /** Games of a standings position: one number, or the range when its players counted different games. */
 export type StandingsGames = number | { min: number; max: number }

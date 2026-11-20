@@ -7,6 +7,7 @@
 //   clubs           POST /api/me/clubs, DELETE /api/me/clubs/{clubId}
 //   contact         POST /api/account/contact-change
 //   register        POST /api/register/{clubId}   (a visitor: no session)
+//   claim           POST /api/claim/{token}       (a visitor, a club record's link: RTR ID by the entry email, claimSharedEntry)
 //
 //   docker run -d --rm --name rotra-capture-pg -e POSTGRES_PASSWORD=test -p 127.0.0.1:55461:5432 postgres:16-alpine
 //   source ~/.nvm/nvm.sh && nvm use
@@ -101,7 +102,7 @@ afterAll(async () => {
   await capture?.close()
 })
 
-for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'contact', 'register']) {
+for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'contact', 'register', 'claim']) {
   test(name, async () => {
     await captureWrites({ db: capture.db, testdata, name, apiDir, beforeCase: () => globalThis.__logins.clear() })
   })

@@ -40,8 +40,9 @@ var errNoWrite = errors.New("claim: nothing to write")
 //
 // Lock order, the same for every claim, so two claims can never wait on each other: the link row; then the
 // player row (a player's link) or the new player and its contact (a record's link), whose unique phone and email
-// keys make claims for the same phone or email queue up; then the club record; then the RTR counter row; then the
-// rest. A second claim of the same link waits on the link row and finds it consumed.
+// keys make claims for the same phone or email queue up; then the club record; then the email advisory locks of the
+// shared entries (the record's email first, then the registering one) and the RTR counter row; then the rest. A second
+// claim of the same link waits on the link row and finds it consumed.
 func (h *handlers) claim(ctx context.Context, digest []byte, s submission, d profile.Details, hash string, now time.Time) (outcome, error) {
 	var out outcome
 	err := h.st.InTxWith(ctx, func(tx pgx.Tx, sq *store.Queries) error {
@@ -218,8 +219,9 @@ func (w *writer) player(l *playerLink, phone string) (outcome, error) {
 }
 
 // record is completeRecordClaim's transaction for a link on a club's own record: it creates the claimed player and
-// its contact, then the RTR ID of the inviting club's founding city, the account, links this record and every other
-// club's record with the same phone, saves the details and consumes the link.
+// its contact, then the RTR ID (the one of an open shared entry held by the record's email or the registering email, else
+// a new one for the inviting club's founding city), the account, links this record, claims that shared entry and joins its
+// other records, links every other club's record with the same phone, saves the details and consumes the link.
 func (w *writer) record(l *recordLink, phone string) (outcome, error) {
 	pid, err := uuid.NewV7()
 	if err != nil {
@@ -243,7 +245,9 @@ func (w *writer) record(l *recordLink, phone string) (outcome, error) {
 	if o, changed, err := w.staleRecord(l, phone); err != nil || changed {
 		return o, err
 	}
-	_, err = identity.AllocateRTRID(w.ctx, w.tx, pid, uuidOf(l.ClubID), w.now)
+	// The record's own shared entry (saved with an email) keeps its RTR ID, as does an entry under the registering email
+	// (D-2026-11-16-04); the record's email is tried first.
+	_, err = identity.AllocateRTRIDFor(w.ctx, w.tx, pid, uuidOf(l.ClubID), w.now, orEmpty(l.SharedEntryEmail), w.s.email)
 	if err != nil {
 		return outcome{}, err
 	}
@@ -251,8 +255,12 @@ func (w *writer) record(l *recordLink, phone string) (outcome, error) {
 	if err != nil {
 		return outcome{}, err
 	}
-	if err := w.q.LinkClubPlayer(w.ctx, sqlcgen.LinkClubPlayerParams{PlayerID: pgUUID(pid), Now: pgTime(w.now), ClubID: l.ClubID, ID: l.ClubPlayerID}); err != nil {
+	if err := w.q.LinkClaimedClubPlayer(w.ctx, sqlcgen.LinkClaimedClubPlayerParams{PlayerID: pgUUID(pid), Now: pgTime(w.now), ClubID: l.ClubID, ID: l.ClubPlayerID}); err != nil {
 		return outcome{}, fmt.Errorf("claim: linking the club record: %w", err)
+	}
+	// Every other club's record under the same shared entry joins the account too (the entry is claimed and closed).
+	if _, err := identity.ClaimSharedEntry(w.ctx, w.tx, pid, []string{orEmpty(l.SharedEntryEmail), w.s.email}, w.now); err != nil {
+		return outcome{}, err
 	}
 	if l.HasInput {
 		if err := w.q.ResolveClubPlayerInput(w.ctx, sqlcgen.ResolveClubPlayerInputParams{PlayerID: pgUUID(pid), Now: pgTime(w.now), ClubPlayerID: l.ClubPlayerID}); err != nil {

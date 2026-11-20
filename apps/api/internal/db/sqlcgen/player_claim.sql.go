@@ -78,28 +78,31 @@ SELECT l.id AS link_id,
        cp.removed_at,
        (pi.club_player_id IS NOT NULL)::bool AS has_input,
        pi.phone_e164 AS input_phone,
-       pi.email AS input_email
+       pi.email AS input_email,
+       se.email AS shared_entry_email
 FROM club_player_claim_links l
 JOIN club_players cp ON cp.club_id = l.club_id AND cp.id = l.club_player_id
 JOIN clubs c ON c.id = cp.club_id
 LEFT JOIN club_player_private_inputs pi ON pi.club_player_id = cp.id
+LEFT JOIN shared_player_entries se ON se.id = cp.shared_entry_id
 WHERE l.token_digest = $1
 `
 
 type GetClubPlayerClaimLinkViewRow struct {
-	LinkID       pgtype.UUID
-	ClubID       pgtype.UUID
-	State        PlayerClaimLinkState
-	ExpiresAt    pgtype.Timestamptz
-	ClubName     string
-	ClubPlayerID pgtype.UUID
-	DisplayName  string
-	Nickname     pgtype.Text
-	PlayerID     pgtype.UUID
-	RemovedAt    pgtype.Timestamptz
-	HasInput     bool
-	InputPhone   pgtype.Text
-	InputEmail   pgtype.Text
+	LinkID           pgtype.UUID
+	ClubID           pgtype.UUID
+	State            PlayerClaimLinkState
+	ExpiresAt        pgtype.Timestamptz
+	ClubName         string
+	ClubPlayerID     pgtype.UUID
+	DisplayName      string
+	Nickname         pgtype.Text
+	PlayerID         pgtype.UUID
+	RemovedAt        pgtype.Timestamptz
+	HasInput         bool
+	InputPhone       pgtype.Text
+	InputEmail       pgtype.Text
+	SharedEntryEmail pgtype.Text
 }
 
 func (q *Queries) GetClubPlayerClaimLinkView(ctx context.Context, tokenDigest []byte) (GetClubPlayerClaimLinkViewRow, error) {
@@ -119,6 +122,7 @@ func (q *Queries) GetClubPlayerClaimLinkView(ctx context.Context, tokenDigest []
 		&i.HasInput,
 		&i.InputPhone,
 		&i.InputEmail,
+		&i.SharedEntryEmail,
 	)
 	return i, err
 }
@@ -304,6 +308,31 @@ func (q *Queries) InsertPrivateContact(ctx context.Context, arg InsertPrivateCon
 	var revision int64
 	err := row.Scan(&revision)
 	return revision, err
+}
+
+const linkClaimedClubPlayer = `-- name: LinkClaimedClubPlayer :exec
+UPDATE club_players
+SET player_id = $1, nickname = NULL, revision = revision + 1, updated_at = $2
+WHERE club_id = $3 AND id = $4
+`
+
+type LinkClaimedClubPlayerParams struct {
+	PlayerID pgtype.UUID
+	Now      pgtype.Timestamptz
+	ClubID   pgtype.UUID
+	ID       pgtype.UUID
+}
+
+// The claimed record becomes the player's. Its nickname became the account's, so the club nickname starts empty
+// (D-2026-11-18-03), as in completeRecordClaim; the phone linking of other clubs' records keeps theirs (LinkClubPlayer).
+func (q *Queries) LinkClaimedClubPlayer(ctx context.Context, arg LinkClaimedClubPlayerParams) error {
+	_, err := q.db.Exec(ctx, linkClaimedClubPlayer,
+		arg.PlayerID,
+		arg.Now,
+		arg.ClubID,
+		arg.ID,
+	)
+	return err
 }
 
 const lockClubPlayerClaimLink = `-- name: LockClubPlayerClaimLink :one

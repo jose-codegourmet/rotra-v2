@@ -68,7 +68,8 @@ test('a confirmed request, promotion and direct join notify the right players on
       }),
     ]),
   )
-  expect(await countUnreadPlayerNotifications(juan)).toBe(1)
+  // 0: the seeded player_google_sign_in flag is off, so no verification reminder (D-2026-11-18-01).
+  expect(await countUnreadPlayerNotifications(juan)).toBe(0)
   await expect(markPlayerNotificationsRead(juan, rows[0].id)).rejects.toMatchObject({
     code: 'not_found',
   })
@@ -118,7 +119,19 @@ test('a publication and a replayed rank job notify the confirmed history owners 
   )
 })
 
+test('no verification reminder while Google sign-in for players is off (D-2026-11-18-01)', async () => {
+  await prisma.featureFlag.update({
+    where: { key: 'player_google_sign_in' },
+    data: { value: false },
+  })
+  expect((await listPlayerNotifications(maria)).find((row) => row.pinned)).toBeUndefined()
+})
+
 test('Admin review reports the decision and verification replaces the pinned reminder', async () => {
+  await prisma.featureFlag.update({
+    where: { key: 'player_google_sign_in' },
+    data: { value: true },
+  })
   const approved = await submitOwnContactChange(maria, {
     commandId: randomUUID(),
     field: 'email',

@@ -42,6 +42,35 @@ func placementOf(b writes.Body) addPlacement {
 	return addPlacement{allowOverfill: over, toWaitlist: wait}
 }
 
+// addSource is what an add names: a saved player, a Player Information profile, or a new player (the default).
+type addSource struct {
+	saved     *savedPlayerAdd
+	directory *directoryPlayerAdd
+	newPlayer *newPlayerAdd
+}
+
+// addSourceOf reads the fields of an add the way the single add route and the batch both read them. A source that is neither
+// saved nor directory is a new player; its phone is checked here, before any session is looked up.
+func addSourceOf(b writes.Body, operationID, level string) (addSource, error) {
+	switch b.Text("source") {
+	case "saved":
+		return addSource{saved: &savedPlayerAdd{addPlacement: placementOf(b), operationID: operationID, clubPlayerID: b.Text("clubPlayerId"), level: level}}, nil
+	case "directory":
+		return addSource{directory: &directoryPlayerAdd{
+			addPlacement: placementOf(b), operationID: operationID, playerID: b.Text("playerId"), name: b.Text("name"), level: level,
+		}}, nil
+	}
+	person := newClubPlayer{name: b.Text("name"), nickname: b.Text("nickname"), email: b.Text("email")}
+	if raw := fields.JSTrim(b.Text("phone")); raw != "" {
+		e164, ok := phone.Parse(raw)
+		if !ok {
+			return addSource{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"phone": "Enter a valid phone number."})
+		}
+		person.phone = e164
+	}
+	return addSource{newPlayer: &newPlayerAdd{addPlacement: placementOf(b), operationID: operationID, person: person, level: level}}, nil
+}
+
 // operationOf reads one wire operation, shaped like the single-op routes read theirs; anything else is invalid. A source that
 // is neither saved nor directory is a new player.
 func operationOf(raw any) (rosterOperation, error) {
@@ -54,24 +83,11 @@ func operationOf(raw any) (rosterOperation, error) {
 	switch b.Text("op") {
 	case "add":
 		op.op = "add"
-		switch b.Text("source") {
-		case "saved":
-			op.saved = &savedPlayerAdd{addPlacement: placementOf(b), operationID: op.operationID, clubPlayerID: b.Text("clubPlayerId"), level: op.level}
-		case "directory":
-			op.directory = &directoryPlayerAdd{
-				addPlacement: placementOf(b), operationID: op.operationID, playerID: b.Text("playerId"), name: b.Text("name"), level: op.level,
-			}
-		default:
-			person := newClubPlayer{name: b.Text("name"), nickname: b.Text("nickname"), email: b.Text("email")}
-			if raw := fields.JSTrim(b.Text("phone")); raw != "" {
-				e164, ok := phone.Parse(raw)
-				if !ok {
-					return rosterOperation{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"phone": "Enter a valid phone number."})
-				}
-				person.phone = e164
-			}
-			op.newPlayer = &newPlayerAdd{addPlacement: placementOf(b), operationID: op.operationID, person: person, level: op.level}
+		src, err := addSourceOf(b, op.operationID, op.level)
+		if err != nil {
+			return rosterOperation{}, err
 		}
+		op.saved, op.directory, op.newPlayer = src.saved, src.directory, src.newPlayer
 	case "remove":
 		op.op, op.rosterID = "remove", b.Text("rosterId")
 	case "acceptRequest":

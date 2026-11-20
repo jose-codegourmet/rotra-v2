@@ -12,3 +12,14 @@ import (
 // differently from the Route Handler only where a step says "goExpects" (the deviations log has each).
 
 func TestRosterBatchGolden(t *testing.T) { writetest.Replay(t, "testdata", "roster", build) }
+
+// The single roster operations (add, remove, level, no show, move to waitlist, games, presence, waitlist remove, give slot, fill).
+func TestRosterOpsGolden(t *testing.T) { writetest.Replay(t, "testdata", "rosterops", build) }
+
+// Session preparation and the court commands: create, edit, the join switches, start, delete, add, edit and remove a court, open early.
+// The TypeScript was captured with TZ=UTC (the servers' zone); the clash texts and the dates of a series are UTC here too.
+func TestSessionPrepGolden(t *testing.T) { writetest.Replay(t, "testdata", "prep", build) }
+
+// The club's writes: the invite link, venues, settings and saved players (add, delete, move, club nickname, registration link). A race
+// whose winner is not decided is not pinned here.
+func TestClubWritesGolden(t *testing.T) { writetest.Replay(t, "testdata", "club", build) }

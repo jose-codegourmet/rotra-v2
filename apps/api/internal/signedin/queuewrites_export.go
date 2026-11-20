@@ -79,3 +79,63 @@ func ReadSessionRoster(ctx context.Context, q *sqlcgen.Queries, club, sessionID 
 	}
 	return (&server{now: now}).rosterOf(ctx, q, club, rows[0])
 }
+
+// OrderedWaitlist is orderedWaitlist: the session's waitlist rows in waitlist order.
+func OrderedWaitlist(rows []sqlcgen.ListQueueWaitlistRow) []sqlcgen.ListQueueWaitlistRow {
+	return orderedQueueWaitlist(rows)
+}
+
+// CountedGamesByEntry is countedGamesByEntry: the games each roster entry has counted, by entry id.
+func CountedGamesByEntry(ctx context.Context, q *sqlcgen.Queries, session pgtype.UUID) (map[string]int, error) {
+	return countedGamesByEntry(ctx, q, session)
+}
+
+// Session is sessionDto on the wire.
+type Session = queueSessionDTO
+
+// Court is courtDto on the wire.
+type Court = queueCourtDTO
+
+// SessionOf is sessionDto for a queue_sessions row, as a write reads it (the columns of LockQueueSession).
+func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
+	formats := r.RequestFormats
+	d := Session{
+		ID: r.ID.String(), ClubID: r.ClubID.String(), Title: r.Title, Notes: r.Notes.String,
+		ScheduledStartAt: httpapi.ToIso(r.ScheduledStartAt.Time), ScheduledEndAt: httpapi.ToIso(r.ScheduledEndAt.Time),
+		VenueID: uuidPtr(r.VenueID), VenueName: r.VenueName.String, VenueAddress: r.VenueAddress.String, State: string(r.State),
+		InvalidReason: textPtr(r.InvalidReason), CancelledAt: isoPtr(r.CancelledAt), CancelReason: textPtr(r.CancelReason),
+		SessionMode: string(r.SessionMode), AllowSingles: r.AllowSingles, AllowDoubles: r.AllowDoubles, MinimumGames: r.MinimumGames,
+		MinimumIsCalculated: r.MinimumIsCalculated, PlayersPerCourt: r.PlayersPerCourt, StartedAt: isoPtr(r.StartedAt),
+		FinalizedAt: isoPtr(r.FinalizedAt), SeriesID: uuidPtr(r.SeriesID), PublicSlug: r.PublicSlug, AcceptJoinRequests: r.AcceptJoinRequests,
+		AlwaysRequireRequest: r.AlwaysRequireRequest, CourtFillMode: string(r.CourtFillMode), RequestFormats: requestFormatsRecord(formats),
+		RecordGames: r.RecordGames, Revision: httpapi.ToDecimalString(r.Revision),
+	}
+	if r.ExpectedPlayers.Valid {
+		v := r.ExpectedPlayers.Int32
+		d.ExpectedPlayers = &v
+	}
+	return d
+}
+
+// CourtOf is courtDto for a session court row.
+func CourtOf(c sqlcgen.SessionCourt) Court {
+	return Court{
+		ID: c.ID.String(), SessionID: c.SessionID.String(), Label: c.Label, StartsAt: isoPtr(c.StartsAt), OpenedEarlyAt: isoPtr(c.OpenedEarlyAt),
+		OpenUntil: isoPtr(c.OpenUntil), RemovedAt: isoPtr(c.RemovedAt),
+	}
+}
+
+// NewInviteCode is newClubInviteCode: a random club invite code.
+func NewInviteCode() (string, error) { return newInviteCode() }
+
+// Venue is venueDto on the wire.
+type Venue = queueVenueDTO
+
+// VenueOf is venueDto for a saved venue.
+func VenueOf(v sqlcgen.ClubVenue) Venue {
+	return Venue{
+		ID: v.ID.String(), ClubID: v.ClubID.String(), Name: v.Name, Address: v.Address.String,
+		CourtFeePerCourtHr: moneyOrNil(v.CourtFeePerCourtHourMinor, v.Currency), EntranceFee: moneyOrNil(v.EntranceFeeMinor, v.Currency),
+		Revision: httpapi.ToDecimalString(v.Revision),
+	}
+}

@@ -128,6 +128,13 @@ before a step, `snapshot` pins the rows after it, `save` and `{{name}}` pass a g
 `testdata/tools/capture-writes-queue.test.mjs` (same recipe as the groups above), and `queue.seed.sql` is the seed. A race whose winner is
 not decided is tested in `race_test.go`, not pinned.
 
+Preparation, courts and the roster (`session_prep.go`, `courts.go`, `roster_ops.go`) and the club's own writes (`club_writes.go`) are in the same package.
+Their goldens are `prep`, `rosterops` and `club` (cases from `gen-writes-queue-prep-cases.py`, `gen-writes-queue-ops-cases.py` and
+`gen-writes-queue-club-cases.py`). Capture `prep` with `TZ=UTC` (see its generator). `session_rules.go` holds the preparation rules no other code
+shares (the repeating dates and their clashes, the court window, the late start's new end). Create, edit and start check the entitlement before the
+transaction and lock the session without the live-session exception: use `lockedSession(..., false, ...)` for such a command, `inSession` for the
+rest. A session a command changed is read again with `txn.reload` / `txn.touch` (the queries return no row because pgx cannot scan an enum array).
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

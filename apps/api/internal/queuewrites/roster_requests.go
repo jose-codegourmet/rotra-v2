@@ -68,7 +68,7 @@ func (t *txn) addDirectoryPlayerIn(in directoryPlayerAdd) (placed, error) {
 		return placed{}, err
 	}
 	now := t.stamp()
-	cp, err := t.clubPlayerForProfile(in.operationID, in.playerID, now, in.name)
+	cp, _, err := t.clubPlayerForProfile(in.operationID, in.playerID, now, in.name)
 	if err != nil {
 		return placed{}, err
 	}
@@ -174,7 +174,7 @@ func (t *txn) confirmJoinRequestIn(in requestAccept) (confirmed, error) {
 	}
 	var cp sqlcgen.ClubPlayer
 	if current.PlayerID.Valid {
-		cp, err = t.clubPlayerForProfile(in.operationID, current.PlayerID.String(), now, "")
+		cp, _, err = t.clubPlayerForProfile(in.operationID, current.PlayerID.String(), now, "")
 	} else {
 		// A guest's request saves a guest: a name only (D-2026-11-16-04 removed the request phone and its phone linking).
 		cp, _, err = t.createClubPlayer(in.operationID, newClubPlayer{name: current.Name, nickname: current.Nickname.String}, now)

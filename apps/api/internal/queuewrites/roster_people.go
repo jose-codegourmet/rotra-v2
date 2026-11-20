@@ -124,8 +124,13 @@ func (r *emailResolution) personOf() (player, entry pgtype.UUID) {
 
 // savedRecordFor is savedRecordFor: the club's current saved record that already is this person, if any.
 func (t *txn) savedRecordFor(r *emailResolution) (*sqlcgen.GetSavedRecordForPersonRow, error) {
+	return t.savedRecordExcept(r, pgtype.UUID{})
+}
+
+// savedRecordExcept is savedRecordFor that leaves out one record: the one being edited or moved.
+func (t *txn) savedRecordExcept(r *emailResolution, except pgtype.UUID) (*sqlcgen.GetSavedRecordForPersonRow, error) {
 	player, entry := r.personOf()
-	row, err := t.q.GetSavedRecordForPerson(t.ctx, sqlcgen.GetSavedRecordForPersonParams{ClubID: t.club, PlayerID: player, EntryID: entry})
+	row, err := t.q.GetSavedRecordForPerson(t.ctx, sqlcgen.GetSavedRecordForPersonParams{ClubID: t.club, PlayerID: player, EntryID: entry, ExceptID: except})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
@@ -243,27 +248,27 @@ const ownNameError = "Enter a name."
 // saved them yet. profileID is a registered player's id, or the id of an unclaimed person's shared entry: then the club's own
 // record is made with ownName (another club's name, picture and level are never shown). A deleted saved player is restored
 // rather than duplicated. A registered player's row keeps no nickname.
-func (t *txn) clubPlayerForProfile(operationID string, profileText string, at pgtype.Timestamptz, ownName string) (sqlcgen.ClubPlayer, error) {
+func (t *txn) clubPlayerForProfile(operationID string, profileText string, at pgtype.Timestamptz, ownName string) (cp sqlcgen.ClubPlayer, created bool, err error) {
 	profileID, err := parseRowID(profileText)
 	if err != nil {
-		return sqlcgen.ClubPlayer{}, err
+		return sqlcgen.ClubPlayer{}, false, err
 	}
 	player, perr := t.q.GetDirectoryPlayerForRoster(t.ctx, profileID)
 	if perr != nil && !errors.Is(perr, pgx.ErrNoRows) {
-		return sqlcgen.ClubPlayer{}, perr
+		return sqlcgen.ClubPlayer{}, false, perr
 	}
 	hasPlayer := perr == nil
 	var entryID pgtype.UUID
 	if !hasPlayer {
 		entryID, err = t.q.GetOpenSharedEntryByID(t.ctx, profileID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return sqlcgen.ClubPlayer{}, err
+			return sqlcgen.ClubPlayer{}, false, err
 		}
 	}
 	isEntry := entryID.Valid
 	registered := hasPlayer && player.HasAllocation && player.ProfileState == sqlcgen.PlayerProfileStateClaimed
 	if !registered && !isEntry {
-		return sqlcgen.ClubPlayer{}, writes.Fail(httpapi.ErrNotFound, map[string]string{"player": "Player not available."})
+		return sqlcgen.ClubPlayer{}, false, writes.Fail(httpapi.ErrNotFound, map[string]string{"player": "Player not available."})
 	}
 	var saved sqlcgen.ClubPlayer
 	if isEntry {
@@ -273,35 +278,36 @@ func (t *txn) clubPlayerForProfile(operationID string, profileText string, at pg
 	}
 	hasSaved := err == nil
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return saved, err
+		return saved, false, err
 	}
 	if hasSaved && !saved.RemovedAt.Valid {
-		return saved, nil
+		return saved, false, nil
 	}
 	name := player.FullName
 	if isEntry {
 		name = fields.JSTrim(ownName)
 	}
 	if name == "" {
-		return saved, writes.Fail(httpapi.ErrInvalid, map[string]string{"name": ownNameError})
+		return saved, false, writes.Fail(httpapi.ErrInvalid, map[string]string{"name": ownNameError})
 	}
 	// A deleted saved player is restored rather than duplicated (one saved row per person per club). The guarded write
 	// restores once, so a replayed operation tells a registered player once.
 	if hasSaved {
 		restored, err := t.q.RestoreClubPlayer(t.ctx, sqlcgen.RestoreClubPlayerParams{SetName: isEntry, DisplayName: name, Now: t.stamp(), ClubID: t.club, ID: saved.ID})
 		if err != nil {
-			return saved, err
+			return saved, false, err
 		}
 		if restored > 0 && !isEntry {
 			op, err := opUUID(operationID)
 			if err != nil {
-				return saved, err
+				return saved, false, err
 			}
 			if err := t.notifySavedPlayer(profileID, op); err != nil {
-				return saved, err
+				return saved, false, err
 			}
 		}
-		return t.q.GetClubPlayerByID(t.ctx, saved.ID)
+		cp, err := t.q.GetClubPlayerByID(t.ctx, saved.ID)
+		return cp, restored > 0, err
 	}
 	id := derivedID(operationID, "club-player")
 	params := sqlcgen.InsertProfileClubPlayerParams{ID: id, ClubID: t.club, DisplayName: name, Now: t.stamp()}
@@ -311,17 +317,18 @@ func (t *txn) clubPlayerForProfile(operationID string, profileText string, at pg
 		params.PlayerID = profileID
 	}
 	if err := t.q.InsertProfileClubPlayer(t.ctx, params); err != nil {
-		return saved, err
+		return saved, false, err
 	}
 	// Only a registered player has an inbox; an unclaimed person's shared entry has no account.
 	if !isEntry {
 		op, err := opUUID(operationID)
 		if err != nil {
-			return saved, err
+			return saved, false, err
 		}
 		if err := t.notifySavedPlayer(profileID, op); err != nil {
-			return saved, err
+			return saved, false, err
 		}
 	}
-	return t.q.GetClubPlayerByID(t.ctx, id)
+	cp, err = t.q.GetClubPlayerByID(t.ctx, id)
+	return cp, true, err
 }

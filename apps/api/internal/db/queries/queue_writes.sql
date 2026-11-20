@@ -4,7 +4,7 @@
 
 -- name: LockQueueSession :one
 -- lockSession: the club's session row, locked for the rest of the transaction (FOR UPDATE). No row is another club's or an
--- unknown id.
+-- unknown id. The columns are listed (not *) because request_formats is read as text[]: pgx cannot scan an array of an enum.
 SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, state, invalid_reason,
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
@@ -12,10 +12,18 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        created_at, updated_at, revision
 FROM queue_sessions WHERE club_id = @club_id AND id = @id FOR UPDATE;
 
--- name: TouchQueueSession :one
+-- name: GetQueueSession :one
+-- The session as it is now, with the columns of LockQueueSession (a write reads its session again after it changed it).
+SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, state, invalid_reason,
+       cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
+       expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
+       always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
+       created_at, updated_at, revision
+FROM queue_sessions WHERE id = @id;
+
+-- name: TouchQueueSession :exec
 -- touchSession: bumps the session revision after any change to it or its roster, courts or waitlist.
-UPDATE queue_sessions SET revision = revision + 1, updated_at = @now WHERE id = @id
-RETURNING id, state, minimum_games, minimum_is_calculated, scheduled_start_at, scheduled_end_at, players_per_court, expected_players, allow_singles, allow_doubles;
+UPDATE queue_sessions SET revision = revision + 1, updated_at = @now WHERE id = @id;
 
 -- name: SetQueueSessionMinimum :exec
 UPDATE queue_sessions SET minimum_games = @minimum_games, updated_at = @now WHERE id = @id;

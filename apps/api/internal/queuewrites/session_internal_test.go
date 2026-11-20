@@ -229,8 +229,8 @@ func TestMapDatabaseError(t *testing.T) {
 		want httpapi.ErrorCode
 	}{
 		{"unique", pg("23505"), httpapi.ErrConflict},
-		{"exclusion", pg("23P01"), httpapi.ErrConflict},
 		{"foreign key", pg("23503"), httpapi.ErrInvalid},
+		{"restrict violation (the level lock)", pg("23001"), httpapi.ErrInvalid},
 		{"missing row", pgx.ErrNoRows, httpapi.ErrNotFound},
 		{"wrapped missing row", errors.Join(errors.New("x"), pgx.ErrNoRows), httpapi.ErrNotFound},
 		{"a service error passes", writes.Fail(httpapi.ErrForbidden, nil), httpapi.ErrForbidden},
@@ -241,9 +241,11 @@ func TestMapDatabaseError(t *testing.T) {
 			t.Errorf("%s: %v, want %s", c.name, got, c.want)
 		}
 	}
-	other := pg("40001")
-	if got := mapDatabaseError(other); got != other {
-		t.Errorf("an unexpected database error must pass through: %v", got)
+	// An exclusion violation has no code of its own in Prisma, so main answers it with a 500: it passes through here too.
+	for _, other := range []error{pg("40001"), pg("23P01"), pg("23514")} {
+		if got := mapDatabaseError(other); got != other {
+			t.Errorf("an unexpected database error must pass through: %v", got)
+		}
 	}
 }
 

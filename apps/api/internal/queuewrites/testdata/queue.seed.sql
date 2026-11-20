@@ -8,11 +8,11 @@ SET LOCAL session_replication_role = replica;
 
 -- ---- start clean: the file is also the reset between cases, so it removes what it inserts ----
 DELETE FROM player_notifications; DELETE FROM admin_audit_events;
-DELETE FROM player_match_facts; DELETE FROM match_participations; DELETE FROM match_decisions; DELETE FROM matches;
+DELETE FROM player_match_facts; DELETE FROM active_court_holds; DELETE FROM active_player_holds; DELETE FROM match_court_usage; DELETE FROM match_participations; DELETE FROM match_decisions; DELETE FROM matches;
 DELETE FROM session_match_request_spots; DELETE FROM session_match_requests; DELETE FROM session_drop_out_notices;
 DELETE FROM session_join_requests; DELETE FROM session_waitlist; DELETE FROM club_assessments; DELETE FROM session_players;
-DELETE FROM session_courts; DELETE FROM queue_sessions;
-DELETE FROM club_player_private_inputs; DELETE FROM club_players; DELETE FROM shared_player_entries;
+DELETE FROM session_courts; DELETE FROM queue_sessions; DELETE FROM club_venues;
+DELETE FROM club_player_private_inputs; DELETE FROM club_player_claim_links; DELETE FROM player_claim_links; DELETE FROM club_players; DELETE FROM shared_player_entries;
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters; DELETE FROM players;
 DELETE FROM club_entitlements; DELETE FROM club_license_terms; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM admin_accounts;
 
@@ -35,6 +35,12 @@ INSERT INTO club_entitlements (club_id, effective_term_id, effective_access_ends
   ('c9000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2027-10-01 00:00:00+00', NULL, TIMESTAMPTZ '2026-10-01 00:00:00+00', TIMESTAMPTZ '2026-10-01 00:00:00+00', 1),
   ('c9000000-0000-4000-8000-000000000002', 'a1000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-05 00:00:00+00', NULL, TIMESTAMPTZ '2026-11-05 00:00:00+00', TIMESTAMPTZ '2026-11-05 00:00:00+00', 1),
   ('c9000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000003', TIMESTAMPTZ '2027-10-01 00:00:00+00', NULL, TIMESTAMPTZ '2026-10-01 00:00:00+00', TIMESTAMPTZ '2026-10-01 00:00:00+00', 1);
+
+-- ---- saved venues (Smash Club has two, Other Club one) ----
+INSERT INTO club_venues (id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, currency, created_at, updated_at, revision) VALUES
+  ('a5000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Smash Hall', 'Cebu City', 25000, 5000, 'PHP', TIMESTAMPTZ '2026-10-02 00:00:00+00', TIMESTAMPTZ '2026-10-02 00:00:00+00', 1),
+  ('a5000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'Court Two', NULL, NULL, NULL, 'PHP', TIMESTAMPTZ '2026-10-02 00:00:00+00', TIMESTAMPTZ '2026-10-02 00:00:00+00', 3),
+  ('a5000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000003', 'Davao Court', 'Davao', NULL, NULL, 'PHP', TIMESTAMPTZ '2026-10-02 00:00:00+00', TIMESTAMPTZ '2026-10-02 00:00:00+00', 1);
 
 -- ---- registered players (with an account, so they have an inbox) and one unclaimed profile ----
 INSERT INTO player_id_counters (location_code_id, sync_date, last_sequence) VALUES ((SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), DATE '2026-10-29', 40);

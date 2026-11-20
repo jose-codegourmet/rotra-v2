@@ -381,6 +381,97 @@ func (q *Queries) GetQueueJoinRequestForUpdate(ctx context.Context, id pgtype.UU
 	return i, err
 }
 
+const getQueueSession = `-- name: GetQueueSession :one
+SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, state, invalid_reason,
+       cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
+       expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
+       always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
+       created_at, updated_at, revision
+FROM queue_sessions WHERE id = $1
+`
+
+type GetQueueSessionRow struct {
+	ID                   pgtype.UUID
+	ClubID               pgtype.UUID
+	Title                string
+	Notes                pgtype.Text
+	ScheduledStartAt     pgtype.Timestamptz
+	ScheduledEndAt       pgtype.Timestamptz
+	VenueID              pgtype.UUID
+	VenueName            pgtype.Text
+	VenueAddress         pgtype.Text
+	State                QueueSessionState
+	InvalidReason        pgtype.Text
+	CancelledAt          pgtype.Timestamptz
+	CancelReason         pgtype.Text
+	SessionMode          SessionMode
+	AllowSingles         bool
+	AllowDoubles         bool
+	MinimumGames         int32
+	MinimumIsCalculated  bool
+	PlayersPerCourt      int16
+	ExpectedPlayers      pgtype.Int4
+	QueueRevision        int64
+	StartedAt            pgtype.Timestamptz
+	FinalizedAt          pgtype.Timestamptz
+	SeriesID             pgtype.UUID
+	StartLicenseTermID   pgtype.UUID
+	PublicSlug           string
+	AcceptJoinRequests   bool
+	AlwaysRequireRequest bool
+	CourtFillMode        CourtFillMode
+	RecordGames          bool
+	RequestFormats       []string
+	SourceCommandID      pgtype.UUID
+	CreatedAt            pgtype.Timestamptz
+	UpdatedAt            pgtype.Timestamptz
+	Revision             int64
+}
+
+// The session as it is now, with the columns of LockQueueSession (a write reads its session again after it changed it).
+func (q *Queries) GetQueueSession(ctx context.Context, id pgtype.UUID) (GetQueueSessionRow, error) {
+	row := q.db.QueryRow(ctx, getQueueSession, id)
+	var i GetQueueSessionRow
+	err := row.Scan(
+		&i.ID,
+		&i.ClubID,
+		&i.Title,
+		&i.Notes,
+		&i.ScheduledStartAt,
+		&i.ScheduledEndAt,
+		&i.VenueID,
+		&i.VenueName,
+		&i.VenueAddress,
+		&i.State,
+		&i.InvalidReason,
+		&i.CancelledAt,
+		&i.CancelReason,
+		&i.SessionMode,
+		&i.AllowSingles,
+		&i.AllowDoubles,
+		&i.MinimumGames,
+		&i.MinimumIsCalculated,
+		&i.PlayersPerCourt,
+		&i.ExpectedPlayers,
+		&i.QueueRevision,
+		&i.StartedAt,
+		&i.FinalizedAt,
+		&i.SeriesID,
+		&i.StartLicenseTermID,
+		&i.PublicSlug,
+		&i.AcceptJoinRequests,
+		&i.AlwaysRequireRequest,
+		&i.CourtFillMode,
+		&i.RecordGames,
+		&i.RequestFormats,
+		&i.SourceCommandID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Revision,
+	)
+	return i, err
+}
+
 const getRosterNames = `-- name: GetRosterNames :one
 SELECT cp.nickname AS club_nickname, p.nickname AS player_nickname, p.profile_state
 FROM club_players cp LEFT JOIN players p ON p.id = cp.player_id
@@ -909,7 +1000,7 @@ type LockQueueSessionRow struct {
 // session-store.ts. Prisma fills @updatedAt on the client on every create and update, so each statement here sets
 // updated_at from @now, and so does created_at: Prisma stamps @default(now()) with the application clock too.
 // lockSession: the club's session row, locked for the rest of the transaction (FOR UPDATE). No row is another club's or an
-// unknown id.
+// unknown id. The columns are listed (not *) because request_formats is read as text[]: pgx cannot scan an array of an enum.
 func (q *Queries) LockQueueSession(ctx context.Context, arg LockQueueSessionParams) (LockQueueSessionRow, error) {
 	row := q.db.QueryRow(ctx, lockQueueSession, arg.ClubID, arg.ID)
 	var i LockQueueSessionRow
@@ -1161,9 +1252,8 @@ func (q *Queries) SetSessionWaitlistLevel(ctx context.Context, arg SetSessionWai
 	return i, err
 }
 
-const touchQueueSession = `-- name: TouchQueueSession :one
+const touchQueueSession = `-- name: TouchQueueSession :exec
 UPDATE queue_sessions SET revision = revision + 1, updated_at = $1 WHERE id = $2
-RETURNING id, state, minimum_games, minimum_is_calculated, scheduled_start_at, scheduled_end_at, players_per_court, expected_players, allow_singles, allow_doubles
 `
 
 type TouchQueueSessionParams struct {
@@ -1171,34 +1261,8 @@ type TouchQueueSessionParams struct {
 	ID  pgtype.UUID
 }
 
-type TouchQueueSessionRow struct {
-	ID                  pgtype.UUID
-	State               QueueSessionState
-	MinimumGames        int32
-	MinimumIsCalculated bool
-	ScheduledStartAt    pgtype.Timestamptz
-	ScheduledEndAt      pgtype.Timestamptz
-	PlayersPerCourt     int16
-	ExpectedPlayers     pgtype.Int4
-	AllowSingles        bool
-	AllowDoubles        bool
-}
-
 // touchSession: bumps the session revision after any change to it or its roster, courts or waitlist.
-func (q *Queries) TouchQueueSession(ctx context.Context, arg TouchQueueSessionParams) (TouchQueueSessionRow, error) {
-	row := q.db.QueryRow(ctx, touchQueueSession, arg.Now, arg.ID)
-	var i TouchQueueSessionRow
-	err := row.Scan(
-		&i.ID,
-		&i.State,
-		&i.MinimumGames,
-		&i.MinimumIsCalculated,
-		&i.ScheduledStartAt,
-		&i.ScheduledEndAt,
-		&i.PlayersPerCourt,
-		&i.ExpectedPlayers,
-		&i.AllowSingles,
-		&i.AllowDoubles,
-	)
-	return i, err
+func (q *Queries) TouchQueueSession(ctx context.Context, arg TouchQueueSessionParams) error {
+	_, err := q.db.Exec(ctx, touchQueueSession, arg.Now, arg.ID)
+	return err
 }

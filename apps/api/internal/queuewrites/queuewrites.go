@@ -12,12 +12,17 @@
 //	server.club           the club pass check + writes.Handle for a command that gets the club's ID
 //	server.inSession      lock the club's session, check access (entitlement, or an active session a license term started)
 //	server.rosterCommand  inSession + the open states + close stale match requests + revision bump + minimum recompute
+//	server.lockedSession  inSession with the access check optional (create, edit, start and delete check the entitlement before the transaction)
+//	server.inClub         one transaction on the club with no session (venues, settings, saved players); server.entitled is the check before it
+//	txn.reload, txn.touch the session as stored now, and touchSession: the session queries return no row (pgx cannot scan an enum array)
 //	requireRevision       the expected-revision check of a command (409 conflict, or 422 for a revision that is no number)
 //	requireState          the session state check (422 invalid with the field state)
 //	derivedID             a stable UUID derived from an operation id, for the extra rows one command writes
 //	parseOperationID      the operation id as Postgres reads a uuid; a malformed one is 422
 //	place, promoteWaiter, assessEntry, createClubPlayer, clubPlayerForProfile, resolveEmail
 //	                      the roster building blocks (roster_*.go); the batch and the single-operation routes both call them
+//	stepDownIn, liveEntry, requireLiveCourt, retireEntryIfOrphan, signedin.SessionOf / CourtOf / VenueOf
+//	                      what the match and money slices reuse (Move to waitlist for a signed-in Player, the court helpers, the DTOs)
 //
 // The idempotency of a command is not one table: each command repeats safely in its own way, as the TypeScript does. An
 // admission keys on club_assessments.source_operation_id and on rows whose ID is derived from the operation id, a request
@@ -77,6 +82,10 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 // registerRoutes adds the Queue app's writes (X-Rotra-App club). A path that another app answers too is routed per app.
 func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerRosterBatch(rt)
+	s.registerRosterOps(rt)
+	s.registerSessionPrep(rt)
+	s.registerCourts(rt)
+	s.registerClubWrites(rt)
 }
 
 // at is `new Date()`: the clock in milliseconds.

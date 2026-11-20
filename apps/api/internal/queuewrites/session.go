@@ -64,6 +64,12 @@ func parseRowID(text string) (pgtype.UUID, error) {
 // unknown ID are not found), then requireSessionAccess. A database error comes back as it is: a command that maps them (as
 // rosterCommand does) calls mapDatabaseError itself.
 func (s *server) inSession(ctx context.Context, club pgtype.UUID, sessionID string, change func(t *txn) (any, error)) (any, error) {
+	return s.lockedSession(ctx, club, sessionID, true, change)
+}
+
+// lockedSession is inSession with the access check optional: create, edit, start and delete check the club's entitlement before the
+// transaction and never read requireSessionAccess's live-session exception, so they lock without it.
+func (s *server) lockedSession(ctx context.Context, club pgtype.UUID, sessionID string, access bool, change func(t *txn) (any, error)) (any, error) {
 	id, err := parseSessionID(sessionID)
 	if err != nil {
 		return nil, err
@@ -78,8 +84,10 @@ func (s *server) inSession(ctx context.Context, club pgtype.UUID, sessionID stri
 			return err
 		}
 		t := &txn{ctx: ctx, q: q, s: s, club: club, sess: sess}
-		if err := t.requireSessionAccess(); err != nil {
-			return err
+		if access {
+			if err := t.requireSessionAccess(); err != nil {
+				return err
+			}
 		}
 		out, err = change(t)
 		return err
@@ -116,11 +124,26 @@ func (t *txn) finishRosterChange() error {
 	if _, err := t.q.CloseStaleQueueMatchRequests(t.ctx, sqlcgen.CloseStaleQueueMatchRequestsParams{Now: t.stamp(), SessionID: t.sess.ID}); err != nil {
 		return err
 	}
-	touched, err := t.q.TouchQueueSession(t.ctx, sqlcgen.TouchQueueSessionParams{Now: t.stamp(), ID: t.sess.ID})
+	touched, err := t.touch()
 	if err != nil {
 		return err
 	}
-	return t.recomputeMinimum(touched)
+	_, err = t.recomputeMinimum(touched)
+	return err
+}
+
+// reload is the session as it is stored now, with the columns the lock reads.
+func (t *txn) reload(id pgtype.UUID) (sqlcgen.LockQueueSessionRow, error) {
+	row, err := t.q.GetQueueSession(t.ctx, id)
+	return sqlcgen.LockQueueSessionRow(row), err
+}
+
+// touch is touchSession: it bumps the revision of the locked session and answers it as stored now.
+func (t *txn) touch() (sqlcgen.LockQueueSessionRow, error) {
+	if err := t.q.TouchQueueSession(t.ctx, sqlcgen.TouchQueueSessionParams{Now: t.stamp(), ID: t.sess.ID}); err != nil {
+		return sqlcgen.LockQueueSessionRow{}, err
+	}
+	return t.reload(t.sess.ID)
 }
 
 // requireSessionAccess is requireSessionAccess: an active session may keep running after the licence expires, but only under
@@ -135,17 +158,23 @@ func (t *txn) requireSessionAccess() error {
 // requireClubEntitlement is requireClubEntitlement: the club's entitlement row must record an access end after now. No row,
 // no end and an end at or before now are all entitlement_required. JavaScript compares whole milliseconds.
 func requireClubEntitlement(ctx context.Context, q *sqlcgen.Queries, club pgtype.UUID, now time.Time) error {
-	end, err := q.GetClubAccessEnd(ctx, club)
+	_, err := entitlementTerm(ctx, q, club, now)
+	return err
+}
+
+// entitlementTerm is requireClubEntitlement keeping what it returns: the term the entitlement is effective under.
+func entitlementTerm(ctx context.Context, q *sqlcgen.Queries, club pgtype.UUID, now time.Time) (pgtype.UUID, error) {
+	e, err := q.GetClubEntitlement(ctx, club)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return writes.Fail(httpapi.ErrEntitlementRequired, nil)
+		return pgtype.UUID{}, writes.Fail(httpapi.ErrEntitlementRequired, nil)
 	}
 	if err != nil {
-		return err
+		return pgtype.UUID{}, err
 	}
-	if !end.Valid || !end.Time.Truncate(time.Millisecond).After(now.Truncate(time.Millisecond)) {
-		return writes.Fail(httpapi.ErrEntitlementRequired, nil)
+	if !e.EffectiveAccessEndsAt.Valid || !e.EffectiveAccessEndsAt.Time.Truncate(time.Millisecond).After(now.Truncate(time.Millisecond)) {
+		return pgtype.UUID{}, writes.Fail(httpapi.ErrEntitlementRequired, nil)
 	}
-	return nil
+	return e.EffectiveTermID, nil
 }
 
 // requireState is requireState: the session must be in one of the states, or `invalid` with the field state.
@@ -165,8 +194,9 @@ func requireRevision(stored int64, expected string) error {
 }
 
 // mapDatabaseError is mapDatabaseError: constraint failures become service errors, the database being the backstop for
-// races. A unique or exclusion violation is a conflict, a foreign key violation is invalid, and a row an update or a
-// findUniqueOrThrow needed is not found (Prisma's P2025). Anything else is unexpected.
+// races. A unique violation is a conflict (P2002), a foreign key or restrict violation is invalid (P2003), and a row an update or a
+// findUniqueOrThrow needed is not found (P2025). Anything else is unexpected, an exclusion violation too: Prisma reports it with no code
+// of its own, so the TypeScript answers 500 where its mapDatabaseError looks for 23P01 (pinned by the start and court cases).
 func mapDatabaseError(err error) error {
 	var se *writes.Error
 	if errors.As(err, &se) {
@@ -175,9 +205,10 @@ func mapDatabaseError(err error) error {
 	var pg *pgconn.PgError
 	if errors.As(err, &pg) {
 		switch pg.Code {
-		case "23505", "23P01":
+		case "23505":
 			return writes.Fail(httpapi.ErrConflict, nil)
-		case "23503":
+		case "23503", "23001":
+			// A restrict violation (the level lock refusing a release) reaches the TypeScript as Prisma's P2003 too.
 			return writes.Fail(httpapi.ErrInvalid, nil)
 		}
 	}
@@ -188,18 +219,18 @@ func mapDatabaseError(err error) error {
 }
 
 // recomputeMinimum is recomputeMinimum: while prepared with a calculated minimum, it is recomputed from the courts, the
-// length, the players and the formats. sess is the session after touchSession.
-func (t *txn) recomputeMinimum(sess sqlcgen.TouchQueueSessionRow) error {
+// length, the players and the formats. sess is the session after touchSession; it comes back as stored now.
+func (t *txn) recomputeMinimum(sess sqlcgen.LockQueueSessionRow) (sqlcgen.LockQueueSessionRow, error) {
 	if sess.State != sqlcgen.QueueSessionStatePrepared || !sess.MinimumIsCalculated {
-		return nil
+		return sess, nil
 	}
 	courts, err := t.q.CountQueueLiveCourts(t.ctx, sess.ID)
 	if err != nil {
-		return err
+		return sess, err
 	}
 	count, err := t.q.CountQueueLiveRoster(t.ctx, sess.ID)
 	if err != nil {
-		return err
+		return sess, err
 	}
 	// players: the roster count, else the expected players, else the slot capacity (JavaScript || skips 0 and null).
 	players := int64(count)
@@ -215,9 +246,12 @@ func (t *txn) recomputeMinimum(sess sqlcgen.TouchQueueSessionRow) error {
 		Players: players, AllowSingles: sess.AllowSingles, AllowDoubles: sess.AllowDoubles,
 	}).Low
 	if int32(low) == sess.MinimumGames {
-		return nil
+		return sess, nil
 	}
-	return t.q.SetQueueSessionMinimum(t.ctx, sqlcgen.SetQueueSessionMinimumParams{MinimumGames: int32(low), Now: t.stamp(), ID: sess.ID})
+	if err := t.q.SetQueueSessionMinimum(t.ctx, sqlcgen.SetQueueSessionMinimumParams{MinimumGames: int32(low), Now: t.stamp(), ID: sess.ID}); err != nil {
+		return sess, err
+	}
+	return t.reload(sess.ID)
 }
 
 // slotCapacity is slotCapacity of the shared roster rules (version 1 until a session stamps its rules version).

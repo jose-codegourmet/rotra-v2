@@ -17,6 +17,8 @@ const selfAliases = Object.entries(pkg.exports)
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.tsx'],
   framework: { name: '@storybook/react-vite', options: {} },
+  // The Queue app's public folder, so illustrated cards show the same /art files here
+  staticDirs: ['../../../apps/queue/public'],
   core: { disableTelemetry: true },
   viteFinal: async (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()]

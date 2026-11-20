@@ -79,6 +79,14 @@ const meta = {
   ],
   args: {
     mode: 'create',
+    cardArt: {
+      chill: '/art/session-setup/chill.webp',
+      fair: '/art/session-setup/fair.webp',
+      hard: '/art/session-setup/hard.webp',
+      p31: '/art/session-setup/p31.webp',
+      p21: '/art/session-setup/p21.webp',
+      p21x3: '/art/session-setup/p21x3.webp',
+    },
     clubName: club.name,
     onSubmit: fn(),
     onCancel: fn(),
@@ -216,6 +224,7 @@ export const RecordGamesLocked: Story = {
     mode: 'edit',
     initialValues: { ...withVenue, recordGames: false },
     recordGamesLocked: true,
+    scoringLocked: true,
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: /Step 2/ }))

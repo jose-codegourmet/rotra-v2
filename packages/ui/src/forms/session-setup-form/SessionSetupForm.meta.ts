@@ -9,6 +9,7 @@ export const sessionSetupFormMeta = {
     'getOccurrences and computeEstimate are the rules from @rotra/data passed in, so the form stays free of runtime data imports.',
     'Only page 1 is required; Next validates the current page, saving validates every page and opens the first with an error.',
     'Record games (page 2, Formats and mode) is on by default and for a session saved before the option existed; pass recordGamesLocked once the session has started to show a read-only On / Off chip. The review lists it.',
+    'Scoring (page 2) stores one of the five scoring keys, default 16/31 (a session saved before the field reads as 16/31); pass scoringLocked once the session has started. cardArt takes the image URLs for the Mode and Scoring cards.',
     'Page 1 opens Edit Court N itself (a Sheet inside the form); the container wires nothing for it.',
   ],
   prototype: {

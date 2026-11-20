@@ -1,4 +1,5 @@
 import { clockTimeFrom, courtTimeOnSession, instantOnDate } from '@rotra/schema/court-window'
+import { SCORING, type ScoringKey } from '@rotra/schema/scoring'
 import type { SessionSetupInput } from './SessionSetupForm.schema'
 
 const minutesOf = (hhmm: string) => {
@@ -139,3 +140,46 @@ export function recordGamesHint(recordGames: boolean, locked = false): string {
 export function recordGamesLabel(recordGames: boolean): string {
   return recordGames ? 'On' : 'Off · no results kept'
 }
+
+/** Which illustration each Mode and Scoring card shows: image URLs the app supplies (apps/queue/public/art). */
+export type SetupCardArtKey = 'chill' | 'fair' | 'hard' | 'p31' | 'p21' | 'p21x3'
+export type SetupCardArt = Partial<Record<SetupCardArtKey, string>>
+
+/**
+ * The three Scoring points cards. Each maps to the scoring keys: `on` with deuce, `off` without
+ * (null: One game to 21 has no no-deuce mode).
+ */
+export const SCORING_POINTS: readonly {
+  k: 'p31' | 'p21' | 'p21x3'
+  label: string
+  text: string
+  on: ScoringKey
+  off: ScoringKey | null
+}[] = [
+  { k: 'p31', label: '31 points', text: 'One game · change sides at 16', on: '31', off: '31nd' },
+  { k: 'p21', label: '21 points', text: 'One game · change sides at 11', on: '21', off: null },
+  { k: 'p21x3', label: '21 × 3', text: 'Best of 3 games to 21', on: '21x3', off: '21x3nd' },
+]
+
+/** The points card a scoring key belongs to. */
+export const pointsOf = (key: ScoringKey) =>
+  SCORING_POINTS.find((p) => p.on === key || p.off === key) ??
+  (SCORING_POINTS[0] as (typeof SCORING_POINTS)[number])
+
+/** The key for a points card: Deuce kept when the card has both modes, otherwise its only one. */
+export const scoringKeyFor = (
+  points: (typeof SCORING_POINTS)[number],
+  deuce: boolean,
+): ScoringKey => (deuce || !points.off ? points.on : points.off)
+
+/** The Deuce row's line under its name. */
+export function deuceHint(key: ScoringKey): string {
+  const { target, deuce } = SCORING[key]
+  if (!pointsOf(key).off) return 'One game to 21 always plays deuce at 20–20.'
+  return deuce ? `Deuce at ${target - 1}–${target - 1}.` : `No deuce: the first to ${target} wins.`
+}
+
+/** The Scoring hint under the field; locked once the session has started. */
+export const SCORING_HINT =
+  'How games are scored tonight. The match result dialog asks only for what this needs.'
+export const SCORING_LOCKED_HINT = "Scoring can't change after Start."

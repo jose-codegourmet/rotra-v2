@@ -2,6 +2,7 @@
 
 import { useSessionInviteCode } from '@rotra/data/public-session/useSessionInviteCode'
 import { Button } from '@rotra/ui/button'
+import { CopyField } from '@rotra/ui/copy-field'
 import { Notice } from '@rotra/ui/notice'
 import { SessionInviteCard } from '@rotra/ui/share-card'
 import { Sheet } from '@rotra/ui/sheet'
@@ -28,10 +29,20 @@ export type SessionInviteSheetProps = {
   waitlistOpen: boolean
 }
 
+function copyLink(link: string) {
+  const unavailable = () => toast('Select the link and copy it')
+  try {
+    navigator.clipboard.writeText(link).then(() => toast('Invite link copied'), unavailable)
+  } catch {
+    unavailable()
+  }
+}
+
 /**
  * Q-PUBLIC-JOIN › Invite › Session invite: a Sheet around SessionInviteCard. The player's code is
  * made the first time the sheet opens (useSessionInviteCode) and the link carries it as
- * /s/<slug>?invite=<code>. Footer: Close; Share or Download image come from the card.
+ * /s/<slug>?invite=<code>. Footer: Close; Share or Download image come from the card. Under the card: the Invite link
+ * CopyField (owner, November 20, 2026).
  */
 export function SessionInviteSheet({
   slug,
@@ -64,22 +75,26 @@ export function SessionInviteSheet({
       footer={<Button onClick={() => onOpenChange(false)}>Close</Button>}
     >
       {link ? (
-        <SessionInviteCard
-          link={link}
-          slug={slug}
-          inviterName={inviterName}
-          inviterAvatarUrl={inviterAvatarUrl}
-          clubName={clubName}
-          clubInitials={clubInitials}
-          clubLogoUrl={clubLogoUrl}
-          sessionTitle={sessionTitle}
-          dateLabel={dateLabel}
-          timeLabel={timeLabel}
-          venueName={venueName}
-          waitlistOpen={waitlistOpen}
-          onShared={() => toast('Share sheet opened')}
-          onError={(message) => toast.error(message)}
-        />
+        <div className="flex flex-col gap-4">
+          <SessionInviteCard
+            link={link}
+            slug={slug}
+            inviterName={inviterName}
+            inviterAvatarUrl={inviterAvatarUrl}
+            clubName={clubName}
+            clubInitials={clubInitials}
+            clubLogoUrl={clubLogoUrl}
+            sessionTitle={sessionTitle}
+            dateLabel={dateLabel}
+            timeLabel={timeLabel}
+            venueName={venueName}
+            waitlistOpen={waitlistOpen}
+            onShared={() => toast('Share sheet opened')}
+            onError={(message) => toast.error(message)}
+          />
+          {/* Owner, November 20, 2026: the invite link, copyable, under the card (mockup sessionQr). */}
+          <CopyField label="Invite link" value={link} onCopy={() => copyLink(link)} />
+        </div>
       ) : invite.isError ? (
         <Notice tone="error">{invite.error.message}</Notice>
       ) : (

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 191 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -451,4 +451,5 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 190 · CANCELLED: 4 · 
 | [2026-11-19-queue-upcoming-compact-cards](2026-11-19-queue-upcoming-compact-cards.md) | Queue app: the Courts tab's upcoming queued matches use compact cards | queue match card, compact variant (new): overlapping avatar stack with level rings | NEW |
 | [2026-11-20-player-not-ranked-games](2026-11-20-player-not-ranked-games.md) | Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate | game-row (note), session-row, chip, notice, tabs | NEW |
 | [2026-11-20-queue-record-games-not-ranked](2026-11-20-queue-record-games-not-ranked.md) | Queue app: Record games off records the games as usual; only their wins stay out of the leaderboards and win rate | session-setup-form, session-setup-card, chip, notice, confirm-result-sheet, public-session-details | NEW |
+| [2026-11-20-queue-session-invite-photo-link](2026-11-20-queue-session-invite-photo-link.md) | Queue public page: the Session invite shows the inviter's own picture and an Invite link copy field | share-card (SessionInviteCard), copy-field | IN MOCK APP — PR #992 |
 <!-- status-index:end -->

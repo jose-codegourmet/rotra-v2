@@ -857,6 +857,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           open={inviteOpen}
           onOpenChange={setInviteOpen}
           inviterName={nightViewer.name}
+          inviterAvatarUrl={barAccount?.pictureUrl}
           clubName={p.club.name}
           clubInitials={p.club.initials}
           clubLogoUrl={p.club.logoUrl}

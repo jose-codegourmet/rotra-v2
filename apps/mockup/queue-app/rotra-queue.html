@@ -417,6 +417,8 @@ body.court-dragging { cursor: grabbing; }
 .qc-top div span { font-size: 12px; color: var(--qc-dim); }
 .qc-club { width: 40px; height: 40px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 14px; }
 .qc-club img, .qc-badge img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Owner, November 20, 2026: a Session invite shows the inviting player's own picture, not the club logo. */
+.qc-club svg { width: 100%; height: 100%; display: block; }
 .qc-mid h3 { margin: 0 0 6px; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--qc-fg); text-wrap: balance; }
 .qr-card.story .qc-mid h3 { font-size: 24px; }
 .qc-mid p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--qc-dim); }
@@ -5941,6 +5943,8 @@ const SHEETS = {
   },
   sessionQr(sh) {
     const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    // Owner, November 20, 2026 ("my profile pic is not shown"; "there is no share link input with copy too"): the invite card shows the
+    // inviter's own picture, and the sheet has the Invite link copy field under the card.
     // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
     const inv = !club && sh.invite ? P(sh.invite) : null, invRow = inv ? R(s, inv.id) || (s.waitlist || []).find((w) => w.pid === inv.id) : null;
     const invLink = club ? clubInviteLink() : inv ? `${sessionLink(s)}?invite=${invRow.inviteCode}` : sessionLink(s);
@@ -5952,14 +5956,15 @@ const SHEETS = {
     const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
     // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
     const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
-      <div class="qc-top"><span class="qc-club">${mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
+      <div class="qc-top"><span class="qc-club">${inv ? picInner(inv) : mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
       <div class="qc-mid">${club ? `<h3>${esc(S.club.name)} invites you to play</h3><p>Register with ROTRA and join the club</p>` : `<h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}${inv ? `<br>${esc(S.club.name)}` : ''}</p>`}</div>
       <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>${inv && full ? 'Waitlist open' : 'Scan to join'}</b><span class="mono">${esc(invLink)}</span></div>
       <div class="qc-foot">${rotraLogoDark('qc-logo')}</div></div>`;
     return sheetShell(club ? 'Share club invite' : inv ? 'Session invite' : 'Session QR', `<div class="stack" style="align-items:center;text-align:center">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
       ${card}
-      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}</div>`,
+      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}
+      ${inv ? `<div class="copy-field"><label class="label" for="invite-link">Invite link</label><div class="cf-box"><input id="invite-link" readonly value="${esc(invLink)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="copyInvite" data-v="${esc(invLink)}" aria-label="Copy invite link" title="Copy">${COPY_ICON}</button></div></div>` : ''}</div>`,
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
         : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
   },

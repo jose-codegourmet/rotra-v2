@@ -22,7 +22,7 @@ function visibleTo(playerId: string, now: Date) {
 
 async function reminderFor(tx: Prisma.TransactionClient, playerId: string, now: Date) {
   // D-2026-11-18-01: no verification reminder while Google sign-in for players is off.
-  if (!(await readPlayerFeatureFlag(PLAYER_GOOGLE_SIGN_IN_FLAG))) return null
+  if (!(await readPlayerFeatureFlag(PLAYER_GOOGLE_SIGN_IN_FLAG, tx))) return null
   const current = await readVerification(tx, playerId)
   return current && !current.verification.verified
     ? verificationReminder(

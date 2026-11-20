@@ -3,9 +3,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const confirmResultSheetMeta = {
   name: 'ConfirmResultSheet',
   description:
-    'D-WINNER, the "Confirm match result" review: the Winner card (names, opponents, "21–17 (Team A–Team B)" or "No score entered", court(s)), the permanent-result warning, Back to result and "Confirm Team A wins".',
+    'D-WINNER, the "Confirm match result" review: the Winner card (names, opponents, "31–24 (Team A–Team B)", best of 3 "2–1 · 21–18, 15–21, 21–19 (Team A–Team B)", or "No score entered", court(s)), the permanent-result warning, Back to result and "Confirm Team A wins".',
   usage: [
     'Open it with the values MatchResultForm reported from Review result; onBack reopens that form with what was entered.',
+    'Pass games for a best-of-3 result with game scores (teamAScore / teamBScore then hold the games won); leave it out or null for one game and for a winner-only result.',
     'onConfirm fires once per attempt: pass isPending from useCompleteMatch and error when it fails. Save durably before the court frees; the container shows the "Team A wins match N · Court X free" toast.',
     'The primary always names the winning team; never a neutral Save. After confirmation there is no Undo, Change score, Add score later or Admin correction.',
     'courtLabels with two courts (5v5) switches the copy to "Both courts will become available."',

@@ -25,6 +25,7 @@ import { ActiveMatchSheet } from '@rotra/ui/active-match-sheet'
 import { ConfirmResultSheet } from '@rotra/ui/confirm-result-sheet'
 import { FinishMatchSheet } from '@rotra/ui/finish-match-sheet'
 import { MatchResultForm } from '@rotra/ui/forms/match-result-form'
+import { matchResultInputOf } from '@rotra/ui/forms/match-result-form/default-values'
 import type {
   MatchResultFormInput,
   MatchResultFormValues,
@@ -419,11 +420,8 @@ function OpenActiveMatch({
   /** Review result passed validation: the confirm step, with what was entered kept for Back to result */
   const onReviewResult = (values: MatchResultFormValues) =>
     go({ kind: 'review', values, operationId: newOperationId() })
-  const resultInputOf = (values: MatchResultFormValues): Partial<MatchResultFormInput> => ({
-    winner: values.winningTeam,
-    scoreA: values.teamAScore === null ? '' : String(values.teamAScore),
-    scoreB: values.teamBScore === null ? '' : String(values.teamBScore),
-  })
+  const resultInputOf = (values: MatchResultFormValues): Partial<MatchResultFormInput> =>
+    matchResultInputOf(values)
 
   const profile = (
     // Back to match closes the profile; the sheet underneath is unchanged

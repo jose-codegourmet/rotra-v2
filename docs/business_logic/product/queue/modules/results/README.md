@@ -41,7 +41,7 @@ Order by:
 
 Only players with at least one counted game are listed; players who never completed a counted game are left out. Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. The standings rule (`computeStandings`, in TypeScript and Go) returns this order and each row's shared position (Q23.4, #972); the Queue screens still draw one row per player until they are wired to it (Q23.6). Results published before the change keep the standings they were published with: stored standings are never recomputed.
 
-A session with **Record games** off has no standings, result slides or awards at all ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [sessions](../sessions/README.md#record-games)).
+A session with **Record games** off has standings, result slides and awards like any other, and its games go to player records, but their wins don't count toward the leaderboards, win rate or rank ([D-2026-11-20-01](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01), replacing the November 18 “no standings, result slides or awards”; [sessions](../sessions/README.md#record-games); mockup only).
 
 Guests participate in standings. Fun-game wins/losses count. A partial game counts for neither substituted player unless the operator gave the game to one of them; that player gets the game, the win or loss, and minimum credit for the session. Invalid matches count for no one.
 

@@ -9,7 +9,7 @@ Screen ID: Q-SETUP, Q-PREPARE, Q-CONSOLE, Q-MATCH-DONE, Q-FINALIZING, Q-HISTORY,
 Artifact: none
 Components: session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details
 Supersedes: none
-Superseded by: none
+Superseded by: 2026-11-20-queue-record-games-not-ranked.md (what Off does: games are recorded as usual; only their wins stay out of the leaderboards and win rate)
 
 ## What changed
 - **Session setup › Formats and mode** gets a **Record games** switch after Scoring, on by default. Once the

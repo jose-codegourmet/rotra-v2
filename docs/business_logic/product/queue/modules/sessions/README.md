@@ -82,13 +82,11 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 **Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
-While it is **off**, the session is run only and nothing is kept:
+While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-01](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-01); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only — the mock app and real mode still run the November 18 rule “run only, keep nothing”):
 
-- The queue, courts, presence, payments and minimum games work as usual. A finished game still counts toward each player's games for the night.
-- **Match done** asks for no winner and no score.
-- There is no Leaderboard, no standings, no result slides, no awards and nothing to publish.
-- Nothing goes to player records, player history or ranking.
-- The session still appears in the club's records, marked **Not recorded**, with its roster, games played against the minimum and financials.
+- Everything works as in a recorded session: the queue, courts, presence, payments and minimum games; **Match done** with a winner and score; the Leaderboard, Match History, standings, result slides, awards and Publish results; player records and each player's history in the Player app.
+- **The only difference:** the wins and losses are not part of the Top annual / monthly / weekly leaderboards' wins, the win rate or the shared rank ([ranking](../../../player-information/modules/ranking/README.md)).
+- The session shows a **Not ranked** chip (console, session record) and a **Rankings · Not ranked** tile on the public page.
 
 Open points are listed in the decision.
 

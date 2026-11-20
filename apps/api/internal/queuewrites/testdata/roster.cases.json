@@ -1,0 +1,5000 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "app": "club",
+ "snapshotDiff": true,
+ "seed": "queue.seed.sql",
+ "scenarios": {
+  "base": [],
+  "hal_released": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000001'"
+  ],
+  "hal_no_show": [
+   "UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a7000000-0000-4000-8000-000000000004'"
+  ],
+  "s2_free_slot": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000003'"
+  ],
+  "kai_not_waiting": [
+   "DELETE FROM session_waitlist WHERE id = 'a3300000-0000-4000-8000-000000000002'"
+  ],
+  "s3_full": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "queue_sessions",
+   "sql": "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, minimum_games, updated_at FROM queue_sessions ORDER BY id"
+  },
+  {
+   "name": "session_players",
+   "sql": "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"
+  },
+  {
+   "name": "club_assessments",
+   "sql": "SELECT club_player_id, session_id, session_player_id, player_id_at_assessment, skill_level_id, (SELECT s.source_operation_id FROM club_assessments s WHERE s.id = club_assessments.supersedes_id) AS supersedes_operation_id, source_operation_id, assessed_at, received_at, accepted_revision::text AS accepted_revision, actor_club_id FROM club_assessments ORDER BY source_operation_id"
+  },
+  {
+   "name": "session_waitlist",
+   "sql": "SELECT id, session_id, club_player_id, skill_level_id, added_at, demoted_at, demoted_confirmed_at, created_at, updated_at, revision::text AS revision FROM session_waitlist ORDER BY id"
+  },
+  {
+   "name": "session_join_requests",
+   "sql": "SELECT id, session_id, name, nickname, phone_e164, status, placement, requested_at, decided_at, decided_by_device_id, club_player_id, player_id, created_at, updated_at, revision::text AS revision FROM session_join_requests ORDER BY id"
+  },
+  {
+   "name": "club_players",
+   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
+  },
+  {
+   "name": "club_player_private_inputs",
+   "sql": "SELECT club_player_id, club_id, phone_e164, email, state, captured_at, created_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_player_id"
+  },
+  {
+   "name": "shared_player_entries",
+   "sql": "SELECT email, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
+  },
+  {
+   "name": "player_id_counters",
+   "sql": "SELECT l.country_code, l.city_code, c.sync_date, c.last_sequence FROM player_id_counters c JOIN location_codes l ON l.id = c.location_code_id ORDER BY l.city_code, c.sync_date"
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT n.player_id, n.kind, n.title, n.body, n.target, n.source_type, COALESCE((SELECT a.source_operation_id FROM club_assessments a WHERE n.source_type = 'club_assessment' AND a.id = n.source_id), n.source_id) AS source_id, n.created_at, n.read_at FROM player_notifications n ORDER BY n.player_id, n.kind, n.source_type, 7"
+  },
+  {
+   "name": "session_match_requests",
+   "sql": "SELECT id, session_id, session_player_id, status, decided_at, created_at, updated_at, revision::text AS revision FROM session_match_requests ORDER BY id"
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT count(*)::text AS n FROM admin_audit_events"
+  }
+ ],
+ "cases": [
+  {
+   "name": "v_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": null,
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000001",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_player_subject_is_not_a_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000002",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_unknown_subject",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-0000000000ff",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000003",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "v_body_array",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "[]"
+    }
+   ]
+  },
+  {
+   "name": "v_body_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "null"
+    }
+   ]
+  },
+  {
+   "name": "v_no_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "v_no_operations_field",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "v_operations_object",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": {}
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operations_string",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operations_empty_list",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operations_101",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001000",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001001",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001002",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001003",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001004",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001005",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001006",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001007",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001008",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001009",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001010",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001011",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001012",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001013",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001014",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001015",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001016",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001017",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001018",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001019",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001020",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001021",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001022",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001023",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001024",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001025",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001026",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001027",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001028",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001029",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001030",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001031",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001032",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001033",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001034",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001035",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001036",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001037",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001038",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001039",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001040",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001041",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001042",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001043",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001044",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001045",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001046",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001047",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001048",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001049",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001050",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001051",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001052",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001053",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001054",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001055",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001056",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001057",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001058",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001059",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001060",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001061",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001062",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001063",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001064",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001065",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001066",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001067",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001068",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001069",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001070",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001071",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001072",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001073",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001074",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001075",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001076",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001077",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001078",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001079",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001080",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001081",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001082",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001083",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001084",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001085",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001086",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001087",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001088",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001089",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001090",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001091",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001092",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001093",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001094",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001095",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001096",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001097",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001098",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001099",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000001100",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operations_100_removes",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002000",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002001",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002002",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002003",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002004",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002005",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002006",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002007",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002008",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002009",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002010",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002011",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002012",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002013",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002014",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002015",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002016",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002017",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002018",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002019",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002020",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002021",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002022",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002023",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002024",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002025",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002026",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002027",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002028",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002029",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002030",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002031",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002032",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002033",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002034",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002035",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002036",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002037",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002038",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002039",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002040",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002041",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002042",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002043",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002044",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002045",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002046",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002047",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002048",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002049",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002050",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002051",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002052",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002053",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002054",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002055",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002056",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002057",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002058",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002059",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002060",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002061",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002062",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002063",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002064",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002065",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002066",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002067",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002068",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002069",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002070",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002071",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002072",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002073",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002074",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002075",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002076",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002077",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002078",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002079",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002080",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002081",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002082",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002083",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002084",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002085",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002086",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002087",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002088",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002089",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002090",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002091",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002092",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002093",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002094",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002095",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002096",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002097",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002098",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000002099",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       null
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_string",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       "x"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_array",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       [
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_unknown_op",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "explode",
+        "operationId": "b0000000-0000-4000-8000-000000000004"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_missing_op",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "operationId": "b0000000-0000-4000-8000-000000000005"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_numeric_op",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": 7,
+        "operationId": "b0000000-0000-4000-8000-000000000006"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_bad_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000007",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "phone": "abc"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_blank_phone_ok",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000008",
+        "name": "Blank Phone",
+        "level": "intermediate_low",
+        "phone": "   "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_second_operation_invalid_nothing_written",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000009",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "explode",
+        "operationId": "b0000000-0000-4000-8000-000000000010"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_operation_error_before_duplicate_ids",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000001",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "explode",
+        "operationId": "b0000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_duplicate_operation_ids",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000001",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000001",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_empty_operation_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_empty_operation_id_string",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_unknown_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_malformed_session_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/not-a-uuid/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000012",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_validation_before_session_lookup",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/not-a-uuid/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_other_clubs_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000013",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_closed_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000014",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_closed_session_validation_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "explode",
+        "operationId": "b0000000-0000-4000-8000-000000000015"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_lapsed_club_prepared_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000016",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000020",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_lapsed_club_live_session_runs_on",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000017",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000020",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_malformed_operation_id_on_add",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "not-a-uuid",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 422,
+      "code": "invalid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_malformed_operation_id_on_remove_is_fine",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "not-a-uuid",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "v_uppercase_operation_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "B0000000-0000-4000-8000-000000000005",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_guest_open_slot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000018",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_registered_player_gets_the_spot_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000019",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_flags_that_are_not_true_do_not_count",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000020",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low",
+        "allowOverfill": "true",
+        "toWaitlist": "yes"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_to_waitlist_flag",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000021",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_to_waitlist_flag_registered_gets_the_place_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000022",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+        "level": "intermediate_low",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_full_roster_goes_to_the_waitlist",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000023",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_full_roster_registered_waitlist_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000024",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_full_roster_overfill",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000025",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low",
+        "allowOverfill": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_full_roster_overfill_registered",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000026",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+        "level": "intermediate_low",
+        "allowOverfill": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_to_waitlist_beats_overfill",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000027",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low",
+        "allowOverfill": true,
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_already_on_the_roster",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000028",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_already_on_the_waitlist",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000029",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_removed_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000030",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_unknown_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000031",
+        "clubPlayerId": "c6000000-0000-4000-8000-0000000000ff",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_other_clubs_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000032",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000030",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_malformed_player_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000033",
+        "clubPlayerId": "zzz",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_missing_player_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000034",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_bad_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000035",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "expert"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_missing_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000036",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_released_entry_comes_back",
+   "scenario": "hal_released",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000037",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_no_show_entry_is_still_live",
+   "scenario": "hal_no_show",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000038",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_live_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000039",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_live_session_closes_stale_match_requests",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000040",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "add_saved_live_session_fills_then_waitlists_then_overfills",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000041",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000042",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000043",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000012",
+        "level": "intermediate_low",
+        "allowOverfill": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_minimum_is_recomputed_when_calculated",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000044",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000045",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "intermediate_low",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_minimum_kept_when_not_calculated",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000046",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low",
+        "allowOverfill": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_midnight_hours_in_the_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000047",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_noon_hours_in_the_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000006/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000048",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_saved_same_period_hours_in_the_notification",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000049",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+        "level": "intermediate_low",
+        "allowOverfill": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_registered_player_deleted_record_is_restored",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000050",
+        "playerId": "d4000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_registered_player_new_record",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000051",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_registered_player_already_saved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000052",
+        "playerId": "d4000000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_unclaimed_profile",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000053",
+        "playerId": "d4000000-0000-4000-8000-000000000004",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_registered_without_rtr_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000054",
+        "playerId": "d4000000-0000-4000-8000-000000000005",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_shared_entry_with_a_club_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000055",
+        "playerId": "a6000000-0000-4000-8000-000000000008",
+        "level": "intermediate_low",
+        "name": "Uri B."
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_shared_entry_name_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000056",
+        "playerId": "a6000000-0000-4000-8000-000000000008",
+        "level": "intermediate_low",
+        "name": "  Uri Padded  "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_shared_entry_without_a_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000057",
+        "playerId": "a6000000-0000-4000-8000-000000000008",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_shared_entry_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000058",
+        "playerId": "a6000000-0000-4000-8000-000000000008",
+        "level": "intermediate_low",
+        "name": "   "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_shared_entry_name_ignored_for_a_registered_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000059",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low",
+        "name": "Ignored"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_unknown_profile",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000060",
+        "playerId": "d4000000-0000-4000-8000-0000000000ff",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_malformed_profile_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000061",
+        "playerId": "x",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_to_waitlist_registered",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000062",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_retry_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000077",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000077",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_directory_second_operation_for_the_same_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000077",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000078",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000063",
+        "name": "Newbie",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_with_nickname_and_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000064",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "nickname": "Nub",
+        "phone": "0917 555 0100"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_phone_plus63",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000065",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "phone": "+63 917-555-0101"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_phone_639",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000066",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "phone": "639175550102"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_name_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000067",
+        "name": "  Padded Pat  ",
+        "level": "intermediate_low",
+        "nickname": "  Pad  "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000068",
+        "name": "   ",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_missing_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000069",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_guest_bad_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000070",
+        "name": "Newbie",
+        "level": "nope"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_unknown_source_is_a_new_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "elsewhere",
+        "operationId": "b0000000-0000-4000-8000-000000000071",
+        "name": "Odd Source",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_missing_source_is_a_new_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "operationId": "b0000000-0000-4000-8000-000000000072",
+        "name": "No Source",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_phone_that_is_not_text_is_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000073",
+        "name": "Num Phone",
+        "level": "intermediate_low",
+        "phone": 639175550102
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_new_email_makes_an_unclaimed_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000074",
+        "name": "Eli Newmail",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_new_email_registers_the_counter_day",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000075",
+        "name": "Eli Newmail",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000076",
+        "name": "Fin Newmail",
+        "level": "intermediate_low",
+        "email": "fin@example.test",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_an_open_entry_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000077",
+        "name": "Eve Open",
+        "level": "intermediate_low",
+        "email": "eve@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_is_trimmed_and_lower_cased",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000078",
+        "name": "Eve Open",
+        "level": "intermediate_low",
+        "email": "  EVE@Example.TEST "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_of_a_registered_player_links_them",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000079",
+        "name": "Gil Again",
+        "level": "intermediate_low",
+        "email": "gil@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_of_a_registered_player_by_google_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000080",
+        "name": "Cy Again",
+        "level": "intermediate_low",
+        "email": "cy@gmail.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_already_saved_by_the_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000081",
+        "name": "Una Again",
+        "level": "intermediate_low",
+        "email": "una@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_of_a_saved_registered_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000082",
+        "name": "Ben Again",
+        "level": "intermediate_low",
+        "email": "ben@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_bad_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000083",
+        "name": "Bad Mail",
+        "level": "intermediate_low",
+        "email": "nope"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_email_with_inner_space",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000084",
+        "name": "Bad Mail",
+        "level": "intermediate_low",
+        "email": "a b@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_email_goes_to_the_waitlist_when_full",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000085",
+        "name": "Eve Open",
+        "level": "intermediate_low",
+        "email": "eve@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_retry_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_retry_with_a_changed_name_keeps_the_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Newbie",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Renamed",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_two_in_one_batch_share_the_counter",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000086",
+        "name": "One Mail",
+        "level": "intermediate_low",
+        "email": "one@example.test",
+        "toWaitlist": true
+       },
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000087",
+        "name": "Two Mail",
+        "level": "intermediate_low",
+        "email": "two@example.test",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_prepared_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_already_released_is_a_no_op",
+   "scenario": "hal_released",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000089",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_unknown_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000090",
+        "rosterId": "a7000000-0000-4000-8000-0000000000ff"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_entry_of_another_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000091",
+        "rosterId": "a7000000-0000-4000-8000-000000000002"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_on_a_live_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000092",
+        "rosterId": "a7000000-0000-4000-8000-000000000004"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_malformed_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000093",
+        "rosterId": "q"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_missing_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000094"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_then_add_the_same_player_again",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000095",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000096",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_the_same_entry_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000097",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000098",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_frees_the_slot_for_the_next_add",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000099",
+        "rosterId": "a7000000-0000-4000-8000-000000000002"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000100",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_guest_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000101",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_registered_players_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000102",
+        "requestId": "a3400000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_waitlist_placement_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000103",
+        "requestId": "a3400000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_declined_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000104",
+        "requestId": "a3400000-0000-4000-8000-000000000004",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_confirmed_request_under_another_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000105",
+        "requestId": "a3400000-0000-4000-8000-000000000005",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_unknown_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000106",
+        "requestId": "a3400000-0000-4000-8000-0000000000ff",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_other_clubs_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000107",
+        "requestId": "a3400000-0000-4000-8000-000000000009",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_request_of_another_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000108",
+        "requestId": "a3400000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_malformed_request_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000109",
+        "requestId": "m",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_bad_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000110",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "nope"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_missing_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000111",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_guest_twice_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000099",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000099",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_guest_twice_other_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000099",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000098",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_registered_twice_other_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000099",
+        "requestId": "a3400000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000098",
+        "requestId": "a3400000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_prepared_full",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000112",
+        "requestId": "a3400000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_prepared_with_a_free_slot",
+   "scenario": "s2_free_slot",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000113",
+        "requestId": "a3400000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_reusing_an_operation_id_of_another_entry",
+   "scenario": "s2_free_slot",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "requestId": "a3400000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_on_a_live_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000114",
+        "requestId": "a3400000-0000-4000-8000-000000000008",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_when_no_longer_waiting",
+   "scenario": "kai_not_waiting",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000115",
+        "requestId": "a3400000-0000-4000-8000-000000000008",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_from_waitlist_live_over_budget",
+   "scenario": "s3_full",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000116",
+        "requestId": "a3400000-0000-4000-8000-000000000008",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_guest_request_goes_to_the_waitlist_when_full",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000117",
+        "requestId": "a3400000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_midnight_session_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000005/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000118",
+        "requestId": "a3400000-0000-4000-8000-000000000010",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_pending_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000119",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000060",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000061",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_declined_request_answers_as_is",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000120",
+        "requestId": "a3400000-0000-4000-8000-000000000004"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_confirmed_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000121",
+        "requestId": "a3400000-0000-4000-8000-000000000005"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_unknown_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000122",
+        "requestId": "a3400000-0000-4000-8000-0000000000ff"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_other_clubs_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000123",
+        "requestId": "a3400000-0000-4000-8000-000000000009"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_request_of_another_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000124",
+        "requestId": "a3400000-0000-4000-8000-000000000006"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_malformed_request_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000125",
+        "requestId": "m"
+       }
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "accept_after_decline_in_one_batch",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000126",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000127",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "decline_after_accept_in_one_batch",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000128",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000129",
+        "requestId": "a3400000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "mixed_burst_in_click_order",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000130",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000131",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       },
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000132",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000133",
+        "requestId": "a3400000-0000-4000-8000-000000000003"
+       },
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000134",
+        "name": "Zed Walkin",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "directory",
+        "operationId": "b0000000-0000-4000-8000-000000000135",
+        "playerId": "d4000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "mixed_burst_later_operations_see_earlier_ones",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000136",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000137",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "mixed_burst_rolls_back_when_one_fails",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000138",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000139",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000140",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000006",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "retry_the_same_batch",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000012",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "acceptRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "requestId": "a3400000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000012",
+        "name": "Newbie",
+        "level": "intermediate_low",
+        "email": "eli@example.test"
+       }
+      ]
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "retry_the_same_batch_five_minutes_later",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "requestId": "a3400000-0000-4000-8000-000000000003"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "declineRequest",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "requestId": "a3400000-0000-4000-8000-000000000003"
+       }
+      ]
+     },
+     "now": "2026-11-19T04:05:00.000Z"
+    }
+   ]
+  },
+  {
+   "name": "retry_a_waitlisted_add",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "reuse_an_operation_id_for_another_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "reuse_an_operation_id_for_a_remove_after_an_add",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "replay_in_order_after_a_clock_jump",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "now": "2026-11-19T04:00:00.000Z"
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "now": "2026-11-19T04:30:00.000Z",
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000012",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000012",
+        "level": "intermediate_low"
+       }
+      ]
+     },
+     "now": "2026-11-19T05:15:00.000Z"
+    }
+   ]
+  },
+  {
+   "name": "batch_then_single_player_leaves_then_returns",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000010",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "intermediate_low"
+       },
+       {
+        "op": "remove",
+        "operationId": "b0000000-0000-4000-8000-000000000011",
+        "rosterId": "a7000000-0000-4000-8000-000000000001"
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b0000000-0000-4000-8000-000000000012",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+        "level": "intermediate_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "parallel_the_same_batch_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "operations": [
+         {
+          "op": "add",
+          "source": "saved",
+          "operationId": "b0000000-0000-4000-8000-000000000010",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "level": "intermediate_low"
+         },
+         {
+          "op": "add",
+          "source": "new",
+          "operationId": "b0000000-0000-4000-8000-000000000012",
+          "name": "Newbie",
+          "level": "intermediate_low",
+          "email": "eli@example.test"
+         }
+        ]
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "operations": [
+         {
+          "op": "add",
+          "source": "saved",
+          "operationId": "b0000000-0000-4000-8000-000000000010",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "level": "intermediate_low"
+         },
+         {
+          "op": "add",
+          "source": "new",
+          "operationId": "b0000000-0000-4000-8000-000000000012",
+          "name": "Newbie",
+          "level": "intermediate_low",
+          "email": "eli@example.test"
+         }
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "parallel_a_retry_and_its_original_on_a_live_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "operations": [
+         {
+          "op": "add",
+          "source": "saved",
+          "operationId": "b0000000-0000-4000-8000-000000000010",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "level": "intermediate_low"
+         }
+        ]
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/batch",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "operations": [
+         {
+          "op": "add",
+          "source": "saved",
+          "operationId": "b0000000-0000-4000-8000-000000000010",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "level": "intermediate_low"
+         }
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

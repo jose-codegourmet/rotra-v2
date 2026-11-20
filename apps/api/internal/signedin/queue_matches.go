@@ -1,6 +1,7 @@
 package signedin
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -56,7 +57,10 @@ func isoMs(ms int64) string { return httpapi.ToIso(msTime(ms)) }
 // sessionMatchViews is sessionMatches in the rule shape: the session's matches in number order (a discarded draft is
 // left out), each with the rows it was read from.
 func sessionMatchViews(r *http.Request, q *sqlcgen.Queries, sessionID pgtype.UUID) ([]model.Match, []sqlcgen.ListSessionMatchRowsRow, error) {
-	ctx := r.Context()
+	return sessionMatchViewsIn(r.Context(), q, sessionID)
+}
+
+func sessionMatchViewsIn(ctx context.Context, q *sqlcgen.Queries, sessionID pgtype.UUID) ([]model.Match, []sqlcgen.ListSessionMatchRowsRow, error) {
 	rows, err := q.ListSessionMatchRows(ctx, sessionID)
 	if err != nil {
 		return nil, nil, err
@@ -94,11 +98,16 @@ func sessionMatchViews(r *http.Request, q *sqlcgen.Queries, sessionID pgtype.UUI
 
 // matchesOf loads the session's matches in the wire shape, with the stored revision of each.
 func matchesOf(r *http.Request, q *sqlcgen.Queries, sessionID pgtype.UUID) ([]queueMatchDTO, error) {
-	views, rows, err := sessionMatchViews(r, q, sessionID)
+	return matchesIn(r.Context(), q, sessionID)
+}
+
+// matchesIn is matchesOf on a context (a write reads its matches inside its transaction).
+func matchesIn(ctx context.Context, q *sqlcgen.Queries, sessionID pgtype.UUID) ([]queueMatchDTO, error) {
+	views, rows, err := sessionMatchViewsIn(ctx, q, sessionID)
 	if err != nil {
 		return nil, err
 	}
-	revs, err := q.ListQueueMatchRevisions(r.Context(), sessionID)
+	revs, err := q.ListQueueMatchRevisions(ctx, sessionID)
 	if err != nil {
 		return nil, err
 	}

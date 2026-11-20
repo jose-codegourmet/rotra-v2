@@ -1,6 +1,7 @@
 package signedin
 
 import (
+	"context"
 	"net/http"
 	"sort"
 	"strings"
@@ -116,11 +117,16 @@ func orderedQueueWaitlist(rows []sqlcgen.ListQueueWaitlistRow) []sqlcgen.ListQue
 }
 
 func (s *server) queueRoster(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID) (any, error) {
-	ctx := r.Context()
 	sess, err := s.session(r, q, club)
 	if err != nil {
 		return nil, err
 	}
+	return s.rosterOf(r.Context(), q, club, sess)
+}
+
+// rosterOf is readSessionRosterIn: the roster, the No show entries, the waitlist and the pending requests of a session
+// the caller has already found and checked. The roster burst batch reads it inside its own transaction.
+func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.UUID, sess sqlcgen.ListQueueSessionsRow) (any, error) {
 	all, err := q.ListQueueRoster(ctx, sess.ID)
 	if err != nil {
 		return nil, err

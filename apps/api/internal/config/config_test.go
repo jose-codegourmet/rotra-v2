@@ -280,3 +280,20 @@ func TestAuthKeysInvalidFailFastWithoutLeakingValues(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadVisitorReceiptSecret(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x"}))
+	if err != nil || cfg.VisitorReceiptSecret != "" {
+		t.Fatalf("unset: %q %v", cfg.VisitorReceiptSecret, err)
+	}
+	// The secret is the environment's value as it is: the TypeScript reads process.env with no trimming.
+	cfg, err = Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_VISITOR_RECEIPT_SECRET": " a secret "}))
+	if err != nil || cfg.VisitorReceiptSecret != " a secret " {
+		t.Fatalf("set: %q %v", cfg.VisitorReceiptSecret, err)
+	}
+	// Loading it never puts it in an error: a missing database URL names only the variable.
+	_, err = Load(lookup(map[string]string{"ROTRA_VISITOR_RECEIPT_SECRET": "hunter2"}))
+	if err == nil || strings.Contains(err.Error(), "hunter2") {
+		t.Fatalf("error %v", err)
+	}
+}

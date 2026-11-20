@@ -1,7 +1,10 @@
 package writetest
 
 import (
+	"encoding/json"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -90,4 +93,55 @@ func RedactColumns(rows []any, columns []string) error {
 		}
 	}
 	return nil
+}
+
+// PathString reads the value at a dotted path of a decoded JSON document as text (Step.Save): a number segment is an
+// array index. A missing path, a null and a value that is not a string or a number are not found.
+func PathString(v any, path string) (string, bool) {
+	for _, seg := range strings.Split(path, ".") {
+		switch node := v.(type) {
+		case map[string]any:
+			child, ok := node[seg]
+			if !ok {
+				return "", false
+			}
+			v = child
+		case []any:
+			i, err := strconv.Atoi(seg)
+			if err != nil || i < 0 || i >= len(node) {
+				return "", false
+			}
+			v = node[i]
+		default:
+			return "", false
+		}
+	}
+	switch x := v.(type) {
+	case string:
+		return x, true
+	case json.Number:
+		return x.String(), true
+	}
+	return "", false
+}
+
+// placeholder is the pattern the capture replaces too (capture-writes-base.mjs): `{{name}}` with a word for a name. Any other
+// text, `{{` included, is left as it is on both sides.
+var placeholder = regexp.MustCompile(`\{\{(\w+)\}\}`)
+
+// Substitute replaces each `{{name}}` of s with the saved value; a name that was not saved is an error.
+func Substitute(s string, vars map[string]string) (string, error) {
+	var missing string
+	out := placeholder.ReplaceAllStringFunc(s, func(m string) string {
+		name := m[2 : len(m)-2]
+		val, ok := vars[name]
+		if !ok && missing == "" {
+			missing = name
+		}
+		return val
+	})
+	if missing != "" {
+		return "", fmt.Errorf("{{%s}} was not saved by an earlier step", missing)
+	}
+	return out, nil
 }

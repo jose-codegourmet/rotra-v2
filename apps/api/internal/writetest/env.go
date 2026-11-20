@@ -66,6 +66,9 @@ type Env struct {
 	Handler http.Handler
 
 	adminIdentities bool
+	clubIdentities  bool
+	// Clubs makes Reseed relink the club accounts too (Replay sets it for the Queue app's case files).
+	Clubs bool
 	// Players makes Reseed relink the player accounts too (Replay sets it for the Player app's case files; an Admin
 	// seed keeps its accounts as they are).
 	Players bool
@@ -192,6 +195,63 @@ func (e *Env) RelinkAdmins(t testing.TB) {
 	}
 }
 
+// RelinkClubs turns the capture's 'supabase' club accounts into Go sign-in identities: one identity per account, with the
+// account's subject as its ID and the username as its login. Run it after every load of the seed, which puts the
+// 'supabase' provider back; the identities are made once.
+func (e *Env) RelinkClubs(t testing.TB) {
+	t.Helper()
+	e.Setup(t, []string{`UPDATE club_accounts SET auth_provider = 'rotra'`})
+	if e.clubIdentities {
+		return
+	}
+	e.clubIdentities = true
+	rows, err := e.Pool.Query(e.Ctx, `SELECT auth_subject, username FROM club_accounts WHERE auth_subject IS NOT NULL ORDER BY club_id`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	type acc struct {
+		subject uuid.UUID
+		name    string
+	}
+	var accs []acc
+	for rows.Next() {
+		var a acc
+		if err := rows.Scan(&a.subject, &a.name); err != nil {
+			t.Fatal(err)
+		}
+		accs = append(accs, a)
+	}
+	rows.Close()
+	for _, a := range accs {
+		if _, err := e.Store.InsertIdentity(e.Ctx, store.NewIdentity{
+			ID: a.subject, Audience: store.AudienceClub, LoginKey: a.name, PasswordHash: "fake-hash-for-tests",
+			PasswordScheme: store.SchemeArgon2id, Now: e.Clock.Now(),
+		}); err != nil {
+			t.Fatalf("insert club identity: %v", err)
+		}
+	}
+}
+
+// ClubPass signs the club behind a subject in at the current fake time and returns the access pass. A subject with no
+// identity, or whose account row is gone, gets no pass (the request goes out signed out).
+func (e *Env) ClubPass(t testing.TB, subject string) string {
+	t.Helper()
+	id := uuid.MustParse(subject)
+	ident, err := e.Store.GetIdentityByID(e.Ctx, id)
+	if err != nil {
+		return ""
+	}
+	var club uuid.UUID
+	if err := e.Pool.QueryRow(e.Ctx, `SELECT club_id FROM club_accounts WHERE auth_subject = $1`, id).Scan(&club); err != nil {
+		return ""
+	}
+	iss, err := e.Service.Issue(e.Ctx, session.IssueInput{Identity: ident, AccountID: club, DeviceLabel: "Chrome on Android"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return iss.AccessPass
+}
+
 // RelinkPlayers turns the capture's player accounts into Go sign-in identities. An account whose subject already
 // has an identity (a seed may insert them) keeps it; any other gets one with the account's subject as its ID, its
 // contact email as the login (or "player-<id>" when it has none) and a password. It also sets the provider to 'rotra',
@@ -276,6 +336,8 @@ type Request struct {
 	Body string
 	// NoSecret leaves the proxy secret out.
 	NoSecret bool
+	// Headers are set after the defaults; a value of "" removes a default header.
+	Headers map[string]string
 }
 
 // Do sends the request through the proxy guard and returns what was answered.
@@ -296,6 +358,13 @@ func (e *Env) Do(r Request) *httptest.ResponseRecorder {
 	}
 	if r.Body != "" {
 		hr.Header.Set("Content-Type", "application/json")
+	}
+	for k, v := range r.Headers {
+		if v == "" {
+			hr.Header.Del(k)
+		} else {
+			hr.Header.Set(k, v)
+		}
 	}
 	w := httptest.NewRecorder()
 	e.Handler.ServeHTTP(w, hr)
@@ -331,6 +400,9 @@ func (e *Env) Reseed(t testing.TB, seed string, scenario []string) {
 	e.RelinkAdmins(t)
 	if e.Players {
 		e.RelinkPlayers(t)
+	}
+	if e.Clubs {
+		e.RelinkClubs(t)
 	}
 	e.Setup(t, scenario)
 }

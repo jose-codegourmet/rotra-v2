@@ -12,14 +12,10 @@ import (
 )
 
 // The Session done status: GET /api/sessions/{sessionId}/finalization. A port of readFinalizationStatus in
-// packages/db/src/queue/finalization.ts, and only of that read.
-//
-// The Route Handler also runs driveFinalizationJobs before it reads. That drive claims this session's projection jobs
-// and runs them: it writes the result snapshot, the player history and the player ranks, and it moves the jobs and the
-// finalization row on (pending to running to done or failed). Those are permanent results and ranking, so this port does
-// not run it. The answer here is therefore the stored state, exactly as the TypeScript read answers it once the drive has
-// had nothing to do. While jobs are still due, the Route Handler answers a later state than this one does. The route is
-// registered but not yet moved to Go: it waits for the write track that owns the drive.
+// packages/db/src/queue/finalization.ts, and of the drive the Route Handler runs before it: driveFinalizationJobs claims this
+// session's projection jobs and runs them (result snapshot, player history, player rank), which moves the jobs and the
+// finalization row on. That drive writes, so it is not here: Deps.DriveFinalization is the queuewrites package's port of it
+// (main wires it). Without it this read answers the stored state.
 
 func (s *server) registerQueueFinalization(rt *Router) {
 	rt.Handle("GET /api/sessions/{sessionId}/finalization", store.AudienceClub, s.club(s.queueFinalization))
@@ -39,6 +35,10 @@ func (s *server) queueFinalization(r *http.Request, q *sqlcgen.Queries, club pgt
 	id, ok := parseUUIDString(r.PathValue("sessionId"))
 	if !ok {
 		return nil, errNotFound
+	}
+	// The Route Handler drives this session's jobs first and never lets that fail the read.
+	if s.driveFinalization != nil {
+		s.driveFinalization(ctx, club, id)
 	}
 	f, err := q.GetQueueFinalization(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {

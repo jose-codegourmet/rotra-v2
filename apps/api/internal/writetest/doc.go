@@ -26,7 +26,25 @@
 //     set "goExpects" on the step with the status and error code, add "allow500" if the capture must record the
 //     crash, and write the reason in the plan's deviations log. The rows left behind are still compared.
 //
-// The app of a case file is admin or player. A Player file signs the players of its seed in (Env.RelinkPlayers makes a Go
+// # Multi-step cases (the offline contract)
+//
+// A case is already an ordered list of steps on one state, so a retry, a replay in order or a batch followed by another is just
+// more steps. Each step is pinned on its own (status, headers, body). Four optional fields of a step make the long cases usable:
+//
+//   - "now" moves the clock before the step (and before its pass is issued): a retry five minutes later shows which stamps move.
+//   - "snapshot": true also reads the rows after that step and pins them in the golden step ("no second write" is the same rows
+//     before and after the retry). The case's final rows are always pinned.
+//   - "save" keeps values of the answer for later steps (name -> dotted path, a number segment is an array index) and "{{name}}"
+//     in a later path, body or rawBody is replaced by it. Each side saves from its own answer, so a generated id needs no fixed
+//     value; the capture and Replay read the answer before anything is redacted.
+//   - "parallel" (above) races requests; the case file's "snapshotDiff": true pins only the rows that changed (see CaseFile), which
+//     keeps the golden of a big seed readable.
+//
+// A step may also send "headers" (the Player's session page calls come from the paired Queue origin, so its steps send an Origin; a value
+// of "" leaves out a default header such as the Content-Type). A body that is not JSON (an empty 204) is pinned as {"__raw": text}.
+//
+// The app of a case file is admin, player or club (the Queue app: Env.ClubPass signs a club account in, Env.RelinkClubs links the
+// seed's club accounts to Go sign-in identities). A Player file signs the players of its seed in (Env.RelinkPlayers makes a Go
 // sign-in identity for each account that has none, and Replay signs a step's "who", the account's auth subject, in with
 // Env.PlayerPass); an Admin file keeps its player accounts as the seed made them.
 //

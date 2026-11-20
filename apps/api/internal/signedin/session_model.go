@@ -65,59 +65,8 @@ func loadSession(ctx context.Context, q *sqlcgen.Queries, slug string) (*loadedS
 		return nil, err
 	}
 	ls := &loadedSession{row: row}
-	if ls.rosterAll, err = q.ListSessionRosterRows(ctx, row.ID); err != nil {
+	if err := ls.fill(ctx, q, row.ID); err != nil {
 		return nil, err
-	}
-	for _, e := range ls.rosterAll {
-		if e.IsLive {
-			ls.roster = append(ls.roster, e)
-			ls.rules = append(ls.rules, model.Player{
-				ID: e.ID.String(), SessionID: row.ID.String(), ClubPlayerID: e.ClubPlayerID.String(), NameSnapshot: e.NameSnapshot,
-				Present: e.Present, PresentChangedAt: msPtr(e.PresentChangedAt), Level: levelOf(e.SkillLevelID),
-				LevelLockedAt: msPtr(e.LevelLockedAt), ConfirmedAt: msOf(e.ConfirmedAt),
-			})
-		}
-	}
-	if ls.courtsAll, err = q.ListSessionCourtRows(ctx, row.ID); err != nil {
-		return nil, err
-	}
-	for _, c := range ls.courtsAll {
-		if !c.RemovedAt.Valid {
-			ls.courts = append(ls.courts, model.Court{
-				ID: c.ID.String(), SessionID: row.ID.String(), Label: c.Label, StartsAt: msPtr(c.StartsAt),
-				OpenedEarlyAt: msPtr(c.OpenedEarlyAt), OpenUntil: msPtr(c.OpenUntil),
-			})
-		}
-	}
-	if ls.matchRows, err = q.ListSessionMatchRows(ctx, row.ID); err != nil {
-		return nil, err
-	}
-	parts, err := q.ListSessionParticipationRows(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
-	holds, err := q.ListSessionCourtHoldRows(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
-	usage, err := q.ListSessionCourtUsageRows(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
-	partsOf := map[pgtype.UUID][]sqlcgen.ListSessionParticipationRowsRow{}
-	for _, p := range parts {
-		partsOf[p.MatchID] = append(partsOf[p.MatchID], p)
-	}
-	holdsOf := map[pgtype.UUID][]string{}
-	for _, h := range holds {
-		holdsOf[h.MatchID] = append(holdsOf[h.MatchID], h.CourtID.String())
-	}
-	usageOf := map[pgtype.UUID][]sqlcgen.ListSessionCourtUsageRowsRow{}
-	for _, u := range usage {
-		usageOf[u.MatchID] = append(usageOf[u.MatchID], u)
-	}
-	for _, m := range ls.matchRows {
-		ls.matches = append(ls.matches, matchView(m, partsOf[m.ID], holdsOf[m.ID], usageOf[m.ID]))
 	}
 	return ls, nil
 }
@@ -346,4 +295,63 @@ func sessionRecordHistory(fallbackStart int64, courts []sqlcgen.ListSessionCourt
 	}
 	h.to = max(h.to, h.from+minuteMs)
 	return h
+}
+
+// fill reads the roster, courts and matches of a session into ls.
+func (ls *loadedSession) fill(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (err error) {
+	if ls.rosterAll, err = q.ListSessionRosterRows(ctx, id); err != nil {
+		return err
+	}
+	for _, e := range ls.rosterAll {
+		if e.IsLive {
+			ls.roster = append(ls.roster, e)
+			ls.rules = append(ls.rules, model.Player{
+				ID: e.ID.String(), SessionID: id.String(), ClubPlayerID: e.ClubPlayerID.String(), NameSnapshot: e.NameSnapshot,
+				Present: e.Present, PresentChangedAt: msPtr(e.PresentChangedAt), Level: levelOf(e.SkillLevelID),
+				LevelLockedAt: msPtr(e.LevelLockedAt), ConfirmedAt: msOf(e.ConfirmedAt),
+			})
+		}
+	}
+	if ls.courtsAll, err = q.ListSessionCourtRows(ctx, id); err != nil {
+		return err
+	}
+	for _, c := range ls.courtsAll {
+		if !c.RemovedAt.Valid {
+			ls.courts = append(ls.courts, model.Court{
+				ID: c.ID.String(), SessionID: id.String(), Label: c.Label, StartsAt: msPtr(c.StartsAt),
+				OpenedEarlyAt: msPtr(c.OpenedEarlyAt), OpenUntil: msPtr(c.OpenUntil),
+			})
+		}
+	}
+	if ls.matchRows, err = q.ListSessionMatchRows(ctx, id); err != nil {
+		return err
+	}
+	parts, err := q.ListSessionParticipationRows(ctx, id)
+	if err != nil {
+		return err
+	}
+	holds, err := q.ListSessionCourtHoldRows(ctx, id)
+	if err != nil {
+		return err
+	}
+	usage, err := q.ListSessionCourtUsageRows(ctx, id)
+	if err != nil {
+		return err
+	}
+	partsOf := map[pgtype.UUID][]sqlcgen.ListSessionParticipationRowsRow{}
+	for _, p := range parts {
+		partsOf[p.MatchID] = append(partsOf[p.MatchID], p)
+	}
+	holdsOf := map[pgtype.UUID][]string{}
+	for _, h := range holds {
+		holdsOf[h.MatchID] = append(holdsOf[h.MatchID], h.CourtID.String())
+	}
+	usageOf := map[pgtype.UUID][]sqlcgen.ListSessionCourtUsageRowsRow{}
+	for _, u := range usage {
+		usageOf[u.MatchID] = append(usageOf[u.MatchID], u)
+	}
+	for _, m := range ls.matchRows {
+		ls.matches = append(ls.matches, matchView(m, partsOf[m.ID], holdsOf[m.ID], usageOf[m.ID]))
+	}
+	return nil
 }

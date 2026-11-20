@@ -1,0 +1,3606 @@
+{
+  "publish_signed_out": {
+    "steps": [
+      {
+        "status": 401,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "unauthenticated",
+            "message": "Sign in to continue."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_body_not_json": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_both_slides": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_standings_only": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_awards_only": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_with_off_day": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards"
+          ],
+          "includeOffDay": true,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"offDay\": [{\"name\": \"Jo\", \"priorSessions\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": true,
+          "published_slides": "{awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": true,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_with_off_day_and_both_slides": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": true,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"offDay\": [{\"name\": \"Jo\", \"priorSessions\": 2}], \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": true,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": true,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_off_day_without_the_awards_slide": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "offDay": "Off Day goes with the awards slide."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_off_day_not_true_is_excluded": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_with_off_day_and_no_stored_off_day": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards"
+          ],
+          "includeOffDay": true,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"offDay\": []}",
+          "expiry_cycle_id": null,
+          "include_off_day": true,
+          "published_slides": "{awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": true,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_no_slides": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "slides": "Choose standings, awards or both."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_slides_not_a_list": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "slides": "Choose standings, awards or both."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_an_unknown_slide": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "slides": "Choose standings, awards or both."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_slides_that_are_not_text_are_dropped": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_slide_twice_is_kept_once": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards",
+            "standings"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{awards,standings}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{awards,standings}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_the_slides_are_checked_before_the_session_lookup": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "slides": "Choose standings, awards or both."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_without_a_command_id": {
+    "steps": [
+      {
+        "status": 500,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "internal",
+            "message": "Something went wrong."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_malformed_command_id": {
+    "steps": [
+      {
+        "status": 500,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "internal",
+            "message": "Something went wrong."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_twice_same_command_returns_the_first_answer": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_again_replaces_the_selection": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": true,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "3",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": true,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "slides": "{standings}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000002"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_again_never_carries_off_day_over": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards"
+          ],
+          "includeOffDay": true,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "3",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": true,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "slides": "{awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000002"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_after_a_second_snapshot_version_uses_the_latest": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": null, \"mostImproved\": null}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000002",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000002",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_with_no_winners": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": null, \"mostImproved\": null}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_command_id_used_for_another_session": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_session_that_is_not_finished": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "state": "Finish the session before publishing results."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_prepared_session": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "state": "Finish the session before publishing results."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_with_record_games_off": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "results": "This session has no result slides yet."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_before_the_results_are_ready": {
+    "steps": [
+      {
+        "status": 503,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "unavailable",
+            "message": "This is not available right now.",
+            "fields": {
+              "results": "Results are still being prepared."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_removed_public_page": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "publication": "This public page was removed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_over_a_details_publication": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"title\": \"old\"}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[]"
+        }
+      ],
+      "session_publications (removed)": [
+        {
+          "id": "<redacted>",
+          "state": "details",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "published_at": null,
+          "last_synced_at": "2026-11-19T02:00:00+00:00",
+          "public_results": null,
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": null,
+          "details_projection": "{\"title\": \"old\"}",
+          "published_snapshot_id": null,
+          "participants_projection": "[]"
+        }
+      ],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_venue_address_in_the_details": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"Smash Hall\", \"address\": \"Cebu City\"}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_notifies_the_players_who_played": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You played 1 game. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        },
+        {
+          "body": "You played 3 games. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000002/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}, {\"name\": \"Ann Reyes\", \"pictureUrl\": null, \"hasRotraProfile\": true}, {\"name\": \"Ben Santos\", \"pictureUrl\": null, \"hasRotraProfile\": true}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_notifies_the_linked_players_of_a_guest": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You played 1 game. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        },
+        {
+          "body": "You played 7 games. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000002/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}, {\"name\": \"Ann Reyes\", \"pictureUrl\": null, \"hasRotraProfile\": true}, {\"name\": \"Ben Santos\", \"pictureUrl\": null, \"hasRotraProfile\": true}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_again_notifies_again": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "slides": [
+            "standings"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You played 1 game. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        },
+        {
+          "body": "You played 1 game. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        },
+        {
+          "body": "You played 3 games. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000002/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        },
+        {
+          "body": "You played 3 games. See how they counted.",
+          "kind": "session",
+          "title": "Results are up for Last Week",
+          "target": "/players/d4000000-0000-4000-8000-000000000002/games",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "source_id": "<redacted>",
+          "created_at": "<redacted>",
+          "source_type": "session_publication_event"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "3",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}, {\"name\": \"Ann Reyes\", \"pictureUrl\": null, \"hasRotraProfile\": true}, {\"name\": \"Ben Santos\", \"pictureUrl\": null, \"hasRotraProfile\": true}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "slides": "{standings}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000002"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_unknown_session": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_malformed_session_id": {
+    "steps": [
+      {
+        "status": 500,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "internal",
+            "message": "Something went wrong."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_another_clubs_session": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_a_session_of_a_lapsed_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [],
+      "session_publications (removed)": [],
+      "session_publication_events": [],
+      "session_publication_events (removed)": []
+    }
+  },
+  "publish_two_at_once_same_command": {
+    "steps": [
+      {
+        "parallel": [
+          {
+            "status": 200,
+            "headers": {
+              "cache-control": "private, no-store",
+              "content-type": "application/json",
+              "vary": "Cookie"
+            },
+            "body": {
+              "slides": [
+                "standings",
+                "awards"
+              ],
+              "includeOffDay": false,
+              "publishedAt": "2026-11-19T04:00:00.000Z"
+            }
+          },
+          {
+            "status": 200,
+            "headers": {
+              "cache-control": "private, no-store",
+              "content-type": "application/json",
+              "vary": "Cookie"
+            },
+            "body": {
+              "slides": [
+                "standings",
+                "awards"
+              ],
+              "includeOffDay": false,
+              "publishedAt": "2026-11-19T04:00:00.000Z"
+            }
+          }
+        ]
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
+      "session_publications (removed)": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_publication_events (removed)": []
+    }
+  }
+}

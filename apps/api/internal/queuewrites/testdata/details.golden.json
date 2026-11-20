@@ -1,0 +1,3476 @@
+{
+  "edit_signed_out": {
+    "steps": [
+      {
+        "status": 401,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "unauthenticated",
+            "message": "Sign in to continue."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_player_subject_is_not_a_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "wrong_account",
+            "message": "This account cannot use this app."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_body_not_json": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_without_a_body": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_renamed": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Renamed",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gussy",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_blank_nickname_clears_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_nickname_not_text_clears_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_blank_name": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter a name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_name_not_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter a name."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_gets_no_details_row": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_typed_phone_is_not_kept": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_typed_email_makes_them_unclaimed": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest · unclaimed · RTR-PH-CEB-111926-0001",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "new.person@example.test",
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_email_of_a_person_already_saved": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": {
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+            "name": "Una Alonzo"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_email_of_a_registered_player_already_saved": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": {
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Ben Santos"
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_email_of_a_registered_player_not_saved": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest · linked to their ROTRA account",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "3",
+          "player_id": "d4000000-0000-4000-8000-000000000006",
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_guest_email_of_an_unclaimed_person_on_rotra": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest · already on ROTRA · RTR-PH-CEB-102926-0009",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_email_not_valid": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "email": "Enter an email address, like name@example.com."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_email_is_ignored_when_one_is_on_file": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_an_unclaimed_player_saves_details": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una A",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "U",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una A",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "fb.com/una",
+              "linkedin": "",
+              "instagram": "ig"
+            },
+            "playingStyle": "Defender",
+            "experienceMonths": 27,
+            "experienceRecordedAt": "2026-11-19T04:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_an_unclaimed_player_takes_a_phone": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550150",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_an_unclaimed_player_phone_not_valid": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Enter a Philippine mobile number, like 0917 555 0142."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_phone_is_checked_before_the_entitlement": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Enter a Philippine mobile number, like 0917 555 0142."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_phone_on_file_is_never_replaced": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": "+639175550111",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": "+639175550111",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": null,
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_phone_taken_by_another_saved_player": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "phone": "Ann Reyes already has this number."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_phone_taken_by_a_deleted_player_is_fine": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550199",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_an_older_record_with_a_phone_and_no_email": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": "+639175550100",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "Net",
+            "experienceMonths": 5,
+            "experienceRecordedAt": "2026-11-19T04:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "club_player_private_inputs (removed)": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": "+639175550100",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": null,
+          "club_player_id": "c6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_shows_the_experience_that_kept_counting": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": 33,
+            "experienceRecordedAt": "2026-11-19T04:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "facebook": "old"
+            },
+            "playingStyle": "Old",
+            "experienceMonths": 24,
+            "experienceRecordedAt": "2026-03-10T00:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_unchanged_keeps_the_recorded_date": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": 24,
+            "experienceRecordedAt": "2026-03-10T00:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "facebook": "old"
+            },
+            "playingStyle": "Old",
+            "experienceMonths": 24,
+            "experienceRecordedAt": "2026-03-10T00:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_cleared": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "captured_at": "2026-11-19T02:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "facebook": "old"
+            },
+            "playingStyle": "Old",
+            "experienceMonths": 24,
+            "experienceRecordedAt": "2026-03-10T00:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_months_only": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": 11,
+            "experienceRecordedAt": "2026-11-19T04:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_years_only": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "message": "Details saved · Una Alonzo",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": 960,
+            "experienceRecordedAt": "2026-11-19T04:00:00.000Z"
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_too_many_years": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "experience": "Enter whole years from 0 to 80 and months from 0 to 11."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_too_many_months": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "experience": "Enter whole years from 0 to 80 and months from 0 to 11."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_negative": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "experience": "Enter whole years from 0 to 80 and months from 0 to 11."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_fraction": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "experience": "Enter whole years from 0 to 80 and months from 0 to 11."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_experience_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "experience": "Enter whole years from 0 to 80 and months from 0 to 11."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_registered_player_keeps_their_own_details": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "player": "This player registered, so they keep their own details."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_a_deleted_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_unknown_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_other_clubs_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_malformed_id": {
+    "steps": [
+      {
+        "status": 500,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "internal",
+            "message": "Something went wrong."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_lapsed_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_twice": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest · unclaimed · RTR-PH-CEB-111926-0001",
+          "samePerson": null
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "message": "Details saved · Gus Guest",
+          "samePerson": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "4",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "new.person@example.test",
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "edit_the_same_edit_twice_at_once": {
+    "steps": [
+      {
+        "parallel": [
+          {
+            "status": 200,
+            "headers": {
+              "cache-control": "private, no-store",
+              "content-type": "application/json",
+              "vary": "Cookie"
+            },
+            "body": {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+              "message": "Details saved · Una A",
+              "samePerson": null
+            }
+          },
+          {
+            "status": 200,
+            "headers": {
+              "cache-control": "private, no-store",
+              "content-type": "application/json",
+              "vary": "Cookie"
+            },
+            "body": {
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+              "message": "Details saved · Una A",
+              "samePerson": null
+            }
+          }
+        ]
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una A",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "c6000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  }
+}

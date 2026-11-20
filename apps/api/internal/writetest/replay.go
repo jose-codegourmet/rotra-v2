@@ -48,6 +48,7 @@ func ReplayFull(t *testing.T, dir, name string, build BuildFull) {
 	seed := ReadSeed(t, dir, cf.Seed)
 	e := NewEnvFull(t, cf.Now, build)
 	e.Players = cf.App == "player"
+	e.Clubs = cf.App == "club"
 	for _, c := range cf.Cases {
 		t.Run(c.Name, func(t *testing.T) {
 			want, ok := golden[c.Name]
@@ -64,13 +65,33 @@ func ReplayFull(t *testing.T, dir, name string, build BuildFull) {
 				now = *c.Now
 			}
 			e.Clock.Set(now)
+			var base map[string][]any
+			if cf.SnapshotDiff {
+				base = Snapshot(t, e, cf.Snapshot, c.Redact)
+			}
 			if len(want.Steps) != len(c.Steps) {
 				t.Fatalf("%d golden steps for %d steps", len(want.Steps), len(c.Steps))
 			}
+			vars := map[string]string{}
 			for i, s := range c.Steps {
-				compareStep(t, fmt.Sprintf("step %d", i+1), e.runStep(t, cf.App, s), want.Steps[i], s)
+				label := fmt.Sprintf("step %d", i+1)
+				s, err := substituteStep(s, vars)
+				if err != nil {
+					t.Fatalf("%s: %v", label, err)
+				}
+				if s.Now != nil {
+					e.Clock.Set(*s.Now)
+				}
+				got := e.runStep(t, cf.App, s)
+				compareStep(t, label, got, want.Steps[i], s)
+				saveStep(t, label, got, s, vars)
+				if s.Snapshot {
+					compareDB(t, e, cf.Snapshot, c.Redact, want.Steps[i].DB, base)
+				} else if len(want.Steps[i].DB) > 0 {
+					t.Fatalf("%s: the golden has rows after this step, the step does not ask for them", label)
+				}
 			}
-			compareDB(t, e, cf.Snapshot, c.Redact, want.DB)
+			compareDB(t, e, cf.Snapshot, c.Redact, want.DB, base)
 		})
 	}
 }
@@ -82,13 +103,64 @@ type answer struct {
 	body    []byte
 }
 
+// substituteStep writes the saved values into the path and body of a step.
+func substituteStep(s Step, vars map[string]string) (Step, error) {
+	var err error
+	if s.Path, err = Substitute(s.Path, vars); err != nil {
+		return s, err
+	}
+	if len(s.Body) > 0 {
+		b, err := Substitute(string(s.Body), vars)
+		if err != nil {
+			return s, err
+		}
+		s.Body = json.RawMessage(b)
+	}
+	if s.RawBody != nil {
+		b, err := Substitute(*s.RawBody, vars)
+		if err != nil {
+			return s, err
+		}
+		s.RawBody = &b
+	}
+	return s, nil
+}
+
+// saveStep keeps the values the step names in Save, read from the answer before anything is redacted.
+func saveStep(t *testing.T, label string, got stepAnswer, s Step, vars map[string]string) {
+	t.Helper()
+	if len(s.Save) == 0 {
+		return
+	}
+	v, err := decode(got.one.body)
+	if err != nil {
+		t.Fatalf("%s: cannot save from a body that is not JSON: %q", label, got.one.body)
+	}
+	for name, path := range s.Save {
+		val, ok := PathString(v, path)
+		if !ok {
+			t.Fatalf("%s: save %q: no text or number at %q in %s", label, name, path, got.one.body)
+		}
+		vars[name] = val
+	}
+}
+
 // request builds the request of a step. It signs the account in first, so the pass is issued at the case's instant.
 func (e *Env) request(t *testing.T, app string, s Step) Request {
-	r := Request{Method: s.Method, Path: s.Path, App: app}
+	r := Request{Method: s.Method, Path: s.Path, App: app, Headers: s.Headers}
+	if s.Cookie != "" {
+		r.Headers = map[string]string{"Cookie": s.Cookie}
+		for k, v := range s.Headers {
+			r.Headers[k] = v
+		}
+	}
 	if s.Who != nil {
-		if app == "player" {
+		switch app {
+		case "player":
 			r.Bearer = e.PlayerPass(t, *s.Who)
-		} else {
+		case "club":
+			r.Bearer = e.ClubPass(t, *s.Who)
+		default:
 			r.Bearer = e.AdminPass(t, *s.Who)
 		}
 	}
@@ -140,7 +212,8 @@ func normalize(t *testing.T, label string, body []byte, redact []string, optiona
 	t.Helper()
 	v, err := decode(body)
 	if err != nil {
-		t.Fatalf("%s: body is not JSON: %q (%v)", label, body, err)
+		// A body that is not JSON (an empty 204, text) is pinned as the capture keeps it: {"__raw": text}.
+		v = map[string]any{"__raw": string(body)}
 	}
 	redactor := RedactPaths
 	if optional {
@@ -183,6 +256,11 @@ func compareOne(t *testing.T, label string, got answer, want GoldenStep, s Step)
 		t.Errorf("%s: headers %v, want %v", label, gotHeaders, wantHeaders)
 	}
 	g, w := normalize(t, label, got.body, s.Redact, s.RedactOptional), normalize(t, label+" (golden)", want.Body, nil, false)
+	for _, side := range []any{g, w} {
+		if err := SortUnordered(side, s.Unordered); err != nil {
+			t.Errorf("%s: %v", label, err)
+		}
+	}
 	if !reflect.DeepEqual(g, w) {
 		t.Errorf("%s: body\n got %s\nwant %s", label, canonical(g), canonical(w))
 	}
@@ -254,26 +332,64 @@ func canonical(v any) string {
 	return string(b)
 }
 
-// compareDB reads the snapshot and compares it with the golden rows.
-func compareDB(t *testing.T, e *Env, specs []SnapshotSpec, extra map[string][]string, want map[string][]json.RawMessage) {
+// compareDB reads the snapshot and compares it with the golden rows. With a base (SnapshotDiff) only the rows that are new
+// or differ from it are compared, and the rows that went away under "<name> (removed)".
+func compareDB(t *testing.T, e *Env, specs []SnapshotSpec, extra map[string][]string, want map[string][]json.RawMessage, base map[string][]any) {
 	t.Helper()
 	got := Snapshot(t, e, specs, extra)
+	if base != nil {
+		got = diffSnapshot(got, base, specs)
+	}
 	for _, spec := range specs {
-		var w []any
-		for _, raw := range want[spec.Name] {
-			v, err := decode(raw)
-			if err != nil {
-				t.Fatalf("golden %s: %v", spec.Name, err)
+		names := []string{spec.Name}
+		if base != nil {
+			names = append(names, spec.Name+RemovedSuffix)
+		}
+		for _, name := range names {
+			var w []any
+			for _, raw := range want[name] {
+				v, err := decode(raw)
+				if err != nil {
+					t.Fatalf("golden %s: %v", name, err)
+				}
+				w = append(w, v)
 			}
-			w = append(w, v)
-		}
-		if w == nil {
-			w = []any{}
-		}
-		if !reflect.DeepEqual(got[spec.Name], w) {
-			t.Errorf("rows of %s\n got %s\nwant %s", spec.Name, canonical(got[spec.Name]), canonical(w))
+			if w == nil {
+				w = []any{}
+			}
+			if !reflect.DeepEqual(got[name], w) {
+				t.Errorf("rows of %s\n got %s\nwant %s", name, canonical(got[name]), canonical(w))
+			}
 		}
 	}
+}
+
+// RemovedSuffix names the golden entry of the rows a case removed (SnapshotDiff).
+const RemovedSuffix = " (removed)"
+
+// diffSnapshot is the rows of got that are not in base (same document), and under "<name> (removed)" the rows of base that
+// are not in got.
+func diffSnapshot(got, base map[string][]any, specs []SnapshotSpec) map[string][]any {
+	out := map[string][]any{}
+	for _, spec := range specs {
+		inBase, inGot := map[string]bool{}, map[string]bool{}
+		for _, r := range base[spec.Name] {
+			inBase[canonical(r)] = true
+		}
+		out[spec.Name], out[spec.Name+RemovedSuffix] = []any{}, []any{}
+		for _, r := range got[spec.Name] {
+			inGot[canonical(r)] = true
+			if !inBase[canonical(r)] {
+				out[spec.Name] = append(out[spec.Name], r)
+			}
+		}
+		for _, r := range base[spec.Name] {
+			if !inGot[canonical(r)] {
+				out[spec.Name+RemovedSuffix] = append(out[spec.Name+RemovedSuffix], r)
+			}
+		}
+	}
+	return out
 }
 
 // Snapshot runs each spec's SQL (time zone UTC) and returns its rows decoded, with the spec's columns redacted and
@@ -321,4 +437,28 @@ func Snapshot(t testing.TB, e *Env, specs []SnapshotSpec, extra map[string][]str
 		out[spec.Name] = list
 	}
 	return out
+}
+
+// SortUnordered sorts the arrays at the dotted paths (Step.Unordered) by the canonical JSON of their elements, in place.
+func SortUnordered(v any, paths []string) error {
+	for _, path := range paths {
+		node := v
+		for _, seg := range strings.Split(path, ".") {
+			m, ok := node.(map[string]any)
+			if !ok {
+				node = nil
+				break
+			}
+			node = m[seg]
+		}
+		if node == nil {
+			continue // an error answer has no such list
+		}
+		list, ok := node.([]any)
+		if !ok {
+			return fmt.Errorf("unordered %q: not an array", path)
+		}
+		sort.SliceStable(list, func(i, j int) bool { return canonical(list[i]) < canonical(list[j]) })
+	}
+	return nil
 }

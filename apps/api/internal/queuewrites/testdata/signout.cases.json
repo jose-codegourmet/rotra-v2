@@ -1,0 +1,249 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "app": "player",
+ "snapshotDiff": true,
+ "seed": "queue.seed.sql",
+ "scenarios": {
+  "base": []
+ },
+ "snapshot": [
+  {
+   "name": "queue_sessions",
+   "sql": "SELECT id, state, revision::text AS revision FROM queue_sessions ORDER BY id"
+  }
+ ],
+ "cases": [
+  {
+   "name": "sign_out_signed_in",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_signed_in_with_no_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000",
+      "Content-Type": "application/json"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "sign_out_with_a_json_charset",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000",
+      "Content-Type": "application/json; charset=utf-8"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_ignores_the_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {
+      "sessionEnded": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "sign_out_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_without_an_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {},
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_from_another_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9999"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_not_json_is_forbidden",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000",
+      "Content-Type": "text/plain"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "sign_out_without_a_content_type",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000",
+      "Content-Type": ""
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "rawBody": "{}"
+    }
+   ]
+  },
+  {
+   "name": "sign_out_from_another_origin_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9999"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "preflight_sign_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "OPTIONS",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "preflight_sign_out_from_another_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "OPTIONS",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9999"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "preflight_sign_out_without_an_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "OPTIONS",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {},
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -129,7 +129,7 @@ func TestAdminReadsRefuseAnExpiredSessionRow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	e.exec(t, `UPDATE auth_sessions SET expires_at = now() - interval '1 day' WHERE id = $1`, iss.Session.ID)
+	e.exec(t, `UPDATE auth_sessions SET expires_at = timestamptz '2000-01-01' WHERE id = $1`, iss.Session.ID)
 	if w := e.do(req{path: "/api/feature-flags", app: "admin", bearer: iss.AccessPass}); w.Code != 401 {
 		t.Fatalf("an expired session row reads %d: %s", w.Code, w.Body.String())
 	}

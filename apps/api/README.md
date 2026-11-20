@@ -44,6 +44,12 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
   path or trailing slash, validated at start). CORS headers are sent on the two stream routes only, only for a listed origin.
 - `ROTRA_QUEUE_ORIGINS` (optional): same format; the Queue app origins that may call the credentialed Player stats read
   (`GET /api/rtr-ids/{rtrId}/stats` with cookies). Separate from `ROTRA_ALLOWED_ORIGINS`; unset means no Queue origin is allowed.
+- `ROTRA_VISITOR_RECEIPT_SECRET` (optional, a secret; set in Railway, never in the repo): the key of the receipt a Queue visitor holds for
+  their join request, an HMAC-SHA256 of `join-request:<requestId>` (base64url, no padding) kept in the httpOnly cookie
+  `rotra_join_request`. Use the same value the Next apps used, so a receipt issued before the move still matches. It is read as given (no
+  trimming), compared in constant time and never logged. Unset: `POST /api/public-sessions/{slug}/join-request` answers 503
+  `unavailable` once the body and the slug are valid, and `GET .../my-request` answers 503 only for a request holding a cookie, as the Route
+  Handlers do.
 
 ## Housekeeping (B-34)
 
@@ -107,6 +113,78 @@ Supabase here): Go makes the sign-in identity itself, so those columns are out o
 The capture fakes `Date` only: Prisma stamps `@default(now())` and `@updatedAt` times with the
 application clock, so those are pinned, and Go writes them from its own clock (`Deps.Now`). Only truly generated values
 (an audit event id) are redacted.
+
+## Queue writes (go-writes-queue)
+
+`internal/queuewrites` serves the Queue app's writes (`X-Rotra-App: club`) on the same shared router, behind the club pass
+check in write mode. It holds the helpers every later Queue write is built on: `inSession` (lock the club's session row, check
+access: an entitlement, or a live session a licence term started), `rosterCommand` (that, then the open states, then the tail every
+roster change has: close the match requests that name someone no longer present, bump the session revision, recompute a calculated
+minimum), `requireRevision` / `requireState`, `derivedID` and the roster building blocks `place`, `promoteWaiter`, `assessEntry`,
+`createClubPlayer`, `clubPlayerForProfile`. The roster read and DTOs are exported from `signedin` (`queuewrites_export.go`) so a
+write answers what the read sends.
+
+The offline contract has no table of its own: a command repeats safely in its own way (`club_assessments.source_operation_id` plus rows
+whose ID is derived from the operation id; a request decision on the request's status), so a retry recomputes its answer and still
+bumps the session revision. `GET /api/sync` is read-only (see `internal/signedin/queue_sync.go`).
+
+Cases that need more than one request use the multi-step fields of the write harness (`internal/writetest/doc.go`): `now` moves the clock
+before a step, `snapshot` pins the rows after it, `save` and `{{name}}` pass a generated id to a later step, and the case file's
+`snapshotDiff` pins only the rows the steps changed. `testdata/tools/gen-writes-queue-cases.py` writes the cases, the capture is
+`testdata/tools/capture-writes-queue.test.mjs` (same recipe as the groups above), and `queue.seed.sql` is the seed. A race whose winner is
+not decided is tested in `race_test.go`, not pinned.
+
+Preparation, courts and the roster (`session_prep.go`, `courts.go`, `roster_ops.go`) and the club's own writes (`club_writes.go`) are in the same package.
+Their goldens are `prep`, `rosterops` and `club` (cases from `gen-writes-queue-prep-cases.py`, `gen-writes-queue-ops-cases.py` and
+`gen-writes-queue-club-cases.py`). Capture `prep` with `TZ=UTC` (see its generator). `session_rules.go` holds the preparation rules no other code
+shares (the repeating dates and their clashes, the court window, the late start's new end). Create, edit and start check the entitlement before the
+transaction and lock the session without the live-session exception: use `lockedSession(..., false, ...)` for such a command, `inSession` for the
+rest. A session a command changed is read again with `txn.reload` / `txn.touch` (the queries return no row because pgx cannot scan an enum array).
+
+Join and match requests (slice 2.2) are in the same package. `join_requests.go`, `match_requests.go`, `court_fill.go`, `drop_outs.go` and
+`club_player_details.go` are the Queue Master's side (goldens `requests` and `details`); `match_store.go` is the match store the match control
+slice builds on (`matchCommand`, `matchContext`, `appendMatch`, `putOnCourt` with its court and player holds, `autoFill` as `fillCourts`).
+`public_session.go` is the signed-in Player's side (golden `pubjoin`, app `player`): every route checks the paired Queue origin and the JSON
+content type first, answers the CORS preflight, then the Player pass in write mode and the Google deadline gate, and locks the session without
+the club entitlement check (`inPageSession`). The match request rules no other code shares are in `internal/rules/matchrequest` (a grid captured from
+the real TypeScript: `testdata/tools/capture-matchrequest-lineup.test.mjs`). A step of the write harness may send `headers` (an Origin, or a
+Content-Type left out with ""), and the capture runs the Player's Route Handlers on the Player origin (`ROTRA_CAPTURE_ORIGIN`).
+
+The Player's sign-out (`POST /api/public-sessions/{slug}/sign-out`, golden `signout`) is `signin.SignOut(deps, player)` behind the same origin and content type checks (`Deps.PlayerSignOut`; nil leaves the route out). The capture has no Supabase, so its provider call is a stand-in and the golden does not compare `Set-Cookie`; `signout_test.go` pins the revoked session and the cleared cookies.
+
+Match control and the queue (slice 2.3, `match_control.go`, `match_queue.go`, golden `match`, cases from `gen-writes-queue-match-cases.py`):
+Put on court, Start, Send back, Move, Swap, Replace player, Substitute, Team wins / No result and Invalid, Add match (manual, selection,
+suggested, reviewed drafts), edit, remove and reorder a waiting match, Auto queue and Regenerate. `matchCommand` runs each one; `loadMatch` reads a
+match with its segments, holds, court usage and decision (`matchRow`); `decide` is the shared end of Team wins and Invalid (a contradicting
+decision commits its `sync_conflicts` row and then answers 409, which is why `decide` returns a marker and fails after the command). The
+server generates lineups from `n` with `internal/queuewrites/queuegen` (a port of queue.rules.ts and autoQueue.rules.ts; TypeScript-only rules
+until the device sends its own lineups, BL-3), pinned by a grid captured from the real TypeScript (`capture-queuegen.test.mjs`). `fillCourts` is
+the one Auto Queue fill: the court commands now call it too. Session-level commands (slice 2.4, `session_finish.go`, golden `finish`): Set end
+time, Extend, Cancel session and Mark session invalid; Publish results (`results_publication.go`, golden `publish`, with a result snapshot the cases seed; Session done, which writes it, is below). The Player's match request, its cancel and Move me to the waitlist are in
+`public_match_request.go` (golden `pubmr`). A race whose winner is not decided is in `race_match_test.go`.
+
+Session done (slice 4, `finalization.go`, `finalization_jobs.go`, `finalization_snapshot.go`, `finalization_rank.go`, golden `finalize`, cases from
+`gen-writes-queue-finalize-cases.py`): `POST /api/sessions/{id}/finalization` commits the one finalization row, the facts, the session summaries and the
+jobs in one transaction under the session lock, then drives the jobs in the same request (result snapshot, player history, player rank: claimed with
+SKIP LOCKED, each in its own transaction, three rounds, a failed job backs off 30 s doubling to an hour and stops after eight attempts). `GET` of the same
+path is the signedin package's route; it runs the same drive first through `signedin.Deps.DriveFinalization` (`queuewrites.DriveFinalization`, wired in
+`cmd/api/main.go`). The rules are `internal/rules/sessionresult` (standings, awards, the award baseline; the expected win chance reads the captured
+`10 ** y` table), pinned by the Vitest cases, a captured grid of 140 sessions and the finalize golden. The finalization sign-off list is in the plan's
+deviations log. The job list of the status and the belowMinimum warning are compared as sets (`Step.Unordered`: a path whose array order the TypeScript does not
+decide). Rank notifications are keyed by the job id; the cases seed a rank row, a ranking policy that takes effect late (a trigger the
+case file installs) and job rows in every state to reach each branch of the drive.
+
+The Queue visitor routes (`visitor.go`, goldens `visitor` and `visitor-nosecret`, cases from `gen-writes-queue-visitor-cases.py`): Request to join
+(`POST /api/public-sessions/{slug}/join-request`) and My request (`GET .../my-request`), registered for the Queue app (`X-Rotra-App: club`) with no
+pass. The receipt cookie is written as Next writes it (`Path`, `Secure` when the request came over https, `HttpOnly`, `SameSite=lax`); the capture
+reads Next's own serializer through the `next/headers` stub, and a step may send a `cookie`.
+
+Money (slice 3.1, `inventory.go`, `payments.go`, `money_cost.go`, golden `money`, cases from `gen-writes-queue-money-cases.py`, capture with `TZ=UTC`): the
+club's inventory (add or edit, stock step, remove), the payment batch, the amount received and Mark all paid, and the cost estimate that Create
+session and Edit preparation save beside the session. The pure rules are in `internal/rules/sessioncost` and `internal/rules/payment` (the signed-in
+reads call them too). `normalizeCost` reads the estimate of a form body as JavaScript does (`jsValue` keeps undefined apart from null; a wrong shape is
+the TypeError the TypeScript answers with a 500), pinned by `jsnumber.golden.json`. A mark is deleted and inserted, never updated. The stock step's
+`updated_at` is the database clock; every other stamp is the application clock. The money sign-off list is in the plan's deviations log.
 
 ## Golden files
 

@@ -42,11 +42,13 @@ SELECT l.id AS link_id,
        cp.removed_at,
        (pi.club_player_id IS NOT NULL)::bool AS has_input,
        pi.phone_e164 AS input_phone,
-       pi.email AS input_email
+       pi.email AS input_email,
+       se.email AS shared_entry_email
 FROM club_player_claim_links l
 JOIN club_players cp ON cp.club_id = l.club_id AND cp.id = l.club_player_id
 JOIN clubs c ON c.id = cp.club_id
 LEFT JOIN club_player_private_inputs pi ON pi.club_player_id = cp.id
+LEFT JOIN shared_player_entries se ON se.id = cp.shared_entry_id
 WHERE l.token_digest = @token_digest;
 
 -- name: LockPlayerClaimLink :one
@@ -57,6 +59,13 @@ SELECT id FROM club_player_claim_links WHERE token_digest = @token_digest FOR UP
 
 -- name: LockClubPlayerRow :one
 SELECT id FROM club_players WHERE club_id = @club_id AND id = @id FOR UPDATE;
+
+-- The claimed record becomes the player's. Its nickname became the account's, so the club nickname starts empty
+-- (D-2026-11-18-03), as in completeRecordClaim; the phone linking of other clubs' records keeps theirs (LinkClubPlayer).
+-- name: LinkClaimedClubPlayer :exec
+UPDATE club_players
+SET player_id = @player_id, nickname = NULL, revision = revision + 1, updated_at = @now
+WHERE club_id = @club_id AND id = @id;
 
 -- name: ConsumePlayerClaimLink :exec
 UPDATE player_claim_links

@@ -844,4 +844,69 @@ assert len(names) == len(set(names)), "duplicate case names in register"
 with open(os.path.join(OUT, "register.cases.json"), "w") as f:
     json.dump(doc, f, indent=1, ensure_ascii=False)
     f.write("\n")
+
+# ---------------------------------------------------------------- claim from a club record's link (BL-12)
+# POST /api/claim/{token} for a record-keyed link (completeRecordClaim): the RTR ID is allocated by the record's shared entry email and
+# the registering email, and claimSharedEntry joins the entry's records. Same capture mocks as register (Supabase only).
+claim_cases = []
+case = mk(claim_cases)
+CR1 = REC(0xc1)
+def claim_link(n, club, rec, token):
+    return ("INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES "
+            "('f7000000-0000-4000-8000-0000000000%02x', '%s', '%s', sha256('%s'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', %s)" % (n, club, rec, token, TS))
+CL_PLAIN = [
+    "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('%s', '%s', NULL, 'Rita Record', 'Ri', TIMESTAMPTZ '2026-10-07 00:00:00+00', %s)" % (CR1, SMASH, TS),
+    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('%s', '%s', '+639175550401', 'pending', %s, %s)" % (CR1, SMASH, TS, TS),
+    claim_link(1, SMASH, CR1, "rec-plain"),
+]
+CL_SHARED_LINKS = [
+    claim_link(2, SMASH, REC(0xb1), "rec-shared"),
+    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('%s', '%s', '+639175550398', 'pending', %s, %s)" % (REC(0xb2), NINJA, TS, TS),
+    claim_link(3, NINJA, REC(0xb2), "rec-shared-ninja"),
+]
+claim_sc = dict(SCENARIOS)
+claim_sc["claim_plain"] = CL_PLAIN
+claim_sc["claim_shared"] = REG_SCENARIOS["shared_entry"] + CL_PLAIN + CL_SHARED_LINKS
+claim_sc["claim_shared_taken"] = REG_SCENARIOS["shared_entry_taken_id"] + CL_PLAIN + CL_SHARED_LINKS
+claim_sc["claim_shared_retired"] = REG_SCENARIOS["shared_entry_retired"] + CL_PLAIN + CL_SHARED_LINKS
+claim_sc["claim_shared_claimed"] = REG_SCENARIOS["shared_entry"] + CL_PLAIN + CL_SHARED_LINKS + [
+    "UPDATE shared_player_entries SET email = NULL, claimed_player_id = '%s', claimed_at = %s" % (BOB, TS)]
+claim_sc["claim_two_entries"] = REG_SCENARIOS["shared_entry"] + CL_PLAIN + CL_SHARED_LINKS + [
+    "UPDATE player_id_counters SET last_sequence = 42",
+    "INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, allocated_at, created_at, updated_at) VALUES "
+    "('5e000000-0000-4000-8000-000000000002', 'second@example.test', 'RTR-PH-CEB-102926-0042', '%s', %s, 'PH', 'CEB', DATE '2026-10-29', 42, %s, %s, %s)" % (SMASH, LOC("CEB"), TS, TS, TS),
+    "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, updated_at) VALUES "
+    "('%s', '%s', NULL, 'Second Person', NULL, '5e000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-10-08 00:00:00+00', %s)" % (REC(0xb3), BIRDIE, TS)]
+claim_sc["claim_shared_and_phone"] = REG_SCENARIOS["shared_entry"] + REG_SCENARIOS["unclaimed_records"] + CL_PLAIN + CL_SHARED_LINKS
+CLAIM = lambda token: "/api/claim/%s" % token
+def claim(token, email=NEWBIE, phone="0917 555 0301", **kw):
+    body = {"email": email, "password": "correct horse", "phone": phone, "fullName": "Newbie Tan", "nickname": "Newb", "playingStyle": "",
+            "experienceYears": None, "experienceMonths": None, "socialLinks": {"facebook": "", "instagram": "", "youtube": "", "linkedin": ""}}
+    out = step("POST", CLAIM(token), None, body, redact=["playerId", "session.account.id"], **kw)
+    out["redactOptional"] = True
+    out["ignoreHeaders"] = ["set-cookie"]
+    return out
+case("claim_a_record_with_no_entry_allocates_a_new_rtr_id", [claim("rec-plain", phone="")], scenario="claim_plain")
+case("claim_a_record_leaves_an_unrelated_entry_open", [claim("rec-plain", phone="")], scenario="claim_shared")
+case("claim_a_record_held_by_an_entry_keeps_its_rtr_id", [claim("rec-shared", email="other@example.test")], scenario="claim_shared")
+case("claim_a_record_held_by_an_entry_registering_with_the_entry_email", [claim("rec-shared", email="shared@example.test")], scenario="claim_shared")
+case("claim_a_record_held_by_an_entry_registering_with_the_email_in_capitals", [claim("rec-shared", email=" Shared@Example.TEST ")], scenario="claim_shared")
+case("claim_registering_with_the_email_of_an_entry_of_other_records_keeps_its_rtr_id", [claim("rec-plain", email="shared@example.test", phone="")], scenario="claim_shared")
+case("claim_a_record_held_by_an_entry_whose_rtr_id_is_taken_allocates_a_new_one", [claim("rec-shared", email="other@example.test")], scenario="claim_shared_taken")
+case("claim_a_record_of_a_retired_entry_allocates_a_new_one", [claim("rec-shared", email="shared@example.test")], scenario="claim_shared_retired")
+case("claim_a_record_of_a_claimed_entry_allocates_a_new_one", [claim("rec-shared", email="other@example.test")], scenario="claim_shared_claimed")
+case("claim_the_records_entry_decides_before_the_registering_email", [claim("rec-shared", email="second@example.test")], scenario="claim_two_entries")
+case("claim_the_registering_email_entry_when_the_record_has_none", [claim("rec-plain", email="second@example.test", phone="")], scenario="claim_two_entries")
+case("claim_a_record_held_by_an_entry_and_other_records_with_the_phone", [claim("rec-shared", email="other@example.test")], scenario="claim_shared_and_phone")
+case("claim_a_record_with_a_phone_on_file_held_by_an_entry_resolves_the_input", [claim("rec-shared-ninja", email="other@example.test", phone="")], scenario="claim_shared")
+# A retry after success saves no details again in Go on purpose (TestPostRetryAfterSuccess), so it is not a golden case.
+doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": claim_sc,
+       "snapshot": [R_PLAYERS, R_CONTACTS, R_ALLOC, R_COUNTERS, R_ACCOUNTS, R_LINKS, R_MEMBERS, R_INPUTS, R_ENTRIES, R_SOCIAL, NOTES, AUDIT,
+                    {"name": "club_player_claim_links", "sql": "SELECT l.club_id, l.state, l.consumed_at, l.revoked_at, l.revision::text AS revision, l.updated_at, cp.display_name FROM club_player_claim_links l JOIN club_players cp ON cp.id = l.club_player_id AND cp.club_id = l.club_id ORDER BY l.token_digest", "redact": []}],
+       "cases": claim_cases}
+names = [c["name"] for c in claim_cases]
+assert len(names) == len(set(names)), "duplicate case names in claim"
+with open(os.path.join(OUT, "claim.cases.json"), "w") as f:
+    json.dump(doc, f, indent=1, ensure_ascii=False)
+    f.write("\n")
 print("ok")

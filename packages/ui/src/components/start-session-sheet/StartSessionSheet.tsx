@@ -1,5 +1,6 @@
 'use client'
 
+import { SCORING } from '@rotra/schema/scoring'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { Field } from '@rotra/ui/field'
@@ -21,6 +22,8 @@ export type StartSessionSheetProps = {
   courts: number
   formatsLabel: string
   modeLabel: string
+  /** The scoring mode's label ("16/31", "11/21 × 3", from SCORING in @rotra/schema/scoring); omitted reads as 16/31 */
+  scoringLabel?: string
   /** Record games; omitted reads as on */
   recordGames?: boolean
   minimumGames: number
@@ -54,6 +57,7 @@ export function StartSessionSheet({
   courts,
   formatsLabel,
   modeLabel,
+  scoringLabel = SCORING['31'].label,
   recordGames = true,
   minimumGames,
   rosterCount,
@@ -124,6 +128,7 @@ export function StartSessionSheet({
               { label: 'Courts', value: String(courts) },
               { label: 'Formats', value: formatsLabel },
               { label: 'Mode', value: modeLabel },
+              { label: 'Scoring', value: scoringLabel },
               { label: 'Record games', value: recordGamesLabel(recordGames) },
               { label: 'Minimum', value: `${minimumGames} games` },
               {

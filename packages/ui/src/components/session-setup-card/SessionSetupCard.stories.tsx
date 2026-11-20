@@ -78,7 +78,12 @@ export const RequestsSomeLight: Story = { ...RequestsSome, globals: { theme: 'li
 export const RequestsNoneLight: Story = { ...RequestsNone, globals: { theme: 'light' } }
 
 /** A Scoring row: the mode label; a session saved before the setting reads 16/31. */
-export const ScoringBestOfThree: Story = { args: { scoringLabel: '11/21 × 3' } }
+export const ScoringBestOfThree: Story = {
+  args: {
+    scoringLabel: '11/21 × 3',
+    scoringDescription: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.',
+  },
+}
 export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }
 export const ScoringFixedAfterStart: Story = {
   args: { scoringLabel: '16/31, no deuce', fixedAfterStart: true },

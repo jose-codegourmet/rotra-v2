@@ -1,3 +1,4 @@
+import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -14,6 +15,8 @@ export type PublicPageSummaryDetails = {
   formats: string
   /** The mode label, e.g. "Fair" */
   mode: string
+  /** The scoring mode's label, e.g. "16/31" (SCORING[key].label); omitted reads as 16/31 */
+  scoring?: string
   /** The N in "N games per player" */
   minimum: number
 }
@@ -98,6 +101,7 @@ export function PublicPageSummary({
                 { label: 'Courts', value: details.courts },
                 { label: 'Formats', value: details.formats },
                 { label: 'Mode', value: details.mode },
+                { label: 'Scoring', value: details.scoring ?? SCORING['31'].label },
                 { label: 'Minimum', value: `${details.minimum} games per player` },
               ]}
             />

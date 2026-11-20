@@ -25,7 +25,7 @@ import {
 } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { recordsGames } from '../queue-session/queueSession.types'
+import { recordsGames, sessionScoring } from '../queue-session/queueSession.types'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
@@ -432,6 +432,7 @@ function project(
     courts: courts.map((c) => c.label),
     formats: { singles: s.allowSingles, doubles: s.allowDoubles },
     mode: s.sessionMode,
+    scoring: sessionScoring(s),
     minimum: s.minimumGames,
     notes: s.notes || null,
     participantCount: roster.length,

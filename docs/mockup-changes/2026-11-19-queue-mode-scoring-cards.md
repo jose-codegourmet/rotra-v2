@@ -1,6 +1,6 @@
 # Queue app: Mode and Scoring cards get illustrations; Scoring picks the points first, then Deuce
 
-Status: NEW
+Status: IN MOCK APP — #944
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewSetup()` step 2, `artCard()`, `CARD_ART`, `SCORING_POINTS`, `pointsOf()`
@@ -51,3 +51,9 @@ Superseded by: none
 
 ## Docs updated
 - docs/screens/product/modules/queue/session-setup.md (step 2: Mode cards, Scoring picker)
+
+## Real app work
+- Built in the mock app: `ChoiceGroup` art cards and the Scoring points picker with the Deuce switch in
+  `SessionSetupForm` (#986); `apps/queue` serves the six images from `public/art/session-setup` and the setup
+  container passes them (#986, #988). Scoring is read-only after Start. Real mode does not store the scoring
+  mode yet (see [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md)).

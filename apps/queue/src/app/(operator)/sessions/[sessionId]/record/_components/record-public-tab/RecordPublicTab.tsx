@@ -4,6 +4,7 @@ import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
+import { scoringMode } from '@rotra/schema/scoring'
 import { PublicPageSummary } from '@rotra/ui/public-page-summary'
 import { ParticipantCard } from '@rotra/ui/public-participants/participant-card'
 import { useRouter } from 'next/navigation'
@@ -56,6 +57,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
               .filter(Boolean)
               .join(' + ') || 'No standard format',
           mode: MODE_LABELS[p.mode],
+          scoring: scoringMode(p.scoring).label,
           minimum: p.minimum,
         }}
         publication={

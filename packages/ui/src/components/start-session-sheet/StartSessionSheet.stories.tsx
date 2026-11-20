@@ -41,6 +41,12 @@ export const Refused: Story = {
 /** Record games off: "Off · no results kept" */
 export const RecordGamesOff: Story = { args: { recordGames: false } }
 export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
+/** Scoring (Q22): the session's scoring mode after Mode. */
+export const ScoringBestOfThree: Story = { args: { scoringLabel: '11/21 × 3' } }
+export const ScoringBestOfThreeLight: Story = {
+  ...ScoringBestOfThree,
+  globals: { theme: 'light' },
+}
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 
 /** On time: the planned window is today and not over, so no New end is asked for. */

@@ -37,8 +37,8 @@ Afterwards the same visitor sees a status card instead: **Request sent** (“…
 | Courts | Count and labels |
 | Formats | “Doubles”, “Singles + Doubles”, or “No standard format” |
 | Mode | Name and description (“Fair · Mainly level-matched games, roughly 10% easy games.”) |
-| Scoring | The session's scoring mode label (“16/31”); mockup only, November 18, 2026 |
-| Results | Only when Record games is off (mockup and mock app, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)): “Not recorded · No results, standings or awards for this session.” Shown after Scoring (after Mode while Scoring is not built) and before Minimum. No row for a recorded session |
+| Scoring | The session's scoring mode label and its rule (“16/31 · One game to 31. Change sides at 16. Deuce at 30–30.”); mockup and mock app (#988). Real mode shows 16/31 until the scoring mode is stored |
+| Results | Only when Record games is off (mockup and mock app, November 18, 2026; [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)): “Not recorded · No results, standings or awards for this session.” Shown after Scoring and before Minimum. No row for a recorded session |
 | Minimum | “N games per player” |
 | Payment | “₱X per player · paid at the venue” (the session's payment per player: custom amount, or break-even); “Free” when the amount is 0; the row is omitted when no estimate is saved. Added November 9, 2026 on the owner's request |
 

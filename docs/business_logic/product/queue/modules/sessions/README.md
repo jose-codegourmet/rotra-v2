@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup and mock app, #988; real mode reads 16/31 until the migration); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -26,7 +26,7 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 |---|---|
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). The end is on the session date or the next day, chosen with day buttons (never guessed), after the start and at most 24 hours later. The duration is shown |
 | 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
-| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup only, November 18, 2026): one of five scoring modes, default 16/31 |
+| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup and mock app, November 18, 2026; real mode reads 16/31 until the migration): one of five scoring modes, default 16/31 |
 | 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
 | 3 · Notes and review | Optional notes shown on the public page, plus a summary with an Edit link per section |

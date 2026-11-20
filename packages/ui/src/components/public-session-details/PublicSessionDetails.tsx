@@ -41,6 +41,8 @@ export type PublicSessionDetailsProps = {
   modeDescription: string
   /** The scoring mode's label ("16/31", "11/21 × 3"); omitted reads as 16/31 */
   scoringLabel?: string
+  /** The scoring mode's rule (SCORING[key].text), shown after the label like the Mode row */
+  scoringDescription?: string
   /** Record games; false adds the Results row "Not recorded". Omitted reads as on. */
   recorded?: boolean
   minimumGames: number
@@ -92,6 +94,7 @@ export function PublicSessionDetails({
   modeLabel,
   modeDescription,
   scoringLabel = SCORING['31'].label,
+  scoringDescription,
   recorded = true,
   minimumGames,
   amountDuePerPlayer,
@@ -133,7 +136,16 @@ export function PublicSessionDetails({
                 </>
               ),
             },
-            { label: 'Scoring', value: scoringLabel },
+            {
+              label: 'Scoring',
+              value: scoringDescription ? (
+                <>
+                  {scoringLabel} · <span className="text-fg2">{scoringDescription}</span>
+                </>
+              ) : (
+                scoringLabel
+              ),
+            },
             ...(recorded
               ? []
               : [

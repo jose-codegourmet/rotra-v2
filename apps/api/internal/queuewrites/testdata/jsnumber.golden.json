@@ -1,0 +1,306 @@
+[
+ {
+  "value": null,
+  "gtZero": false
+ },
+ {
+  "value": true,
+  "gtZero": true
+ },
+ {
+  "value": false,
+  "gtZero": false
+ },
+ {
+  "value": 0,
+  "gtZero": false
+ },
+ {
+  "value": 1,
+  "gtZero": true
+ },
+ {
+  "value": -1,
+  "gtZero": false
+ },
+ {
+  "value": 0.5,
+  "gtZero": true
+ },
+ {
+  "value": 3,
+  "gtZero": true
+ },
+ {
+  "value": 1e+300,
+  "gtZero": true
+ },
+ {
+  "value": -1e+300,
+  "gtZero": false
+ },
+ {
+  "value": "",
+  "gtZero": false
+ },
+ {
+  "value": " ",
+  "gtZero": false
+ },
+ {
+  "value": "\n",
+  "gtZero": false
+ },
+ {
+  "value": "0",
+  "gtZero": false
+ },
+ {
+  "value": "3",
+  "gtZero": true
+ },
+ {
+  "value": " 3 ",
+  "gtZero": true
+ },
+ {
+  "value": "\t4\n",
+  "gtZero": true
+ },
+ {
+  "value": "-3",
+  "gtZero": false
+ },
+ {
+  "value": "+3",
+  "gtZero": true
+ },
+ {
+  "value": ".5",
+  "gtZero": true
+ },
+ {
+  "value": "5.",
+  "gtZero": true
+ },
+ {
+  "value": "1e3",
+  "gtZero": true
+ },
+ {
+  "value": "1E3",
+  "gtZero": true
+ },
+ {
+  "value": "1e",
+  "gtZero": false
+ },
+ {
+  "value": "e1",
+  "gtZero": false
+ },
+ {
+  "value": "1.2.3",
+  "gtZero": false
+ },
+ {
+  "value": "--5",
+  "gtZero": false
+ },
+ {
+  "value": "1 2",
+  "gtZero": false
+ },
+ {
+  "value": "1,5",
+  "gtZero": false
+ },
+ {
+  "value": "0x10",
+  "gtZero": true
+ },
+ {
+  "value": "0X1f",
+  "gtZero": true
+ },
+ {
+  "value": "0b11",
+  "gtZero": true
+ },
+ {
+  "value": "0B2",
+  "gtZero": false
+ },
+ {
+  "value": "0o17",
+  "gtZero": true
+ },
+ {
+  "value": "0xg",
+  "gtZero": false
+ },
+ {
+  "value": "0x",
+  "gtZero": false
+ },
+ {
+  "value": "-0x10",
+  "gtZero": false
+ },
+ {
+  "value": "1_000",
+  "gtZero": false
+ },
+ {
+  "value": "0x1_0",
+  "gtZero": false
+ },
+ {
+  "value": "Infinity",
+  "gtZero": true
+ },
+ {
+  "value": "+Infinity",
+  "gtZero": true
+ },
+ {
+  "value": "-Infinity",
+  "gtZero": false
+ },
+ {
+  "value": "infinity",
+  "gtZero": false
+ },
+ {
+  "value": "inf",
+  "gtZero": false
+ },
+ {
+  "value": "NaN",
+  "gtZero": false
+ },
+ {
+  "value": "nan",
+  "gtZero": false
+ },
+ {
+  "value": "abc",
+  "gtZero": false
+ },
+ {
+  "value": "true",
+  "gtZero": false
+ },
+ {
+  "value": "null",
+  "gtZero": false
+ },
+ {
+  "value": "٣",
+  "gtZero": false
+ },
+ {
+  "value": "３",
+  "gtZero": false
+ },
+ {
+  "value": "1n",
+  "gtZero": false
+ },
+ {
+  "value": [],
+  "gtZero": false
+ },
+ {
+  "value": [
+   3
+  ],
+  "gtZero": true
+ },
+ {
+  "value": [
+   0
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   "3"
+  ],
+  "gtZero": true
+ },
+ {
+  "value": [
+   " 3 "
+  ],
+  "gtZero": true
+ },
+ {
+  "value": [
+   null
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   [
+    3
+   ]
+  ],
+  "gtZero": true
+ },
+ {
+  "value": [
+   []
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   1,
+   2
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   true
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   false
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   null,
+   3
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   "abc"
+  ],
+  "gtZero": false
+ },
+ {
+  "value": [
+   {}
+  ],
+  "gtZero": false
+ },
+ {
+  "value": {},
+  "gtZero": false
+ },
+ {
+  "value": {
+   "tubes": 3
+  },
+  "gtZero": false
+ }
+]

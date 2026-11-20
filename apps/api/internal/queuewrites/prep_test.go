@@ -68,16 +68,13 @@ func TestRaceVenueWrites(t *testing.T) {
 	}
 }
 
-// A Save with a cost estimate waits for the money slice and a club logo is an upload. Until then each stops with a 500 instead of
-// skipping that part.
+// A club logo is an upload (out of this track's scope): the write stops with a 500 instead of skipping that part. The cost estimate of a
+// Save is ported (money.golden.json).
 func TestUnportedPartsStop(t *testing.T) {
 	e := raceEnv(t)
 	cases := map[string]writetest.Request{
 		"club logo": jsonRequest(e, t, "PATCH", "/api/club", map[string]any{"expectedRevision": "1", "logoUrl": nil}),
 	}
-	form := sessionForm("2026-12-05T01:00:00.000Z", "2026-12-05T05:00:00.000Z")
-	form["costEstimate"] = map[string]any{"courtFee": 1}
-	cases["create with a cost estimate"] = jsonRequest(e, t, "POST", "/api/sessions", map[string]any{"commandId": "cost-1", "input": form})
 	for name, req := range cases {
 		if got := e.Do(req).Code; got != 500 {
 			t.Errorf("%s answered %d, want 500", name, got)

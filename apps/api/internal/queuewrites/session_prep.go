@@ -34,11 +34,6 @@ import (
 // errTypeError is a body field of the wrong type: the TypeScript throws a TypeError or Prisma refuses the value (a 500).
 var errTypeError = errors.New("queuewrites: a body field has the wrong type")
 
-// errCostEstimatePending is the cost estimate that POST /api/sessions and PATCH /api/sessions/{id} save beside the session
-// (saveSessionCost, packages/db/src/queue/financials.ts). Money is its own slice of the track: until it lands, a request that
-// carries a costEstimate is refused here.
-var errCostEstimatePending = errors.New("queuewrites: saving a cost estimate with a session is not ported yet (the money slice)")
-
 func (s *server) registerSessionPrep(rt *signedin.Router) {
 	rt.Handle("POST /api/sessions", store.AudienceClub, s.club(s.createSession))
 	rt.Handle("PATCH /api/sessions/{sessionId}", store.AudienceClub, s.club(s.patchSession))
@@ -340,7 +335,10 @@ func (s *server) createSession(r *http.Request, club pgtype.UUID) (writes.Result
 		return writes.Result{}, errTypeError // `input.costEstimate` of a missing input, after the sessions were created
 	}
 	if truthy(in["costEstimate"]) {
-		return writes.Result{}, errCostEstimatePending
+		// The estimate is saved on each date the command made, after the sessions were committed (money_cost.go).
+		if err := s.saveCreatedCosts(r, club, out.FirstSessionID, in["costEstimate"]); err != nil {
+			return writes.Result{}, err
+		}
 	}
 	return writes.Result{Status: http.StatusCreated, Body: out}, nil
 }
@@ -509,7 +507,15 @@ func (s *server) patchSession(r *http.Request, club pgtype.UUID) (writes.Result,
 		return writes.Result{}, mapDatabaseError(err)
 	}
 	if in.Has("costEstimate") {
-		return writes.Result{}, errCostEstimatePending
+		// The estimate is saved against the revision in effect, after the edit was committed; the answer is the edit's, from before the
+		// estimate bumped the session revision (money_cost.go).
+		current, err := s.estimateRevision(r.Context(), club, sessionID)
+		if err != nil {
+			return writes.Result{}, err
+		}
+		if err := s.saveSessionCost(r.Context(), club, sessionID, in["costEstimate"], current); err != nil {
+			return writes.Result{}, err
+		}
 	}
 	return writes.Result{Body: out}, nil
 }

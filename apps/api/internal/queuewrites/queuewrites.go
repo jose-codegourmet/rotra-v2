@@ -100,6 +100,8 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerMatchQueue(rt)
 	s.registerSessionFinish(rt)
 	s.registerResultsPublication(rt)
+	s.registerInventory(rt)
+	s.registerPayments(rt)
 }
 
 // at is `new Date()`: the clock in milliseconds.

@@ -155,6 +155,13 @@ the one Auto Queue fill: the court commands now call it too. Session-level comma
 time, Extend, Cancel session and Mark session invalid; Publish results (`results_publication.go`, golden `publish`, with a result snapshot the cases seed: the finalization drive that writes it is not ported, so `POST finalization` is not either). The Player's match request, its cancel and Move me to the waitlist are in
 `public_match_request.go` (golden `pubmr`). A race whose winner is not decided is in `race_match_test.go`.
 
+Money (slice 3.1, `inventory.go`, `payments.go`, `money_cost.go`, golden `money`, cases from `gen-writes-queue-money-cases.py`, capture with `TZ=UTC`): the
+club's inventory (add or edit, stock step, remove), the payment batch, the amount received and Mark all paid, and the cost estimate that Create
+session and Edit preparation save beside the session. The pure rules are in `internal/rules/sessioncost` and `internal/rules/payment` (the signed-in
+reads call them too). `normalizeCost` reads the estimate of a form body as JavaScript does (`jsValue` keeps undefined apart from null; a wrong shape is
+the TypeError the TypeScript answers with a 500), pinned by `jsnumber.golden.json`. A mark is deleted and inserted, never updated. The stock step's
+`updated_at` is the database clock; every other stamp is the application clock. The money sign-off list is in the plan's deviations log.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

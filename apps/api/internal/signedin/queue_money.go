@@ -2,7 +2,6 @@ package signedin
 
 import (
 	"errors"
-	"math"
 	"net/http"
 	"sort"
 
@@ -12,13 +11,14 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/collate"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/payment"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessioncost"
 )
 
 // GET /api/sessions/{sessionId}/cost and /payments (Q-MONEY). Ports of readSessionCost and readSessionPayments in
 // packages/db/src/queue/financials.ts, and of the pure rules in @rotra/data/session-cost and session-payment
-// (internal/rules/sessioncost and payment are still empty, so the rules live here as unexported helpers, as the Admin
-// sales rules do). Money is integer centavos; JavaScript numbers are exact below 2^53, so the arithmetic is done in
-// int64 and float64 where the TypeScript divides.
+// (internal/rules/sessioncost and payment). Money is integer centavos; JavaScript numbers are exact below 2^53, so the arithmetic
+// is done in int64.
 
 type costInput struct {
 	CourtFeePerCourtHour *int32          `json:"courtFeePerCourtHour"`
@@ -59,47 +59,32 @@ type costResult struct {
 	Result             costResultKind `json:"result"`
 }
 
-func nz(v *int32) int64 {
+func int64Ptr(v *int32) *int64 {
 	if v == nil {
-		return 0
+		return nil
 	}
-	return int64(*v)
+	n := int64(*v)
+	return &n
 }
 
-// estimateSessionCost is estimateSessionCost: the court fee rounds to the nearest centavo, break-even up to a whole peso.
+// estimateSessionCost is estimateSessionCost (rules/sessioncost): the DTO of the estimate of an input, the courts and minutes it is for,
+// the players and the club's prices.
 func estimateSessionCost(in costInput, courts, durationMinutes, players int64, price map[string]int32) costResult {
-	p := max(1, players)
-	court := (nz(in.CourtFeePerCourtHour)*courts*durationMinutes + 30) / 60
-	var shuttle int64
+	input := sessioncost.Input{
+		CourtFeePerCourtHour: int64Ptr(in.CourtFeePerCourtHour), EntranceFeePerHead: int64Ptr(in.EntranceFeePerHead),
+		PaymentMode: in.PaymentMode, CustomFeePerHead: int64Ptr(in.CustomFeePerHead),
+	}
+	items := make([]sessioncost.Item, 0, len(price))
+	for id, p := range price {
+		items = append(items, sessioncost.Item{ID: id, UnitCostMinor: int64(p)})
+	}
 	for _, line := range in.Shuttles {
-		shuttle += int64(line.Tubes) * int64(price[line.InventoryItemID])
+		input.Shuttles = append(input.Shuttles, sessioncost.ShuttleLine{InventoryItemID: line.InventoryItemID, Tubes: int64(line.Tubes)})
 	}
-	entranceFee := nz(in.EntranceFeePerHead)
-	entrance := entranceFee * p
-	total := court + shuttle + entrance
-	breakEven := int64(math.Ceil(float64(total)/float64(p*100))) * 100
-	isCustom := in.PaymentMode == "custom"
-	perHead := breakEven
-	if isCustom {
-		perHead = nz(in.CustomFeePerHead)
-	}
-	collect := perHead * p
-	diff := collect - total
-	kind := "loss"
-	switch {
-	case total == 0:
-		kind = "no_costs"
-	case !isCustom || diff == 0:
-		kind = "breaks_even"
-	case diff > 0:
-		kind = "profit"
-	}
-	if diff < 0 {
-		diff = -diff
-	}
+	r := sessioncost.Estimate(input, sessioncost.Context{Courts: courts, DurationMinutes: durationMinutes, Players: players, Items: items})
 	return costResult{
-		Players: p, Court: court, Shuttle: shuttle, Entrance: entrance, EntranceFeePerHead: entranceFee, Total: total, BreakEven: breakEven,
-		PerHead: perHead, IsCustom: isCustom, Collect: collect, Result: costResultKind{Kind: kind, Amount: diff},
+		Players: r.Players, Court: r.Court, Shuttle: r.Shuttle, Entrance: r.Entrance, EntranceFeePerHead: r.EntranceFeePerHead, Total: r.Total,
+		BreakEven: r.BreakEven, PerHead: r.PerHead, IsCustom: r.IsCustom, Collect: r.Collect, Result: costResultKind{Kind: r.Outcome.Kind, Amount: r.Outcome.Amount},
 	}
 }
 
@@ -218,44 +203,17 @@ type paymentTotalsDTO struct {
 	Cost         *int64 `json:"cost"`
 }
 
-// paymentTotals is paymentTotals: marks holds one received amount (null: the current amount due) per marked player.
+// paymentTotals is paymentTotals (rules/payment): marks holds one received amount (null: the current amount due) per marked player.
 func paymentTotals(marks []*int32, total int64, amountDue *int64, cost *int64) paymentTotalsDTO {
-	var paid, partial, collected, owed, toReimburse int64
-	for _, m := range marks {
-		// receivedAmount: a mark with no amount counts as the current amount due (0 with no fee set).
-		var received int64
-		switch {
-		case m != nil:
-			received = int64(*m)
-		case amountDue != nil:
-			received = *amountDue
-		}
-		collected += received
-		switch {
-		case amountDue == nil, received == *amountDue:
-			paid++ // Paid
-		case received <= 0:
-			// Unpaid
-		case received < *amountDue:
-			partial++ // Partial
-		default:
-			paid++ // Reimburse counts as fully paid
-		}
-		if amountDue != nil {
-			owed += max(*amountDue-received, 0)
-			toReimburse += max(received-*amountDue, 0)
-		}
+	list := make([]payment.Mark, len(marks))
+	for i, m := range marks {
+		list[i] = payment.Mark{Amount: int64Ptr(m)}
 	}
-	t := paymentTotalsDTO{Paid: paid, Partial: partial, Total: total, Collected: collected, ToReimburse: toReimburse, Cost: cost}
-	if amountDue != nil {
-		v := (total-int64(len(marks)))*(*amountDue) + owed
-		t.StillDue = &v
+	t := payment.ComputeTotals(list, total, amountDue, cost)
+	return paymentTotalsDTO{
+		Paid: t.Paid, Partial: t.Partial, Total: t.Total, Collected: t.Collected, StillDue: t.StillDue, ToReimburse: t.ToReimburse,
+		AgainstCosts: t.AgainstCosts, Cost: t.Cost,
 	}
-	if cost != nil {
-		v := collected - *cost
-		t.AgainstCosts = &v
-	}
-	return t
 }
 
 func (s *server) queuePayments(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID) (any, error) {

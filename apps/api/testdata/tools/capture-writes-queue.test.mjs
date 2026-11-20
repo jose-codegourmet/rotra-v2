@@ -6,6 +6,7 @@
 //   club       the club's writes (invite link, venues, settings, saved players: add, delete, move, club nickname, registration link)
 //   prep       session preparation and courts (create, edit, join switches, start, delete, the court commands); run with TZ=UTC
 //   match      match control and the queue of waiting matches (place, start, send back, move, swap, replace, substitute, result, invalid, add, edit, remove, reorder, Auto queue, Regenerate)
+//   money      inventory, the payment switches and the cost estimate saved beside a session (Create session, Edit preparation); run with TZ=UTC
 //   finish     Set end time, Extend, Cancel session, Mark session invalid
 //   publish    Publish results (the result snapshot is seeded: the finalization drive that writes it is not ported)
 //   pubmr      the Player's match request, its cancel and Move me to the waitlist (app player)
@@ -105,4 +106,9 @@ test('pubjoin', async () => {
   } finally {
     delete process.env.ROTRA_CAPTURE_ORIGIN
   }
+})
+
+// Run this group with TZ=UTC too: the dates of a repeating series, saved with their cost estimates, read the zone.
+test('money', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'money', apiDir })
 })

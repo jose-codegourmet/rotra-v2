@@ -54,3 +54,9 @@ func TestPublicMatchRequestGolden(t *testing.T) { writetest.Replay(t, "testdata"
 // Publish results. The result snapshot it reads is written by the finalization drive, which is not ported, so the cases seed one. The ids a
 // first publish makes (the publication, its key, the event) are random and hidden by the case files (Case.redact).
 func TestPublishResultsGolden(t *testing.T) { writetest.Replay(t, "testdata", "publish", build) }
+
+// The money: the club's inventory (add, edit, stock step, remove), the payment switches (batch, amount received, Mark all paid) and the cost
+// estimate Create session and Edit preparation save beside the session (cases from gen-writes-queue-money-cases.py, captured with TZ=UTC).
+// Amounts are integer centavos. A database now() (a column default, the stock step's updated_at) shows as "database now()" in the rows; the
+// ids of a shuttle plan line (a version 7 UUID) are pinned by their version. A race whose winner is not decided is in race_money_test.go.
+func TestMoneyGolden(t *testing.T) { writetest.Replay(t, "testdata", "money", build) }

@@ -141,7 +141,7 @@ func run() error {
 			return err
 		}
 		// The Queue app's writes (go-writes-queue): the roster burst batch so far.
-		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins})
 		if err != nil {
 			return err
 		}

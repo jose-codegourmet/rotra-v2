@@ -74,7 +74,7 @@ export async function openCaptureDb() {
 
 /** What Next does for a path: static segments win over a dynamic one; a dynamic segment is percent-decoded. */
 function resolveRoute(apiDir, path) {
-  const url = new URL(path, 'http://localhost:9002')
+  const url = new URL(path, process.env.ROTRA_CAPTURE_ORIGIN ?? 'http://localhost:9002')
   let dir = apiDir
   const params = {}
   for (const raw of url.pathname.split('/').slice(2)) {
@@ -98,7 +98,13 @@ async function send(apiDir, step) {
   const init = { method: step.method }
   if (step.rawBody !== undefined && step.rawBody !== null) init.body = step.rawBody
   else if (step.body !== undefined && step.body !== null) init.body = JSON.stringify(step.body)
-  if (init.body !== undefined) init.headers = { 'content-type': 'application/json' }
+  const headers = init.body !== undefined ? { 'content-type': 'application/json' } : {}
+  // Step.headers: sent as given; "" leaves a default header out.
+  for (const [name, value] of Object.entries(step.headers ?? {})) {
+    if (value === '') delete headers[name.toLowerCase()]
+    else headers[name.toLowerCase()] = value
+  }
+  init.headers = headers
   return handler(new Request(url, init), { params: Promise.resolve(params) })
 }
 

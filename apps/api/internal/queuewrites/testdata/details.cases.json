@@ -1,0 +1,859 @@
+{
+ "now": "2026-11-19T04:00:00.000Z",
+ "app": "club",
+ "snapshotDiff": true,
+ "seed": "queue.seed.sql",
+ "scenarios": {
+  "base": [],
+  "hal_released": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000001'"
+  ],
+  "hal_no_show": [
+   "UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a7000000-0000-4000-8000-000000000004'"
+  ],
+  "s2_free_slot": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000003'"
+  ],
+  "kai_not_waiting": [
+   "DELETE FROM session_waitlist WHERE id = 'a3300000-0000-4000-8000-000000000002'"
+  ],
+  "s3_full": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
+  ],
+  "club_has_a_code": [
+   "UPDATE clubs SET invite_code = 'ABCDEFGHJK' WHERE id = 'c9000000-0000-4000-8000-000000000001'"
+  ],
+  "club_has_settings": [
+   "UPDATE clubs SET post_template = 'Old template', description = 'Old description', court_rules = 'Old rules', self_check_in_enabled = true WHERE id = 'c9000000-0000-4000-8000-000000000001'"
+  ],
+  "gus_has_a_phone": [
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', '+639175550100', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "gus_has_a_phone_and_is_deleted": [
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', '+639175550100', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-05 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000001'"
+  ],
+  "ann_has_a_club_nickname": [
+   "UPDATE club_players SET nickname = 'Old nick' WHERE id = 'c6000000-0000-4000-8000-000000000003'"
+  ],
+  "hal_present_on_s3": [
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000004'"
+  ],
+  "dee_saved": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, revision, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000040', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', 'Dee Unclaimed', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', 1, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "gus_everywhere": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000101', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000001', 3, TIMESTAMPTZ '2026-11-17 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, club_player_id, created_at, updated_at, revision) VALUES ('a3400000-0000-4000-8000-000000000030', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Gus Guest', 'unsure', 'slot', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'c6000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, created_at, updated_at, revision) VALUES ('a8000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', decode('00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff', 'hex'), 'active', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-26 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000005', 'c6000000-0000-4000-8000-000000000001', 'Gus Old', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-16 00:00:00+00', 'removed', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "gus_released_on_s1": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Old', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-16 00:00:00+00', 'removed', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "gus_and_una_on_s1": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000005', 'Una Alonzo', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "gus_and_una_on_s1_una_released": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000005', 'Una Alonzo', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-16 00:00:00+00', 'removed', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "gus_and_una_both_waiting_on_s2": [
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000101', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000001', 3, TIMESTAMPTZ '2026-11-17 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000102', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000005', 3, TIMESTAMPTZ '2026-11-17 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "hal_on_court": [
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000004'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, placed_at, started_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'active', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "hal_in_a_waiting_match": [
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000004'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, placed_at, started_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'waiting', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "una_has_a_phone": [
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', '+639175550111', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "rex_has_that_phone_and_is_deleted": [
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000006', 'c9000000-0000-4000-8000-000000000001', '+639175550199', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "una_has_experience": [
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', NULL, '{\"version\":1,\"playingStyle\":\"Old\",\"experienceMonths\":24,\"experienceRecordedAt\":\"2026-03-10T00:00:00.000Z\",\"socialLinks\":{\"facebook\":\"old\"}}'::jsonb, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "queue_sessions",
+   "sql": "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, minimum_games, updated_at FROM queue_sessions ORDER BY id"
+  },
+  {
+   "name": "session_players",
+   "sql": "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, games_adjustment, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"
+  },
+  {
+   "name": "club_assessments",
+   "sql": "SELECT club_player_id, session_id, session_player_id, player_id_at_assessment, skill_level_id, (SELECT s.source_operation_id FROM club_assessments s WHERE s.id = club_assessments.supersedes_id) AS supersedes_operation_id, source_operation_id, assessed_at, received_at, accepted_revision::text AS accepted_revision, actor_club_id FROM club_assessments ORDER BY source_operation_id"
+  },
+  {
+   "name": "session_waitlist",
+   "sql": "SELECT id, session_id, club_player_id, skill_level_id, added_at, demoted_at, demoted_confirmed_at, created_at, updated_at, revision::text AS revision FROM session_waitlist ORDER BY id"
+  },
+  {
+   "name": "session_join_requests",
+   "sql": "SELECT id, session_id, name, nickname, phone_e164, status, placement, requested_at, decided_at, decided_by_device_id, club_player_id, player_id, created_at, updated_at, revision::text AS revision FROM session_join_requests ORDER BY id"
+  },
+  {
+   "name": "club_players",
+   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
+  },
+  {
+   "name": "club_player_private_inputs",
+   "sql": "SELECT club_player_id, club_id, phone_e164, email, preset_fields, state, captured_at, created_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_player_id"
+  },
+  {
+   "name": "shared_player_entries",
+   "sql": "SELECT email, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
+  },
+  {
+   "name": "player_id_counters",
+   "sql": "SELECT l.country_code, l.city_code, c.sync_date, c.last_sequence FROM player_id_counters c JOIN location_codes l ON l.id = c.location_code_id ORDER BY l.city_code, c.sync_date"
+  },
+  {
+   "name": "player_notifications",
+   "sql": "SELECT n.player_id, n.kind, n.title, n.body, n.target, n.source_type, COALESCE((SELECT a.source_operation_id FROM club_assessments a WHERE n.source_type = 'club_assessment' AND a.id = n.source_id), n.source_id) AS source_id, n.created_at, n.read_at FROM player_notifications n ORDER BY n.player_id, n.kind, n.source_type, 7"
+  },
+  {
+   "name": "session_match_requests",
+   "sql": "SELECT id, session_id, session_player_id, status, decided_at, created_at, updated_at, revision::text AS revision FROM session_match_requests ORDER BY id"
+  },
+  {
+   "name": "admin_audit_events",
+   "sql": "SELECT count(*)::text AS n FROM admin_audit_events"
+  },
+  {
+   "name": "clubs",
+   "sql": "SELECT id, name, invite_code, post_template, description, court_rules, self_check_in_enabled, revision::text AS revision, updated_at FROM clubs ORDER BY id",
+   "redact": [
+    "invite_code"
+   ]
+  },
+  {
+   "name": "club_venues",
+   "sql": "SELECT id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, currency, created_at, updated_at, revision::text AS revision FROM club_venues ORDER BY id"
+  },
+  {
+   "name": "club_player_claim_links",
+   "sql": "SELECT club_player_id, club_id, state, issued_at, expires_at, consumed_at, revoked_at, created_at, updated_at, revision::text AS revision FROM club_player_claim_links ORDER BY club_player_id, revision, state"
+  },
+  {
+   "name": "player_claim_links",
+   "sql": "SELECT player_id, issuing_club_id, state, issued_at, expires_at, consumed_at, revoked_at, created_at, updated_at, revision::text AS revision FROM player_claim_links ORDER BY player_id, revision, state"
+  }
+ ],
+ "cases": [
+  {
+   "name": "edit_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": null,
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_player_subject_is_not_a_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "edit_without_a_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_renamed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "  Gus Renamed ",
+      "nickname": " Gussy "
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_blank_nickname_clears_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "   "
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_nickname_not_text_clears_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "  "
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_name_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_gets_no_details_row",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "playingStyle": "Attacker",
+      "experienceYears": 2,
+      "socialLinks": {
+       "facebook": "fb"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_typed_phone_is_not_kept",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "phone": "0917 555 0199"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_typed_email_makes_them_unclaimed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "  New.Person@Example.test "
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_email_of_a_person_already_saved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "una@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_email_of_a_registered_player_already_saved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "ben@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_email_of_a_registered_player_not_saved",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "gil@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_guest_email_of_an_unclaimed_person_on_rotra",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "eve@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_email_not_valid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "nope"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_email_is_ignored_when_one_is_on_file",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "other@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_an_unclaimed_player_saves_details",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una A",
+      "nickname": "U",
+      "playingStyle": "  Defender ",
+      "experienceYears": 2,
+      "experienceMonths": 3,
+      "socialLinks": {
+       "facebook": " fb.com/una ",
+       "instagram": "ig",
+       "youtube": 5,
+       "linkedin": null,
+       "tiktok": "x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_an_unclaimed_player_takes_a_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "phone": "0917 555 0150"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_an_unclaimed_player_phone_not_valid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "phone": "123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_phone_is_checked_before_the_entitlement",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000020",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "fullName": "Larry Lapsed",
+      "phone": "123"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_phone_on_file_is_never_replaced",
+   "scenario": "una_has_a_phone",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "phone": "0917 555 0150"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_phone_taken_by_another_saved_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "phone": "0917 555 0001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_phone_taken_by_a_deleted_player_is_fine",
+   "scenario": "rex_has_that_phone_and_is_deleted",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "phone": "0917 555 0199"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_an_older_record_with_a_phone_and_no_email",
+   "scenario": "gus_has_a_phone",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "playingStyle": "Net",
+      "experienceMonths": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_shows_the_experience_that_kept_counting",
+   "scenario": "una_has_experience",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": 2,
+      "experienceMonths": 9
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_unchanged_keeps_the_recorded_date",
+   "scenario": "una_has_experience",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": 2,
+      "experienceMonths": 8
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_cleared",
+   "scenario": "una_has_experience",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_months_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceMonths": 11
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_years_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": 80
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_too_many_years",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": 81
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_too_many_months",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceMonths": 12
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_negative",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": -1
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_fraction",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceMonths": 1.5
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_experience_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "experienceYears": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_registered_player_keeps_their_own_details",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000003",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Ann R"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_a_deleted_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000006",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Rex"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_unknown_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "X"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_other_clubs_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000030",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "X"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_malformed_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/m",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "X"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_lapsed_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000020",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "fullName": "Larry"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "new.person@example.test"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "email": "another@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_the_same_edit_twice_at_once",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "PATCH",
+       "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "fullName": "Una A"
+       }
+      },
+      {
+       "method": "PATCH",
+       "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "fullName": "Una A"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

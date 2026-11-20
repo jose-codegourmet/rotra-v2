@@ -40,6 +40,9 @@
 //   - "parallel" (above) races requests; the case file's "snapshotDiff": true pins only the rows that changed (see CaseFile), which
 //     keeps the golden of a big seed readable.
 //
+// A step may also send "headers" (the Player's session page calls come from the paired Queue origin, so its steps send an Origin; a value
+// of "" leaves out a default header such as the Content-Type). A body that is not JSON (an empty 204) is pinned as {"__raw": text}.
+//
 // The app of a case file is admin, player or club (the Queue app: Env.ClubPass signs a club account in, Env.RelinkClubs links the
 // seed's club accounts to Go sign-in identities). A Player file signs the players of its seed in (Env.RelinkPlayers makes a Go
 // sign-in identity for each account that has none, and Replay signs a step's "who", the account's auth subject, in with

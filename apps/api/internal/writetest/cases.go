@@ -58,6 +58,9 @@ type Step struct {
 	// Body is the JSON body; RawBody is a body sent as is (not JSON, or JSON with odd bytes). Neither: no body.
 	Body    json.RawMessage `json:"body"`
 	RawBody *string         `json:"rawBody"`
+	// Headers are sent with the request. A value of "" leaves a default header out (the Content-Type a body gets). The Player's
+	// session page calls come from the paired Queue origin, so a step there sends Origin.
+	Headers map[string]string `json:"headers"`
 	// Parallel sends these steps at the same moment; the other fields of this step are then not used.
 	Parallel []Step `json:"parallel"`
 	// Redact lists the dotted paths in the response body whose value is generated ("a.b", "list.*.id"). On a

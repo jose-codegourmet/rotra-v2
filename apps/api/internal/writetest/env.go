@@ -336,6 +336,8 @@ type Request struct {
 	Body string
 	// NoSecret leaves the proxy secret out.
 	NoSecret bool
+	// Headers are set after the defaults; a value of "" removes a default header.
+	Headers map[string]string
 }
 
 // Do sends the request through the proxy guard and returns what was answered.
@@ -356,6 +358,13 @@ func (e *Env) Do(r Request) *httptest.ResponseRecorder {
 	}
 	if r.Body != "" {
 		hr.Header.Set("Content-Type", "application/json")
+	}
+	for k, v := range r.Headers {
+		if v == "" {
+			hr.Header.Del(k)
+		} else {
+			hr.Header.Set(k, v)
+		}
 	}
 	w := httptest.NewRecorder()
 	e.Handler.ServeHTTP(w, hr)

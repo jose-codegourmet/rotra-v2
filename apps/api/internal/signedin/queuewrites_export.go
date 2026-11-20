@@ -2,12 +2,14 @@ package signedin
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
 )
 
 // What the Queue writes (internal/queuewrites) answer with: the same roster read, entry, waitlist entry and join
@@ -138,4 +140,94 @@ func VenueOf(v sqlcgen.ClubVenue) Venue {
 		CourtFeePerCourtHr: moneyOrNil(v.CourtFeePerCourtHourMinor, v.Currency), EntranceFee: moneyOrNil(v.EntranceFeeMinor, v.Currency),
 		Revision: httpapi.ToDecimalString(v.Revision),
 	}
+}
+
+// Match is matchDto on the wire.
+type Match = queueMatchDTO
+
+// MatchContext is what matchContext holds for a session: the live roster, the courts and the matches in the shapes the shared
+// rules read, with the stored match rows behind them (a write that places a match needs the row of each).
+type MatchContext struct {
+	Roster  []model.Player
+	Courts  []model.Court
+	Matches []model.Match
+	Rows    []sqlcgen.ListSessionMatchRowsRow
+}
+
+// MatchContextOf reads the match context of a session, on q (a transaction's queries). The roster has no games adjustment: the
+// caller that needs it reads the stored roster too.
+func MatchContextOf(ctx context.Context, q *sqlcgen.Queries, sessionID pgtype.UUID) (MatchContext, error) {
+	ls := &loadedSession{}
+	if err := ls.fill(ctx, q, sessionID); err != nil {
+		return MatchContext{}, err
+	}
+	return MatchContext{Roster: ls.rules, Courts: ls.courts, Matches: ls.matches, Rows: ls.matchRows}, nil
+}
+
+// MatchOf is matchDto for one match of a session, as stored now; false when it is not among the session's matches.
+func MatchOf(ctx context.Context, q *sqlcgen.Queries, sessionID pgtype.UUID, matchID pgtype.UUID) (Match, bool, error) {
+	all, err := matchesIn(ctx, q, sessionID)
+	if err != nil {
+		return Match{}, false, err
+	}
+	want := matchID.String()
+	for _, m := range all {
+		if m.ID == want {
+			return m, true, nil
+		}
+	}
+	return Match{}, false, nil
+}
+
+// OwnDetails is readOwnDetails: what a club entered about its own unclaimed player. Anything missing or malformed reads as not
+// entered. Months is nil with no experience; RecordedAt is the stored text of the date it was recorded ("" for none).
+type OwnDetails struct {
+	PlayingStyle string
+	Months       *int64
+	RecordedAt   string
+	Links        map[string]string
+}
+
+// OwnDetailsOf reads the stored details (club_player_private_inputs.preset_fields).
+func OwnDetailsOf(stored []byte) OwnDetails {
+	d := readOwnDetails(stored)
+	return OwnDetails{PlayingStyle: d.playingStyle, Months: d.months, RecordedAt: d.recordedAt, Links: d.links}
+}
+
+// CurrentExperienceMonths is currentExperienceMonths: the recorded months plus the calendar months since they were recorded. A
+// recorded date that is not a date leaves the months as they are.
+func CurrentExperienceMonths(months int64, recordedAt string, now time.Time) int64 {
+	if recordedAt == "" {
+		return months
+	}
+	at, ok := parseJSDate(recordedAt)
+	if !ok {
+		return months
+	}
+	return currentMonthsAt(months, at, now)
+}
+
+// ErrNoSuchPlayer is StandingOf for a Player with no row: forbidden.
+var ErrNoSuchPlayer = errors.New("signedin: no such player")
+
+// PlayerStanding is what the Player's join write decides on: playerStanding without the display fields.
+type PlayerStanding struct {
+	InSession bool
+	// WaitlistClubPlayerID is the Player's own saved player while they are waitlisted and not on the roster.
+	WaitlistClubPlayerID pgtype.UUID
+	// RequestPending says the Player's latest request is pending.
+	RequestPending bool
+}
+
+// StandingOf is playerStanding: where the signed-in Player stands in a session. A Player that does not exist is forbidden.
+func StandingOf(ctx context.Context, q *sqlcgen.Queries, playerID, sessionID pgtype.UUID) (PlayerStanding, error) {
+	st, err := playerStanding(ctx, q, playerID, sessionID)
+	var se *serviceError
+	if errors.As(err, &se) && se.code == httpapi.ErrForbidden {
+		return PlayerStanding{}, ErrNoSuchPlayer
+	}
+	if err != nil {
+		return PlayerStanding{}, err
+	}
+	return PlayerStanding{InSession: st.InSession, WaitlistClubPlayerID: st.waitlistClubPlayer, RequestPending: st.JoinRequest != nil && st.JoinRequest.Status == "pending"}, nil
 }

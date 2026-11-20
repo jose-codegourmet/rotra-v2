@@ -147,7 +147,7 @@ func saveStep(t *testing.T, label string, got stepAnswer, s Step, vars map[strin
 
 // request builds the request of a step. It signs the account in first, so the pass is issued at the case's instant.
 func (e *Env) request(t *testing.T, app string, s Step) Request {
-	r := Request{Method: s.Method, Path: s.Path, App: app}
+	r := Request{Method: s.Method, Path: s.Path, App: app, Headers: s.Headers}
 	if s.Who != nil {
 		switch app {
 		case "player":
@@ -206,7 +206,8 @@ func normalize(t *testing.T, label string, body []byte, redact []string, optiona
 	t.Helper()
 	v, err := decode(body)
 	if err != nil {
-		t.Fatalf("%s: body is not JSON: %q (%v)", label, body, err)
+		// A body that is not JSON (an empty 204, text) is pinned as the capture keeps it: {"__raw": text}.
+		v = map[string]any{"__raw": string(body)}
 	}
 	redactor := RedactPaths
 	if optional {

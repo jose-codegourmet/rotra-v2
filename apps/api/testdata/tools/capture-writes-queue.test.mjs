@@ -62,3 +62,22 @@ test('prep', async () => {
 test('club', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'club', apiDir })
 })
+
+test('requests', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'requests', apiDir })
+})
+
+test('details', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'details', apiDir })
+})
+
+// The Player app's routes (apps/player/src/app/api/public-sessions/*) called from the paired Queue origin: the request URL is the
+// Player's own origin (localhost:9001) and each step sends Origin http://localhost:9000.
+test('pubjoin', async () => {
+  process.env.ROTRA_CAPTURE_ORIGIN = 'http://localhost:9001'
+  try {
+    await captureWrites({ db: capture.db, testdata, name: 'pubjoin', apiDir: resolve(root, 'apps/player/src/app/api') })
+  } finally {
+    delete process.env.ROTRA_CAPTURE_ORIGIN
+  }
+})

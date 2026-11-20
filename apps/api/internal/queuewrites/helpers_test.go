@@ -18,7 +18,7 @@ func TestMain(m *testing.M) { testpg.Main(m) }
 
 // build registers the Queue writes behind the shared signedin router, as main does, with the clock of the case.
 func build(pool *pgxpool.Pool, auth *session.Authenticator, log *slog.Logger, now func() time.Time) func(*http.ServeMux) {
-	routes, err := queuewrites.Routes(queuewrites.Deps{Pool: pool, Auth: auth, Logger: log, Now: now})
+	routes, err := queuewrites.Routes(queuewrites.Deps{Pool: pool, Auth: auth, Logger: log, Now: now, QueueOrigins: []string{"http://localhost:9000"}})
 	if err != nil {
 		panic(err)
 	}

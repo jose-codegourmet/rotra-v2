@@ -96,6 +96,8 @@ type standing struct {
 	InSession        bool             `json:"inSession"`
 	WaitlistPosition *int             `json:"waitlistPosition"`
 	JoinRequest      *joinRequestView `json:"joinRequest"`
+	// waitlistClubPlayer is the Player's own saved player while waitlisted (waitlistClubPlayerId); the join write reads it.
+	waitlistClubPlayer pgtype.UUID
 }
 
 // joinRequestView is the Player's latest join request.
@@ -153,6 +155,7 @@ func playerStanding(ctx context.Context, q *sqlcgen.Queries, playerID, sessionID
 	if !onRoster && waitIndex >= 0 {
 		pos := waitIndex + 1
 		st.WaitlistPosition = &pos
+		st.waitlistClubPlayer = ordered[waitIndex].ClubPlayerID
 	}
 	// A confirmed request whose place the Queue Master has since removed is history, not a status.
 	if hasRequest && (request.Status != sqlcgen.JoinRequestStatusConfirmed || inSession) {

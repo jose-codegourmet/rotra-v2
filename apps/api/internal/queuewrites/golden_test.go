@@ -23,3 +23,16 @@ func TestSessionPrepGolden(t *testing.T) { writetest.Replay(t, "testdata", "prep
 // The club's writes: the invite link, venues, settings and saved players (add, delete, move, club nickname, registration link). A race
 // whose winner is not decided is not pinned here.
 func TestClubWritesGolden(t *testing.T) { writetest.Replay(t, "testdata", "club", build) }
+
+// Join and match requests: confirm and decline a join request, add and decline a match request, the Auto Queue court fill and the
+// drop-out notices (Keep, Remove from roster). The court fill's operation ids are random, so its case files hide them (Case.redact).
+func TestRequestsGolden(t *testing.T) { writetest.Replay(t, "testdata", "requests", build) }
+
+// Edit details of a saved player (PATCH /api/club/players/{id}): the name, the email once, the phone when none is on file, and the
+// club's own playing style, experience and links of an unclaimed player.
+func TestEditDetailsGolden(t *testing.T) { writetest.Replay(t, "testdata", "details", build) }
+
+// The signed-in Player's writes on a public Queue Session, called from the paired Queue origin (the app is player): join, cancel the
+// request, I'm here, I'm leaving, I can't make it and the Session invite. The ids a join and a notice make are random, so the case
+// file hides them (Case.redact).
+func TestPublicSessionWritesGolden(t *testing.T) { writetest.Replay(t, "testdata", "pubjoin", build) }

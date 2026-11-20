@@ -55,6 +55,8 @@ type Deps struct {
 	// Now is the clock the rows are stamped with (Prisma stamps created and updated times with the application clock) and
 	// the notification texts and entitlement checks read. Nil is time.Now.
 	Now func() time.Time
+	// QueueOrigins are the exact Queue app origins that may call the Player routes of a public session (ROTRA_QUEUE_ORIGINS).
+	QueueOrigins []string
 }
 
 type server struct {
@@ -62,6 +64,8 @@ type server struct {
 	auth *session.Authenticator
 	log  *slog.Logger
 	now  func() time.Time
+	// queueOrigins are the origins the Player routes of a public session answer to.
+	queueOrigins []string
 }
 
 // Routes returns what registers the Queue writes on the shared signedin router (signedin.Deps.Routes).
@@ -69,7 +73,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("queuewrites: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}
@@ -86,6 +90,12 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerSessionPrep(rt)
 	s.registerCourts(rt)
 	s.registerClubWrites(rt)
+	s.registerJoinRequests(rt)
+	s.registerMatchRequests(rt)
+	s.registerCourtFill(rt)
+	s.registerDropOuts(rt)
+	s.registerClubPlayerDetails(rt)
+	s.registerPublicSession(rt)
 }
 
 // at is `new Date()`: the clock in milliseconds.

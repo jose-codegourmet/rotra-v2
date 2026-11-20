@@ -135,6 +135,15 @@ shares (the repeating dates and their clashes, the court window, the late start'
 transaction and lock the session without the live-session exception: use `lockedSession(..., false, ...)` for such a command, `inSession` for the
 rest. A session a command changed is read again with `txn.reload` / `txn.touch` (the queries return no row because pgx cannot scan an enum array).
 
+Join and match requests (slice 2.2) are in the same package. `join_requests.go`, `match_requests.go`, `court_fill.go`, `drop_outs.go` and
+`club_player_details.go` are the Queue Master's side (goldens `requests` and `details`); `match_store.go` is the match store the match control
+slice builds on (`matchCommand`, `matchContext`, `appendMatch`, `putOnCourt` with its court and player holds, `autoFill` as `fillCourts`).
+`public_session.go` is the signed-in Player's side (golden `pubjoin`, app `player`): every route checks the paired Queue origin and the JSON
+content type first, answers the CORS preflight, then the Player pass in write mode and the Google deadline gate, and locks the session without
+the club entitlement check (`inPageSession`). The match request rules no other code shares are in `internal/rules/matchrequest` (a grid captured from
+the real TypeScript: `testdata/tools/capture-matchrequest-lineup.test.mjs`). A step of the write harness may send `headers` (an Origin, or a
+Content-Type left out with ""), and the capture runs the Player's Route Handlers on the Player origin (`ROTRA_CAPTURE_ORIGIN`).
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

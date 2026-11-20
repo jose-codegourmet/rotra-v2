@@ -56,3 +56,4 @@ Superseded by: none
 
 ## Real app work
 - Supabase Google provider and the OAuth callback route in apps/player; the Player sign-in, invite, join and link screens; Sign-in methods card; the announcement band. Real mode needs the owner's Google Cloud OAuth client and Supabase settings first.
+- Real mode written in #922 behind `player_google_sign_in` (November 18, 2026), completed November 20, 2026 ([D-2026-11-20-01](../mvp/decisions/2026-11-20.md#d-2026-11-20-01)): the Admin link card and Google registration with the city (the RTR ID takes that place, no club joined), and the session invite card naming the inviter from `invite=` (own invite included). Migration `20261118000200_player_google_sign_in` is applied to the shared database; `20261120000100_admin_link_registration` is written, not applied. Not run against Google yet (#896).

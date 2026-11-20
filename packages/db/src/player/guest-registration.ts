@@ -6,12 +6,52 @@ import { prisma } from '../client/prisma'
 import { ServiceError } from '../service/errors'
 import { type ClaimDetails, registerFromClaim, registerFromClaimWithGoogle } from './account-access'
 import { CLAIM_LINK_DAYS } from './claim'
-import { allocateRtrId, linkClubRecordsByPhone } from './identity'
+import { allocateRtrId, CITY_REQUIRED, linkClubRecordsByPhone, type RtrIdPlace } from './identity'
 import { addPlayerToClub } from './my-clubs'
 import { claimSharedEntry } from './shared-entry'
 
 const MATCH = { status: 'account-match' as const }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * The Admin link (`/register`, D-2026-11-09-06): no club, no session. The player picks a city or
+ * province for the RTR ID, and registering adds them to no club.
+ */
+const ADMIN_LINK = {
+  clubName: null,
+  sessionTitle: null,
+  sessionSlug: null,
+  sessionPageUrl: null,
+} as const
+
+type RegistrationContext = Awaited<ReturnType<typeof guestRegistrationClub>> | typeof ADMIN_LINK
+
+/** A club or session link's context (checked by `guestRegistrationClub`), or the Admin link's. */
+async function registrationContext(
+  clubId: string | null,
+  sessionSlug?: string | null,
+  inviteCode?: string | null,
+): Promise<RegistrationContext> {
+  return clubId ? guestRegistrationClub(clubId, sessionSlug, inviteCode) : ADMIN_LINK
+}
+
+/**
+ * Where the RTR ID takes its place from: the club's founding city, or for the Admin link the
+ * founding city the player picked (`PH-CEB`, as A-ADD-CLUB names one), one ROTRA knows
+ * (`location_codes`, Admin-managed). No city is allowed only for an email with an open shared
+ * entry, which keeps that RTR ID; `allocateRtrId` refuses the rest with the city question.
+ */
+async function placeOf(clubId: string | null, cityCode?: string | null): Promise<RtrIdPlace> {
+  if (clubId) return clubId
+  const [countryCode, code] = (cityCode ?? '').trim().toUpperCase().split('-')
+  if (!countryCode || !code) return { locationCodeId: null }
+  const location = await prisma.locationCode.findUnique({
+    where: { countryCode_cityCode: { countryCode, cityCode: code } },
+    select: { id: true },
+  })
+  if (!location) throw new ServiceError('invalid', { cityCode: CITY_REQUIRED })
+  return { locationCodeId: location.id }
+}
 
 /**
  * The registration page's context; no guest, player or private contact is exposed. `sessionSlug` (#689) is the session link the visitor came from
@@ -52,60 +92,73 @@ export async function guestRegistrationClub(
 }
 
 /**
- * #490: independent registration. The club supplies the RTR allocation context, and the RTR ID is
- * allocated here, at registration (D-2026-11-11-03). Never writes roster, history attribution or
+ * #490: independent registration. The club supplies the RTR allocation context (for the Admin link,
+ * `clubId` null, the city the player picked does), and the RTR ID is allocated here, at
+ * registration (D-2026-11-11-03). Never writes roster, history attribution or
  * permanent results. Once the account exists, every club's unclaimed record with the same phone
  * links to the new player automatically (D-2026-11-11-03, owner answer November 12, 2026: no Queue
  * Master tap; the phone is not verified, an accepted MVP risk), then the new player is saved to the
  * originating club (D-2026-11-09-06, #707), as the mock does; a club link (with its current invite
- * code, #712) and a session link both join that club.
+ * code, #712) and a session link both join that club; the Admin link joins none (club records the
+ * phone or email links still join the account).
  * A client-generated secret makes provider failures/lost replies retryable through the existing
  * claim staging. Only its digest is stored; a retry must still supply the same private contacts.
  */
 export async function registerGuest(
   cookies: CookieAdapter,
-  clubId: string,
+  clubId: string | null,
   input: {
     attempt: string
     email: string
     phoneE164: string
     password: string
     details: ClaimDetails
+    /** The Admin link's city or province (`PH-CEB`); ignored for a club or session link */
+    cityCode?: string | null
   },
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {
-  const context = await guestRegistrationClub(clubId, sessionSlug, inviteCode)
+  const context = await registrationContext(clubId, sessionSlug, inviteCode)
   if (!/^[a-f0-9]{64}$/.test(input.attempt)) throw new ServiceError('invalid')
   const email = input.email.trim().toLowerCase()
   const token = `registration:${input.attempt}`
-  const staged = { ...input, email }
-  if (!(await stageRegistration(clubId, token, staged))) return MATCH
+  const { cityCode = null, ...rest } = input
+  const staged = { ...rest, email }
+  const place = await placeOf(clubId, cityCode)
+  if (!(await stageRegistration(clubId, token, staged, place))) return MATCH
   return finishRegistration(clubId, context, input.phoneE164, [email], null, () =>
     registerFromClaim(cookies, token, staged),
   )
 }
 
 /**
- * Registration from a club or session invite with Google (D-2026-11-16-01, #922): the same staging
- * and the same joins as `registerGuest`, with Google's login instead of a new email + password
- * login. `pending` is the held Google sign-in, verified with the provider by the caller, on a login
+ * Registration from a club or session invite, or the Admin link (`clubId` null, with the picked
+ * city), with Google (D-2026-11-16-01, #922): the same staging and the same joins as
+ * `registerGuest`, with Google's login instead of a new email + password login. `pending` is the held Google sign-in, verified with the provider by the caller, on a login
  * with no ROTRA account. The Google email is the ROTRA email, confirmed at once; the phone is
  * required. The attempt is keyed on Google's login, so a retry resumes the same registration.
  */
 export async function registerGuestWithGoogle(
   jar: GoogleCookies,
-  clubId: string,
+  clubId: string | null,
   pending: PendingGoogle,
-  input: { phoneE164: string; details: ClaimDetails; identityRecordId?: string | null },
+  input: {
+    phoneE164: string
+    details: ClaimDetails
+    identityRecordId?: string | null
+    /** The Admin link's city or province (`PH-CEB`); ignored for a club or session link */
+    cityCode?: string | null
+  },
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {
-  const context = await guestRegistrationClub(clubId, sessionSlug, inviteCode)
+  const context = await registrationContext(clubId, sessionSlug, inviteCode)
   const token = `registration:google:${pending.subject}`
-  const { identityRecordId = null, ...details } = input
+  const { identityRecordId = null, cityCode = null, ...details } = input
   const staged = { ...details, email: pending.google.email }
-  if (!(await stageRegistration(clubId, token, staged, pending.subject))) return MATCH
+  const place = await placeOf(clubId, cityCode)
+  if (!(await stageRegistration(clubId, token, staged, place, pending.subject))) return MATCH
   // The Google email is the ROTRA email here, so one match covers both (D-2026-11-16-04).
   return finishRegistration(
     clubId,
@@ -118,15 +171,17 @@ export async function registerGuestWithGoogle(
 }
 
 /**
- * Step 1 of registration: the unclaimed player, its private contact, its RTR ID and the staging
- * link, in one transaction. False when the phone or email already belongs to an account (nothing
- * is created). `googleSubject` is the login Google made for this very email, which is therefore
- * not "another login"; a Google email connected to an account also counts as used.
+ * Step 1 of registration: the unclaimed player, its private contact, its RTR ID (from `place`) and
+ * the staging link (no issuing club for the Admin link), in one transaction. False when the phone
+ * or email already belongs to an account (nothing is created). `googleSubject` is the login Google
+ * made for this very email, which is therefore not "another login"; a Google email connected to an
+ * account also counts as used.
  */
 async function stageRegistration(
-  clubId: string,
+  clubId: string | null,
   token: string,
   input: { email: string; phoneE164: string; details: ClaimDetails },
+  place: RtrIdPlace,
   googleSubject?: string,
 ) {
   const { email } = input
@@ -186,7 +241,7 @@ async function stageRegistration(
           data: { playerId: player.id, phoneE164: input.phoneE164, email },
         })
         // An email clubs already saved keeps its RTR ID (D-2026-11-16-04).
-        await allocateRtrId(tx, player.id, clubId, now, [email])
+        await allocateRtrId(tx, player.id, place, now, [email])
         await tx.playerClaimLink.create({
           data: {
             playerId: player.id,
@@ -212,14 +267,14 @@ async function stageRegistration(
  * the player in; then the shared entry with the registering email (D-2026-11-16-04: the ROTRA email
  * or the Google email) is claimed and every club's record pointing to it joins the account, the
  * phone still links every club's older record with that phone and no email (owner answer,
- * November 18, 2026), and the player joins the club. `joinedClubs` names the clubs whose
- * email-saved records joined.
+ * November 18, 2026), and the player joins the club (none for the Admin link). `joinedClubs`
+ * names the clubs whose email-saved records joined.
  */
 async function finishRegistration<
   R extends { playerId: string; rtrId: string; firstName: string; session: unknown },
 >(
-  clubId: string,
-  context: Awaited<ReturnType<typeof guestRegistrationClub>>,
+  clubId: string | null,
+  context: RegistrationContext,
   phoneE164: string,
   emails: string[],
   identityRecordId: string | null,
@@ -252,12 +307,14 @@ async function finishRegistration<
             error instanceof Error ? error.name : typeof error,
           )
         })
-      await addPlayerToClub(result.playerId, clubId).catch((error: unknown) => {
-        console.error(
-          '[guest-registration] join club',
-          error instanceof Error ? error.name : typeof error,
-        )
-      })
+      // The Admin link adds the player to no club (D-2026-11-09-06).
+      if (clubId)
+        await addPlayerToClub(result.playerId, clubId).catch((error: unknown) => {
+          console.error(
+            '[guest-registration] join club',
+            error instanceof Error ? error.name : typeof error,
+          )
+        })
       return {
         status: 'registered' as const,
         ...result,

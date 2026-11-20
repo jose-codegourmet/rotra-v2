@@ -68,20 +68,12 @@ func TestRaceVenueWrites(t *testing.T) {
 	}
 }
 
-// A court added to a running Auto Queue session, and a Save with a cost estimate, wait for the slices that own them (match
-// control and money); a club logo is an upload. Until then each stops with a 500 instead of skipping that part.
+// A Save with a cost estimate waits for the money slice and a club logo is an upload. Until then each stops with a 500 instead of
+// skipping that part.
 func TestUnportedPartsStop(t *testing.T) {
 	e := raceEnv(t)
-	if _, err := e.Pool.Exec(e.Ctx, `UPDATE queue_sessions SET court_fill_mode = 'auto' WHERE id = 'a3000000-0000-4000-8000-000000000003'`); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := e.Pool.Exec(e.Ctx, `UPDATE session_courts SET starts_at = TIMESTAMPTZ '2026-11-19 06:00:00+00' WHERE id = 'a2c00000-0000-4000-8000-000000000004'`); err != nil {
-		t.Fatal(err)
-	}
 	cases := map[string]writetest.Request{
-		"add court to an Auto Queue session":  jsonRequest(e, t, "POST", "/api/sessions/a3000000-0000-4000-8000-000000000003/courts", map[string]any{"courtId": "a2c00000-0000-4000-8000-000000000190", "label": "Court 9"}),
-		"open all courts early in Auto Queue": jsonRequest(e, t, "POST", "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/open-early", map[string]any{}),
-		"club logo":                           jsonRequest(e, t, "PATCH", "/api/club", map[string]any{"expectedRevision": "1", "logoUrl": nil}),
+		"club logo": jsonRequest(e, t, "PATCH", "/api/club", map[string]any{"expectedRevision": "1", "logoUrl": nil}),
 	}
 	form := sessionForm("2026-12-05T01:00:00.000Z", "2026-12-05T05:00:00.000Z")
 	form["costEstimate"] = map[string]any{"courtFee": 1}

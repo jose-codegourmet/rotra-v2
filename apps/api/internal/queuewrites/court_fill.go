@@ -14,9 +14,9 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
 
-// Auto Queue (packages/db/src/queue/match-control.ts: autoFillCourts, setCourtFillMode, fillOpenedCourts) and the two court-fill
-// routes. autoFillCourts here is the real fill; courts.go keeps its own stub for the court commands of the match control slice,
-// which switches to this one when it is golden-tested.
+// Auto Queue (packages/db/src/queue/match-control.ts: autoFillCourts, setCourtFillMode, fillOpenedCourts) and the two court-fill routes.
+// fillCourts is the one fill every command that can trigger Auto Queue calls: the court-fill routes, Add match, Auto queue, Regenerate,
+// Send back, Move, Team wins and Invalid, and the court commands (add a court, open early).
 
 func (s *server) registerCourtFill(rt *signedin.Router) {
 	const path = "/api/sessions/{sessionId}/court-fill"

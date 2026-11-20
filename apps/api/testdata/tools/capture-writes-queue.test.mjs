@@ -5,6 +5,10 @@
 //   rosterops  the single roster operations (add, remove, level, no show, move to waitlist, games, presence, waitlist)
 //   club       the club's writes (invite link, venues, settings, saved players: add, delete, move, club nickname, registration link)
 //   prep       session preparation and courts (create, edit, join switches, start, delete, the court commands); run with TZ=UTC
+//   match      match control and the queue of waiting matches (place, start, send back, move, swap, replace, substitute, result, invalid, add, edit, remove, reorder, Auto queue, Regenerate)
+//   finish     Set end time, Extend, Cancel session, Mark session invalid
+//   publish    Publish results (the result snapshot is seeded: the finalization drive that writes it is not ported)
+//   pubmr      the Player's match request, its cancel and Move me to the waitlist (app player)
 //
 //   docker run -d --rm --name rotra-capture-pg -e POSTGRES_PASSWORD=test -p 127.0.0.1:55439:5432 postgres:16-alpine
 //   source ~/.nvm/nvm.sh && nvm use
@@ -67,12 +71,33 @@ test('requests', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'requests', apiDir })
 })
 
+test('match', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'match', apiDir })
+})
+
+test('finish', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'finish', apiDir })
+})
+
+test('publish', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'publish', apiDir })
+})
+
 test('details', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'details', apiDir })
 })
 
 // The Player app's routes (apps/player/src/app/api/public-sessions/*) called from the paired Queue origin: the request URL is the
 // Player's own origin (localhost:9001) and each step sends Origin http://localhost:9000.
+test('pubmr', async () => {
+  process.env.ROTRA_CAPTURE_ORIGIN = 'http://localhost:9001'
+  try {
+    await captureWrites({ db: capture.db, testdata, name: 'pubmr', apiDir: resolve(root, 'apps/player/src/app/api') })
+  } finally {
+    delete process.env.ROTRA_CAPTURE_ORIGIN
+  }
+})
+
 test('pubjoin', async () => {
   process.env.ROTRA_CAPTURE_ORIGIN = 'http://localhost:9001'
   try {

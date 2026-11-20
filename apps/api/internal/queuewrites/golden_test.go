@@ -36,3 +36,21 @@ func TestEditDetailsGolden(t *testing.T) { writetest.Replay(t, "testdata", "deta
 // request, I'm here, I'm leaving, I can't make it and the Session invite. The ids a join and a notice make are random, so the case
 // file hides them (Case.redact).
 func TestPublicSessionWritesGolden(t *testing.T) { writetest.Replay(t, "testdata", "pubjoin", build) }
+
+// Match control and the queue of waiting matches: Put on court, Start, Send back, Move, Swap, Replace player, Substitute, Team wins and
+// No result, Invalid, Add match (manual, selection, suggested and reviewed Auto queue drafts), edit, remove and reorder a waiting match, Auto
+// queue and Regenerate (the server generates from `n`), and the Auto Queue fill a court command triggers. The ids Auto Queue's fill takes
+// from a random operation are hidden by the case files (Case.redact). A write that fails after its changes (a contradicting decision)
+// commits the sync conflict row it quarantines the attempt in; the golden rows pin that.
+func TestMatchControlGolden(t *testing.T) { writetest.Replay(t, "testdata", "match", build) }
+
+// Session-level commands: Set end time, Extend, Cancel session and Mark session invalid. Session done (finalization) is not ported: its route
+// also drives the projection jobs (result snapshot, player history, ranks), which write permanent results.
+func TestSessionFinishGolden(t *testing.T) { writetest.Replay(t, "testdata", "finish", build) }
+
+// The signed-in Player's match request (send, cancel) and Move me to the waitlist on a public session, from the paired Queue origin.
+func TestPublicMatchRequestGolden(t *testing.T) { writetest.Replay(t, "testdata", "pubmr", build) }
+
+// Publish results. The result snapshot it reads is written by the finalization drive, which is not ported, so the cases seed one. The ids a
+// first publish makes (the publication, its key, the event) are random and hidden by the case files (Case.redact).
+func TestPublishResultsGolden(t *testing.T) { writetest.Replay(t, "testdata", "publish", build) }

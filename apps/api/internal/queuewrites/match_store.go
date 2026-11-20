@@ -97,6 +97,16 @@ func (m matchState) rules(now int64) model.Context {
 	return model.Context{Roster: m.Roster, Matches: m.Matches, Courts: m.Courts, Now: now}
 }
 
+// view is the match as the rules read it (ctx.matches.find): false when the id is not one of the session's live matches.
+func (m matchState) view(id pgtype.UUID) (model.Match, bool) {
+	for _, x := range m.Matches {
+		if x.ID == id.String() {
+			return x, true
+		}
+	}
+	return model.Match{}, false
+}
+
 // rosterIDs is the set of the live roster's entry ids.
 func (m matchState) rosterIDs() map[string]bool {
 	ids := make(map[string]bool, len(m.Roster))
@@ -123,6 +133,10 @@ type lineupInput struct {
 	operationID     string
 	origin          sqlcgen.MatchOrigin
 	manualProtected bool
+	// generationID groups the matches one generation or rebuild command made; empty is none.
+	generationID string
+	// position is the queue position to take; nil is the next one after every waiting match.
+	position *int64
 }
 
 // appendMatch is appendMatch: one waiting match with the next immutable match number at the end of the queue. Repeat-safe on the
@@ -149,18 +163,34 @@ func (t *txn) appendMatch(rosterIDs map[string]bool, lineup model.Lineup, in lin
 	if err != nil {
 		return pgtype.UUID{}, err
 	}
-	position, err := t.q.NextQueuePosition(t.ctx, t.sess.ID)
-	if err != nil {
-		return pgtype.UUID{}, err
+	position := in.position
+	if position == nil {
+		next, err := t.q.NextQueuePosition(t.ctx, t.sess.ID)
+		if err != nil {
+			return pgtype.UUID{}, err
+		}
+		position = &next
+	}
+	var generation pgtype.UUID
+	if in.generationID != "" {
+		if generation, err = opUUID(in.generationID); err != nil {
+			return pgtype.UUID{}, err
+		}
 	}
 	id := derivedID(in.operationID, "match")
 	now := t.stamp()
 	if err := t.q.InsertQueueMatch(t.ctx, sqlcgen.InsertQueueMatchParams{
 		ID: id, ClubID: t.sess.ClubID, SessionID: t.sess.ID, MatchNo: no, Format: sqlcgen.MatchFormat(lineup.Format),
-		QueuePosition: pgtype.Int8{Int64: position, Valid: true}, Origin: in.origin, ManualProtected: in.manualProtected, SourceOperationID: op, Now: now,
+		QueuePosition: pgtype.Int8{Int64: *position, Valid: true}, Origin: in.origin, ManualProtected: in.manualProtected,
+		GenerationID: generation, SourceOperationID: op, Now: now,
 	}); err != nil {
 		return pgtype.UUID{}, err
 	}
+	return id, t.writeLineup(id, lineup, in.operationID, op, now)
+}
+
+// writeLineup is writeLineup: one open segment for each player of the lineup, each keyed on the operation.
+func (t *txn) writeLineup(matchID pgtype.UUID, lineup model.Lineup, operationID string, op pgtype.UUID, now pgtype.Timestamptz) error {
 	for _, side := range []struct {
 		team sqlcgen.TeamSide
 		ids  []string
@@ -168,17 +198,17 @@ func (t *txn) appendMatch(rosterIDs map[string]bool, lineup model.Lineup, in lin
 		for _, playerID := range side.ids {
 			player, err := parseRowID(playerID)
 			if err != nil {
-				return pgtype.UUID{}, err
+				return err
 			}
 			if err := t.q.InsertMatchParticipation(t.ctx, sqlcgen.InsertMatchParticipationParams{
-				ID: derivedID(in.operationID, id.String()+":"+playerID), ClubID: t.sess.ClubID, SessionID: t.sess.ID, MatchID: id,
+				ID: derivedID(operationID, matchID.String()+":"+playerID), ClubID: t.sess.ClubID, SessionID: t.sess.ID, MatchID: matchID,
 				SessionPlayerID: player, Team: side.team, JoinedOperationID: op, Now: now,
 			}); err != nil {
-				return pgtype.UUID{}, err
+				return err
 			}
 		}
 	}
-	return id, nil
+	return nil
 }
 
 // validateLineup is validateLineup: every slot filled by a different live roster entry; formats switched off are refused.

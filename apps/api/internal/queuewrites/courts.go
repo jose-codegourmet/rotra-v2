@@ -20,11 +20,6 @@ import (
 // on a prepared or running session, behind the same access check as the roster commands, and none of them maps database errors
 // (addCourt only the insert of its court).
 
-// errAutoFillPending is Auto Queue placing matches on a court that just opened or was added to a running session (autoFillCourts in
-// match-control.ts). Match control is the next slice of the track; until it lands, a court command on a running session in Auto
-// Queue stops here (a 500) instead of skipping the placement. A prepared session and a Manual Queue session never reach it.
-var errAutoFillPending = errors.New("queuewrites: Auto Queue court fill is not ported yet (the match control slice)")
-
 var courtsChanged = map[string]string{"court": "Something changed. Review the courts again."}
 
 func (s *server) registerCourts(rt *signedin.Router) {
@@ -35,14 +30,6 @@ func (s *server) registerCourts(rt *signedin.Router) {
 	rt.Handle("POST "+courts+"/open-early", store.AudienceClub, s.club(s.openAllCourtsEarly))
 	rt.Handle("POST "+courts+"/{courtId}/open-early", store.AudienceClub, s.club(s.openCourtEarly))
 	rt.Handle("DELETE "+courts+"/{courtId}/open-early", store.AudienceClub, s.club(s.undoCourtEarlyOpen))
-}
-
-// autoFillCourts is autoFillCourts for the courts a command opened: it places nothing outside a running Auto Queue session.
-func (t *txn) autoFillCourts(session sqlcgen.LockQueueSessionRow) error {
-	if session.State != sqlcgen.QueueSessionStateActive || session.CourtFillMode != sqlcgen.CourtFillModeAuto {
-		return nil
-	}
-	return errAutoFillPending
 }
 
 // sessionBase is the session start courts count from: the actual start once live.
@@ -155,7 +142,7 @@ func (s *server) addCourt(r *http.Request, club pgtype.UUID) (writes.Result, err
 			return nil, err
 		}
 		// Auto Queue: a court added to a running session fills now if it is open (never while prepared).
-		if err := t.autoFillCourts(touched); err != nil {
+		if _, err := t.fillCourts(touched, courtID.String(), fillOptions{onlyCourtIDs: []string{courtID.String()}}); err != nil {
 			return nil, err
 		}
 		return map[string]any{"court": signedin.CourtOf(court)}, nil
@@ -335,7 +322,12 @@ func (t *txn) openCourtsEarly(courtText *string) ([]sqlcgen.SessionCourt, error)
 		return nil, err
 	}
 	// Auto Queue: the courts that just opened get the next eligible matches, in the same transaction.
-	return opened, t.autoFillCourts(t.sess)
+	only := make([]string, len(opened))
+	for i, c := range opened {
+		only[i] = c.ID.String()
+	}
+	_, err = t.fillCourts(t.sess, randomID().String(), fillOptions{onlyCourtIDs: only})
+	return opened, err
 }
 
 func courtsOf(rows []sqlcgen.SessionCourt) []signedin.Court {

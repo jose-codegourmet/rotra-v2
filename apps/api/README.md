@@ -144,6 +144,17 @@ the club entitlement check (`inPageSession`). The match request rules no other c
 the real TypeScript: `testdata/tools/capture-matchrequest-lineup.test.mjs`). A step of the write harness may send `headers` (an Origin, or a
 Content-Type left out with ""), and the capture runs the Player's Route Handlers on the Player origin (`ROTRA_CAPTURE_ORIGIN`).
 
+Match control and the queue (slice 2.3, `match_control.go`, `match_queue.go`, golden `match`, cases from `gen-writes-queue-match-cases.py`):
+Put on court, Start, Send back, Move, Swap, Replace player, Substitute, Team wins / No result and Invalid, Add match (manual, selection,
+suggested, reviewed drafts), edit, remove and reorder a waiting match, Auto queue and Regenerate. `matchCommand` runs each one; `loadMatch` reads a
+match with its segments, holds, court usage and decision (`matchRow`); `decide` is the shared end of Team wins and Invalid (a contradicting
+decision commits its `sync_conflicts` row and then answers 409, which is why `decide` returns a marker and fails after the command). The
+server generates lineups from `n` with `internal/queuewrites/queuegen` (a port of queue.rules.ts and autoQueue.rules.ts; TypeScript-only rules
+until the device sends its own lineups, BL-3), pinned by a grid captured from the real TypeScript (`capture-queuegen.test.mjs`). `fillCourts` is
+the one Auto Queue fill: the court commands now call it too. Session-level commands (slice 2.4, `session_finish.go`, golden `finish`): Set end
+time, Extend, Cancel session and Mark session invalid; Publish results (`results_publication.go`, golden `publish`, with a result snapshot the cases seed: the finalization drive that writes it is not ported, so `POST finalization` is not either). The Player's match request, its cancel and Move me to the waitlist are in
+`public_match_request.go` (golden `pubmr`). A race whose winner is not decided is in `race_match_test.go`.
+
 ## Golden files
 
 `internal/http/testdata/*.golden.json` are captured from the TypeScript Route Handler sources, not written by hand.

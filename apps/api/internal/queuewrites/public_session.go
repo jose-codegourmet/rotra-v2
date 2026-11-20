@@ -44,6 +44,10 @@ func (s *server) registerPublicSession(rt *signedin.Router) {
 		"leave":       s.leaveSession,
 		"drop-out":    s.sendDropOut,
 		"invite-code": s.sessionInviteCode,
+		// The match request and Move me to the waitlist (public_match_request.go).
+		"match-request":        s.sendMatchRequest,
+		"match-request/cancel": s.cancelMyMatchRequest,
+		"step-down":            s.movePlayerToWaitlist,
 	}
 	for action, cmd := range routes {
 		path := "/api/public-sessions/{slug}/" + action

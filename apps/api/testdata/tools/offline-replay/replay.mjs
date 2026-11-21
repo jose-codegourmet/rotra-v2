@@ -1,8 +1,8 @@
 // Offline-replay check for go-writes-queue task 5.1. Run it through run.sh (it needs the local stack that run.sh starts).
 //
 // It drives the real Queue app in a real browser (system Chrome through Playwright): the club account signs in through
-// the Go API, downloads the live session, goes offline with the app's own "Simulate offline" switch, records Queue Master
-// commands by clicking, goes online and watches the device outbox (packages/data/src/outbox/replay.ts) drain through
+// the Go API, downloads the live session, goes offline with the app's own "Simulate offline" switch (plus a real network cut
+// for the match steps), records Queue Master commands by clicking, goes online and watches the device outbox (packages/data/src/outbox/replay.ts) drain through
 // proxy.ts into the Go API and the local Postgres. Nothing here talks to the API except the browser itself, apart from
 // the one out-of-band write that makes a stale revision (marked below) and the read-backs that compare the device copy.
 //
@@ -252,10 +252,24 @@ try {
   await page.getByRole('radio', { name: /^Everyone/ }).click()
   await page.getByRole('switch', { name: 'Ivy present', ...exact }).click() // Ivy was away
   await page.waitForTimeout(2500)
+  // The match commands are recorded under a real network cut as well (the browser itself is offline, not only the app's
+  // switch). A real cut makes TanStack Query hold back writes and reads unless the app tells it to run them, so without
+  // that these steps hang and nothing reaches the outbox.
+  await ctx.setOffline(true)
+  await sleep(1000)
+  const browserOffline = await page.evaluate(() => navigator.onLine === false)
   await makeMatch('Hal', 'Zed') // Zed is a row this device created: its ids are learned on replay
   await putOnCourt('Court 1')
   await startMatch('Court 1')
   await matchDone('Court 1')
+  const underCut = (await outbox()).map((c) => c.name)
+  check(
+    'real network cut: make, place, start and result reached the outbox',
+    browserOffline && ['queue.make', 'match.place', 'match.start', 'match.complete'].every((n) => underCut.includes(n)),
+    `navigator offline: ${browserOffline}; outbox: ${underCut.join(',') || 'empty'}`,
+  )
+  await ctx.setOffline(false)
+  await sleep(1000)
   await markPaid('Hal Guest')
   const recorded = await outbox()
   console.log('recorded offline:', recorded.map((c) => `${c.name} [${c.text}]`).join(' | '))

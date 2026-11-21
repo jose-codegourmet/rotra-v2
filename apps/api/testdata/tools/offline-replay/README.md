@@ -26,7 +26,8 @@ or step by step: `up`, `test` (repeat with `reseed` between runs), `down`.
    Go, and moves the live session ("Live Now") to the present.
 2. `replay.mjs` signs in through the UI, downloads the session (it flips the session to prepared in the database only for the
    download card, then back), turns on the app's own "Simulate offline" switch, and records, by clicking: add a new player, a
-   presence change, make a match with that new player, put it on a court, start it, finish it, and a payment mark.
+   presence change, make a match with that new player, put it on a court, start it, finish it, and a payment mark. The four
+   match steps are recorded with the browser's network really cut as well (Playwright `context.setOffline`).
 3. It goes online, drops the first answer to the match result (the request reaches Go, the reply does not reach the browser),
    lets the outbox retry, and checks: outbox empty, no conflict, the same `operationId` sent twice and saved once (one decision row), the device copy
    equals the server's reads, and the rows in the database.
@@ -39,7 +40,8 @@ or step by step: `up`, `test` (repeat with `reseed` between runs), `down`.
 
 The first run (2026-11-21) found that an offline session could not be recorded and replayed in real mode. It passed only with a temporary patch to `packages/data`; the fixes landed in ticket #999 and the patch was removed. The findings are in the track plan's deviations log and backlog row BL-18.
 
-What the check cannot do: it simulates offline with the app's own switch, not by cutting the network; it covers one browser, the
+What the check cannot do: only the match steps of round 1 run under a real network cut (the rest uses the app's own switch),
+and no real phone is involved; it covers one browser, the
 club account and the Queue app only; device time and sent lineups (BL-2, BL-3), live-update events (BL-15), Move to waitlist
 (BL-17) and the pass renewal after 15 minutes (B-28) are not part of it. When the sync dialog offers no Retry sync after the
 dropped reply, the script retries by reconnecting, and says so.

@@ -40,6 +40,12 @@ export function QueryProvider({ children }: { children: ReactNode }) {
             retry: (failureCount, error) =>
               failureCount < 1 && (!(error instanceof MockError) || error.kind === 'retryable'),
             refetchOnWindowFocus: false,
+            // Run reads also on a real network cut. `@rotra/data` is the one connectivity truth: offline it answers a
+            // downloaded session from the device copy and refuses the rest, the same as the "Simulate offline" switch.
+            // Left to itself TanStack Query pauses the read, and the screen never shows the device copy.
+            networkMode: 'always',
+            // TanStack Query turns this off under 'always'; keep refreshing when the connection returns.
+            refetchOnReconnect: true,
           },
         },
       }),

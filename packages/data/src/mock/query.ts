@@ -13,6 +13,9 @@ export function useMockMutation<Input, Output>(
     client.invalidateQueries({ predicate: (query) => query.queryKey[0] !== 'auth' })
   return useMutation({
     mutationFn,
+    // Always run, also on a real network cut: TanStack Query would otherwise pause the command until the browser is back
+    // online, so it would never reach the device outbox. Offline is handled below this hook (mock store, outbox).
+    networkMode: 'always',
     // Returning the promise keeps the mutation pending until every active query has refetched.
     onSuccess: options?.backgroundRefresh
       ? () => {

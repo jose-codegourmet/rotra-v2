@@ -1,5 +1,6 @@
 import { isRealDataMode } from '../real/mode'
 import { NotConnectedError } from './errors'
+import { isWorkingStateActive } from './store'
 
 let latencyEnabled = true
 
@@ -14,8 +15,9 @@ export function setMockLatencyEnabled(enabled: boolean): () => void {
 
 /** Short, deterministic mock request delay; rejects on cancellation so stale requests do not finish. */
 export function delay(milliseconds = 400, signal?: AbortSignal): Promise<void> {
-  // Real data mode never answers from the mock store: an unwired domain fails truthfully.
-  if (isRealDataMode()) return Promise.reject(new NotConnectedError())
+  // Real data mode never answers from the mock store: an unwired domain fails truthfully. The one
+  // exception is the offline working state, where reducers apply a change to the device copy.
+  if (isRealDataMode() && !isWorkingStateActive()) return Promise.reject(new NotConnectedError())
   if (signal?.aborted) return Promise.reject(signal.reason)
   if (!latencyEnabled || milliseconds <= 0) return Promise.resolve()
   return new Promise((resolve, reject) => {

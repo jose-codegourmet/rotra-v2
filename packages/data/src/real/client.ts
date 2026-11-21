@@ -2,7 +2,7 @@ import { getConnectivity } from '../connectivity/connectivity'
 import { sessionIdOfPath } from '../device/deviceCopy'
 import { readOfflineBody, rememberGetBody } from '../device/deviceIndex'
 import { MockError, type MockErrorKind } from '../mock/errors'
-import { pathHasPendingWork } from '../outbox/state'
+import { isReplaying, pathHasPendingWork } from '../outbox/state'
 
 /** A refused Route Handler call; `status` lets a read tell not-found from other failures. */
 export class RealRequestError extends MockError {
@@ -99,7 +99,11 @@ export async function realRequest<T>(
   const method = options.method ?? 'GET'
   const offline = getConnectivity() === 'offline'
   // Browser offline or DevMenu "Simulate offline": the same refusal either way.
-  if (method === 'GET' && (offline || (await pathHasPendingWork(sessionIdOfPath(path))))) {
+  // While the replay runs, waiting commands do not hold GETs on the copy: its own reads must see the server.
+  if (
+    method === 'GET' &&
+    (offline || (!isReplaying() && (await pathHasPendingWork(sessionIdOfPath(path)))))
+  ) {
     const kept = await readOfflineBody(path)
     if (kept.found) return kept.body as T
   }

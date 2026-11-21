@@ -12,7 +12,6 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { recordsGames } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
@@ -91,10 +90,6 @@ export type ConsoleViewProps = {
 
 const OFFLINE_NOTICE =
   'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.'
-
-// Real data mode has no device copy that saves changes yet, so the mock text above would be untrue.
-const OFFLINE_NOTICE_REAL =
-  'Working offline. This device shows the last session data it loaded; changes need an internet connection until you reconnect. Session done needs internet.'
 
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
@@ -363,7 +358,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         />
       ) : null}
       {online ? null : (
-        <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
+        <Notice tone="offline">{OFFLINE_NOTICE}</Notice>
       )}
       <Tabs
         aria-label="Console views"

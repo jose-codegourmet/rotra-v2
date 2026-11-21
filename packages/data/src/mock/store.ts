@@ -291,6 +291,8 @@ function seedState(): MockState {
  * mock read or write in real mode refuses as before.
  */
 let working: { snapshot: MockState } | null = null
+/** True while an offline apply runs over the downloaded copy (`withWorkingState`). */
+export const isWorkingStateActive = () => working !== null
 
 /**
  * Runs `run` with the mock store pointed at `state` (a copy of it), then returns the result and the

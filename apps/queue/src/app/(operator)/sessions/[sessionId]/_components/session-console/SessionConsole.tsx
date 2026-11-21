@@ -1,6 +1,7 @@
 'use client'
 
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
+import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
 import {
   activeMatches,
   matchStatus,
@@ -12,6 +13,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { recordsGames } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
@@ -91,6 +93,10 @@ export type ConsoleViewProps = {
 const OFFLINE_NOTICE =
   'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.'
 
+// Real data mode, no downloaded copy of this session: nothing saves on the device, so the text above would be untrue.
+const OFFLINE_NOTICE_REAL =
+  'Working offline. This device shows the last session data it loaded; changes need an internet connection until you reconnect. Session done needs internet.'
+
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
  * soon as it is listed here; an unlisted Queue hides its tab, while unlisted Players and
@@ -162,6 +168,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
 
   // Online: the browser's connection, or the DevMenu's Simulate offline toggle.
   const { online } = useConnectivity()
+  // Offline changes are recorded on the device only for a downloaded session (real mode); the mock always records them.
+  const downloads = useDeviceDownloads()
+  const savesOffline =
+    !isRealDataMode() || (downloads.data?.some((d) => d.sessionId === sessionId) ?? false)
 
   // Session done opens the three-step sheet from the footer button and the dock pill alike; offline
   // both are disabled.
@@ -358,7 +368,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         />
       ) : null}
       {online ? null : (
-        <Notice tone="offline">{OFFLINE_NOTICE}</Notice>
+        <Notice tone="offline">{savesOffline ? OFFLINE_NOTICE : OFFLINE_NOTICE_REAL}</Notice>
       )}
       <Tabs
         aria-label="Console views"

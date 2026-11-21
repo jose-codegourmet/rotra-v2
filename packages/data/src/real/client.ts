@@ -99,11 +99,9 @@ export async function realRequest<T>(
   const method = options.method ?? 'GET'
   const offline = getConnectivity() === 'offline'
   // Browser offline or DevMenu "Simulate offline": the same refusal either way.
+  const waiting = method === 'GET' && (await pathHasPendingWork(sessionIdOfPath(path)))
   // While the replay runs, waiting commands do not hold GETs on the copy: its own reads must see the server.
-  if (
-    method === 'GET' &&
-    (offline || (!isReplaying() && (await pathHasPendingWork(sessionIdOfPath(path)))))
-  ) {
+  if (method === 'GET' && (offline || (waiting && !isReplaying()))) {
     const kept = await readOfflineBody(path)
     if (kept.found) return kept.body as T
   }
@@ -154,7 +152,9 @@ export async function realRequest<T>(
     body = (await response.json().catch(() => null)) as (T & ErrorBody) | null
   }
   if (response.ok) {
-    if (method === 'GET') rememberGetBody(path, body)
+    // A read the replay makes for a session that still has waiting commands does not overwrite the copy: it would show a
+    // result that waits in the outbox as not done. The copy follows the server again once the session drains.
+    if (method === 'GET' && !(waiting && isReplaying())) rememberGetBody(path, body)
     return body as T
   }
   const message = body?.error?.message ?? 'Something went wrong. Try again.'

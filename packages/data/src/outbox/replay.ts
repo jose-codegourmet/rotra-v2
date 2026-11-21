@@ -113,8 +113,9 @@ export async function replayOutbox(): Promise<void> {
         break
       }
     }
-    if (drained && !outboxCommands().some((c) => c.conflict)) setProblem(undefined)
     await refreshOutbox()
+    // Only a run that ended with nothing waiting clears the flag; a failure after some drained keeps it.
+    if (drained && outboxCommands().length === 0) setProblem(undefined)
     // The copy of a session that has nothing left waiting follows the server again.
     for (const sessionId of touched)
       if (

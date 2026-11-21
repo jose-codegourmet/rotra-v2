@@ -244,7 +244,7 @@ try {
     !check(
       'offline recording works: the add reached the outbox (roster.batch)',
       first.some((c) => c.name === 'roster.batch'),
-      `outbox: ${first.map((c) => c.name).join(',') || 'empty'}; without offline-apply.patch the app refuses it ("isn't connected to saved data yet")`,
+      `outbox: ${first.map((c) => c.name).join(',') || 'empty'}; an empty outbox here means the app refused the offline change ("isn't connected to saved data yet")`,
     )
   )
     throw new Error('the app did not record the offline change, so there is nothing to replay')

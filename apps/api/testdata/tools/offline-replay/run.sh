@@ -35,27 +35,6 @@ nvm_use() {
   (cd "$ROOT" && nvm use >/dev/null)
 }
 
-PATCH="$HERE/offline-apply.patch"
-
-# Two device-side bugs stop an offline session from being recorded and replayed in real mode (see README.md and the plan's
-# deviations log). The patch is the smallest fix for each; it is applied to the working tree for the run and reverted by `down`.
-# When the fixes land in the apps the patch stops applying and the run goes on without it.
-apply_workarounds() {
-  if [ -n "${ROTRA_REPLAY_NO_PATCH:-}" ]; then echo "ROTRA_REPLAY_NO_PATCH is set: running the app as it is"; return; fi
-  if git -C "$ROOT" apply --check "$PATCH" 2>/dev/null; then
-    git -C "$ROOT" apply "$PATCH" && touch "$STATE/patched"
-    echo "applied the TypeScript workaround patch to packages/data (down reverts it)"
-  else
-    echo "the workaround patch does not apply (fixed in the apps, or already applied): running without it"
-  fi
-}
-revert_workarounds() {
-  if [ -f "$STATE/patched" ]; then
-    git -C "$ROOT" apply -R "$PATCH" && rm -f "$STATE/patched"
-    echo "reverted the TypeScript workaround patch"
-  fi
-}
-
 secret() { openssl rand -base64 33 | tr -d '\n='; }
 
 up() {
@@ -93,7 +72,6 @@ ENV
   for _ in $(seq 1 40); do curl -sf "http://127.0.0.1:${GO_PORT}/healthz" >/dev/null && break; sleep 0.5; done
   curl -sf "http://127.0.0.1:${GO_PORT}/healthz" >/dev/null || { echo "Go API did not start; see $STATE/go.log" >&2; exit 1; }
   nvm_use
-  apply_workarounds
   # The Queue app in real data mode; the proxy forwards the moved areas to Go and never calls Supabase. The first `next dev`
   # may stop after printing an advisory banner; the second start continues, so try twice.
   app_up() { curl -s -o /dev/null -w '%{http_code}' "http://localhost:${APP_PORT}/login" | grep -q 200; }
@@ -135,7 +113,6 @@ reseed() {
 }
 
 down() {
-  revert_workarounds
   for p in app go; do
     if [ -f "$STATE/$p.pid" ]; then
       pid="$(cat "$STATE/$p.pid")"

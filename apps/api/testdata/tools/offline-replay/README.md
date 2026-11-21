@@ -35,21 +35,9 @@ or step by step: `up`, `test` (repeat with `reseed` between runs), `down`.
 5. It lists every `/api/*` path the browser used and checks each is under the moved prefixes (set by `run.sh`, the exact list in
    `docs/architecture.md` plus the other prefixes the Queue pages call).
 
-## Two TypeScript workarounds, and why
+## History
 
-With the app as it is, an offline session cannot be recorded and replayed in real mode, with any backend. `offline-apply.patch`
-holds the smallest fix for each bug; `run.sh up` applies it to the working tree and `down` reverts it (set
-`ROTRA_REPLAY_NO_PATCH=1` to run the app as it is and see the failures). It is never committed here. When the fixes land in the
-apps the patch stops applying and `run.sh` skips it.
-
-1. `delay()` in `packages/data/src/mock/latency.ts` refuses every mock reducer in real mode, even inside the offline working
-   state, so nothing reaches the outbox ("This part of ROTRA isn't connected to saved data yet.").
-2. `realRequest` in `packages/data/src/real/client.ts` answers a session's GETs from the device copy while commands of that
-   session wait, even during replay, so the replay's own fresh read of the queue shows the device's match id; the next command is
-   rewritten to the server's id and fails "Match not available".
-
-Both, and three smaller ones (the cleared "needs attention" flag, TanStack pausing mutations when the network is really cut, a
-stale offline notice), are logged in the track plan's deviations log as TypeScript follow-ups.
+The first run (2026-11-21) found that an offline session could not be recorded and replayed in real mode. It passed only with a temporary patch to `packages/data`; the fixes landed in ticket #999 and the patch was removed. The findings are in the track plan's deviations log and backlog row BL-18.
 
 What the check cannot do: it simulates offline with the app's own switch, not by cutting the network; it covers one browser, the
 club account and the Queue app only; device time and sent lineups (BL-2, BL-3), live-update events (BL-15), Move to waitlist

@@ -87,6 +87,8 @@ export async function handleAccountRequest<A extends AccountAudience>(
  */
 export const PUBLIC_READS = [
   'public-session.page',
+  /** Share payment status (#1010): masked names and amounts of the confirmed roster only */
+  'public-session.payment-status',
   'player.public-profile',
   'player.match-history',
   'player.public-clubs',

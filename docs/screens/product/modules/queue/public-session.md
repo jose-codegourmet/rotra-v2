@@ -1,6 +1,6 @@
 # Public session page
 
-**Last verified:** 2026-11-22 for a finished session's Hosts (#1008); 2026-11-18 for the Scoring row and game scores in Match history ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-11-11 for join requests closing at Start, the participant profile card and Move me to the waitlist ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)). 2026-11-10 for the real-mode signed-in join (#687). 2026-11-09 for the signed-in Player experience (D-2026-11-09-02 to 05, 06, 08; in the mock app, Q17). Earlier: the operator-only preview route (#469), masked participant names (#475) and the aggregate skill mix (#474).
+**Last verified:** 2026-11-22 for a finished session's Hosts (#1008) and the Payment status card ([D-2026-11-22-02](../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-02); [log](../../../../mockup-changes/2026-11-22-queue-payment-status-share.md)); 2026-11-18 for the Scoring row and game scores in Match history ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-11-11 for join requests closing at Start, the participant profile card and Move me to the waitlist ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)). 2026-11-10 for the real-mode signed-in join (#687). 2026-11-09 for the signed-in Player experience (D-2026-11-09-02 to 05, 06, 08; in the mock app, Q17). Earlier: the operator-only preview route (#469), masked participant names (#475) and the aggregate skill mix (#474).
 
 **Surfaces:** `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE`, `Q-PUBLIC-JOIN`.
 
@@ -44,7 +44,7 @@ Afterwards the same visitor sees a status card instead: **Request sent** (“…
 
 Then the notes, and a footer: “Slots are confirmed with the Queue Master directly. Last updated HH:MM.” — adding “Recent changes from the venue haven't synced yet.” when the server knows changes are pending.
 
-Only the payment per player is shown; no cost lines, break-even math or payment states. The club founding location never replaces the venue. Values change only after sync, never from a disconnected operator's local edits. Do not call stale data “Live.”
+The Details rows show only the payment per player; no cost lines or break-even math. Below the notes, a **Payment status** card (owner decision, November 22, 2026, #1015) has the button **Share payment status**, shown when the session has an amount due and a confirmed roster, and not when it is cancelled. It opens the same dialog as the Queue Master's Payments checklist (names masked like the rest of this page): filter All / Paid / Partial / Unpaid, numbered lists with amounts paid and balances, collected totals, Copy text and Share. Works in the mock app and in real mode; see [financials](../../../../business_logic/product/queue/modules/financials/README.md#share-payment-status-1010-epic-1009-owner-decisions-november-22-2026-d-2026-11-22-02). The club founding location never replaces the venue. Values change only after sync, never from a disconnected operator's local edits. Do not call stale data “Live.”
 
 ## Q-PUBLIC-PARTICIPANTS — Confirmed people
 

@@ -1,6 +1,6 @@
 # Session financials and club inventory
 
-**Last verified:** 2026-11-01.
+**Last verified:** 2026-11-22 (Share payment status, #1010). 2026-11-01 for the rest.
 **Status:** Agreed v1 target rules, added October 26, 2026 from the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). This replaces the earlier v1 exclusion of shuttle pricing, cost estimates, and paid/unpaid tracking. ROTRA still never collects or moves money.
 
 ## Purpose
@@ -52,6 +52,19 @@ Each session has a **Payments** list of its roster players (waitlisted players a
 - It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync. **After Session done** the Queue Master can still tick paid / not paid (decided November 11, 2026, [D-2026-11-11-06](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-06)); payments are bookkeeping with an audit record and never reopen or change results.
 - **Demotion keeps the paid mark** (same decision): a paid player moved to the waitlist by a capacity change keeps the mark, and it shows again if they regain a slot.
 - **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). ROTRA records no refunds; the cancel confirmation warns how many players are marked paid and that refunds happen outside ROTRA. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
+
+### Share payment status (#1010, epic #1009; owner decisions November 22, 2026, [D-2026-11-22-02](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-02))
+
+A text summary of who has paid, for the Queue Master to copy or send to the group chat.
+
+- **Where:** a **Share status** button on the Payments checklist (preparation, live console, session record), and a **Share payment status** card on the public session page's Details tab. Both show the same dialog. ROTRA only writes the text; it moves no money.
+- **Who:** every confirmed roster person, registered players and guests. Waitlisted people are never in it. Cancelled and invalid sessions have no share. On the public page, names are masked like the rest of that page.
+- **Statuses and amounts** are the existing ones (Payments checklist above): Paid (Paid and Reimburse), Partial, Unpaid, compared with the **current** amount due. A **Reimburse** player is listed under Paid with "₱X to return".
+- **Filter:** All, Paid, Partial, Unpaid. All prints the three lists in that order; a filter prints one. An empty list reads "None".
+- **Each list** is numbered from 1 under a header with its count ("PAID (12)"). Each line: the name, **amount paid** and **balance** ("1. Maya Cruz · paid ₱500 · balance ₱200"); an Unpaid line shows only the balance. With no fee set there are no balances, and the text says "No fee set for this session."
+- **Collected total:** the last line, "Collected: ₱X · Balance: ₱Y", totals the people shown. **Collected is cash actually received.** A **waived** amount (slot transfers, [#1013](https://github.com/jose-codegourmet/rotra-v2/issues/1013)) lowers a person's balance and can make them Paid in full, but is never counted as collected and is listed as "₱X waived". Waivers are not recorded yet; the rule already accepts one.
+- **Copy / Share:** Copy text always; Share (the system share sheet) where the device has one. Facebook session sharing is a separate feature and is not changed.
+- **Public page, real mode:** a visitor-safe read returns the confirmed roster's names masked on the server, the amount due and the amount received per person. It returns nothing for a cancelled or invalid session and carries no contacts, ids, times or costs.
 
 This is a record kept by the operator, not proof of payment. ROTRA doesn't show players' contact details here; private phone and email rules still apply.
 

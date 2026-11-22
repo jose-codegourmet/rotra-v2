@@ -325,6 +325,7 @@
     "./forms/session-financials-fields/schema": "./src/forms/session-financials-fields/SessionFinancialsFields.schema.ts",
     "./forms/session-financials-fields/default-values": "./src/forms/session-financials-fields/SessionFinancialsFields.defaultValues.ts",
     "./payments-checklist": "./src/components/payments-checklist/PaymentsChecklist.tsx",
+    "./payment-status-share-sheet": "./src/components/payment-status-share-sheet/PaymentStatusShareSheet.tsx",
     "./payments-checklist/payment-card": "./src/components/payments-checklist/payment-card/PaymentCard.tsx",
     "./payments-checklist/payment-status-chip": "./src/components/payments-checklist/payment-status-chip/PaymentStatusChip.tsx",
     "./inventory-item-card": "./src/components/inventory-item-card/InventoryItemCard.tsx",

@@ -1,4 +1,5 @@
 import 'server-only'
+import { maskPublicName } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import {
   amountDuePerHead,
@@ -372,6 +373,41 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
         cost: estimate?.total ?? null,
       }),
     }
+  })
+}
+
+/**
+ * Payment status share on the public page (#1010; owner decision 2026-11-22, #1015): amounts per
+ * confirmed roster person with names masked here (`maskPublicName`, #475), so a full name never
+ * leaves the server. Roster only (no waitlist, no no-shows); no contacts, ids, times or costs. A
+ * cancelled or invalid session, an unknown slug or a removed page reveals nothing.
+ */
+export async function readPublicPaymentStatus(slug: string) {
+  const session = await prisma.queueSession.findUnique({
+    where: { publicSlug: slug },
+    include: { publication: { select: { state: true } } },
+  })
+  if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
+  if (session.state === 'invalid' || session.state === 'cancelled') return null
+  return prisma.$transaction(async (tx) => {
+    const roster = await liveRoster(tx, session.id)
+    const marks = await tx.sessionPaymentMark.findMany({
+      where: { sessionId: session.id, sessionPlayerId: { in: roster.map((r) => r.id) } },
+    })
+    const { estimate } = await estimateFor(tx, session)
+    const amountDue = amountDuePerHead(estimate)
+    const byEntry = new Map(marks.map((m) => [m.sessionPlayerId, m]))
+    const rows = roster
+      .map((p) => {
+        const mark = byEntry.get(p.id)
+        return {
+          name: maskPublicName(p.nameSnapshot),
+          // A legacy mark with no amount counts as paid in full at today's amount due (#479).
+          receivedMinor: mark ? (mark.amountMinor ?? amountDue ?? 0) : null,
+        }
+      })
+      .sort((a, b) => a.name.localeCompare(b.name))
+    return { amountDue, rows }
   })
 }
 

@@ -19,6 +19,7 @@ import { useJoinAsPlayer } from '@rotra/data/public-session/useJoinAsPlayer'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { useMyNight } from '@rotra/data/public-session/useMyNight'
 import { usePublicMatchHistory } from '@rotra/data/public-session/usePublicMatchHistory'
+import { usePublicPaymentStatus } from '@rotra/data/public-session/usePublicPaymentStatus'
 import {
   usePublicSession,
   useSignedInPublicSession,
@@ -57,6 +58,7 @@ import { ParticipantProfile } from '@/app/(public)/s/[slug]/_components/particip
 import { SessionAwards } from '@/app/(public)/s/[slug]/_components/session-awards/SessionAwards'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 import { SessionLeaderboard } from '@/app/(public)/s/[slug]/_components/session-leaderboard/SessionLeaderboard'
+import { PaymentStatusShareDialog } from '@/lib/PaymentStatusShareDialog'
 
 export type PublicSessionProps = {
   slug: string
@@ -282,6 +284,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   const offline = !useConnectivity().online
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
+  const paymentStatus = usePublicPaymentStatus(slug)
+  const [payShareOpen, setPayShareOpen] = useState(false)
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
   // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
   // mode has no Player session in this app: the Player app's access read (below) says who is
@@ -790,6 +794,29 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                     ) : undefined
                   }
                 />
+                {paymentStatus.data &&
+                paymentStatus.data.amountDue !== null &&
+                paymentStatus.data.rows.length > 0 ? (
+                  <Card className="flex flex-wrap items-center justify-between gap-3 p-4">
+                    <div className="min-w-0 basis-[240px] flex-1">
+                      <h2 className="m-0 text-base font-bold">Payment status</h2>
+                      <p className="m-0 mt-1 text-sm text-fg2">
+                        Who has paid, who paid part and who still owes, as text you can copy or
+                        share.
+                      </p>
+                    </div>
+                    <Button size="sm" onClick={() => setPayShareOpen(true)}>
+                      Share payment status
+                    </Button>
+                    <PaymentStatusShareDialog
+                      open={payShareOpen}
+                      onOpenChange={setPayShareOpen}
+                      heading={`${p.title} · ${date(p.start)}`}
+                      amountDue={paymentStatus.data.amountDue}
+                      rows={paymentStatus.data.rows}
+                    />
+                  </Card>
+                ) : null}
                 {finished && !unrecorded ? (
                   p.results && (p.results.awards || p.results.offDay) ? (
                     <SessionAwards

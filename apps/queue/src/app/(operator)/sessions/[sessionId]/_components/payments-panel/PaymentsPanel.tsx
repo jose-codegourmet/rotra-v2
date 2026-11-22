@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { statusForReceived } from '@rotra/data/session-payment/rules'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSetPaymentAmount } from '@rotra/data/session-payment/useSetPaymentAmount'
@@ -13,6 +14,8 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { shortDateLabel } from '@/lib/dates'
+import { PaymentStatusShareDialog } from '@/lib/PaymentStatusShareDialog'
 import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 import { PlayerProfile } from '../player-profile/PlayerProfile'
 
@@ -25,6 +28,8 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
     onError: (error) => toast.error(error.message),
   })
   const amount = useSetPaymentAmount()
+  const session = useQueueSession(sessionId)
+  const [sharing, setSharing] = useState(false)
   const [filter, setFilter] = useState<PaymentFilter>('all')
   const [profile, setProfile] = useState<string | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
@@ -87,12 +92,27 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
           if (player) marks.set(clubPlayerId, !player.paid)
         }}
         onMarkAllPaid={marks.markAll}
+        onShareStatus={() => setSharing(true)}
         onSelectPlayer={setProfile}
         onEditAmount={(clubPlayerId) => {
           amount.reset()
           setEditing(clubPlayerId)
         }}
         asSheet={asSheet}
+      />
+      <PaymentStatusShareDialog
+        open={sharing}
+        onOpenChange={setSharing}
+        heading={
+          session.data
+            ? `${session.data.title} · ${shortDateLabel(session.data.scheduledStartAt)}`
+            : 'Session'
+        }
+        amountDue={amountDue}
+        rows={payments.data.players.map((p) => ({
+          name: p.name,
+          receivedMinor: p.paid?.amount ?? null,
+        }))}
       />
       <Sheet
         open={!!editingPlayer}

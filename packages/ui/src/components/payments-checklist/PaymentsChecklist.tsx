@@ -34,6 +34,8 @@ export type PaymentsChecklistProps = {
   onSelectPlayer: (id: string) => void
   /** Card body tap: opens "Payment from <name>" (#479) */
   onEditAmount: (id: string) => void
+  /** Opens Share payment status (#1010); the button is hidden when omitted */
+  onShareStatus?: () => void
   asSheet?: boolean
   disabled?: boolean
   saveError?: string
@@ -51,6 +53,7 @@ export function PaymentsChecklist({
   onMarkAllPaid,
   onSelectPlayer,
   onEditAmount,
+  onShareStatus,
   asSheet,
   disabled,
   saveError,
@@ -80,11 +83,18 @@ export function PaymentsChecklist({
             it; money is collected outside the app.
           </p>
         </div>
-        {players.some((p) => !p.paid) ? (
-          <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>
-            Mark all paid
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {onShareStatus && players.length ? (
+            <Button size="sm" onClick={onShareStatus}>
+              Share status
+            </Button>
+          ) : null}
+          {players.some((p) => !p.paid) ? (
+            <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>
+              Mark all paid
+            </Button>
+          ) : null}
+        </div>
       </div>
       {saveError ? <Notice tone="error">{saveError}</Notice> : null}
       <div className="grid grid-cols-2 gap-3 min-[800px]:grid-cols-4">

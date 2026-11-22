@@ -35,6 +35,7 @@ const meta = {
     onMarkAllPaid: fn(),
     onSelectPlayer: fn(),
     onEditAmount: fn(),
+    onShareStatus: fn(),
   },
 } satisfies Meta<typeof PaymentsChecklist>
 export default meta

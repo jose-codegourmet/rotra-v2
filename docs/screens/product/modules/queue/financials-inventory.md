@@ -1,6 +1,6 @@
 # Session financials and club inventory
 
-**Last verified:** 2026-11-01.
+**Last verified:** 2026-11-22 (Share status, #1010). 2026-11-01 for the rest.
 **Surfaces:** `Q-FINANCIALS`, `Q-INVENTORY`, `Q-INVENTORY-ITEM`.
 
 **Source:** [financials rules](../../../../business_logic/product/queue/modules/financials/README.md). **Reference:** [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html) — setup step 5 and Inventory.
@@ -42,6 +42,7 @@ No financial value appears on the public page, result slides, or image exports.
 - **Mark all paid** starts a flush of pending switches first, then queues the remaining paid marks behind that save. Tab changes, sheet close and route changes flush on panel exit. Page hide/exit initiates a flush; an outstanding save warns before browser exit. Mock data still resets on reload.
 - A failed batch rolls back its switches while preserving later changes, and shows the existing save error and error toast. The summary toast appears only after acceptance.
 - Empty states: “Everyone has paid.” / “Nobody has paid yet.” / “No players yet.” Invalid sessions show no checklist.
+- **Share status** (#1010; [log](../../../../mockup-changes/2026-11-22-queue-payment-status-share.md)): a small button beside **Mark all paid** while the roster is not empty. It opens the **Share payment status** dialog: a filter row **All · N**, **Paid · N**, **Partial · N**, **Unpaid · N**; a read-only monospace text preview (header “Payment status · TITLE · Thu, Nov 20”, “₱700 per player”, then “PAID (2)”, “PARTIAL (1)”, “UNPAID (1)” lists numbered from 1 with paid amount and balance, and “Collected: ₱X · Balance: ₱Y”); the note “Collected is the cash received. ROTRA only writes the text; money is collected outside the app.”; footer **Close**, **Share** (only where the device has a share sheet), **Copy text**. Toasts: “Payment status copied”, “Couldn't copy. Try again.” Rules: [financials](../../../../business_logic/product/queue/modules/financials/README.md#share-payment-status-1010-epic-1009-owner-decisions-november-22-2026-d-2026-11-22-02).
 
 ## Q-INVENTORY — Club inventory
 

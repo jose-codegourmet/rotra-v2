@@ -240,6 +240,7 @@ Rules: [Financials](business_logic/product/queue/modules/financials/README.md)
 | Entrance fee | Per-head venue cost, listed for transparency, covered by the payment per player |
 | Payments checklist | Manual record per player per session: a quick paid tick or the amount received (#479). **ROTRA never collects money** |
 | Payment status | Amount received vs. today's payment per player (#479): **Paid** (equal), **Partial** (less; “₱X left”), **Reimburse** (more; “₱X to return”, a reminder only, never a refund), **Unpaid** (nothing). Code `PaymentStatus` kinds `paid` · `partial` · `reimburse` · `unpaid` |
+| Payment status share | Copyable text of the session's Paid, Partial and Unpaid people (numbered, with amounts paid, balances and the cash collected) for the Queue Master and the public session page (#1010). Confirmed players and guests only; a waived amount is never collected cash. Not a Facebook share |
 | Inventory | Club's list of shuttlecocks, equipment, and items with stock and cost per unit |
 | Running low | Inventory item with 2 or fewer left |
 

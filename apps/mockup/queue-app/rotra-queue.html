@@ -403,6 +403,8 @@ body.court-dragging { cursor: grabbing; }
 .time-pair .dt-field > svg:first-child { display: none; }
 .time-pair .dt-val { white-space: nowrap; font-size: 14px; }
 .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.pay-share-text { margin: 0; padding: 14px; max-height: 50vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+.pay-share-card { gap: 12px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
 .seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
 .seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
@@ -3790,6 +3792,30 @@ const payChip = (st) => st.kind === 'paid' ? '<span class="chip ok">Paid</span>'
   : st.kind === 'partial' ? `<span class="chip warn">Partial · ${peso(st.left)} left</span>`
   : st.kind === 'reimburse' ? `<span class="chip ok">Reimburse · ${peso(st.back)} to return</span>`
   : '<span class="chip">Unpaid</span>';
+// Payment status share (#1010, epic #1009; owner decisions 2026-11-22): numbered Paid / Partial / Unpaid text for the Queue Master's
+// Payments area and the public session page. Confirmed players and guests only (no waitlist). Collected is cash received: a waived
+// amount (slot transfers, a later ticket) lowers the balance but is never collected.
+function payShareGroups(s, masked) {
+  const due = duePerHead(s), pay = s.payments || {};
+  const g = { paid: [], partial: [], unpaid: [] };
+  s.roster.map((r) => ({ name: masked ? maskName(P(r.pid).name) : P(r.pid).name, got: pay[r.pid] ? (pay[r.pid].amount == null ? due || 0 : pay[r.pid].amount) : 0, waived: 0 }))
+    .sort((a, b) => a.name.localeCompare(b.name)).forEach((x) => {
+      const owed = due == null ? null : Math.max(due - x.waived, 0);
+      const grp = due == null ? (x.got > 0 ? 'paid' : 'unpaid') : x.waived > 0 && x.got + x.waived >= due ? 'paid' : x.got <= 0 ? 'unpaid' : x.got >= owed ? 'paid' : 'partial';
+      g[grp].push({ ...x, bal: owed == null ? null : Math.max(owed - x.got, 0), over: owed == null ? 0 : Math.max(x.got - owed, 0) });
+    });
+  return g;
+}
+function payShareText(s, filter, masked) {
+  const due = duePerHead(s), g = payShareGroups(s, masked), shown = filter === 'all' ? ['paid', 'partial', 'unpaid'] : [filter];
+  const label = { paid: 'PAID', partial: 'PARTIAL', unpaid: 'UNPAID' };
+  const line = (x, i, grp) => [`${i + 1}. ${x.name}`, ...(grp === 'unpaid' ? [] : [`paid ${peso(x.got)}`]), ...(x.bal == null ? [] : [`balance ${peso(x.bal)}`]), ...(x.over ? [`${peso(x.over)} to return`] : [])].join(' · ');
+  const people = shown.flatMap((k) => g[k]);
+  const collected = people.reduce((t, x) => t + x.got, 0), balance = due == null ? null : people.reduce((t, x) => t + (x.bal || 0), 0);
+  return [`Payment status · ${s.title} · ${fmtDate(s.start)}`, due == null ? 'No fee set for this session.' : `${peso(due)} per player`,
+    ...shown.flatMap((k) => ['', `${label[k]} (${g[k].length})`, ...(g[k].length ? g[k].map((x, i) => line(x, i, k)) : ['None'])]),
+    '', balance == null ? `Collected: ${peso(collected)}` : `Collected: ${peso(collected)} · Balance: ${peso(balance)}`].join('\n');
+}
 function paymentsPanel(s) {
   const due = duePerHead(s), pay = s.payments || {};
   const all = s.roster.map((r) => ({ r, p: P(r.pid), paid: pay[r.pid], st: payStatus(pay[r.pid], due) })).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
@@ -3802,7 +3828,7 @@ function paymentsPanel(s) {
   const f = S.ui.payF || 'all';
   const rows = all.filter((x) => f === 'all' || (f === 'paid' ? payCovered(x.st) : !payCovered(x.st)));
   return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay, or tap a card to record a partial amount. ROTRA only records it; money is collected outside the app.</p></div>
-      ${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
+      <div class="row">${all.length ? `<button class="btn sm" data-act="openPayShare" aria-haspopup="dialog">${I.share} Share status</button>` : ''}${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div></div>
     ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
       <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b>${partialN ? `<span class="small muted">${partialN} partial</span>` : ''}</div>
@@ -5707,6 +5733,7 @@ function viewPublic() {
         ${recordedOf(s) ? '' : tile('Rankings', 'Not ranked', "Wins here don't count toward the ROTRA leaderboards or win rate.")}
       </div>
       ${s.notes ? `<div class="card stack tight"><span class="pf-l">Notes</span><p style="margin:0">${esc(s.notes)}</p></div>` : ''}
+      ${due != null && s.roster.length && s.status !== 'cancelled' ? `<div class="card between pay-share-card"><div class="stack tight"><h3 style="margin:0">Payment status</h3><p class="small muted" style="margin:0">Who has paid, who paid part and who still owes, as text you can copy or share.</p></div><button class="btn sm" data-act="openPayShare" data-pub="1" aria-haspopup="dialog">${I.share} Share payment status</button></div>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`; })()
     : tab === 'leaderboard' && pub && pub.slides.includes(0) ? pubLeaderboard(s, pub) : tab === 'leaderboard' ? '' : `<section class="stack">${pubHostsHtml(s)}${fullRoster && s.roster.length ? '<p class="small muted">Tap a player to see their profile and stats.</p>' : ''}${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
@@ -5965,6 +5992,16 @@ const SHEETS = {
       ${preview ? `<p class="small muted">Status: ${preview}</p>` : ''}
       <p class="small muted">ROTRA only records it; money is collected outside the app.</p>`,
       '<button class="btn" data-act="payAmountCancel">Cancel</button><button class="btn primary" data-act="savePayAmount">Save</button>');
+  },
+  // #1010: Share payment status. `pub` = opened from the public page (names masked like the rest of that page).
+  payShare() {
+    const sh = S.ui.sheet, s = cur(), f = sh.f || 'all', g = payShareGroups(s, sh.pub);
+    const n = { all: s.roster.length, paid: g.paid.length, partial: g.partial.length, unpaid: g.unpaid.length };
+    return sheetShell('Share payment status', `<div class="stack">
+      <div class="seg" role="group" aria-label="Show in the text">${[['all', 'All'], ['paid', 'Paid'], ['partial', 'Partial'], ['unpaid', 'Unpaid']].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payShareFilter" data-k="${k}">${l} · ${n[k]}</button>`).join('')}</div>
+      <pre class="pay-share-text" aria-label="Payment status text">${esc(payShareText(s, f, sh.pub))}</pre>
+      <p class="small muted">Collected is the cash received. ROTRA only writes the text; money is collected outside the app.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn" data-act="payShareNative">Share</button>' : ''}<button class="btn primary" data-act="payShareCopy">Copy text</button>`);
   },
   payments() { return sheetShell('Payments', paymentsPanel(cur()).replace(/^<section class="card stack" id="payments">/, '<section class="stack" id="payments">'), '<button class="btn" data-act="closeSheet">Done</button>', true); },
   postPreview() {
@@ -7793,6 +7830,14 @@ const ACT = {
   },
   openPayments: () => openSheet({ type: 'payments' }),
   payFilter: (d) => { S.ui.payF = d.k; render(); },
+  openPayShare: (d) => openSheet({ type: 'payShare', f: 'all', pub: !!d.pub, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null }),
+  payShareFilter: (d) => { S.ui.sheet.f = d.k; render(); },
+  payShareCopy: () => {
+    const sh = S.ui.sheet, text = payShareText(cur(), sh.f || 'all', sh.pub);
+    const fail = () => toast("Couldn't copy. Try again.");
+    try { navigator.clipboard.writeText(text).then(() => toast('Payment status copied'), fail); } catch (e) { fail(); }
+  },
+  payShareNative: () => { const sh = S.ui.sheet; try { navigator.share({ title: 'Payment status', text: payShareText(cur(), sh.f || 'all', sh.pub) }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   togglePaid: (d) => {
     const s = cur(); s.payments = s.payments || {};
     if (paymentPending.size && [...paymentPending.values()][0].sid !== s.id) flushPayments();

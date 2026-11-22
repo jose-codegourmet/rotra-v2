@@ -25,6 +25,24 @@ export function realGetPublicSession(slug: string) {
 }
 
 /**
+ * Share payment status (#1010): the confirmed roster's masked names and amounts received. Null for
+ * a cancelled or invalid session; any failure hides the optional card instead of erroring the page.
+ */
+export async function realGetPublicPaymentStatus(slug: string) {
+  try {
+    const { paymentStatus } = await realRequest<{
+      paymentStatus: {
+        amountDue: number | null
+        rows: { name: string; receivedMinor: number | null }[]
+      } | null
+    }>(`${base(slug)}/payment-status`)
+    return paymentStatus
+  } catch {
+    return null
+  }
+}
+
+/**
  * Request to join. `requestId` is the sheet's stable ID, so a retry with the same fields returns
  * the same request. The server keeps the visitor's receipt in an httpOnly cookie.
  */

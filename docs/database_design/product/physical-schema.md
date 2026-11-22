@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-22 (trusted club hosts section; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -424,7 +424,6 @@ passes the wider CHECK (it accepts everything the old one did). Checked on a dis
 (`rotra_disposable_q238` on the local Supabase Postgres, 127.0.0.1:54322): rebuild with no drift, seed,
 80/80 checks. Not applied to the shared database.
 
-<<<<<<< HEAD
 ## D-2026-11-20-02 — Record games off takes a winner again
 
 `20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
@@ -434,7 +433,7 @@ session's `record_games`. The trigger, `match_decisions_kind_check` (still the N
 and every table, column and row are unchanged, so no-result rows written under the November 19 rule
 stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
 ([verification](verification.md)).
-=======
+
 ## P12.7 — Registration from the Admin link (D-2026-11-20-01)
 
 `20261120000100_admin_link_registration` (#922; owner answer of November 20, 2026). **Written only:
@@ -449,4 +448,17 @@ every existing row keeps its club.
 
 Apply it before deploying the code that writes these nulls (the Admin-link registration, password
 and Google, in real mode). The guard function stays revoked from PUBLIC. No grant, RLS or index change.
->>>>>>> origin/main
+
+## D-2026-11-22-01 — Trusted club hosts (#1003)
+
+`20261122000100_club_trusted_hosts` (epic #1002). **Status: written; applied to a local disposable
+database 2026-11-22 only; not applied to the shared database (owner sign-off needed).** One new table;
+nothing dropped, moved or rewritten.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `club_trusted_hosts` | PK `id`; unique `(club_id, id)`; index `(club_id, club_player_id)`; partial unique `club_trusted_hosts_one_current` `(club_id, club_player_id) WHERE removed_at IS NULL` | `removed_at` null or not before `added_at` | `club_id` → `clubs`; `(club_id, club_player_id)` → `club_players(club_id, id)` (RESTRICT) |
+
+RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
+(`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): rebuild with no drift, seed, 85/85 checks
+(five new trusted-host checks). Design: [sessions and roster › `club_trusted_hosts`](queue/modules/sessions-roster.md#club_trusted_hosts).

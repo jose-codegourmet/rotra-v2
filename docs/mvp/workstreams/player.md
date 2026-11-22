@@ -75,6 +75,7 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-19-13](../decisions/2026-11-19.md#d-2026-11-19-13) — bottom dock on phones; the logo is Home.
 - [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (sign-in, onboarding).
 - [D-2026-11-20-01](../decisions/2026-11-20.md#d-2026-11-20-01) — Google sign-in in real mode: registration from the Admin link (picked city, no club), the inviting player on a session invite, one accepted risk; migration `20261120000100_admin_link_registration` written, not applied.
+- [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts: a **Host** badge in the profile Clubs section (later ticket of epic #1002; #1003 built only the Queue Club settings list).
 
 ## Blocking open decisions
 

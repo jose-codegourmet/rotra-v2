@@ -282,6 +282,25 @@ SELECT pg_temp.expect_rejected('club record invite for another club''s record', 
   VALUES ('cc000000-0000-4000-8000-0000000000a4', 'c1000000-0000-4000-8000-00000000000b', 'cb000000-0000-4000-8000-0000000000a2',
     decode(repeat('ef', 32), 'hex'), now(), now() + interval '7 days', now()) $q$);
 
+-- Trusted hosts (D-2026-11-22-01) --------------------------------------------------------------
+SELECT pg_temp.expect_accepted('trusted host from a guest saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('second current trusted-host row for one saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()) $q$);
+SELECT pg_temp.expect_accepted('trusted host removed and added again (history kept)', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, removed_at, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now() - interval '2 days', now() - interval '1 day', now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), NULL, now()) $q$);
+SELECT pg_temp.expect_rejected('trusted host from another club''s saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000b2', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('trusted host removed before it was added', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, removed_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2', now(), now() - interval '1 day', now()) $q$);
+
 -- Restrictive deletion --------------------------------------------------------------------------
 SELECT pg_temp.expect_rejected('club deleted', $q$ DELETE FROM clubs WHERE id = 'c1000000-0000-4000-8000-00000000000a' $q$);
 SELECT pg_temp.expect_rejected('player with history deleted', $q$ DELETE FROM players WHERE id = '91000000-0000-4000-8000-000000000001' $q$);

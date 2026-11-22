@@ -1,0 +1,27 @@
+// Trusted club hosts and session hosts (epic #1002, D-2026-11-22-01). Hosting is informational, never
+// authorization: club credentials stay the only way to operate the Queue app, and nothing here grants
+// a role, a permission or a sign-in.
+
+/// A club's trusted-host list, drawn from its saved players (club_players): guests and unclaimed
+/// players can be trusted hosts too. One current row per (club, saved player), enforced by a partial
+/// unique index in SQL (`removed_at IS NULL`). Removing a trusted host sets `removed_at` and never
+/// touches the saved player or any session's host records.
+model ClubTrustedHost {
+  id           String    @id @db.Uuid
+  clubId       String    @map("club_id") @db.Uuid
+  clubPlayerId String    @map("club_player_id") @db.Uuid
+  /// When the club put this saved player on its trusted-host list.
+  addedAt      DateTime  @map("added_at") @db.Timestamptz(6)
+  /// The club took them off the list. Null = currently trusted.
+  removedAt    DateTime? @map("removed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision     BigInt    @default(1)
+
+  club       Club       @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  clubPlayer ClubPlayer @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+
+  @@unique([clubId, id])
+  @@index([clubId, clubPlayerId])
+  @@map("club_trusted_hosts")
+}

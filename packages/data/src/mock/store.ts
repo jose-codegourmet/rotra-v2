@@ -35,6 +35,7 @@ import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
+import { createTrustedHostFixtures } from '../fixtures/trustedHosts'
 import { seedUnclaimedPlayers } from '../fixtures/unclaimedPlayers'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
@@ -77,6 +78,7 @@ import type {
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
+import type { ClubTrustedHost } from '../trusted-host/trustedHost.types'
 import { NotConnectedError } from './errors'
 export type MockState = {
   passwordResetRequests: PasswordResetRequest[]
@@ -117,6 +119,11 @@ export type MockState = {
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
+  /**
+   * Each club's trusted-host list (D-2026-11-22-01), current and removed rows. Absent in older
+   * saved states reads as none.
+   */
+  clubTrustedHosts?: ClubTrustedHost[]
   sessions: QueueSession[]
   courts: SessionCourt[]
   roster: SessionPlayer[]
@@ -244,6 +251,7 @@ function seedState(): MockState {
     venues,
     players: [...players, ...requests.players],
     clubPlayers: [...clubPlayers, ...requests.clubPlayers],
+    clubTrustedHosts: createTrustedHostFixtures(now),
     sessions,
     courts,
     roster: [...roster, ...history.roster],

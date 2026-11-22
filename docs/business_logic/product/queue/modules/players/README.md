@@ -1,6 +1,6 @@
 # Players and roster
 
-**Last verified:** 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-22 for trusted hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003); 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -19,6 +19,17 @@ Adding a player offers three sources, in this order:
 **Player lookup finds registered and unclaimed players, by exact RTR ID or exact email only** ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04), replacing the registered-only search of [D-2026-11-11-03](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-03)). A guest is never found by another club. One email is one person and one RTR ID: each club keeps its own name, nickname, picture, level and optional phone for an unclaimed player, edits only its own, and is never shown another club's. The Queue Master confirms with the player before adding them. An unclaimed player already in the club's Saved players needs no identity check (the earlier **RTR ID matches** / **Scanned their QR** / **Phone confirmed** step stays withdrawn for them); whether a Confirm player step applies to another club's unclaimed player is [open](../../../open-decisions.md). **Registered (claimed)** profiles need no identity check and no confirmation step: tapping one adds them at once at their Player Information level (decided October 26, 2026). The same one-tap add applies to saved club players who have a level; the level can still be changed in the roster before the session starts (in a live session it locks on entry). A level step appears only when the player has no level yet (the operator must choose one). Players hiding their phone show "Phone hidden by player". The same email identifies the same person across clubs, registered or unclaimed. Whether lookup by phone and by QR code stay is [open](../../../open-decisions.md). Lookup must respect hidden contact details.
 
 Offline, Player Information lookup is unavailable. The operator adds the person as a new player with their email; ROTRA looks them up after reconnecting (Lookup pending).
+
+## Trusted hosts
+
+([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003.) The club keeps a **trusted-host list** drawn from its saved players, in Club settings › Trusted hosts. Any current saved player can be on it: registered, unclaimed, a guest or Lookup pending, with or without a ROTRA account. Each saved player is on it at most once.
+
+- **Informational, not authorization.** The list grants no role, permission or sign-in; the club account stays the only way to operate the Queue app. It is separate from saved-player membership: adding or removing a trusted host changes only the list.
+- **Add** picks from saved players not on the list. **Remove** asks first, then takes them off the list. The saved player stays, with their registrations and history, and sessions they already hosted keep showing them; a registered player's profile stops showing the **Host** badge for the club, and they are no longer listed first in the host picker.
+- Removal is kept as history (the row gets a removal time); adding the same player again starts a new entry.
+- A saved player the club deletes, or moves into another saved player (Same person), drops off the list.
+- Online only, like the rest of Club settings.
+- Session hosts (the session's optional **Hosts** section, auto-registration as a participant, the Host badge and the public Hosts section) follow in the later tickets of epic #1002, under the same decision.
 
 ## Saved player statistics
 

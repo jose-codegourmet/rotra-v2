@@ -27,8 +27,20 @@ export type SlotTransfer = {
   pid: string
   senderClubPlayerId: string
   senderPlayerId: string
-  /** The registered ROTRA player picked by RTR ID */
-  recipientPlayerId: string
+  /**
+   * The registered ROTRA player picked by RTR ID, or the first signed-in claimant of a transfer link
+   * (#1012). Null only for a link nobody has claimed yet; set once.
+   */
+  recipientPlayerId: string | null
+  /**
+   * Transfer link (#1012): the SHA-256 digest (hex) of the link's token, never the token. Missing or
+   * null for a transfer made by RTR ID. The link works exactly while the transfer is pending.
+   */
+  linkTokenDigest?: string | null
+  /** When the link's first signed-in claimant took it; null until then and for an RTR ID transfer */
+  claimedAt?: number | null
+  /** Who withdrew it: the sender, or a link's claimant withdrawing their claim (#1012) */
+  withdrawnByPlayerId?: string | null
   /** Set on approval: the recipient's saved player and the roster row that now holds the slot */
   recipientClubPlayerId: string | null
   recipientPid: string | null
@@ -67,16 +79,58 @@ export type SlotTransferView = {
   recipientWaitlistPosition: number | null
   /** The level the approval presets: their waitlist level, else their saved level here, else null */
   suggestedLevel: PlayingLevel | null
+  /** The recipient claimed a transfer link (#1012) rather than being picked by RTR ID */
+  viaLink?: boolean
   at: number
 }
 
-/** The sender's own pending transfer on My night. */
+/**
+ * The sender's own pending transfer on My night. A transfer link nobody has claimed yet (#1012) has
+ * no recipient: `recipientName` and `recipientRtrId` are null and `viaLink` is true.
+ */
 export type MySlotTransfer = {
   id: string
-  recipientName: string
-  recipientRtrId: string
+  recipientName: string | null
+  recipientRtrId: string | null
+  /** Made as a transfer link (#1012); missing on a server from before links reads false */
+  viaLink?: boolean
   at: number
 }
+
+/**
+ * What a transfer link (#1012) shows the person who opened it, from the viewer's side:
+ * - `open`: nobody has claimed it; a signed-in player can claim it (`claimBlock` says when not)
+ * - `yours`: the viewer claimed it and the Queue Master has not decided yet (Withdraw claim)
+ * - `approved`: the viewer claimed it and the Queue Master approved: the slot is theirs
+ * - `claimed`: someone else claimed it first
+ * - `own`: the viewer is the sender
+ * - `closed`: rejected, withdrawn or approved for someone else, or an unknown token: ask for a new link
+ * - `expired`: the session started (links stop working at the start)
+ * - `cancelled`: the whole session was cancelled
+ */
+export type TransferLinkState =
+  | 'open'
+  | 'yours'
+  | 'approved'
+  | 'claimed'
+  | 'own'
+  | 'closed'
+  | 'expired'
+  | 'cancelled'
+
+export type TransferLinkView = {
+  state: TransferLinkState
+  /** The sender's public (masked) name, as the session page shows names; null for an unknown link */
+  senderName: string | null
+  /** While `open` and signed in: why this viewer cannot claim (already has a slot here), else null */
+  claimBlock: string | null
+}
+
+/** The opaque token from `?transfer=` and the signed-in viewer (mock identity), or null */
+export type TransferLinkInput = { token: string; playerId: string | null }
+export type ClaimTransferLinkInput = { token: string; playerId: string }
+/** A new transfer link: the plaintext token is returned once and never stored */
+export type CreatedTransferLink = { transferId: string; token: string }
 
 export type RequestSlotTransferInput = { playerId: string; rtrId: string }
 export type FindTransferRecipientInput = { playerId: string; rtrId: string }

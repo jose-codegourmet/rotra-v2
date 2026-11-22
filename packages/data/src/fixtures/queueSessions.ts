@@ -19,6 +19,11 @@ import {
 import { clubPlayers, JOSE_PLAYER_ID } from './players'
 import { createSessionHistoryFixtures } from './sessionHistory'
 import { venues } from './venues'
+
+/** #1012 demo transfer link token (mock only) and the SHA-256 digest the store keeps for it. */
+export const TRANSFER_LINK_DEMO_TOKEN = 'Rotra-demo-transfer-link-for-tonight-0001xy'
+const TRANSFER_LINK_DEMO_DIGEST = '852292b9be2349e57ba7aff6ec1c7bba20a90950703a6b805e145b6f3ed9a7fb'
+
 /** Same relative dates as seedSessions/PAST and ensureHistory; reset uses a new seed time. */
 export function createQueueFixtures(now = Date.now()) {
   const at = (days: number, hour: number, minute = 0) => {
@@ -183,6 +188,31 @@ export function createQueueFixtures(now = Date.now()) {
       decidedAt: null,
     },
   ]
+  // #1012: the last registered player on tonight's first fourteen made a transfer link for a friend
+  // with no ROTRA account; nobody has claimed it yet, so it is not in the QM's Requests. The demo
+  // link is /s/tonight?transfer=TRANSFER_LINK_DEMO_TOKEN (the store keeps only the digest).
+  const linkSender = roster
+    .slice(0, 14)
+    .reverse()
+    .find((r) => r.id !== jasper.id && clubPlayers.find((p) => p.id === r.clubPlayerId)?.playerId)
+  const linkSenderPlayerId = clubPlayers.find((p) => p.id === linkSender?.clubPlayerId)?.playerId
+  if (linkSender && linkSenderPlayerId)
+    slotTransfers.push({
+      id: 'slot-transfer-s-tonight-link',
+      sessionId: tonight.id,
+      pid: linkSender.id,
+      senderClubPlayerId: linkSender.clubPlayerId,
+      senderPlayerId: linkSenderPlayerId,
+      recipientPlayerId: null,
+      linkTokenDigest: TRANSFER_LINK_DEMO_DIGEST,
+      claimedAt: null,
+      recipientClubPlayerId: null,
+      recipientPid: null,
+      recipientWasWaitlisted: null,
+      status: 'pending',
+      requestedAt: now - 8 * 60000,
+      decidedAt: null,
+    })
   const requests = {
     slotTransfers,
     joinRequests: [

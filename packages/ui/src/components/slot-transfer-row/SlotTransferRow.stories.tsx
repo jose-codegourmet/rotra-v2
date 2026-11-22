@@ -39,6 +39,9 @@ export const ErrorState: Story = {
   name: 'Error',
   args: { error: 'Russel Tan already has a slot in this session.' },
 }
+/** #1012: the recipient claimed the sender's transfer link */
+export const ClaimedLink: Story = { args: { viaLink: true, recipientName: 'Bea Santos' } }
+export const ClaimedLinkLight: Story = { ...ClaimedLink, globals: { theme: 'light' } }
 export const NotInSessionLight: Story = { globals: { theme: 'light' } }
 export const FromWaitlistLight: Story = { ...FromWaitlist, globals: { theme: 'light' } }
 export const NoLevelYetLight: Story = { ...NoLevelYet, globals: { theme: 'light' } }

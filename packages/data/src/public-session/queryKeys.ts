@@ -24,4 +24,7 @@ export const publicSessionKeys = {
     ['public-session', 'participant-stats', rtrId, viewerPlayerId] as const,
   inviteCode: (slug: string, playerId: string) =>
     ['public-session', 'invite-code', slug, playerId] as const,
+  /** The transfer link card (#1012) for `?transfer=<token>`, from this viewer's side */
+  transferLink: (slug: string, token: string, playerId: string) =>
+    ['public-session', 'transfer-link', slug, token, playerId] as const,
 }

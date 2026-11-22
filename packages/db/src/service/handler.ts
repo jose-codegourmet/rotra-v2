@@ -126,6 +126,8 @@ export async function handlePublicRead(
 export const VISITOR_COMMANDS = [
   'public-session.join-request',
   'public-session.my-request',
+  /** Transfer link card (#1012): anyone holding the link; signed in, where the viewer stands */
+  'public-session.transfer-link',
   'player.claim-link',
   'player.claim',
   'player.guest-registration',

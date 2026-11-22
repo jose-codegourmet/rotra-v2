@@ -205,6 +205,7 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
         recipientRtrId: t.recipientRtrId,
         recipientWaitlistPosition: t.recipientWaitlistPosition,
         suggestedLevel: t.suggestedLevel,
+        viaLink: t.viaLink ?? false,
         timeLabel: formatTime(t.at),
         isPending,
         onApprove: (level) => run(approveTransfer.mutate, { sessionId, transferId: t.id, level }),

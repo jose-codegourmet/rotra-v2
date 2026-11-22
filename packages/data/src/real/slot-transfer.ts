@@ -1,6 +1,8 @@
 import type {
   ApproveSlotTransferInput,
+  CreatedTransferLink,
   DecideSlotTransferInput,
+  TransferLinkView,
   TransferRecipient,
 } from '../slot-transfer/slotTransfer.types'
 import { realRequest } from './client'
@@ -36,6 +38,51 @@ export async function realWithdrawSlotTransfer(slug: string) {
     slug,
     'slot-transfer/withdraw',
     {},
+  )
+  return { savedOffline: false, message: done.message, data: { transferId: done.transferId } }
+}
+
+// ---------- Transfer links (#1012), on the Player origin ----------
+
+/**
+ * **Create a transfer link**: the plaintext token comes back once in this reply and is never stored
+ * by the server. A retried tap after a lost reply gets 409 (a transfer is pending); My night then
+ * shows the link as shared, with Cancel link to make a new one.
+ */
+export async function realCreateTransferLink(slug: string) {
+  const done = await playerPost<CreatedTransferLink & { message: string }>(
+    slug,
+    'slot-transfer/link',
+    { transferId: crypto.randomUUID() },
+  )
+  return {
+    savedOffline: false,
+    message: done.message,
+    data: { transferId: done.transferId, token: done.token },
+  }
+}
+
+/** The transfer link card: anyone holding the link; the Player app adds the viewer's own side. */
+export function realReadTransferLink(slug: string, token: string) {
+  return playerPost<TransferLinkView>(slug, 'slot-transfer/link/read', { token })
+}
+
+/** **Claim this slot**: the first signed-in claimant only. */
+export async function realClaimTransferLink(slug: string, token: string) {
+  const done = await playerPost<{ transferId: string; message: string }>(
+    slug,
+    'slot-transfer/link/claim',
+    { token },
+  )
+  return { savedOffline: false, message: done.message, data: { transferId: done.transferId } }
+}
+
+/** **Withdraw claim**: the transfer closes and the link stops working. */
+export async function realWithdrawTransferClaim(slug: string, token: string) {
+  const done = await playerPost<{ transferId: string; message: string }>(
+    slug,
+    'slot-transfer/link/withdraw',
+    { token },
   )
   return { savedOffline: false, message: done.message, data: { transferId: done.transferId } }
 }

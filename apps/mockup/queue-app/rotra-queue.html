@@ -2207,7 +2207,10 @@ function seedSessions() {
       // Epic #1002 (#1006): Miguel hosts and plays (Hosts and Players, one slot); Gab Torres hosts without playing (Hosts only).
       hosts: [{ pid: 'p1', at: Date.now() - 36e5 }, { pid: 'p17', at: Date.now() - 36e5 + 1 }],
       // #1011: Dani asks to hand her confirmed slot to Cara, a registered ROTRA player who is not in this session.
-      transfers: [{ id: 't-seed-dani', pid: 'p13', to: 'p25', at: Date.now() - 20 * 60000, status: 'pending' }],
+      transfers: [{ id: 't-seed-dani', pid: 'p13', to: 'p25', at: Date.now() - 20 * 60000, status: 'pending' },
+        // #1012: p14 made a transfer link for a friend with no ROTRA account; nobody has claimed it, so it is not in Requests yet.
+        // Open /queue/s/s-tonight?transfer=Rotra-demo-transfer-link-for-tonight-0001xy to see the claim card.
+        { id: 't-seed-link', pid: 'p14', to: null, link: 'Rotra-demo-transfer-link-for-tonight-0001xy', at: Date.now() - 8 * 60000, status: 'pending' }],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
     },
@@ -4383,7 +4386,8 @@ const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
 // #1011 slot transfers: a confirmed signed-in player asks to give their slot to another registered ROTRA player; the QM approves
 // or rejects before Start. Pending ones expire at Start and are cancelled with the session. Decided ones stay on the record.
-const pendingTransfers = (s) => (s.status === 'prepared' ? (s.transfers || []) : []).filter((t) => t.status === 'pending' && R(s, t.pid)).sort((a, b) => a.at - b.at);
+// #1012: an unclaimed transfer link (`to` still null) has nobody to approve, so it is not listed for the QM.
+const pendingTransfers = (s) => (s.status === 'prepared' ? (s.transfers || []) : []).filter((t) => t.status === 'pending' && t.to && R(s, t.pid)).sort((a, b) => a.at - b.at);
 const myTransfer = (s, pid) => (s.transfers || []).find((t) => t.pid === pid && t.status === 'pending') || null;
 const closeTransfers = (s, status) => (s.transfers || []).forEach((t) => { if (t.status === 'pending') { t.status = status; t.decidedAt = Date.now(); } });
 const RTR_SHAPE = /^RTR-[A-Z]{2}-[A-Z]{3}-\d{6}-\d{4}$/;
@@ -4396,6 +4400,25 @@ const transferRecipient = (rtr) => {
   return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, dir: g } : null;
 };
 const transferTo = (t) => P(t.to) || (() => { const g = DIRECTORY.find((x) => x.id === t.to); return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, identity: 'registered' } : null; })();
+// #1012 transfer links: when the recipient has no ROTRA account the sender makes a single-claim link instead of picking an RTR ID.
+// It is a pending transfer with `link` (the token; the real app stores only its SHA-256 digest) and `to` null until the first
+// signed-in claimant takes it. It works exactly while pending: Reject, either side's Withdraw, Start and Cancel session all end it.
+const LINK_TOKEN = /^[A-Za-z0-9_-]{43}$/;
+const newLinkToken = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const transferLinkUrl = (s, t) => `${sessionLink(s)}?transfer=${t.link}`;
+const linkTransfer = (s, token) => (LINK_TOKEN.test(token || '') && (s.transfers || []).find((t) => t.link === token)) || null;
+// The link's state from the viewer's side, the same words as the real app's transferLinkState().
+function linkState(s, t, vid) {
+  if (!t) return 'closed';
+  const mine = !!vid && t.to === vid;
+  if (t.status === 'approved') return mine ? 'approved' : 'closed';
+  if (t.status === 'cancelled' || s.status === 'cancelled') return 'cancelled';
+  if (t.status === 'expired' || (t.status === 'pending' && s.status !== 'prepared')) return 'expired';
+  if (t.status !== 'pending') return 'closed';
+  if (vid && vid === t.pid) return 'own';
+  if (mine) return 'yours';
+  return t.to ? 'claimed' : 'open';
+}
 const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length + pendingTransfers(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 // D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
@@ -4492,7 +4515,8 @@ function transferRow(s, t) {
   const p = P(t.pid), to = transferTo(t) || { name: 'Unknown', rtr: '' };
   const wl = waitOf(s).findIndex((w) => w.pid === t.to) + 1;
   const lv = t.level ?? (wl ? waitOf(s)[wl - 1].level : null) ?? to.sugg ?? null;
-  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Asks to transfer their slot · ${fmtWhen(t.at, { lower: true })}</p><p class="small"><b>To ${esc(to.name)} · <span class="mono" style="font-weight:400">${esc(to.rtr)}</span></b></p></div>${wl ? chip(`Waitlist #${wl}`, 'ok') : chip('Not in this session')}</div>
+  // #1012: a claimed transfer link reads "Shared a transfer link" and "Claimed by NAME"; rejecting it ends the link.
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">${t.link ? 'Shared a transfer link' : 'Asks to transfer their slot'} · ${fmtWhen(t.claimedAt || t.at, { lower: true })}</p><p class="small"><b>${t.link ? 'Claimed by' : 'To'} ${esc(to.name)} · <span class="mono" style="font-weight:400">${esc(to.rtr)}</span></b></p></div>${wl ? chip(`Waitlist #${wl}`, 'ok') : chip('Not in this session')}</div>
       <p class="small muted">Approving gives the slot to ${esc(to.name)}${wl ? ', who leaves the waitlist' : ''}. ${esc(p.name)} comes off the roster. The slot count stays the same.</p>
       <div class="req-actions">${selectLevel(`tr-lv-${t.id}`, lv, `data-act-change="trLevel" data-id="${t.id}" aria-label="Level for ${esc(to.name)}"`, t.err && lv == null)}
         <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button><button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
@@ -4531,6 +4555,30 @@ const memberJoinOk = (s, v) => s.status === 'prepared' && s.acceptReq !== false 
 function wantField(s, want, act, err) {
   const full = slotsFullFor(s);
   return `<div class="field"><span>How do you want to join?</span><div class="seg" role="group" aria-label="How do you want to join?">${WANT_CHOICES.map(([v, l]) => `<button aria-pressed="${want === v}" ${act} data-v="${v}" ${v === 'slot' && full ? 'disabled title="All slots are taken"' : ''}>${l}</button>`).join('')}</div>${err ? `<span class="err">${esc(err)}</span>` : `<span class="hint">${full ? 'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.' : 'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'}</span>`}</div>`;
+}
+// #1012: the card a person sees on the session page opened from a transfer link (?transfer=<token>). Not signed in: sign up or
+// log in to claim. Signed in: Claim this slot (first claimant only), then the pending claim with Withdraw claim, or the slot once
+// approved. Every closed state says why and what to do. The sender's name is masked like every name on the public page.
+function transferLinkCard(s) {
+  const token = S.ui.trLink; if (!token || !S.ui.guest) return '';
+  const t = linkTransfer(s, token), v = pubViewer(), st = linkState(s, t, v ? v.id : null);
+  const sender = t ? pubNameText(P(t.pid)) : 'A player';
+  const head = ['open', 'yours', 'approved'].includes(st) ? `${esc(sender)} wants to give you their slot` : 'Transfer link';
+  const CLOSED = {
+    claimed: ['Someone else already claimed this transfer link.', 'Only the first person to claim a transfer link can. Ask the sender if they have another slot to give.'],
+    own: ['This is your own transfer link.', 'Send it to the player who\'ll take your slot. You can cancel it on My night.'],
+    closed: ['This transfer link no longer works.', 'It was cancelled, withdrawn or rejected. Ask the sender for a new link.'],
+    expired: ['This transfer link has expired.', 'Transfer links stop working when the session starts.'],
+    cancelled: ['This session was cancelled.', 'The transfer link no longer works.'],
+  };
+  let body;
+  if (CLOSED[st]) body = notice('warn', `<b>${CLOSED[st][0]}</b> ${CLOSED[st][1]}`);
+  else if (st === 'approved') body = notice('ok', '<b>The slot is yours.</b> The Queue Master approved the transfer. See you on court.');
+  else if (st === 'yours') body = `<p>You claimed ${esc(sender)}'s slot · the Queue Master decides before the session starts.</p><p class="small muted">Withdrawing gives the slot back to ${esc(sender)}, and this link stops working.</p><div class="row acts"><button class="btn" data-act="withdrawTransferClaim" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Withdraw claim</button></div>`;
+  else if (!v) body = `<p>Sign up or log in to ROTRA to claim it. The first person to claim it gets the slot once the Queue Master approves.</p><div class="row acts"><button class="btn primary" data-act="linkSignUp">Sign up to claim</button><button class="btn" data-act="linkSignUp" data-k="login">Log in</button></div>`;
+  else if (R(s, v.id)) body = notice('warn', 'You already have a slot in this session, so you can\'t claim this one.');
+  else body = `<p>Claim it and the Queue Master decides before the session starts. Only the first person to claim this link can.</p><div class="row acts"><button class="btn primary" data-act="claimTransferLink" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Claim this slot</button></div>`;
+  return `<section class="card stack" aria-labelledby="tl-h"><h2 id="tl-h" style="margin:0;font-size:16px">${head}</h2>${body}</section>`;
 }
 function joinCard(s) {
   if (s.status !== 'prepared' && s.status !== 'active') return '';
@@ -5685,7 +5733,9 @@ function myNight(s) {
     else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
     // #1011: one pending slot transfer per slot; the QM approves or rejects it before the start.
     const tr = myTransfer(s, v.id), trTo = tr && transferTo(tr);
-    if (tr) { lines.push(`Transfer to ${esc(trTo ? trTo.name : 'another player')} requested · the QM decides`); acts.push('<button class="btn" data-act="withdrawTransfer">Withdraw request</button>'); }
+    // #1012: a transfer link nobody has claimed yet reads its own line and Cancel link; once claimed it reads like a request.
+    if (tr && tr.link && !tr.to) { lines.push('Transfer link shared · waiting for someone to claim it'); acts.push('<button class="btn" data-act="withdrawTransfer">Cancel link</button>'); }
+    else if (tr) { lines.push(`Transfer to ${esc(trTo ? trTo.name : 'another player')} requested · the QM decides`); acts.push('<button class="btn" data-act="withdrawTransfer">Withdraw request</button>'); }
     else acts.push('<button class="btn" data-act="openSlotTransfer">Transfer my slot</button>');
   } else if (s.status === 'finalized') {
     lines.push('Session finished'); stats = statBlock(0);
@@ -5735,7 +5785,8 @@ function viewPublic() {
   const why = (s.cancelReason || '').replace(/[.\s]+$/, '');
   // Artifact comment, November 13, 2026 ("so much white space"): on wide screens the join card and My night move to a
   // side column beside the tabs, instead of everything sitting in one 760px column.
-  const side = `${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
+  // #1012: the transfer link card goes first in the side column.
+  const side = `${transferLinkCard(s)}${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
   // Artifact comment, same day: My night sits right above the tabs, in the main column, at every width.
   const night = s.status === 'cancelled' ? '' : myNight(s);
   return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? `<b>Session page (prototype).</b> What this person sees after opening your session link.` : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>
@@ -6875,8 +6926,24 @@ const SHEETS = {
     const found = f ? `<div class="li" style="padding:10px;border:1px solid var(--border);border-radius:10px">${avatar(P(f.id) || { id: f.id, name: f.name, identity: 'registered' })}<div class="main"><b>${esc(f.name)}</b><div class="small muted mono">${esc(f.rtr)}</div><p class="small muted">${f.wl ? `On the waitlist #${f.wl} · leaves the waitlist if approved` : 'Not in this session yet'}</p></div></div>` : '';
     return sheetShell('Transfer my slot', `<p class="small muted">Give your slot to another ROTRA player. The Queue Master approves it before the session starts (${fmtDate(s.start)}, ${fmtTime(s.start)}); until then you keep your slot. Requests still waiting at the start close.</p>
       <label class="field"><span>Their RTR ID</span><input class="input mono${sh.err ? ' bad' : ''}" id="st-rtr" data-bind="ui.sheet.q" value="${esc(sh.q || '')}" placeholder="RTR-PH-CEB-102926-0001" autocomplete="off" autocapitalize="characters" spellcheck="false" data-autofocus>${sh.err ? `<span class="err">${esc(sh.err)}</span>` : '<span class="hint">Ask them for the RTR ID on their ROTRA profile.</span>'}</label>
-      <button class="btn" data-act="findTransfer">Find</button>${found}`,
+      <button class="btn" data-act="findTransfer">Find</button>${found}
+      <div class="stack tight" style="border-top:1px solid var(--border);padding-top:14px"><b style="font-size:14px">No ROTRA account yet?</b><p class="small muted">Make a transfer link instead. They sign up or log in with it, and the first person to claim it gets your slot once the Queue Master approves. It stops working at the start.</p><button class="btn" data-act="createTransferLink">Create a transfer link</button></div>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendTransfer" ${f ? '' : 'disabled'}>Send transfer request</button>`);
+  },
+  // #1012 Transfer link: shown once, right after it is made (the real app stores only the token's digest). QR, copy field, Share.
+  transferLink(sh) {
+    const s = cur(), t = (s.transfers || []).find((x) => x.id === sh.id); if (!t) return sheetShell('Transfer link', '<p class="small muted">This link is closed.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const link = transferLinkUrl(s, t);
+    // Static placeholder QR (finder squares + sample modules), like the Session QR; the real app encodes the link.
+    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
+    const dots = [[9,1],[12,3],[10,5],[13,7],[1,9],[4,10],[8,9],[11,11],[15,9],[18,10],[2,13],[9,14],[12,16],[16,13],[19,15],[14,19],[10,19],[17,18]];
+    const qr = `<div style="width:min(220px,100%);aspect-ratio:1;align-self:center;background:#fff;border-radius:16px;padding:14px"><svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the transfer link" style="display:block;width:100%;height:100%">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg></div>`;
+    return sheetShell('Transfer link', `<div class="stack">
+      <p class="small muted">Send this link to the player who'll take your slot. They sign up or log in to ROTRA, then claim it. Only the first person to claim it can; the Queue Master still approves, and you keep your slot until then.</p>
+      ${qr}
+      <div class="copy-field"><label class="label" for="transfer-link">Transfer link</label><div class="cf-box"><input id="transfer-link" readonly value="${esc(link)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="copyTransferLink" data-v="${esc(link)}" aria-label="Copy transfer link" title="Copy">${COPY_ICON}</button></div></div>
+      <p class="small muted">It stops working at the start (${fmtDate(s.start)}, ${fmtTime(s.start)}), or if the Queue Master rejects the claim or it is withdrawn; then make a new one. ROTRA shows this link only once: if you lose it, cancel it on My night and make a new one.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? `<button class="btn primary" data-act="shareTransferLink" data-v="${esc(link)}">Share</button>` : `<button class="btn primary" data-act="copyTransferLink" data-v="${esc(link)}">Copy link</button>`}`);
   },
   cancelSession(sh) {
     const s = cur(), pay = s.payments || {};
@@ -7380,7 +7447,34 @@ const ACT = {
     s.transfers = [...(s.transfers || []), { id: `t${Date.now()}`, pid: v.id, to: f.id, at: Date.now(), status: 'pending' }];
     S.ui.sheet = null; save(); render(); toast(`Transfer to ${f.name} sent · the QM decides`);
   },
-  withdrawTransfer: () => { const s = cur(), v = pubViewer(), t = v && myTransfer(s, v.id); if (!t) return; t.status = 'withdrawn'; t.decidedAt = Date.now(); save(); render(); toast('Transfer request withdrawn'); },
+  withdrawTransfer: () => { const s = cur(), v = pubViewer(), t = v && myTransfer(s, v.id); if (!t) return; const unclaimed = t.link && !t.to; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast(unclaimed ? 'Transfer link cancelled' : 'Transfer request withdrawn'); },
+  // #1012 Create a transfer link (sender). One pending transfer per slot, so a link and an RTR ID request never coexist.
+  createTransferLink: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    const t = { id: `t${Date.now()}`, pid: v.id, to: null, link: newLinkToken(), at: Date.now(), status: 'pending' };
+    s.transfers = [...(s.transfers || []), t];
+    save(); openSheet({ type: 'transferLink', id: t.id }); toast('Transfer link ready · share it with the new player');
+  },
+  copyTransferLink: (d) => {
+    const done = () => toast('Transfer link copied');
+    try { navigator.clipboard.writeText(d.v).then(done, () => { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }); }
+    catch (e) { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }
+  },
+  shareTransferLink: (d) => { try { navigator.share({ title: 'Take my slot on ROTRA', url: d.v }).catch(() => {}); } catch (e) { /* share unavailable */ } },
+  // #1012 claimant side. Prototype only: Sign up / Log in signs in as a registered player who is not in this session (the real
+  // app uses the session link's registration, so identity and RTR ID work like any session link).
+  linkSignUp: (d) => { setPubAs('newplayer'); toast(d.k === 'login' ? 'Prototype: logged in through the transfer link' : 'Prototype: signed up through the transfer link'); },
+  claimTransferLink: () => {
+    const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t) return;
+    const st = linkState(s, t, v.id);
+    if (st !== 'open') { render(); toast(st === 'claimed' ? 'Someone else already claimed this transfer link.' : 'This transfer link no longer works. Ask the sender for a new link.'); return; }
+    if (R(s, v.id)) { toast('You already have a slot in this session, so you can\'t claim this one.'); return; }
+    // First claimant wins: the real app claims with one conditional update on the locked rows.
+    t.to = v.id; t.claimedAt = Date.now(); save(); render(); toast('Slot claimed · the QM decides');
+  },
+  withdrawTransferClaim: () => { const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t || linkState(s, t, v.id) !== 'yours') return; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast('Claim withdrawn · this link no longer works'); },
   cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
   // D-2026-11-09-05, player side: Request a match.
   openMatchReq: () => { const s = cur(), a = reqAllowed(s); if (!REQ_FORMATS.some((k) => a[k])) { toast('This session isn\'t taking match requests'); return; } openSheet({ type: 'matchReq', format: REQ_FORMATS.find((k) => a[k]), partners: [], opp: [] }); },
@@ -8910,7 +9004,9 @@ function prototypePath() {
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
-  return `/queue${path ?? ''}${tab ? `?tab=${encodeURIComponent(tab)}` : ''}`;
+  // #1012: a transfer link's token stays on the session page's address.
+  const q = new URLSearchParams(); if (tab) q.set('tab', tab); if (S.screen === 'public' && S.ui.guest && S.ui.trLink) q.set('transfer', S.ui.trLink);
+  return `/queue${path ?? ''}${q.toString() ? `?${q}` : ''}`;
 }
 function applyPrototypeRoute(url) {
   flushPresence();
@@ -8922,6 +9018,8 @@ function applyPrototypeRoute(url) {
   const match = path.match(/^\/sessions\/([^/]+)(?:\/(preparation|edit|record|finishing|results|public-page|recovery))?$/);
   const guest = path.match(/^\/s\/([^/]+)$/);
   const tab = url.searchParams.get('tab');
+  // #1012: /s/<id>?transfer=<token> opens the transfer link card.
+  S.ui.trLink = guest && LINK_TOKEN.test(url.searchParams.get('transfer') || '') ? url.searchParams.get('transfer') : null;
   if (setting) {
     const entry = Object.entries(settingsSlugs).find(([, slug]) => slug === (setting[1] || 'club-identity'));
     if (!entry) return false;

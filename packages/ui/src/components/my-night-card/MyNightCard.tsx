@@ -24,6 +24,12 @@ export type MyNightCardProps = {
    * “Transfer to NAME requested · the QM decides” and Withdraw request instead of Transfer my slot.
    */
   transferPendingTo?: string
+  /**
+   * Before start: the player's own transfer link (#1012) that nobody has claimed yet. Shows
+   * “Transfer link shared · waiting for someone to claim it” and Cancel link (onWithdrawTransfer).
+   * Once claimed, pass the claimant's name as `transferPendingTo` instead.
+   */
+  transferLinkOpen?: boolean
   /** Before start: Transfer my slot (#1011); omit to hide it */
   onTransfer?: () => void
   /** Withdraw request on the pending transfer */
@@ -148,6 +154,7 @@ export function MyNightCard({
   startsLabel,
   cantMakeItSent = false,
   transferPendingTo,
+  transferLinkOpen = false,
   onTransfer,
   onWithdrawTransfer,
   hasLeft = false,
@@ -200,6 +207,18 @@ export function MyNightCard({
       actions.push(
         <Button key="withdraw" onClick={onWithdrawTransfer} disabled={blocked} title={offlineTitle}>
           Withdraw request
+        </Button>,
+      )
+    } else if (transferLinkOpen) {
+      lines.push('Transfer link shared · waiting for someone to claim it')
+      actions.push(
+        <Button
+          key="cancel-link"
+          onClick={onWithdrawTransfer}
+          disabled={blocked}
+          title={offlineTitle}
+        >
+          Cancel link
         </Button>,
       )
     } else if (onTransfer)

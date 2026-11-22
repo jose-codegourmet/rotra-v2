@@ -44,6 +44,12 @@ export type SlotTransferFormProps = {
   onRtrIdChange?: () => void
   isPending?: boolean
   serverError?: string
+  /**
+   * Create a transfer link (#1012) for a recipient with no ROTRA account; omit to hide the option.
+   * The container makes the link and opens TransferLinkSheet with it.
+   */
+  onCreateLink?: () => void
+  isCreatingLink?: boolean
   returnFocusRef?: RefObject<HTMLElement | null>
 }
 
@@ -51,6 +57,7 @@ export type SlotTransferFormProps = {
  * Transfer my slot (#1011, the prototype's SHEETS.slotTransfer): the signed-in confirmed player
  * types the full RTR ID of another registered ROTRA player, taps Find, checks the name, then
  * Send transfer request. The Queue Master approves or rejects; nothing changes before that.
+ * No ROTRA account? Create a transfer link instead (#1012): a single-claim link they sign up with.
  */
 export function SlotTransferForm({
   open,
@@ -64,6 +71,8 @@ export function SlotTransferForm({
   onRtrIdChange,
   isPending = false,
   serverError,
+  onCreateLink,
+  isCreatingLink = false,
   returnFocusRef,
 }: SlotTransferFormProps) {
   const formId = useId()
@@ -73,21 +82,21 @@ export function SlotTransferForm({
   })
   const typed = normalizeRtrId(form.watch('rtrId') ?? '')
   const found = recipient && recipient.rtrId === typed ? recipient : null
-  const busy = isPending || isFinding
+  const busy = isPending || isFinding || isCreatingLink
   const error = form.formState.errors.rtrId?.message ?? findError
 
   return (
     <Sheet
       open={open}
       onOpenChange={(next) => {
-        if (!isPending) onOpenChange(next)
+        if (!isPending && !isCreatingLink) onOpenChange(next)
       }}
       title="Transfer my slot"
-      dismissible={!isPending}
+      dismissible={!isPending && !isCreatingLink}
       returnFocusRef={returnFocusRef}
       footer={
         <>
-          <Button disabled={isPending} onClick={() => onOpenChange(false)}>
+          <Button disabled={isPending || isCreatingLink} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
@@ -95,7 +104,7 @@ export function SlotTransferForm({
             form={formId}
             variant="primary"
             loading={isPending}
-            disabled={!found || isFinding}
+            disabled={!found || isFinding || isCreatingLink}
           >
             Send transfer request
           </Button>
@@ -163,6 +172,25 @@ export function SlotTransferForm({
                   : 'Not in this session yet'}
               </span>
             </div>
+          </div>
+        ) : null}
+        {onCreateLink ? (
+          <div className="flex flex-col gap-2 border-t border-border pt-3.5">
+            <b className="text-sm">No ROTRA account yet?</b>
+            <p className="m-0 text-[13px] text-fg2">
+              Make a transfer link instead. They sign up or log in with it, and the first person to
+              claim it gets your slot once the Queue Master approves. It stops working at the start.
+            </p>
+            <Button
+              type="button"
+              disabled={busy}
+              loading={isCreatingLink}
+              onClick={() => {
+                if (!busy) onCreateLink()
+              }}
+            >
+              Create a transfer link
+            </Button>
           </div>
         ) : null}
       </form>

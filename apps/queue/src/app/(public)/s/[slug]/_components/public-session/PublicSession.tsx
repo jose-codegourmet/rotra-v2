@@ -29,6 +29,9 @@ import { useSessionPageAccount } from '@rotra/data/public-session/useSessionPage
 import { useSessionPageSignOut } from '@rotra/data/public-session/useSessionPageSignOut'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
+import { useClaimTransferLink } from '@rotra/data/slot-transfer/useClaimTransferLink'
+import { useTransferLink } from '@rotra/data/slot-transfer/useTransferLink'
+import { useWithdrawTransferClaim } from '@rotra/data/slot-transfer/useWithdrawTransferClaim'
 import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -46,6 +49,7 @@ import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
+import { TransferLinkCard } from '@rotra/ui/transfer-link-card'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ClubCard } from '@/app/(public)/s/[slug]/_components/club-card/ClubCard'
@@ -71,6 +75,8 @@ export type PublicSessionProps = {
   openJoin?: boolean
   /** ?invite=<code> on the visitor's link: sent with Request to join as NAME ("Invited by NAME") */
   inviteCode?: string
+  /** ?transfer=<token> on the visitor's link (#1012): the transfer link card (claim, withdraw) */
+  transferToken?: string
 }
 
 const MODES = {
@@ -280,7 +286,13 @@ const savedTab = (value: unknown): SavedTab | null =>
  * started/cancelled notice) sits in a sticky 360 px side column (2026-11-13 wide layout log). No
  * operator controls.
  */
-export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: PublicSessionProps) {
+export function PublicSession({
+  slug,
+  viewer,
+  openJoin = false,
+  inviteCode,
+  transferToken,
+}: PublicSessionProps) {
   const offline = !useConnectivity().online
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
@@ -321,6 +333,15 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       ? { id: realPlayer.playerId, name: realPlayer.name }
       : null
   const night = useMyNight(slug, nightViewer?.id)
+  // #1012: a transfer link (`?transfer=<token>`), from this viewer's side. Real mode reads the
+  // Player app's own sign-in; the viewer id only keys the read so it refetches after sign-in.
+  const transferLink = useTransferLink(
+    slug,
+    viewer === 'visitor' ? transferToken : undefined,
+    nightViewer?.id ?? null,
+  )
+  const claimLink = useClaimTransferLink(slug)
+  const withdrawClaim = useWithdrawTransferClaim(slug)
   // Real mode (#850): a finished session's Match history from the Player app's own read; the mock
   // signed-in read carries it as `history`.
   const realHistory = usePublicMatchHistory(
@@ -621,14 +642,52 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       ? `/s/${encodeURIComponent(slug)}`
       : new URL(`/s/${encodeURIComponent(slug)}`, location.origin).href
   const resultsClub = { name: p.club.name, initials: p.club.initials, logoUrl: p.club.logoUrl }
+  // #1012: the transfer link card goes first in the side column. Signing up goes through the
+  // session link's registration (identity and RTR ID like any session link), back to this link.
+  const linkToken = transferToken ?? ''
+  const linkView = linkToken ? transferLink.data : undefined
+  const linkWrite = {
+    onSuccess: (done: { message: string }) => toast(done.message),
+    onError: (error: Error) => toast.error(error.message),
+  }
+  const linkCard = linkView ? (
+    <TransferLinkCard
+      state={linkView.state}
+      senderName={linkView.senderName}
+      signedIn={!!nightViewer}
+      claimBlock={linkView.claimBlock}
+      registerHref={
+        isRealDataMode() && p.club.id && typeof location !== 'undefined'
+          ? playerRegisterUrl(p.club.id, location.href, { join: false })
+          : undefined
+      }
+      logInHref={loginHref}
+      pending={claimLink.isPending || withdrawClaim.isPending}
+      offline={offline}
+      onClaim={() => {
+        if (nightViewer) claimLink.mutate({ token: linkToken, playerId: nightViewer.id }, linkWrite)
+      }}
+      onWithdraw={() => {
+        if (nightViewer)
+          withdrawClaim.mutate({ token: linkToken, playerId: nightViewer.id }, linkWrite)
+      }}
+    />
+  ) : null
   // The join card, or the started/cancelled notice: the side column from 1100 px.
-  const side =
+  const sideMain =
     p.status === 'cancelled' ? (
       <Notice tone="warn" title="This session is cancelled.">
         {cancelWhy ? `${cancelWhy}.` : null}
       </Notice>
     ) : card ? (
       <JoinRequestCard {...card} />
+    ) : null
+  const side =
+    linkCard || sideMain ? (
+      <>
+        {linkCard}
+        {sideMain}
+      </>
     ) : null
 
   return (

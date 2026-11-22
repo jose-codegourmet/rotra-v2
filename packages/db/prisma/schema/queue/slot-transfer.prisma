@@ -7,9 +7,14 @@
 // A row is immutable once it leaves `pending` (trigger in SQL), so repeat transfers read as a chain:
 // the next transfer's `sender_session_player_id` is the previous one's `recipient_session_player_id`.
 //
+// Transfer links (#1012, D-2026-11-22-04): when the recipient has no ROTRA account the sender makes a
+// single-claim link instead of picking an RTR ID. The link IS this row: a pending transfer with
+// `link_token_digest` set and `recipient_player_id` null until the first signed-in claimant takes it
+// (conditional UPDATE under the session lock; a trigger refuses a second claimant or a new token). The
+// link works exactly while the row is pending, so rejection, withdrawal (by either side), Start
+// (`expired`) and Cancel session (`cancelled`) all end it; a new link is a new row.
+//
 // Shape kept ready for the later tickets of the epic, none of it built yet:
-// - #1012 transfer links: a link table keyed on (club_id, session_id, id) of this row, plus a nullable
-//   link column here; `recipient_player_id` is already nullable for a link nobody has claimed.
 // - #1013 accounting: nullable snapshot columns (amount paid, waived amount) written by the same
 //   approval UPDATE that leaves `pending`; the sender's payment mark is never touched.
 // - #1014 refunds: a separate append-only refund record referencing this row.
@@ -18,7 +23,7 @@ enum SlotTransferStatus {
   pending
   approved
   rejected
-  /// The sender withdrew it while pending (with transfer links, #1012, also the recipient)
+  /// The sender withdrew it while pending, or the claimant of a transfer link withdrew their claim (#1012)
   withdrawn
   /// Still pending when the session started (Start closes every pending transfer)
   expired
@@ -40,9 +45,15 @@ model SessionSlotTransfer {
   /// The sender's saved player in this club and their account, frozen at request time.
   senderClubPlayerId       String             @map("sender_club_player_id") @db.Uuid
   senderPlayerId           String             @map("sender_player_id") @db.Uuid
-  /// The registered ROTRA player picked by exact RTR ID. Nullable only for a transfer link nobody
-  /// has claimed yet (#1012); every #1011 request sets it, and approval requires it (CHECK).
+  /// The registered ROTRA player picked by exact RTR ID, or the first signed-in claimant of a
+  /// transfer link (#1012). Null only for a link nobody has claimed yet; set once (trigger), and
+  /// approval and rejection require it (CHECK).
   recipientPlayerId        String?            @map("recipient_player_id") @db.Uuid
+  /// Transfer link (#1012): SHA-256 of the opaque token in the shared link, never the token itself.
+  /// Null for a transfer made by RTR ID. Never changes once written (trigger).
+  linkTokenDigest          Bytes?             @unique @map("link_token_digest")
+  /// When the first signed-in claimant took the link; set exactly when a link has a recipient.
+  claimedAt                DateTime?          @map("claimed_at") @db.Timestamptz(6)
   /// Set on approval: the recipient's saved player in this club (created when new to the club) and
   /// the roster entry that now holds the slot.
   recipientClubPlayerId    String?            @map("recipient_club_player_id") @db.Uuid

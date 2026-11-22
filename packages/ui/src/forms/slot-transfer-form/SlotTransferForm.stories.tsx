@@ -12,6 +12,7 @@ const meta = {
     onFind: fn(),
     onSubmit: fn(),
     onRtrIdChange: fn(),
+    onCreateLink: fn(),
   },
 } satisfies Meta<typeof SlotTransferForm>
 export default meta
@@ -29,6 +30,11 @@ export const Sending: Story = { args: { isPending: true } }
 export const ServerError: Story = {
   args: { serverError: 'Your transfer request is already sent.' },
 }
+/** #1012: making a transfer link for a recipient with no ROTRA account */
+export const CreatingLink: Story = { args: { isCreatingLink: true } }
+/** #1012: the RTR ID path only (no link option) */
+export const WithoutLinkOption: Story = { args: { onCreateLink: undefined } }
+export const CreatingLinkLight: Story = { ...CreatingLink, globals: { theme: 'light' } }
 export const EmptyLight: Story = { globals: { theme: 'light' } }
 export const NotFoundLight: Story = { ...NotFound, globals: { theme: 'light' } }
 export const ServerErrorLight: Story = { ...ServerError, globals: { theme: 'light' } }

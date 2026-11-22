@@ -17,6 +17,11 @@ export type SlotTransferRowProps = {
   recipientWaitlistPosition?: number | null
   /** "7:20 PM" */
   timeLabel: string
+  /**
+   * The recipient claimed the sender's transfer link (#1012) instead of being picked by RTR ID:
+   * the row reads “Shared a transfer link · TIME” and “Claimed by NAME”.
+   */
+  viaLink?: boolean
   /** The level the select starts on: their waitlist level or saved level here; null for none */
   suggestedLevel?: PlayingLevel | null
   /** Approve with the level the Queue Master chose for the recipient at this club */
@@ -31,8 +36,9 @@ const LEVEL_ERROR = 'Choose a level for this club before approving.'
 /**
  * One pending slot transfer in Requests (#1011, the prototype's transferRow()): the sender, who
  * they want to give the slot to (name and RTR ID), whether that player is on the waitlist, the
- * level the recipient plays at here, and Reject / Approve. Presentational: the caller owns the
- * transfer mutations.
+ * level the recipient plays at here, and Reject / Approve. A claimed transfer link (#1012) reads
+ * “Claimed by NAME”; rejecting it ends the link. Presentational: the caller owns the transfer
+ * mutations.
  */
 export function SlotTransferRow({
   senderName,
@@ -41,6 +47,7 @@ export function SlotTransferRow({
   recipientRtrId,
   recipientWaitlistPosition = null,
   timeLabel,
+  viaLink = false,
   suggestedLevel = null,
   onApprove,
   onReject,
@@ -63,9 +70,12 @@ export function SlotTransferRow({
         <Avatar name={senderName} src={senderPhotoUrl} />
         <div className="flex min-w-0 flex-1 flex-col">
           <b className="[overflow-wrap:anywhere]">{senderName}</b>
-          <span className="text-[13px] text-fg2">Asks to transfer their slot · {timeLabel}</span>
+          <span className="text-[13px] text-fg2">
+            {viaLink ? 'Shared a transfer link' : 'Asks to transfer their slot'} · {timeLabel}
+          </span>
           <span className="text-[13px] font-semibold [overflow-wrap:anywhere]">
-            To {recipientName} · <span className="font-mono font-normal">{recipientRtrId}</span>
+            {viaLink ? 'Claimed by' : 'To'} {recipientName} ·{' '}
+            <span className="font-mono font-normal">{recipientRtrId}</span>
           </span>
         </div>
         <Chip tone={recipientWaitlistPosition ? 'accent' : 'neutral'}>

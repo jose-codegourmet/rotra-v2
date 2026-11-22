@@ -8,6 +8,7 @@ export const slotTransferFormMeta = {
     'onFind receives the normalized RTR ID; the container runs the lookup and passes recipient (name, RTR ID, picture, waitlist place) or findError back.',
     'Send transfer request is enabled only while the found recipient matches the typed RTR ID; call onRtrIdChange to clear a stale result.',
     'Shown from My night before the start only. Nothing moves until the Queue Master approves.',
+    'Pass onCreateLink to offer Create a transfer link (#1012) for a recipient with no ROTRA account; the container makes the link and opens TransferLinkSheet. isCreatingLink disables the sheet meanwhile.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -17,5 +18,5 @@ export const slotTransferFormMeta = {
     'docs/screens/product/modules/queue/public-session.md',
     'docs/business_logic/product/queue/modules/players/README.md',
   ],
-  related: ['Sheet', 'Field', 'TextInput', 'Avatar', 'MyNightCard'],
+  related: ['Sheet', 'Field', 'TextInput', 'Avatar', 'MyNightCard', 'TransferLinkSheet'],
 } satisfies ComponentMeta

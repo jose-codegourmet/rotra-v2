@@ -1,8 +1,18 @@
 import 'server-only'
 import { isRtrId, normalizeRtrId } from '@rotra/data/player/rtr-id'
+import { maskPublicName } from '@rotra/data/public-session/rules'
 import {
+  isTransferLinkToken,
   TRANSFER_ALREADY_DECIDED_ERROR,
   TRANSFER_ALREADY_PENDING_ERROR,
+  TRANSFER_CLAIM_CLOSED_ERROR,
+  TRANSFER_CLAIM_CONFIRMED_ERROR,
+  TRANSFER_CLAIM_WITHDRAWN_TOAST,
+  TRANSFER_CLAIMED_TOAST,
+  TRANSFER_LINK_CANCELLED_TOAST,
+  TRANSFER_LINK_CLAIMED_ERROR,
+  TRANSFER_LINK_CLOSED_ERROR,
+  TRANSFER_LINK_CREATED_TOAST,
   TRANSFER_NOT_CONFIRMED_ERROR,
   TRANSFER_NOT_FOUND_ERROR,
   TRANSFER_RTR_ID_ERROR,
@@ -10,11 +20,17 @@ import {
   TRANSFER_STARTED_ERROR,
   TRANSFER_WITHDRAWN_TOAST,
   transferApprovedToast,
+  transferLinkClaimError,
+  transferLinkState,
   transferRecipientBlock,
   transferRecipientConfirmedError,
   transferRejectedToast,
   transferSentToast,
 } from '@rotra/data/slot-transfer/slotTransfer.rules'
+import type {
+  SlotTransferStatus,
+  TransferLinkView,
+} from '@rotra/data/slot-transfer/slotTransfer.types'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession } from '../generated/prisma/client'
@@ -44,7 +60,9 @@ import {
  * transfer row, so two approvals, an approval racing a Start, or two requests for one slot cannot
  * interleave; the partial unique index (one pending per slot) and the final-row trigger are the
  * database backstops. Start expires pending transfers and Cancel session cancels them
- * (`closePendingSlotTransfers`). ROTRA moves no money: the sender's payment mark is never touched.
+ * (`closePendingSlotTransfers`), which also ends every open transfer link (#1012): a link works
+ * exactly while its transfer is pending. ROTRA moves no money: the sender's payment mark is never
+ * touched.
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -245,35 +263,234 @@ export async function withdrawSlotTransfer(context: PlayerContext, slug: string)
       })
       if (!pending)
         throw new ServiceError('conflict', { player: 'This transfer request is already closed.' })
-      await lockTransfer(tx, session.id, pending.id)
+      const locked = await lockTransfer(tx, session.id, pending.id)
       await tx.sessionSlotTransfer.update({
         where: { id: pending.id },
         data: { status: 'withdrawn', decidedAt: new Date(), withdrawnByPlayerId: context.playerId },
       })
       await touchSession(tx, session)
-      return { transferId: pending.id, message: TRANSFER_WITHDRAWN_TOAST }
+      // Cancel link (#1012) on a link nobody claimed; otherwise Withdraw request. Either way the
+      // link stops working: it lives exactly as long as the pending row.
+      const unclaimedLink = !!locked.linkTokenDigest && !locked.recipientPlayerId
+      return {
+        transferId: pending.id,
+        message: unclaimedLink ? TRANSFER_LINK_CANCELLED_TOAST : TRANSFER_WITHDRAWN_TOAST,
+      }
     })
   } catch (error) {
     rethrow(error)
   }
 }
 
-/** My night: the Player's own pending transfer on this roster entry, in the `MySlotTransfer` shape. */
+/**
+ * My night: the Player's own pending transfer on this roster entry, in the `MySlotTransfer` shape.
+ * A transfer link nobody has claimed yet (#1012) comes with no recipient.
+ */
 export async function myPendingSlotTransfer(tx: Tx, sessionPlayerId: string) {
   const t = await tx.sessionSlotTransfer.findFirst({
     where: { senderSessionPlayerId: sessionPlayerId, status: 'pending' },
     select: {
       id: true,
       requestedAt: true,
+      linkTokenDigest: true,
       recipientPlayer: { select: { fullName: true, idAllocation: { select: { rtrId: true } } } },
     },
   })
-  if (!t?.recipientPlayer) return null
+  if (!t || (!t.recipientPlayer && !t.linkTokenDigest)) return null
   return {
     id: t.id,
-    recipientName: t.recipientPlayer.fullName,
-    recipientRtrId: t.recipientPlayer.idAllocation?.rtrId ?? '',
+    recipientName: t.recipientPlayer?.fullName ?? null,
+    recipientRtrId: t.recipientPlayer ? (t.recipientPlayer.idAllocation?.rtrId ?? '') : null,
+    viaLink: !!t.linkTokenDigest,
     at: toIso(t.requestedAt),
+  }
+}
+
+// ---------- Transfer links (#1012, D-2026-11-22-04) ----------
+
+/** SHA-256 of the token, the only form stored (like `player_claim_links.token_digest`). */
+async function tokenDigest(token: string) {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)))
+}
+
+/** 32 random bytes in base64url (43 characters), like the registration claim links. */
+function newLinkToken() {
+  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url')
+}
+
+/** The transfer whose link carries this token, in this session, or null. No lock. */
+async function transferForToken(tx: Tx, sessionId: string, token: string) {
+  if (!isTransferLinkToken(token)) return null
+  const t = await tx.sessionSlotTransfer.findUnique({
+    where: { linkTokenDigest: await tokenDigest(token) },
+    select: { id: true, sessionId: true },
+  })
+  return t && t.sessionId === sessionId ? t : null
+}
+
+function linkState(
+  session: QueueSession,
+  t: { status: SlotTransferStatus; senderPlayerId: string; recipientPlayerId: string | null },
+  viewerPlayerId: string | null,
+) {
+  return transferLinkState({
+    status: t.status,
+    sessionState: session.state,
+    senderPlayerId: t.senderPlayerId,
+    recipientPlayerId: t.recipientPlayerId,
+    viewerPlayerId,
+  })
+}
+
+/**
+ * **Create a transfer link** on the Transfer my slot sheet, for a recipient with no ROTRA account: a
+ * pending transfer with no recipient and the digest of a fresh token. The plaintext token is returned
+ * once and never stored, so a lost link is cancelled and made again. One pending transfer per slot
+ * (the partial unique index backs it), so a link and an RTR ID request never coexist.
+ */
+export async function createTransferLink(
+  context: PlayerContext,
+  slug: string,
+  input: { transferId: string },
+) {
+  if (!UUID.test(input.transferId)) throw new ServiceError('invalid')
+  const found = await sessionForSlug(slug)
+  const token = newLinkToken()
+  const digest = await tokenDigest(token)
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      const entry = await senderEntry(tx, session, context.playerId)
+      const pending = await tx.sessionSlotTransfer.findFirst({
+        where: { senderSessionPlayerId: entry.id, status: 'pending' },
+        select: { id: true },
+      })
+      if (pending) throw new ServiceError('conflict', { player: TRANSFER_ALREADY_PENDING_ERROR })
+      await tx.sessionSlotTransfer.create({
+        data: {
+          id: input.transferId,
+          clubId: session.clubId,
+          sessionId: session.id,
+          senderSessionPlayerId: entry.id,
+          senderClubPlayerId: entry.clubPlayerId,
+          senderPlayerId: context.playerId,
+          recipientPlayerId: null,
+          linkTokenDigest: digest,
+          requestedAt: new Date(),
+        },
+      })
+      await touchSession(tx, session)
+      return { transferId: input.transferId, token, message: TRANSFER_LINK_CREATED_TOAST }
+    })
+  } catch (error) {
+    rethrow(error)
+  }
+}
+
+/**
+ * The transfer link card on the session page (`?transfer=<token>`), for anyone holding the link:
+ * its state from this viewer's side (`viewerPlayerId` null when not signed in) and the sender's
+ * masked name, as the public page masks names. An unknown or malformed token reads `closed` and
+ * says nothing more. A read: no lock.
+ */
+export async function readTransferLink(
+  viewerPlayerId: string | null,
+  slug: string,
+  token: string,
+): Promise<TransferLinkView> {
+  const closed: TransferLinkView = { state: 'closed', senderName: null, claimBlock: null }
+  const found = await prisma.queueSession.findUnique({ where: { publicSlug: slug } })
+  if (!found) return closed
+  return prisma.$transaction(async (tx) => {
+    const hit = await transferForToken(tx, found.id, token)
+    if (!hit) return closed
+    const t = await tx.sessionSlotTransfer.findUniqueOrThrow({
+      where: { id: hit.id },
+      select: {
+        status: true,
+        senderPlayerId: true,
+        recipientPlayerId: true,
+        senderEntry: { select: { nameSnapshot: true } },
+      },
+    })
+    const state = linkState(found, t, viewerPlayerId)
+    const confirmed =
+      state === 'open' && viewerPlayerId ? await liveEntryOf(tx, found.id, viewerPlayerId) : null
+    return {
+      state,
+      senderName: maskPublicName(t.senderEntry.nameSnapshot),
+      claimBlock: confirmed ? TRANSFER_CLAIM_CONFIRMED_ERROR : null,
+    }
+  })
+}
+
+/**
+ * **Claim this slot**: the first signed-in player to accept takes the link. On the locked session
+ * and transfer rows, the claim is one conditional UPDATE (`recipient_player_id IS NULL`): a second
+ * claimant, even one racing in another transaction, updates nothing and is told the link is
+ * already claimed; the trigger refuses any later change of the recipient. The transfer then waits
+ * for the Queue Master exactly like a request by RTR ID. Refused for the sender, for anyone already
+ * confirmed here, and once the link closed (rejected, withdrawn, approved), the session started or
+ * it was cancelled.
+ */
+export async function claimTransferLink(context: PlayerContext, slug: string, token: string) {
+  const found = await sessionForSlug(slug)
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      const hit = await transferForToken(tx, session.id, token)
+      if (!hit) throw new ServiceError('conflict', { transfer: TRANSFER_LINK_CLOSED_ERROR })
+      const t = await lockTransfer(tx, session.id, hit.id)
+      const refused = transferLinkClaimError(linkState(session, t, context.playerId))
+      if (refused) throw new ServiceError('conflict', { transfer: refused })
+      const sender = await tx.sessionPlayer.findUnique({
+        where: { id: t.senderSessionPlayerId },
+        select: { releasedAt: true, noShowAt: true },
+      })
+      if (!sender || sender.releasedAt || sender.noShowAt)
+        throw new ServiceError('conflict', { transfer: TRANSFER_LINK_CLOSED_ERROR })
+      if (await liveEntryOf(tx, session.id, context.playerId))
+        throw new ServiceError('conflict', { transfer: TRANSFER_CLAIM_CONFIRMED_ERROR })
+      const claimed = await tx.sessionSlotTransfer.updateMany({
+        where: { id: t.id, status: 'pending', recipientPlayerId: null },
+        data: { recipientPlayerId: context.playerId, claimedAt: new Date() },
+      })
+      if (claimed.count !== 1)
+        throw new ServiceError('conflict', { transfer: TRANSFER_LINK_CLAIMED_ERROR })
+      // #1018 hook: the claimant signed up or signed in through a transfer link. Club membership
+      // (create or reactivate, no owner approval) is activated here by #1018; nothing is saved in
+      // the club yet: approval saves their club player as it does for an RTR ID recipient.
+      await touchSession(tx, session)
+      return { transferId: t.id, message: TRANSFER_CLAIMED_TOAST }
+    })
+  } catch (error) {
+    rethrow(error)
+  }
+}
+
+/**
+ * **Withdraw claim**: the claimant gives the slot back before the Queue Master decides. The transfer
+ * closes as `withdrawn` (by them) and the link stops working; the sender makes a new one.
+ */
+export async function withdrawTransferClaim(context: PlayerContext, slug: string, token: string) {
+  const found = await sessionForSlug(slug)
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, found, found.id)
+      const hit = await transferForToken(tx, session.id, token)
+      if (!hit) throw new ServiceError('conflict', { transfer: TRANSFER_CLAIM_CLOSED_ERROR })
+      const t = await lockTransfer(tx, session.id, hit.id)
+      if (linkState(session, t, context.playerId) !== 'yours')
+        throw new ServiceError('conflict', { transfer: TRANSFER_CLAIM_CLOSED_ERROR })
+      await tx.sessionSlotTransfer.update({
+        where: { id: t.id },
+        data: { status: 'withdrawn', decidedAt: new Date(), withdrawnByPlayerId: context.playerId },
+      })
+      await touchSession(tx, session)
+      return { transferId: t.id, message: TRANSFER_CLAIM_WITHDRAWN_TOAST }
+    })
+  } catch (error) {
+    rethrow(error)
   }
 }
 
@@ -287,12 +504,19 @@ export async function myPendingSlotTransfer(tx: Tx, sessionPlayerId: string) {
 export async function pendingSlotTransferViews(tx: Tx, session: QueueSession) {
   if (session.state !== 'prepared') return []
   const rows = await tx.sessionSlotTransfer.findMany({
-    where: { sessionId: session.id, status: 'pending', senderEntry: LIVE_ENTRY },
+    // A transfer link nobody has claimed yet (#1012) has nobody to approve: not listed.
+    where: {
+      sessionId: session.id,
+      status: 'pending',
+      senderEntry: LIVE_ENTRY,
+      recipientPlayerId: { not: null },
+    },
     orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
       senderSessionPlayerId: true,
       requestedAt: true,
+      linkTokenDigest: true,
       senderEntry: { select: { nameSnapshot: true, clubPlayer: { select: { nickname: true } } } },
       recipientPlayer: {
         select: { id: true, fullName: true, idAllocation: { select: { rtrId: true } } },
@@ -330,6 +554,7 @@ export async function pendingSlotTransferViews(tx: Tx, session: QueueSession) {
       suggestedLevel: levelCodeFor(
         entry ? entry.skillLevelId : (saved?.assessments[0]?.skillLevelId ?? null),
       ),
+      viaLink: !!t.linkTokenDigest,
       at: toIso(t.requestedAt),
     })
   }
@@ -449,10 +674,14 @@ export function approveSlotTransfer(
 /** **Reject**: the transfer closes; the sender keeps the slot and every payment record. */
 export function rejectSlotTransfer(context: ClubContext, sessionId: string, transferId: string) {
   return decision(context, sessionId, transferId, async (tx, session, transfer) => {
+    // An unclaimed transfer link (#1012) is not in Requests; the sender cancels it instead.
+    if (!transfer.recipientPlayerId)
+      throw new ServiceError('conflict', { transfer: TRANSFER_NOT_FOUND_ERROR })
     const sender = await tx.sessionPlayer.findUnique({
       where: { id: transfer.senderSessionPlayerId },
       select: { nameSnapshot: true },
     })
+    // Rejection ends a claimed link too: it worked only while pending (#1012).
     await tx.sessionSlotTransfer.update({
       where: { id: transfer.id },
       data: { status: 'rejected', decidedAt: new Date() },

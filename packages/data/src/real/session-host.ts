@@ -2,9 +2,9 @@ import type { SessionHost, SessionHostRegistration } from '../session-host/sessi
 import { msOf, realRequest } from './client'
 import { accepted } from './queue'
 
-type WireSessionHost = { id: string; clubPlayerId: string; assignedAt: string }
+type WireSessionHost = { id: string; clubPlayerId: string; assignedAt: string; name: string }
 
-/** Q-SETUP › Hosts (#1004), from `session_hosts`. */
+/** Q-SETUP › Hosts (#1004), from `session_hosts`; a finished session's frozen rows (#1008). */
 export async function realGetSessionHosts(sessionId: string): Promise<SessionHost[]> {
   const { hosts } = await realRequest<{ hosts: WireSessionHost[] }>(
     `/api/sessions/${encodeURIComponent(sessionId)}/hosts`,
@@ -13,6 +13,7 @@ export async function realGetSessionHosts(sessionId: string): Promise<SessionHos
     id: row.id,
     clubPlayerId: row.clubPlayerId,
     assignedAt: msOf(row.assignedAt),
+    name: row.name,
   }))
 }
 

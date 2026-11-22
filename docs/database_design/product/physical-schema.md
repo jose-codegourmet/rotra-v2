@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-22 (session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-22 (session host snapshots, session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -476,3 +476,19 @@ dropped, moved or rewritten.
 RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
 (`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): 43 migrations, rebuild with no drift, seed,
 91/91 checks (six new session-host checks). Design: [sessions and roster › `session_hosts`](queue/modules/sessions-roster.md#session_hosts).
+
+## D-2026-11-22-01 — Session host snapshots (#1008)
+
+`20261122000300_session_host_snapshots` (epic #1002). **Status: written; applied to a local disposable
+database 2026-11-22 only; not applied to the shared database (owner sign-off needed).** Two columns on
+`session_hosts` (backfilled), two checks and one guard trigger; nothing dropped or moved.
+
+| Table | Columns | Checks and triggers |
+|---|---|---|
+| `session_hosts` | `name_snapshot` text NOT NULL (backfilled from the saved player: the ROTRA full name, else `display_name`); `frozen_at` timestamptz (backfilled to `finalized_at`, else `updated_at`, on the current rows of completed or invalid sessions) | `session_hosts_frozen_current_check`: `frozen_at` only with `removed_at` null; `session_hosts_name_snapshot_check`: not blank; trigger `session_hosts_frozen_guard` (BEFORE INSERT/UPDATE/DELETE): a frozen row is never changed or deleted, `frozen_at` only on a completed or invalid session |
+
+Checked on a disposable local database (`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432):
+44 migrations, rebuild with no drift, seed, 101/101 checks (ten new snapshot checks). The backfill was
+also run on a separate throwaway database seeded with host rows before the migration (names filled,
+completed/invalid current rows frozen, removed and open rows not). Design: [sessions and roster ›
+`session_hosts`](queue/modules/sessions-roster.md#session_hosts).

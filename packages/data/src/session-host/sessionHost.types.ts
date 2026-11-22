@@ -13,16 +13,30 @@ export type SessionHostRecord = {
   assignedAt: number
   /** The host designation ended; null = current host */
   removedAt: number | null
+  /**
+   * The host's name when assigned (#1008): the ROTRA full name for a registered record, else the
+   * saved player's name. Refreshed once more when the session ends, then kept.
+   */
+  nameSnapshot: string
+  /**
+   * When the session ended (Session done or Mark session invalid) on the rows current then: the
+   * finished session's hosts, kept as they were. Null on a row removed before the end, and on every
+   * row of an open session.
+   */
+  frozenAt: number | null
 }
 
 /**
- * One current host of a session, as Q-SETUP reads them. The screen joins it to the saved player
- * (`useClubPlayers`) for the name, picture and identity.
+ * One host of a session, as Q-SETUP reads them: the current hosts of an open session, or the hosts a
+ * finished session ended with (#1008). The screen joins it to the saved player (`useClubPlayers`)
+ * for the picture and identity; `name` is the row's snapshot, the name to show on a finished
+ * session and whenever that saved player is gone (deleted, or moved into another record).
  */
 export type SessionHost = {
   id: string
   clubPlayerId: string
   assignedAt: number
+  name: string
 }
 
 /** What saving the setup did with its hosts: newly registered with a slot, or on the waitlist. */

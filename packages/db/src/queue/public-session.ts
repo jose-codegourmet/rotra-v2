@@ -39,6 +39,7 @@ import { closeStaleMatchRequests } from './match-request-store'
 import { peopleFor, readMyMatchRequest } from './match-requests'
 import { matchContext } from './match-store'
 import { readPublishedResults } from './results'
+import { endedState, shownHostRows } from './session-host-snapshots'
 import { placeClubMember, stepDownIn } from './session-roster'
 import {
   capacityOf,
@@ -191,11 +192,13 @@ export async function readPublicSession(slug: string) {
     const courts = await liveCourts(tx, session.id)
     const roster = await liveRoster(tx, session.id)
     const waitlist = await orderedWaitlist(tx, session.id)
-    // Epic #1002 (#1006): the current hosts ride the same read, oldest first. Zero is valid.
+    // Epic #1002 (#1006): the current hosts ride the same read, oldest first. Zero is valid. A
+    // finished session shows the rows frozen at its end, by their snapshot name (#1008).
+    const ended = endedState(session.state)
     const hostRows = await tx.sessionHost.findMany({
-      where: { sessionId: session.id, removedAt: null },
+      where: { sessionId: session.id, ...shownHostRows(session.state) },
       orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
-      select: { clubPlayerId: true },
+      select: { clubPlayerId: true, nameSnapshot: true },
     })
     const clubPlayers = await tx.clubPlayer.findMany({
       where: {
@@ -261,7 +264,9 @@ export async function readPublicSession(slug: string) {
           placed?.skillLevelId ?? waiting?.skillLevelId ?? clubPlayer.assessments[0]?.skillLevelId
         return [
           {
-            name: maskPublicName(placed?.nameSnapshot ?? clubPlayer.displayName),
+            name: maskPublicName(
+              ended ? host.nameSnapshot : (placed?.nameSnapshot ?? clubPlayer.displayName),
+            ),
             pictureUrl: clubPlayer.player?.avatarRef ?? null,
             ...publicLevel(levelCodeFor(levelId ?? null)),
           },
@@ -533,7 +538,7 @@ async function memberOf(tx: Tx, clubId: string, playerId: string) {
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: slug },
-    select: { id: true, clubId: true, publication: { select: { state: true } } },
+    select: { id: true, clubId: true, state: true, publication: { select: { state: true } } },
   })
   if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
@@ -560,10 +565,12 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
     })
     // Epic #1002 (#1006): the current hosts get the same name and card rule as the roster. They
     // never feed `fullRoster` below (a host who is not playing does not unlock the full roster).
+    // A finished session: the rows frozen at its end, by their snapshot name (#1008).
+    const ended = endedState(session.state)
     const hostRows = await tx.sessionHost.findMany({
-      where: { sessionId: session.id, removedAt: null },
+      where: { sessionId: session.id, ...shownHostRows(session.state) },
       orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
-      select: { clubPlayerId: true },
+      select: { clubPlayerId: true, nameSnapshot: true },
     })
     const hostPlayers = await tx.clubPlayer.findMany({
       where: { id: { in: hostRows.map((h) => h.clubPlayerId) }, clubId: session.clubId },
@@ -718,7 +725,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         const who = hostPlayers.find((p) => p.id === host.clubPlayerId)
         if (!who) return []
         const placed = roster.find((r) => r.clubPlayerId === who.id)
-        const nameSnapshot = placed?.nameSnapshot ?? who.displayName
+        const nameSnapshot = ended ? host.nameSnapshot : (placed?.nameSnapshot ?? who.displayName)
         const levelId = placed?.skillLevelId ?? who.assessments[0]?.skillLevelId ?? null
         return [
           {

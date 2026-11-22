@@ -39,6 +39,7 @@ import {
   realSendJoinRequest,
 } from '../real/public-session'
 import { sessionCostIn } from '../session-cost/fetchers'
+import { shownSessionHostRows } from '../session-host/sessionHost.history'
 import { submitJoinRequest } from '../session-roster/mutations'
 import { playerOrigin } from './context'
 import {
@@ -407,34 +408,40 @@ function projectQueue(
 /**
  * The Hosts section (#1006, D-2026-11-22-01): the session's current host rows through the same
  * person rule as Players (`publicPerson`). The roster or waitlist entry's snapshot and level win; a
- * host who is not placed uses the saved player's name and level. Never counted in capacity.
+ * host who is not placed uses the saved player's name and level. Never counted in capacity. A
+ * finished session (#1008) shows the rows frozen when it ended, by their snapshot name, even when
+ * the saved player was deleted, moved into another record or taken off the trusted-host list.
  */
 function projectHosts(
   state: MockState,
   sessionId: string,
   viewer: Viewer | null,
 ): PublicSessionParticipant[] {
-  return (state.sessionHosts ?? [])
-    .filter((h) => h.sessionId === sessionId && h.removedAt === null)
-    .sort((a, b) => a.assignedAt - b.assignedAt || a.id.localeCompare(b.id))
-    .flatMap((h) => {
-      const p = state.clubPlayers.find((x) => x.id === h.clubPlayerId)
-      if (!p) return []
-      const placed =
-        state.roster.find((r) => r.sessionId === sessionId && r.clubPlayerId === p.id) ??
-        state.waitlist.find((w) => w.sessionId === sessionId && w.clubPlayerId === p.id)
-      const names =
-        placed && 'nameSnapshot' in placed
-          ? { fullName: placed.nameSnapshot, nickname: placed.nicknameSnapshot }
-          : { fullName: p.fullName, nickname: p.nickname }
-      return [
-        participantOf(
-          publicPerson(state, p.id, names, viewer),
-          placed?.level ?? p.playingLevel,
-          viewer !== null,
-        ),
-      ]
-    })
+  const s = state.sessions.find((x) => x.id === sessionId)
+  const ended = s?.state === 'completed' || s?.state === 'invalid'
+  // #1008: a finished session shows the hosts frozen at its end, by the name each had then.
+  return shownSessionHostRows(state, sessionId).flatMap((h) => {
+    const p = state.clubPlayers.find((x) => x.id === h.clubPlayerId)
+    if (!p) return []
+    const placed =
+      state.roster.find((r) => r.sessionId === sessionId && r.clubPlayerId === p.id) ??
+      state.waitlist.find((w) => w.sessionId === sessionId && w.clubPlayerId === p.id)
+    const names = ended
+      ? {
+          fullName: h.nameSnapshot,
+          nickname: placed && 'nameSnapshot' in placed ? placed.nicknameSnapshot : p.nickname,
+        }
+      : placed && 'nameSnapshot' in placed
+        ? { fullName: placed.nameSnapshot, nickname: placed.nicknameSnapshot }
+        : { fullName: p.fullName, nickname: p.nickname }
+    return [
+      participantOf(
+        publicPerson(state, p.id, names, viewer),
+        placed?.level ?? p.playingLevel,
+        viewer !== null,
+      ),
+    ]
+  })
 }
 
 function project(

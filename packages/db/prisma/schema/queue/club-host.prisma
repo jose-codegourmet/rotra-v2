@@ -31,6 +31,8 @@ model ClubTrustedHost {
 /// every slot is taken) unless they are already registered; that roster row is separate, so removing a
 /// host (`removed_at`) never removes their registration and withdrawing as a player never ends the
 /// host row. One current row per (session, saved player), enforced by a partial unique index in SQL.
+/// Finished sessions keep their hosts (#1008): the rows current at the end are frozen with a name
+/// snapshot, so trusted-host removal, saved-player deletion or a Same person move never changes them.
 model SessionHost {
   id           String    @id @db.Uuid
   clubId       String    @map("club_id") @db.Uuid
@@ -40,6 +42,13 @@ model SessionHost {
   assignedAt   DateTime  @map("assigned_at") @db.Timestamptz(6)
   /// The host designation ended. Null = current host. Their roster row is untouched.
   removedAt    DateTime? @map("removed_at") @db.Timestamptz(6)
+  /// The host's name when assigned (#1008): the ROTRA full name for a linked record, else the saved
+  /// player's display name. Refreshed once more when the session ends, then frozen with the row.
+  nameSnapshot String    @map("name_snapshot")
+  /// Set when the session ended (Session done or Mark session invalid) on the rows current then: the
+  /// finished session's hosts. A guard trigger keeps a frozen row unchanged and undeleted. Null on a
+  /// row removed before the end, and on every row of a session still open.
+  frozenAt     DateTime? @map("frozen_at") @db.Timestamptz(6)
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision     BigInt    @default(1)

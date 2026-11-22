@@ -2223,7 +2223,8 @@ PAST.forEach((x) => {
 
 // The club's saved venues. Picking one fills the session venue, address and court fee; new names are added here.
 // Epic #1002 (#1003): Miguel (registered) and Gab Torres (unclaimed, no ROTRA account) start as trusted hosts.
-function seedTrustedHosts() { return [{ pid: 'p1', added: Date.now() - 40 * 864e5 }, { pid: 'p17', added: Date.now() - 6 * 864e5 }]; }
+// Epic #1002 (#1008): Bea was a trusted host until two days ago; Sunday Night Queue (h2) still shows her as its host.
+function seedTrustedHosts() { return [{ pid: 'p1', added: Date.now() - 40 * 864e5 }, { pid: 'p17', added: Date.now() - 6 * 864e5 }, { pid: 'p2', added: Date.now() - 60 * 864e5, removed: Date.now() - 2 * 864e5 }]; }
 function seedVenues() {
   return [
     { id: 'v1', name: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City', courtFee: 350 },
@@ -2278,6 +2279,17 @@ const trustedHosts = () => (S.club.trustedHosts || []).filter((h) => !h.removed 
 const isTrustedHost = (pid) => trustedHosts().some((h) => h.pid === pid);
 // Epic #1002 (#1004): a session's hosts. s.hosts keeps every row ({ pid, at, removed }); a removed row stays as history.
 const currentHostIds = (s) => ((s && s.hosts) || []).filter((h) => !h.removed).map((h) => h.pid);
+// Epic #1002 (#1008): a finished session keeps its hosts. Session done freezes the rows current at the end ({ frozen, name }),
+// so removing a trusted host, deleting the saved player or moving them into another record (Same person) changes nothing;
+// a host removed before the end is not a host of the finished session. Open sessions read their current rows.
+const isEnded = (s) => !!s && (s.status === 'finalized' || s.status === 'invalid');
+const sessionHostPeople = (s) => isEnded(s)
+  ? ((s && s.hosts) || []).filter((h) => h.frozen).map((h) => { const p = P(h.pid); return p ? { ...p, name: h.name || p.name } : null; }).filter(Boolean)
+  : currentHostIds(s).map((pid) => P(pid)).filter(Boolean);
+function freezeHosts(s) {
+  const now = Date.now();
+  ((s && s.hosts) || []).forEach((h) => { if (!h.removed && !h.frozen) { const p = P(h.pid); h.name = (p && !p.removed ? p.name : h.name) || (p ? p.name : ''); h.frozen = now; } });
+}
 // Saving setup: a new host is registered as a player unless already on the roster or waitlist. A slot while one is open,
 // otherwise the waitlist (the preparation rule). Their saved level comes with them. Removing a host keeps their registration.
 function applyHosts(s, ids) {
@@ -3465,6 +3477,8 @@ function simulateHistory(spec) {
   const roster = spec.players.map((pid) => ({ pid, level: (P(pid) || {}).sugg ?? 4, present: true, locked: true, presentAt: start }));
   const lv = (pid) => roster.find((x) => x.pid === pid).level;
   const s = { id: spec.id, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', scoring: spec.scoring || '31', minimum: spec.minimum, minAuto: spec.minAuto !== false, notes: spec.notes || '', status: spec.status, download: 'none', roster, matches: [], seq: 0, published: spec.published ? { slides: [0, 1], offDay: false, at: end } : null, startedAt: start, finalizedAt: end + 6e5, invalidReason: spec.reason || null, finance: spec.finance || null, payments: {} };
+  // Epic #1002 (#1008): the hosts the night ended with are frozen with their name; one removed mid-session stays unfrozen history.
+  s.hosts = (spec.hosts || []).map((h, i) => ({ pid: h.pid, at: start - 36e5 + i, ...(h.removedMin != null ? { removed: start + h.removedMin * 6e4 } : { name: (P(h.pid) || {}).name, frozen: s.finalizedAt }) }));
   if (spec.finance && spec.status === 'finalized') roster.forEach((x, i) => { if (i < roster.length - (spec.unpaid || 0)) s.payments[x.pid] = { at: start + (i % 40) * 6e4, amount: duePerHead(s) }; });
   const games = {}, free = {}, courtFree = {};
   roster.forEach((x) => { games[x.pid] = 0; free[x.pid] = start + Math.floor(r() * 20) * 6e4; });
@@ -3597,13 +3611,13 @@ function upcomingExamples() {
 }
 // Example sessions, versioned by S.histV: a bump replaces these ids in older saves and leaves everything else alone.
 function ensureHistory() {
-  if (S.histV === 6) return;
+  if (S.histV === 7) return;
   // Older saves get the example players they're missing (levels already on the nine-step list by now).
   seedPlayers().forEach((p) => { if (!S.players.some((x) => x.id === p.id)) S.players.push({ ...p, sugg: p.sugg == null ? p.sugg : oldToNewLevel(p.sugg) }); });
   const ids = pidRange;
   const specs = [
     { id: 'h1', title: 'Thursday Open Play', ago: 3, h: 19, len: 3, courts: 3, players: ids(1, 18), minimum: 6, status: 'finalized', published: true, seed: 11, invalidSeq: [14], unpaid: 3, finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 700, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
-    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, scoring: '21x3', finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
+    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, hosts: [{ pid: 'p2' }, { pid: 'p17', removedMin: 60 }], scoring: '21x3', finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
     { id: 'h3', title: 'Tuesday Drills', ago: 12, h: 19, len: 2, courts: 2, players: ids(3, 14), minimum: 4, status: 'invalid', seed: 33, venue: 'Lahug Covered Court', address: 'Salinas Dr, Lahug, Cebu City', reason: 'The original device was lost before its records synced, so this session could not be recorded.' },
     // An ordinary night, a full house (24 of 24 slots), over budget (27 of 24) and few players for the courts.
     { id: 'x-ordinary', title: 'Open Play Night', ago: 2, h: 19, len: 3, courts: 3, players: ids(5, 22), minimum: 6, status: 'finalized', published: true, seed: 44, unpaid: 2, finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }, { itemId: 'inv2', tubes: 2 }] }, ...BANILAD },
@@ -3615,7 +3629,7 @@ function ensureHistory() {
   S.sessions = S.sessions.filter((x) => !built.some((b) => b.id === x.id)).concat(built);
   // One live example, unless something is already live (one session at a time).
   if (!S.sessions.some((x) => x.status === 'active')) S.sessions.push(buildLive('full'));
-  S.histV = 6;
+  S.histV = 7;
   save();
 }
 function historyMatch(s, m) {
@@ -3722,12 +3736,16 @@ function histNightPane(s, { invalid, played }) {
         return `<div class="hist-col"><div class="between"><h3>${esc(c.label)}</h3><span class="small muted">${ms.length} match${ms.length === 1 ? '' : 'es'}</span></div>${ms.map((m) => historyMatch(s, m)).join('') || '<p class="small muted">No matches.</p>'}</div>`;
       }).join('')}</div></div>`;
 }
+// Epic #1002 (#1008): the session record's Hosts, the compact #1006 chips with the club's full names. The hosts the session
+// ended with, by the name each had then; a later trusted-host removal, deletion or Same person move doesn't change them.
+const recordHostsHtml = (s) => { const hs = sessionHostPeople(s); return hs.length ? `<section class="stack tight" aria-label="Hosts"><h3>Hosts · ${hs.length}</h3><ul class="pub-hosts">${hs.map((p) => `<li><div class="pub-host">${avatar(p)}<span class="ph-name"><b>${esc(p.name)}</b></span></div></li>`).join('')}</ul><p class="small muted">The hosts this session ended with. Removing a trusted host or a saved player later doesn't change them.</p></section>` : ''; };
 function histPlayersPane(s, { invalid }) {
   const st = invalid ? [] : standings(s);
   const byPid = Object.fromEntries(st.map((r) => [r.pid, { ...r, rank: r.pos }]));
   const rows = s.roster.map((r) => ({ r, p: P(r.pid), g: gamesOf(s, r.pid), x: byPid[r.pid] })).sort((a, b) => b.g - a.g || a.p.name.localeCompare(b.p.name));
   const below = rows.filter((x) => x.g < s.minimum).length;
   return `<div class="between"><h2>Players</h2><span class="small muted">${invalid ? 'Not counted' : `Minimum ${s.minimum} games · ${below} below it`}</span></div>
+    ${recordHostsHtml(s)}
     <div class="pgrid2">${rows.map(({ r, p, g, x }) => `<article class="pcard2"><div class="pc-top">${avatar(p, 'xl')}${x ? `<span class="chip ${x.rank <= 3 ? 'ok' : ''}">#${x.rank}</span>` : ''}</div>
       <div class="stack tight" style="gap:2px"><span class="pc-name">${esc(p.name)}</span><span class="small muted">${esc(lvLabel(r.level))}</span></div>
       ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div><div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div></div>
@@ -4354,6 +4372,9 @@ function mergePlayer(fromId, toId) {
     (x.matchRequests || []).forEach((mr) => { mr.pid = swap(mr.pid); mr.partners = (mr.partners || []).map((x) => x && swap(x)); mr.opponents = (mr.opponents || []).map((x) => x && swap(x)); });
     (x.dropOuts || []).forEach((d) => { d.pid = swap(d.pid); });
     if (x.payments && x.payments[fromId]) { x.payments[toId] = x.payments[toId] || x.payments[fromId]; delete x.payments[fromId]; }
+    // Epic #1002 (#1008): a current host row of an open session moves too (ends if the other player already hosts it).
+    // A finished session keeps its frozen host row and name on the moved record.
+    if (!isEnded(x)) (x.hosts || []).forEach((h) => { if (h.pid !== fromId || h.removed) return; if (currentHostIds(x).includes(toId)) h.removed = Date.now(); else h.pid = toId; });
   });
   to.prior = (to.prior || 0) + (from.prior || 0);
   from.removed = true; from.linkedTo = toId;
@@ -5439,7 +5460,7 @@ const pubAvatarOf = (p) => (showsFull(p) || (pubSignedIn() && alwaysPrivate(p)) 
 const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
 // Epic #1002 (#1006): the Hosts section of the public page. The same masking, picture and profile-tap rule as the Players tiles;
 // a host who plays is in Players too and counts once toward capacity (hosts are never counted here). Zero hosts: no section.
-const pubHostsHtml = (s) => { const hs = currentHostIds(s).map((pid) => P(pid)).filter(Boolean); return hs.length ? `<section class="stack" aria-label="Hosts"><h3>Hosts · ${hs.length}</h3><ul class="pub-hosts">${hs.map((p) => `<li>${pubTile(p, 'pub-host', '', `${pubAvatarOf(p)}<span class="ph-name">${pubNameHtml(p)}</span>`)}</li>`).join('')}</ul></section>` : ''; };
+const pubHostsHtml = (s) => { const hs = sessionHostPeople(s); return hs.length ? `<section class="stack" aria-label="Hosts"><h3>Hosts · ${hs.length}</h3><ul class="pub-hosts">${hs.map((p) => `<li>${pubTile(p, 'pub-host', '', `${pubAvatarOf(p)}<span class="ph-name">${pubNameHtml(p)}</span>`)}</li>`).join('')}</ul></section>` : ''; };
 // Owner, November 13, 2026: "in the public view of the Queue session, clicking on player avatars should open the profile dialog".
 // For a signed-in player, every face on the page (Courts now, the Queue) opens the same profile card as the Participants tiles. Visitors keep plain faces.
 const pubFace = (p, cls, label, inner) => (pubSignedIn() && p
@@ -8285,7 +8306,7 @@ const ACT = {
     const tick = () => {
       S.ui.finalStage += 1; render();
       if (S.ui.finalStage < 4) setTimeout(tick, 650);
-      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'player records updated, not ranked'; s.status = 'finalized'; s.finalizedAt = Date.now(); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go('results'); toast(`Session finished · ${note}`); }, 500);
+      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'player records updated, not ranked'; s.status = 'finalized'; s.finalizedAt = Date.now(); freezeHosts(s); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go('results'); toast(`Session finished · ${note}`); }, 500);
     };
     setTimeout(tick, 650);
   },

@@ -19,6 +19,8 @@ import {
 } from '../real/session-live'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
+import { assignSessionHosts } from '../session-host/fetchers'
+import { hostRegistrationText } from '../session-host/rules'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import { saveToastText } from '../sync/fetchers'
 import {
@@ -132,6 +134,7 @@ export function createQueueSession(input: QueueSessionInput) {
       )
     const seriesId = occurrences.length > 1 ? crypto.randomUUID() : null,
       ids: string[] = []
+    let hostText = ''
     for (const date of free) {
       const id = crypto.randomUUID()
       ids.push(id)
@@ -179,16 +182,22 @@ export function createQueueSession(input: QueueSessionInput) {
           removedAt: null,
         })),
       )
+      // Q-SETUP › Hosts (#1004): host rows and their roster places in the same write.
+      const placed = input.hostClubPlayerIds?.length
+        ? assignSessionHosts(state, id, input.hostClubPlayerIds)
+        : null
+      if (placed && !hostText) hostText = hostRegistrationText(placed)
       recomputeMinimum(state, id)
     }
     const created = ids.length,
       skipped = occurrences.length - created
     return {
       data: { firstSessionId: required(ids[0]), created, skipped },
-      text:
+      text: `${
         occurrences.length === 1
           ? 'Session created'
-          : `${created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`,
+          : `${created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`
+      }${hostText}`,
     }
   })
 }
@@ -270,10 +279,14 @@ export function updateQueueSession({
         })),
       )
       for (const w of b.movedIn) promoteWaiter(state, w)
+      // Q-SETUP › Hosts (#1004): after the new budget, so new hosts take what is open now.
+      const placed = values.hostClubPlayerIds
+        ? assignSessionHosts(state, sessionId, values.hostClubPlayerIds)
+        : null
       recomputeMinimum(state, sessionId)
       return {
         data: s,
-        text: `Preparation saved${b.movedOut.length ? ` · ${b.movedOut.length} players moved to the waitlist` : b.movedIn.length ? ` · ${b.movedIn.length} players moved from the waitlist` : ''}`,
+        text: `Preparation saved${b.movedOut.length ? ` · ${b.movedOut.length} players moved to the waitlist` : b.movedIn.length ? ` · ${b.movedIn.length} players moved from the waitlist` : ''}${placed ? hostRegistrationText(placed) : ''}`,
       }
     },
   )
@@ -396,6 +409,7 @@ export function deleteSession(sessionId: string) {
     state.waitlist = state.waitlist.filter(other)
     state.joinRequests = state.joinRequests.filter(other)
     state.paymentMarks = state.paymentMarks.filter(other)
+    state.sessionHosts = (state.sessionHosts ?? []).filter(other)
     delete state.costEstimates[sessionId]
     delete state.downloads[sessionId]
     delete state.downloadInfo[sessionId]

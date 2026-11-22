@@ -42,6 +42,10 @@ import {
 import { SetupCourtsSection } from './setup-courts-section/SetupCourtsSection'
 import { SetupDetailsSection } from './setup-details-section/SetupDetailsSection'
 import { SetupFormatsSection } from './setup-formats-section/SetupFormatsSection'
+import {
+  SetupHostsSection,
+  type SetupHostsSectionProps,
+} from './setup-hosts-section/SetupHostsSection'
 import { SetupMinimumSection } from './setup-minimum-section/SetupMinimumSection'
 import { SetupNotesReviewSection } from './setup-notes-review-section/SetupNotesReviewSection'
 
@@ -87,6 +91,11 @@ export type SessionSetupFormProps = {
   scoringLocked?: boolean
   /** Illustration URLs for the Mode and Scoring cards (apps/queue/public/art/session-setup) */
   cardArt?: SetupCardArt
+  /**
+   * Page 1 › Courts › Hosts (#1004, D-2026-11-22-01): the saved players, the trusted-host action
+   * and the placement rule. Omitted hides the Hosts field and its review row.
+   */
+  hosts?: Omit<SetupHostsSectionProps, 'editing' | 'rosterCount'>
   financials?: Omit<
     SessionFinancialsFieldsProps,
     'courts' | 'durationMinutes' | 'players' | 'venueRate'
@@ -129,6 +138,7 @@ export function SessionSetupForm({
   scoringLocked = false,
   cardArt,
   financials,
+  hosts,
   ref,
 }: SessionSetupFormProps) {
   const form = useForm<SessionSetupInput, unknown, SessionSetupValues>({
@@ -294,7 +304,16 @@ export function SessionSetupForm({
       onOpenVenuePicker={() => onOpenVenuePicker(values.venue.venueId)}
       onViewClash={onViewClash}
     />,
-    <SetupCourtsSection key="courts" editContext={editContext} />,
+    <div key="courts" className="flex flex-col gap-3.5">
+      <SetupCourtsSection editContext={editContext} />
+      {hosts ? (
+        <SetupHostsSection
+          {...hosts}
+          editing={mode === 'edit'}
+          rosterCount={editContext?.rosterCount ?? 0}
+        />
+      ) : null}
+    </div>,
     <SetupFormatsSection
       key="formats"
       recordGamesLocked={recordGamesLocked}
@@ -330,6 +349,13 @@ export function SessionSetupForm({
       estimatedMinimum={estimatedMinimum}
       onEditPage={goTo}
       costsReviewLine={costsLine}
+      hostNames={
+        hosts
+          ? (values.hostClubPlayerIds ?? []).map(
+              (h) => hosts.people.find((p) => p.clubPlayerId === h)?.name ?? 'Saved player',
+            )
+          : undefined
+      }
     />,
   ]
 

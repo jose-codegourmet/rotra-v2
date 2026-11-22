@@ -28,6 +28,8 @@ import type {
   QueueSessionSummary,
   SessionCourt,
 } from '../queue-session/queueSession.types'
+import { hostRegistrationText } from '../session-host/rules'
+import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
@@ -440,6 +442,7 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
     firstSessionId: string
     created: number
     skipped: number | null
+    hosts?: SessionHostRegistration | null
   }>('/api/sessions', {
     method: 'POST',
     body: {
@@ -461,9 +464,11 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
   const series = input.repeat && input.repeat !== 'none'
   return accepted(
     { firstSessionId: data.firstSessionId, created: data.created, skipped },
-    !series
-      ? 'Session created'
-      : `${data.created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`,
+    `${
+      !series
+        ? 'Session created'
+        : `${data.created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`
+    }${data.hosts ? hostRegistrationText(data.hosts) : ''}`,
   )
 }
 

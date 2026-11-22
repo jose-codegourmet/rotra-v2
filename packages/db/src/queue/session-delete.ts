@@ -30,6 +30,8 @@ export async function deleteSession(context: ClubContext, sessionId: string) {
           roster: `${confirmed} ${confirmed === 1 ? 'player is' : 'players are'} confirmed. Remove them from the roster first.`,
         })
       const { title } = session
+      // Host records go with the session (#1004); a deletable session has no confirmed player.
+      await tx.sessionHost.deleteMany({ where: { sessionId } })
       await tx.sessionWaitlistEntry.deleteMany({ where: { sessionId } })
       await tx.sessionJoinRequest.deleteMany({ where: { sessionId } })
       await tx.sessionPaymentMark.deleteMany({ where: { sessionId } })

@@ -1,6 +1,8 @@
 import type { PlayingLevel } from '../player/player.types'
 import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
 import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
+import { hostRegistrationText } from '../session-host/rules'
+import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type { RosterBatchOperation, RosterBatchResult } from '../session-roster/sessionRoster.types'
 import { realRequest } from './client'
@@ -56,25 +58,31 @@ export async function realUpdateQueueSession(input: {
 }) {
   const { revision } = await readSession(input.sessionId)
   const { values } = input
-  await realRequest<WireSession>(sessionPath(input.sessionId), {
-    method: 'PATCH',
-    body: {
-      commandId: crypto.randomUUID(),
-      expectedRevision: revision,
-      input: {
-        ...values,
-        scheduledStartAt: iso(values.scheduledStartAt),
-        scheduledEndAt: iso(values.scheduledEndAt),
-        courts: values.courts.map((court) => ({
-          label: court.label,
-          startsAt: court.startsAt == null ? null : iso(court.startsAt),
-          openUntil: court.openUntil == null ? null : iso(court.openUntil),
-        })),
+  const saved = await realRequest<{ hosts?: SessionHostRegistration | null }>(
+    sessionPath(input.sessionId),
+    {
+      method: 'PATCH',
+      body: {
+        commandId: crypto.randomUUID(),
+        expectedRevision: revision,
+        input: {
+          ...values,
+          scheduledStartAt: iso(values.scheduledStartAt),
+          scheduledEndAt: iso(values.scheduledEndAt),
+          courts: values.courts.map((court) => ({
+            label: court.label,
+            startsAt: court.startsAt == null ? null : iso(court.startsAt),
+            openUntil: court.openUntil == null ? null : iso(court.openUntil),
+          })),
+        },
       },
+      fields: { session: 'title' },
     },
-    fields: { session: 'title' },
-  })
-  return accepted(await realGetQueueSession(input.sessionId), 'Preparation saved')
+  )
+  return accepted(
+    await realGetQueueSession(input.sessionId),
+    `Preparation saved${saved.hosts ? hostRegistrationText(saved.hosts) : ''}`,
+  )
 }
 
 export async function realDeleteSession(sessionId: string) {

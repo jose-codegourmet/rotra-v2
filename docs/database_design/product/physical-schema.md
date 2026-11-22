@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-22 (trusted club hosts section; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-22 (session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -462,3 +462,17 @@ nothing dropped, moved or rewritten.
 RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
 (`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): rebuild with no drift, seed, 85/85 checks
 (five new trusted-host checks). Design: [sessions and roster › `club_trusted_hosts`](queue/modules/sessions-roster.md#club_trusted_hosts).
+
+## D-2026-11-22-01 — Session hosts (#1004)
+
+`20261122000200_session_hosts` (epic #1002). **Status: written; applied to a local disposable database
+2026-11-22 only; not applied to the shared database (owner sign-off needed).** One new table; nothing
+dropped, moved or rewritten.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_hosts` | PK `id`; unique `(club_id, id)`; indexes `(club_id, session_id)`, `(club_id, club_player_id)`; partial unique `session_hosts_one_current` `(session_id, club_player_id) WHERE removed_at IS NULL` | `removed_at` null or not before `assigned_at` | `club_id` → `clubs`; `(club_id, session_id)` → `queue_sessions(club_id, id)`; `(club_id, club_player_id)` → `club_players(club_id, id)` (all RESTRICT) |
+
+RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
+(`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): 43 migrations, rebuild with no drift, seed,
+91/91 checks (six new session-host checks). Design: [sessions and roster › `session_hosts`](queue/modules/sessions-roster.md#session_hosts).

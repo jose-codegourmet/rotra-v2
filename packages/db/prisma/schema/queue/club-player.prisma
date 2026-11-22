@@ -40,6 +40,7 @@ model ClubPlayer {
   assessments     ClubAssessment[]
   claimLinks      ClubPlayerClaimLink[]
   trustedHosts    ClubTrustedHost[]
+  sessionHosts    SessionHost[]
 
   facts        PlayerMatchFact[]
   summaries    ClubSessionPlayerSummary[]

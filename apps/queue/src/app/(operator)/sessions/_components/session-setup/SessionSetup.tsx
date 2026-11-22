@@ -1,6 +1,8 @@
 'use client'
 
 import { useClub } from '@rotra/data/club'
+import { savedPlayerName } from '@rotra/data/club-player/clubNickname-rules'
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubVenues } from '@rotra/data/club-venue/useClubVenues'
 import { useSaveClubVenue } from '@rotra/data/club-venue/useSaveClubVenue'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
@@ -29,7 +31,11 @@ import {
   normalizeSessionCost,
 } from '@rotra/data/session-cost/rules'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
+import { hostPlacement } from '@rotra/data/session-host/rules'
+import { useSessionHosts } from '@rotra/data/session-host/useSessionHosts'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useAddTrustedHost } from '@rotra/data/trusted-host/useAddTrustedHost'
+import { useTrustedHosts } from '@rotra/data/trusted-host/useTrustedHosts'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ChooseDateSheet } from '@rotra/ui/choose-date-sheet'
 import { toYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
@@ -48,8 +54,10 @@ import type {
   SessionSetupInput,
   SessionSetupValues,
 } from '@rotra/ui/forms/session-setup-form/schema'
+import type { SetupHostPerson } from '@rotra/ui/forms/session-setup-form/setup-hosts-section'
 import { VenueForm } from '@rotra/ui/forms/venue-form'
 import { feeToInput } from '@rotra/ui/forms/venue-form/default-values'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import type { RepeatOccurrence } from '@rotra/ui/repeat-schedule-panel'
 import { SessionPeekSheet } from '@rotra/ui/session-peek-sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -100,6 +108,9 @@ export function SessionSetup(props: SessionSetupProps) {
   const saveVenue = useSaveClubVenue()
   const create = useCreateQueueSession()
   const update = useUpdateQueueSession()
+  const clubPlayers = useClubPlayers()
+  const trustedHosts = useTrustedHosts(clubId)
+  const addTrustedHost = useAddTrustedHost()
   const formRef = useRef<SessionSetupFormHandle>(null)
 
   const [datePicker, setDatePicker] = useState<string | null>(null)
@@ -156,6 +167,7 @@ export function SessionSetup(props: SessionSetupProps) {
     router.push('/inventory?from=setup')
   }
   const roster = useSessionRoster(editing ?? '')
+  const sessionHosts = useSessionHosts(editing ?? '')
   const isEdit = props.mode === 'edit'
   const backHref = isEdit ? `/sessions/${editing}/preparation` : '/'
   const backLabel = isEdit ? 'Back to preparation' : 'Home'
@@ -227,8 +239,53 @@ export function SessionSetup(props: SessionSetupProps) {
       })),
       repeat: isEdit ? 'none' : values.repeat,
       occurrences: values.repeatCount,
+      hostClubPlayerIds: values.hostClubPlayerIds,
     }
   }
+
+  // Q-SETUP › Hosts (#1004): saved players, trusted hosts first in list order, then the rest.
+  const hostPeople = (): SetupHostPerson[] => {
+    const saved = clubPlayers.data?.players ?? []
+    const trustedOrder = (trustedHosts.data ?? []).map((h) => h.clubPlayerId)
+    const rosterIds = new Set((roster.data?.roster ?? []).map((r) => r.clubPlayerId))
+    const waitIds = new Set((roster.data?.waitlist ?? []).map((w) => w.clubPlayerId))
+    return saved
+      .map((p) => ({
+        clubPlayerId: p.id,
+        name: p.fullName,
+        nickname: p.nickname,
+        clubNickname: p.clubNickname,
+        shortName: savedPlayerName(p),
+        photoUrl: profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName),
+        identity: p.identity,
+        detailsRequired: p.detailsRequired,
+        trusted: trustedOrder.includes(p.id),
+        registration: !isEdit
+          ? null
+          : rosterIds.has(p.id)
+            ? ('slot' as const)
+            : waitIds.has(p.id)
+              ? ('waitlist' as const)
+              : null,
+      }))
+      .sort((a, b) =>
+        a.trusted && b.trusted
+          ? trustedOrder.indexOf(a.clubPlayerId) - trustedOrder.indexOf(b.clubPlayerId)
+          : a.trusted !== b.trusted
+            ? a.trusted
+              ? -1
+              : 1
+            : a.name.localeCompare(b.name),
+      )
+  }
+  const trustHost = (clubPlayerId: string) =>
+    addTrustedHost.mutateAsync({ clubPlayerId }).then(
+      (result) => toast(result.message),
+      (error: unknown) => {
+        toast.error(errorMessage(error))
+        throw error
+      },
+    )
 
   const onSubmit = (values: SessionSetupValues) => {
     const input = toInput(values)
@@ -299,6 +356,7 @@ export function SessionSetup(props: SessionSetupProps) {
         expectedPlayers: s.expectedPlayers === null ? '' : String(s.expectedPlayers),
         expectedIsAuto: s.expectedPlayers === null,
         notes: s.notes,
+        hostClubPlayerIds: (sessionHosts.data ?? []).map((h) => h.clubPlayerId),
       }
     }
     const venue = pickedVenue(props.venueId)
@@ -322,8 +380,10 @@ export function SessionSetup(props: SessionSetupProps) {
     venues.data &&
     sessions.data &&
     inventory.data &&
+    clubPlayers.data &&
+    trustedHosts.data &&
     restored !== undefined &&
-    (!isEdit || (existing.data && roster.data && !cost.isPending))
+    (!isEdit || (existing.data && roster.data && sessionHosts.data && !cost.isPending))
   const initial = ready ? initialValues() : null
   const peek = peekId ? sessions.data?.find((s) => s.id === peekId) : undefined
   const markedDates = (sessions.data ?? [])
@@ -344,6 +404,12 @@ export function SessionSetup(props: SessionSetupProps) {
         <QueryError query={inventory} title="Couldn't load your inventory." />
       ) : cost.isError && isEdit ? (
         <QueryError query={cost} title="Couldn't load the cost estimate." />
+      ) : clubPlayers.isError ? (
+        <QueryError query={clubPlayers} title="Couldn't load your saved players." />
+      ) : trustedHosts.isError ? (
+        <QueryError query={trustedHosts} title="Couldn't load your trusted hosts." />
+      ) : isEdit && sessionHosts.isError ? (
+        <QueryError query={sessionHosts} title="Couldn't load this session's hosts." />
       ) : sessions.isError ? (
         <QueryError query={sessions} title="Couldn't load your sessions." />
       ) : isEdit && existing.isError ? (
@@ -375,6 +441,13 @@ export function SessionSetup(props: SessionSetupProps) {
           recordGamesLocked={isEdit && !!existing.data && existing.data.state !== 'prepared'}
           scoringLocked={isEdit && !!existing.data && existing.data.state !== 'prepared'}
           cardArt={CARD_ART}
+          hosts={{
+            people: hostPeople(),
+            savedHostIds: (sessionHosts.data ?? []).map((h) => h.clubPlayerId),
+            onTrust: trustHost,
+            isTrusting: addTrustedHost.isPending,
+            placement: hostPlacement,
+          }}
           playersPerCourtDefault={club.data?.defaultPlayersPerCourt}
           clubName={club.data?.name ?? ''}
           offline={offline}

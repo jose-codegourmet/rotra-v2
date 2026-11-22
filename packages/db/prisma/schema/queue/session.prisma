@@ -102,6 +102,7 @@ model QueueSession {
   syncConflicts        SyncConflict[]
   matches              Match[]
   matchRequests        SessionMatchRequest[]
+  hosts                SessionHost[]
 
   costEstimate SessionCostEstimate?
 

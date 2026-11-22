@@ -11,6 +11,7 @@ export const sessionSetupFormMeta = {
     'Record games (page 2, Formats and mode) is on by default and for a session saved before the option existed; pass recordGamesLocked once the session has started to show a read-only On / Off chip. The review lists it.',
     'Scoring (page 2) stores one of the five scoring keys, default 16/31 (a session saved before the field reads as 16/31); pass scoringLocked once the session has started. cardArt takes the image URLs for the Mode and Scoring cards.',
     'Page 1 opens Edit Court N itself (a Sheet inside the form); the container wires nothing for it.',
+    'hosts (#1004) adds the optional Hosts field under page 1 › Courts (SetupHostsSection with HostPickerSheet) and a Hosts review row; the form saves hostClubPlayerIds. The container passes the saved players (trusted flag, registration), useAddTrustedHost as onTrust and hostPlacement from @rotra/data.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -25,6 +26,8 @@ export const sessionSetupFormMeta = {
     'ClashNotice',
     'VenuePickerSheet',
     'ChooseDateSheet',
+    'SetupHostsSection',
+    'HostPickerSheet',
     'SetupCourtPicture',
     'DateTimePicker',
   ],

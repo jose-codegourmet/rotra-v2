@@ -25,3 +25,31 @@ model ClubTrustedHost {
   @@index([clubId, clubPlayerId])
   @@map("club_trusted_hosts")
 }
+
+/// A Queue Session's hosts (#1004): saved players of the club assigned to host that one session. Shown,
+/// never a permission. Assigning a host also gives them a roster place (a slot, or the waitlist when
+/// every slot is taken) unless they are already registered; that roster row is separate, so removing a
+/// host (`removed_at`) never removes their registration and withdrawing as a player never ends the
+/// host row. One current row per (session, saved player), enforced by a partial unique index in SQL.
+model SessionHost {
+  id           String    @id @db.Uuid
+  clubId       String    @map("club_id") @db.Uuid
+  sessionId    String    @map("session_id") @db.Uuid
+  clubPlayerId String    @map("club_player_id") @db.Uuid
+  /// When the saved player was assigned as a host of this session.
+  assignedAt   DateTime  @map("assigned_at") @db.Timestamptz(6)
+  /// The host designation ended. Null = current host. Their roster row is untouched.
+  removedAt    DateTime? @map("removed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  revision     BigInt    @default(1)
+
+  club       Club         @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  session    QueueSession @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  clubPlayer ClubPlayer   @relation(fields: [clubId, clubPlayerId], references: [clubId, id], onDelete: Restrict)
+
+  @@unique([clubId, id])
+  @@index([clubId, sessionId])
+  @@index([clubId, clubPlayerId])
+  @@map("session_hosts")
+}

@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup and mock app, #988; real mode reads 16/31 until the migration); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-22 for session hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1004; mockup, mock app and real mode; migration applied locally only); 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup and mock app, #988; real mode reads 16/31 until the migration); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -25,7 +25,7 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 | Page · section | Fields and rules |
 |---|---|
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). The end is on the session date or the next day, chosen with day buttons (never guessed), after the start and at most 24 hours later. The duration is shown |
-| 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
+| 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", …; the optional **Hosts** (see [Session hosts](#session-hosts)) |
 | 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup and mock app, November 18, 2026; real mode reads 16/31 until the migration): one of five scoring modes, default 16/31 |
 | 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
@@ -34,6 +34,16 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, 16/31 scoring, and expected players = the slot budget (courts × players per court) until the operator changes it.
 
 The venue may differ from the club's fixed founding address and never changes it.
+
+### Session hosts
+
+([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1004; [log](../../../../../mockup-changes/2026-11-22-queue-session-hosts.md).) A Queue Session's **Hosts** are optional: zero hosts is valid, and several are allowed. A host is one of the club's saved players; hosting is shown on the session and grants no role, permission or sign-in.
+
+- **Picking.** Setup page 1 › Courts › **Add host** lists the club's **trusted hosts** first (in list order), then the other saved players by name. A saved player already picked is not listed again. Picking another saved player asks first, because it **permanently adds them to the club's trusted-host list** ([players › Trusted hosts](../players/README.md#trusted-hosts)); confirming adds them to the list right away, even if the setup is not saved. A save refuses a new host who is not a trusted host by then.
+- **Auto-registration.** Saving gives each new host a host record and registers them as a player, unless they (or another saved record of the same ROTRA player) already hold a slot or a waitlist place: no duplicate registration. A host takes one slot (two hosts on a 16-slot session = 2/16) with their saved level, or no level (set in Roster and levels before Start). Capacity follows the existing preparation rule: past the open slots, the remaining hosts go on the **waitlist** in the order picked ([Slots and waitlist](../players/README.md#slots-and-waitlist)); the setup says so before saving. The save toast adds “· N hosts registered” / “· N hosts waitlisted”.
+- **Series.** Every date of a repeating series gets the same hosts, each registered on that date.
+- **Editing.** In Edit preparation, removing a host ends only the host record; their slot or waitlist place stays. Hosts kept from before are left as they are. A session that is deleted takes its host records with it.
+- Not here: changing hosts during an active session (#1005), the public Hosts section (#1006), the Host badge and host snapshots for finished sessions (#1008).
 
 ### Times and days (owner decision, November 6, 2026)
 

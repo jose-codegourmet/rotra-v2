@@ -1,6 +1,7 @@
 'use client'
 
 import type { PaymentStatus } from '@rotra/data/session-payment/rules'
+import type { SlotPaymentTransfer } from '@rotra/data/slot-transfer/slotTransfer.types'
 import { formatPeso } from '@rotra/schema/money'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
@@ -14,10 +15,15 @@ export type PaymentPlayer = {
   clubPlayerId: string
   name: string
   picture?: string | null
-  /** The recorded payment: amount received (centavos) and when */
+  /** The recorded payment: cash received (centavos, own plus any carried by a transfer) and when */
   paid?: { amount: number; at: number }
-  /** Amount received against today's amount due (#479) */
+  /** Amount received (and any waiver) against today's amount due (#479, #1013) */
   status: PaymentStatus
+  /**
+   * The slot came by approved slot transfer (#1013): Paid in Full through its history, so the
+   * switch is locked and the card body opens the Slot history instead of the amount editor.
+   */
+  transfer?: SlotPaymentTransfer
 }
 export type PaymentCardProps = {
   player: PaymentPlayer
@@ -26,6 +32,8 @@ export type PaymentCardProps = {
   onSelectPlayer: () => void
   /** Opens "Payment from <name>" to record the amount received (#479) */
   onEditAmount: () => void
+  /** Opens the Slot history of a slot that came by transfer (#1013) */
+  onOpenHistory?: () => void
   disabled?: boolean
 }
 
@@ -39,7 +47,8 @@ const timeOf = (at: number) =>
 /**
  * One roster player on the Payments list. The picture opens the profile and the switch is the quick
  * paid toggle; the card body below them is a separate button that opens the amount editor, so a
- * switch tap never opens it.
+ * switch tap never opens it. A slot that came by transfer (#1013) is locked: the switch is
+ * disabled and the body opens the Slot history (who paid, what was waived) instead.
  */
 export function PaymentCard({
   player,
@@ -47,9 +56,11 @@ export function PaymentCard({
   onTogglePaid,
   onSelectPlayer,
   onEditAmount,
+  onOpenHistory,
   disabled,
 }: PaymentCardProps) {
   const covered = player.status.kind === 'paid' || player.status.kind === 'reimburse'
+  const transfer = player.transfer
   return (
     <article
       className={cn(
@@ -67,23 +78,39 @@ export function PaymentCard({
           className={covered ? 'ring-2 ring-accent' : undefined}
         />
         <Switch
-          aria-label={`${player.name} paid`}
+          aria-label={
+            transfer ? `${player.name} paid through a slot transfer` : `${player.name} paid`
+          }
           checked={!!player.paid}
           tone={player.status.kind === 'partial' ? 'warn' : 'accent'}
           onChange={onTogglePaid}
-          disabled={disabled}
+          disabled={disabled || !!transfer}
         />
       </div>
       <button
         type="button"
-        aria-label={`Payment from ${player.name}: ${paymentStatusLabel(player.status)}`}
+        aria-label={
+          transfer
+            ? `Slot history for ${player.name}: ${paymentStatusLabel(player.status)}`
+            : `Payment from ${player.name}: ${paymentStatusLabel(player.status)}`
+        }
+        aria-haspopup={transfer ? 'dialog' : undefined}
         disabled={disabled}
-        onClick={onEditAmount}
+        onClick={transfer ? onOpenHistory : onEditAmount}
         className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-1 rounded-sm border-0 bg-transparent p-0 text-left text-fg disabled:cursor-not-allowed"
       >
         <b className="break-words text-sm">{player.name}</b>
         <PaymentStatusChip status={player.status} />
-        {player.paid ? (
+        {transfer ? (
+          <>
+            <span className={cn('text-xs text-fg2', covered && 'font-semibold text-accent')}>
+              {`${formatPeso(player.paid?.amount ?? 0)} received · via transfer`}
+            </span>
+            {transfer.waivedMinor ? (
+              <span className="text-xs text-fg2">{`${formatPeso(transfer.waivedMinor)} waived`}</span>
+            ) : null}
+          </>
+        ) : player.paid ? (
           <span className={cn('text-xs text-fg2', covered && 'font-semibold text-accent')}>
             {`${formatPeso(player.paid.amount)} received · ${timeOf(player.paid.at)}`}
           </span>

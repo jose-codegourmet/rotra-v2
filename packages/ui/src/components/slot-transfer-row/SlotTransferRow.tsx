@@ -1,6 +1,10 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
+import {
+  type TransferPaymentSnapshot,
+  transferWaiverText,
+} from '@rotra/data/slot-transfer/transferAccounting.rules'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -24,6 +28,11 @@ export type SlotTransferRowProps = {
   viaLink?: boolean
   /** The level the select starts on: their waitlist level or saved level here; null for none */
   suggestedLevel?: PlayingLevel | null
+  /**
+   * What Approve will record (#1013), shown before approving: the slot's cash and the automatic
+   * waiver of what it still owes. Omitted: no payment line.
+   */
+  payment?: TransferPaymentSnapshot
   /** Approve with the level the Queue Master chose for the recipient at this club */
   onApprove: (level: PlayingLevel) => void
   onReject: () => void
@@ -37,8 +46,8 @@ const LEVEL_ERROR = 'Choose a level for this club before approving.'
  * One pending slot transfer in Requests (#1011, the prototype's transferRow()): the sender, who
  * they want to give the slot to (name and RTR ID), whether that player is on the waitlist, the
  * level the recipient plays at here, and Reject / Approve. A claimed transfer link (#1012) reads
- * “Claimed by NAME”; rejecting it ends the link. Presentational: the caller owns the transfer
- * mutations.
+ * “Claimed by NAME”; rejecting it ends the link. #1013: the payment line shows the waiver Approve
+ * will record, before approving. Presentational: the caller owns the transfer mutations.
  */
 export function SlotTransferRow({
   senderName,
@@ -49,6 +58,7 @@ export function SlotTransferRow({
   timeLabel,
   viaLink = false,
   suggestedLevel = null,
+  payment,
   onApprove,
   onReject,
   isPending = false,
@@ -89,6 +99,12 @@ export function SlotTransferRow({
         {recipientWaitlistPosition ? ', who leaves the waitlist' : ''}. {senderName} comes off the
         roster. The slot count stays the same.
       </p>
+      {payment ? (
+        <p className="m-0 text-[13px] [overflow-wrap:anywhere]">
+          <b>Payment:</b> {transferWaiverText(payment)} {recipientName} will be Paid in Full and owe
+          ₱0. Collected cash stays the same.
+        </p>
+      ) : null}
       {error ? <Notice tone="error">{error}</Notice> : null}
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 max-sm:grid-cols-1">
         <LevelSelect

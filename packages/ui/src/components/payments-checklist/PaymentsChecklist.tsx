@@ -18,8 +18,10 @@ export type PaymentsChecklistProps = {
     paid: number
     partial: number
     total: number
-    /** Σ amount received */
+    /** Σ cash received; never a waived amount */
     collected: number
+    /** Σ waived on slots that came by transfer (#1013), a record and not cash; hint when above 0 */
+    waived?: number
     stillDue: number | null
     /** Σ overpayments to return outside ROTRA; shown only when above 0 */
     toReimburse: number
@@ -34,6 +36,8 @@ export type PaymentsChecklistProps = {
   onSelectPlayer: (id: string) => void
   /** Card body tap: opens "Payment from <name>" (#479) */
   onEditAmount: (id: string) => void
+  /** Card body tap on a slot that came by transfer (#1013): opens its Slot history */
+  onOpenSlotHistory?: (id: string) => void
   /** Opens Share payment status (#1010); the button is hidden when omitted */
   onShareStatus?: () => void
   asSheet?: boolean
@@ -53,6 +57,7 @@ export function PaymentsChecklist({
   onMarkAllPaid,
   onSelectPlayer,
   onEditAmount,
+  onOpenSlotHistory,
   onShareStatus,
   asSheet,
   disabled,
@@ -107,7 +112,13 @@ export function PaymentsChecklist({
           {
             label: 'Collected',
             value: formatPeso(totals.collected),
-            hint: totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : undefined,
+            hint:
+              [
+                totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : null,
+                totals.waived ? `${formatPeso(totals.waived)} waived (not cash)` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ') || undefined,
           },
           {
             label: 'Still due',
@@ -157,6 +168,7 @@ export function PaymentsChecklist({
               onTogglePaid={() => onTogglePaid(p.clubPlayerId)}
               onSelectPlayer={() => onSelectPlayer(p.clubPlayerId)}
               onEditAmount={() => onEditAmount(p.clubPlayerId)}
+              onOpenHistory={() => onOpenSlotHistory?.(p.clubPlayerId)}
               disabled={disabled}
             />
           ))}

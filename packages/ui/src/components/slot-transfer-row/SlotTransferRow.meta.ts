@@ -8,6 +8,7 @@ export const slotTransferRowMeta = {
     'Approve needs a level: with none chosen the select shows the error and nothing is sent.',
     'Listed before Start only, after the drop-out notices; Start expires pending transfers.',
     'Pass viaLink for a claimed transfer link (#1012): “Shared a transfer link” and “Claimed by NAME”. An unclaimed link is never listed.',
+    'Pass payment (#1013, from the Requests read) to show “₱500 paid · ₱400 will be waived.” before approving; the recipient becomes Paid in Full and owes ₱0. Approve sends the waiver shown, so a payment change in between is refused.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

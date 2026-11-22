@@ -1,12 +1,14 @@
 import type { MatchRequest } from '../match-request/matchRequest.types'
 import { publicSlugFor } from '../queue-session/queueSession.rules'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
+import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import type {
   DropOutNotice,
   SessionInviteCode,
   SessionPlayer,
 } from '../session-roster/sessionRoster.types'
 import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
+import { carriedHolding, transferSnapshot } from '../slot-transfer/transferAccounting.rules'
 import { DEMO_CLUB_ID } from './clubs'
 import {
   createAccountJoinRequestFixture,
@@ -213,8 +215,63 @@ export function createQueueFixtures(now = Date.now()) {
       requestedAt: now - 8 * 60000,
       decidedAt: null,
     })
+  // #1013: Jasper paid ₱500 of tonight's ₱900, so his pending transfer shows "₱400 will be waived"
+  // before Approve. A registered club member who is not on tonight's roster paid ₱600 and gave the
+  // slot (approved yesterday) to the first other registered player on it: Paid in Full, ₱300 waived;
+  // their card opens the Slot history. The giver's mark stays on their released entry (off the
+  // mock roster), frozen into the transfer.
+  const tonightDue = 90000
+  const paymentMarks: SessionPaymentMark[] = [
+    {
+      sessionId: tonight.id,
+      sessionPlayerId: jasper.id,
+      amountMinor: 50000,
+      currency: 'PHP',
+      markedAt: now - 26 * 3600000,
+    },
+  ]
+  const holder = roster
+    .slice(0, 14)
+    .find(
+      (r) =>
+        r.id !== jasper.id &&
+        r.id !== linkSender?.id &&
+        clubPlayers.find((p) => p.id === r.clubPlayerId)?.playerId,
+    )
+  const holderPlayerId = clubPlayers.find((p) => p.id === holder?.clubPlayerId)?.playerId
+  const giver = clubPlayers.find(
+    (p) => p.playerId && p.id !== russel.id && !roster.some((r) => r.clubPlayerId === p.id),
+  )
+  if (holder && holderPlayerId && giver?.playerId) {
+    const giverEntryId = `${tonight.id}-transferred-1`
+    paymentMarks.push({
+      sessionId: tonight.id,
+      sessionPlayerId: giverEntryId,
+      amountMinor: 60000,
+      currency: 'PHP',
+      markedAt: now - 30 * 3600000,
+    })
+    const payment = transferSnapshot(tonightDue, { cashMinor: 60000, waivedMinor: 0 })
+    if (carriedHolding(payment).waivedMinor !== 30000) throw new Error('Unexpected fixture waiver.')
+    slotTransfers.unshift({
+      id: 'slot-transfer-s-tonight-approved',
+      sessionId: tonight.id,
+      pid: giverEntryId,
+      senderClubPlayerId: giver.id,
+      senderPlayerId: giver.playerId,
+      recipientPlayerId: holderPlayerId,
+      recipientClubPlayerId: holder.clubPlayerId,
+      recipientPid: holder.id,
+      recipientWasWaitlisted: false,
+      payment,
+      status: 'approved',
+      requestedAt: now - 27 * 3600000,
+      decidedAt: now - 25 * 3600000,
+    })
+  }
   const requests = {
     slotTransfers,
+    paymentMarks,
     joinRequests: [
       createAccountJoinRequestFixture(now),
       ...createSessionPageJoinRequestFixtures(now),

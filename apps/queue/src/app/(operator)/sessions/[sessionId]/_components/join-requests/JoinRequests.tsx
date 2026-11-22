@@ -206,9 +206,17 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
         recipientWaitlistPosition: t.recipientWaitlistPosition,
         suggestedLevel: t.suggestedLevel,
         viaLink: t.viaLink ?? false,
+        // #1013: the waiver Approve records, shown first; Approve sends it back as the one seen.
+        payment: t.payment,
         timeLabel: formatTime(t.at),
         isPending,
-        onApprove: (level) => run(approveTransfer.mutate, { sessionId, transferId: t.id, level }),
+        onApprove: (level) =>
+          run(approveTransfer.mutate, {
+            sessionId,
+            transferId: t.id,
+            level,
+            expectedWaiverMinor: t.payment?.waivedMinor,
+          }),
         onReject: () => run(rejectTransfer.mutate, { sessionId, transferId: t.id }),
       }))}
       matchRequests={matchRequests.map((m) => ({

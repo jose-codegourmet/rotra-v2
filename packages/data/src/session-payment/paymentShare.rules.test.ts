@@ -103,4 +103,16 @@ describe('payment status share (#1010)', () => {
     expect(text).toContain('Collected: ₱300')
     expect(text).not.toContain('Balance')
   })
+  it('a waiver is never money to return, and a transferred slot is Paid with no fee set (#1013)', () => {
+    // The fee dropped to ₱600 after an approval waived ₱200 of ₱700: Paid, nothing to return.
+    expect(
+      paymentShareEntry({ name: 'A', receivedMinor: 50000, waivedMinor: 20000 }, 60000),
+    ).toMatchObject({ group: 'paid', balanceMinor: 0, overMinor: 0 })
+    expect(
+      paymentShareEntry({ name: 'A', receivedMinor: 50000, waivedMinor: 20000 }, 40000),
+    ).toMatchObject({ group: 'paid', overMinor: 10000 })
+    expect(
+      paymentShareEntry({ name: 'B', receivedMinor: 0, viaTransfer: true }, null),
+    ).toMatchObject({ group: 'paid', balanceMinor: null })
+  })
 })

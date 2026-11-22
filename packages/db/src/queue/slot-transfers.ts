@@ -1,6 +1,7 @@
 import 'server-only'
 import { isRtrId, normalizeRtrId } from '@rotra/data/player/rtr-id'
 import { maskPublicName } from '@rotra/data/public-session/rules'
+import { amountDuePerHead } from '@rotra/data/session-cost/rules'
 import {
   isTransferLinkToken,
   TRANSFER_ALREADY_DECIDED_ERROR,
@@ -31,11 +32,18 @@ import type {
   SlotTransferStatus,
   TransferLinkView,
 } from '@rotra/data/slot-transfer/slotTransfer.types'
+import {
+  holdingOf,
+  TRANSFER_WAIVER_CHANGED_ERROR,
+  transferSnapshot,
+} from '@rotra/data/slot-transfer/transferAccounting.rules'
+import { formatPeso } from '@rotra/schema/money'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { estimateFor } from './financials'
 import { clubPlayerForProfile } from './session-roster'
 import {
   derivedId,
@@ -51,6 +59,7 @@ import {
   type Tx,
   touchSession,
 } from './session-store'
+import { slotLedger } from './transfer-accounting'
 
 /**
  * Transfer my slot (#1011, epic #1009, D-2026-11-22-03), the same rules as the mock
@@ -62,7 +71,7 @@ import {
  * database backstops. Start expires pending transfers and Cancel session cancels them
  * (`closePendingSlotTransfers`), which also ends every open transfer link (#1012): a link works
  * exactly while its transfer is pending. ROTRA moves no money: the sender's payment mark is never
- * touched.
+ * touched; an approval snapshots the slot's money on the transfer row instead (#1013).
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -523,6 +532,10 @@ export async function pendingSlotTransferViews(tx: Tx, session: QueueSession) {
       },
     },
   })
+  // #1013: what Approve would record now, shown before approving (the same rule as the approval).
+  const { estimate } = await estimateFor(tx, session)
+  const amountDue = amountDuePerHead(estimate)
+  const ledger = await slotLedger(tx, session.id)
   const views = []
   for (const t of rows) {
     const recipient = t.recipientPlayer
@@ -555,6 +568,10 @@ export async function pendingSlotTransferViews(tx: Tx, session: QueueSession) {
         entry ? entry.skillLevelId : (saved?.assessments[0]?.skillLevelId ?? null),
       ),
       viaLink: !!t.linkTokenDigest,
+      payment: transferSnapshot(
+        amountDue,
+        holdingOf(ledger.paymentOf(t.senderSessionPlayerId, amountDue), amountDue),
+      ),
       at: toIso(t.requestedAt),
     })
   }
@@ -598,9 +615,16 @@ async function decision<T>(
 export function approveSlotTransfer(
   context: ClubContext,
   sessionId: string,
-  input: { transferId: string; level: string },
+  input: { transferId: string; level: string; expectedWaiverMinor?: unknown },
 ) {
   const skillLevelId = levelIdFor(input.level)
+  const expected = input.expectedWaiverMinor
+  if (
+    expected !== undefined &&
+    expected !== null &&
+    (typeof expected !== 'number' || !Number.isSafeInteger(expected) || expected < 0)
+  )
+    throw new ServiceError('invalid', { expectedWaiverMinor: 'Enter the waiver in centavos.' })
   return decision(context, sessionId, input.transferId, async (tx, session, transfer) => {
     const sender = await tx.sessionPlayer.findUnique({
       where: { id: transfer.senderSessionPlayerId },
@@ -616,6 +640,20 @@ export function approveSlotTransfer(
     if (await liveEntryOf(tx, session.id, recipientId))
       throw new ServiceError('conflict', {
         transfer: transferRecipientConfirmedError(recipient.fullName),
+      })
+    // #1013: the slot's money, read before it changes hands: its cash collected so far (the
+    // sender's own mark plus anything carried to them), earlier waivers and the automatic waiver.
+    // No payment mark is written or changed; collected cash stays the same.
+    const { estimate } = await estimateFor(tx, session)
+    const amountDue = amountDuePerHead(estimate)
+    const ledger = await slotLedger(tx, session.id)
+    const payment = transferSnapshot(
+      amountDue,
+      holdingOf(ledger.paymentOf(sender.id, amountDue), amountDue),
+    )
+    if (typeof expected === 'number' && expected !== payment.waivedMinor)
+      throw new ServiceError('conflict', {
+        transfer: TRANSFER_WAIVER_CHANGED_ERROR(formatPeso(payment.waivedMinor)),
       })
     const now = new Date()
     const operationId = await derivedId(transfer.id, 'approve')
@@ -661,12 +699,17 @@ export function approveSlotTransfer(
         recipientClubPlayerId: clubPlayer.id,
         recipientSessionPlayerId: promoted.id,
         recipientWasWaitlisted: !!waiting,
+        amountDueMinor: payment.amountDueMinor,
+        amountPaidMinor: payment.paidMinor,
+        priorWaivedMinor: payment.priorWaivedMinor,
+        waivedMinor: payment.waivedMinor,
+        currency: 'PHP',
       },
     })
     await recomputeMinimum(tx, await touchSession(tx, session))
     return {
       transferId: transfer.id,
-      message: transferApprovedToast(sender.nameSnapshot, recipient.fullName),
+      message: transferApprovedToast(sender.nameSnapshot, recipient.fullName, payment.waivedMinor),
     }
   })
 }

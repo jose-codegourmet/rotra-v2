@@ -137,6 +137,7 @@
     "./match-request-card": "./src/components/match-request-card/MatchRequestCard.tsx",
     "./drop-out-notice-row": "./src/components/drop-out-notice-row/DropOutNoticeRow.tsx",
     "./slot-transfer-row": "./src/components/slot-transfer-row/SlotTransferRow.tsx",
+    "./slot-transfer-history": "./src/components/slot-transfer-history/SlotTransferHistory.tsx",
     "./transfer-link-sheet": "./src/components/transfer-link-sheet/TransferLinkSheet.tsx",
     "./transfer-link-card": "./src/components/transfer-link-card/TransferLinkCard.tsx",
     "./match-card": "./src/components/match-card/MatchCard.tsx",

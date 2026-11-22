@@ -186,6 +186,8 @@
     "./session-roster/useKeepDropOut": "./src/session-roster/useKeepDropOut.ts",
     "./slot-transfer/slotTransfer.types": "./src/slot-transfer/slotTransfer.types.ts",
     "./slot-transfer/slotTransfer.rules": "./src/slot-transfer/slotTransfer.rules.ts",
+    "./slot-transfer/transferAccounting.rules": "./src/slot-transfer/transferAccounting.rules.ts",
+    "./slot-transfer/slotPayments": "./src/slot-transfer/slotPayments.ts",
     "./slot-transfer/playerTransfers": "./src/slot-transfer/playerTransfers.ts",
     "./slot-transfer/transferDecisions": "./src/slot-transfer/transferDecisions.ts",
     "./slot-transfer/useFindTransferRecipient": "./src/slot-transfer/useFindTransferRecipient.ts",

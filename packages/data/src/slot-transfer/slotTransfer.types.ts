@@ -1,4 +1,5 @@
 import type { PlayingLevel } from '../player/player.types'
+import type { SlotTransferStep, TransferPaymentSnapshot } from './transferAccounting.rules'
 
 /**
  * A slot transfer's status (#1011, D-2026-11-22-03). `pending` until the Queue Master decides;
@@ -46,6 +47,11 @@ export type SlotTransfer = {
   recipientPid: string | null
   /** Set on approval: the recipient came off the waitlist */
   recipientWasWaitlisted: boolean | null
+  /**
+   * Set on approval (#1013), never changed after: the amount due, the slot's cash collected so far,
+   * earlier waivers and the automatic waiver this approval recorded. Missing before #1013.
+   */
+  payment?: TransferPaymentSnapshot | null
   status: SlotTransferStatus
   requestedAt: number
   /** When it left `pending` */
@@ -81,7 +87,21 @@ export type SlotTransferView = {
   suggestedLevel: PlayingLevel | null
   /** The recipient claimed a transfer link (#1012) rather than being picked by RTR ID */
   viaLink?: boolean
+  /**
+   * What Approve would record now (#1013), shown before approving: the slot's cash, earlier
+   * waivers and the automatic waiver. Missing on a server from before #1013.
+   */
+  payment?: TransferPaymentSnapshot
   at: number
+}
+
+/**
+ * A Payments row whose slot came by approved transfer (#1013): the slot's waivers and the chain,
+ * oldest first. Its payment is locked (read-only history).
+ */
+export type SlotPaymentTransfer = {
+  waivedMinor: number
+  steps: SlotTransferStep[]
 }
 
 /**
@@ -135,4 +155,11 @@ export type CreatedTransferLink = { transferId: string; token: string }
 export type RequestSlotTransferInput = { playerId: string; rtrId: string }
 export type FindTransferRecipientInput = { playerId: string; rtrId: string }
 export type DecideSlotTransferInput = { sessionId: string; transferId: string }
-export type ApproveSlotTransferInput = DecideSlotTransferInput & { level: PlayingLevel }
+export type ApproveSlotTransferInput = DecideSlotTransferInput & {
+  level: PlayingLevel
+  /**
+   * The waiver the Queue Master saw (#1013); the approval is refused when the slot's payment changed
+   * since, so nobody approves a waiver they did not see. Omitted: no check.
+   */
+  expectedWaiverMinor?: number
+}

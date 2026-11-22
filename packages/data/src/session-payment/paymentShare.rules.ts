@@ -6,8 +6,8 @@
  *
  * - Only confirmed roster people are passed in (registered players and guests); waitlisted people
  *   never reach this rule.
- * - Collected is actual received cash only. A waived amount (`waivedMinor`, from the slot transfer
- *   tickets, #1013) lowers what is owed but is never collected.
+ * - Collected is actual received cash only. A waived amount (`waivedMinor`, recorded by an approved
+ *   slot transfer, #1013) lowers what is owed but is never collected or returned.
  */
 import { formatPeso } from '@rotra/schema/money'
 import { paymentStatus } from './sessionPayment.rules'
@@ -22,6 +22,8 @@ export type PaymentShareRow = {
   receivedMinor: number | null
   /** Amount waived in centavos (a waiver is not cash); omitted means none */
   waivedMinor?: number
+  /** The slot came to this person by an approved slot transfer (#1013): Paid with no fee set */
+  viaTransfer?: boolean
 }
 
 export type PaymentShareEntry = {
@@ -51,7 +53,10 @@ export const PAYMENT_SHARE_LABELS: Record<PaymentShareGroup, string> = {
 }
 const GROUPS: PaymentShareGroup[] = ['paid', 'partial', 'unpaid']
 
-/** One person's group, balance and cash. A waiver counts toward "paid in full", never as cash. */
+/**
+ * One person's group, balance and cash, from the shared payment status (#479) with any waiver
+ * (#1013): a waiver counts toward "paid in full", never as cash, and never as money to return.
+ */
 export function paymentShareEntry(
   row: PaymentShareRow,
   amountDue: number | null,
@@ -60,17 +65,18 @@ export function paymentShareEntry(
   const waived = Math.max(row.waivedMinor ?? 0, 0)
   const base = { name: row.name, receivedMinor: received, waivedMinor: waived }
   if (amountDue === null) {
-    // No fee set: any payment counts as paid, no balance to show.
-    return { ...base, group: received > 0 ? 'paid' : 'unpaid', balanceMinor: null, overMinor: 0 }
+    // No fee set: any payment (or a slot taken over by transfer) counts as paid, no balance.
+    const paid = received > 0 || !!row.viaTransfer
+    return { ...base, group: paid ? 'paid' : 'unpaid', balanceMinor: null, overMinor: 0 }
   }
-  const due = Math.max(amountDue - waived, 0)
-  if (waived > 0 && received + waived >= amountDue) {
-    return { ...base, group: 'paid', balanceMinor: 0, overMinor: Math.max(received - due, 0) }
-  }
-  const status = paymentStatus(received > 0 ? { amountMinor: received } : null, due)
+  const status = paymentStatus(
+    received > 0 || waived > 0 ? { amountMinor: received, waivedMinor: waived } : null,
+    amountDue,
+  )
   if (status.kind === 'partial')
     return { ...base, group: 'partial', balanceMinor: status.left, overMinor: 0 }
-  if (status.kind === 'unpaid') return { ...base, group: 'unpaid', balanceMinor: due, overMinor: 0 }
+  if (status.kind === 'unpaid')
+    return { ...base, group: 'unpaid', balanceMinor: amountDue, overMinor: 0 }
   return {
     ...base,
     group: 'paid',

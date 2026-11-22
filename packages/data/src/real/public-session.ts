@@ -33,7 +33,13 @@ export async function realGetPublicPaymentStatus(slug: string) {
     const { paymentStatus } = await realRequest<{
       paymentStatus: {
         amountDue: number | null
-        rows: { name: string; receivedMinor: number | null }[]
+        rows: {
+          name: string
+          receivedMinor: number | null
+          /** #1013: waived on a transferred slot (never cash); missing before #1013 */
+          waivedMinor?: number
+          viaTransfer?: boolean
+        }[]
       } | null
     }>(`${base(slug)}/payment-status`)
     return paymentStatus

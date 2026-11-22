@@ -42,7 +42,9 @@ import {
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import { shownSessionHostRows } from '../session-host/sessionHost.history'
+import { receivedAmount } from '../session-payment/sessionPayment.rules'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { slotPaymentsIn } from '../slot-transfer/slotPayments'
 import { mySlotTransfer } from '../slot-transfer/slotTransferViews'
 import { playerOrigin } from './context'
 import {
@@ -1021,7 +1023,12 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
  */
 export async function getPublicPaymentStatus(slug: string): Promise<{
   amountDue: number | null
-  rows: { name: string; receivedMinor: number | null }[]
+  rows: {
+    name: string
+    receivedMinor: number | null
+    waivedMinor?: number
+    viaTransfer?: boolean
+  }[]
 } | null> {
   if (isRealDataMode()) return realGetPublicPaymentStatus(slug)
   await delay()
@@ -1029,15 +1036,17 @@ export async function getPublicPaymentStatus(slug: string): Promise<{
   const session = sessionBySlug(state, slug)
   if (session.state === 'invalid' || session.state === 'cancelled') return null
   const amountDue = amountDuePerHead(sessionCostIn(state, session.id)?.estimate ?? null)
+  // #1013: the cash an approved slot transfer carried and its waivers count for the holder, once.
+  const ledger = slotPaymentsIn(state, session.id, amountDue)
   const rows = state.roster
     .filter((p) => p.sessionId === session.id)
     .map((p) => {
-      const mark = state.paymentMarks.find(
-        (m) => m.sessionId === session.id && m.sessionPlayerId === p.id,
-      )
+      const payment = ledger.paymentOf(p.id)
       return {
         name: maskPublicName(p.nameSnapshot),
-        receivedMinor: mark ? mark.amountMinor : null,
+        receivedMinor: payment.mark ? receivedAmount(payment.mark, amountDue) : null,
+        waivedMinor: payment.mark?.waivedMinor ?? 0,
+        viaTransfer: payment.chain.length > 0,
       }
     })
     .sort((a, b) => a.name.localeCompare(b.name))

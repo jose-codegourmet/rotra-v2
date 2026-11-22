@@ -1,6 +1,6 @@
 # Session cost estimates and club inventory
 
-**Last verified:** 2026-10-28 for calculation units; payment lifecycle remains proposed.
+**Last verified:** 2026-11-22 for marks frozen by an approved slot transfer and waivers in the totals ([D-2026-11-22-05](../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-05), #1013); 2026-10-28 for calculation units; payment lifecycle remains proposed.
 
 **Status:** Proposed data model, added October 26, 2026 for the [financials rules](../../../../business_logic/product/queue/modules/financials/README.md) introduced by the [ROTRA Queue prototype](../../../../../apps/mockup/queue-app/rotra-queue.html). Field names are new design names, not existing Prisma columns.
 
@@ -66,6 +66,8 @@ Unique `(session_id, inventory_item_id)` is **not** required: the prototype allo
 | `marked_at`, actor/device | When and where it was ticked or the amount was recorded |
 
 Unticking deletes the row (keep an audit event if history matters). Recording an amount replaces the row (delete, then insert under the new operation ID); 0 deletes it. Marks are ordinary sync operations and work offline. Status and totals are derived against the **current** amount due: Paid (received = due), Partial (0 < received < due), Reimburse (received > due), Unpaid (no row or 0); paid count = Paid + Reimburse, collected = Σ received, still due = Σ max(due − received, 0) over the roster, to reimburse = Σ max(received − due, 0), against costs = collected − total cost. Reimburse is a label; no refund rows are stored.
+
+**Slot transfers (#1013, [D-2026-11-22-05](../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-05)).** An approved transfer never writes or changes a mark. The sender's mark stays on their released entry and is **frozen**: trigger `session_payment_marks_frozen_by_transfer` refuses UPDATE and DELETE of a mark whose entry sent an approved transfer decided at or after `marked_at`. The transfer row snapshots the slot's cash and the automatic waiver ([`session_slot_transfers`](sessions-roster.md#session_slot_transfers)); the recipient's entry carries them. Totals then use, per live entry, received = own cash + carried cash and waived = the slot's waivers: collected = Σ received (never a waiver), waived = Σ waived, still due = Σ max(due − received − waived, 0), to reimburse = Σ max(received − due, 0). A transferred-in entry's mark cannot be ticked, unticked or edited (no second payment).
 
 **Cancelled sessions (proposed, November 6, 2026).** Marks on a `cancelled` session are kept as they were and become read-only: ticks and unticks are refused like on an invalid session. ROTRA stores no refund rows; refunds happen outside ROTRA ([log](../../../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)).
 

@@ -92,11 +92,17 @@ export async function realWithdrawTransferClaim(slug: string, token: string) {
 const transferPath = (input: DecideSlotTransferInput, action: 'approve' | 'reject') =>
   `/api/sessions/${encodeURIComponent(input.sessionId)}/requests/transfers/${encodeURIComponent(input.transferId)}/${action}`
 
-/** **Approve** with the chosen level: toast “SENDER's slot now belongs to RECIPIENT”. */
+/**
+ * **Approve** with the chosen level and the waiver the Queue Master was shown (#1013): toast
+ * “SENDER's slot now belongs to RECIPIENT · ₱X waived”. 409 when the slot's payment changed since.
+ */
 export async function realApproveSlotTransfer(input: ApproveSlotTransferInput) {
   const done = await realRequest<{ transferId: string; message: string }>(
     transferPath(input, 'approve'),
-    { method: 'POST', body: { level: input.level } },
+    {
+      method: 'POST',
+      body: { level: input.level, expectedWaiverMinor: input.expectedWaiverMinor },
+    },
   )
   return accepted(null, done.message)
 }

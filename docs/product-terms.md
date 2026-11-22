@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-22 (Trusted host, Host; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-22 (Trusted host, Host; Waiver and Slot history, #1013; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -242,6 +242,8 @@ Rules: [Financials](business_logic/product/queue/modules/financials/README.md)
 | Entrance fee | Per-head venue cost, listed for transparency, covered by the payment per player |
 | Payments checklist | Manual record per player per session: a quick paid tick or the amount received (#479). **ROTRA never collects money** |
 | Payment status | Amount received vs. today's payment per player (#479): **Paid** (equal), **Partial** (less; “₱X left”), **Reimburse** (more; “₱X to return”, a reminder only, never a refund), **Unpaid** (nothing). Code `PaymentStatus` kinds `paid` · `partial` · `reimburse` · `unpaid` |
+| Waiver | The part of a slot's amount due that an approved slot transfer records as no longer owed, so the recipient is Paid in Full and owes ₱0 (#1013, [D-2026-11-22-05](mvp/decisions/2026-11-22.md#d-2026-11-22-05)): amount due − cash collected for the slot − earlier waivers. **A record, never cash:** never counted as collected and never “to return”. Shown as “₱X waived”. Not a refund (#1014) |
+| Slot history | The read-only chain of approved slot transfers behind a slot, opened from the holder's Payments card: original payer, each recipient, what each giver paid, each waiver, approval times (#1013). Append-only |
 | Payment status share | Copyable text of the session's Paid, Partial and Unpaid people (numbered, with amounts paid, balances and the cash collected) for the Queue Master and the public session page (#1010). Confirmed players and guests only; a waived amount is never collected cash. Not a Facebook share |
 | Inventory | Club's list of shuttlecocks, equipment, and items with stock and cost per unit |
 | Running low | Inventory item with 2 or fewer left |
@@ -320,6 +322,8 @@ from the [database design](database_design/product/README.md). Add a row here **
 | Match request | `MatchRequest` | `match_requests` | `status`: `open` · `added` · `declined` · `cancelled` · `closed`; `matchId` set by **Add to queue** ([D-2026-11-09-05](mvp/decisions/2026-11-09.md#d-2026-11-09-05)) |
 | Drop-out notice | `SessionDropOutNotice` | `session_drop_out_notices` | `status`: `open` · `closed`; `decision`: `kept` · `removed` ([D-2026-11-09-03](mvp/decisions/2026-11-09.md#d-2026-11-09-03)) |
 | Slot transfer | `SessionSlotTransfer` / `SlotTransfer` | `session_slot_transfers` | `status`: `pending` · `approved` · `rejected` · `withdrawn` · `expired` · `cancelled`; approval releases the sender's entry with `release_reason` `transferred` ([D-2026-11-22-03](mvp/decisions/2026-11-22.md#d-2026-11-22-03)) |
+| Waiver | `TransferPaymentSnapshot.waivedMinor` (+ `priorWaivedMinor`), `SlotPaymentTransfer.waivedMinor` | `session_slot_transfers.waived_minor`, `prior_waived_minor` (with `amount_due_minor`, `amount_paid_minor`, `currency`) | written once by the approval; rules `@rotra/data/slot-transfer/transferAccounting.rules` |
+| Slot history | `SlotPaymentTransfer.steps` (`SlotTransferStep`), `SlotTransferHistory` | approved `session_slot_transfers` rows chained sender entry → recipient entry | read-only |
 | Transfer link | `SessionSlotTransfer.linkTokenDigest` / `SlotTransfer.linkTokenDigest`, `TransferLinkView` | `session_slot_transfers.link_token_digest`, `claimed_at` | a pending transfer with no recipient until claimed; `TransferLinkState`: `open` · `yours` · `approved` · `claimed` · `own` · `closed` · `expired` · `cancelled` ([D-2026-11-22-04](mvp/decisions/2026-11-22.md#d-2026-11-22-04)) |
 | Session invite | `SessionInviteCode` | `session_invite_codes` | One `code` per player and session ([D-2026-11-09-08](mvp/decisions/2026-11-09.md#d-2026-11-09-08)) |
 | Self check-in | `SessionPlayer.selfCheckedInAt` | `session_players.self_checked_in_at` | Null once the QM turns Present off; `left_at` for **I'm leaving** ([D-2026-11-09-03](mvp/decisions/2026-11-09.md#d-2026-11-09-03)) |

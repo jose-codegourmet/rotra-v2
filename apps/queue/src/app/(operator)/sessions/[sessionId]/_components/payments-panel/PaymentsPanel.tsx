@@ -11,6 +11,7 @@ import type { PaymentAmountFormValues } from '@rotra/ui/forms/payment-amount-for
 import { type PaymentFilter, PaymentsChecklist } from '@rotra/ui/payments-checklist'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { SlotTransferHistory } from '@rotra/ui/slot-transfer-history'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
@@ -33,6 +34,8 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
   const [filter, setFilter] = useState<PaymentFilter>('all')
   const [profile, setProfile] = useState<string | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
+  // #1013: the Slot history of a card whose slot came by transfer (read-only)
+  const [history, setHistory] = useState<string | null>(null)
   // A second tap can land before isPending re-renders; this keeps it to one request.
   const sending = useRef(false)
   if (payments.isError) return <QueryError query={payments} title="Couldn't load payments." />
@@ -40,6 +43,7 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
   if (!payments.data) return null
   const { amountDue } = payments.data
   const editingPlayer = payments.data.players.find((p) => p.clubPlayerId === editing)
+  const historyPlayer = payments.data.players.find((p) => p.clubPlayerId === history && p.transfer)
 
   const closeEditor = () => {
     if (amount.isPending) return
@@ -98,6 +102,7 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
           amount.reset()
           setEditing(clubPlayerId)
         }}
+        onOpenSlotHistory={setHistory}
         asSheet={asSheet}
       />
       <PaymentStatusShareDialog
@@ -112,8 +117,27 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
         rows={payments.data.players.map((p) => ({
           name: p.name,
           receivedMinor: p.paid?.amount ?? null,
+          // #1013: a transferred slot's waivers lower its balance; they are never collected.
+          waivedMinor: p.transfer?.waivedMinor ?? 0,
+          viaTransfer: !!p.transfer,
         }))}
       />
+      <Sheet
+        open={!!historyPlayer}
+        onOpenChange={(next) => {
+          if (!next) setHistory(null)
+        }}
+        title={historyPlayer ? `Slot history · ${historyPlayer.name}` : 'Slot history'}
+      >
+        {historyPlayer?.transfer ? (
+          <SlotTransferHistory
+            holderName={historyPlayer.name}
+            transfer={historyPlayer.transfer}
+            cashMinor={historyPlayer.paid?.amount ?? 0}
+            status={historyPlayer.status}
+          />
+        ) : null}
+      </Sheet>
       <Sheet
         open={!!editingPlayer}
         onOpenChange={(next) => {

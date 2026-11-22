@@ -360,6 +360,43 @@ SELECT pg_temp.expect_accepted('open session host freely removed (not frozen)', 
   VALUES ('5b000000-0000-4000-8000-0000000000a5', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now());
   UPDATE session_hosts SET removed_at = now() WHERE id = '5b000000-0000-4000-8000-0000000000a5' $q$);
 
+-- Slot transfer accounting (#1013, D-2026-11-22-05) ---------------------------------------------
+-- Setup (rolled back with everything else): Juan's ₱700 slot in S1 went to Ana; nothing was owed.
+INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES ('5f000000-0000-4000-8000-0000000a1013', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1001', 'cb000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), 70000, 70000, 0, 0, 'PHP');
+SELECT pg_temp.expect_rejected('payment mark frozen by an approved slot transfer removed', $q$
+  DELETE FROM session_payment_marks WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1001' $q$);
+SELECT pg_temp.expect_accepted('payment mark of a slot never transferred removed (untick)', $q$
+  DELETE FROM session_payment_marks WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1002' $q$);
+SELECT pg_temp.expect_rejected('approved slot transfer waiver rewritten', $q$
+  UPDATE session_slot_transfers SET waived_minor = 0, amount_paid_minor = 0 WHERE id = '5f000000-0000-4000-8000-0000000a1013' $q$);
+SELECT pg_temp.expect_rejected('slot transfer waiver that is not what the slot still owed', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), 70000, 20000, 0, 10000, 'PHP') $q$);
+SELECT pg_temp.expect_rejected('approved slot transfer with no payment snapshot', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), NULL, NULL, NULL, NULL, NULL) $q$);
+SELECT pg_temp.expect_rejected('payment snapshot on a pending slot transfer', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, amount_paid_minor)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'pending', now(), 0) $q$);
+SELECT pg_temp.expect_accepted('repeat transfer that waives the partial balance', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1004', 'cb000000-0000-4000-8000-0000000000a4', '91000000-0000-4000-8000-000000000003',
+    '91000000-0000-4000-8000-000000000001', 'cb000000-0000-4000-8000-0000000000a2', 'e1000000-0000-4000-8000-0000000a1002', false,
+    'approved', now(), now(), 90000, 70000, 0, 20000, 'PHP') $q$);
+
 -- Restrictive deletion --------------------------------------------------------------------------
 SELECT pg_temp.expect_rejected('club deleted', $q$ DELETE FROM clubs WHERE id = 'c1000000-0000-4000-8000-00000000000a' $q$);
 SELECT pg_temp.expect_rejected('player with history deleted', $q$ DELETE FROM players WHERE id = '91000000-0000-4000-8000-000000000001' $q$);

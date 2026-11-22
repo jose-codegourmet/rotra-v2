@@ -1,3 +1,4 @@
+import { formatPeso } from '@rotra/schema/money'
 import type { SlotTransferStatus, TransferLinkState } from './slotTransfer.types'
 
 /**
@@ -108,8 +109,8 @@ export function transferLinkClaimError(state: TransferLinkState): string | null 
 export const transferSentToast = (recipientName: string) =>
   `Transfer to ${recipientName} sent · the QM decides`
 export const TRANSFER_WITHDRAWN_TOAST = 'Transfer request withdrawn'
-export const transferApprovedToast = (senderName: string, recipientName: string) =>
-  `${senderName}'s slot now belongs to ${recipientName}`
+export const transferApprovedToast = (senderName: string, recipientName: string, waivedMinor = 0) =>
+  `${senderName}'s slot now belongs to ${recipientName}${waivedMinor ? ` · ${formatPeso(waivedMinor)} waived` : ''}`
 export const transferRejectedToast = (senderName: string) =>
   `Transfer rejected · ${senderName} keeps the slot`
 export const TRANSFER_LINK_CREATED_TOAST = 'Transfer link ready · share it with the new player'

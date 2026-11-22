@@ -14,9 +14,13 @@
 // link works exactly while the row is pending, so rejection, withdrawal (by either side), Start
 // (`expired`) and Cancel session (`cancelled`) all end it; a new link is a new row.
 //
-// Shape kept ready for the later tickets of the epic, none of it built yet:
-// - #1013 accounting: nullable snapshot columns (amount paid, waived amount) written by the same
-//   approval UPDATE that leaves `pending`; the sender's payment mark is never touched.
+// Transfer accounting (#1013, D-2026-11-22-05): the approval UPDATE that leaves `pending` also writes
+// the payment snapshot (amount due, the slot's cash collected so far, earlier waivers and the
+// automatic waiver of what the slot still owed), so the recipient is Paid in Full and owes ₱0. No
+// payment mark is written or changed: the sender's mark stays on their released entry and is frozen
+// (trigger on session_payment_marks). Readers count the live holder's carried cash once.
+//
+// Shape kept ready for the later tickets of the epic, not built yet:
 // - #1014 refunds: a separate append-only refund record referencing this row.
 
 enum SlotTransferStatus {
@@ -60,6 +64,18 @@ model SessionSlotTransfer {
   recipientSessionPlayerId String?            @map("recipient_session_player_id") @db.Uuid
   /// Set on approval: the recipient was promoted out of the waitlist (their waitlist row deleted).
   recipientWasWaitlisted   Boolean?           @map("recipient_was_waitlisted")
+  /// Payment snapshot (#1013), set by the approval and never changed (the row is final). Centavos.
+  /// The amount due per player at approval; null with no fee set.
+  amountDueMinor           Int?               @map("amount_due_minor")
+  /// Cash collected for this slot by every holder so far (the sender's slot cash at approval).
+  /// Never moved: it stays on the payment marks; the recipient's entry carries it.
+  amountPaidMinor          Int?               @map("amount_paid_minor")
+  /// Waivers recorded on this slot by earlier approvals in the chain.
+  priorWaivedMinor         Int?               @map("prior_waived_minor")
+  /// The automatic waiver this approval recorded: due − paid − prior waivers, never below 0. A
+  /// record only, never cash (CHECK keeps it equal to that formula).
+  waivedMinor              Int?               @map("waived_minor")
+  currency                 String?            @db.Char(3)
   status                   SlotTransferStatus @default(pending)
   requestedAt              DateTime           @map("requested_at") @db.Timestamptz(6)
   /// When it left `pending`, for every final status.

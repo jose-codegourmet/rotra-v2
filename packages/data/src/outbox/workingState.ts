@@ -353,11 +353,28 @@ function wirePaymentsOf(original: WirePayments, state: MockState, sessionId: str
   const roster = state.roster.filter((r) => r.sessionId === sessionId)
   const markOf = (r: SessionPlayer): SessionPaymentMark | undefined =>
     state.paymentMarks.find((m) => m.sessionId === sessionId && m.sessionPlayerId === r.id)
-  const marks = roster.map(markOf).filter((m): m is SessionPaymentMark => !!m)
+  // #1013: a slot paid through a transfer keeps the server's carried payment as it was downloaded
+  // (it is locked, so no offline write changes it); its cash and waivers stay in the totals.
+  const transferOf = (r: SessionPlayer) =>
+    original.players.find((p) => p.sessionPlayerId === r.id && p.transfer)
+  const marks = roster.flatMap((r): { amountMinor: number | null; waivedMinor?: number }[] => {
+    const carried = transferOf(r)
+    if (carried?.paid)
+      return [
+        {
+          amountMinor: minorOf(carried.paid.amount) ?? original.amountDue ?? 0,
+          waivedMinor: carried.transfer?.waivedMinor ?? 0,
+        },
+      ]
+    const mark = markOf(r)
+    return mark ? [mark] : []
+  })
   return {
     ...original,
     players: roster
       .map((r) => {
+        const carried = transferOf(r)
+        if (carried) return { ...carried, name: r.nameSnapshot }
         const mark = markOf(r)
         return {
           sessionPlayerId: r.id,

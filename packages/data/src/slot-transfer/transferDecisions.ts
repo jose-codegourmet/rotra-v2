@@ -1,3 +1,4 @@
+import { formatPeso } from '@rotra/schema/money'
 import { flushSessionBatches } from '../batch/flushBatches'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { closeStaleMatchRequests } from '../match-request/matchRequest.rules'
@@ -9,7 +10,10 @@ import { playerSlot } from '../public-session/publicSession.rules'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { isRealDataMode } from '../real/mode'
 import { realApproveSlotTransfer, realRejectSlotTransfer } from '../real/slot-transfer'
+import { sessionCostIn } from '../session-cost/fetchers'
+import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import { slotTransfersOf } from './closeSlotTransfers'
+import { slotPaymentsIn } from './slotPayments'
 import {
   TRANSFER_ALREADY_DECIDED_ERROR,
   TRANSFER_LEVEL_ERROR,
@@ -21,6 +25,11 @@ import {
   transferRejectedToast,
 } from './slotTransfer.rules'
 import type { ApproveSlotTransferInput, DecideSlotTransferInput } from './slotTransfer.types'
+import {
+  holdingOf,
+  TRANSFER_WAIVER_CHANGED_ERROR,
+  transferSnapshot,
+} from './transferAccounting.rules'
 
 /**
  * The Queue Master's side of Transfer my slot (#1011, D-2026-11-22-03), in Requests beside the
@@ -82,8 +91,11 @@ function recipientClubPlayer(s: MockState, clubId: string, playerId: string): Cl
  * **Approve** with the level the Queue Master chose for the recipient. In one write: the sender's
  * roster row goes, the recipient takes the slot in the same place in slot order (a waitlisted
  * recipient leaves the waitlist; nobody else moves), so the roster count is unchanged. Refused when
- * the recipient got a slot meanwhile. The sender's paid mark stays as recorded (#1013 adds the
- * accounting); the recipient's own pending join request and the sender's open drop-out notice close.
+ * the recipient got a slot meanwhile. #1013: the same write snapshots the slot's money on the
+ * transfer (cash collected so far, earlier waivers and the automatic waiver of what it still owed),
+ * so the recipient is Paid in Full and owes ₱0; no payment mark is written or changed (the sender's
+ * stays as recorded). Refused when the waiver differs from the one the Queue Master was shown. The
+ * recipient's own pending join request and the sender's open drop-out notice close.
  */
 export function approveSlotTransfer(input: ApproveSlotTransferInput) {
   if (isRealDataMode()) return realApproveSlotTransfer(input)
@@ -98,6 +110,15 @@ export function approveSlotTransfer(input: ApproveSlotTransferInput) {
     const name = recipient?.fullName ?? 'The recipient'
     const slot = playerSlot(s, session, recipientPlayerId)
     if (slot.roster) fail(transferRecipientConfirmedError(name), 'conflict')
+    // #1013: the slot's money, taken before the slot changes hands. Collected cash never changes.
+    const amountDue = amountDuePerHead(sessionCostIn(s, session.id)?.estimate ?? null)
+    const ledger = slotPaymentsIn(s, session.id, amountDue)
+    const payment = transferSnapshot(amountDue, holdingOf(ledger.paymentOf(row.id), amountDue))
+    if (
+      input.expectedWaiverMinor !== undefined &&
+      input.expectedWaiverMinor !== payment.waivedMinor
+    )
+      fail(TRANSFER_WAIVER_CHANGED_ERROR(formatPeso(payment.waivedMinor)), 'conflict')
     const clubPlayer = recipientClubPlayer(s, session.clubId, recipientPlayerId)
     const now = Date.now()
     // The slot changes hands: release the sender's row, then promote the recipient into it.
@@ -135,7 +156,8 @@ export function approveSlotTransfer(input: ApproveSlotTransferInput) {
     t.recipientClubPlayerId = waiting.clubPlayerId
     t.recipientPid = taken?.id ?? null
     t.recipientWasWaitlisted = !!slot.waitlist
-    return { data: null, text: transferApprovedToast(row.nameSnapshot, name) }
+    t.payment = payment
+    return { data: null, text: transferApprovedToast(row.nameSnapshot, name, payment.waivedMinor) }
   })
 }
 

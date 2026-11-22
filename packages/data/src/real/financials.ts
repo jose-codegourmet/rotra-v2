@@ -10,6 +10,7 @@ import type {
   SetPaymentAmountInput,
   SetPaymentMarksInput,
 } from '../session-payment/sessionPayment.types'
+import type { SlotPaymentTransfer } from '../slot-transfer/slotTransfer.types'
 import { minorOf, msOf, realRequest, type WireMoney } from './client'
 import { accepted } from './queue'
 
@@ -56,13 +57,30 @@ export type WirePayments = {
     sessionPlayerId: string
     clubPlayerId: string
     name: string
+    /** Own cash plus cash an approved slot transfer carried in (#1013); `at` the latest of them */
     paid: { amount: WireMoney; at: string } | null
+    /** The slot came by approved transfer (#1013): waivers and the chain; missing or null otherwise */
+    transfer?: WireSlotPaymentTransfer | null
   }[]
   amountDue: number | null
   dueBasis: SessionCostInput['paymentMode']
   entranceFeeIncluded: number | null
   totals: PaymentTotals
 }
+
+export type WireSlotPaymentTransfer = Omit<SlotPaymentTransfer, 'steps'> & {
+  steps: (Omit<SlotPaymentTransfer['steps'][number], 'approvedAt'> & { approvedAt: string })[]
+}
+
+export const slotPaymentTransferOf = (
+  wire: WireSlotPaymentTransfer | null | undefined,
+): SlotPaymentTransfer | undefined =>
+  wire
+    ? {
+        waivedMinor: wire.waivedMinor,
+        steps: wire.steps.map((step) => ({ ...step, approvedAt: msOf(step.approvedAt) })),
+      }
+    : undefined
 
 export async function realGetSessionPayments(sessionId: string) {
   const { payments } = await realRequest<{ payments: WirePayments | null }>(
@@ -72,7 +90,12 @@ export async function realGetSessionPayments(sessionId: string) {
   return {
     players: payments.players.map((player) => {
       // A legacy mark with no amount counts as paid in full at today's amount due (#479).
-      const mark = player.paid ? { amountMinor: minorOf(player.paid.amount) } : null
+      const mark = player.paid
+        ? {
+            amountMinor: minorOf(player.paid.amount),
+            waivedMinor: player.transfer?.waivedMinor ?? 0,
+          }
+        : null
       return {
         sessionPlayerId: player.sessionPlayerId,
         clubPlayerId: player.clubPlayerId,
@@ -86,6 +109,7 @@ export async function realGetSessionPayments(sessionId: string) {
             }
           : undefined,
         status: paymentStatus(mark, payments.amountDue),
+        transfer: slotPaymentTransferOf(player.transfer),
       }
     }),
     amountDue: payments.amountDue,

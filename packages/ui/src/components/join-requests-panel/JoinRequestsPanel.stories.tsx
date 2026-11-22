@@ -203,6 +203,7 @@ const transfers = [
     recipientRtrId: 'RTR-PH-CEB-102926-0014',
     timeLabel: '7:05 PM',
     suggestedLevel: 'intermediate_mid' as const,
+    payment: { amountDueMinor: 90000, paidMinor: 50000, priorWaivedMinor: 0, waivedMinor: 40000 },
     onApprove: fn(),
     onReject: fn(),
   },

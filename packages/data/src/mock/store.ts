@@ -202,7 +202,8 @@ function freeze<T>(value: T): DeepReadonly<T> {
 function seedState(): MockState {
   const now = Date.now(),
     { sessions, courts, roster, history, requests } = createQueueFixtures(now),
-    publicationFixtures = createSessionPublicationFixtures(now)
+    publicationFixtures = createSessionPublicationFixtures(now),
+    financials = createFinancialFixtures([...roster, ...history.roster], now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage
   // produced; an unrecorded one never reached that stage and has none.
   const resultSnapshots = Object.fromEntries(
@@ -240,7 +241,9 @@ function seedState(): MockState {
     ],
     adminPlayerRecords: {},
     ...createPlayerRankFixtures(),
-    ...createFinancialFixtures([...roster, ...history.roster], now),
+    ...financials,
+    // #1013: tonight's sample marks for the slot transfer accounting (partial payer, chain giver)
+    paymentMarks: [...financials.paymentMarks, ...requests.paymentMarks],
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,

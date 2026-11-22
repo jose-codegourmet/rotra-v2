@@ -4,6 +4,7 @@ import { requireClubInvite } from '../admin/club-invite'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import { readHostClubIds } from '../queue/club-hosts'
+import type { Tx } from '../queue/session-store'
 import { ServiceError } from '../service/errors'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -72,37 +73,46 @@ export async function addPlayerToClub(playerId: string, clubId: string) {
   const unavailable = () =>
     new ServiceError('not_found', { club: 'This club link is not available.' })
   if (!UUID.test(clubId)) throw unavailable()
-  try {
-    await joinInTransaction(playerId, clubId, unavailable)
-  } catch (error) {
-    // A second tap that raced the first created the same (club, player) row: already joined.
-    if ((error as { code?: string })?.code !== 'P2002') throw error
-  }
+  await prisma.$transaction((tx) => activateClubMembership(tx, playerId, clubId, unavailable))
 }
 
-function joinInTransaction(playerId: string, clubId: string, unavailable: () => ServiceError) {
-  return prisma.$transaction(async (tx) => {
-    const club = await tx.club.findUnique({ where: { id: clubId }, select: { id: true } })
-    if (!club) throw unavailable()
-    const existing = await tx.clubPlayer.findUnique({
-      where: { clubId_playerId: { clubId, playerId } },
-      select: { id: true, removedAt: true },
-    })
-    if (existing) {
-      if (existing.removedAt)
-        await tx.clubPlayer.update({
-          where: { id: existing.id },
-          data: { removedAt: null, revision: { increment: 1 } },
-        })
-      return
-    }
-    const player = await tx.player.findUnique({
-      where: { id: playerId },
-      select: { fullName: true, nickname: true },
-    })
-    if (!player) throw new ServiceError('forbidden')
-    await tx.clubPlayer.create({
-      data: {
+/**
+ * Club membership is one `club_players` row per (club, player) (#1018, D-2026-11-22-07): this makes
+ * the player a member of the club, in the caller's transaction. No row: one is created. A row the
+ * player left (or the club deleted) comes back as the SAME row with `removed_at` cleared, so there
+ * is never a duplicate. Already a member: nothing changes. No owner approval, and it grants no
+ * queue-management right. Callers check the link first; this never does.
+ */
+export async function activateClubMembership(
+  tx: Tx,
+  playerId: string,
+  clubId: string,
+  unavailable: () => ServiceError = () =>
+    new ServiceError('not_found', { club: 'This club link is not available.' }),
+) {
+  const club = await tx.club.findUnique({ where: { id: clubId }, select: { id: true } })
+  if (!club) throw unavailable()
+  const existing = await tx.clubPlayer.findUnique({
+    where: { clubId_playerId: { clubId, playerId } },
+    select: { id: true, removedAt: true },
+  })
+  if (existing) {
+    if (existing.removedAt)
+      await tx.clubPlayer.update({
+        where: { id: existing.id },
+        data: { removedAt: null, revision: { increment: 1 } },
+      })
+    return
+  }
+  const player = await tx.player.findUnique({
+    where: { id: playerId },
+    select: { fullName: true, nickname: true },
+  })
+  if (!player) throw new ServiceError('forbidden')
+  // A second request that raced this one created the same (club, player) row: already a member.
+  await tx.clubPlayer.createMany({
+    data: [
+      {
         id: randomUUID(),
         clubId,
         playerId,
@@ -110,19 +120,52 @@ function joinInTransaction(playerId: string, clubId: string, unavailable: () => 
         nickname: player.nickname,
         addedAt: new Date(),
       },
-    })
+    ],
+    skipDuplicates: true,
   })
 }
 
 /**
- * Leave club (owner decision): marks the player's row removed and keeps it for history; never a
- * hard delete. Only the signed-in player's own row is touched. Leaving again is a no-op.
+ * Leave club (owner decision, #1018): never blocked. Marks the player's row removed and keeps it for
+ * history; never a hard delete. Registrations, payments and past transfer records stay. In the same
+ * transaction every PENDING slot transfer the player is part of (sender, or recipient or claimant of
+ * a transfer link) in this club's sessions becomes `cancelled`, which also ends its link, and the
+ * player's current trusted-host row in the club ends (`removed_at` set, history kept; session host
+ * records untouched), so rejoining never restores it. Only the signed-in player's own row is touched.
+ * Leaving again is a no-op.
  */
 export async function leaveMyClub(context: PlayerContext, clubId: string) {
-  if (UUID.test(clubId))
-    await prisma.clubPlayer.updateMany({
+  if (!UUID.test(clubId)) return { playerId: context.playerId, clubId }
+  await prisma.$transaction(async (tx) => {
+    const now = new Date()
+    const rows = await tx.clubPlayer.findMany({
       where: { clubId, playerId: context.playerId, removedAt: null },
-      data: { removedAt: new Date(), revision: { increment: 1 } },
+      select: { id: true },
     })
+    if (rows.length === 0) return
+    const ids = rows.map((row) => row.id)
+    await tx.clubPlayer.updateMany({
+      where: { clubId, id: { in: ids }, removedAt: null },
+      data: { removedAt: now, revision: { increment: 1 } },
+    })
+    await tx.sessionSlotTransfer.updateMany({
+      where: {
+        clubId,
+        status: 'pending',
+        OR: [{ senderPlayerId: context.playerId }, { recipientPlayerId: context.playerId }],
+      },
+      data: { status: 'cancelled', decidedAt: now },
+    })
+    // The current trusted-host row ends (history kept); rejoining never restores it. Records moved
+    // into the one left (Same person) count for it, so theirs end too. Session hosts are untouched.
+    await tx.clubTrustedHost.updateMany({
+      where: {
+        clubId,
+        removedAt: null,
+        OR: [{ clubPlayerId: { in: ids } }, { clubPlayer: { linkedToClubPlayerId: { in: ids } } }],
+      },
+      data: { removedAt: now, revision: { increment: 1 } },
+    })
+  })
   return { playerId: context.playerId, clubId }
 }

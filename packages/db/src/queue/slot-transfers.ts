@@ -48,6 +48,7 @@ import { formatPeso } from '@rotra/schema/money'
 import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession } from '../generated/prisma/client'
+import { activateClubMembership } from '../player/my-clubs'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 import { estimateFor } from './financials'
@@ -475,9 +476,9 @@ export async function claimTransferLink(context: PlayerContext, slug: string, to
       })
       if (claimed.count !== 1)
         throw new ServiceError('conflict', { transfer: TRANSFER_LINK_CLAIMED_ERROR })
-      // #1018 hook: the claimant signed up or signed in through a transfer link. Club membership
-      // (create or reactivate, no owner approval) is activated here by #1018; nothing is saved in
-      // the club yet: approval saves their club player as it does for an RTR ID recipient.
+      // #1018: signing up or in through a transfer link makes the claimant a member of the club
+      // (create or reactivate the one membership row, no owner approval, no queue rights).
+      await activateClubMembership(tx, context.playerId, session.clubId)
       await touchSession(tx, session)
       return { transferId: t.id, message: TRANSFER_CLAIMED_TOAST }
     })

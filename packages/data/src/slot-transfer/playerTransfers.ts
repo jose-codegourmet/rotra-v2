@@ -4,6 +4,7 @@ import { type MockState, readMockState } from '../mock/store'
 import { isRtrId, normalizeRtrId } from '../player/rtrId'
 import { isUnclaimedPerson } from '../player/unclaimed'
 import { isListedInDirectory } from '../player/visibility.rules'
+import { activateClubMembership } from '../player-club/membership'
 import { playerWrite } from '../public-session/playerMutations'
 import { maskPublicName, playerSlot } from '../public-session/publicSession.rules'
 import type { PlayerSessionInput } from '../public-session/publicSession.types'
@@ -309,6 +310,8 @@ export async function claimTransferLink(slug: string, input: ClaimTransferLinkIn
         fail(TRANSFER_CLAIM_CONFIRMED_ERROR, 'conflict')
       t.recipientPlayerId = input.playerId
       t.claimedAt = Date.now()
+      // #1018: signing up or in through a transfer link makes the claimant a club member.
+      activateClubMembership(s, input.playerId, session.clubId, 'session')
       return { transferId: t.id }
     },
     TRANSFER_CLAIMED_TOAST,

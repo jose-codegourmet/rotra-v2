@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 202 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 203 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -452,6 +452,7 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 202 · CANCELLED: 4 · 
 | [2026-11-20-player-not-ranked-games](2026-11-20-player-not-ranked-games.md) | Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate | game-row (note), session-row, chip, notice, tabs | NEW |
 | [2026-11-20-queue-record-games-not-ranked](2026-11-20-queue-record-games-not-ranked.md) | Queue app: Record games off records the games as usual; only their wins stay out of the leaderboards and win rate | session-setup-form, session-setup-card, chip, notice, confirm-result-sheet, public-session-details | NEW |
 | [2026-11-20-queue-session-invite-photo-link](2026-11-20-queue-session-invite-photo-link.md) | Queue public page: the Session invite shows the inviter's own picture and an Invite link copy field | share-card (SessionInviteCard), copy-field | IN MOCK APP — PR #992 |
+| [2026-11-22-player-club-membership-leave](2026-11-22-player-club-membership-leave.md) | Player: Leave club says what happens to pending slot transfers | confirm-sheet (copy only, in the club page container) | IN MOCK APP — #1018 |
 | [2026-11-22-player-host-badge](2026-11-22-player-host-badge.md) | Player profile Clubs card shows a Host badge for clubs where the player is a trusted host | player-clubs-card | IN MOCK APP — #1007 |
 | [2026-11-22-queue-change-hosts](2026-11-22-queue-change-hosts.md) | Change a session's hosts before and during the session: a compact Hosts card | session-hosts-card, host-picker-sheet | IN MOCK APP — #1005 |
 | [2026-11-22-queue-manual-refunds](2026-11-22-queue-manual-refunds.md) | Queue: Reject and refund on a slot transfer, FIFO waitlist promotion, and Refund everyone who paid after a cancellation | refund-confirm-sheet (new), refund-list (new), slot-transfer-row (extended with `onRejectAndRefund`), payments-checklist (extended with `totals.refunded`), cancel-session-sheet (copy), session-record-header (copy) | IN MOCK APP — #1014 |

@@ -32,7 +32,7 @@ enum SlotTransferStatus {
   withdrawn
   /// Still pending when the session started (Start closes every pending transfer)
   expired
-  /// Closed by the system: the whole session was cancelled (later also a party leaving the club, #1018)
+  /// Closed by the system: the whole session was cancelled or a party left the club (#1018)
   cancelled
 
   @@map("slot_transfer_status")

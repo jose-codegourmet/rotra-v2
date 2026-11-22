@@ -1,6 +1,6 @@
 # Players and roster
 
-**Last verified:** 2026-11-22 for trusted hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003; session hosts #1004) and transfer links ([D-2026-11-22-04](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-04), #1012); 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-22 for trusted hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003; session hosts #1004) and Club membership (#1018, D-2026-11-22-07); 2026-11-22 for transfer links ([D-2026-11-22-04](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-04), #1012); 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -274,4 +274,15 @@ Owner, November 19, 2026 ([D-2026-11-19-12](../../../../../mvp/decisions/2026-11
 - The Queue Master **can still add or confirm** anyone outside the restriction after a warning (confirm or add a second time). Adding to the waitlist isn't checked.
 - Promoting an already-confirmed player from the waitlist into a slot isn't re-checked.
 - Slots per level count roster players by band; changing a player's level later doesn't remove them.
+
+### Club membership (#1018)
+
+Epic #1009, owner decisions on #1015 (November 22, 2026), [D-2026-11-22-07](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-07). Membership is the player's one saved-player record in the club ([D-2026-11-09-06](../../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-06)).
+
+- **Joining is automatic.** Registering through a club link or a session link, and claiming a transfer link ([Slot transfers](#slot-transfers-1011)), make the player a member: the record is created, or brought back if they left. No club owner approval; a player can belong to several clubs; membership gives no queue-management right. Signing in alone, and sending a join request, do not make anyone a member.
+- **Leaving is never blocked.** Leave club (on the club page) removes the player from the club's saved players and keeps the record. Their registrations, payments, refunds, waivers, past games and decided transfer records stay as they are.
+- **Pending transfers end with it.** Every pending slot transfer the player is part of, as sender or as recipient or claimant of a transfer link, in that club's sessions is cancelled in the same write, and its link stops working. The slot, the registration and the payment of a sender stay unchanged.
+- **Trusted-host status ends with it** ([Trusted hosts](#trusted-hosts)). Leaving ends the player's current trusted-host row in that club (`removed_at` set; the row stays as history), so their Host badge goes. Their session host records, past and current, are untouched.
+- **Rejoining brings back the same record** (no duplicate), but never the trusted-host status: no new trusted-host row is written. The club can add them again in Club settings › Trusted hosts.
+- A player who left and one the club deleted share the same marker today (D-2026-11-22-07 assumptions).
 

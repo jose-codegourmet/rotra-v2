@@ -1,6 +1,6 @@
 # Public page: the Skill mix bar spans the slot budget
 
-Status: IN MOCK APP — no ticket (owner bug report, fixed in the mockup and the app together)
+Status: IN MOCK APP — PR #1024
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `skillMix`, the Want to play? join card

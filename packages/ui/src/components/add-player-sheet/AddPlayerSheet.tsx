@@ -478,7 +478,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
             offline ? (
               <Notice tone="warn">
                 Player Information search needs internet. Add them as a new player with their email
-                now; ROTRA looks them up after you reconnect.
+                or social link now; ROTRA looks them up after you reconnect.
               </Notice>
             ) : (
               <>

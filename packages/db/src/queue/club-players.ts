@@ -74,7 +74,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       addedAt: true,
       avatarRef: true,
       privateInput: { select: { phoneE164: true } },
-      sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true } },
+      sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true, email: true } },
       player: {
         select: {
           avatarRef: true,
@@ -130,7 +130,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
       phoneHidden: registered ? (p.player?.hidePhoneFromClubs ?? false) : false,
       hasPhone: Boolean((registered && p.player?.privateContact?.phoneE164) || phone),
-      emailOnFile: Boolean(entry),
+      // #1019: an entry saved with a social link only has no email.
+      emailOnFile: Boolean(entry?.email),
       detailsRequired,
       sessionsHere: new Set(p.rosterEntries.map((r) => r.sessionId)).size,
       addedAt: p.addedAt.toISOString(),

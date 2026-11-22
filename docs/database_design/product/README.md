@@ -76,7 +76,7 @@ This is an overview, not every FK. In particular, an assessment belongs to a clu
 | Owner | Records |
 |---|---|
 | Admin/shared | `clubs`, `club_accounts`, `admin_accounts`, `club_license_terms`, `club_entitlements`, `club_expiry_cycles`, `club_name_change_requests`, `ranking_policy_versions`, `feature_flags`, `player_contact_change_requests`, `admin_audit_events` |
-| Queue | `club_players`, `club_player_private_inputs`, `club_trusted_hosts`, `club_venues`, `queue_sessions`, `club_session_reservations`, `session_players`, `session_waitlist`, `session_join_requests`, `session_courts`, `matches`, `match_participations`, `match_court_usage`, `active_player_holds`, `active_court_holds`, `match_decisions` |
+| Queue | `club_players`, `club_player_private_inputs`, `club_trusted_hosts`, `club_venues`, `queue_sessions`, `club_session_reservations`, `session_hosts`, `session_players`, `session_waitlist`, `session_join_requests`, `session_courts`, `matches`, `match_participations`, `match_court_usage`, `active_player_holds`, `active_court_holds`, `match_decisions` |
 | Queue sync | `devices`, `device_session_streams`, `sync_operations`, `sync_conflicts`, `session_finalizations`, `projection_jobs` |
 | Results | `player_match_facts`, `club_session_player_summaries`, `session_result_snapshots`, `session_publications`, `session_publication_events`, `result_exports` |
 | Queue financials | `inventory_items`, `session_cost_estimates`, `session_shuttle_plan_lines`, `session_payment_marks` — estimates and manual paid marks; ROTRA does not collect money |

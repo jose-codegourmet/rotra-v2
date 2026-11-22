@@ -2266,6 +2266,25 @@ const P = (id) => S.players.find((p) => p.id === id);
 if (!S.club.trustedHosts) S.club.trustedHosts = seedTrustedHosts();
 const trustedHosts = () => (S.club.trustedHosts || []).filter((h) => !h.removed && P(h.pid) && !P(h.pid).removed);
 const isTrustedHost = (pid) => trustedHosts().some((h) => h.pid === pid);
+// Epic #1002 (#1004): a session's hosts. s.hosts keeps every row ({ pid, at, removed }); a removed row stays as history.
+const currentHostIds = (s) => ((s && s.hosts) || []).filter((h) => !h.removed).map((h) => h.pid);
+// Saving setup: a new host is registered as a player unless already on the roster or waitlist. A slot while one is open,
+// otherwise the waitlist (the preparation rule). Their saved level comes with them. Removing a host keeps their registration.
+function applyHosts(s, ids) {
+  const now = Date.now(); let reg = 0, wait = 0;
+  s.hosts = s.hosts || [];
+  s.hosts.forEach((h) => { if (!h.removed && !ids.includes(h.pid)) h.removed = now; });
+  ids.forEach((pid, i) => {
+    if (s.hosts.some((h) => h.pid === pid && !h.removed)) return;
+    s.hosts.push({ pid, at: now + i });
+    if (R(s, pid) || (s.waitlist || []).some((w) => w.pid === pid)) return;
+    const lv = (P(pid) || {}).sugg ?? null;
+    if (openSlots(s)) { s.roster.push({ pid, level: lv, present: false, locked: false, presentAt: now + i }); reg++; }
+    else { s.waitlist = [...(s.waitlist || []), { pid, level: lv, at: now + i }]; wait++; }
+  });
+  return { reg, wait };
+}
+const hostsText = (h) => `${h.reg ? ` · ${h.reg} host${h.reg === 1 ? '' : 's'} registered` : ''}${h.wait ? ` · ${h.wait} host${h.wait === 1 ? '' : 's'} waitlisted` : ''}`;
 // Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
 const saved = () => S.players.filter((p) => !p.removed);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
@@ -4016,7 +4035,7 @@ function restrictError(d) {
   if (BAND_KEYS.some(([b]) => !Number.isInteger(+rs.slots[b] || 0) || (+rs.slots[b] || 0) < 0)) return 'Use whole numbers, 0 or more.';
   return sum === cap ? '' : `The slots add up to ${sum}; this session has ${cap} (${d.courts.length} court${d.courts.length === 1 ? '' : 's'} × ${+d.perCourt || 8}).`;
 }
-const draftFrom = (s, day) => ({ ...draftFrom0(s, day), restrict: s ? JSON.parse(JSON.stringify({ slots: {}, ...restrictOf(s) })) : { k: 'all', slots: {} } });
+const draftFrom = (s, day) => ({ ...draftFrom0(s, day), hosts: currentHostIds(s), restrict: s ? JSON.parse(JSON.stringify({ slots: {}, ...restrictOf(s) })) : { k: 'all', slots: {} } });
 function draftFrom0(s, day) {
   const pad = (n) => String(n).padStart(2, '0');
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
@@ -4100,6 +4119,22 @@ const setupCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" role="img"
 let setupCourtDialog = '';
 // “4 HR”, “1 HR 30 MIN”, “45 MIN” for the setup summary.
 const durLabel = (mins) => { const h = Math.floor(mins / 60), m = mins % 60; return [h ? `${h} HR` : '', m ? `${m} MIN` : ''].filter(Boolean).join(' ') || '0 MIN'; };
+// Epic #1002 (#1004): the optional Hosts field (page 1 › Courts). Hosts are shown on the session, never a sign-in.
+// Each new host takes one slot unless already registered; past the open slots they go on the waitlist (the preparation rule).
+function setupHosts(d, cap) {
+  const ids = d.hosts || (d.hosts = []);
+  const ex = d.id ? S.sessions.find((x) => x.id === d.id) : null, kept = currentHostIds(ex);
+  const inAlready = (pid) => !!ex && (!!R(ex, pid) || (ex.waitlist || []).some((w) => w.pid === pid));
+  const fresh = ids.filter((pid) => !kept.includes(pid) && !inAlready(pid));
+  const open = Math.max(0, cap - (ex ? ex.roster.length : 0)), wait = Math.max(0, fresh.length - open);
+  const pl = (n) => `${n} host${n === 1 ? '' : 's'}`;
+  const sub = (pid) => kept.includes(pid) || inAlready(pid) ? (R(ex, pid) ? 'Already has a slot' : (ex.waitlist || []).some((w) => w.pid === pid) ? 'Already on the waitlist' : 'Hosting this session')
+    : fresh.indexOf(pid) < open ? 'Gets a player slot' : 'Goes on the waitlist';
+  return `<div class="field" id="f-hosts"><div class="between"><span>Hosts <span class="muted" style="font-weight:400">· optional</span></span><button type="button" class="btn sm" data-act="openHostPicker" ${saved().some((p) => !ids.includes(p.id)) ? '' : 'disabled'}>${I.plus || '+'} Add host</button></div>
+    ${ids.length ? `<div class="list">${ids.map((pid) => { const p = P(pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${sub(pid)}</p></div>${chip('Host', 'ok')}<button type="button" class="btn sm ghost" data-act="removeDraftHost" data-id="${pid}" aria-label="Remove ${esc(p.name)} as a host">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted">No hosts. Add your trusted hosts, or anyone from your saved players.</p>'}
+    ${fresh.length ? notice(wait ? 'warn' : 'ok', wait ? `<b>Only ${open} slot${open === 1 ? '' : 's'} open.</b> The last ${pl(wait)} go${wait === 1 ? 'es' : ''} on the waitlist when you save, like any player added to a full session.` : `<b>${pl(fresh.length)} take${fresh.length === 1 ? 's' : ''} ${fresh.length} of ${ex ? `the ${open} open` : cap} slot${(ex ? open : cap) === 1 ? '' : 's'}.</b> Each host is registered as a player when you save.`) : ''}
+    <span class="hint">Hosts are shown on the session. Each one is also registered as a player and takes one slot, unless they're already in. Hosting doesn't let anyone sign in to Queue.${d.id ? ' Removing a host keeps their player slot.' : ''}</span></div>`;
+}
 function viewSetup() {
   const d = S.ui.draft;
   const e = S.ui.errors;
@@ -4176,7 +4211,8 @@ function viewSetup() {
         return n ? notice('', `When you save, the first ${n} on the waitlist get the new slot${n > 1 ? 's' : ''}.`) : '';
       })()}
       ${e.courts ? `<span class="err">${esc(e.courts)} Press a court to fix it.</span>` : ''}
-      <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>`,
+      <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>
+      ${setupHosts(d, slots)}`,
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
       ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Generate matches has nothing to make. Only manual fun games would be possible.') : ''}
@@ -4219,6 +4255,7 @@ function viewSetup() {
           ${!d.id && d.repeat && d.repeat !== 'none' ? (() => { const occ = occurrences(d), ok = occ.filter((o) => !o.clash).length; return `<dt>Repeats</dt><dd>${REPEATS[d.repeat]} · ${ok} session${ok === 1 ? '' : 's'}${occ.length - ok ? ` <span class="small" style="color:var(--warn)">(${occ.length - ok} clashing date${occ.length - ok > 1 ? 's' : ''} skipped)</span>` : ''}</dd>`; })() : ''}
           <dt>Venue</dt><dd>${esc(d.venue || '—')}${d.address ? `<br><span class="small muted">${esc(d.address)}</span>` : ''}</dd>
           <dt>Courts</dt><dd>${d.courts.map((c) => esc(c)).join(', ')} · ${+d.perCourt || 8} per court (${d.courts.length * (+d.perCourt || 8)} slots) <button class="btn xs ghost" data-act="wizGo" data-k="0">Edit</button></dd>
+          <dt>Hosts</dt><dd>${(d.hosts || []).length ? d.hosts.map((pid) => esc((P(pid) || { name: '?' }).name)).join(', ') : 'None'} <button class="btn xs ghost" data-act="wizGo" data-k="0">Edit</button></dd>
           <dt>Formats</dt><dd>${fmtFormats(d)} · ${MODES[d.mode].label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Levels</dt><dd>${restrictText(d)} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Scoring</dt><dd>${(SCORING[d.scoring] || SCORING['31']).label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
@@ -6055,6 +6092,23 @@ const SHEETS = {
       <p class="small muted">They won't be listed first in the host picker any more${p.identity === 'registered' ? ', and their ROTRA profile stops showing the Host badge for your club' : ''}.</p>`,
       `<button class="btn" data-act="closeSheet" data-autofocus>Keep host</button><button class="btn danger" data-act="confirmRemoveTrustedHost" data-id="${p.id}">Remove host</button>`);
   },
+  // Epic #1002 (#1004): Session setup › Hosts › Add host. Trusted hosts first, then other saved players; hosts already picked are left out.
+  hostPicker(sh) {
+    const d = S.ui.draft, q = (sh.q || '').trim().toLowerCase(), ids = (d && d.hosts) || [];
+    const list = saved().filter((p) => !ids.includes(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q)));
+    const trusted = trustedHosts().map((h) => P(h.pid)).filter((p) => list.includes(p)), others = list.filter((p) => !isTrustedHost(p.id)).sort((a, b) => a.name.localeCompare(b.name));
+    const row = (p, t) => `<button class="opt" data-act="pickHost" data-id="${p.id}" aria-label="${t ? `Add ${esc(p.name)} as a host` : `Add ${esc(p.name)} as a host and a trusted host`}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b>${p.nick ? `<div class="small muted">“${esc(p.nick)}”</div>` : ''}</div>${t ? chip('Trusted host', 'ok') : identChip(p)}</button>`;
+    return sheetShell('Add host', `<input class="input" id="hp-q" type="search" placeholder="Search saved players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search saved players" data-autofocus>
+      <div class="stack tight"><span class="label">Trusted hosts</span>${trusted.length ? `<div class="sel-list">${trusted.map((p) => row(p, true)).join('')}</div>` : `<p class="small muted">${trustedHosts().length ? 'No trusted host left to pick.' : 'No trusted hosts yet.'}</p>`}</div>
+      <div class="stack tight"><span class="label">Other saved players</span>${others.length ? `<div class="sel-list">${others.map((p) => row(p, false)).join('')}</div><p class="small muted">Picking one asks first: it adds them to your club's trusted hosts.</p>` : '<p class="small muted">No saved player matches.</p>'}</div>`,
+      '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+  confirmHostTrust(sh) {
+    const p = P(sh.id);
+    return sheetShell(`Add ${esc(p.name)} as a trusted host?`, `<p>This permanently adds ${esc(short(p.id))} to your club's trusted hosts, so they're listed first in the host picker from now on. You can remove them later in Club settings › Trusted hosts.</p>
+      <p class="small muted">They host this session and are registered as a player unless they're already in. Hosting doesn't let them sign in to Queue.</p>`,
+      `<button class="btn" data-act="openHostPicker" data-autofocus>Back</button><button class="btn primary" data-act="confirmHostTrust" data-id="${p.id}">Add trusted host</button>`);
+  },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
       '<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="regenClubInvite">Regenerate</button>');
@@ -7074,6 +7128,20 @@ const ACT = {
   copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
   openAddTrustedHost: () => openSheet({ type: 'addTrustedHost', q: '' }),
+  // Epic #1002 (#1004): Session setup › Hosts. A non-trusted saved player needs the confirmation, which adds them to the trusted hosts.
+  openHostPicker: () => openSheet({ type: 'hostPicker', q: '' }),
+  pickHost: (d) => {
+    const dr = S.ui.draft, p = P(d.id); if (!dr || !p || p.removed || (dr.hosts || []).includes(p.id)) return;
+    if (!isTrustedHost(p.id)) { openSheet({ type: 'confirmHostTrust', id: p.id }); return; }
+    (dr.hosts = dr.hosts || []).push(p.id); S.ui.sheet = null; render(); toast(`${p.name} added as a host`);
+  },
+  confirmHostTrust: (d) => {
+    const dr = S.ui.draft, p = P(d.id); if (!dr || !p || p.removed) return;
+    if (!isTrustedHost(p.id)) (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() });
+    if (!(dr.hosts || []).includes(p.id)) (dr.hosts = dr.hosts || []).push(p.id);
+    S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts and as a host`);
+  },
+  removeDraftHost: (d) => { const dr = S.ui.draft; if (!dr) return; dr.hosts = (dr.hosts || []).filter((x) => x !== d.id); render(); toast(`${nm(d.id)} removed as a host`); },
   addTrustedHost: (d) => { const p = P(d.id); if (!p || p.removed || isTrustedHost(p.id)) return; (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() }); S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts`); },
   openRemoveTrustedHost: (d) => openSheet({ type: 'removeTrustedHost', id: d.id }),
   // Soft: the entry keeps its dates (history); the saved player and past session hosts are untouched.
@@ -7572,7 +7640,8 @@ const ACT = {
     const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected || courts.length * (+d.perCourt || 8), perGameOf(d));
     const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, reqFormats: { ...reqDefaults(d), ...(d.reqFormats || {}) }, mode: d.mode, scoring: SCORING[d.scoring] ? d.scoring : '31', recorded: d.recorded !== false, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, restrict: d.restrict && d.restrict.k === 'slots' ? { k: 'slots', slots: Object.fromEntries(BAND_KEYS.map(([b]) => [b, +d.restrict.slots[b] || 0])) } : { k: (d.restrict && d.restrict.k) || 'all' }, notes: d.notes.trim(), finance };
     let bal = { moved: 0, filled: 0 };
-    if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); }
+    let hb = { reg: 0, wait: 0 };
+    if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); hb = applyHosts(s, d.hosts || []); }
     let made = 1, skipped = 0;
     if (!d.id) {
       // One prepared session per free date; clashing dates are skipped, never created.
@@ -7581,12 +7650,15 @@ const ACT = {
       free.forEach((o, i) => {
         const id = `s${Date.now()}${i}`;
         S.sessions.push({ id, ...JSON.parse(JSON.stringify(fields)), courts: courts.map((c) => ({...c, startsAt: c.startsAt ? c.startsAt + o.start - start : null, until: c.until ? c.until + o.start - start : null})), start: o.start, end: o.end, seriesId, status: 'prepared', download: 'none', roster: [], matches: [], seq: 0, published: null });
-        if (i === 0) S.currentId = id;
+        // Epic #1002 (#1004): every date gets the same hosts, each registered as a player.
+        const h = applyHosts(S.sessions[S.sessions.length - 1], d.hosts || []);
+        if (i === 0) { S.currentId = id; hb = h; }
       });
       made = free.length; skipped = occ.length - free.length;
     }
     const pl = (n) => `${n} player${n === 1 ? '' : 's'}`;
-    const msg = d.id ? `Preparation saved${bal.moved ? ` · ${pl(bal.moved)} moved to the waitlist` : bal.filled ? ` · ${pl(bal.filled)} moved from the waitlist` : ''}` : made > 1 ? `${made} sessions created${skipped ? ` · ${skipped} clashing date${skipped > 1 ? 's' : ''} skipped` : ''}` : 'Session created';
+    let msg = d.id ? `Preparation saved${bal.moved ? ` · ${pl(bal.moved)} moved to the waitlist` : bal.filled ? ` · ${pl(bal.filled)} moved from the waitlist` : ''}` : made > 1 ? `${made} sessions created${skipped ? ` · ${skipped} clashing date${skipped > 1 ? 's' : ''} skipped` : ''}` : 'Session created';
+    msg += hostsText(hb);
     S.lastSync = Date.now(); logSync(d.id ? `${fields.title}: preparation saved` : `${fields.title}: ${msg.toLowerCase()}`); save(); go('prepare'); toast(msg);
   },
   download: () => {

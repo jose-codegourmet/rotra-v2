@@ -136,6 +136,13 @@ export type QueueSessionInput = Pick<
   courts: { label: string; startsAt?: number; openUntil?: number | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
   occurrences?: number
+  /**
+   * Q-SETUP › Hosts (#1004, D-2026-11-22-01): the saved players (club player ids) hosting the
+   * session after this save, in the order picked. Every date of a series gets the same hosts. New
+   * hosts must be trusted hosts; each is registered as a player (a slot, or the waitlist once full)
+   * unless already registered. Left out = hosts unchanged; [] = no hosts.
+   */
+  hostClubPlayerIds?: string[]
 }
 /** Q-SESSION-DONE read model; the pending count is the same one that drives the SyncStatus pill. */
 export type SessionDoneReview = {

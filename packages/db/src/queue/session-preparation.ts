@@ -18,6 +18,7 @@ import { ServiceError } from '../service/errors'
 import { courtDto, requestFormatsInput, sessionDto } from './dto'
 import { autoFillCourts } from './match-control'
 import { liveOpenRequests } from './match-request-store'
+import { assignSessionHostsIn, type HostRegistration, hostIdsInput } from './session-hosts'
 import {
   derivedId,
   LIVE_ENTRY,
@@ -65,6 +66,12 @@ export type QueueSessionInput = {
   courts: { id?: string; label: string; startsAt?: string | null; openUntil?: string | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
   occurrences?: number
+  /**
+   * Q-SETUP › Hosts (#1004, D-2026-11-22-01): the saved players (club player ids) hosting the
+   * session after this save. Every date of a series gets the same hosts. Left out = unchanged
+   * (edit) or none (create); [] = no hosts. See `assignSessionHostsIn`.
+   */
+  hostClubPlayerIds?: unknown
 }
 
 const ms = (iso: string) => {
@@ -202,6 +209,7 @@ export async function createQueueSession(
   input: QueueSessionInput,
 ) {
   await requireClubEntitlement(context)
+  const hostIds = hostIdsInput(input.hostClubPlayerIds)
   const firstCommandId = await derivedId(commandId, 'session:0')
   try {
     return await prisma.$transaction(async (tx) => {
@@ -215,7 +223,7 @@ export async function createQueueSession(
               where: { clubId: context.clubId, seriesId: existing.seriesId },
             })
           : 1
-        return { firstSessionId: existing.id, created, skipped: null }
+        return { firstSessionId: existing.id, created, skipped: null, hosts: null }
       }
       const { venue, start, end, playersPerCourt } = await validate(tx, context, input)
       const occurrences = sessionOccurrences(
@@ -238,6 +246,7 @@ export async function createQueueSession(
         })
       const seriesId = occurrences.length > 1 ? await derivedId(commandId, 'series') : null
       const ids: string[] = []
+      let hosts: HostRegistration | null = null
       for (const [index, date] of occurrences.entries()) {
         if (date.clash) continue
         const id = await derivedId(commandId, `session-id:${index}`)
@@ -286,12 +295,26 @@ export async function createQueueSession(
             },
           })
         }
+        // Q-SETUP › Hosts (#1004): host rows and their roster places in the same transaction.
+        if (hostIds?.length) {
+          const placed = await assignSessionHostsIn(
+            tx,
+            context,
+            session,
+            hostIds,
+            await derivedId(commandId, `hosts:${index}`),
+            new Date(),
+          )
+          hosts ??= placed
+        }
         session = await recomputeMinimum(tx, session)
       }
       return {
         firstSessionId: ids[0] as string,
         created: ids.length,
         skipped: occurrences.length - ids.length,
+        /** What the first date's save did with its hosts; null without hosts */
+        hosts,
       }
     })
   } catch (error) {
@@ -312,6 +335,7 @@ export async function updateQueueSession(
   input: QueueSessionInput,
 ) {
   await requireClubEntitlement(context)
+  const hostIds = hostIdsInput(input.hostClubPlayerIds)
   try {
     return await prisma.$transaction(async (tx) => {
       let session = await lockSession(tx, context, sessionId)
@@ -433,11 +457,23 @@ export async function updateQueueSession(
           )
           movedIn++
         }
+      // Q-SETUP › Hosts (#1004): after the new budget, so new hosts take what is open now.
+      const hosts = hostIds
+        ? await assignSessionHostsIn(
+            tx,
+            context,
+            session,
+            hostIds,
+            await derivedId(commandId, 'hosts'),
+            now,
+          )
+        : null
       session = await recomputeMinimum(tx, session)
       return {
         session: sessionDto(session),
         movedToWaitlist: movedOut.length,
         movedFromWaitlist: movedIn,
+        hosts,
       }
     })
   } catch (error) {

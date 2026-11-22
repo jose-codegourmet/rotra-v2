@@ -61,6 +61,7 @@ import { isRealDataMode } from '../real/mode'
 import { salesSettingsSeed } from '../sales/sales.fixtures'
 import type { SalesSettings } from '../sales/sales.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
+import type { SessionHostRecord } from '../session-host/sessionHost.types'
 import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import type {
@@ -124,6 +125,11 @@ export type MockState = {
    * saved states reads as none.
    */
   clubTrustedHosts?: ClubTrustedHost[]
+  /**
+   * Each session's host rows (#1004, D-2026-11-22-01), current and ended. Absent in older saved
+   * states reads as none.
+   */
+  sessionHosts?: SessionHostRecord[]
   sessions: QueueSession[]
   courts: SessionCourt[]
   roster: SessionPlayer[]
@@ -252,6 +258,7 @@ function seedState(): MockState {
     players: [...players, ...requests.players],
     clubPlayers: [...clubPlayers, ...requests.clubPlayers],
     clubTrustedHosts: createTrustedHostFixtures(now),
+    sessionHosts: [],
     sessions,
     courts,
     roster: [...roster, ...history.roster],

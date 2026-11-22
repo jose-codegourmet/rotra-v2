@@ -1,6 +1,6 @@
 # Players and roster
 
-**Last verified:** 2026-11-22 for trusted hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003); 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-22 for trusted hosts ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1003; session hosts #1004); 2026-11-16 for guests, unclaimed players and player lookup ([D-2026-11-16-04](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04); the mockup and the mock data follow it, #923; the screens are not wired yet and real mode's services still follow the November 11 rules); 2026-11-11 for stepping down to the waitlist, overfilling, join requests ending at Start and the participant profile card ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for busy On court players; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -29,7 +29,7 @@ Offline, Player Information lookup is unavailable. The operator adds the person 
 - Removal is kept as history (the row gets a removal time); adding the same player again starts a new entry.
 - A saved player the club deletes, or moves into another saved player (Same person), drops off the list.
 - Online only, like the rest of Club settings.
-- Session hosts (the session's optional **Hosts** section, auto-registration as a participant, the Host badge and the public Hosts section) follow in the later tickets of epic #1002, under the same decision.
+- Session hosts are picked from this list first in session setup; picking another saved player there asks, then adds them to this list permanently. Each host is registered as a player (#1004, [sessions › Session hosts](../sessions/README.md#session-hosts)). The Host badge and the public Hosts section follow in the later tickets of epic #1002, under the same decision.
 
 ## Saved player statistics
 

@@ -402,3 +402,27 @@ export const EditCourtDialogErrorLight: Story = {
   ...EditCourtDialogError,
   globals: { theme: 'light' },
 }
+
+// Q-SETUP › Hosts (#1004): Miguel and Gab Torres are trusted hosts; the rule is inlined for the story.
+const hosts: NonNullable<SessionSetupFormProps['hosts']> = {
+  people: [
+    { clubPlayerId: 'p1', name: 'Miguel Santos', identity: 'registered', trusted: true },
+    { clubPlayerId: 'p17', name: 'Gab Torres', identity: 'unclaimed', trusted: true },
+    { clubPlayerId: 'p2', name: 'Bea Castillo', identity: 'registered', trusted: false },
+  ],
+  onTrust: async () => {},
+  placement: ({ capacity, rosterCount, needingPlace }) => {
+    const slots = Math.min(needingPlace, Math.max(0, capacity - rosterCount))
+    return { slots, waitlisted: needingPlace - slots }
+  },
+}
+export const WithHosts: Story = {
+  args: { initialValues: { ...withVenue, hostClubPlayerIds: ['p1', 'p17'] }, hosts },
+}
+export const WithHostsLight: Story = { ...WithHosts, globals: { theme: 'light' } }
+export const ReviewWithHosts: Story = {
+  args: WithHosts.args,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /Step 3/ }))
+  },
+}

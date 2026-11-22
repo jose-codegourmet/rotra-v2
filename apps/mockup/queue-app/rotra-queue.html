@@ -4700,7 +4700,7 @@ function joinCard(s) {
     if (req && req.status === 'declined') return `<section class="card stack join-card">${notice('bad', '<b>Request not accepted</b><br>The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.')}</section>`;
     if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
     return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
-    ${s.roster.length ? skillMix(s.roster) : ''}
+    ${s.roster.length ? skillMix(s.roster, capacityOf(s)) : ''}
     <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}${memberJoinOk(s, v) ? `You're a member of ${esc(S.club.name)}, so you get your place right away.` : 'One tap sends your request and the Queue Master confirms it.'}</p>
     ${wantField(s, pubWantOf(s), 'data-act="pubWant"')}
     ${memberJoinOk(s, v) ? `<button class="btn primary jc-btn" data-act="memberJoin">${pubWantOf(s) === 'waitlist' ? 'Join the waitlist as' : 'Join as'} ${esc(v.name)}</button>` : `<button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button>`}</section>`;
@@ -4718,7 +4718,7 @@ function joinCard(s) {
   if (s.status === 'active') return '<section class="card join-card"><p class="small muted">The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.</p></section>';
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
   return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
-    ${s.roster.length ? skillMix(s.roster) : ''}
+    ${s.roster.length ? skillMix(s.roster, capacityOf(s)) : ''}
     <p class="small muted">${open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
     <button class="btn primary jc-btn" data-act="openJoin">Request to join</button></section>`;
 }
@@ -4910,14 +4910,16 @@ function rvCard(s, r, live) {
         ${live ? '' : `<div class="rv-meta">${rvStepDown(r, p)}</div>`}
       </article>`;
 }
-function skillMix(rows) {
+// Public join card: the bar spans the slot budget (cap), so 4 of 24 taken fills a sixth; the grey remainder is open slots.
+function skillMix(rows, cap) {
   const n = (g) => rows.filter((r) => (r.level == null ? 'No level' : LEVELS[r.level].band) === g).length;
   const items = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level']].map(([k, l]) => [k, l, n(l)]).filter(([, , c]) => c > 0);
   const total = items.reduce((t, [, , c]) => t + c, 0);
+  const open = cap ? cap - total : 0;
   if (!total) return '<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>No players yet</span></div><div class="sm-bar empty"></div></div>';
   const tip = (l, c) => (l === 'No level' ? `${c} with no level` : `${l}: ${c} player${c === 1 ? '' : 's'}`);
   return `<div class="skill-mix"><div class="sm-head"><b>Skill mix</b></div>
-    <div class="sm-bar" role="group" aria-label="Skill mix">${items.map(([k, l, c]) => `<i class="sm-${k}" style="flex-grow:${c}" tabindex="0" role="img" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}"></i>`).join('')}</div></div>`;
+    <div class="sm-bar" role="group" aria-label="Skill mix">${items.map(([k, l, c]) => `<i class="sm-${k}" style="flex-grow:${c}" tabindex="0" role="img" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}"></i>`).join('')}${open > 0 ? `<i class="sm-open" style="flex-grow:${open}" tabindex="0" role="img" data-tip="${open} open slot${open === 1 ? '' : 's'}" aria-label="${open} open slot${open === 1 ? '' : 's'}"></i>` : ''}</div></div>`;
 }
 // One box for the roster tab: slots used and skill mix in a single bar. The bar spans the slot budget; colored segments are the
 // confirmed players by skill group, the grey remainder is open slots. Hover or focus a segment for its count.

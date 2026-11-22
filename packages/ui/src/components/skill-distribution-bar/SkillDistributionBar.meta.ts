@@ -6,6 +6,7 @@ export const skillDistributionBarMeta = {
     'A small "Skill mix" label over one compact bar: a segment per skill group sized by head count, ordered Beginner, Intermediate, Advanced, No level. No legend, no rows, no green. Hover or focus a segment for its count.',
   usage: [
     'Pass counts only; the component never receives player data, so the public page can pass aggregate counts.',
+    'Pass capacity (the slot budget) where open slots matter, as on the Want to play? card: the bar then spans the budget and a grey remainder shows the open slots, so 4 of 24 taken fills a sixth.',
     'Zero-count groups are left out. No level shows only when unrated is above zero.',
     'Colors are the level tokens (bg-lv-beg, bg-lv-int, bg-lv-adv, bg-lv-none); both themes ship.',
     'Each segment is a focusable image whose label is its count ("Beginner: 4 players", "1 with no level"); the tooltip shows the same text on hover and focus.',

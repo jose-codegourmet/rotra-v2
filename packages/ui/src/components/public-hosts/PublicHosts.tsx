@@ -18,6 +18,11 @@ export type PublicHostsProps = {
    * Players tiles. Visitors pass nothing and keep plain chips.
    */
   onOpenHost?: (host: PublicHost) => void
+  /**
+   * A short line under the chips. The session record's Players tab (#1008) says these are the hosts
+   * the session ended with. The public page passes nothing.
+   */
+  note?: string
   className?: string
 }
 
@@ -25,8 +30,9 @@ export type PublicHostsProps = {
  * Public session page › **Hosts** (#1006, D-2026-11-22-01): a compact row of picture and name chips
  * above Players and Waitlisted. Optional: with no hosts nothing renders. A host who plays also shows
  * in Players; this section never changes capacity or the player count. Hosting is shown, not a role.
+ * On a finished session (#1008) the hosts are the ones it ended with, by the name kept then.
  */
-export function PublicHosts({ hosts, onOpenHost, className }: PublicHostsProps) {
+export function PublicHosts({ hosts, onOpenHost, note, className }: PublicHostsProps) {
   if (!hosts.length) return null
   return (
     <section aria-label="Hosts" className={cn('flex min-w-0 flex-col gap-2.5', className)}>
@@ -89,6 +95,7 @@ export function PublicHosts({ hosts, onOpenHost, className }: PublicHostsProps) 
           )
         })}
       </ul>
+      {note ? <p className="m-0 text-[13px] text-fg2">{note}</p> : null}
     </section>
   )
 }

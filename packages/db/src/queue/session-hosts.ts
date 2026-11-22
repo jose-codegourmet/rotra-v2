@@ -4,6 +4,7 @@ import { prisma } from '../client/prisma'
 import type { QueueSession } from '../generated/prisma/client'
 import { notifyWaitlistPlace } from '../player/notification-events'
 import { ServiceError } from '../service/errors'
+import { hostName, shownHostRows } from './session-host-snapshots'
 import { placeClubMember } from './session-roster'
 import {
   capacityOf,
@@ -21,13 +22,19 @@ import {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** One current host of a session, as Q-SETUP reads them (#1004). The screen joins the saved player. */
-export type SessionHostDto = { id: string; clubPlayerId: string; assignedAt: string }
+/**
+ * One host of a session, as Q-SETUP reads them (#1004). The screen joins the saved player; `name` is
+ * the row's snapshot (#1008), the name to show when that saved player is gone (deleted or moved).
+ */
+export type SessionHostDto = { id: string; clubPlayerId: string; assignedAt: string; name: string }
 
 /** What a setup save did with its hosts: given a slot, or put on the waitlist (every slot taken). */
 export type HostRegistration = { registered: number; waitlisted: number }
 
-/** Q-SETUP › Hosts (#1004, D-2026-11-22-01): the session's current hosts, oldest first. */
+/**
+ * Q-SETUP › Hosts (#1004, D-2026-11-22-01): the session's current hosts, oldest first. On a finished
+ * session, the record's hosts: the rows frozen at its end, by their snapshot name (#1008).
+ */
 export async function listSessionHosts(
   context: ClubContext,
   sessionId: string,
@@ -35,18 +42,20 @@ export async function listSessionHosts(
   if (!UUID.test(sessionId)) throw new ServiceError('not_found')
   const session = await prisma.queueSession.findFirst({
     where: { id: sessionId, clubId: context.clubId },
-    select: { id: true },
+    select: { id: true, state: true },
   })
   if (!session) throw new ServiceError('not_found')
+  // A finished session shows the hosts frozen when it ended (#1008); an open one its current rows.
   const rows = await prisma.sessionHost.findMany({
-    where: { clubId: context.clubId, sessionId, removedAt: null },
+    where: { clubId: context.clubId, sessionId, ...shownHostRows(session.state) },
     orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
-    select: { id: true, clubPlayerId: true, assignedAt: true },
+    select: { id: true, clubPlayerId: true, assignedAt: true, nameSnapshot: true },
   })
   return rows.map((row) => ({
     id: row.id,
     clubPlayerId: row.clubPlayerId,
     assignedAt: row.assignedAt.toISOString(),
+    name: row.nameSnapshot,
   }))
 }
 
@@ -92,6 +101,7 @@ export async function assignSessionHostsIn(
   if (!fresh.length) return result
   const players = await tx.clubPlayer.findMany({
     where: { clubId: context.clubId, id: { in: fresh }, removedAt: null },
+    include: { player: { select: { fullName: true } } },
   })
   const trusted = new Set(
     (
@@ -118,6 +128,8 @@ export async function assignSessionHostsIn(
         sessionId: session.id,
         clubPlayerId: id,
         assignedAt: at,
+        // #1008: the name the finished session keeps, refreshed once more when it ends.
+        nameSnapshot: hostName(clubPlayer),
       },
     })
     const waiting = await tx.sessionWaitlistEntry.findUnique({

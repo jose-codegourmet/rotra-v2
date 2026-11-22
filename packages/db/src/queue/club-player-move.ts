@@ -18,10 +18,11 @@ const SAME_SESSION =
  * be that player's (it is not a free link).
  *
  * Moved to the other record: live slots in prepared and active sessions (taking that player's
- * name), waitlist spots and pending join requests. Where both hold a live slot in one session the
- * move is refused (no slot is dropped: payments, games and requests hang on the slot). Finished
- * sessions, assessments, facts and summaries are append-only, so they stay on the moved record, which
- * is hidden with `removed_at` and points to the other through `linked_to_club_player_id`.
+ * name), current host rows of those sessions (#1008), waitlist spots and pending join requests.
+ * Where both hold a live slot in one session the move is refused (no slot is dropped: payments,
+ * games and requests hang on the slot). Finished sessions (their frozen host rows included),
+ * assessments, facts and summaries are append-only, so they stay on the moved record, which is
+ * hidden with `removed_at` and points to the other through `linked_to_club_player_id`.
  */
 export async function moveSavedPlayer(
   context: ClubContext,
@@ -108,6 +109,31 @@ export async function moveSavedPlayer(
           where: { id: spot.id },
           data: { clubPlayerId: target.id },
         })
+    }
+    // Epic #1002 (#1008): a current host row of a prepared or active session moves with the slot,
+    // taking the other player's name; where the other player already hosts that session, this row
+    // ends instead. Finished sessions keep their frozen host rows (and snapshot name) on this record.
+    const hostRows = await tx.sessionHost.findMany({
+      where: {
+        clubId: context.clubId,
+        clubPlayerId: moved.id,
+        removedAt: null,
+        frozenAt: null,
+        session: { state: { in: ['prepared', 'active'] } },
+      },
+      select: { id: true, sessionId: true },
+    })
+    for (const host of hostRows) {
+      const hosting = await tx.sessionHost.findFirst({
+        where: { sessionId: host.sessionId, clubPlayerId: target.id, removedAt: null },
+        select: { id: true },
+      })
+      await tx.sessionHost.update({
+        where: { id: host.id },
+        data: hosting
+          ? { removedAt: now, revision: { increment: 1 } }
+          : { clubPlayerId: target.id, nameSnapshot: name, revision: { increment: 1 } },
+      })
     }
     await tx.sessionJoinRequest.updateMany({
       where: { clubId: context.clubId, clubPlayerId: moved.id, status: 'pending' },

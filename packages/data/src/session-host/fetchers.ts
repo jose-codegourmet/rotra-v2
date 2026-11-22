@@ -1,4 +1,3 @@
-import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
@@ -13,18 +12,36 @@ import {
   realGetSessionHosts,
   realRemoveSessionHost,
 } from '../real/session-host'
+import { hostNameOf, shownSessionHostRows } from './sessionHost.history'
 import { hostRegistrationText } from './sessionHost.rules'
-import type { SessionHost, SessionHostRegistration } from './sessionHost.types'
+import type { SessionHost, SessionHostRecord, SessionHostRegistration } from './sessionHost.types'
+
+const toHost = ({
+  id,
+  clubPlayerId,
+  assignedAt,
+  nameSnapshot,
+}: SessionHostRecord): SessionHost => ({
+  id,
+  clubPlayerId,
+  assignedAt,
+  name: nameSnapshot,
+})
+const byAssigned = (a: SessionHostRecord, b: SessionHostRecord) =>
+  a.assignedAt - b.assignedAt || a.id.localeCompare(b.id)
 
 /** The session's current host rows, oldest first. */
 export function currentSessionHosts(state: MockState, sessionId: string): SessionHost[] {
   return (state.sessionHosts ?? [])
     .filter((h) => h.sessionId === sessionId && h.removedAt === null)
-    .sort((a, b) => a.assignedAt - b.assignedAt || a.id.localeCompare(b.id))
-    .map(({ id, clubPlayerId, assignedAt }) => ({ id, clubPlayerId, assignedAt }))
+    .sort(byAssigned)
+    .map(toHost)
 }
 
-/** Q-SETUP › Hosts (#1004): the session's current hosts, oldest first. */
+/**
+ * Q-SETUP › Hosts (#1004): the session's current hosts, oldest first. A finished session: the hosts
+ * it ended with, by their snapshot name (#1008).
+ */
 export async function getSessionHosts(sessionId: string): Promise<SessionHost[]> {
   if (isRealDataMode()) return realGetSessionHosts(sessionId)
   await delay()
@@ -32,13 +49,8 @@ export async function getSessionHosts(sessionId: string): Promise<SessionHost[]>
   const state = readMockState()
   if (!state.sessions.some((s) => s.id === sessionId && s.clubId === DEMO_CLUB_ID))
     throw new MockError('permission', 'Session not available.')
-  return currentSessionHosts(state, sessionId)
+  return shownSessionHostRows(state, sessionId).map(toHost)
 }
-
-const nameOf = (state: MockState, p: ClubPlayer) =>
-  (p.identity === 'registered' &&
-    state.playerProfiles.find((x) => x.playerId === p.playerId)?.fullName) ||
-  p.fullName
 
 /**
  * The mock write behind Q-SETUP › Hosts (#1004, D-2026-11-22-01), inside the create or edit
@@ -83,7 +95,7 @@ export function assignSessionHosts(
     if (!trusted.has(id))
       throw new MockError(
         'conflict',
-        `${nameOf(state, p)} is not a trusted host. Pick them again to add them to your trusted hosts.`,
+        `${hostNameOf(state, p)} is not a trusted host. Pick them again to add them to your trusted hosts.`,
       )
     const linked = state.clubPlayers
       .filter((x) => x.id === p.id || (p.playerId && x.playerId === p.playerId))
@@ -95,7 +107,7 @@ export function assignSessionHosts(
     if (live && !registered && !p.playingLevel)
       throw new MockError(
         'permission',
-        `${nameOf(state, p)} has no saved level. Add them as a player with a level first, then add them as a host.`,
+        `${hostNameOf(state, p)} has no saved level. Add them as a player with a level first, then add them as a host.`,
       )
     rows.push({
       id: crypto.randomUUID(),
@@ -104,6 +116,8 @@ export function assignSessionHosts(
       clubPlayerId: id,
       assignedAt: now + index,
       removedAt: null,
+      nameSnapshot: hostNameOf(state, p),
+      frozenAt: null,
     })
     if (registered) continue
     const rosterCount = state.roster.filter((r) => r.sessionId === sessionId).length
@@ -150,7 +164,7 @@ export function addSessionHost(input: { sessionId: string; clubPlayerId: string 
         (x) => x.id === input.clubPlayerId && x.clubId === DEMO_CLUB_ID && isCurrentRecord(x),
       )
       if (!p) throw new MockError('permission', 'A host is no longer one of your saved players.')
-      const name = nameOf(state, p)
+      const name = hostNameOf(state, p)
       const current = currentSessionHosts(state, input.sessionId)
       if (current.some((h) => h.clubPlayerId === p.id))
         throw new MockError('conflict', `${name} is already a host.`)
@@ -187,7 +201,7 @@ export function removeSessionHost(input: { sessionId: string; clubPlayerId: stri
       row.removedAt = Date.now()
       return {
         data: { clubPlayerId: input.clubPlayerId },
-        text: `${nameOf(state, p)} removed as a host`,
+        text: `${hostNameOf(state, p)} removed as a host`,
       }
     },
   )

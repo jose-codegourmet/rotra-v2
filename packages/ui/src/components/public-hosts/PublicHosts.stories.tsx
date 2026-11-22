@@ -55,3 +55,17 @@ export const ManyHostsPhone: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+/**
+ * The session record's Players tab (#1008): the club's own view of a finished session's hosts, full
+ * names kept at the finish, with the note that later changes don't touch them.
+ */
+export const SessionRecord: Story = {
+  args: {
+    hosts: [{ id: 'h1', name: 'Aaron', masked: false }],
+    note: "The hosts this session ended with. Removing a trusted host or a saved player later doesn't change them.",
+  },
+}
+export const SessionRecordLightPhone: Story = {
+  args: SessionRecord.args,
+  globals: { theme: 'light', viewport: { value: 'phone' } },
+}

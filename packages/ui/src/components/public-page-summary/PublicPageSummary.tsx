@@ -40,6 +40,11 @@ export type PublicPageSummaryProps = {
   publication: PublicPageSummaryPublication | null
   /** The N in "Participants · N" */
   participantCount: number
+  /**
+   * The Hosts section (PublicHosts) under the Participants heading, above the grid (#1006, #1008):
+   * on a finished session, the hosts it ended with. Omit with no hosts.
+   */
+  hosts?: ReactNode
   /** The participant cards (ParticipantCard from PublicParticipants), laid out in the grid */
   children?: ReactNode
   onOpenPublicPage: () => void
@@ -64,6 +69,7 @@ export function PublicPageSummary({
   details,
   publication,
   participantCount,
+  hosts,
   children,
   onOpenPublicPage,
   onPublish,
@@ -132,6 +138,7 @@ export function PublicPageSummary({
 
       <section aria-labelledby="public-page-participants-heading" className="flex flex-col gap-3">
         <h3 id="public-page-participants-heading">Participants · {participantCount}</h3>
+        {hosts}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,150px),1fr))] gap-2.5">
           {children}
         </div>

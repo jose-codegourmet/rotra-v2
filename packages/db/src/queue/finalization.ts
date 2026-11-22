@@ -5,6 +5,7 @@ import type { Prisma, ProjectionKind, SessionFinalization } from '../generated/p
 import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 import { closeSessionMatchRequests } from './match-request-store'
+import { freezeSessionHostsIn } from './session-host-snapshots'
 import {
   LIVE_ENTRY,
   lockSession,
@@ -478,6 +479,8 @@ export async function finalizeSession(
           where: { id: sessionId },
           data: { state: 'completed', finalizedAt: now, revision: { increment: 1 } },
         })
+        // #1008: the hosts current at the end are this session's hosts from now on (name refreshed).
+        await freezeSessionHostsIn(tx, sessionId, now)
         await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
         // No summaries, snapshot, history or rank work for an unrecorded session: no jobs at all.
         if (!recorded) return { status: await statusDto(tx, finalization), warnings }
@@ -598,7 +601,10 @@ export async function invalidateSession(
       where: { id: sessionId },
       data: { state: 'invalid', invalidReason: reason, revision: { increment: 1 } },
     })
+    // #1008: an invalid session keeps the hosts it had when it ended, like a finished one.
+    const now = new Date()
+    await freezeSessionHostsIn(tx, sessionId, now)
     await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
-    return { state: 'invalid' as const, invalidReason: reason, at: toIso(new Date()) }
+    return { state: 'invalid' as const, invalidReason: reason, at: toIso(now) }
   })
 }

@@ -5,6 +5,7 @@ import { queueMutation } from '../mock/transaction'
 import { isCurrentRecord, savedDisplayName, savedRecordByEmail } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import { realMoveSavedPlayer } from '../real/queue'
+import { moveSessionHosts } from '../session-host/sessionHost.history'
 
 /**
  * Placeholder copy (not in the mockup): the record being moved is in a match of a session the other
@@ -101,6 +102,8 @@ export function moveSavedPlayer(input: {
     for (const spot of s.waitlist) if (spot.clubPlayerId === moved.id) spot.clubPlayerId = target.id
     for (const request of s.joinRequests)
       if (request.clubPlayerId === moved.id) request.clubPlayerId = target.id
+    // Epic #1002 (#1008): open sessions' current host rows follow; finished ones keep theirs.
+    moveSessionHosts(s, moved.id, target.id, live, name)
 
     // OPEN: combining two award histories (prior sessions, baseline win rate) is rank math, so it
     // is not done here. The moved record's history moves only when the other player has none;

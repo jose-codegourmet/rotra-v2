@@ -30,10 +30,11 @@ export function createTrustedHostFixtures(now: number): ClubTrustedHost[] {
     {
       id: '0f1e2d3c-4b5a-4968-8776-a1b2c3d4e5f3',
       clubId: DEMO_CLUB_ID,
-      // Aaron: trusted for a while, then removed; still a saved player.
+      // Aaron: trusted for a while, then removed two days ago; still a saved player. Sunday Night
+      // Queue (h2, a week ago) still shows him as its host (#1008, fixtures/sessionHosts.ts).
       clubPlayerId: '62dc8cc2-6673-5356-b659-51e1fa5d533c',
       addedAt: now - 60 * day,
-      removedAt: now - 20 * day,
+      removedAt: now - 2 * day,
     },
   ]
 }

@@ -42,7 +42,9 @@ export const OverCap: Story = {}
 /** Hosts (#1006) sit above Players; a playing host is in both lists and counts once. */
 export const WithHosts: Story = {
   args: {
-    hosts: [participants[0], { ...participants[19], id: 'host-not-playing' }],
+    hosts: [participants[0], participants[19]].flatMap((p, i) =>
+      p ? [i ? { ...p, id: 'host-not-playing' } : p] : [],
+    ),
     participants: participants.slice(0, 6),
     waitlist: participants.slice(18, 20),
     openSlots: 2,

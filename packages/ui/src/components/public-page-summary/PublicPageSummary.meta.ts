@@ -7,6 +7,7 @@ export const publicPageSummaryMeta = {
   usage: [
     'details.scoring is the Scoring row after Mode (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31.',
     'Use as the body of the Public page tab of a session record (Q-HISTORY). Pass the participant cards (ParticipantCard from PublicParticipants) as children; the component lays them out in the grid.',
+    'Pass the Hosts section (PublicHosts) as `hosts`: it sits under the Participants heading, above the grid. On a finished session these are the hosts it ended with (#1008); omit it with no hosts.',
     'Invalid sessions get the "Invalid sessions have no results to share." copy and no publish action.',
     'Pass recorded={false} for an unrecorded session (Record games off): the Publish results button is not shown.',
     'Do not use on the public page itself: that page is built from PublicSessionHero, PublicSessionDetails, PublicParticipants and PublicResultsSection.',
@@ -23,6 +24,7 @@ export const publicPageSummaryMeta = {
     'SessionRecordHeader',
     'PublicResultsSection',
     'PublicParticipants',
+    'PublicHosts',
     'KeyValueList',
     'PublishResultsForm',
   ],

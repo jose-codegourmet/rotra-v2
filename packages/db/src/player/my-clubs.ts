@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { requireClubInvite } from '../admin/club-invite'
 import type { PlayerContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import { readHostClubIds } from '../queue/club-hosts'
 import { ServiceError } from '../service/errors'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -36,11 +37,13 @@ export async function readMyClubs(context: PlayerContext) {
       },
     },
   })
+  const hostClubs = await readHostClubIds(context.playerId)
   return rows.map((row) => ({
     id: row.club.id,
     name: row.club.name,
     initials: initials(row.club.name),
     logoUrl: row.club.logoRef,
+    isHost: hostClubs.has(row.club.id),
     joinedVia: row.joinRequests.length ? ('session_link' as const) : ('club_added' as const),
   }))
 }

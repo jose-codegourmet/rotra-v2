@@ -1,5 +1,6 @@
 import 'server-only'
 import { prisma } from '../client/prisma'
+import { readHostClubIds } from '../queue/club-hosts'
 import { ServiceError } from '../service/errors'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -17,7 +18,8 @@ function initials(name: string) {
  * P-PUBLIC-PROFILE · Clubs (#766, D-2026-11-12-04) public read (`player.public-clubs`): the clubs a
  * player is currently saved in (`club_players` not removed), as id, name, initials and logo only.
  * How they joined never leaves here (the owner reads that from `/api/me/clubs`). It follows the
- * profile read: only a profile with a permanent RTR ID is found, and an always-private profile
+ * profile read: each club also says whether the player is a current trusted host there (`isHost`,
+ * the Host badge, #1007), computed in this same read. It follows the profile read: only a profile with a permanent RTR ID is found, and an always-private profile
  * (D-2026-11-12-01) returns no clubs, since its page shows the private card for everyone else.
  */
 export async function readPlayerClubs(playerId: string) {
@@ -33,10 +35,19 @@ export async function readPlayerClubs(playerId: string) {
     orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
     select: { club: { select: { id: true, name: true, logoRef: true } } },
   })
+  const hostClubs = await readHostClubIds(playerId)
   const seen = new Set<string>()
   return rows.flatMap(({ club }) => {
     if (seen.has(club.id)) return []
     seen.add(club.id)
-    return [{ id: club.id, name: club.name, initials: initials(club.name), logoUrl: club.logoRef }]
+    return [
+      {
+        id: club.id,
+        name: club.name,
+        initials: initials(club.name),
+        logoUrl: club.logoRef,
+        isHost: hostClubs.has(club.id),
+      },
+    ]
   })
 }

@@ -65,6 +65,14 @@ const TAKES_REQUESTS = ['prepared', 'active']
 /** Join requests end at Start (D-2026-11-11-11): none is created once the session is live. */
 const JOIN_REQUESTS_STARTED = 'The session has started, so online join requests are closed.'
 
+/**
+ * The picture a saved player shows: a registered player's own, else the one the club set for its
+ * guest or unclaimed player (D-2026-11-09-12), else initials.
+ */
+const pictureOf = (
+  clubPlayer: { avatarRef: string | null; player: { avatarRef: string | null } | null } | undefined,
+) => (clubPlayer?.player ? clubPlayer.player.avatarRef : (clubPlayer?.avatarRef ?? null))
+
 /** Rate/abuse guard (proposal pending #248): pending requests one session will hold at once. */
 export const MAX_PENDING_REQUESTS_PER_SESSION = 60
 
@@ -215,6 +223,7 @@ export async function readPublicSession(slug: string) {
       select: {
         id: true,
         displayName: true,
+        avatarRef: true,
         player: { select: { avatarRef: true } },
         assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
@@ -248,7 +257,7 @@ export async function readPublicSession(slug: string) {
         const clubPlayer = byId.get(entry.clubPlayerId)
         return {
           name: maskPublicName(entry.nameSnapshot),
-          pictureUrl: clubPlayer?.player?.avatarRef ?? null,
+          pictureUrl: pictureOf(clubPlayer),
           ...publicLevel(levelCodeFor(entry.skillLevelId)),
         }
       }),
@@ -268,7 +277,7 @@ export async function readPublicSession(slug: string) {
             name: maskPublicName(
               ended ? host.nameSnapshot : (placed?.nameSnapshot ?? clubPlayer.displayName),
             ),
-            pictureUrl: clubPlayer.player?.avatarRef ?? null,
+            pictureUrl: pictureOf(clubPlayer),
             ...publicLevel(levelCodeFor(levelId ?? null)),
           },
         ]
@@ -277,7 +286,7 @@ export async function readPublicSession(slug: string) {
         const clubPlayer = byId.get(w.clubPlayerId)
         return {
           name: maskPublicName(clubPlayer?.displayName ?? ''),
-          pictureUrl: clubPlayer?.player?.avatarRef ?? null,
+          pictureUrl: pictureOf(clubPlayer),
           ...publicLevel(levelCodeFor(w.skillLevelId)),
         }
       }),
@@ -295,7 +304,7 @@ export async function readPublicSession(slug: string) {
               await readPublishedResults(session.id, tx),
               roster.map((entry) => ({
                 name: entry.nameSnapshot,
-                pictureUrl: byId.get(entry.clubPlayerId)?.player?.avatarRef ?? null,
+                pictureUrl: pictureOf(byId.get(entry.clubPlayerId)),
               })),
             )
           : null,
@@ -548,6 +557,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       id: true,
       playerId: true,
       nickname: true,
+      avatarRef: true,
       sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
       player: {
         select: {
@@ -584,7 +594,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
     const shownBanners = await readShownProfileBanners(tx)
     const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
     const pictures = new Map(
-      [...linked, ...hostPlayers].map((entry) => [entry.id, entry.player?.avatarRef ?? null]),
+      [...linked, ...hostPlayers].map((entry) => [entry.id, pictureOf(entry)]),
     )
     const people = new Map([...linked, ...hostPlayers].map((entry) => [entry.id, entry]))
     /**
@@ -731,7 +741,7 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         return [
           {
             ...person({ clubPlayerId: who.id, nameSnapshot }),
-            pictureUrl: who.player?.avatarRef ?? null,
+            pictureUrl: pictureOf(who),
             ...publicLevel(levelCodeFor(levelId)),
           },
         ]

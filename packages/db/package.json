@@ -26,6 +26,7 @@
     "./queue/slot-transfers": "./src/queue/slot-transfers.ts",
     "./queue/club-players": "./src/queue/club-players.ts",
     "./queue/club-player-details": "./src/queue/club-player-details.ts",
+    "./queue/club-player-picture": "./src/queue/club-player-picture.ts",
     "./queue/club-player-delete": "./src/queue/club-player-delete.ts",
     "./queue/club-hosts": "./src/queue/club-hosts.ts",
     "./queue/session-hosts": "./src/queue/session-hosts.ts",

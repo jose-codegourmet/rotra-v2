@@ -157,6 +157,7 @@ async function findRecordLink(tokenDigest: Uint8Array<ArrayBuffer>) {
           nickname: true,
           playerId: true,
           removedAt: true,
+          avatarRef: true,
           club: { select: { name: true } },
           privateInput: { select: { phoneE164: true, email: true } },
           sharedEntry: { select: { id: true, email: true, rtrId: true } },
@@ -378,7 +379,13 @@ async function completeRecordClaim(
     if (current.state !== 'active') throw new ServiceError('forbidden', { link: EXPIRED })
     const now = new Date()
     const player = await tx.player.create({
-      data: { fullName: record.displayName, nickname: record.nickname, profileState: 'claimed' },
+      // D-2026-11-09-12 (owner, November 10, 2026): the club-set picture is the starting picture.
+      data: {
+        fullName: record.displayName,
+        nickname: record.nickname,
+        avatarRef: record.avatarRef,
+        profileState: 'claimed',
+      },
       select: { id: true, fullName: true, nickname: true },
     })
     const contact = await tx.playerPrivateContact.create({

@@ -92,8 +92,8 @@ export type ClubPlayerDetails = {
   /** The club's own phone for an unclaimed player is on file; a guest never has one */
   phoneOnFile: boolean
   /**
-   * Edit details › Profile picture: what shows now and the previous photo, if any. Mock only;
-   * missing in real data mode until club-set picture storage is decided (D-2026-11-09-12).
+   * Edit details › Profile picture: what shows now and the previous photo, if any
+   * (D-2026-11-09-12; stored on `club_players.avatar_ref` in real mode).
    */
   picture?: ClubPlayerPictureState
   /**

@@ -7,6 +7,7 @@ import type {
   ClubPlayerDetailsInput,
   ClubPlayerDetailsResult,
   DeleteImpact,
+  SetClubPlayerPictureInput,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
@@ -878,4 +879,38 @@ export async function realAddDirectoryPlayerToClub(input: {
     body: { ...input, source: 'directory', operationId: crypto.randomUUID() },
   })
   return accepted({ clubPlayerId: saved.clubPlayerId }, `${saved.name} saved`)
+}
+
+/**
+ * Edit details › Profile picture (D-2026-11-09-12): Upload photo or Choose a character for the
+ * club's own guest or unclaimed player. The server crops a photo to a centred square, as mock mode.
+ */
+export async function realSetClubPlayerPicture(input: SetClubPlayerPictureInput) {
+  const form = new FormData()
+  form.set('kind', input.kind)
+  if (input.kind === 'photo') form.set('photo', input.file)
+  else form.set('id', input.characterId)
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'PATCH', body: form },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
+}
+
+/** Edit details › Profile picture › Remove: back to initials. */
+export async function realRemoveClubPlayerPicture(input: { clubPlayerId: string }) {
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'DELETE' },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
+}
+
+/** Edit details › Profile picture › Use previous picture. */
+export async function realRestorePreviousClubPlayerPicture(input: { clubPlayerId: string }) {
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'POST' },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
 }

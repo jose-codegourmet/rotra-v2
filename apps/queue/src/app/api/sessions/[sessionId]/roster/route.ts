@@ -71,6 +71,7 @@ export async function POST(
       nickname: text(body.nickname) || undefined,
       phone: phone?.success ? phone.data : undefined,
       email: text(body.email) || null,
+      socialLink: text(body.socialLink) || null,
       level: text(body.level),
       ...placementOf(body),
     })

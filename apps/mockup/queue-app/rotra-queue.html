@@ -2182,6 +2182,8 @@ const DIRECTORY = [
   { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', email: 'trish.mendoza@example.com', sugg: 5, rank: 'Rank 388' },
   { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', email: 'marco.lim@example.com', sugg: 4, rank: 'Rank 1,042' },
   { id: 'g5', name: '', identity: 'unclaimed', rtr: 'RTR-PH-MNL-090126-0203', email: 'ivan.delarosa@example.com', sugg: null, rank: '' },
+  // Saved by another club with a name and a Facebook link only (#1019).
+  { id: 'g6', name: '', identity: 'unclaimed', rtr: 'RTR-PH-CEB-111926-0141', email: '', social: { facebook: 'https://facebook.com/jun.bautista' }, sugg: null, rank: '' },
 ];
 
 function todayAt(h, m) { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
@@ -2811,14 +2813,39 @@ const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
 const idLine = (p) => (p.rtr ? esc(p.rtr) : p.identity === 'unclaimed' ? 'Details required' : 'Guest');
 // D-2026-11-16-04: an unclaimed player needs an email. An older record with a phone and no email shows Details required
 // until the Queue Master adds the email or deletes the player.
-const needsEmail = (p) => !!p && p.identity === 'unclaimed' && !p.email;
+const needsEmail = (p) => !!p && p.identity === 'unclaimed' && !p.email && !socialKeys(p).length;
 // Registered and unclaimed players are ROTRA players with an RTR ID; a guest is a name in this club only.
-const onRotra = (p) => !!p && (p.identity === 'registered' || (p.identity === 'unclaimed' && !!p.email));
+const onRotra = (p) => !!p && (p.identity === 'registered' || (p.identity === 'unclaimed' && (!!p.email || socialKeys(p).length > 0)));
 const identChip = (p) => (needsEmail(p) ? chip('Details required', 'warn') : chip(IDENT[p.identity] || esc(p.identity), p.identity === 'registered' ? 'ok' : p.identity === 'pending' ? 'warn' : ''));
 const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 // One email is one person: a saved player in this club, or a ROTRA player elsewhere (registered or unclaimed).
 const dirByEmail = (v) => DIRECTORY.find((g) => g.email === v.trim().toLowerCase()) || null;
 const savedByEmail = (v, notId) => { const e = v.trim().toLowerCase(), g = dirByEmail(e); return saved().find((p) => p.id !== notId && ((p.email || '').toLowerCase() === e || (g && p.rtr === g.rtr))) || null; };
+// #1019: a social link is an entry key for an unclaimed player, like an email. Normalized before comparing:
+// any host alias (m., www., fb.com) becomes the provider's site, no query string, hash or trailing slash, lower case.
+const SOCIAL_HOSTS = { facebook: ['facebook.com', 'fb.com'], instagram: ['instagram.com'], youtube: ['youtube.com'], linkedin: ['linkedin.com'] };
+function socialKey(v) {
+  let u; try { u = new URL(/^https?:\/\//i.test(v.trim()) ? v.trim() : `https://${v.trim()}`); } catch (e) { return null; }
+  const host = u.hostname.toLowerCase().replace(/^(www\.|m\.|mobile\.)/, '');
+  const kind = Object.keys(SOCIAL_HOSTS).find((k) => SOCIAL_HOSTS[k].includes(host));
+  const path = u.pathname.replace(/\/+$/, '').toLowerCase();
+  if (!kind || !path || path === '/') return null;
+  return { kind, key: `${SOCIAL_HOSTS[kind][0]}${path}` };
+}
+const socialKeys = (p) => Object.values(p?.social || {}).map((v) => (v ? socialKey(v)?.key : null)).filter(Boolean);
+const dirBySocial = (v) => { const k = socialKey(v)?.key; return k ? DIRECTORY.find((g) => g.identity === 'unclaimed' && socialKeys(g).includes(k)) || null : null; };
+const savedBySocial = (v, notId) => { const k = socialKey(v)?.key, g = dirBySocial(v); return k ? saved().find((p) => p.id !== notId && p.identity !== 'registered' && (socialKeys(p).includes(k) || (g && p.rtr === g.rtr))) || null : null; };
+// Saving a social link makes the player unclaimed, or links them to the unclaimed player who already has it.
+// The link wins over the email when they point to two different unclaimed players. Offline the lookup waits for sync.
+function applySocial(p, link) {
+  const sk = socialKey(link), g = dirBySocial(link);
+  p.social = { ...(p.social || {}), [sk.kind]: link.trim() };
+  if (p.identity === 'guest') p.noPhone = true;
+  if (!S.online) { p.identity = 'pending'; return 'profile lookup after sync'; }
+  if (g) { p.identity = 'unclaimed'; p.rtr = g.rtr; return `already on ROTRA · ${g.rtr}`; }
+  if (p.identity !== 'unclaimed' && p.identity !== 'registered') { p.identity = 'unclaimed'; p.rtr = newRtr(); p.rtrNew = true; }
+  return `unclaimed · ${p.rtr}`;
+}
 // An unclaimed player gets an RTR ID when the club saves their email: the club's city code, today's date, the next number.
 const newRtr = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `RTR-PH-CEB-${z(d.getMonth() + 1)}${z(d.getDate())}${String(d.getFullYear()).slice(2)}-${String(86 + S.players.filter((p) => p.rtrNew).length).padStart(4, '0')}`; };
 // Saving an email makes a guest (or an older record) an unclaimed player, or links them when the email is already on ROTRA.
@@ -6779,19 +6806,22 @@ const SHEETS = {
     } else if (tab === 'global') {
       // D-2026-11-16-04: exact RTR ID or exact email only. No name search here.
       const key = (sh.q || '').trim().toLowerCase();
-      const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key;
+      const sk = socialKey(key)?.key;
+      const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key || (!!sk && x.identity === 'unclaimed' && socialKeys(x).includes(sk));
       const mine = key ? saved().find((x) => hit(x) || DIRECTORY.some((g) => hit(g) && g.rtr === x.rtr)) : null;
       const list = key && !mine ? DIRECTORY.filter(hit) : [];
       body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email now; ROTRA looks them up after you reconnect.')
-        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID or email" data-autofocus><span class="hint">Enter the full RTR ID or email. Names are searched in your saved players only.</span></label>
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID or email.' : 'Enter an RTR ID or email to find a ROTRA player.'}</div>`}</div>
+        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID, email or social link" data-autofocus><span class="hint">Enter the full RTR ID, email or social link. Names are searched in your saved players only.</span></label>
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID, email or social link.' : 'Enter an RTR ID, email or social link to find a ROTRA player.'}</div>`}</div>
         <p class="small muted">Confirm with the player before adding them.</p>
-        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112 or ivan.delarosa@example.com.</p>`;
+        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com or facebook.com/jun.bautista.</p>`;
     } else {
       body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
         ${genderField('add-gender', 'sheet', sh.gender)}
-        <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly.</span></label>
+        <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Never shown publicly. If the email is already on ROTRA, they're linked to that player.</span></label>
+        <label class="field"><span>Social link (optional)</span><input class="input${sh.err && sh.errK === 'social' ? ' bad' : ''}" id="add-social" type="url" inputmode="url" data-bind="ui.sheet.social" value="${esc(sh.social || '')}" placeholder="https://facebook.com/yourname"><span class="hint">Facebook, Instagram, YouTube or LinkedIn. Shown on their profile. If the link is already an unclaimed player on ROTRA, they're linked to that player.</span></label>
+        <p class="small muted">With an email or a social link they're saved as an unclaimed player and get an RTR ID. With neither, they're saved as a guest.</p>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
       return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
@@ -7904,11 +7934,16 @@ const ACT = {
     if (d.phone.trim() && !/^(09\d{9}|639\d{9})$/.test(digits)) err.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     const email = p.email ? '' : d.email.trim();
     if (email && !emailOk(email)) err.email = 'Enter an email address, like name@example.com.';
+    for (const k of ['facebook', 'instagram', 'youtube', 'linkedin']) if (d[k].trim() && socialKey(d[k])?.kind !== k) err[k] = `Enter a ${k === 'youtube' ? 'YouTube' : k === 'linkedin' ? 'LinkedIn' : k[0].toUpperCase() + k.slice(1)} profile link.`;
     const exp = expError(d); if (exp) err.exp = exp;
     sh.err = err;
     if (Object.keys(err).length) { render(); return; }
     Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, sugg: d.level, style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
     if (d.phone.trim()) p.noPhone = false;
+    // #1019: no email and no social link left means no entry key, so they go back to being a guest.
+    if (p.identity === 'unclaimed' && !p.email && !email && !socialKeys(p).length) { p.identity = 'guest'; p.rtr = null; S.ui.sheet = { type: 'profile', id: p.id }; commit(`Details saved · ${p.name} · now a guest`); render(); return; }
+    // #1019: a player saved with a link only keeps their RTR ID; the email joins them when nobody else has it.
+    if (email && p.identity === 'unclaimed' && p.rtr && socialKeys(p).length) { if (!dirByEmail(email) && !savedByEmail(email, p.id)) p.email = email.toLowerCase(); S.ui.sheet = { type: 'profile', id: p.id }; commit(`Details saved · ${p.name}`); render(); return; }
     // One email is one person: an email that is already a saved player asks before the two records become one.
     const same = email ? savedByEmail(email, p.id) : null;
     if (same) { S.ui.sheet = { type: 'sameEmail', id: p.id, to: same.id }; commit(`Details saved · ${p.name}`); render(); return; }
@@ -8285,25 +8320,32 @@ const ACT = {
     afterAdd(sh, `${nm(pid)} added · ${lvLabel(+sh.level)}${s.status === 'active' ? ' · level locked' : ''}`);
   },
   confirmNew: () => {
-    const sh = S.ui.sheet, name = (sh.name || '').trim(), email = (sh.email || '').trim();
+    const sh = S.ui.sheet, name = (sh.name || '').trim(), email = (sh.email || '').trim(), social = (sh.social || '').trim();
+    sh.errK = '';
     if (!name) { sh.err = 'Enter a name.'; render(); return; }
+    // #1019: a social link is an entry key too. It must be a profile on one of the four sites.
+    if (social && !socialKey(social)) { sh.err = 'Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty.'; sh.errK = 'social'; render(); return; }
+    const sameSocial = social ? savedBySocial(social) : null;
+    if (sameSocial) { sh.err = `That social link is already ${sameSocial.name} in your saved players.`; sh.errK = 'social'; render(); return; }
     // D-2026-11-16-04: no email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player.
     if (email && !emailOk(email)) { sh.err = 'Enter an email address, like name@example.com, or leave it empty.'; render(); return; }
-    const same = email ? savedByEmail(email) : null;
+    const same = email && !social ? savedByEmail(email) : null;
     if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
+    // The email and the link both saved: the link decides who they are; the email is kept on the record.
+    const keys = (p) => { const a = social ? applySocial(p, social) : ''; const b = email ? (social ? (p.email = email.toLowerCase(), a) : applyEmail(p, email)) : a; return b; };
     const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
     if (sh.club) {
       // Saved players › Add player: a level only if one was chosen.
       np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;
       S.players.push(np);
-      afterAdd(sh, `${name} saved${email ? ` · ${applyEmail(np, email)}` : ' as a guest'}`);
+      afterAdd(sh, `${name} saved${email || social ? ` · ${keys(np)}` : ' as a guest'}`);
       return;
     }
     const s = cur();
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club.'; render(); return; }
     { const blk = sh.toWait ? '' : restrictBlock(s, +sh.level); if (blk && !sh.over) { sh.over = true; sh.err = `${blk} Press it again to add ${name} anyway.`; render(); return; } sh.over = false; }
     if (!sh.toWait && needsOverfill(s, name, 'confirmNew', undefined, true)) return;
-    const pid = np.id, how = email ? ` · ${applyEmail(np, email)}` : ' as a guest';
+    const pid = np.id, how = email || social ? ` · ${keys(np)}` : ' as a guest';
     S.players.push(np);
     if (sh.toWait) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${name} added to the waitlist as #${s.waitlist.length}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });

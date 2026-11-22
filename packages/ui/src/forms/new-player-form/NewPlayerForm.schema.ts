@@ -1,6 +1,7 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { emailField } from '@rotra/schema/email'
 import { nameField } from '@rotra/schema/name'
+import { normalizeSocialLink, SOCIAL_LINK_ERROR } from '@rotra/schema/social-link'
 import { LEVEL_OPTION_GROUPS } from '@rotra/ui/level-select'
 import { z } from 'zod'
 
@@ -27,6 +28,23 @@ const optionalEmail = z
     return parsed.data
   })
 
+/**
+ * #1019: optional social link as typed: empty stays null; otherwise a Facebook, Instagram, YouTube
+ * or LinkedIn profile link, trimmed (normalizing for matching happens where it is saved).
+ */
+const optionalSocialLink = z
+  .string()
+  .trim()
+  .transform((value, ctx) => {
+    if (value === '') return null
+    const link = normalizeSocialLink(value)
+    if (!link) {
+      ctx.addIssue({ code: 'custom', message: SOCIAL_LINK_ERROR })
+      return z.NEVER
+    }
+    return link.url
+  })
+
 /** The level select holds '' until chosen; one of the nine playing levels is required. */
 const requiredLevel = z.string().transform((value, ctx) => {
   if (!LEVEL_VALUES.has(value)) {
@@ -37,9 +55,9 @@ const requiredLevel = z.string().transform((value, ctx) => {
 })
 
 /**
- * Q-ADD-PLAYER › New player: a required name, optional nickname and email, and the level for this
- * club. No email means the player is saved as a guest; an email saves an unclaimed player with an
- * RTR ID (D-2026-11-16-04).
+ * Q-ADD-PLAYER › New player: a required name, optional nickname, email and social link, and the
+ * level for this club. With neither an email nor a social link the player is saved as a guest;
+ * either one saves an unclaimed player with an RTR ID (D-2026-11-16-04, #1019).
  */
 export const newPlayerSchema = z.object({
   name: nameField,
@@ -49,6 +67,7 @@ export const newPlayerSchema = z.object({
     .max(NICKNAME_MAX)
     .transform((value) => value || null),
   email: optionalEmail,
+  socialLink: optionalSocialLink,
   level: requiredLevel,
 })
 

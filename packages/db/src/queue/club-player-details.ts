@@ -5,8 +5,12 @@ import type { SocialProvider } from '../generated/prisma/client'
 import { currentExperienceMonths, experienceUpdate } from '../player/profile'
 import {
   emailWords,
+  followClubLinks,
+  lockEmail,
   normalizeEmail,
+  openEntryByEmail,
   pointRecordAt,
+  registeredPlayerByEmail,
   resolveEmail,
   savedRecordFor,
 } from '../player/shared-entry'
@@ -141,7 +145,9 @@ export async function updateClubPlayerDetails(
 
   const row = await loadEditable(context, input.clubPlayerId)
   const unclaimed = isUnclaimed(row)
-  const emailOnFile = Boolean(row.sharedEntryId || row.playerId)
+  // #1019: a record saved with a social link only has an entry and no email yet: one can be added.
+  const linkOnly = Boolean(row.sharedEntryId && !row.playerId && !row.sharedEntry?.email)
+  const emailOnFile = Boolean(row.sharedEntryId || row.playerId) && !linkOnly
   const typedEmail = emailOnFile ? '' : (input.email?.trim() ?? '')
   const email = typedEmail ? normalizeEmail(typedEmail) : null
   if (typedEmail && !email) throw new ServiceError('invalid', { email: EMAIL_ERROR })
@@ -212,7 +218,29 @@ export async function updateClubPlayerDetails(
       })
     }
     const message = `Details saved · ${fullName}`
-    if (!email) return { clubPlayerId: row.id, message, samePerson: null }
+    if (linkOnly && row.sharedEntryId) {
+      // The email joins the person when nobody on ROTRA has it; the link wins otherwise.
+      if (email) {
+        await lockEmail(tx, email)
+        const taken =
+          (await registeredPlayerByEmail(tx, email)) || (await openEntryByEmail(tx, email))
+        if (!taken)
+          await tx.sharedPlayerEntry.update({
+            where: { id: row.sharedEntryId },
+            data: { email, revision: { increment: 1 } },
+          })
+      }
+    }
+    // #1019: the entry's link key follows this club's links; no email and no link left is a guest.
+    if (row.sharedEntryId && !row.playerId) {
+      const links = readOwnDetails(
+        (await tx.clubPlayerPrivateInput.findUnique({ where: { clubPlayerId: row.id } }))
+          ?.presetFields,
+      ).socialLinks
+      if (await followClubLinks(tx, context.clubId, row.id, row.sharedEntryId, links, now))
+        return { clubPlayerId: row.id, message: `${message} · now a guest`, samePerson: null }
+    }
+    if (!email || linkOnly) return { clubPlayerId: row.id, message, samePerson: null }
     const known = await resolveEmail(tx, context.clubId, email, now, false)
     if (known) {
       const same = await savedRecordFor(tx, context.clubId, known, row.id)

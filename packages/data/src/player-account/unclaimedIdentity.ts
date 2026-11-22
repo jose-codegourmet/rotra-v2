@@ -190,6 +190,8 @@ export function claimUnclaimedPerson(
     throw new MockError('conflict', 'That profile is no longer available. Pick again.')
   if (picked?.picture) profile.picture = clubPictureState(picked, null).reference
   account.claimed = true
+  // #1019: a registered player is never found or matched by a social link.
+  account.socialKey = null
   account.phone = input.phone
   s.playerRanks[playerId] ??= {
     playerId,

@@ -181,6 +181,8 @@ export type MockState = {
    * as none.
    */
   pendingEmails?: Record<string, string>
+  /** Lookup pending (#1019): the social link typed for a new player while offline, by club player id. */
+  pendingSocialLinks?: Record<string, string>
   /**
    * The highest RTR ID number given per place and day ('RTR-PH-CEB-102926-' → 12). It only goes
    * up, so a retired RTR ID, or one Admin moved to another place or date, is never given again.

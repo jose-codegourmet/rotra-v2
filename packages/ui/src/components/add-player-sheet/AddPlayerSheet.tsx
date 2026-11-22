@@ -125,6 +125,8 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   addedCount?: number
   /** New player: the email typed already belongs to this saved player's name (the form refuses it) */
   newPlayerEmailSavedAs?: string
+  /** New player: why the social link was refused (#1019), shown under the field */
+  newPlayerSocialLinkError?: string
   /** Tab shown when the sheet opens; Saved players (Player Information in the club context) unless a story or container says otherwise */
   initialTab?: AddPlayerTab
 }
@@ -199,6 +201,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     directoryLoading = false,
     directorySavedName,
     newPlayerEmailSavedAs,
+    newPlayerSocialLinkError,
     isPending = false,
     serverError,
     serverErrorReturnsToList = false,
@@ -481,14 +484,14 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
               <>
                 <Field
                   label="Search Player Information"
-                  hint="Enter the full RTR ID or email. Names are searched in your saved players only."
+                  hint="Enter the full RTR ID, email or social link. Names are searched in your saved players only."
                 >
                   <TextInput
                     key={round}
                     type="search"
                     value={query}
                     onChange={(event) => changeQuery(event.target.value)}
-                    placeholder="Full RTR ID or email"
+                    placeholder="Full RTR ID, email or social link"
                     autoComplete="off"
                   />
                 </Field>
@@ -535,8 +538,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                         {q && directorySavedName
                           ? `${directorySavedName} is already in your saved players.`
                           : q
-                            ? 'No ROTRA player has that RTR ID or email.'
-                            : 'Enter an RTR ID or email to find a ROTRA player.'}
+                            ? 'No ROTRA player has that RTR ID, email or social link.'
+                            : 'Enter an RTR ID, email or social link to find a ROTRA player.'}
                       </EmptyState>
                     )}
                   </div>
@@ -558,6 +561,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 isPending={isPending}
                 serverError={serverError}
                 emailSavedAs={newPlayerEmailSavedAs}
+                socialLinkError={newPlayerSocialLinkError}
                 onSubmit={props.onSubmitNewPlayer}
               />
             ) : (
@@ -570,6 +574,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 isPending={isPending}
                 serverError={serverError}
                 emailSavedAs={newPlayerEmailSavedAs}
+                socialLinkError={newPlayerSocialLinkError}
                 onSubmit={props.onSubmitNewPlayer}
               />
             )

@@ -55,6 +55,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         nickname: text(body.nickname) || undefined,
         phone: phone?.success ? phone.data : undefined,
         email: text(body.email) || null,
+        socialLink: text(body.socialLink) || null,
         level,
         ...placementOf(body),
       }

@@ -1,3 +1,4 @@
+import { socialLinkAlreadySaved } from '@rotra/schema/social-link'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { leaderboardLevels } from '../fixtures/players'
 import { MockError } from '../mock/errors'
@@ -11,6 +12,7 @@ import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { savedPlayerName } from './clubNickname.rules'
 import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
 import { applyClubEmail, emailAlreadySaved, planClubEmail } from './email'
+import { applyClubSocial, planClubSocial, savedRecordForSocial } from './socialLink'
 
 function fail(text: string): never {
   throw new MockError('permission', text)
@@ -29,6 +31,8 @@ export type NewClubPlayerInput = {
   nickname?: string | null
   /** No email saves a guest; a phone is never asked (D-2026-11-16-04) */
   email?: string | null
+  /** #1019: a Facebook, Instagram, YouTube or LinkedIn link is an entry key too; it wins over the email */
+  socialLink?: string | null
 }
 
 /**
@@ -44,8 +48,15 @@ export function createClubPlayer(
   playingLevel: PlayingLevel | null = null,
 ): { player: ClubPlayer; how: string } {
   if (!input.name.trim()) fail('Enter your name.')
+  const social = planClubSocial(s, input.socialLink)
+  const sameLink = savedRecordForSocial(s, DEMO_CLUB_ID, social)
+  if (sameLink) {
+    const text = socialLinkAlreadySaved(savedDisplayName(s, sameLink))
+    throw new MockError('permission', text, { socialLink: text })
+  }
   const plan = planClubEmail(s, input.email)
-  if (plan.kind !== 'guest') {
+  // With a link the link decides who they are; the email's own owner is not checked (#1019).
+  if (plan.kind !== 'guest' && social.kind === 'none') {
     const same = savedRecordByEmail(s, DEMO_CLUB_ID, plan.email)
     if (same) {
       const text = emailAlreadySaved(savedDisplayName(s, same))
@@ -64,6 +75,10 @@ export function createClubPlayer(
     joinedVia: 'added',
   }
   s.clubPlayers.push(player)
+  if (social.kind !== 'none') {
+    const email = plan.kind === 'new' || plan.kind === 'pending' ? plan.email : null
+    return { player, how: ` · ${applyClubSocial(s, player, social, email)}` }
+  }
   if (plan.kind === 'guest') return { player, how: ' as a guest' }
   return { player, how: ` · ${applyClubEmail(s, player, plan)}` }
 }

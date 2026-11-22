@@ -121,6 +121,8 @@ export function resolvePendingEmails(s: MockState) {
   for (const row of s.clubPlayers) {
     const email = s.pendingEmails?.[row.id]
     if (!email || row.identity !== 'pending' || !isCurrentRecord(row)) continue
+    // A record with a pending social link is looked up by the link (#1019).
+    if (s.pendingSocialLinks?.[row.id]) continue
     if (savedRecordByEmail(s, row.clubId, email, row.id)) continue
     const account = accountByEmail(s, email)
     const unavailable =

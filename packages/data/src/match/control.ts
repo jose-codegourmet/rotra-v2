@@ -5,7 +5,7 @@ import { type MockState, readMockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
-import { recordsGames, sessionScoring } from '../queue-session/queueSession.types'
+import { sessionScoring } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SyncArea } from '../sync/sync.types'
 import {
@@ -208,9 +208,8 @@ export function swapWithQueue(input: {
  * except `holdCourtId`: the court the next-match picker (Q-NEXT-MATCH) opens for stays free, and
  * Skip for now hands it back to Auto Queue (fillOpenedCourts with afterSkip).
  *
- * A session with Record games off (D-2026-11-18-06): the match ends with no winner and no score,
- * whatever the call carries; nothing is validated or kept. It still counts toward each player's
- * games and the minimum, like any completed match.
+ * Record games off takes a winner and score like any session (D-2026-11-20-02); only the
+ * leaderboard, win-rate and rank reads leave the session out.
  */
 export function completeMatch(input: {
   matchId: string
@@ -233,20 +232,6 @@ export function completeMatch(input: {
           exceptCourtIds: input.holdCourtId ? [input.holdCourtId] : undefined,
         })
       const session = s.sessions.find((x) => x.id === m.sessionId)
-      if (session && !recordsGames(session)) {
-        m.state = 'completed'
-        m.endedAt = Date.now()
-        m.decision = {
-          kind: 'completed',
-          winningTeam: null,
-          teamAScore: null,
-          teamBScore: null,
-          confirmedAt: m.endedAt,
-        }
-        const placed = fill(),
-          where = courtNames(m, s.courts)
-        return `Match ${m.matchNo} done · ${where} free${autoFillNote(s, placed)}`
-      }
       // The session's scoring mode decides which scores are refused (missing reads as 16/31).
       const games = input.games?.length ? input.games.map((g) => ({ a: g.a, b: g.b })) : null
       const result = validateResult({

@@ -1,7 +1,7 @@
 import type { PlayingLevel } from '../player/player.types'
 import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
 import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
-import { hostRegistrationText } from '../session-host/rules'
+import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import type { RosterBatchOperation, RosterBatchResult } from '../session-roster/sessionRoster.types'

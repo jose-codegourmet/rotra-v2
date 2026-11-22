@@ -2279,10 +2279,30 @@ function applyHosts(s, ids) {
     s.hosts.push({ pid, at: now + i });
     if (R(s, pid) || (s.waitlist || []).some((w) => w.pid === pid)) return;
     const lv = (P(pid) || {}).sugg ?? null;
-    if (openSlots(s)) { s.roster.push({ pid, level: lv, present: false, locked: false, presentAt: now + i }); reg++; }
+    // Epic #1002 (#1005): added during play, a host's slot is present and the level locks, like any player admitted live.
+    if (openSlots(s)) { const live = s.status === 'active'; s.roster.push({ pid, level: lv, present: live, locked: live, presentAt: now + i }); reg++; }
     else { s.waitlist = [...(s.waitlist || []), { pid, level: lv, at: now + i }]; wait++; }
   });
   return { reg, wait };
+}
+// Epic #1002 (#1005): the compact Hosts card of Q-PREPARE and the live Settings. Add host reuses the Add host sheet (live mode);
+// Remove ends the host row only. The player keeps their slot or waitlist place, and withdrawing never removes a host.
+function hostsCard(s) {
+  const ids = currentHostIds(s), open = openSlots(s);
+  const where = (pid) => R(s, pid) ? 'Playing · has a slot' : (s.waitlist || []).some((w) => w.pid === pid) ? 'On the waitlist' : 'Not on the roster';
+  return `<section class="card ls-card" id="hosts-card" aria-labelledby="hc-h"><div class="between"><h3 id="hc-h">Hosts${ids.length ? ` · ${ids.length}` : ''}</h3><button type="button" class="btn sm" data-act="openHostPicker" data-live="1" ${saved().some((p) => !ids.includes(p.id)) ? '' : 'disabled'}>${I.plus || '+'} Add host</button></div>
+    ${ids.length ? `<div class="list">${ids.map((pid) => { const p = P(pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${where(pid)}</p></div>${chip('Host', 'ok')}<button type="button" class="btn sm ghost" data-act="removeSessionHost" data-id="${pid}" aria-label="Remove ${esc(p.name)} as a host">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted" style="margin:0">No hosts. Add your trusted hosts, or anyone from your saved players.</p>'}
+    <span class="hint small muted">${open ? `${open} slot${open === 1 ? '' : 's'} open. A new host takes one unless they're already in.` : "Every slot is taken. A new host who isn't in yet goes on the waitlist."} Removing a host keeps their player place${s.status === 'active' ? '' : ', and withdrawing keeps the host designation'}. Hosting doesn't let anyone sign in to Queue.</span></section>`;
+}
+// Adds one host to the current session (before or during play): the Q-SETUP rules (a slot while one is open, else the waitlist;
+// never a second registration). During play levels are locked, so a host who would take a place needs a saved level.
+function addLiveHost(pid) {
+  const s = cur(), p = P(pid); if (!s || !p || p.removed || currentHostIds(s).includes(pid)) return false;
+  if (s.status === 'active' && !R(s, pid) && !(s.waitlist || []).some((w) => w.pid === pid) && p.sugg == null) {
+    toast(`${p.name} has no saved level. Add them as a player with a level first, then add them as a host.`); return false;
+  }
+  const h = applyHosts(s, [...currentHostIds(s), pid]);
+  commit(`${p.name} added as a host${hostsText(h)}`); return true;
 }
 const hostsText = (h) => `${h.reg ? ` · ${h.reg} host${h.reg === 1 ? '' : 's'} registered` : ''}${h.wait ? ` · ${h.wait} host${h.wait === 1 ? '' : 's'} waitlisted` : ''}`;
 // Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
@@ -2617,6 +2637,7 @@ function syncLabel() {
 // Every saved change goes into a per-device sync log, grouped by the part of the session it touched, so the
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
+  pickHost: 'Session', confirmHostTrust: 'Session', removeSessionHost: 'Session',
   confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
@@ -4526,6 +4547,7 @@ function prepOverview(s) {
         <div class="row"><button class="btn sm" data-act="download" ${!S.online || s.download === 'downloading' ? 'disabled' : ''}>${s.download === 'ready' ? 'Update download' : 'Download for offline use'}</button></div>
         ${!S.online ? '<p class="small muted">Downloading needs an internet connection.</p>' : ''}</section>` : ''}
     </div>
+    ${hostsCard(s)}
     ${linkCard(s)}`;
 }
 // Settings tab during a live session: the setup summary as cards (owner artifact comment, November 19, 2026).
@@ -4581,7 +4603,7 @@ function liveSettings(s, est, present, allLink) {
   // Owner, November 19, 2026 ("all over the place"): courts in one row, then a 2×2 grid of even-height cards
   // (Game rules | Players, Costs | Notes), labels and values in two aligned columns.
   return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div>${allLink ? `<button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button>` : ''}</div>
-    <div class="ls-grid">${courts}${rules}${players}${money}${notes}</div></section>`;
+    <div class="ls-grid">${courts}${rules}${players}${hostsCard(s)}${money}${notes}</div></section>`;
 }
 // Settings tab before start (owner artifact comment, November 19, 2026): the setup as cards, each with Edit opening that step
 // of the session editor. Replaces the header's Edit preparation button.
@@ -4606,7 +4628,7 @@ function prepSettings(s) {
       <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div></section>`; })() : '';
   const notes = `<section class="card ls-card" aria-labelledby="ps-notes-h">${head('ps-notes-h', 'Notes', 2)}<p class="small${s.notes ? '' : ' muted'}" style="margin:0;white-space:pre-line">${s.notes ? esc(s.notes) : 'No notes. Notes show on the public session page.'}</p></section>`;
   return `<section class="stack" aria-labelledby="ps-h"><div class="ls-head"><div><h2 id="ps-h">Settings</h2><p class="small muted">Everything set when the session was made. Edit opens that part of the session editor; saving needs an internet connection.</p></div></div>
-    <div class="ls-grid">${when}${courts}${rules}${money}${notes}</div></section>`;
+    <div class="ls-grid">${when}${courts}${rules}${hostsCard(s)}${money}${notes}</div></section>`;
 }
 // ---------- Q-PREPARE ----------
 // Roster and levels panel. Level tabs follow each player's level family; Group by splits the list into headed
@@ -6094,7 +6116,8 @@ const SHEETS = {
   },
   // Epic #1002 (#1004): Session setup › Hosts › Add host. Trusted hosts first, then other saved players; hosts already picked are left out.
   hostPicker(sh) {
-    const d = S.ui.draft, q = (sh.q || '').trim().toLowerCase(), ids = (d && d.hosts) || [];
+    // Live mode (#1005): the picked hosts are the session's current hosts, not the setup draft's.
+    const d = S.ui.draft, q = (sh.q || '').trim().toLowerCase(), ids = sh.live ? currentHostIds(cur()) : (d && d.hosts) || [];
     const list = saved().filter((p) => !ids.includes(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q)));
     const trusted = trustedHosts().map((h) => P(h.pid)).filter((p) => list.includes(p)), others = list.filter((p) => !isTrustedHost(p.id)).sort((a, b) => a.name.localeCompare(b.name));
     const row = (p, t) => `<button class="opt" data-act="pickHost" data-id="${p.id}" aria-label="${t ? `Add ${esc(p.name)} as a host` : `Add ${esc(p.name)} as a host and a trusted host`}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b>${p.nick ? `<div class="small muted">“${esc(p.nick)}”</div>` : ''}</div>${t ? chip('Trusted host', 'ok') : identChip(p)}</button>`;
@@ -6107,7 +6130,7 @@ const SHEETS = {
     const p = P(sh.id);
     return sheetShell(`Add ${esc(p.name)} as a trusted host?`, `<p>This permanently adds ${esc(short(p.id))} to your club's trusted hosts, so they're listed first in the host picker from now on. You can remove them later in Club settings › Trusted hosts.</p>
       <p class="small muted">They host this session and are registered as a player unless they're already in. Hosting doesn't let them sign in to Queue.</p>`,
-      `<button class="btn" data-act="openHostPicker" data-autofocus>Back</button><button class="btn primary" data-act="confirmHostTrust" data-id="${p.id}">Add trusted host</button>`);
+      `<button class="btn" data-act="openHostPicker" ${sh.live ? 'data-live="1" ' : ''}data-autofocus>Back</button><button class="btn primary" data-act="confirmHostTrust" data-id="${p.id}">Add trusted host</button>`);
   },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
@@ -7129,18 +7152,34 @@ const ACT = {
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
   openAddTrustedHost: () => openSheet({ type: 'addTrustedHost', q: '' }),
   // Epic #1002 (#1004): Session setup › Hosts. A non-trusted saved player needs the confirmation, which adds them to the trusted hosts.
-  openHostPicker: () => openSheet({ type: 'hostPicker', q: '' }),
+  openHostPicker: (d) => openSheet({ type: 'hostPicker', q: '', live: !!(d && d.live) }),
   pickHost: (d) => {
-    const dr = S.ui.draft, p = P(d.id); if (!dr || !p || p.removed || (dr.hosts || []).includes(p.id)) return;
+    const live = !!(S.ui.sheet && S.ui.sheet.live), p = P(d.id);
+    // Epic #1002 (#1005): during or before the session (Q-PREPARE Hosts card). A non-trusted saved player needs the same confirmation.
+    if (live) {
+      if (!p || p.removed) return;
+      if (!isTrustedHost(p.id)) { openSheet({ type: 'confirmHostTrust', id: p.id, live: true }); return; }
+      S.ui.sheet = null; if (!addLiveHost(p.id)) save(); render(); return;
+    }
+    const dr = S.ui.draft; if (!dr || !p || p.removed || (dr.hosts || []).includes(p.id)) return;
     if (!isTrustedHost(p.id)) { openSheet({ type: 'confirmHostTrust', id: p.id }); return; }
     (dr.hosts = dr.hosts || []).push(p.id); S.ui.sheet = null; render(); toast(`${p.name} added as a host`);
   },
   confirmHostTrust: (d) => {
+    if (S.ui.sheet && S.ui.sheet.live) {
+      const p = P(d.id); if (!p || p.removed) return;
+      // The level check comes first, so a refused host is not added to the trusted hosts.
+      const s = cur(); if (s.status === 'active' && !R(s, p.id) && !(s.waitlist || []).some((w) => w.pid === p.id) && p.sugg == null) { S.ui.sheet = null; render(); toast(`${p.name} has no saved level. Add them as a player with a level first, then add them as a host.`); return; }
+      if (!isTrustedHost(p.id)) (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() });
+      S.ui.sheet = null; addLiveHost(p.id); render(); return;
+    }
     const dr = S.ui.draft, p = P(d.id); if (!dr || !p || p.removed) return;
     if (!isTrustedHost(p.id)) (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() });
     if (!(dr.hosts || []).includes(p.id)) (dr.hosts = dr.hosts || []).push(p.id);
     S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts and as a host`);
   },
+  // Epic #1002 (#1005): ends the host row only; the player keeps their slot or waitlist place and stays a trusted host.
+  removeSessionHost: (d) => { const s = cur(), row = ((s && s.hosts) || []).find((h) => h.pid === d.id && !h.removed); if (!row) return; row.removed = Date.now(); commit(`${nm(d.id)} removed as a host`); render(); },
   removeDraftHost: (d) => { const dr = S.ui.draft; if (!dr) return; dr.hosts = (dr.hosts || []).filter((x) => x !== d.id); render(); toast(`${nm(d.id)} removed as a host`); },
   addTrustedHost: (d) => { const p = P(d.id); if (!p || p.removed || isTrustedHost(p.id)) return; (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() }); S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts`); },
   openRemoveTrustedHost: (d) => openSheet({ type: 'removeTrustedHost', id: d.id }),
@@ -7762,6 +7801,8 @@ const ACT = {
   },
   giveSlot: (d) => {
     const s = cur(); const w = (s.waitlist || []).find((x) => x.pid === d.pid); if (!w) return;
+    // Epic #1002 (#1005): a host with no saved level waits without one; a slot needs a level first.
+    if (w.level == null) { toast('Choose a level before giving a slot.'); return; }
     if (needsOverfill(s, nm(w.pid), 'giveSlot', d, false)) return;
     const over = !openSlots(s);
     s.waitlist = s.waitlist.filter((x) => x.pid !== d.pid);
@@ -7769,7 +7810,8 @@ const ACT = {
     commit(`${nm(w.pid)} got a slot${s.status === 'active' ? ' · level locked' : ''}${over ? ` · now ${s.roster.length} players for ${capacityOf(s)} slots` : ''}`); render();
   },
   fillSlots: () => {
-    const s = cur(); const take = waitOf(s).slice(0, openSlots(s));
+    // Waiters without a level (a host with no saved level) are skipped.
+    const s = cur(); const take = waitOf(s).filter((w) => w.level != null).slice(0, openSlots(s));
     take.forEach((w) => { s.roster.push({ pid: w.pid, level: w.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() }); });
     s.waitlist = (s.waitlist || []).filter((w) => !take.includes(w));
     commit(`${take.length} player${take.length > 1 ? 's' : ''} moved from the waitlist`); render();

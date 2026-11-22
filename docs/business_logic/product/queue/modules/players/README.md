@@ -29,7 +29,7 @@ Offline, Player Information lookup is unavailable. The operator adds the person 
 - Removal is kept as history (the row gets a removal time); adding the same player again starts a new entry.
 - A saved player the club deletes, or moves into another saved player (Same person), drops off the list.
 - Online only, like the rest of Club settings.
-- Session hosts are picked from this list first in session setup; picking another saved player there asks, then adds them to this list permanently. Each host is registered as a player (#1004, [sessions › Session hosts](../sessions/README.md#session-hosts)). The Host badge and the public Hosts section follow in the later tickets of epic #1002, under the same decision.
+- Session hosts are picked from this list first in session setup; picking another saved player there asks, then adds them to this list permanently. Each host is registered as a player (#1004, [sessions › Session hosts](../sessions/README.md#session-hosts)); hosts can also be added or removed before and during the session (#1005, same section). The Host badge and the public Hosts section follow in the later tickets of epic #1002, under the same decision.
 
 ## Saved player statistics
 

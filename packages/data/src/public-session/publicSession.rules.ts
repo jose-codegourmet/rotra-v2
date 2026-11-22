@@ -5,6 +5,7 @@ import type { MockState } from '../mock/store'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
+import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import type {
   ParticipantStats,
   ParticipantStatsRead,
@@ -99,6 +100,8 @@ export function closeSessionRequests(state: MockState, sessionId: string, now = 
       m.status = 'closed'
       m.decidedAt = now
     }
+  // #1011: a transfer can only be pending before Start, so here that is Cancel session.
+  closePendingSlotTransfers(state, sessionId, 'cancelled', now)
 }
 
 /** The club player records of the club linked to this Player account. */

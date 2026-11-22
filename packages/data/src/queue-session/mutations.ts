@@ -22,6 +22,7 @@ import { validateSessionCost } from '../session-cost/validation'
 import { assignSessionHosts } from '../session-host/fetchers'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
+import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import { saveToastText } from '../sync/fetchers'
 import {
   atWhenLabel,
@@ -385,6 +386,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
         r.decidedAt = now
         closed++
       }
+    // #1011: pending slot transfers expire at Start; the slot stays with the sender.
+    closePendingSlotTransfers(state, sessionId, 'expired', now)
     return {
       data: s,
       text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}${joinRequestsClosedNote(closed)}`,

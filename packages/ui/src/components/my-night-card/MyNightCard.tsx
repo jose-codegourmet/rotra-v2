@@ -19,13 +19,22 @@ export type MyNightCardProps = {
   startsLabel?: string
   /** Before start: the player already told the Queue Master they can't make it */
   cantMakeItSent?: boolean
+  /**
+   * Before start: the player's own pending slot transfer (#1011), as the recipient's name. Shows
+   * “Transfer to NAME requested · the QM decides” and Withdraw request instead of Transfer my slot.
+   */
+  transferPendingTo?: string
+  /** Before start: Transfer my slot (#1011); omit to hide it */
+  onTransfer?: () => void
+  /** Withdraw request on the pending transfer */
+  onWithdrawTransfer?: () => void
   /** Live, not present: the player tapped I'm leaving earlier tonight */
   hasLeft?: boolean
   /** Live, not present: the club turned self check-in off; the player cannot tap I'm here */
   selfCheckInOff?: boolean
   /** Live, present: the player checked in themselves this session */
   checkedIn?: boolean
-  /** This device is offline: I'm leaving, I can't make it, Cancel, Request a match and Invite are disabled ("You're offline. Reconnect and try again."); I'm here still works and the Queue Master sees the check-in after a sync */
+  /** This device is offline: I'm leaving, I can't make it, Transfer my slot, Cancel, Request a match and Invite are disabled ("You're offline. Reconnect and try again."); I'm here still works and the Queue Master sees the check-in after a sync */
   offline?: boolean
   /** Live, present: games played, won, lost */
   games?: number
@@ -138,6 +147,9 @@ export function MyNightCard({
   waitlistPosition,
   startsLabel,
   cantMakeItSent = false,
+  transferPendingTo,
+  onTransfer,
+  onWithdrawTransfer,
   hasLeft = false,
   selfCheckInOff = false,
   checkedIn = false,
@@ -180,6 +192,20 @@ export function MyNightCard({
       actions.push(
         <Button key="cant" onClick={onCantMakeIt} disabled={blocked} title={offlineTitle}>
           I can't make it
+        </Button>,
+      )
+    // #1011: one pending transfer per slot; the QM approves or rejects it before the start.
+    if (transferPendingTo) {
+      lines.push(`Transfer to ${transferPendingTo} requested · the QM decides`)
+      actions.push(
+        <Button key="withdraw" onClick={onWithdrawTransfer} disabled={blocked} title={offlineTitle}>
+          Withdraw request
+        </Button>,
+      )
+    } else if (onTransfer)
+      actions.push(
+        <Button key="transfer" onClick={onTransfer} disabled={blocked} title={offlineTitle}>
+          Transfer my slot
         </Button>,
       )
   } else if (stage === 'finished') {

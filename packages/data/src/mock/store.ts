@@ -79,6 +79,7 @@ import type {
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
+import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
 import type { ClubTrustedHost } from '../trusted-host/trustedHost.types'
 import { NotConnectedError } from './errors'
@@ -144,6 +145,8 @@ export type MockState = {
   matchRequests: MatchRequest[]
   /** Session invite codes (D-2026-11-09-08): one per Player and session */
   sessionInviteCodes: SessionInviteCode[]
+  /** Slot transfers (#1011) in every state; decided ones stay. Missing in older saved states */
+  slotTransfers?: SlotTransfer[]
   /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
   /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
@@ -268,6 +271,7 @@ function seedState(): MockState {
     dropOutNotices: requests.dropOutNotices,
     matchRequests: requests.matchRequests,
     sessionInviteCodes: requests.sessionInviteCodes,
+    slotTransfers: requests.slotTransfers,
     licensePayments: adminClubTerms,
     clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},

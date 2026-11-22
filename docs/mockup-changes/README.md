@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 198 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 199 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -458,5 +458,6 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 198 · CANCELLED: 4 · 
 | [2026-11-22-queue-payment-status-share](2026-11-22-queue-payment-status-share.md) | Queue: Share payment status, numbered Paid, Partial and Unpaid text, in Payments and on the public page | payment-status-share-sheet (new), payments-checklist (extended with `onShareStatus`), sheet, segmented-control | IN MOCK APP — #1010 |
 | [2026-11-22-queue-public-hosts](2026-11-22-queue-public-hosts.md) | Public session page: a compact Hosts section above Players and Waitlisted | public-hosts, public-participants | IN MOCK APP — #1006 |
 | [2026-11-22-queue-session-hosts](2026-11-22-queue-session-hosts.md) | Session setup gets an optional Hosts field: pick several hosts, each registered as a player | setup-hosts-section, host-picker-sheet, session-setup-form, setup-notes-review-section | IN MOCK APP — #1004 |
+| [2026-11-22-queue-slot-transfer](2026-11-22-queue-slot-transfer.md) | Queue: Transfer my slot, the player's request and the Queue Master's Approve or Reject before Start | slot-transfer-row (new), forms/slot-transfer-form (new), join-requests-panel (extended with `transfers`), my-night-card (extended with `onTransfer`, `transferPendingTo`, `onWithdrawTransfer`) | IN MOCK APP — #1011 |
 | [2026-11-22-queue-trusted-hosts](2026-11-22-queue-trusted-hosts.md) | Club settings gets a Trusted hosts section: add and remove trusted hosts from saved players | trusted-hosts-panel, club-settings-menu | IN MOCK APP — #1003 |
 <!-- status-index:end -->

@@ -9,6 +9,8 @@
 enum RosterReleaseReason {
   demoted
   removed
+  /// An approved slot transfer (#1011) handed this entry's slot to another player.
+  transferred
 
   @@map("roster_release_reason")
 }
@@ -70,6 +72,9 @@ model SessionPlayer {
   paymentMark SessionPaymentMark?
 
   dropOutNotices SessionDropOutNotice[]
+
+  slotTransfersSent     SessionSlotTransfer[] @relation("SlotTransferSender")
+  slotTransfersReceived SessionSlotTransfer[] @relation("SlotTransferRecipient")
 
   facts   PlayerMatchFact[]
   summary ClubSessionPlayerSummary?

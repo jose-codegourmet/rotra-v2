@@ -80,7 +80,7 @@ export function realGetMyJoinRequest(slug: string) {
  * **Request to join as NAME** / **Cancel request**: credentialed calls to the Player app, which
  * reads the Player's own sign-in. No Player token or cookie is ever copied into the Queue app.
  */
-async function playerPost<T>(slug: string, action: string, body: Record<string, unknown>) {
+export async function playerPost<T>(slug: string, action: string, body: Record<string, unknown>) {
   const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
   if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
   return realRequest<T>(`${origin}${base(slug)}/${action}`, {
@@ -168,13 +168,18 @@ export async function realGetMyNight(slug: string): Promise<MyNight> {
   const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
   if (!origin) throw new Error('Sign in with ROTRA Player to see your night.')
   const wire = await realRequest<
-    Omit<MyNight, 'matchRequest'> & {
+    Omit<MyNight, 'matchRequest' | 'slotTransfer'> & {
       matchRequest: (Omit<NonNullable<MyNight['matchRequest']>, 'at'> & { at: string }) | null
+      /** Missing on a server from before slot transfers (#1011) */
+      slotTransfer?: (Omit<NonNullable<MyNight['slotTransfer']>, 'at'> & { at: string }) | null
     }
   >(`${origin}${base(slug)}/my-night`, { credentials: 'include' })
   return {
     ...wire,
     matchRequest: wire.matchRequest && { ...wire.matchRequest, at: msOf(wire.matchRequest.at) },
+    slotTransfer: wire.slotTransfer
+      ? { ...wire.slotTransfer, at: msOf(wire.slotTransfer.at) }
+      : null,
   }
 }
 

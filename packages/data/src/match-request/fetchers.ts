@@ -16,6 +16,7 @@ import {
   realSendMatchRequest,
 } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
+import { slotTransferViews } from '../slot-transfer/slotTransferViews'
 import {
   allowedRequestFormats,
   closeStaleMatchRequests,
@@ -131,7 +132,7 @@ export function sessionRequests(state: MockState, sessionId: string): SessionReq
     const mark = selfCheckInMark(r)
     if (mark) selfCheckIn[r.id] = mark
   }
-  const empty = { total: 0, join: 0, joinRequests: 0, dropOuts: 0, match: 0 }
+  const empty = { total: 0, join: 0, joinRequests: 0, dropOuts: 0, transfers: 0, match: 0 }
   // Finished, invalid and cancelled sessions show no requests (closed, kept on the record).
   if (!sessionTakesRequests(session))
     return {
@@ -140,6 +141,7 @@ export function sessionRequests(state: MockState, sessionId: string): SessionReq
       counts: empty,
       join: [],
       dropOuts: [],
+      transfers: [],
       match: [],
       selfCheckIn,
     }
@@ -199,6 +201,7 @@ export function sessionRequests(state: MockState, sessionId: string): SessionReq
       name: nameOf(d.pid),
       nickname: byId.get(d.pid)?.nicknameSnapshot ?? null,
     }))
+  const transfers = slotTransferViews(state, session.id, byId)
   const present = new Set(roster.filter((r) => r.present).map((r) => r.id))
   const match = state.matchRequests
     .filter(
@@ -220,14 +223,16 @@ export function sessionRequests(state: MockState, sessionId: string): SessionReq
     sessionId,
     minimum: session.minimumGames,
     counts: {
-      total: join.length + dropOuts.length + match.length,
-      join: join.length + dropOuts.length,
+      total: join.length + dropOuts.length + transfers.length + match.length,
+      join: join.length + dropOuts.length + transfers.length,
       joinRequests: join.length,
       dropOuts: dropOuts.length,
+      transfers: transfers.length,
       match: match.length,
     },
     join,
     dropOuts,
+    transfers,
     match,
     selfCheckIn,
   }

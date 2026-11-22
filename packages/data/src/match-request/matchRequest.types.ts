@@ -1,6 +1,7 @@
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { DropOutNotice, SessionJoinRequest } from '../session-roster/sessionRoster.types'
+import type { SlotTransferView } from '../slot-transfer/slotTransfer.types'
 
 /**
  * **Request a match** from a present, signed-in, confirmed Player (D-2026-11-09-05). Ids are roster
@@ -88,12 +89,14 @@ export type SessionRequests = {
   /** The session's minimum games, for “N of MIN games” on match request cards */
   minimum: number
   counts: {
-    /** The Requests · N button: pending join requests + open drop-out notices + open match requests */
+    /** The Requests · N button: pending join requests + open drop-out notices + pending slot transfers + open match requests */
     total: number
-    /** The Join tab: pending join requests + open drop-out notices */
+    /** Before Start: pending join requests + open drop-out notices + pending slot transfers */
     join: number
     joinRequests: number
     dropOuts: number
+    /** Pending slot transfers (#1011); missing on a server from before transfers */
+    transfers?: number
     /** The Match tab */
     match: number
   }
@@ -101,6 +104,8 @@ export type SessionRequests = {
   join: JoinRequestView[]
   /** Open drop-out notices, oldest first (“Can't make it · N” at the top of Join) */
   dropOuts: DropOutNoticeView[]
+  /** Pending slot transfers (#1011), oldest first (“Slot transfers · N”, after the drop-out notices) */
+  transfers: SlotTransferView[]
   /** Open match requests, oldest first */
   match: MatchRequestView[]
   /** Roster row id → its own-action mark; rows without one are absent */

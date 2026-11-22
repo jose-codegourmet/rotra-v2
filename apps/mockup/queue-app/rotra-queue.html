@@ -2206,6 +2206,8 @@ function seedSessions() {
       ],
       // Epic #1002 (#1006): Miguel hosts and plays (Hosts and Players, one slot); Gab Torres hosts without playing (Hosts only).
       hosts: [{ pid: 'p1', at: Date.now() - 36e5 }, { pid: 'p17', at: Date.now() - 36e5 + 1 }],
+      // #1011: Dani asks to hand her confirmed slot to Cara, a registered ROTRA player who is not in this session.
+      transfers: [{ id: 't-seed-dani', pid: 'p13', to: 'p25', at: Date.now() - 20 * 60000, status: 'pending' }],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
     },
@@ -2662,7 +2664,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   pickHost: 'Session', confirmHostTrust: 'Session', removeSessionHost: 'Session',
-  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
+  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', approveTransfer: 'Roster', rejectTransfer: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
@@ -4379,7 +4381,22 @@ const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open'
 const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
-const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length; };
+// #1011 slot transfers: a confirmed signed-in player asks to give their slot to another registered ROTRA player; the QM approves
+// or rejects before Start. Pending ones expire at Start and are cancelled with the session. Decided ones stay on the record.
+const pendingTransfers = (s) => (s.status === 'prepared' ? (s.transfers || []) : []).filter((t) => t.status === 'pending' && R(s, t.pid)).sort((a, b) => a.at - b.at);
+const myTransfer = (s, pid) => (s.transfers || []).find((t) => t.pid === pid && t.status === 'pending') || null;
+const closeTransfers = (s, status) => (s.transfers || []).forEach((t) => { if (t.status === 'pending') { t.status = status; t.decidedAt = Date.now(); } });
+const RTR_SHAPE = /^RTR-[A-Z]{2}-[A-Z]{3}-\d{6}-\d{4}$/;
+// Exact RTR ID only, registered ROTRA players only (a saved player of this club or one found in Player Information). Never a guest
+// or an unclaimed person, never a name search.
+const transferRecipient = (rtr) => {
+  const mine = S.players.find((p) => !p.removed && p.identity === 'registered' && p.rtr === rtr);
+  if (mine) return { id: mine.id, name: mine.name, rtr: mine.rtr, sugg: mine.sugg ?? null, dir: null };
+  const g = DIRECTORY.find((x) => x.identity === 'registered' && x.rtr === rtr);
+  return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, dir: g } : null;
+};
+const transferTo = (t) => P(t.to) || (() => { const g = DIRECTORY.find((x) => x.id === t.to); return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, identity: 'registered' } : null; })();
+const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length + pendingTransfers(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 // D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
 const inviterOf = (s, r) => { if (!r.inviteCode) return null; const row = [...s.roster, ...(s.waitlist || [])].find((x) => x.inviteCode === r.inviteCode); return row ? P(row.pid) : null; };
@@ -4420,23 +4437,25 @@ function linkCard(s) {
   </section></div>`;
 }
 function requestsPanel(s, inSheet) {
-  const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
+  const joins = pendingReqs(s), drops = openDropOuts(s), trs = pendingTransfers(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
   // Owner comments, November 11, 2026: before Start there are only join requests and drop-out notices; once the session is live there
   // are only match requests (join requests close at Start; the Queue Master adds late players directly). So there are no tabs.
   const live = s.status === 'active';
   const tab = live ? 'match' : 'join';
-  const n = live ? mrs.length : joins.length + drops.length;
-  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests and drop-out notices from the session page'}. Nothing changes until you act on one.</p></div>`;
+  const n = live ? mrs.length : joins.length + drops.length + trs.length;
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests, drop-out notices and slot transfers from the session page'}. Nothing changes until you act on one.</p></div>`;
   const tabs = '';
   let body;
   if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
   else {
     const dropList = drops.length ? `<section class="stack tight" aria-labelledby="rq-drop-h"><h3 id="rq-drop-h" style="margin:0;font-size:14px">Can't make it · ${drops.length}</h3><p class="small muted">The slot stays until you remove the player.</p><div class="list">${drops.map((d) => dropOutRow(s, d)).join('')}</div></section>` : '';
-    const joinList = joins.length ? `<div class="stack tight">${drops.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
+    // #1011: pending slot transfers sit after the drop-out notices. Approve hands the slot over; the slot count never changes.
+    const trList = trs.length ? `<section class="stack tight" aria-labelledby="rq-tr-h"><h3 id="rq-tr-h" style="margin:0;font-size:14px">Slot transfers · ${trs.length}</h3><p class="small muted">Nothing changes until you approve. Requests still waiting at the start close.</p><div class="list">${trs.map((t) => transferRow(s, t)).join('')}</div></section>` : '';
+    const joinList = joins.length ? `<div class="stack tight">${drops.length || trs.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
       <div class="list">${joins.map((r) => joinReqCard(s, r, full)).join('')}</div></div>`
       : `<p class="small muted">No join requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Anyone who opens the session link can ask for a slot; they show up here.'}</p>`;
-    body = dropList + joinList;
+    body = dropList + trList + joinList;
   }
   return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests">${head}${tabs}<div id="rq-panel" role="tabpanel" aria-labelledby="rqt-${tab}" class="stack">${body}</div></section>`;
 }
@@ -4467,6 +4486,17 @@ function dropOutRow(s, d) {
   const p = P(d.pid);
   return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
       <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
+}
+// #1011: the sender, who they want to give the slot to (name and RTR ID), whether that player is waitlisted, their level here, Reject / Approve.
+function transferRow(s, t) {
+  const p = P(t.pid), to = transferTo(t) || { name: 'Unknown', rtr: '' };
+  const wl = waitOf(s).findIndex((w) => w.pid === t.to) + 1;
+  const lv = t.level ?? (wl ? waitOf(s)[wl - 1].level : null) ?? to.sugg ?? null;
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Asks to transfer their slot · ${fmtWhen(t.at, { lower: true })}</p><p class="small"><b>To ${esc(to.name)} · <span class="mono" style="font-weight:400">${esc(to.rtr)}</span></b></p></div>${wl ? chip(`Waitlist #${wl}`, 'ok') : chip('Not in this session')}</div>
+      <p class="small muted">Approving gives the slot to ${esc(to.name)}${wl ? ', who leaves the waitlist' : ''}. ${esc(p.name)} comes off the roster. The slot count stays the same.</p>
+      <div class="req-actions">${selectLevel(`tr-lv-${t.id}`, lv, `data-act-change="trLevel" data-id="${t.id}" aria-label="Level for ${esc(to.name)}"`, t.err && lv == null)}
+        <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button><button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
+      ${t.err ? `<span class="err">${esc(t.err)}</span>` : ''}</div>`;
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
 function matchReqCard(s, mr) {
@@ -5653,6 +5683,10 @@ function myNight(s) {
     lines.push(`Confirmed · starts ${fmtDate(s.start)}, ${fmtTime(s.start)}`);
     if (d) lines.push('Told the QM you can\'t make it');
     else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
+    // #1011: one pending slot transfer per slot; the QM approves or rejects it before the start.
+    const tr = myTransfer(s, v.id), trTo = tr && transferTo(tr);
+    if (tr) { lines.push(`Transfer to ${esc(trTo ? trTo.name : 'another player')} requested · the QM decides`); acts.push('<button class="btn" data-act="withdrawTransfer">Withdraw request</button>'); }
+    else acts.push('<button class="btn" data-act="openSlotTransfer">Transfer my slot</button>');
   } else if (s.status === 'finalized') {
     lines.push('Session finished'); stats = statBlock(0);
     // Artifact comment, November 13, 2026: no Match history button here; the history is right below on the page.
@@ -6835,6 +6869,15 @@ const SHEETS = {
       <p class="small muted">Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.</p>`,
       '<button class="btn" data-act="closeSheet">Keep queue</button><button class="btn danger fill" data-act="confirmClearQueue">Clear queue</button>');
   },
+  // #1011 Transfer my slot: the full RTR ID of another registered ROTRA player, Find, check the name, then Send transfer request.
+  slotTransfer(sh) {
+    const s = cur(), f = sh.found;
+    const found = f ? `<div class="li" style="padding:10px;border:1px solid var(--border);border-radius:10px">${avatar(P(f.id) || { id: f.id, name: f.name, identity: 'registered' })}<div class="main"><b>${esc(f.name)}</b><div class="small muted mono">${esc(f.rtr)}</div><p class="small muted">${f.wl ? `On the waitlist #${f.wl} · leaves the waitlist if approved` : 'Not in this session yet'}</p></div></div>` : '';
+    return sheetShell('Transfer my slot', `<p class="small muted">Give your slot to another ROTRA player. The Queue Master approves it before the session starts (${fmtDate(s.start)}, ${fmtTime(s.start)}); until then you keep your slot. Requests still waiting at the start close.</p>
+      <label class="field"><span>Their RTR ID</span><input class="input mono${sh.err ? ' bad' : ''}" id="st-rtr" data-bind="ui.sheet.q" value="${esc(sh.q || '')}" placeholder="RTR-PH-CEB-102926-0001" autocomplete="off" autocapitalize="characters" spellcheck="false" data-autofocus>${sh.err ? `<span class="err">${esc(sh.err)}</span>` : '<span class="hint">Ask them for the RTR ID on their ROTRA profile.</span>'}</label>
+      <button class="btn" data-act="findTransfer">Find</button>${found}`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendTransfer" ${f ? '' : 'disabled'}>Send transfer request</button>`);
+  },
   cancelSession(sh) {
     const s = cur(), pay = s.payments || {};
     const paidN = s.roster.filter((r) => pay[r.pid]).length, wl = (s.waitlist || []).length;
@@ -7313,6 +7356,31 @@ const ACT = {
   // D-2026-11-09-03: self check-in, I'm leaving, I can't make it. All write to the roster; the QM's last action wins.
   imHere: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = true; r.presentAt = Date.now(); r.selfCheckedIn = true; r.selfCheckedInAt = Date.now(); r.selfLeft = false; if (!S.online) S.pending += 1; save(); render(); toast(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs'); },
   imLeaving: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = false; r.selfLeft = true; r.leftAt = Date.now(); const mr = openMatchReq(s, r.pid); if (mr) mr.status = 'closed'; if (!S.online) S.pending += 1; save(); render(); toast('Told the QM you\'re leaving'); },
+  // #1011 Transfer my slot (signed-in confirmed player, before the start only).
+  openSlotTransfer: () => { const s = cur(), v = pubViewer(); if (!v || s.status !== 'prepared' || !R(s, v.id) || myTransfer(s, v.id)) return; openSheet({ type: 'slotTransfer', q: '', found: null, err: '' }); },
+  findTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const q = (sh.q || '').trim().toUpperCase(); sh.q = q; sh.found = null; sh.err = '';
+    if (!RTR_SHAPE.test(q)) sh.err = 'Enter the full RTR ID, like RTR-PH-CEB-102926-0001.';
+    else {
+      const f = transferRecipient(q);
+      if (!f) sh.err = 'No registered ROTRA player has that RTR ID.';
+      else if (f.id === v.id) sh.err = 'That\'s your own RTR ID.';
+      else if (R(s, f.id)) sh.err = `${f.name} already has a slot in this session.`;
+      else sh.found = { ...f, wl: waitOf(s).findIndex((w) => w.pid === f.id) + 1 };
+    }
+    render();
+  },
+  sendTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const f = sh.found;
+    if (!f || f.rtr !== (sh.q || '').trim().toUpperCase()) { sh.found = null; sh.err = 'Tap Find to check the RTR ID first.'; render(); return; }
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    s.transfers = [...(s.transfers || []), { id: `t${Date.now()}`, pid: v.id, to: f.id, at: Date.now(), status: 'pending' }];
+    S.ui.sheet = null; save(); render(); toast(`Transfer to ${f.name} sent · the QM decides`);
+  },
+  withdrawTransfer: () => { const s = cur(), v = pubViewer(), t = v && myTransfer(s, v.id); if (!t) return; t.status = 'withdrawn'; t.decidedAt = Date.now(); save(); render(); toast('Transfer request withdrawn'); },
   cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
   // D-2026-11-09-05, player side: Request a match.
   openMatchReq: () => { const s = cur(), a = reqAllowed(s); if (!REQ_FORMATS.some((k) => a[k])) { toast('This session isn\'t taking match requests'); return; } openSheet({ type: 'matchReq', format: REQ_FORMATS.find((k) => a[k]), partners: [], opp: [] }); },
@@ -7403,6 +7471,25 @@ const ACT = {
   // D-2026-11-09-03: drop-out notices. The slot never frees by itself.
   keepDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'kept'; x.closedAt = Date.now(); commit(`${nm(x.pid)} stays on the roster`); render(); },
   removeDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'removed'; x.closedAt = Date.now(); s.roster = s.roster.filter((r) => r.pid !== x.pid); commit(`${nm(x.pid)} removed from the roster`); render(); },
+  // #1011, QM side: Approve hands the slot over in one change (the recipient takes the sender's place in slot order; a waitlisted
+  // recipient leaves the waitlist; the slot count never changes). Reject leaves the sender's slot and payment exactly as they were.
+  approveTransfer: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return;
+    const to = transferTo(t), wl = waitOf(s).find((w) => w.pid === t.to);
+    const lv = t.level ?? wl?.level ?? to?.sugg ?? null;
+    if (lv == null) { t.err = 'Choose a level for this club before approving.'; render(); const f = document.getElementById(`tr-lv-${t.id}`); if (f) f.focus(); return; }
+    if (R(s, t.to)) { t.err = `${to.name} already has a slot in this session.`; render(); return; }
+    const g = DIRECTORY.find((x) => x.id === t.to);
+    if (!P(t.to) && g) S.players.push({ id: g.id, name: g.name, nick: '', identity: 'registered', rtr: g.rtr, sugg: g.sugg ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' });
+    const i = s.roster.findIndex((r) => r.pid === t.pid), sender = nm(t.pid);
+    s.roster.splice(i, 1, { pid: t.to, level: +lv, present: false, locked: false, presentAt: Date.now() });
+    s.waitlist = (s.waitlist || []).filter((w) => w.pid !== t.to);
+    (s.requests || []).forEach((r) => { if (r.status === 'pending' && (r.pid === t.to || (to?.rtr && r.account === to.rtr))) r.status = 'closed'; });
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    t.status = 'approved'; t.decidedAt = Date.now(); t.level = +lv; t.fromWaitlist = !!wl; t.err = '';
+    commit(`${sender}'s slot now belongs to ${to.name}`); render();
+  },
+  rejectTransfer: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return; t.status = 'rejected'; t.decidedAt = Date.now(); commit(`Transfer rejected · ${nm(t.pid)} keeps the slot`); render(); },
   // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.
   addMatchReq: (d) => {
     const s = cur(), mr = openMatchReqs(s).find((x) => x.id === d.id); if (!mr) return;
@@ -7439,6 +7526,8 @@ const ACT = {
     s.status = 'cancelled'; s.cancelledAt = Date.now(); s.cancelReason = reason || null;
     // Join requests close with the session; the record keeps them as closed.
     (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
+    // #1011: pending slot transfers are cancelled with the session.
+    closeTransfers(s, 'cancelled');
     S.ui.sheet = null; commit(`${s.title} cancelled`); go('history', s.id);
   },
   peekSession: (d) => openSheet({ type: 'peek', id: d.id }),
@@ -8003,6 +8092,8 @@ const ACT = {
     // Owner comment, November 11, 2026: join requests end at Start. Pending ones close; the public page tells visitors to ask at the venue.
     const closed = (s.requests || []).filter((r) => r.status === 'pending');
     closed.forEach((r) => { r.status = 'closed'; r.closedAt = s.startedAt; });
+    // #1011: pending slot transfers expire at Start; every slot stays with its holder.
+    closeTransfers(s, 'expired');
     S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}${closed.length ? ` · ${closed.length} join request${closed.length === 1 ? '' : 's'} closed` : ''}`); render(); window.scrollTo(0, 0);
   },
   pane: (d) => { S.ui.pane = d.k; render(); },
@@ -8379,6 +8470,7 @@ const CHANGE = {
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },
   rvSet: (el) => { S.ui.rv = { ...(S.ui.rv || {}), [el.dataset.k]: el.value }; render(); },
+  trLevel: (el) => { const t = (cur().transfers || []).find((x) => x.id === el.dataset.id); if (!t) return; t.level = el.value === '' ? null : +el.value; t.err = ''; render(); },
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },
   spSet: (el) => { S.ui.spf = { ...(S.ui.spf || {}), [el.dataset.k]: el.value }; render(); },
   draftSel: (el) => { S.ui.draft[el.dataset.k] = el.value; if (el.dataset.k === 'repeat' && !S.ui.draft.repeatCount) S.ui.draft.repeatCount = 4; delete S.ui.errors.when; render(); },

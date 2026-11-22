@@ -64,26 +64,29 @@ model Player {
   verificationOverrideBy String?                     @map("verification_override_by") @db.Uuid
   verificationOverrideAt DateTime?                   @map("verification_override_at") @db.Timestamptz(6)
 
-  verificationAdmin     AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
-  banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
-  privateContact        PlayerPrivateContact?
-  account               PlayerAccount?
-  socialLinks           PlayerSocialLink[]
-  claimLinks            PlayerClaimLink[]
-  idAllocation          PlayerIdAllocation?
-  claimedSharedEntry    SharedPlayerEntry?
-  passwordResetRequests PlayerPasswordResetRequest[]
-  contactChanges        PlayerContactChangeRequest[]
-  notifications         PlayerNotification[]
-  adminEmailEdits       AdminPlayerEmailEdit[]
-  clubPlayers           ClubPlayer[]
-  resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
-  rosterEntries         SessionPlayer[]              @relation("SessionPlayerAtEntry")
-  assessments           ClubAssessment[]             @relation("AssessmentPlayer")
-  activeHold            ActivePlayerHold?            @relation("ActivePlayerHold")
-  joinRequests          SessionJoinRequest[]
-  dropOutNotices        SessionDropOutNotice[]
-  sessionInviteCodes    SessionInviteCode[]
+  verificationAdmin      AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
+  banner                 ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
+  privateContact         PlayerPrivateContact?
+  account                PlayerAccount?
+  socialLinks            PlayerSocialLink[]
+  claimLinks             PlayerClaimLink[]
+  idAllocation           PlayerIdAllocation?
+  claimedSharedEntry     SharedPlayerEntry?
+  passwordResetRequests  PlayerPasswordResetRequest[]
+  contactChanges         PlayerContactChangeRequest[]
+  notifications          PlayerNotification[]
+  adminEmailEdits        AdminPlayerEmailEdit[]
+  clubPlayers            ClubPlayer[]
+  resolvedInputs         ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
+  rosterEntries          SessionPlayer[]              @relation("SessionPlayerAtEntry")
+  assessments            ClubAssessment[]             @relation("AssessmentPlayer")
+  activeHold             ActivePlayerHold?            @relation("ActivePlayerHold")
+  joinRequests           SessionJoinRequest[]
+  dropOutNotices         SessionDropOutNotice[]
+  slotTransfersSent      SessionSlotTransfer[]        @relation("SlotTransferSender")
+  slotTransfersReceived  SessionSlotTransfer[]        @relation("SlotTransferRecipient")
+  slotTransfersWithdrawn SessionSlotTransfer[]        @relation("SlotTransferWithdrawnBy")
+  sessionInviteCodes     SessionInviteCode[]
 
   facts          PlayerMatchFact[]          @relation("FactPlayer")
   rankCurrent    PlayerRankCurrent?

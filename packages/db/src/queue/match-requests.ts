@@ -52,6 +52,7 @@ import {
   rosterNamesFor,
   type Tx,
 } from './session-store'
+import { pendingSlotTransferViews } from './slot-transfers'
 
 /**
  * Match requests in real mode (D-2026-11-09-05, Q17.14 and Q18.12), the same rules as the mock
@@ -387,11 +388,12 @@ export async function readSessionRequests(context: ClubContext, sessionId: strin
   await requireSessionAccess(context, found)
   return prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, context, sessionId)
-    const counts = (match: number, dropOuts: number) => ({
-      total: match + dropOuts,
-      join: dropOuts,
+    const counts = (match: number, dropOuts: number, transfers = 0) => ({
+      total: match + dropOuts + transfers,
+      join: dropOuts + transfers,
       joinRequests: 0,
       dropOuts,
+      transfers,
       match,
     })
     const empty = {
@@ -399,6 +401,7 @@ export async function readSessionRequests(context: ClubContext, sessionId: strin
       minimum: session.minimumGames,
       join: [],
       dropOuts: [] as Awaited<ReturnType<typeof openDropOutNotices>>,
+      transfers: [] as Awaited<ReturnType<typeof pendingSlotTransferViews>>,
       selfCheckIn: {},
     }
     if (!takesRequests(session)) return { ...empty, counts: counts(0, 0), match: [] }
@@ -440,7 +443,15 @@ export async function readSessionRequests(context: ClubContext, sessionId: strin
       }
     })
     const dropOuts = await openDropOutNotices(tx, session.id)
-    return { ...empty, dropOuts, counts: counts(match.length, dropOuts.length), match }
+    // #1011: pending slot transfers, listed beside the drop-out notices before Start.
+    const transfers = await pendingSlotTransferViews(tx, session)
+    return {
+      ...empty,
+      dropOuts,
+      transfers,
+      counts: counts(match.length, dropOuts.length, transfers.length),
+      match,
+    }
   })
 }
 

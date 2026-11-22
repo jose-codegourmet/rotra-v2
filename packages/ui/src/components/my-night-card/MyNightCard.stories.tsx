@@ -138,3 +138,19 @@ export const MoveMeToWaitlistLiveLight: Story = {
   ...MoveMeToWaitlistLive,
   globals: { theme: 'light' },
 }
+
+// #1011: Transfer my slot before the start; a pending transfer reads its line and Withdraw request.
+export const TransferMySlot: Story = {
+  args: {
+    stage: 'before-start',
+    startsLabel: 'Nov 9, 7:30 PM',
+    canInvite: true,
+    onTransfer: fn(),
+    onWithdrawTransfer: fn(),
+  },
+}
+export const TransferPending: Story = {
+  args: { ...TransferMySlot.args, transferPendingTo: 'Russel Tan' },
+}
+export const TransferMySlotLight: Story = { ...TransferMySlot, globals: { theme: 'light' } }
+export const TransferPendingLight: Story = { ...TransferPending, globals: { theme: 'light' } }

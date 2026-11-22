@@ -23,6 +23,7 @@
     "./queue/session-cancel": "./src/queue/session-cancel.ts",
     "./queue/session-roster": "./src/queue/session-roster.ts",
     "./queue/drop-out-notices": "./src/queue/drop-out-notices.ts",
+    "./queue/slot-transfers": "./src/queue/slot-transfers.ts",
     "./queue/club-players": "./src/queue/club-players.ts",
     "./queue/club-player-details": "./src/queue/club-player-details.ts",
     "./queue/club-player-delete": "./src/queue/club-player-delete.ts",

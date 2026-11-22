@@ -6,8 +6,15 @@ import { useLeaveSession } from '@rotra/data/public-session/useLeaveSession'
 import { useMoveMeToWaitlist } from '@rotra/data/public-session/useMoveMeToWaitlist'
 import { useSelfCheckIn } from '@rotra/data/public-session/useSelfCheckIn'
 import { useSendDropOutNotice } from '@rotra/data/public-session/useSendDropOutNotice'
+import type { TransferRecipient } from '@rotra/data/slot-transfer/slotTransfer.types'
+import { useFindTransferRecipient } from '@rotra/data/slot-transfer/useFindTransferRecipient'
+import { useRequestSlotTransfer } from '@rotra/data/slot-transfer/useRequestSlotTransfer'
+import { useWithdrawSlotTransfer } from '@rotra/data/slot-transfer/useWithdrawSlotTransfer'
+import { SlotTransferForm } from '@rotra/ui/forms/slot-transfer-form'
 import { MyNightCard } from '@rotra/ui/my-night-card'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
+import { useState } from 'react'
 
 export type MyNightProps = {
   slug: string
@@ -37,7 +44,9 @@ type Writer = {
 /**
  * Q-PUBLIC-JOIN › My night: wires the personal projection (useMyNight) to MyNightCard and the
  * Player's own writes: I'm here, I'm leaving, I can't make it, Cancel on an open match request and
- * Move me to the waitlist (#735, hidden while the Player is on court, playing or queued).
+ * Move me to the waitlist (#735, hidden while the Player is on court, playing or queued), and
+ * Transfer my slot (#1011: before the start, the sheet finds the recipient by RTR ID, then sends
+ * the request; Withdraw request on a pending one).
  * Each toast is the write's own message; offline, the check-in message carries the sync line.
  */
 export function MyNight({
@@ -55,6 +64,13 @@ export function MyNight({
   const dropOut = useSendDropOutNotice(slug)
   const cancelRequest = useCancelMatchRequest(slug)
   const stepDown = useMoveMeToWaitlist(slug)
+  const find = useFindTransferRecipient(slug)
+  const sendTransfer = useRequestSlotTransfer(slug)
+  const withdrawTransfer = useWithdrawSlotTransfer(slug)
+  const [transferOpen, setTransferOpen] = useState(false)
+  const [recipient, setRecipient] = useState<TransferRecipient | null>(null)
+  // A fresh form each time the sheet opens, so an earlier RTR ID never lingers.
+  const [transferKey, setTransferKey] = useState(0)
   if (night.status === 'none' || !night.stage) return null
 
   const pending =
@@ -62,7 +78,8 @@ export function MyNight({
     leave.isPending ||
     dropOut.isPending ||
     cancelRequest.isPending ||
-    stepDown.isPending
+    stepDown.isPending ||
+    withdrawTransfer.isPending
   const run = (write: Writer) => () =>
     write.mutate(
       { playerId: night.playerId },
@@ -72,34 +89,87 @@ export function MyNight({
       },
     )
   const match = night.onCourt ?? night.inQueue
+  const openTransfer = (open: boolean) => {
+    setTransferOpen(open)
+    if (open) setTransferKey((k) => k + 1)
+    else {
+      setRecipient(null)
+      find.reset()
+      sendTransfer.reset()
+    }
+  }
 
   return (
-    <MyNightCard
-      stage={night.stage}
-      waitlistPosition={night.waitlistPosition ?? undefined}
-      startsLabel={startsLabel}
-      cantMakeItSent={sessionOpen && night.cantMakeItSent}
-      hasLeft={night.hasLeft}
-      checkedIn={night.checkedIn}
-      offline={night.offline || offline}
-      games={night.games}
-      won={night.won}
-      lost={night.lost}
-      minimum={night.minimum}
-      queuePosition={night.inQueue?.position}
-      matchLabel={match?.matchLabel}
-      courtLabel={night.onCourt?.courtLabel}
-      matchRequestOpen={sessionOpen && night.matchRequest !== null}
-      canInvite={sessionOpen && acceptJoinRequests && night.canInvite}
-      pending={pending}
-      onCheckIn={run(checkIn)}
-      onLeave={run(leave)}
-      onCantMakeIt={run(dropOut)}
-      onCancelMatchRequest={run(cancelRequest)}
-      onRequestMatch={sessionOpen ? onRequestMatch : undefined}
-      onInvite={onInvite}
-      onStepDown={sessionOpen ? run(stepDown) : undefined}
-      inMatch={night.onCourt !== null || night.inQueue !== null}
-    />
+    <>
+      <MyNightCard
+        stage={night.stage}
+        waitlistPosition={night.waitlistPosition ?? undefined}
+        startsLabel={startsLabel}
+        cantMakeItSent={sessionOpen && night.cantMakeItSent}
+        hasLeft={night.hasLeft}
+        checkedIn={night.checkedIn}
+        offline={night.offline || offline}
+        games={night.games}
+        won={night.won}
+        lost={night.lost}
+        minimum={night.minimum}
+        queuePosition={night.inQueue?.position}
+        matchLabel={match?.matchLabel}
+        courtLabel={night.onCourt?.courtLabel}
+        matchRequestOpen={sessionOpen && night.matchRequest !== null}
+        canInvite={sessionOpen && acceptJoinRequests && night.canInvite}
+        pending={pending}
+        onCheckIn={run(checkIn)}
+        onLeave={run(leave)}
+        onCantMakeIt={run(dropOut)}
+        onCancelMatchRequest={run(cancelRequest)}
+        onRequestMatch={sessionOpen ? onRequestMatch : undefined}
+        onInvite={onInvite}
+        onStepDown={sessionOpen ? run(stepDown) : undefined}
+        inMatch={night.onCourt !== null || night.inQueue !== null}
+        transferPendingTo={sessionOpen ? night.slotTransfer?.recipientName : undefined}
+        onTransfer={sessionOpen && night.canTransfer ? () => openTransfer(true) : undefined}
+        onWithdrawTransfer={run(withdrawTransfer)}
+      />
+      <SlotTransferForm
+        key={transferKey}
+        open={transferOpen}
+        onOpenChange={openTransfer}
+        startsLabel={startsLabel}
+        isFinding={find.isPending}
+        findError={find.error?.message}
+        recipient={
+          recipient && {
+            name: recipient.fullName,
+            rtrId: recipient.rtrId,
+            photoUrl: profilePictureSrc(recipient.picture, recipient.playerId, recipient.fullName),
+            waitlistPosition: recipient.waitlistPosition,
+          }
+        }
+        onRtrIdChange={() => {
+          setRecipient(null)
+          find.reset()
+        }}
+        onFind={({ rtrId }) =>
+          find.mutate(
+            { playerId: night.playerId, rtrId },
+            { onSuccess: (found) => setRecipient(found) },
+          )
+        }
+        isPending={sendTransfer.isPending}
+        serverError={sendTransfer.error?.message}
+        onSubmit={({ rtrId }) =>
+          sendTransfer.mutate(
+            { playerId: night.playerId, rtrId },
+            {
+              onSuccess: (done) => {
+                toast(done.message)
+                openTransfer(false)
+              },
+            },
+          )
+        }
+      />
+    </>
   )
 }

@@ -15,6 +15,8 @@ import { useJoinRequestHints } from '@rotra/data/session-roster/useJoinRequestHi
 import { useKeepDropOut } from '@rotra/data/session-roster/useKeepDropOut'
 import { useRemoveDropOut } from '@rotra/data/session-roster/useRemoveDropOut'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useApproveSlotTransfer } from '@rotra/data/slot-transfer/useApproveSlotTransfer'
+import { useRejectSlotTransfer } from '@rotra/data/slot-transfer/useRejectSlotTransfer'
 import { type JoinRequestDetails, JoinRequestsPanel } from '@rotra/ui/join-requests-panel'
 import { levelLabel } from '@rotra/ui/level-pill'
 import type { MatchRequestSpot } from '@rotra/ui/match-request-card'
@@ -46,7 +48,8 @@ function whereLabel(where: RequestSpot['where']) {
 
 /**
  * Requests from the session page (Q18.12): JoinRequestsPanel without tabs. Before Start it lists
- * drop-out notices, then join requests; once live, match requests only (join requests close at
+ * drop-out notices, pending slot transfers (#1011: Approve with a level, Reject), then join
+ * requests; once live, match requests only (join requests close at
  * Start). Join requests come from useSessionRoster; the ROTRA-player
  * hints, drop-out notices and match requests from useSessionRequests, and the shared rank from
  * useJoinRequestHints. Every decision toasts its result or its error; a refused decision leaves
@@ -63,6 +66,8 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const decline = useDeclineJoinRequest()
   const keep = useKeepDropOut()
   const remove = useRemoveDropOut()
+  const approveTransfer = useApproveSlotTransfer()
+  const rejectTransfer = useRejectSlotTransfer()
   const addMatch = useAddMatchRequestToQueue()
   const declineMatch = useDeclineMatchRequest()
 
@@ -85,10 +90,11 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const pending = joinRequests.filter((r) => r.status === 'pending').length
   const view = requests.data
   const dropOuts = view?.dropOuts ?? []
+  const transfers = view?.transfers ?? []
   const matchRequests = view?.match ?? []
   // No tabs: before Start the panel lists join requests and drop-out notices; live, match requests only.
   const live = s?.state === 'active'
-  const waiting = live ? matchRequests.length : pending + dropOuts.length
+  const waiting = live ? matchRequests.length : pending + dropOuts.length + transfers.length
   // The card only appears once something is waiting, so it stays hidden while loading; the sheet
   // always has a body and shows Skeleton rows until the roster arrives.
   const real = isRealDataMode()
@@ -164,6 +170,8 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     decline.isPending ||
     keep.isPending ||
     remove.isPending ||
+    approveTransfer.isPending ||
+    rejectTransfer.isPending ||
     addMatch.isPending ||
     declineMatch.isPending
 
@@ -188,6 +196,19 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
         isPending,
         onRemove: () => run(remove.mutate, { sessionId, noticeId: d.id }),
         onKeep: () => run(keep.mutate, { sessionId, noticeId: d.id }),
+      }))}
+      transfers={transfers.map((t) => ({
+        id: t.id,
+        senderName: t.senderName,
+        senderPhotoUrl: photoFor(t.pid),
+        recipientName: t.recipientName,
+        recipientRtrId: t.recipientRtrId,
+        recipientWaitlistPosition: t.recipientWaitlistPosition,
+        suggestedLevel: t.suggestedLevel,
+        timeLabel: formatTime(t.at),
+        isPending,
+        onApprove: (level) => run(approveTransfer.mutate, { sessionId, transferId: t.id, level }),
+        onReject: () => run(rejectTransfer.mutate, { sessionId, transferId: t.id }),
       }))}
       matchRequests={matchRequests.map((m) => ({
         id: m.id,

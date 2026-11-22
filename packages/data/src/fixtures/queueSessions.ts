@@ -6,6 +6,7 @@ import type {
   SessionInviteCode,
   SessionPlayer,
 } from '../session-roster/sessionRoster.types'
+import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
 import { DEMO_CLUB_ID } from './clubs'
 import {
   createAccountJoinRequestFixture,
@@ -159,7 +160,31 @@ export function createQueueFixtures(now = Date.now()) {
       matchId: null,
     },
   ]
+  // #1011: Jasper (confirmed tonight) asks to hand his slot to Russel, a registered club member
+  // who is not in the session yet. Approve gives Russel the slot; Reject leaves Jasper on the roster.
+  const jasper = roster[12]
+  const jasperPlayerId = clubPlayers.find((p) => p.id === jasper?.clubPlayerId)?.playerId
+  const russel = clubPlayers.find((p) => p.fullName === 'Russel' && p.playerId)
+  if (!jasper || !jasperPlayerId || !russel?.playerId)
+    throw new Error("Missing Jasper or Russel for tonight's slot transfer.")
+  const slotTransfers: SlotTransfer[] = [
+    {
+      id: 'slot-transfer-s-tonight-jasper',
+      sessionId: tonight.id,
+      pid: jasper.id,
+      senderClubPlayerId: jasper.clubPlayerId,
+      senderPlayerId: jasperPlayerId,
+      recipientPlayerId: russel.playerId,
+      recipientClubPlayerId: null,
+      recipientPid: null,
+      recipientWasWaitlisted: null,
+      status: 'pending',
+      requestedAt: now - 20 * 60000,
+      decidedAt: null,
+    },
+  ]
   const requests = {
+    slotTransfers,
     joinRequests: [
       createAccountJoinRequestFixture(now),
       ...createSessionPageJoinRequestFixtures(now),

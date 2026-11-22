@@ -5,6 +5,7 @@ export const joinRequestsPanelMeta = {
   description:
     'The Requests panel, without tabs. Before Start it lists drop-out notices and join requests ("Join requests and drop-out notices from the session page. Nothing changes until you act on one."); once the session is live it lists match requests only ("Match requests from players on the session page. …"), since join requests close at Start.',
   usage: [
+    'Pass transfers (SlotTransferRow props with an id) for pending slot transfers (#1011): before Start they are listed as "Slot transfers · N" after the drop-out notices and count toward the heading.',
     'Pass requestDetails for ROTRA player hints, and dropOuts and matchRequests with callbacks. Pass live once the session has started: the heading count is then match requests only, otherwise pending join requests plus drop-out notices.',
     'On the live console open it from ConsoleHeaderActions\' "Match requests · N" in a Sheet titled Requests (variant sheet).',
     'Use variant sheet inside a Sheet titled Requests with a Done footer; card variant supplies the heading and introduction.',
@@ -25,6 +26,7 @@ export const joinRequestsPanelMeta = {
   ],
   variants: ['card', 'sheet', 'prepared-full', 'placements', 'live'],
   related: [
+    'SlotTransferRow',
     'ConsoleHeaderActions',
     'MatchRequestCard',
     'SessionLinkCard',

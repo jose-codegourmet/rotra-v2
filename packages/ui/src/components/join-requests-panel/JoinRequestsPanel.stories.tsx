@@ -193,3 +193,29 @@ export const LiveMatchRequestsPhone: Story = {
 export const SlotsFullLight: Story = { ...SlotsFull, globals: { theme: 'light' } }
 export const LevelErrorLight: Story = { ...LevelError, globals: { theme: 'light' } }
 export const InSheetLight: Story = { ...InSheet, globals: { theme: 'light' } }
+
+// #1011: pending slot transfers sit after the drop-out notices, before the join requests.
+const transfers = [
+  {
+    id: 'transfer-1',
+    senderName: 'Jasper Lim',
+    recipientName: 'Russel Tan',
+    recipientRtrId: 'RTR-PH-CEB-102926-0014',
+    timeLabel: '7:05 PM',
+    suggestedLevel: 'intermediate_mid' as const,
+    onApprove: fn(),
+    onReject: fn(),
+  },
+  {
+    id: 'transfer-2',
+    senderName: 'Ana Cruz',
+    recipientName: 'Ben Santos',
+    recipientRtrId: 'RTR-PH-CEB-110126-0031',
+    recipientWaitlistPosition: 1,
+    timeLabel: '7:12 PM',
+    onApprove: fn(),
+    onReject: fn(),
+  },
+]
+export const WithSlotTransfers: Story = { args: { dropOuts, transfers } }
+export const WithSlotTransfersLight: Story = { ...WithSlotTransfers, globals: { theme: 'light' } }

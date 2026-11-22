@@ -43,6 +43,7 @@ import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import { shownSessionHostRows } from '../session-host/sessionHost.history'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { mySlotTransfer } from '../slot-transfer/slotTransferViews'
 import { playerOrigin } from './context'
 import {
   linkedClubPlayerIds,
@@ -755,6 +756,8 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           (d) => d.sessionId === session.id && d.pid === row.id && d.status === 'open',
         )
       : false,
+    canTransfer: !!row && session.state === 'prepared',
+    slotTransfer: row ? mySlotTransfer(live, session.id, row.id) : null,
     offline: getConnectivity() === 'offline',
     games: standing?.games ?? 0,
     won: standing?.wins ?? 0,

@@ -10,6 +10,7 @@ import { ServiceError } from '../service/errors'
 import { sessionDto } from './dto'
 import { closeSessionMatchRequests } from './match-request-store'
 import { lockSession, mapDatabaseError, requireSessionAccess } from './session-store'
+import { closePendingSlotTransfers } from './slot-transfers'
 
 /**
  * Q-PREPARE / D-CANCEL-SESSION: calls off one prepared session. Final; needs internet (never
@@ -39,6 +40,8 @@ export async function cancelSession(
         data: { status: 'closed', decidedAt: now },
       })
       await closeSessionMatchRequests(tx, sessionId, now)
+      // #1011: pending slot transfers are cancelled with the session; slots and payments stay.
+      await closePendingSlotTransfers(tx, sessionId, 'cancelled', now)
       await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
       const updated = await tx.queueSession.update({
         where: { id: sessionId },

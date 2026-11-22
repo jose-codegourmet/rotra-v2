@@ -1,11 +1,16 @@
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
-import { MockError, NotConnectedError } from '../mock/errors'
+import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { mockPhotoReference } from '../player/photo'
 import { characterPictureReference } from '../player/picture'
 import { syncUnclaimedProjection } from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
+import {
+  realRemoveClubPlayerPicture,
+  realRestorePreviousClubPlayerPicture,
+  realSetClubPlayerPicture,
+} from '../real/queue'
 import type { ClubPlayerPicture, SetClubPlayerPictureInput } from './clubPlayer.types'
 import { clubPictureState, takesClubPicture } from './clubPlayerPicture.rules'
 
@@ -16,8 +21,8 @@ const NOT_EDITABLE = 'This player registered, so they keep their own details.'
 
 // Owner answered on 2026-11-10 (D-2026-11-09-12): A1, the club-set picture becomes the player's
 // starting picture on claim; B1, it is stored on the saved-player record (`club_players.avatar_ref`,
-// `avatar_previous_ref`). This mock keeps it on `ClubPlayer.picture`; real mode refuses until the
-// backend lands.
+// `avatar_previous_ref`). This mock keeps it on `ClubPlayer.picture`; real mode stores it there
+// (`/api/club/players/[id]/picture`).
 
 function pictureRow(s: MockState, id: string) {
   const row = s.clubPlayers.find(
@@ -66,7 +71,7 @@ const changePicture = <T>(change: (s: MockState) => { data: T; text: string }) =
  * club logo). Guests, pending guests and unclaimed profiles only; registered players refuse.
  */
 export async function setClubPlayerPicture(input: SetClubPlayerPictureInput) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realSetClubPlayerPicture(input)
   const src = input.kind === 'photo' ? await readPhoto(input.file) : null
   if (input.kind === 'character') characterPictureReference(input.characterId)
   return changePicture((s) => {
@@ -83,7 +88,7 @@ export async function setClubPlayerPicture(input: SetClubPlayerPictureInput) {
 
 /** Edit details › Profile picture › Remove: back to initials; a removed photo is kept as previous. */
 export function removeClubPlayerPicture(input: { clubPlayerId: string }) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realRemoveClubPlayerPicture(input)
   return changePicture((s) => {
     const { row, current } = pictureRow(s, input.clubPlayerId)
     row.picture = withPrevious({ kind: 'initials' }, nextPrevious(current))
@@ -97,7 +102,7 @@ export function removeClubPlayerPicture(input: { clubPlayerId: string }) {
  * current character or initials holds no file, so after the swap no previous photo remains.
  */
 export function restorePreviousClubPlayerPicture(input: { clubPlayerId: string }) {
-  if (isRealDataMode()) throw new NotConnectedError()
+  if (isRealDataMode()) return realRestorePreviousClubPlayerPicture(input)
   return changePicture((s) => {
     const { row, current } = pictureRow(s, input.clubPlayerId)
     if (!current.previousSrc) throw new MockError('conflict', 'No previous picture to restore.')

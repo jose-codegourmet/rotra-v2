@@ -72,6 +72,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       displayName: true,
       nickname: true,
       addedAt: true,
+      avatarRef: true,
       privateInput: { select: { phoneE164: true } },
       sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true } },
       player: {
@@ -119,7 +120,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       fullName: (registered && p.player?.fullName) || p.displayName,
       nickname: registered ? (p.player?.nickname ?? null) : p.nickname,
       clubNickname: registered ? p.nickname?.trim() || null : null,
-      picture: registered ? (p.player?.avatarRef ?? null) : null,
+      // A guest or unclaimed player shows the picture the club set (D-2026-11-09-12).
+      picture: registered ? (p.player?.avatarRef ?? null) : p.avatarRef,
       pictureName: registered ? (p.player?.fullName ?? null) : null,
       bannerKey: banner.bannerKey,
       bannerImageUrl: banner.bannerImageUrl,

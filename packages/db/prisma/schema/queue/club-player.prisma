@@ -24,6 +24,11 @@ model ClubPlayer {
   /// this record moved into that saved player of the same club. Its finished history stays here and
   /// is reached through this redirect; live slots, waitlist spots and pending requests moved.
   linkedToClubPlayerId String?   @map("linked_to_club_player_id") @db.Uuid
+  /// D-2026-11-09-12: the picture the club set for its own guest or unclaimed player (a photo URL
+  /// in the `player-avatars` bucket under `clubs/`, or `character:<id>`; null = initials), and the
+  /// one previous photo kept. Ignored once the player is registered: their own picture shows.
+  avatarRef            String?   @map("avatar_ref")
+  avatarPreviousRef    String?   @map("avatar_previous_ref")
   createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt    @default(1)

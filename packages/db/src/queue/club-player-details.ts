@@ -17,6 +17,7 @@ import {
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
+import { type ClubPictureStateDto, clubPictureStateOf } from './club-player-picture'
 
 const E164 = /^\+639\d{9}$/
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
@@ -35,6 +36,8 @@ export type ClubPlayerDetailsDto = {
   fullName: string
   nickname: string | null
   phoneOnFile: boolean
+  /** The club-set picture and the previous photo kept (D-2026-11-09-12) */
+  picture: ClubPictureStateDto
   /** Unclaimed records only (email '' for an older record with none: Details required); null for guests */
   profile: {
     email: string
@@ -58,6 +61,8 @@ async function loadEditable(context: ClubContext, clubPlayerId: string) {
       privateInput: { select: { phoneE164: true, presetFields: true } },
       sharedEntry: { select: { email: true } },
       player: { select: { profileState: true } },
+      avatarRef: true,
+      avatarPreviousRef: true,
     },
   })
   if (!row || row.removedAt) throw new ServiceError('not_found')
@@ -85,6 +90,7 @@ export async function readClubPlayerDetails(
     fullName: row.displayName,
     nickname: row.nickname,
     phoneOnFile: Boolean(row.privateInput?.phoneE164),
+    picture: clubPictureStateOf(row),
     profile: unclaimed
       ? {
           email: row.sharedEntry?.email ?? '',

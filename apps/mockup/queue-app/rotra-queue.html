@@ -6449,7 +6449,7 @@ const SHEETS = {
   profile(sh) {
     const p = P(sh.id);
     const city = regCity(p);
-    const status = { registered: 'Registered ROTRA player', unclaimed: needsEmail(p) ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet' : 'Saved by your club with their email. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
+    const status = { registered: 'Registered ROTRA player', unclaimed: needsEmail(p) ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet' : (p.email ? 'Saved by your club with their email. Not registered with ROTRA yet' : 'Saved by your club with a social link. Not registered with ROTRA yet'), guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
     // Owner comment, November 11, 2026: the same banner profile card as the participant profile, with the club-private rows below.
     const s = cur(), r = s ? R(s, p.id) : null;
     const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;
@@ -6699,7 +6699,7 @@ const SHEETS = {
     // A guest's link is their own too: registering through it claims this record (D-2026-11-18-07).
     const link = playerInviteLink(p);
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
-      <p>${claim ? 'Your club saved them with their email. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
+      <p>${claim ? `Your club saved them with ${p.email ? 'their email' : 'a social link'}. This link lets them turn that record into a ROTRA account` : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
       ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one. Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
       <p class="small muted">${claim ? '' : 'This record becomes theirs when they register: their games here stay with them. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
@@ -6812,7 +6812,7 @@ const SHEETS = {
       const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key || (!!sk && x.identity === 'unclaimed' && socialKeys(x).includes(sk));
       const mine = key ? saved().find((x) => hit(x) || DIRECTORY.some((g) => hit(g) && g.rtr === x.rtr)) : null;
       const list = key && !mine ? DIRECTORY.filter(hit) : [];
-      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email now; ROTRA looks them up after you reconnect.')
+      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email or social link now; ROTRA looks them up after you reconnect.')
         : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID, email or social link" data-autofocus><span class="hint">Enter the full RTR ID, email or social link. Names are searched in your saved players only.</span></label>
         <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID, email or social link.' : 'Enter an RTR ID, email or social link to find a ROTRA player.'}</div>`}</div>
         <p class="small muted">Confirm with the player before adding them.</p>

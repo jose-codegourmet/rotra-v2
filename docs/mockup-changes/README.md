@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 204 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 206 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -464,5 +464,7 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 204 · CANCELLED: 4 · 
 | [2026-11-22-queue-transfer-accounting](2026-11-22-queue-transfer-accounting.md) | Queue: slot transfer accounting, the automatic waiver shown before Approve and the slot history | slot-transfer-history (new), slot-transfer-row (extended with `payment`), payments-checklist/payment-card (extended with `transfer`, `onOpenHistory`), payments-checklist (extended with `totals.waived`, `onOpenSlotHistory`) | IN MOCK APP — #1013 |
 | [2026-11-22-queue-transfer-links](2026-11-22-queue-transfer-links.md) | Queue: transfer links for a recipient with no ROTRA account, first claimant and invalidation | transfer-link-sheet (new), transfer-link-card (new), forms/slot-transfer-form (extended with `onCreateLink`, `isCreatingLink`), my-night-card (extended with `transferLinkOpen`), slot-transfer-row (extended with `viaLink`) | IN MOCK APP — #1012 |
 | [2026-11-22-queue-trusted-hosts](2026-11-22-queue-trusted-hosts.md) | Club settings gets a Trusted hosts section: add and remove trusted hosts from saved players | trusted-hosts-panel, club-settings-menu | IN MOCK APP — #1003 |
+| [2026-11-23-queue-link-only-player-wording](2026-11-23-queue-link-only-player-wording.md) | Saved player profile and invite say "a social link" for a player saved without an email | player-profile-sheet, invite-sheet, add-player-sheet | IN MOCK APP — #1019 |
+| [2026-11-23-queue-public-skill-mix-capacity](2026-11-23-queue-public-skill-mix-capacity.md) | Public page: the Skill mix bar spans the slot budget | skill-distribution-bar, join-request-card | IN MOCK APP — PR #1024 |
 | [2026-11-23-queue-social-link-entry-key](2026-11-23-queue-social-link-entry-key.md) | Add player: a social link saves an unclaimed player without an email (#1019) | add-player-sheet, add-player-form, edit-player-details-form | IN MOCK APP — #1019 |
 <!-- status-index:end -->

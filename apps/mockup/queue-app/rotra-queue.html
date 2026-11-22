@@ -2212,6 +2212,8 @@ PAST.forEach((x) => {
 });
 
 // The club's saved venues. Picking one fills the session venue, address and court fee; new names are added here.
+// Epic #1002 (#1003): Miguel (registered) and Gab Torres (unclaimed, no ROTRA account) start as trusted hosts.
+function seedTrustedHosts() { return [{ pid: 'p1', added: Date.now() - 40 * 864e5 }, { pid: 'p17', added: Date.now() - 6 * 864e5 }]; }
 function seedVenues() {
   return [
     { id: 'v1', name: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City', courtFee: 350 },
@@ -2222,7 +2224,7 @@ function seedVenues() {
 function freshState() {
   return {
     v: 4, screen: 'login', online: true, syncing: false, pending: 0, lastSync: Date.now(), licenseExpired: false,
-    club: { name: 'Lahug Smash Club', initials: 'LS', founding: 'Founded at Salinas Dr, Lahug, Cebu City', license: 'Yearly license · active until Mar 31, 2027', description: 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.' },
+    club: { name: 'Lahug Smash Club', initials: 'LS', founding: 'Founded at Salinas Dr, Lahug, Cebu City', license: 'Yearly license · active until Mar 31, 2027', description: 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.', trustedHosts: seedTrustedHosts() },
     players: seedPlayers(), sessions: seedSessions(), inventory: seedInventory(), venues: seedVenues(), currentId: 's-tonight',
     ui: { sheet: null, pane: 'courts', slide: 0, pubTab: 'details', search: '', login: { user: 'lahug.smash', pass: '', show: false, err: '' }, draft: null, errors: {} },
   };
@@ -2260,6 +2262,10 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 // Public participant names (owner decision, Nov 7 2026; #475): each word → first letter + fixed "***"; blank → "Player".
 const maskName = (n) => { const w = String(n ?? '').trim().split(/\s+/).filter(Boolean); return w.length ? w.map((x) => `${Array.from(x)[0]}***`).join(' ') : 'Player'; };
 const P = (id) => S.players.find((p) => p.id === id);
+// Epic #1002 (#1003): the club's trusted-host list, drawn from its saved players. A removed entry keeps its dates.
+if (!S.club.trustedHosts) S.club.trustedHosts = seedTrustedHosts();
+const trustedHosts = () => (S.club.trustedHosts || []).filter((h) => !h.removed && P(h.pid) && !P(h.pid).removed);
+const isTrustedHost = (pid) => trustedHosts().some((h) => h.pid === pid);
 // Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
 const saved = () => S.players.filter((p) => !p.removed);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
@@ -3287,7 +3293,7 @@ const LICENSE_PAYMENTS = [
 ];
 const fmtYmd = (v) => new Date(ymdToTime(v)).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 const CLUB_TABS = [
-  ['Club', [['identity', 'Club identity'], ['invite', 'Club invite link'], ['defaults', 'Session defaults'], ['post', 'Facebook post']]],
+  ['Club', [['identity', 'Club identity'], ['invite', 'Club invite link'], ['defaults', 'Session defaults'], ['hosts', 'Trusted hosts'], ['post', 'Facebook post']]],
   ['License', [['license', 'License and payments']]],
   ['This device', [['device', 'Downloads']]],
   ['Account', [['account', 'Account']]],
@@ -3347,6 +3353,9 @@ function viewClub() {
       ${(S.ui.feeOn ?? S.club.entranceFee != null) ? `<div class="field"><label for="club-fee" style="font-size:13px;font-weight:600;color:var(--fg2)">Amount per person</label><div class="row" style="flex-wrap:nowrap"><div class="money" style="flex:1"><span>₱</span><input class="input${S.ui.clubFeeErr ? ' bad' : ''}" id="club-fee" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.clubFee" value="${esc(S.ui.clubFee ?? S.club.entranceFee ?? '')}" placeholder="0"></div><button class="btn" data-act="saveClubFee">Save</button></div>${S.ui.clubFeeErr ? `<span class="err">${esc(S.ui.clubFeeErr)}</span>` : '<span class="hint">It\'s added to each session\'s costs, so the payment per player covers it.</span>'}</div>` : ''}
       <div class="li" style="padding:0"><div class="main"><b>Players can check themselves in</b><p class="small muted">During a live session, confirmed ROTRA players can tap I'm here on the session page. Turn it off and only you mark presence.</p></div>${sw(S.club.selfCheckIn !== false, 'toggleSelfCheckIn', '', 'Players can check themselves in')}</div>
     </section>
+    <section class="card stack" id="club-hosts"><div class="between"><div><h2>Trusted hosts</h2><p class="small muted">Saved players your club trusts to host its sessions. When you create a session, they're listed first in the host picker. Hosting is shown on the session; it doesn't let them sign in to Queue.</p></div><button class="btn sm primary" data-act="openAddTrustedHost" ${saved().some((p) => !isTrustedHost(p.id)) ? '' : 'disabled'}>Add trusted host</button></div>
+      ${trustedHosts().length ? `<div class="list">${trustedHosts().map((h) => { const p = P(h.pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">Trusted since ${fmtShortDate(h.added)}</p></div>${identChip(p)}<button class="btn sm ghost" data-act="openRemoveTrustedHost" data-id="${p.id}" aria-label="Remove ${esc(p.name)} from trusted hosts">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted">No trusted hosts yet. Add saved players you trust to host your sessions.</p>'}
+      <p class="small muted">Removing a trusted host keeps them in your saved players, and sessions they already hosted still show them.</p></section>
     <section class="card stack" id="club-license"><div class="between"><h2>License</h2>${chip('Active', 'ok')}</div>
       <div class="tiles4">
         <div class="card"><span class="label">Plan</span><b class="big">Yearly</b></div>
@@ -6031,6 +6040,21 @@ const SHEETS = {
       <p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="setGamesNext">Next</button>`);
   },
+  // Epic #1002 (#1003): Club settings › Trusted hosts. Picks from saved players not trusted yet; guests and unclaimed players can host too.
+  addTrustedHost(sh) {
+    const q = (sh.q || '').trim().toLowerCase();
+    const list = saved().filter((p) => !isTrustedHost(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
+    return sheetShell('Add trusted host', `<p class="small muted">Pick a saved player your club trusts to host its sessions.</p>
+      <input class="input" id="th-q" type="search" placeholder="Search saved players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search saved players" data-autofocus>
+      ${list.length ? `<div class="list">${list.map((p) => `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b>${p.nick ? `<p class="small muted">“${esc(p.nick)}”</p>` : ''}</div>${identChip(p)}<button class="btn sm" data-act="addTrustedHost" data-id="${p.id}" aria-label="Add ${esc(p.name)} as a trusted host">Add</button></div>`).join('')}</div>` : '<p class="small muted">No saved player matches.</p>'}`,
+      '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+  removeTrustedHost(sh) {
+    const p = P(sh.id);
+    return sheetShell(`Remove ${esc(p.name)} from trusted hosts?`, `<p>${esc(short(p.id))} stays in your saved players. Sessions they already hosted still show them as a host.</p>
+      <p class="small muted">They won't be listed first in the host picker any more${p.identity === 'registered' ? ', and their ROTRA profile stops showing the Host badge for your club' : ''}.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Keep host</button><button class="btn danger" data-act="confirmRemoveTrustedHost" data-id="${p.id}">Remove host</button>`);
+  },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
       '<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="regenClubInvite">Regenerate</button>');
@@ -7049,6 +7073,11 @@ const ACT = {
   openClubInvite: () => openSheet({ type: 'sessionQr', kind: 'club', fmt: 'post' }),
   copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
+  openAddTrustedHost: () => openSheet({ type: 'addTrustedHost', q: '' }),
+  addTrustedHost: (d) => { const p = P(d.id); if (!p || p.removed || isTrustedHost(p.id)) return; (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() }); S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts`); },
+  openRemoveTrustedHost: (d) => openSheet({ type: 'removeTrustedHost', id: d.id }),
+  // Soft: the entry keeps its dates (history); the saved player and past session hosts are untouched.
+  confirmRemoveTrustedHost: (d) => { const p = P(d.id); (S.club.trustedHosts || []).forEach((h) => { if (h.pid === d.id && !h.removed) h.removed = Date.now(); }); S.ui.sheet = null; save(); render(); toast(`${p.name} removed from trusted hosts`); },
   regenClubInvite: () => { S.club.inviteCode = Array.from({ length: 8 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join(''); save(); closeSheet(); render(); toast('Club invite link regenerated'); },
   // D-2026-11-09-10: only the current and previous logo are kept.
   useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
@@ -8583,7 +8612,7 @@ window.addEventListener('resize', () => {
 // ---------- Prototype routes (same paths as apps/queue, under /queue) ----------
 let prototypeRouter;
 const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players' };
-const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
+const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', hosts: 'trusted-hosts', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
 const sessionSuffixes = { prepare: '/preparation', console: '', history: '/record', finalizing: '/finishing', results: '/results' };
 function prototypePath() {
   let path = queuePaths[S.screen];

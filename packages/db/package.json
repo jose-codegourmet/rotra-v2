@@ -26,6 +26,7 @@
     "./queue/club-players": "./src/queue/club-players.ts",
     "./queue/club-player-details": "./src/queue/club-player-details.ts",
     "./queue/club-player-delete": "./src/queue/club-player-delete.ts",
+    "./queue/club-hosts": "./src/queue/club-hosts.ts",
     "./auth/provider-admin": "./src/auth/provider-admin.ts",
     "./admin/audit": "./src/admin/audit.ts",
     "./admin/club-logo": "./src/admin/club-logo.ts",

@@ -260,6 +260,7 @@
     "./tabs": "./src/components/tabs/Tabs.tsx",
     "./team-lineup": "./src/components/team-lineup/TeamLineup.tsx",
     "./text-input": "./src/components/text-input/TextInput.tsx",
+    "./trusted-hosts-panel": "./src/components/trusted-hosts-panel/TrustedHostsPanel.tsx",
     "./textarea": "./src/components/textarea/Textarea.tsx",
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",
     "./theme-provider/script": "./src/components/theme-provider/ThemeProvider.script.ts",

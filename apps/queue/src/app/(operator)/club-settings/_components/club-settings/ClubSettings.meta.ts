@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const clubSettingsMeta = {
   name: 'ClubSettings',
   description:
-    'Q-CLUB container: ClubSettingsMenu plus the chosen section (ClubIdentityPanel, SessionDefaultsPanel, FacebookPostEditor with PostPreviewSheet, LicensePanel, ThisDevicePanel, ChangePasswordForm) wired to the club mutations, and SignOutSheet.',
+    'Q-CLUB container: ClubSettingsMenu plus the chosen section (ClubIdentityPanel, SessionDefaultsPanel, TrustedHostsPanel joined to the saved players, FacebookPostEditor with PostPreviewSheet, LicensePanel, ThisDevicePanel, ChangePasswordForm) wired to the club mutations, and SignOutSheet.',
   usage: [
     'Rendered by /club-settings/[section]; unknown sections open Club identity. Offline, the page shows only the connection notice.',
     'The phone settings drawer and the main nav drawer never open together (OperatorShell context).',
@@ -16,5 +16,6 @@ export const clubSettingsMeta = {
     'SignOutSheet',
     'LicensePanel',
     'FacebookPostEditor',
+    'TrustedHostsPanel',
   ],
 } satisfies ComponentMeta

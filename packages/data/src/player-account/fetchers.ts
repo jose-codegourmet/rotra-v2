@@ -172,6 +172,7 @@ export function finishClaim(
       account.email = changes.email
       if (changes.phone && !account.phone) account.phone = changes.phone
       account.claimed = true
+      account.socialKey = null
       // Every club's record of the person joins the account with it (D-2026-11-16-04).
       joinClubRecords(draft, account.playerId)
     }

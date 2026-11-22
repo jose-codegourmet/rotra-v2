@@ -2,6 +2,7 @@ import 'server-only'
 import { yearGameStats } from '@rotra/data/player/rules'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import type { ParticipantStatsRead } from '@rotra/data/public-session/types'
+import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -11,6 +12,7 @@ import {
   normalizeRtrId,
   openEntryByEmail,
   openEntryByRtrId,
+  openEntryBySocialKey,
   registeredPlayerByEmail,
 } from '../player/shared-entry'
 import { requireClubEntitlement } from '../service/authorize'
@@ -161,6 +163,7 @@ const NO_MATCH: PlayerLookupDto = { player: null, savedName: null }
 
 /**
  * Player lookup (D-2026-11-16-04): the one ROTRA person whose RTR ID or email is exactly `query`
+ * (#1019: or, for an unclaimed person only, whose normalized social link is)
  * (RTR ID uppercased; email trimmed and lowercased), registered or unclaimed. No name search and
  * no phone lookup. When this club already saved them, `savedName` is this club's name for them
  * instead. Players who chose Hide me from Player Information (D-2026-11-12-01) are not found.
@@ -170,12 +173,16 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
   if (!q) return NO_MATCH
   const rtrId = normalizeRtrId(q)
   const email = rtrId ? null : normalizeEmail(q)
-  if (!rtrId && !email) return NO_MATCH
+  // #1019: an exact social link finds an unclaimed player only, never a registered one.
+  const link = rtrId || email ? null : normalizeSocialLink(q)
+  if (!rtrId && !email && !link) return NO_MATCH
   const entry = rtrId
     ? await openEntryByRtrId(prisma, rtrId)
     : email
       ? await openEntryByEmail(prisma, email)
-      : null
+      : link
+        ? await openEntryBySocialKey(prisma, link.key)
+        : null
   const playerId = entry
     ? null
     : rtrId
@@ -298,6 +305,8 @@ export async function addNewSavedPlayer(
     nickname?: string | null
     phone?: string | null
     email?: string | null
+    /** #1019: a social link is an entry key too, and wins over the email */
+    socialLink?: string | null
   },
 ) {
   await requireClubEntitlement(context)

@@ -77,6 +77,7 @@ export async function deleteClubPlayer(id: string) {
     row.removedAt = Date.now()
     delete draft.privatePhones[row.id]
     if (draft.pendingEmails) delete draft.pendingEmails[row.id]
+    if (draft.pendingSocialLinks) delete draft.pendingSocialLinks[row.id]
     const personId = row.playerId
     if (!retireUnsavedPerson(draft, personId)) syncUnclaimedProjection(draft, personId)
   })

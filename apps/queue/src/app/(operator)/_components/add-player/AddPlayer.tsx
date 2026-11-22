@@ -54,8 +54,12 @@ const emailSavedName = (error: unknown) =>
     ? EMAIL_SAVED.exec(error.fieldErrors.email)?.[1]
     : undefined
 
+/** #1019: a refused social link ("That social link is already NAME…") shows under its field. */
+const socialLinkFieldError = (error: unknown) =>
+  error instanceof MockError ? error.fieldErrors?.socialLink : undefined
+
 /**
- * What both contexts share: the Player Information lookup (exact RTR ID or email), the status line,
+ * What both contexts share: the Player Information lookup (exact RTR ID, email or social link), the status line,
  * addedCount and the refusal. A conflict for which `returnsToList` says so is final for that pick:
  * the sheet returns to the list. A failed save (retryable, offline) keeps the card or form with what
  * was typed.
@@ -70,6 +74,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
   const [serverError, setServerError] = useState<string | undefined>()
   const [errorReturnsToList, setErrorReturnsToList] = useState(false)
   const [emailSavedAs, setEmailSavedAs] = useState<string | undefined>()
+  const [socialLinkError, setSocialLinkError] = useState<string | undefined>()
 
   // A fresh sheet each time it opens: Cancel until someone is added, no stale status line.
   const [prevOpen, setPrevOpen] = useState(open)
@@ -80,6 +85,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       setAddedCount(0)
       setServerError(undefined)
       setEmailSavedAs(undefined)
+      setSocialLinkError(undefined)
       setQuery('')
     }
   }
@@ -117,6 +123,12 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       toast(result.message)
     },
     onError: (error: unknown) => {
+      const linkError = socialLinkFieldError(error)
+      if (linkError) {
+        setSocialLinkError(linkError)
+        setErrorReturnsToList(false)
+        return
+      }
       const savedAs = emailSavedName(error)
       if (savedAs) {
         setEmailSavedAs(savedAs)
@@ -135,6 +147,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
     submitting.current = true
     setServerError(undefined)
     setEmailSavedAs(undefined)
+    setSocialLinkError(undefined)
     return true
   }
 
@@ -148,6 +161,7 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       directoryResults,
       directorySavedName: lookup.data?.savedName ?? undefined,
       newPlayerEmailSavedAs: emailSavedAs,
+      newPlayerSocialLinkError: socialLinkError,
       directoryLoading: !offline && lookup.isFetching && !lookup.data,
       serverErrorReturnsToList: errorReturnsToList,
       lastAdded,
@@ -260,6 +274,7 @@ function SessionAddPlayer({
           name: values.name,
           nickname: values.nickname ?? undefined,
           email: values.email ?? undefined,
+          socialLink: values.socialLink ?? undefined,
           level: values.level,
           ...placement,
         },
@@ -326,7 +341,13 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
   const submitNewPlayer = (values: NewSavedPlayerFormValues) => {
     if (!add.begin()) return
     addNew.mutate(
-      { name: values.name, nickname: values.nickname, email: values.email, level: values.level },
+      {
+        name: values.name,
+        nickname: values.nickname,
+        email: values.email,
+        socialLink: values.socialLink,
+        level: values.level,
+      },
       add.options,
     )
   }

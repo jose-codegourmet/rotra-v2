@@ -4,7 +4,7 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
 /**
- * Q-ADD-PLAYER › Player lookup (D-2026-11-16-04): `?q=` an exact RTR ID or an exact email, over
+ * Q-ADD-PLAYER › Player lookup (D-2026-11-16-04): `?q=` an exact RTR ID, an exact email or (#1019, unclaimed players only) an exact social link, over
  * registered and unclaimed people. No name search, no phone lookup. `players` repeats the one match
  * as a list for the older search callers.
  */

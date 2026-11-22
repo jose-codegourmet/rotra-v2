@@ -19,6 +19,7 @@ import type {
 } from './clubPlayer.types'
 import { clubPictureState } from './clubPlayerPicture.rules'
 import { applyClubEmail, EDIT_PLAYER_EMAIL_ERROR, planClubEmail } from './email'
+import { addEmailToLinkedEntry, followClubLinks } from './socialLink'
 
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
 const PHONE_ERROR = 'Enter a Philippine mobile number, like 0917 555 0142.'
@@ -84,7 +85,12 @@ export async function updateClubPlayerDetails({
   mockStore.update((draft) => {
     const row = draft.clubPlayers.find((p) => p.id === id && isCurrentRecord(p))
     if (!row || row.identity === 'registered') throw new MockError('permission', NOT_EDITABLE)
-    const emailOnFile = !!row.playerId || !!draft.pendingEmails?.[row.id]
+    // A record saved with a social link only (#1019) has a person but no email yet: one can be added.
+    const account = row.playerId
+      ? draft.playerAccounts.find((a) => a.playerId === row.playerId)
+      : undefined
+    const linkOnly = !!account && !account.claimed && !account.email.trim()
+    const emailOnFile = (!!row.playerId && !linkOnly) || !!draft.pendingEmails?.[row.id]
     // Everything is checked before the first write, so a refusal saves nothing.
     const plan = emailOnFile
       ? ({ kind: 'guest' } as const)
@@ -111,7 +117,15 @@ export async function updateClubPlayerDetails({
         },
       }
     const message = `Details saved · ${row.fullName}`
-    if (plan.kind === 'guest') {
+    // #1019: with a link-only person the email joins that person when nobody else has it; the
+    // link wins otherwise. With no email and no link left, this club's record is a guest again.
+    if (linkOnly && plan.kind !== 'guest' && plan.kind !== 'pending')
+      addEmailToLinkedEntry(draft, row, plan.email)
+    if (linkOnly || plan.kind === 'guest') {
+      if (followClubLinks(draft, row)) {
+        result = { clubPlayerId: id, message: `${message} · now a guest`, samePerson: null }
+        return
+      }
       syncUnclaimedProjection(draft, row.playerId)
       result = { clubPlayerId: id, message, samePerson: null }
       return

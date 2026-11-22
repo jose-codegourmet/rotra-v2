@@ -84,4 +84,9 @@ export type CompleteClaimResult = {
  */
 export type PlayerAccountRecord = Omit<MyAccount, 'profileVisibility' | 'hiddenFromDirectory'> & {
   claimed: boolean
+  /**
+   * #1019: the normalized social link (`facebook.com/name`) that is this unclaimed person's entry
+   * key, like the email. Cleared when they register: from then on it is only a profile link.
+   */
+  socialKey?: string | null
 }

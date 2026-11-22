@@ -55,8 +55,10 @@ export async function allocateRtrId(
   place: RtrIdPlace,
   at: Date,
   emails: (string | null | undefined)[] = [],
+  /** #1019: the claimed record's own shared entry, kept even when it has no email */
+  entryId?: string | null,
 ) {
-  const adopted = await adoptEntryAllocation(tx, playerId, emails)
+  const adopted = await adoptEntryAllocation(tx, playerId, emails, entryId)
   if (adopted) return adopted
   const clubId = typeof place === 'string' ? place : null
   const location =

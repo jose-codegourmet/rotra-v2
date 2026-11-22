@@ -1,9 +1,11 @@
+import { socialLinkAlreadySaved } from '@rotra/schema/social-link'
 import type { QueryClient } from '@tanstack/react-query'
 import { savedPlayerName } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubEmailWords, emailAlreadySaved, planClubEmail } from '../club-player/email'
 import { OWN_NAME_ERROR } from '../club-player/mutations'
 import { clubPlayerKeys } from '../club-player/queryKeys'
+import { clubSocialWords, planClubSocial, savedRecordForSocial } from '../club-player/socialLink'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
@@ -119,9 +121,22 @@ function directoryPlayer(client: QueryClient, playerId: string) {
  * does not look emails up yet (D-2026-11-16-04 is not built there), so the player is added as the
  * server saves them today: a guest.
  */
-function newPlayerEmailWords(email: string | undefined): string | null {
-  if (!email?.trim() || isRealDataMode()) return null
+function newPlayerEmailWords(email: string | undefined, socialLink?: string): string | null {
+  if ((!email?.trim() && !socialLink?.trim()) || isRealDataMode()) return null
   const s = readMockState()
+  // #1019: a social link is checked first and decides who they are.
+  const social = planClubSocial(s, socialLink)
+  if (social.kind !== 'none') {
+    const sameLink = savedRecordForSocial(s, DEMO_CLUB_ID, social)
+    if (sameLink) {
+      const text = socialLinkAlreadySaved(savedDisplayName(s, sameLink))
+      throw new MockError('permission', text, { socialLink: text })
+    }
+    planClubEmail(s, email)
+    if (social.kind !== 'new') return clubSocialWords(social)
+    const place = s.clubs.find((c) => c.id === DEMO_CLUB_ID)?.locationCode
+    return clubSocialWords(social, place ? peekMockRtrId(s, place) : undefined)
+  }
   const plan = planClubEmail(s, email)
   if (plan.kind === 'guest') return null
   const same = savedRecordByEmail(s, DEMO_CLUB_ID, plan.email)
@@ -269,7 +284,8 @@ export function enqueueAddNewPlayer(
   const name = input.name.trim()
   if (!name) throw new MockError('permission', 'Enter your name.')
   const email = input.email?.trim() || undefined
-  const emailWords = newPlayerEmailWords(email)
+  const socialLink = input.socialLink?.trim() || undefined
+  const emailWords = newPlayerEmailWords(email, socialLink)
   const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   const clubPlayerId = crypto.randomUUID()
   getRosterBatch(client, input.sessionId).enqueue({
@@ -281,6 +297,7 @@ export function enqueueAddNewPlayer(
       name,
       nickname: input.nickname?.trim() || undefined,
       ...(email ? { email } : {}),
+      ...(socialLink ? { socialLink } : {}),
       level: input.level,
     },
     preview: preview(

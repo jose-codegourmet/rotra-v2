@@ -40,6 +40,11 @@ type NewPlayerFormBaseProps = {
    * email field says "That email is already NAME in your saved players." and nothing is saved.
    */
   emailSavedAs?: string
+  /**
+   * #1019: why the server refused the social link ("That social link is already NAME in your
+   * saved players."), shown under the field; nothing is saved.
+   */
+  socialLinkError?: string
 }
 
 /**
@@ -53,7 +58,13 @@ export type NewPlayerFormProps = NewPlayerFormBaseProps &
   )
 
 export const EMAIL_HINT =
-  "Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly."
+  "Never shown publicly. If the email is already on ROTRA, they're linked to that player."
+
+export const SOCIAL_LINK_HINT =
+  "Facebook, Instagram, YouTube or LinkedIn. Shown on their profile. If the link is already an unclaimed player on ROTRA, they're linked to that player."
+
+export const ENTRY_KEY_NOTE =
+  "With an email or a social link they're saved as an unclaimed player and get an RTR ID. With neither, they're saved as a guest."
 
 export const emailSavedMessage = (name: string) =>
   `That email is already ${name} in your saved players.`
@@ -69,7 +80,8 @@ export function addPlayerSubmitLabel(
 }
 
 /**
- * Q-ADD-PLAYER › New player tab: name, optional nickname and email, and the level for this club.
+ * Q-ADD-PLAYER › New player tab: name, optional nickname, email and social link, and the level for
+ * this club.
  * Works offline; the container owns the add mutation and its toasts.
  */
 export function NewPlayerForm(props: NewPlayerFormProps) {
@@ -83,6 +95,7 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
     hideSubmit = false,
     defaultValues,
     emailSavedAs,
+    socialLinkError,
   } = props
   const club = props.context === 'club'
   // Both schemas share the fields; the club one only lets the level stay empty (null).
@@ -146,6 +159,29 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
             )}
           />
         </Field>
+        <Field
+          label="Social link"
+          optional
+          hint={errors.socialLink || socialLinkError ? undefined : SOCIAL_LINK_HINT}
+          error={errors.socialLink?.message ?? socialLinkError}
+        >
+          <Controller
+            control={form.control}
+            name="socialLink"
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder="https://facebook.com/yourname"
+              />
+            )}
+          />
+        </Field>
+        <p className="m-0 text-[13px] text-fg2">{ENTRY_KEY_NOTE}</p>
         <Field
           label={`Level for this club${!club && live ? ' (locks immediately)' : ''}`}
           optional={club}

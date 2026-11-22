@@ -1,4 +1,9 @@
 import 'server-only'
+import {
+  normalizeSocialLink,
+  SOCIAL_LINK_ERROR,
+  socialLinkAlreadySaved,
+} from '@rotra/schema/social-link'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { ClubPlayer, QueueSession, SessionWaitlistEntry } from '../generated/prisma/client'
@@ -8,10 +13,12 @@ import {
   normalizeEmail,
   pointRecordAt,
   resolveEmail,
+  resolveSocialKey,
   savedRecordFor,
 } from '../player/shared-entry'
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
+import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
 import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
 import { countedGamesByEntry } from './finalization'
 import { closeStaleMatchRequests } from './match-request-store'
@@ -217,7 +224,14 @@ export async function createClubPlayer(
   tx: Tx,
   context: ClubContext,
   operationId: string,
-  input: { name: string; nickname?: string | null; phone?: string | null; email?: string | null },
+  input: {
+    name: string
+    nickname?: string | null
+    phone?: string | null
+    email?: string | null
+    /** #1019: a social link is an entry key too, and wins over the email */
+    socialLink?: string | null
+  },
   now: Date,
 ) {
   const id = await derivedId(operationId, 'club-player')
@@ -233,9 +247,23 @@ export async function createClubPlayer(
   const typedEmail = input.email?.trim() || ''
   const email = typedEmail ? normalizeEmail(typedEmail) : null
   if (typedEmail && !email) throw new ServiceError('invalid', { email: NEW_PLAYER_EMAIL_ERROR })
+  const typedLink = input.socialLink?.trim() || ''
+  const link = typedLink ? normalizeSocialLink(typedLink) : null
+  if (typedLink && !link) throw new ServiceError('invalid', { socialLink: SOCIAL_LINK_ERROR })
+  // #1019: a social link makes the record unclaimed, or links the unclaimed player who has it; the
+  // link decides who they are, so the email's owner is not checked. One the club saved is refused.
+  const linked = link ? await resolveSocialKey(tx, context.clubId, link.key, now, false) : null
+  if (linked) {
+    const same = await savedRecordFor(tx, context.clubId, linked)
+    if (same)
+      throw new ServiceError('conflict', {
+        socialLink: socialLinkAlreadySaved(same.player?.fullName || same.displayName),
+      })
+  }
   // D-2026-11-16-04: an email makes the record unclaimed (or links a registered player); one the
   // club already saved is refused, naming that player.
-  const resolution = email ? await resolveEmail(tx, context.clubId, email, now, false) : null
+  const resolution =
+    email && !link ? await resolveEmail(tx, context.clubId, email, now, false) : null
   if (resolution) {
     const same = await savedRecordFor(tx, context.clubId, resolution)
     if (same) {
@@ -256,6 +284,18 @@ export async function createClubPlayer(
     await tx.clubPlayerPrivateInput.create({
       data: { clubPlayerId: id, clubId: context.clubId, phoneE164: phone, capturedAt: now },
     })
+  if (link) {
+    const resolvedLink =
+      linked ?? (await resolveSocialKey(tx, context.clubId, link.key, now, true, email))
+    if (!resolvedLink) throw new Error('Social link resolution failed')
+    await pointRecordAt(tx, context.clubId, id, resolvedLink)
+    // The link is public on the profile card: it is kept in this club's own details.
+    await keepClubLink(tx, context.clubId, id, link, now)
+    clubPlayer = await tx.clubPlayer.findUniqueOrThrow({
+      where: { clubId_id: { clubId: context.clubId, id } },
+    })
+    return { clubPlayer, words: emailWords(resolvedLink) }
+  }
   if (!email) return { clubPlayer, words: null }
   const resolved = resolution ?? (await resolveEmail(tx, context.clubId, email, now))
   if (!resolved) throw new Error('Email resolution failed')
@@ -264,6 +304,27 @@ export async function createClubPlayer(
     where: { clubId_id: { clubId: context.clubId, id } },
   })
   return { clubPlayer, words: emailWords(resolved) }
+}
+
+/** Writes the link into this club's own details for the record (its preset fields). */
+async function keepClubLink(
+  tx: Tx,
+  clubId: string,
+  clubPlayerId: string,
+  link: NonNullable<ReturnType<typeof normalizeSocialLink>>,
+  now: Date,
+) {
+  const input = await tx.clubPlayerPrivateInput.findUnique({ where: { clubPlayerId } })
+  const own = readOwnDetails(input?.presetFields)
+  const presetFields = ownDetailsJson({
+    ...own,
+    socialLinks: { ...own.socialLinks, [link.provider]: link.url },
+  })
+  await tx.clubPlayerPrivateInput.upsert({
+    where: { clubPlayerId },
+    update: { presetFields, revision: { increment: 1 } },
+    create: { clubPlayerId, clubId, presetFields, capturedAt: now },
+  })
 }
 
 const OWN_NAME_ERROR = 'Enter a name.'
@@ -398,6 +459,7 @@ export async function addNewPlayerToSession(
     phone?: string
     /** D-2026-11-16-04: no email adds a guest; an email adds an unclaimed player or links one */
     email?: string | null
+    socialLink?: string | null
     level: string
   },
 ) {
@@ -415,6 +477,7 @@ async function addNewPlayerIn(
     nickname?: string
     phone?: string
     email?: string | null
+    socialLink?: string | null
     level: string
   },
 ) {
@@ -1078,6 +1141,7 @@ export type RosterBatchOperation =
       nickname?: string
       phone?: string
       email?: string | null
+      socialLink?: string | null
       level: string
     })
   | { op: 'remove'; operationId: string; rosterId: string }

@@ -1,3 +1,4 @@
+import { normalizeSocialLink } from '@rotra/schema/social-link'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import type { MockState } from '../mock/store'
@@ -24,6 +25,14 @@ export function accountByEmail(
 ): PlayerAccountRecord | undefined {
   const key = emailKey(email)
   return key ? s.playerAccounts.find((a) => emailKey(a.email) === key) : undefined
+}
+
+/** #1019: the unclaimed person whose entry key is this normalized social link. Never a registered player. */
+export function accountBySocialKey(
+  s: MockState,
+  key: string | null | undefined,
+): PlayerAccountRecord | undefined {
+  return key ? s.playerAccounts.find((a) => !a.claimed && a.socialKey === key) : undefined
 }
 
 /** A person with an RTR ID who has not registered: the shared entry of an unclaimed player. */
@@ -64,6 +73,25 @@ export function savedRecordByEmail(
   )
 }
 
+/** The saved player of one club that already stands for this social link key (current records only). */
+export function savedRecordBySocialKey(
+  s: MockState,
+  clubId: string,
+  key: string,
+  exceptId?: string,
+): ClubPlayer | undefined {
+  const owner = accountBySocialKey(s, key)
+  return s.clubPlayers.find(
+    (p) =>
+      p.clubId === clubId &&
+      p.id !== exceptId &&
+      isCurrentRecord(p) &&
+      p.identity !== 'registered' &&
+      ((!!owner && p.playerId === owner.playerId) ||
+        normalizeSocialLink(s.pendingSocialLinks?.[p.id])?.key === key),
+  )
+}
+
 /** Raises a place and day's counter to at least this RTR ID's number. Counters are never rewound. */
 function countRtrId(s: MockState, rtrId: string) {
   const parts = splitRtrId(rtrId)
@@ -100,7 +128,14 @@ export function allocateMockRtrId(s: MockState, placeCode: string, at = Date.now
  */
 export function createUnclaimedPerson(
   s: MockState,
-  input: { clubId: string; email: string; fullName: string; nickname: string | null },
+  input: {
+    clubId: string
+    /** The email, or null for a person saved with a social link only (#1019) */
+    email: string | null
+    socialKey?: string | null
+    fullName: string
+    nickname: string | null
+  },
 ): Player {
   const club = s.clubs.find((c) => c.id === input.clubId)
   if (!club) throw new Error('An unclaimed player needs the club that saved them.')
@@ -123,6 +158,7 @@ export function createUnclaimedPerson(
     playerId: id,
     phone: '',
     email: emailKey(input.email),
+    socialKey: input.socialKey ?? null,
     phoneHidden: false,
     claimed: false,
   })

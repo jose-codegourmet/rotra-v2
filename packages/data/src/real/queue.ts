@@ -597,6 +597,8 @@ export async function realAddNewPlayerToSession(input: {
   phone?: string
   /** No email adds a guest; an email adds an unclaimed player or links one (D-2026-11-16-04) */
   email?: string
+  /** #1019: a social link is an entry key too, and wins over the email */
+  socialLink?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string
@@ -846,6 +848,8 @@ export async function realAddNewSavedPlayer(input: {
   phone?: string | null
   /** No email saves a guest; an email an unclaimed player or a linked one (D-2026-11-16-04) */
   email?: string | null
+  /** #1019: a social link is an entry key too, and wins over the email */
+  socialLink?: string | null
 }) {
   const saved = await realRequest<{
     clubPlayerId: string

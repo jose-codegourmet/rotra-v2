@@ -572,6 +572,12 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   })
   const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
   const waitlist = p.waitlist.map(tile)
+  // Hosts (#1006): the same name rule as Players. Real mode's signed-in names come from the Player
+  // app's access read, like `participants`; zero hosts hides the section.
+  const hosts = (access && !signedRead ? (access.hosts ?? p.hosts) : p.hosts)?.map((h, i) => ({
+    ...tile(h, i),
+    id: `host-${i}`,
+  }))
   // 2026-11-13-queue-public-faces-profile: for a signed-in player the faces on Courts now and the
   // Queue open the same profile card as the Participants tab.
   const openFace =
@@ -803,6 +809,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
               </TabsContent>
               <TabsContent value="participants">
                 <PublicParticipants
+                  hosts={hosts}
                   participants={participants}
                   participantCount={p.participantCount ?? p.participants.length}
                   uncapped={uncapped}

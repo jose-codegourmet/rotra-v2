@@ -34,6 +34,7 @@ import { profileBanners } from '../fixtures/profileBanners'
 import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
+import { createSessionHostFixtures } from '../fixtures/sessionHosts'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
 import { createTrustedHostFixtures } from '../fixtures/trustedHosts'
 import { seedUnclaimedPlayers } from '../fixtures/unclaimedPlayers'
@@ -258,7 +259,7 @@ function seedState(): MockState {
     players: [...players, ...requests.players],
     clubPlayers: [...clubPlayers, ...requests.clubPlayers],
     clubTrustedHosts: createTrustedHostFixtures(now),
-    sessionHosts: [],
+    sessionHosts: createSessionHostFixtures(now),
     sessions,
     courts,
     roster: [...roster, ...history.roster],

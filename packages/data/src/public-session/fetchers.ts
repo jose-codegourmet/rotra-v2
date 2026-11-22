@@ -404,6 +404,39 @@ function projectQueue(
   }))
 }
 
+/**
+ * The Hosts section (#1006, D-2026-11-22-01): the session's current host rows through the same
+ * person rule as Players (`publicPerson`). The roster or waitlist entry's snapshot and level win; a
+ * host who is not placed uses the saved player's name and level. Never counted in capacity.
+ */
+function projectHosts(
+  state: MockState,
+  sessionId: string,
+  viewer: Viewer | null,
+): PublicSessionParticipant[] {
+  return (state.sessionHosts ?? [])
+    .filter((h) => h.sessionId === sessionId && h.removedAt === null)
+    .sort((a, b) => a.assignedAt - b.assignedAt || a.id.localeCompare(b.id))
+    .flatMap((h) => {
+      const p = state.clubPlayers.find((x) => x.id === h.clubPlayerId)
+      if (!p) return []
+      const placed =
+        state.roster.find((r) => r.sessionId === sessionId && r.clubPlayerId === p.id) ??
+        state.waitlist.find((w) => w.sessionId === sessionId && w.clubPlayerId === p.id)
+      const names =
+        placed && 'nameSnapshot' in placed
+          ? { fullName: placed.nameSnapshot, nickname: placed.nicknameSnapshot }
+          : { fullName: p.fullName, nickname: p.nickname }
+      return [
+        participantOf(
+          publicPerson(state, p.id, names, viewer),
+          placed?.level ?? p.playingLevel,
+          viewer !== null,
+        ),
+      ]
+    })
+}
+
 function project(
   state: MockState,
   slug: string,
@@ -453,6 +486,7 @@ function project(
       ),
     ),
     skillMix: publicSkillMix(roster.map((r) => r.level)),
+    hosts: projectHosts(state, s.id, viewer),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === s.id)
       .sort((a, b) => a.addedAt - b.addedAt)

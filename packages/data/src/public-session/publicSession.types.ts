@@ -172,6 +172,14 @@ export type PublicSessionPage = {
   participants: PublicSessionParticipant[]
   /** Aggregate skill-group counts over the full confirmed roster (never the waitlist), #474 */
   skillMix: PublicSkillMix
+  /**
+   * The session's current **Hosts** (epic #1002, D-2026-11-22-01), oldest first, with the same name,
+   * picture and level treatment as `participants` (masked for visitors, full for a registered player
+   * to a signed-in viewer). A host who plays is in `participants` too, and counts once in
+   * `participantCount`, `openSlots` and `slotBudget`, which read the roster only. Missing or empty:
+   * the page hides the Hosts section. Never the club's nickname (D-2026-11-18-03).
+   */
+  hosts?: PublicSessionParticipant[]
   /** Public-safe waitlisted players in waitlist order. */
   waitlist: PublicSessionParticipant[]
   openSlots: number
@@ -431,6 +439,8 @@ export type PlayerSessionAccess = {
   joinRequest: MyJoinRequest | null
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /** Real mode: the Hosts section by the same signed-in name rule as `participants` (#1006) */
+  hosts?: PublicSessionParticipant[]
   /**
    * Real mode: **Courts now** for the signed-in Player (live sessions; empty otherwise). Missing in
    * mock mode, where the signed-in read carries it, and on a server from before it was connected.

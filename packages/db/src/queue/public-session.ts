@@ -191,12 +191,29 @@ export async function readPublicSession(slug: string) {
     const courts = await liveCourts(tx, session.id)
     const roster = await liveRoster(tx, session.id)
     const waitlist = await orderedWaitlist(tx, session.id)
+    // Epic #1002 (#1006): the current hosts ride the same read, oldest first. Zero is valid.
+    const hostRows = await tx.sessionHost.findMany({
+      where: { sessionId: session.id, removedAt: null },
+      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+      select: { clubPlayerId: true },
+    })
     const clubPlayers = await tx.clubPlayer.findMany({
       where: {
         clubId: session.clubId,
-        id: { in: [...roster.map((r) => r.clubPlayerId), ...waitlist.map((w) => w.clubPlayerId)] },
+        id: {
+          in: [
+            ...roster.map((r) => r.clubPlayerId),
+            ...waitlist.map((w) => w.clubPlayerId),
+            ...hostRows.map((h) => h.clubPlayerId),
+          ],
+        },
       },
-      select: { id: true, displayName: true, player: { select: { avatarRef: true } } },
+      select: {
+        id: true,
+        displayName: true,
+        player: { select: { avatarRef: true } },
+        assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
+      },
     })
     const byId = new Map(clubPlayers.map((p) => [p.id, p]))
     const capacity = await capacityOf(tx, session)
@@ -233,6 +250,23 @@ export async function readPublicSession(slug: string) {
       }),
       // #474: counts over the same roster as `participants`.
       skillMix: publicSkillMix(roster.map((entry) => levelCodeFor(entry.skillLevelId))),
+      // The Hosts section (#1006, D-2026-11-22-01): the same masked name and picture as Players. A
+      // host who plays is also in `participants`; capacity and counts read the roster only.
+      hosts: hostRows.flatMap((host) => {
+        const clubPlayer = byId.get(host.clubPlayerId)
+        if (!clubPlayer) return []
+        const placed = roster.find((r) => r.clubPlayerId === host.clubPlayerId)
+        const waiting = waitlist.find((w) => w.clubPlayerId === host.clubPlayerId)
+        const levelId =
+          placed?.skillLevelId ?? waiting?.skillLevelId ?? clubPlayer.assessments[0]?.skillLevelId
+        return [
+          {
+            name: maskPublicName(placed?.nameSnapshot ?? clubPlayer.displayName),
+            pictureUrl: clubPlayer.player?.avatarRef ?? null,
+            ...publicLevel(levelCodeFor(levelId ?? null)),
+          },
+        ]
+      }),
       waitlist: waitlist.map((w) => {
         const clubPlayer = byId.get(w.clubPlayerId)
         return {
@@ -504,36 +538,54 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
   if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
     const roster = await liveRoster(tx, session.id)
+    const linkedSelect = {
+      id: true,
+      playerId: true,
+      nickname: true,
+      sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
+      player: {
+        select: {
+          avatarRef: true,
+          nickname: true,
+          profileState: true,
+          profileVisibility: true,
+          banner: { select: { id: true, image: true } },
+          idAllocation: { select: { rtrId: true } },
+        },
+      },
+    } as const
     const linked = await tx.clubPlayer.findMany({
       where: { id: { in: roster.map((entry) => entry.clubPlayerId) } },
+      select: linkedSelect,
+    })
+    // Epic #1002 (#1006): the current hosts get the same name and card rule as the roster. They
+    // never feed `fullRoster` below (a host who is not playing does not unlock the full roster).
+    const hostRows = await tx.sessionHost.findMany({
+      where: { sessionId: session.id, removedAt: null },
+      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+      select: { clubPlayerId: true },
+    })
+    const hostPlayers = await tx.clubPlayer.findMany({
+      where: { id: { in: hostRows.map((h) => h.clubPlayerId) }, clubId: session.clubId },
       select: {
-        id: true,
-        playerId: true,
-        nickname: true,
-        sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
-        player: {
-          select: {
-            avatarRef: true,
-            nickname: true,
-            profileState: true,
-            profileVisibility: true,
-            banner: { select: { id: true, image: true } },
-            idAllocation: { select: { rtrId: true } },
-          },
-        },
+        ...linkedSelect,
+        displayName: true,
+        assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
     })
     const shownBanners = await readShownProfileBanners(tx)
     const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
-    const pictures = new Map(linked.map((entry) => [entry.id, entry.player?.avatarRef ?? null]))
-    const people = new Map(linked.map((entry) => [entry.id, entry]))
+    const pictures = new Map(
+      [...linked, ...hostPlayers].map((entry) => [entry.id, entry.player?.avatarRef ?? null]),
+    )
+    const people = new Map([...linked, ...hostPlayers].map((entry) => [entry.id, entry]))
     /**
      * D-2026-11-09-02 for a signed-in Player, #731: a registered (claimed) player's full name,
      * nickname and RTR ID, and which card the tile opens; guests and unclaimed profiles stay
      * masked. An always-private player (D-2026-11-12-01) is masked for everyone but themselves,
      * keeps their picture and opens the private card.
      */
-    const person = (entry: (typeof roster)[number]) => {
+    const person = (entry: { clubPlayerId: string; nameSnapshot: string }) => {
       const club = people.get(entry.clubPlayerId)
       const registered = !!club?.playerId && club.player?.profileState === 'claimed'
       const isViewer = !!club?.playerId && club.playerId === context.playerId
@@ -661,6 +713,21 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),
+      // Epic #1002 (#1006): the Hosts section, the same name, picture and card as Players.
+      hosts: hostRows.flatMap((host) => {
+        const who = hostPlayers.find((p) => p.id === host.clubPlayerId)
+        if (!who) return []
+        const placed = roster.find((r) => r.clubPlayerId === who.id)
+        const nameSnapshot = placed?.nameSnapshot ?? who.displayName
+        const levelId = placed?.skillLevelId ?? who.assessments[0]?.skillLevelId ?? null
+        return [
+          {
+            ...person({ clubPlayerId: who.id, nameSnapshot }),
+            pictureUrl: who.player?.avatarRef ?? null,
+            ...publicLevel(levelCodeFor(levelId)),
+          },
+        ]
+      }),
       courtsNow,
       queue: matches.map((match) => ({
         matchNo: match.matchNo,

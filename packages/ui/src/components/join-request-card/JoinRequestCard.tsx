@@ -234,7 +234,12 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
               <span className="text-[13px] text-fg2">Additional players can be admitted</span>
             )}
           </div>
-          {hasPlayers && skillMix ? <SkillDistributionBar counts={skillMix} /> : null}
+          {hasPlayers && skillMix ? (
+            <SkillDistributionBar
+              counts={skillMix}
+              capacity={props.variant === 'open' ? props.capacity : undefined}
+            />
+          ) : null}
           <p className="m-0 text-[13px] text-fg2">
             {props.variant === 'active'
               ? 'The Queue Master can admit additional players. '

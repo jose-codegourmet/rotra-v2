@@ -35,12 +35,17 @@ import {
   realGetMyJoinRequest,
   realGetMyNight,
   realGetPublicMatchHistory,
+  realGetPublicPaymentStatus,
   realGetPublicSession,
   realSendJoinRequest,
 } from '../real/public-session'
 import { sessionCostIn } from '../session-cost/fetchers'
+import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import { shownSessionHostRows } from '../session-host/sessionHost.history'
+import { receivedAmount } from '../session-payment/sessionPayment.rules'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { slotPaymentsIn } from '../slot-transfer/slotPayments'
+import { mySlotTransfer } from '../slot-transfer/slotTransferViews'
 import { playerOrigin } from './context'
 import {
   linkedClubPlayerIds,
@@ -753,6 +758,8 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           (d) => d.sessionId === session.id && d.pid === row.id && d.status === 'open',
         )
       : false,
+    canTransfer: !!row && session.state === 'prepared',
+    slotTransfer: row ? mySlotTransfer(live, session.id, row.id) : null,
     offline: getConnectivity() === 'offline',
     games: standing?.games ?? 0,
     won: standing?.wins ?? 0,
@@ -1007,4 +1014,41 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
         teamB: team(match.teamB),
       })),
   }
+}
+
+/**
+ * Payment status share on the public page (#1010; owner decision 2026-11-22, #1015): the confirmed
+ * roster's payments as share rows, names masked like every other public name. Read from the last
+ * synced state; real mode reads the visitor-safe `payment-status` Route Handler. A cancelled or invalid session returns null.
+ */
+export async function getPublicPaymentStatus(slug: string): Promise<{
+  amountDue: number | null
+  rows: {
+    name: string
+    receivedMinor: number | null
+    waivedMinor?: number
+    viaTransfer?: boolean
+  }[]
+} | null> {
+  if (isRealDataMode()) return realGetPublicPaymentStatus(slug)
+  await delay()
+  const { state } = serverState()
+  const session = sessionBySlug(state, slug)
+  if (session.state === 'invalid' || session.state === 'cancelled') return null
+  const amountDue = amountDuePerHead(sessionCostIn(state, session.id)?.estimate ?? null)
+  // #1013: the cash an approved slot transfer carried and its waivers count for the holder, once.
+  const ledger = slotPaymentsIn(state, session.id, amountDue)
+  const rows = state.roster
+    .filter((p) => p.sessionId === session.id)
+    .map((p) => {
+      const payment = ledger.paymentOf(p.id)
+      return {
+        name: maskPublicName(p.nameSnapshot),
+        receivedMinor: payment.mark ? receivedAmount(payment.mark, amountDue) : null,
+        waivedMinor: payment.mark?.waivedMinor ?? 0,
+        viaTransfer: payment.chain.length > 0,
+      }
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return { amountDue, rows }
 }

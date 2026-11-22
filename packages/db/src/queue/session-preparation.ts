@@ -34,6 +34,7 @@ import {
   type Tx,
   touchSession,
 } from './session-store'
+import { closePendingSlotTransfers } from './slot-transfers'
 
 /** Q-SETUP input. Instants are ISO strings. Cost estimates are written by the financials ticket. */
 export type QueueSessionInput = {
@@ -568,6 +569,8 @@ export async function startSession(
         where: { clubId: context.clubId, sessionId, status: 'pending' },
         data: { status: 'closed', decidedAt: now },
       })
+      // #1011: pending slot transfers expire at Start; every slot stays with its holder.
+      await closePendingSlotTransfers(tx, sessionId, 'expired', now)
       return { ...sessionDto(session), joinRequestsClosed: closed.count }
     })
   } catch (error) {

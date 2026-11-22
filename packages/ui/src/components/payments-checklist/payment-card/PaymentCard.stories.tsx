@@ -1,6 +1,7 @@
 import {
   allPaymentPlayers,
   mixedPaymentPlayers,
+  transferredPaymentPlayer,
   unpaidPaymentPlayers,
 } from '@rotra/data/fixtures/financials'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -16,6 +17,7 @@ const meta = {
     onTogglePaid: fn(),
     onSelectPlayer: fn(),
     onEditAmount: fn(),
+    onOpenHistory: fn(),
   },
   decorators: [
     (Story) => (
@@ -32,3 +34,6 @@ export const Paid: Story = { args: { player: allPaymentPlayers[0]! } }
 export const Partial: Story = { args: { player: mixedPaymentPlayers[3]! } }
 export const Reimburse: Story = { args: { player: mixedPaymentPlayers[4]! } }
 export const NoFeeSet: Story = { args: { amountDue: null } }
+/** #1013: paid through a slot transfer: locked switch, waiver line, the body opens Slot history */
+export const ViaTransfer: Story = { args: { player: transferredPaymentPlayer } }
+export const ViaTransferLight: Story = { ...ViaTransfer, globals: { theme: 'light' } }

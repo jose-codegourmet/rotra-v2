@@ -136,11 +136,15 @@ session nobody is confirmed in.
   session ends with Session done (or is invalid), never Cancelled.
 - **Final.** There is no undo. To play anyway, the club creates a new session.
 - **Confirm first.** The confirmation names the session, its date and time, how many players joined and how many
-  are on the waitlist, warns when any are marked paid ("Refunds happen outside ROTRA."), and takes an optional
+  are on the waitlist, warns when any are marked paid (the record will list who to refund and how much), and takes an optional
   **reason** (up to 120 characters). See [D-CANCEL-SESSION](../../../../../screens/product/dialogs.md#d-cancel-session--cancel-session).
 - **What it keeps.** The cancelled time and the reason (if any) are recorded. The roster, waitlist and payment
-  marks stay on the session, read-only. ROTRA does not refund anyone: refunds happen outside ROTRA, as with
-  every payment ([Financials](../financials/README.md#payments-checklist)). Payment marks can no longer change.
+  marks stay on the session, read-only. ROTRA moves no money: the Queue Master refunds outside ROTRA. The record
+  then lists **Refund everyone who paid** (paid and partially paid players with the whole cash to refund each) and
+  the Queue Master records each manual refund (#1014, owner decision November 22, 2026;
+  [Financials › Manual full refunds](../financials/README.md#manual-full-refunds-1014)). Payment marks can no
+  longer change; payment and refund records both stay in the history.
+- **What it cancels.** Pending slot transfers are cancelled, so their transfer links stop working (#1011, #1012).
 - **What it closes.** Pending join requests close; the public page shows **Cancelled** and the reason, and no
   join form. The session no longer counts toward venue or time clashes, and is not offered for download.
 - **What it counts toward.** Nothing: no games, standings, result slides, minimum, player records or ranking.

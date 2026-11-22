@@ -3794,7 +3794,7 @@ const SHEETS = {
     '<button class="btn" data-act="gCancel">Cancel</button>'),
   leaveClub: (sh) => {
     const c = CLUB_DIR[sh.id];
-    return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games stay.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
+    return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games, registrations and payments stay. Any pending slot transfer you\'re part of in this club\'s sessions is cancelled, and its link stops working. If you\'re one of the club\'s trusted hosts, that ends too and your Host badge goes; rejoining doesn\'t bring it back.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
   },
   discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
   request: () => {
@@ -4195,6 +4195,8 @@ const ACT = {
   leaveClub: (el) => {
     const a = S.accounts[S.me], c = CLUB_DIR[el.dataset.id];
     a.clubs = (a.clubs || []).filter((x) => x.id !== el.dataset.id);
+    // #1018: leaving ends the player's trusted-host status in that club (the Host badge goes); rejoining never restores it.
+    if (TRUSTED_HOST_CLUBS[S.me]) TRUSTED_HOST_CLUBS[S.me] = TRUSTED_HOST_CLUBS[S.me].filter((id) => id !== el.dataset.id);
     S.ui.sheet = null; render(); toast(`You left ${c.name}`);
   },
   resendEmail: () => toast('Email sent again'),

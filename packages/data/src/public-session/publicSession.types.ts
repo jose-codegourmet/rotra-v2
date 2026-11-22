@@ -6,6 +6,7 @@ import type {
   JoinRequestPlacement,
   SessionJoinRequest,
 } from '../session-roster/sessionRoster.types'
+import type { MySlotTransfer } from '../slot-transfer/slotTransfer.types'
 
 /**
  * The **Tonight ·** line on a profile card (#731): Playing · Court N, On court · getting ready ·
@@ -365,6 +366,13 @@ export type MyNight = {
   hasLeft: boolean
   /** An open I can't make it notice (“Told the QM you can't make it”) */
   cantMakeItSent: boolean
+  /**
+   * Transfer my slot (#1011): true while the Player is confirmed and the session is Prepared, so
+   * the card offers the button. Missing on a server from before transfers reads false.
+   */
+  canTransfer?: boolean
+  /** The Player's own pending slot transfer (“Transfer to NAME requested · the QM decides”), or null */
+  slotTransfer?: MySlotTransfer | null
   /** The club device is offline: “Checked in · the QM will see it when their device syncs” */
   offline: boolean
   /** Counted games, wins and losses tonight; the viewer's own standing only */

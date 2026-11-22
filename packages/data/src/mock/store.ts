@@ -63,7 +63,10 @@ import { salesSettingsSeed } from '../sales/sales.fixtures'
 import type { SalesSettings } from '../sales/sales.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionHostRecord } from '../session-host/sessionHost.types'
-import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
+import type {
+  SessionPaymentMark,
+  SessionPaymentRefund,
+} from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import type {
   PlayerAwardHistory,
@@ -79,6 +82,7 @@ import type {
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
+import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
 import type { ClubTrustedHost } from '../trusted-host/trustedHost.types'
 import { NotConnectedError } from './errors'
@@ -88,6 +92,8 @@ export type MockState = {
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
+  /** Manual full refunds (#1014), append-only; missing in older saved states */
+  paymentRefunds?: SessionPaymentRefund[]
   playerAccounts: typeof playerAccounts
   playerNotifications: Record<string, PlayerNotification[]>
   verificationReminderReads: Record<string, string>
@@ -144,6 +150,8 @@ export type MockState = {
   matchRequests: MatchRequest[]
   /** Session invite codes (D-2026-11-09-08): one per Player and session */
   sessionInviteCodes: SessionInviteCode[]
+  /** Slot transfers (#1011) in every state; decided ones stay. Missing in older saved states */
+  slotTransfers?: SlotTransfer[]
   /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
   /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
@@ -199,7 +207,8 @@ function freeze<T>(value: T): DeepReadonly<T> {
 function seedState(): MockState {
   const now = Date.now(),
     { sessions, courts, roster, history, requests } = createQueueFixtures(now),
-    publicationFixtures = createSessionPublicationFixtures(now)
+    publicationFixtures = createSessionPublicationFixtures(now),
+    financials = createFinancialFixtures([...roster, ...history.roster], now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage
   // produced; an unrecorded one never reached that stage and has none.
   const resultSnapshots = Object.fromEntries(
@@ -237,7 +246,10 @@ function seedState(): MockState {
     ],
     adminPlayerRecords: {},
     ...createPlayerRankFixtures(),
-    ...createFinancialFixtures([...roster, ...history.roster], now),
+    ...financials,
+    // #1013: tonight's sample marks for the slot transfer accounting (partial payer, chain giver)
+    paymentMarks: [...financials.paymentMarks, ...requests.paymentMarks],
+    paymentRefunds: [],
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
@@ -268,6 +280,7 @@ function seedState(): MockState {
     dropOutNotices: requests.dropOutNotices,
     matchRequests: requests.matchRequests,
     sessionInviteCodes: requests.sessionInviteCodes,
+    slotTransfers: requests.slotTransfers,
     licensePayments: adminClubTerms,
     clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},

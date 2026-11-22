@@ -1,6 +1,6 @@
 # Session financials and club inventory
 
-**Last verified:** 2026-11-01.
+**Last verified:** 2026-11-22 (Share payment status, #1010). 2026-11-01 for the rest.
 **Status:** Agreed v1 target rules, added October 26, 2026 from the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). This replaces the earlier v1 exclusion of shuttle pricing, cost estimates, and paid/unpaid tracking. ROTRA still never collects or moves money.
 
 ## Purpose
@@ -44,14 +44,41 @@ Each session has a **Payments** list of its roster players (waitlisted players a
 - **Owner decision, November 7, 2026 (#479): full or partial amounts.** Payment is no longer a tick only. Tapping a player's card (not the switch) opens **Payment from <name>** to record the actual **amount received** (pesos, 0 or more), with **Full ₱X** and **Clear** shortcuts. The quick switch stays and works as before. Saving an amount first saves any pending switch changes. Entering 0 marks the player not paid. Cancelled and invalid sessions stay read-only.
   - Status always compares the amount received with the **current** amount due: equal → **Paid**; above 0 but below → **Partial**, "₱X left"; above → **Reimburse**, "₱X to return"; nothing recorded or 0 → **Unpaid**. With no fee set, any recorded payment is Paid.
   - Changing the session's pricing never rewrites amounts received; statuses and totals refresh against the new amount due.
-  - **Reimburse** only tracks money to return. ROTRA records no refunds and moves no money; money is still collected (and returned) outside ROTRA.
+  - **Reimburse** only tracks money to return; it is not a refund. ROTRA moves no money; money is still collected (and returned) outside ROTRA. Full refunds are recorded only as below (#1014).
   - A payment recorded before this change with no amount counts as paid in full at the current amount due.
 - **Owner decision, November 1, 2026 (#300):** payment switches update optimistically, then save desired end states together after 800 ms without another switch. A switch returned to its accepted state in the window needs no write. Flush before Mark all paid and on tab/sheet/page exit. A failed batch rolls back only its changes, preserving newer intent. Show one summary toast per accepted batch; recorded amounts and storage stay unchanged.
-- Totals (#479): **paid** count (e.g. 15/18) counts Paid and Reimburse players (fully covered), with "N partial" when any are partial; **collected** = sum of amounts received; **still due** = sum over the roster of what each player still owes (amount due − received, never below 0); **to reimburse** = sum of overpayments, shown only when above 0; and collected **against costs** (collected − estimated total cost).
+- Totals (#479): **paid** count (e.g. 15/18) counts Paid and Reimburse players (fully covered), with "N partial" when any are partial; **collected** = sum of amounts received and kept (cash only, never a waiver; net of manual refunds, #1014), with "₱X refunded" shown apart when any; **still due** = sum over the roster of what each player still owes (amount due − received − waived, never below 0); **to reimburse** = sum of overpayments, shown only when above 0; and collected **against costs** (collected − estimated total cost).
 - Filter: Everyone, Not paid (Unpaid and Partial), Paid (Paid and Reimburse). Players with no payment recorded are listed first.
 - It is available before, during and after the session: on the preparation page, from **Payments** in the live console, and in the session record's Financials tab. Ticks are ordinary changes that work offline and sync. **After Session done** the Queue Master can still tick paid / not paid (decided November 11, 2026, [D-2026-11-11-06](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-06)); payments are bookkeeping with an audit record and never reopen or change results.
+- **Slots that came by slot transfer** (#1013, [D-2026-11-22-05](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-05)): the recipient is **Paid** with the cash already collected for the slot ("₱500 received · via transfer") and the automatic waiver ("₱400 waived"). The waiver counts toward Paid but is **never cash**: **collected** counts the slot's cash once (the sender's payment is carried, not copied), **still due** subtracts waivers, **to reimburse** counts only cash above the amount due, and the Collected tile adds "₱X waived (not cash)". The card's switch is locked and its body opens **Slot history** (original payer, each transfer, what each giver paid, each waiver, approval times); quick ticks, Mark all paid and the amount editor never record a second payment for it. The sender's recorded payment is kept on their record, frozen. If the fee changes after the approval, the status follows the new amount due (a waiver never becomes money to return).
 - **Demotion keeps the paid mark** (same decision): a paid player moved to the waitlist by a capacity change keeps the mark, and it shows again if they regain a slot.
-- **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). ROTRA records no refunds; the cancel confirmation warns how many players are marked paid and that refunds happen outside ROTRA. See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
+- **Cancelled session** (owner decision, November 6, 2026): payment marks are kept on the read-only record and can no longer change ("Payments are not available for this session.", as for an invalid session). The cancel confirmation warns how many players are marked paid and that the record will list who to refund; refunds are recorded there (#1014, below). See [Cancelling a session](../sessions/README.md#cancelling-a-session-owner-decision-november-6-2026).
+
+### Manual full refunds (#1014)
+
+Epic #1009, owner decisions on #1015 (November 22, 2026), [D-2026-11-22-06](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-06); [log](../../../../../mockup-changes/2026-11-22-queue-manual-refunds.md).
+
+- **ROTRA moves no money.** A refund is a record that the Queue Master handed cash back outside ROTRA. No gateway, no payout, no receipt.
+- **Full refunds only.** The amount is the whole cash collected for the slot: the holder's own payment plus cash carried in by approved slot transfers (#1013). A **waiver is never refunded** (it was never cash); a slot that holds only a waiver has nothing to refund.
+- **Audit.** Each refund is kept for good (who, how much, why, when, and the rejected transfer when there is one), one per player per session, never changed or removed. The original payment is kept exactly as recorded and can no longer change once refunded.
+- **Two ways in:**
+  - **Reject and refund** on a pending slot transfer (see [Slot transfers](../players/README.md#slot-transfers-1011)): the sender's registration is cancelled and the freed slot goes to the first eligible waitlisted player (FIFO).
+  - **Refund everyone who paid** on a cancelled session's record (owner decision, #1015): every roster player who paid cash (Paid, Reimburse or Partial), with the whole cash to refund each; **Record refund** per player after handing it back. Online only; recording twice changes nothing. Pending transfers were already cancelled with the session and their links stopped working.
+- **What readers show** (net kept = cash received − cash refunded): Payments **Collected** is net kept, with "₱X refunded" apart; **Against costs** uses net kept; status and **Still due** follow net kept (a refunded player reads Unpaid); the payment status share and the public share count net kept. The cancelled record's roster shows what each player paid, "· refunded" once refunded. A refunded sender is off the roster, so in no total; their payment and refund stay in the audit. Admin Sales (license revenue) is unaffected.
+- A refunded player's payment is locked; a refunded sender who rejoins the same session cannot have a new payment recorded for it yet (assumption, D-2026-11-22-06).
+
+### Share payment status (#1010, epic #1009; owner decisions November 22, 2026, [D-2026-11-22-02](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-02))
+
+A text summary of who has paid, for the Queue Master to copy or send to the group chat.
+
+- **Where:** a **Share status** button on the Payments checklist (preparation, live console, session record), and a **Share payment status** card on the public session page's Details tab. Both show the same dialog. ROTRA only writes the text; it moves no money.
+- **Who:** every confirmed roster person, registered players and guests. Waitlisted people are never in it. Cancelled and invalid sessions have no share. On the public page, names are masked like the rest of that page.
+- **Statuses and amounts** are the existing ones (Payments checklist above): Paid (Paid and Reimburse), Partial, Unpaid, compared with the **current** amount due. A **Reimburse** player is listed under Paid with "₱X to return".
+- **Filter:** All, Paid, Partial, Unpaid. All prints the three lists in that order; a filter prints one. An empty list reads "None".
+- **Each list** is numbered from 1 under a header with its count ("PAID (12)"). Each line: the name, **amount paid** and **balance** ("1. Maya Cruz · paid ₱500 · balance ₱200"); an Unpaid line shows only the balance. With no fee set there are no balances, and the text says "No fee set for this session."
+- **Collected total:** the last line, "Collected: ₱X · Balance: ₱Y", totals the people shown. **Collected is cash actually received.** A **waived** amount (slot transfers, [#1013](https://github.com/jose-codegourmet/rotra-v2/issues/1013)) lowers a person's balance and can make them Paid in full, but is never counted as collected or as money to return, and is listed as "₱X waived". Waivers are recorded by approved slot transfers ([D-2026-11-22-05](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-05)); with no fee set, a slot that came by transfer is listed as Paid.
+- **Copy / Share:** Copy text always; Share (the system share sheet) where the device has one. Facebook session sharing is a separate feature and is not changed.
+- **Public page, real mode:** a visitor-safe read returns the confirmed roster's names masked on the server, the amount due and the amount received per person. It returns nothing for a cancelled or invalid session and carries no contacts, ids, times or costs.
 
 This is a record kept by the operator, not proof of payment. ROTRA doesn't show players' contact details here; private phone and email rules still apply.
 
@@ -85,7 +112,7 @@ Inventory is club data behind the license gate: an expired club cannot open it.
 
 ## Boundaries
 
-- No payment collection, receipts, refunds, per-player bills, or gateways. Payments are manual records: a paid tick or an amount received (#479); Reimburse is a reminder, not a refund.
+- No payment collection, receipts, refund execution, per-player bills, or gateways. Payments are manual records: a paid tick or an amount received (#479); Reimburse is a reminder, not a refund; a manual full refund (#1014) is a record of cash handed back outside ROTRA.
 - No per-player charges or different fees per player.
 - The estimate does not change minimum-game targets, matchmaking, or results.
 - Club license payments remain a separate, manual process in [Admin](../../../admin/modules/clubs-licenses/README.md).

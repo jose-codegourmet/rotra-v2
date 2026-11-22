@@ -12,6 +12,11 @@ import {
   realJoinClub,
   realLeaveClub,
 } from '../real/player-club'
+import {
+  activateClubMembership,
+  cancelPendingTransfersOnLeave,
+  endTrustedHostsOnLeave,
+} from './membership'
 
 /**
  * One club on a profile's clubs card (#766), in both modes. `joinedVia` is set only when the
@@ -105,28 +110,8 @@ export async function joinClub({
   mockStore.update((draft) => {
     if (!draft.clubs.some((c) => c.id === clubId))
       throw new MockError('permission', 'This club link is not available.')
-    if (draft.clubPlayers.some((p) => p.playerId === id && p.clubId === clubId && !p.removedAt))
-      return
-    const removed = draft.clubPlayers.find(
-      (p) => p.playerId === id && p.clubId === clubId && p.removedAt,
-    )
-    if (removed) {
-      removed.removedAt = undefined
-      removed.joinedVia = 'club'
-      return
-    }
-    const profile = draft.playerProfiles.find((p) => p.playerId === id)
-    if (!profile) throw new MockError('permission', 'Sign in to join this club.')
-    draft.clubPlayers.push({
-      id: crypto.randomUUID(),
-      clubId,
-      playerId: id,
-      fullName: profile.fullName,
-      nickname: profile.nickname,
-      identity: 'registered',
-      playingLevel: null,
-      joinedVia: 'club',
-    })
+    if (!activateClubMembership(draft, id, clubId, 'club'))
+      throw new MockError('permission', 'Sign in to join this club.')
   })
   return { playerId: id, clubId }
 }
@@ -136,9 +121,18 @@ export async function leaveClub(clubId: string) {
   const id = await owner()
   checkMockSave()
   mockStore.update((draft) => {
-    // Keep a history tombstone, as the existing Saved players deletion does.
+    // Keep a history tombstone, as the existing Saved players deletion does. Leaving is never
+    // blocked; pending transfers the player is part of are cancelled with it, and their current
+    // trusted-host row ends (#1018).
+    const now = Date.now()
+    const left: string[] = []
     for (const player of draft.clubPlayers)
-      if (player.playerId === id && player.clubId === clubId) player.removedAt = Date.now()
+      if (player.playerId === id && player.clubId === clubId && !player.removedAt) {
+        player.removedAt = now
+        left.push(player.id)
+      }
+    cancelPendingTransfersOnLeave(draft, id, clubId, now)
+    endTrustedHostsOnLeave(draft, left, now)
   })
   return { playerId: id, clubId }
 }

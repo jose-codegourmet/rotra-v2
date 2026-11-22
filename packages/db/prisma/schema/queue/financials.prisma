@@ -110,3 +110,43 @@ model SessionPaymentMark {
   @@index([clubId, sessionId])
   @@map("session_payment_marks")
 }
+
+/// Why a manual full refund was recorded (#1014).
+enum PaymentRefundReason {
+  /// Reject and refund on a pending slot transfer: the sender's registration was cancelled.
+  transfer_rejected
+  /// The whole session was cancelled: Refund everyone who paid.
+  session_cancelled
+
+  @@map("payment_refund_reason")
+}
+
+/// Manual full refund (#1014, D-2026-11-22-06): an informational record that the Queue Master
+/// handed a roster entry's whole cash back outside ROTRA. ROTRA moves no money. Append-only: one
+/// row per entry (unique), never updated or deleted (trigger), and the payment marks it refunds are
+/// frozen (trigger), so the original payment and the refund both stay in the audit history.
+/// Readers count the entry's cash net of it (collected = received − refunded).
+model SessionPaymentRefund {
+  id              String              @id @db.Uuid
+  clubId          String              @map("club_id") @db.Uuid
+  sessionId       String              @map("session_id") @db.Uuid
+  /// The roster entry refunded: the transfer's sender, or a player of the cancelled session.
+  sessionPlayerId String              @map("session_player_id") @db.Uuid
+  reason          PaymentRefundReason
+  /// Set exactly for `transfer_rejected` (CHECK): the rejected transfer.
+  slotTransferId  String?             @unique @map("slot_transfer_id") @db.Uuid
+  /// The whole cash collected for the slot at the time (own + carried by transfers), centavos,
+  /// above 0 (CHECK). Never a waived amount.
+  amountMinor     Int                 @map("amount_minor")
+  currency        String              @default("PHP") @db.Char(3)
+  refundedAt      DateTime            @map("refunded_at") @db.Timestamptz(6)
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  session  QueueSession         @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  entry    SessionPlayer        @relation(fields: [clubId, sessionId, sessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  transfer SessionSlotTransfer? @relation(fields: [clubId, sessionId, slotTransferId], references: [clubId, sessionId, id], onDelete: Restrict)
+
+  @@unique([sessionId, sessionPlayerId])
+  @@index([clubId, sessionId])
+  @@map("session_payment_refunds")
+}

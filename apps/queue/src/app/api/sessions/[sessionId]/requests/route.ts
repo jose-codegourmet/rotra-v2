@@ -6,7 +6,8 @@ import { cookies } from 'next/headers'
 /**
  * Q-REQUESTS › the session's Requests read (`SessionRequests` with ISO times): open match requests,
  * oldest first, each spot with games, level and where the player is now. Join requests stay on the
- * roster read in real mode, so `join` and `dropOuts` are empty.
+ * roster read in real mode, so `join` is empty; open drop-out notices and pending slot transfers
+ * (#1011) come with it.
  */
 export async function GET(
   _request: Request,

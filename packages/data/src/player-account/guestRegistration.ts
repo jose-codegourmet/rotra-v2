@@ -8,6 +8,7 @@ import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
 import { allocateMockRtrId } from '../player/unclaimed'
+import { activateClubMembership } from '../player-club/membership'
 import { realRequest } from '../real/client'
 import { isRealDataMode } from '../real/mode'
 import type { CompleteClaimResult } from './playerAccount.types'
@@ -201,20 +202,15 @@ export async function completeGuestRegistration(input: {
     // D-2026-11-11-03, kept: every club's older record with this phone and no email joins the new
     // account automatically, with no Queue Master tap; one record per club, the earliest saved one.
     if (!previous) linkPhoneRecords(draft, id, values.phone)
-    if (
-      input.clubId &&
-      !draft.clubPlayers.some((p) => p.clubId === input.clubId && p.playerId === id && !p.removedAt)
-    ) {
-      draft.clubPlayers.push({
-        id: crypto.randomUUID(),
-        clubId: input.clubId,
-        playerId: id,
-        fullName: values.fullName,
-        nickname: values.nickname || null,
-        identity: 'registered',
-        playingLevel: null,
-        joinedVia: input.sessionSlug ? 'session' : 'club',
-      })
+    // Club or session link: one membership, reactivated when the player left before (#1018).
+    if (input.clubId) {
+      const member = activateClubMembership(
+        draft,
+        id,
+        input.clubId,
+        input.sessionSlug ? 'session' : 'club',
+      )
+      if (member && !member.fullName) member.fullName = values.fullName
     }
     const profile = draft.playerProfiles.find((p) => p.playerId === id)
     if (!profile) throw new Error('Registration produced no profile.')

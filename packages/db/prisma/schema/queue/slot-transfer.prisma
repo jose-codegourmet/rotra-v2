@@ -1,0 +1,111 @@
+// Slot transfers (#1011, epic #1009, D-2026-11-22-03; queue/modules/sessions-roster.md).
+//
+// A confirmed signed-in Player asks to hand their slot to another registered ROTRA player before the
+// session starts; the Queue Master approves or rejects it on the club account. Approval releases the
+// sender's roster entry (reason `transferred`) and gives the slot to the recipient in the same
+// transaction under the session row lock: capacity never changes and no second registration is made.
+// A row is immutable once it leaves `pending` (trigger in SQL), so repeat transfers read as a chain:
+// the next transfer's `sender_session_player_id` is the previous one's `recipient_session_player_id`.
+//
+// Transfer links (#1012, D-2026-11-22-04): when the recipient has no ROTRA account the sender makes a
+// single-claim link instead of picking an RTR ID. The link IS this row: a pending transfer with
+// `link_token_digest` set and `recipient_player_id` null until the first signed-in claimant takes it
+// (conditional UPDATE under the session lock; a trigger refuses a second claimant or a new token). The
+// link works exactly while the row is pending, so rejection, withdrawal (by either side), Start
+// (`expired`) and Cancel session (`cancelled`) all end it; a new link is a new row.
+//
+// Transfer accounting (#1013, D-2026-11-22-05): the approval UPDATE that leaves `pending` also writes
+// the payment snapshot (amount due, the slot's cash collected so far, earlier waivers and the
+// automatic waiver of what the slot still owed), so the recipient is Paid in Full and owes ₱0. No
+// payment mark is written or changed: the sender's mark stays on their released entry and is frozen
+// (trigger on session_payment_marks). Readers count the live holder's carried cash once.
+//
+// Refunds (#1014, D-2026-11-22-06): **Reject and refund** rejects this row and writes one
+// append-only `session_payment_refunds` row that references it (financials.prisma); the row itself
+// reads `rejected`.
+
+enum SlotTransferStatus {
+  pending
+  approved
+  rejected
+  /// The sender withdrew it while pending, or the claimant of a transfer link withdrew their claim (#1012)
+  withdrawn
+  /// Still pending when the session started (Start closes every pending transfer)
+  expired
+  /// Closed by the system: the whole session was cancelled or a party left the club (#1018)
+  cancelled
+
+  @@map("slot_transfer_status")
+}
+
+/// Request to transfer a confirmed slot (#1011). One pending transfer per sender roster entry
+/// (partial unique index in SQL). Final once decided: UPDATE and DELETE of a row that is not pending
+/// are refused by a trigger.
+model SessionSlotTransfer {
+  id                       String             @id @db.Uuid
+  clubId                   String             @map("club_id") @db.Uuid
+  sessionId                String             @map("session_id") @db.Uuid
+  /// The slot being transferred: the sender's live roster entry when they asked.
+  senderSessionPlayerId    String             @map("sender_session_player_id") @db.Uuid
+  /// The sender's saved player in this club and their account, frozen at request time.
+  senderClubPlayerId       String             @map("sender_club_player_id") @db.Uuid
+  senderPlayerId           String             @map("sender_player_id") @db.Uuid
+  /// The registered ROTRA player picked by exact RTR ID, or the first signed-in claimant of a
+  /// transfer link (#1012). Null only for a link nobody has claimed yet; set once (trigger), and
+  /// approval and rejection require it (CHECK).
+  recipientPlayerId        String?            @map("recipient_player_id") @db.Uuid
+  /// Transfer link (#1012): SHA-256 of the opaque token in the shared link, never the token itself.
+  /// Null for a transfer made by RTR ID. Never changes once written (trigger).
+  linkTokenDigest          Bytes?             @unique @map("link_token_digest")
+  /// When the first signed-in claimant took the link; set exactly when a link has a recipient.
+  claimedAt                DateTime?          @map("claimed_at") @db.Timestamptz(6)
+  /// Set on approval: the recipient's saved player in this club (created when new to the club) and
+  /// the roster entry that now holds the slot.
+  recipientClubPlayerId    String?            @map("recipient_club_player_id") @db.Uuid
+  recipientSessionPlayerId String?            @map("recipient_session_player_id") @db.Uuid
+  /// Set on approval: the recipient was promoted out of the waitlist (their waitlist row deleted).
+  recipientWasWaitlisted   Boolean?           @map("recipient_was_waitlisted")
+  /// Payment snapshot (#1013), set by the approval and never changed (the row is final). Centavos.
+  /// The amount due per player at approval; null with no fee set.
+  amountDueMinor           Int?               @map("amount_due_minor")
+  /// Cash collected for this slot by every holder so far (the sender's slot cash at approval).
+  /// Never moved: it stays on the payment marks; the recipient's entry carries it.
+  amountPaidMinor          Int?               @map("amount_paid_minor")
+  /// Waivers recorded on this slot by earlier approvals in the chain.
+  priorWaivedMinor         Int?               @map("prior_waived_minor")
+  /// The automatic waiver this approval recorded: due − paid − prior waivers, never below 0. A
+  /// record only, never cash (CHECK keeps it equal to that formula).
+  waivedMinor              Int?               @map("waived_minor")
+  currency                 String?            @db.Char(3)
+  status                   SlotTransferStatus @default(pending)
+  requestedAt              DateTime           @map("requested_at") @db.Timestamptz(6)
+  /// When it left `pending`, for every final status.
+  decidedAt                DateTime?          @map("decided_at") @db.Timestamptz(6)
+  /// Device that approved or rejected it, from the same club; null when decided online in real mode
+  /// and for system closes (expired, cancelled).
+  decidedByDeviceId        String?            @map("decided_by_device_id") @db.Uuid
+  /// The Player who withdrew it; set exactly when `withdrawn`.
+  withdrawnByPlayerId      String?            @map("withdrawn_by_player_id") @db.Uuid
+  createdAt                DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  session             QueueSession   @relation(fields: [clubId, sessionId], references: [clubId, id], onDelete: Restrict)
+  senderEntry         SessionPlayer  @relation("SlotTransferSender", fields: [clubId, sessionId, senderSessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  senderClubPlayer    ClubPlayer     @relation("SlotTransferSender", fields: [clubId, senderClubPlayerId], references: [clubId, id], onDelete: Restrict)
+  senderPlayer        Player         @relation("SlotTransferSender", fields: [senderPlayerId], references: [id], onDelete: Restrict)
+  recipientPlayer     Player?        @relation("SlotTransferRecipient", fields: [recipientPlayerId], references: [id], onDelete: Restrict)
+  recipientClubPlayer ClubPlayer?    @relation("SlotTransferRecipient", fields: [clubId, recipientClubPlayerId], references: [clubId, id], onDelete: Restrict)
+  recipientEntry      SessionPlayer? @relation("SlotTransferRecipient", fields: [clubId, sessionId, recipientSessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
+  decidedBy           Device?        @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
+  withdrawnBy         Player?        @relation("SlotTransferWithdrawnBy", fields: [withdrawnByPlayerId], references: [id], onDelete: Restrict)
+  /// Reject and refund (#1014): the manual full refund recorded with the rejection.
+  refunds             SessionPaymentRefund[]
+
+  /// Scoped target for later rows that belong to one transfer (links #1012, refunds #1014).
+  @@unique([clubId, sessionId, id])
+  @@index([sessionId, status, requestedAt])
+  @@index([clubId, sessionId, senderSessionPlayerId])
+  @@index([clubId, sessionId, recipientSessionPlayerId])
+  @@index([senderPlayerId])
+  @@index([recipientPlayerId])
+  @@map("session_slot_transfers")
+}

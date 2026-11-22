@@ -4,6 +4,7 @@ import {
   mixedPaymentTotalsFixture,
   paymentPlayers,
   paymentTotalsFixture,
+  transferredPaymentPlayer,
   unpaidPaymentPlayers,
 } from '@rotra/data/fixtures/financials'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -35,6 +36,8 @@ const meta = {
     onMarkAllPaid: fn(),
     onSelectPlayer: fn(),
     onEditAmount: fn(),
+    onOpenSlotHistory: fn(),
+    onShareStatus: fn(),
   },
 } satisfies Meta<typeof PaymentsChecklist>
 export default meta
@@ -104,3 +107,16 @@ export const PartialAndReimburse: Story = {
 export const AsSheet: Story = { args: { asSheet: true } }
 export const SaveFailure: Story = { args: { saveError: 'Changes could not be saved' } }
 export const Saving: Story = { args: { disabled: true } }
+/** #1013: the first card's slot came by transfer: locked switch, ₱200 waived, opens Slot history */
+export const TransferredSlot: Story = {
+  args: {
+    players: [transferredPaymentPlayer, ...paymentPlayers.slice(1)],
+    totals: { ...paymentTotalsFixture, collected: 1030000, waived: 20000 },
+  },
+}
+export const TransferredSlotLight: Story = { ...TransferredSlot, globals: { theme: 'light' } }
+/** #1014: a manual full refund was recorded: Collected is the cash kept, the refund shows apart */
+export const WithRefund: Story = {
+  args: { totals: { ...paymentTotalsFixture, collected: 1030000, refunded: 70000 } },
+}
+export const WithRefundLight: Story = { ...WithRefund, globals: { theme: 'light' } }

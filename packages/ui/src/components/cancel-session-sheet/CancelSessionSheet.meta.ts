@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const cancelSessionSheetMeta = {
   name: 'CancelSessionSheet',
   description:
-    'D-CANCEL-SESSION: Cancel TITLE?, when, how many joined and waitlisted, a paid warning when any are marked paid, optional Reason, then Keep session and Cancel session. Final: refunds happen outside ROTRA.',
+    'D-CANCEL-SESSION: Cancel TITLE?, when, how many joined and waitlisted, a paid warning when any are marked paid, optional Reason, then Keep session and Cancel session. Final: refunds happen outside ROTRA and are recorded on the cancelled record (#1014).',
   usage: [
     "Open from Cancel session on a prepared session's Preparation header; never once the session has started.",
     'The container runs the cancel command (Q12.15); this sheet only collects the optional reason and reports onConfirm(reason).',

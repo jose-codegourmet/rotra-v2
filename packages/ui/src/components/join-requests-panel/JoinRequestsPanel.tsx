@@ -13,6 +13,7 @@ import { MatchRequestCard, type MatchRequestCardProps } from '@rotra/ui/match-re
 import { Notice } from '@rotra/ui/notice'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { SlotTransferRow, type SlotTransferRowProps } from '@rotra/ui/slot-transfer-row'
 import { useId, useState } from 'react'
 
 export type JoinRequestDetails = {
@@ -48,6 +49,8 @@ export type JoinRequestsPanelProps = {
   requestDetails?: Record<string, JoinRequestDetails>
   /** Drop-out notices, listed before Start only */
   dropOuts?: (DropOutNoticeRowProps & { id: string })[]
+  /** Pending slot transfers (#1011), listed before Start only, after the drop-out notices */
+  transfers?: (SlotTransferRowProps & { id: string })[]
   /** Open match requests, listed once the session is live only */
   matchRequests?: (MatchRequestCardProps & { id: string })[]
   /**
@@ -103,6 +106,7 @@ export function JoinRequestsPanel({
   requests,
   requestDetails = {},
   dropOuts = [],
+  transfers = [],
   matchRequests = [],
   slotsFull = false,
   live = false,
@@ -143,7 +147,7 @@ export function JoinRequestsPanel({
   }
 
   const inSheet = variant === 'sheet'
-  const count = live ? matchRequests.length : pending.length + dropOuts.length
+  const count = live ? matchRequests.length : pending.length + dropOuts.length + transfers.length
   const heading = count ? `Requests · ${count}` : 'Requests'
   const body = loading ? (
     <section
@@ -186,7 +190,7 @@ export function JoinRequestsPanel({
           <p className="m-0 text-[13px] text-fg2">
             {live
               ? 'Match requests from players on the session page.'
-              : 'Join requests and drop-out notices from the session page.'}{' '}
+              : 'Join requests, drop-out notices and slot transfers from the session page.'}{' '}
             Nothing changes until you act on one.
           </p>
         </div>
@@ -221,7 +225,20 @@ export function JoinRequestsPanel({
               </div>
             </section>
           ) : null}
-          {pending.length && dropOuts.length ? (
+          {transfers.length ? (
+            <section className="flex flex-col gap-2">
+              <h3 className="m-0 text-sm">Slot transfers · {transfers.length}</h3>
+              <p className="m-0 text-[13px] text-fg2">
+                Nothing changes until you approve. Requests still waiting at the start close.
+              </p>
+              <div className="divide-y divide-border">
+                {transfers.map(({ id: transferId, ...props }) => (
+                  <SlotTransferRow key={transferId} {...props} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+          {pending.length && (dropOuts.length || transfers.length) ? (
             <h3 className="m-0 text-sm">Join requests · {pending.length}</h3>
           ) : null}
           <p className="m-0 text-[13px] text-fg2">

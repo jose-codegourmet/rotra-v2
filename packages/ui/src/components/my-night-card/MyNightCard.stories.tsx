@@ -138,3 +138,28 @@ export const MoveMeToWaitlistLiveLight: Story = {
   ...MoveMeToWaitlistLive,
   globals: { theme: 'light' },
 }
+
+// #1011: Transfer my slot before the start; a pending transfer reads its line and Withdraw request.
+export const TransferMySlot: Story = {
+  args: {
+    stage: 'before-start',
+    startsLabel: 'Nov 9, 7:30 PM',
+    canInvite: true,
+    onTransfer: fn(),
+    onWithdrawTransfer: fn(),
+  },
+}
+export const TransferPending: Story = {
+  args: { ...TransferMySlot.args, transferPendingTo: 'Russel Tan' },
+}
+
+/** #1012: a transfer link nobody has claimed yet: its line and Cancel link */
+export const TransferLinkShared: Story = {
+  args: { ...TransferMySlot.args, transferLinkOpen: true },
+}
+export const TransferLinkSharedLight: Story = {
+  ...TransferLinkShared,
+  globals: { theme: 'light' },
+}
+export const TransferMySlotLight: Story = { ...TransferMySlot, globals: { theme: 'light' } }
+export const TransferPendingLight: Story = { ...TransferPending, globals: { theme: 'light' } }

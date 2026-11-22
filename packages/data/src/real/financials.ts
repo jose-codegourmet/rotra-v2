@@ -7,9 +7,11 @@ import type {
 } from '../session-cost/sessionCost.types'
 import { type PaymentTotals, paymentStatus } from '../session-payment/sessionPayment.rules'
 import type {
+  RecordSessionRefundInput,
   SetPaymentAmountInput,
   SetPaymentMarksInput,
 } from '../session-payment/sessionPayment.types'
+import type { SlotPaymentTransfer } from '../slot-transfer/slotTransfer.types'
 import { minorOf, msOf, realRequest, type WireMoney } from './client'
 import { accepted } from './queue'
 
@@ -56,13 +58,35 @@ export type WirePayments = {
     sessionPlayerId: string
     clubPlayerId: string
     name: string
+    /** Own cash plus cash an approved slot transfer carried in (#1013); `at` the latest of them */
     paid: { amount: WireMoney; at: string } | null
+    /** The slot came by approved transfer (#1013): waivers and the chain; missing or null otherwise */
+    transfer?: WireSlotPaymentTransfer | null
+    /**
+     * The manual full refund recorded for this player (#1014); `paid.amount` is already net of it.
+     * Missing on a server from before #1014.
+     */
+    refund?: { amount: WireMoney; at: string } | null
   }[]
   amountDue: number | null
   dueBasis: SessionCostInput['paymentMode']
   entranceFeeIncluded: number | null
   totals: PaymentTotals
 }
+
+export type WireSlotPaymentTransfer = Omit<SlotPaymentTransfer, 'steps'> & {
+  steps: (Omit<SlotPaymentTransfer['steps'][number], 'approvedAt'> & { approvedAt: string })[]
+}
+
+export const slotPaymentTransferOf = (
+  wire: WireSlotPaymentTransfer | null | undefined,
+): SlotPaymentTransfer | undefined =>
+  wire
+    ? {
+        waivedMinor: wire.waivedMinor,
+        steps: wire.steps.map((step) => ({ ...step, approvedAt: msOf(step.approvedAt) })),
+      }
+    : undefined
 
 export async function realGetSessionPayments(sessionId: string) {
   const { payments } = await realRequest<{ payments: WirePayments | null }>(
@@ -72,7 +96,13 @@ export async function realGetSessionPayments(sessionId: string) {
   return {
     players: payments.players.map((player) => {
       // A legacy mark with no amount counts as paid in full at today's amount due (#479).
-      const mark = player.paid ? { amountMinor: minorOf(player.paid.amount) } : null
+      const mark = player.paid
+        ? {
+            amountMinor: minorOf(player.paid.amount),
+            waivedMinor: player.transfer?.waivedMinor ?? 0,
+            refundedMinor: player.refund ? (minorOf(player.refund.amount) ?? 0) : 0,
+          }
+        : null
       return {
         sessionPlayerId: player.sessionPlayerId,
         clubPlayerId: player.clubPlayerId,
@@ -86,6 +116,10 @@ export async function realGetSessionPayments(sessionId: string) {
             }
           : undefined,
         status: paymentStatus(mark, payments.amountDue),
+        transfer: slotPaymentTransferOf(player.transfer),
+        refund: player.refund
+          ? { amount: minorOf(player.refund.amount) ?? 0, at: msOf(player.refund.at) }
+          : undefined,
       }
     }),
     amountDue: payments.amountDue,
@@ -167,4 +201,23 @@ export async function realMarkAllPaid(
     { method: 'POST', body: { operationId } },
   )
   return accepted({ count }, `${count} players marked paid`)
+}
+
+/**
+ * #1014 · **Record refund** on a cancelled session's Refund everyone who paid list: one manual full
+ * refund per player, append-only. Sends the amount shown; 409 when it no longer matches. A retry
+ * after a lost reply returns the refund already recorded.
+ */
+export async function realRecordSessionRefund(input: RecordSessionRefundInput) {
+  const done = await realRequest<{ message: string }>(
+    sessionPath(input.sessionId, 'payments/refunds'),
+    {
+      method: 'POST',
+      body: {
+        sessionPlayerId: input.sessionPlayerId,
+        expectedAmountMinor: input.expectedAmountMinor,
+      },
+    },
+  )
+  return accepted(null, done.message)
 }

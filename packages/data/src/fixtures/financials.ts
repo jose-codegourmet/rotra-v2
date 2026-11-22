@@ -190,3 +190,41 @@ export function createFinancialFixtures(roster: SessionPlayer[], now = Date.now(
     }))
   return { costEstimates, paymentMarks }
 }
+
+/**
+ * #1013: a slot that changed hands twice (Mara paid ₱500 of ₱700 and gave it to Jun, who gave it to
+ * the holder): ₱500 carried, ₱200 waived on the first approval. Paid in Full, owes ₱0.
+ */
+export const transferredSlotPayment = {
+  waivedMinor: 20000,
+  steps: [
+    {
+      transferId: 'fixture-transfer-1',
+      fromName: 'Mara Dizon',
+      toName: 'Jun Alcantara',
+      paidByGiverMinor: 50000,
+      slotPaidMinor: 50000,
+      waivedMinor: 20000,
+      amountDueMinor: 70000,
+      approvedAt: Date.UTC(2026, 9, 21, 10, 5),
+      viaLink: false,
+    },
+    {
+      transferId: 'fixture-transfer-2',
+      fromName: 'Jun Alcantara',
+      toName: paymentPlayers[0]?.name ?? 'Ana Cruz',
+      paidByGiverMinor: 0,
+      slotPaidMinor: 50000,
+      waivedMinor: 0,
+      amountDueMinor: 70000,
+      approvedAt: Date.UTC(2026, 9, 22, 9, 30),
+      viaLink: true,
+    },
+  ],
+}
+export const transferredPaymentPlayer = {
+  ...(paymentPlayers[0] as (typeof paymentPlayers)[number]),
+  paid: { amount: 50000, at: Date.UTC(2026, 9, 22, 9, 30) },
+  status: { kind: 'paid' } as PaymentStatus,
+  transfer: transferredSlotPayment,
+}

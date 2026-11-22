@@ -1,4 +1,5 @@
 import { pairedQueuePlayerOrigins } from '../app-origins'
+import { isTransferLinkToken } from '../slot-transfer/slotTransfer.rules'
 
 /**
  * Canonical same-site deployment plus local development (and a configured pair, see app-origins);
@@ -8,7 +9,7 @@ const PAIRED = pairedQueuePlayerOrigins()
 export const QUEUE_ORIGINS = PAIRED.queue
 export const PLAYER_ORIGINS = PAIRED.player
 
-/** Only a public session and its three UI parameters (join, tab, invite) may cross the app boundary. */
+/** Only a public session and its UI parameters (join, tab, invite, transfer) may cross the app boundary. */
 export function queueSessionUrl(value: string | undefined): string | null {
   if (!value || value.includes('\\')) return null
   try {
@@ -22,6 +23,9 @@ export function queueSessionUrl(value: string | undefined): string | null {
     // A Session invite code (8 letters or digits) rides along so it survives the login round trip.
     const invite = url.searchParams.get('invite')
     if (invite && /^[A-Za-z0-9]{8}$/.test(invite)) clean.searchParams.set('invite', invite)
+    // A transfer link's token (#1012) rides along the same way, so the claimant lands back on it.
+    const transfer = url.searchParams.get('transfer')
+    if (isTransferLinkToken(transfer)) clean.searchParams.set('transfer', transfer)
     return clean.href
   } catch {
     return null
@@ -83,15 +87,21 @@ export function consumeSessionReturn(value?: string) {
 
 /**
  * Register with ROTRA (D-2026-11-09-06, #689): the Player app's registration form under the
- * session's club, with the session for its title and the way back (`?join=1`).
+ * session's club, with the session for its title and the way back (`?join=1`). A transfer link
+ * (#1012) uses the same session-link registration with `join: false`: the way back is the link
+ * itself (`?transfer=<token>`), so the claimant lands on Claim this slot, not on Request to join.
  */
-export function playerRegisterUrl(clubId: string, returnTo: string) {
+export function playerRegisterUrl(
+  clubId: string,
+  returnTo: string,
+  options: { join?: boolean } = {},
+) {
   const back = queueSessionUrl(returnTo)
   if (!back) return undefined
   const url = new URL(back)
   const origin = playerOrigin(url.origin)
   if (!origin) return undefined
-  url.searchParams.set('join', '1')
+  if (options.join !== false) url.searchParams.set('join', '1')
   const register = new URL(`/register/${encodeURIComponent(clubId)}`, origin)
   register.searchParams.set('session', url.pathname.split('/')[2] ?? '')
   register.searchParams.set('next', url.href)

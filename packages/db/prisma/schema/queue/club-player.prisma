@@ -28,19 +28,21 @@ model ClubPlayer {
   updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt    @default(1)
 
-  club            Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
-  player          Player?                 @relation(fields: [playerId], references: [id], onDelete: Restrict)
-  sharedEntry     SharedPlayerEntry?      @relation(fields: [sharedEntryId], references: [id], onDelete: Restrict)
-  linkedTo        ClubPlayer?             @relation("ClubPlayerMovedInto", fields: [clubId, linkedToClubPlayerId], references: [clubId, id], onDelete: Restrict)
-  movedIn         ClubPlayer[]            @relation("ClubPlayerMovedInto")
-  privateInput    ClubPlayerPrivateInput?
-  rosterEntries   SessionPlayer[]
-  waitlistEntries SessionWaitlistEntry[]
-  joinRequests    SessionJoinRequest[]
-  assessments     ClubAssessment[]
-  claimLinks      ClubPlayerClaimLink[]
-  trustedHosts    ClubTrustedHost[]
-  sessionHosts    SessionHost[]
+  club                  Club                    @relation(fields: [clubId], references: [id], onDelete: Restrict)
+  player                Player?                 @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  sharedEntry           SharedPlayerEntry?      @relation(fields: [sharedEntryId], references: [id], onDelete: Restrict)
+  linkedTo              ClubPlayer?             @relation("ClubPlayerMovedInto", fields: [clubId, linkedToClubPlayerId], references: [clubId, id], onDelete: Restrict)
+  movedIn               ClubPlayer[]            @relation("ClubPlayerMovedInto")
+  privateInput          ClubPlayerPrivateInput?
+  rosterEntries         SessionPlayer[]
+  waitlistEntries       SessionWaitlistEntry[]
+  joinRequests          SessionJoinRequest[]
+  slotTransfersSent     SessionSlotTransfer[]   @relation("SlotTransferSender")
+  slotTransfersReceived SessionSlotTransfer[]   @relation("SlotTransferRecipient")
+  assessments           ClubAssessment[]
+  claimLinks            ClubPlayerClaimLink[]
+  trustedHosts          ClubTrustedHost[]
+  sessionHosts          SessionHost[]
 
   facts        PlayerMatchFact[]
   summaries    ClubSessionPlayerSummary[]

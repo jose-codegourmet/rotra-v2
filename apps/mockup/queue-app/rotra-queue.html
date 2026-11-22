@@ -403,6 +403,8 @@ body.court-dragging { cursor: grabbing; }
 .time-pair .dt-field > svg:first-child { display: none; }
 .time-pair .dt-val { white-space: nowrap; font-size: 14px; }
 .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.pay-share-text { margin: 0; padding: 14px; max-height: 50vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+.pay-share-card { gap: 12px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
 .seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
 .seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
@@ -2204,6 +2206,15 @@ function seedSessions() {
       ],
       // Epic #1002 (#1006): Miguel hosts and plays (Hosts and Players, one slot); Gab Torres hosts without playing (Hosts only).
       hosts: [{ pid: 'p1', at: Date.now() - 36e5 }, { pid: 'p17', at: Date.now() - 36e5 + 1 }],
+      // #1011: Dani asks to hand her confirmed slot to Cara, a registered ROTRA player who is not in this session.
+      // #1013: Dani paid ₱500 of ₱900, so approving her transfer shows "₱400 will be waived" first. Nico paid ₱600 and gave his slot
+      // to Paulo yesterday: Paulo is Paid in Full (₱600 carried, ₱300 waived) and his card opens the slot history.
+      payments: { p13: { at: Date.now() - 26 * 3600e3, amount: 500 }, p26: { at: Date.now() - 30 * 3600e3, amount: 600 } },
+      transfers: [{ id: 't-seed-nico', pid: 'p26', to: 'p11', at: Date.now() - 27 * 3600e3, status: 'approved', decidedAt: Date.now() - 25 * 3600e3, level: 21, fromWaitlist: false, pay: { due: 900, paid: 600, prior: 0, waived: 300 } },
+        { id: 't-seed-dani', pid: 'p13', to: 'p25', at: Date.now() - 20 * 60000, status: 'pending' },
+        // #1012: p14 made a transfer link for a friend with no ROTRA account; nobody has claimed it, so it is not in Requests yet.
+        // Open /queue/s/s-tonight?transfer=Rotra-demo-transfer-link-for-tonight-0001xy to see the claim card.
+        { id: 't-seed-link', pid: 'p14', to: null, link: 'Rotra-demo-transfer-link-for-tonight-0001xy', at: Date.now() - 8 * 60000, status: 'pending' }],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
     },
@@ -2660,7 +2671,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   pickHost: 'Session', confirmHostTrust: 'Session', removeSessionHost: 'Session',
-  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
+  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', approveTransfer: 'Roster', rejectTransfer: 'Roster', confirmRejectRefund: 'Payments', confirmSessionRefund: 'Payments', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
@@ -3589,7 +3600,7 @@ function cancelledExample() {
     roster: ['p2', 'p6', 'p10', 'p18', 'p23', 'p29'].map((pid, i) => ({ pid, level: lv(pid), present: false, locked: false, presentAt: start - (60 - i * 5) * 3600e3 })),
     waitlist: [{ pid: 'p27', level: lv('p27'), at: start - 30 * 3600e3 }], requests: [], matches: [], seq: 0, published: null,
     cancelledAt: start - 14 * 3600e3, cancelReason: 'Not enough players',
-    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 } } };
+    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 }, p10: { at: start - 38 * 3600e3, amount: 120 } } };
   s.minimum = sessionEstimate(s).low;
   return s;
 }
@@ -3604,6 +3615,8 @@ function upcomingExamples() {
     prep({ id: 'x-next-full', title: 'Club Doubles Night', start: at(1, 18), end: at(1, 21), ...BANILAD, courts: courts(2), notes: 'Doubles all night. Slots are full; confirmed guests join the waitlist.', roster: join(pidRange(1, 16)),
       waitlist: ['p21', 'p22', 'p25', 'p26'].map((pid, i) => ({ pid, level: lv(pid), at: now - (20 - i * 4) * 3600e3 })),
       payments: { p1: { at: now - 30 * 3600e3, amount: 200 }, p2: { at: now - 26 * 3600e3, amount: 200 }, p5: { at: now - 5 * 3600e3, amount: 200 } },
+      // #1014: Ana (p2) paid ₱200 and asks to transfer her slot. Reject and refund hands her ₱200 back and gives the slot to p21, first on the waitlist.
+      transfers: [{ id: 't-seed-refund', pid: 'p2', to: 'g4', at: now - 3 * 3600e3, status: 'pending' }],
       finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }] } }),
     prep({ id: 'x-next-partial', title: 'Beginners and Friends', start: at(3, 19), end: at(3, 21), ...LAHUG, courts: courts(3), notes: 'Relaxed games for newer players. Bring a friend.', roster: join(['p3', 'p6', 'p8', 'p10', 'p12', 'p15', 'p17', 'p18', 'p20', 'p23', 'p24', 'p27', 'p29', 'p30']),
       finance: { courtFee: 250, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 3 }] } }),
@@ -3699,14 +3712,31 @@ function viewHistory() {
 }
 // A cancelled session never started: no games, standings or slides, and it counts nowhere. Its roster, waitlist and
 // payment marks stay on the record, read-only.
+// #1014 (owner decision 2026-11-22, #1015): after a cancellation the record lists everyone who paid (Paid or Partial) with the whole cash
+// to hand back, never a waiver. The QM refunds outside ROTRA and records each refund (one per player, append-only).
+function refundRows(s) {
+  const due = duePerHead(s);
+  return s.roster.map((r) => { const h = slotPay(s, r.pid), rf = refundOf(s, r.pid), cash = slotCash(s, r.pid) + (rf ? rf.amount : 0);
+    const st = payStatus(cash > 0 ? { amount: cash, waived: h ? h.waived : 0 } : null, due);
+    return { pid: r.pid, name: P(r.pid).name, cash, rf, partial: st.kind === 'partial' }; })
+    .filter((x) => x.cash > 0).sort((a, b) => a.name.localeCompare(b.name));
+}
+function refundCard(s) {
+  const rows = refundRows(s); if (!rows.length) return '';
+  const left = rows.filter((x) => !x.rf), leftAmt = left.reduce((t, x) => t + x.cash, 0), done = rows.reduce((t, x) => t + (x.rf ? x.rf.amount : 0), 0);
+  return `<section class="card stack" aria-labelledby="refund-h"><div class="between"><div><h2 id="refund-h">Refund everyone who paid</h2><p class="small muted">ROTRA doesn't move money. Hand each amount back outside ROTRA, then record it here. Full refunds of the cash collected; waived amounts are not cash.</p></div>
+      <div class="stack tight" style="text-align:right"><b class="tnum">${left.length ? `${peso(leftAmt)} to refund · ${left.length}` : 'All refunds recorded'}</b>${done ? `<span class="small muted">${peso(done)} refunded</span>` : ''}</div></div>
+    <div class="list">${rows.map((x) => `<div class="li">${avatar(P(x.pid))}<div class="main"><b>${esc(x.name)}</b><p class="small muted">${x.partial ? 'Partial' : 'Paid'} · ${peso(x.cash)} collected</p></div>
+      ${x.rf ? `<span class="chip ok">${I.check} Refunded ${peso(x.rf.amount)} · ${fmtWhen(x.rf.at, { lower: true })}</span>` : `<button class="btn sm" data-act="openSessionRefund" data-pid="${esc(x.pid)}" aria-haspopup="dialog" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Record refund · ${peso(x.cash)}</button>`}</div>`).join('')}</div></section>`;
+}
 function cancelledRecord(s) {
-  const pay = s.payments || {}, wl = waitOf(s);
-  const paidN = s.roster.filter((r) => pay[r.pid]).length;
+  const wl = waitOf(s);
+  const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="stack tight"><span class="label">Session record · read-only</span>${sessTitle(s)}<p class="muted small">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
     <div class="row">${chip('Cancelled')}${s.cancelledAt ? `<span class="small muted">Cancelled ${fmtWhen(s.cancelledAt, { lower: true })}</span>` : ''}</div>
-    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid; refunds happen outside ROTRA.` : ''}`)}
+    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid: refund them outside ROTRA and record each refund below.` : ''}`)}
     <div class="tiles4">
       <div class="card"><span class="label">Joined</span><b class="big tnum">${s.roster.length}</b><span class="small muted">of ${capacityOf(s)} slots</span></div>
       <div class="card"><span class="label">Waitlist</span><b class="big tnum">${wl.length}</b></div>
@@ -3714,7 +3744,8 @@ function cancelledRecord(s) {
       <div class="card"><span class="label">Courts</span><b class="big tnum">${s.courts.length}</b></div>
     </div>
     <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button></div>
-    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = pay[r.pid]; return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
+    ${refundCard(s)}
+    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = slotPay(s, r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid && paid.refunded ? `Paid ${peso(paid.refunded + (paid.amount || 0))} · refunded` : paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
     ${wl.length ? `<section class="stack"><h2>Waitlist · ${wl.length}</h2><ol class="pub-wait">${wl.map((w) => `<li>${esc(P(w.pid).name)}</li>`).join('')}</ol></section>` : ''}
   </main>`;
 }
@@ -3776,45 +3807,111 @@ function duePerHead(s) {
   if (s.finance.custom) return +s.finance.payFee || 0;
   return financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), playerCountOf(s)).share;
 }
-// #479: a payment keeps the amount received; status compares it with today's amount due.
+// #479: a payment keeps the amount received; status compares it with today's amount due. #1013: a slot transfer's waiver counts
+// toward Paid but is never cash, so only cash above the amount due is "to return".
 function payStatus(paid, due) {
   if (!paid) return { kind: 'unpaid' };
   if (due == null) return { kind: 'paid' };
-  const got = paid.amount == null ? due : paid.amount;
-  if (got === due) return { kind: 'paid' };
-  if (got <= 0) return { kind: 'unpaid' };
-  return got < due ? { kind: 'partial', left: due - got } : { kind: 'reimburse', back: got - due };
+  const got = paid.amount == null ? due : paid.amount, cov = got + (paid.waived || 0);
+  if (cov === due) return { kind: 'paid' };
+  if (cov <= 0) return { kind: 'unpaid' };
+  if (cov < due) return { kind: 'partial', left: due - cov };
+  return got > due ? { kind: 'reimburse', back: got - due } : { kind: 'paid' };
 }
+// #1013 transfer accounting (epic #1009, D-2026-11-22-05). Approve snapshots the slot's money on the transfer (t.pay = { due, paid,
+// prior, waived }) and never touches a payment. The recipient's slot carries the cash already collected (paid) and every waiver
+// (prior + waived): Paid in Full, ₱0 owed. The sender's payment stays as recorded on their record and is frozen into the slot, so
+// collected cash never changes. Repeat transfers append rows; the chain is read from them (each sender is the previous recipient).
+const approvedTransfers = (s) => (s.transfers || []).filter((t) => t.status === 'approved' && t.decidedAt);
+function transferChainOf(s, pid) {
+  const ap = approvedTransfers(s), latest = (f, before = Infinity) => ap.filter((t) => f(t) && t.decidedAt <= before).sort((a, b) => b.decidedAt - a.decidedAt)[0];
+  const inc = latest((t) => t.to === pid); if (!inc) return [];
+  const out = latest((t) => t.pid === pid); if (out && out.decidedAt >= inc.decidedAt) return [];
+  const chain = [inc];
+  for (;;) { const prev = latest((t) => t.to === chain[0].pid && !chain.includes(t), chain[0].decidedAt); if (!prev) break; chain.unshift(prev); }
+  return chain;
+}
+const payFrozen = (s, pid) => { const m = (s.payments || {})[pid]; return !!m && approvedTransfers(s).some((t) => t.pid === pid && t.decidedAt >= m.at); };
+// #1014 manual full refunds (D-2026-11-22-06): s.refunds = [{ id, pid, amount, at, reason: 'transfer' | 'cancelled', transferId }].
+// Append-only, one per player; ROTRA moves no money and the payment itself is never changed. Every reader counts the cash kept
+// (received − refunded); the refund shows on its own line.
+const refundOf = (s, pid) => (s.refunds || []).find((x) => x.pid === pid) || null;
+// What a roster player shows and totals: { amount (cash kept: own + carried − refunded), waived, refunded, at, chain } or null.
+function slotPay(s, pid) {
+  const due = duePerHead(s), own = payFrozen(s, pid) ? null : (s.payments || {})[pid], chain = transferChainOf(s, pid), last = chain[chain.length - 1];
+  const rf = refundOf(s, pid), back = rf ? rf.amount : 0, net = (got) => Math.max(got - back, 0);
+  if (!last) return own ? { amount: back ? net(own.amount == null ? due || 0 : own.amount) : own.amount, waived: 0, refunded: back, at: own.at, chain } : null;
+  const x = last.pay || { paid: 0, prior: 0, waived: 0 }, ownGot = own ? (own.amount == null ? due || 0 : own.amount) : 0;
+  return { amount: net(ownGot + x.paid), waived: x.prior + x.waived, refunded: back, at: own ? Math.max(own.at, last.decidedAt) : last.decidedAt, chain };
+}
+// The whole cash the slot holds now (never a waiver): what a full refund hands back.
+const slotCash = (s, pid) => { const h = slotPay(s, pid), due = duePerHead(s); return h ? (h.amount == null ? due || 0 : h.amount) : 0; };
+// #1014 FIFO: the first waitlisted person with a level takes a freed slot, while one is open.
+const firstWaiter = (s) => (openSlots(s) > 0 ? waitOf(s).find((w) => w.level != null) : null) || null;
+// What Approve will record, shown before approving: the slot's cash, earlier waivers, and the new waiver (what it still owes).
+// An unpaid slot transfers the same way: the whole amount due is waived (assumption, D-2026-11-22-05).
+function transferPay(s, t) {
+  const due = duePerHead(s), h = slotPay(s, t.pid), got = h ? (h.amount == null ? due || 0 : h.amount) : 0, prior = h ? h.waived : 0;
+  return { due, paid: got, prior, waived: due == null ? 0 : Math.max(due - got - prior, 0) };
+}
+const transferPayText = (x) => x.due == null ? 'No fee set: nothing to waive.' : x.waived ? `${peso(x.paid)} paid · ${peso(x.waived)} will be waived.` : `${peso(x.paid)} paid · fully paid, nothing to waive.`;
 const payCovered = (st) => st.kind === 'paid' || st.kind === 'reimburse';
 const payChip = (st) => st.kind === 'paid' ? '<span class="chip ok">Paid</span>'
   : st.kind === 'partial' ? `<span class="chip warn">Partial · ${peso(st.left)} left</span>`
   : st.kind === 'reimburse' ? `<span class="chip ok">Reimburse · ${peso(st.back)} to return</span>`
   : '<span class="chip">Unpaid</span>';
-function paymentsPanel(s) {
+// Payment status share (#1010, epic #1009; owner decisions 2026-11-22): numbered Paid / Partial / Unpaid text for the Queue Master's
+// Payments area and the public session page. Confirmed players and guests only (no waitlist). Collected is cash received: a waived
+// amount (slot transfers, a later ticket) lowers the balance but is never collected.
+function payShareGroups(s, masked) {
   const due = duePerHead(s), pay = s.payments || {};
-  const all = s.roster.map((r) => ({ r, p: P(r.pid), paid: pay[r.pid], st: payStatus(pay[r.pid], due) })).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
+  const g = { paid: [], partial: [], unpaid: [] };
+  s.roster.map((r) => { const h = slotPay(s, r.pid); return { name: masked ? maskName(P(r.pid).name) : P(r.pid).name, got: h ? (h.amount == null ? due || 0 : h.amount) : 0, waived: h ? h.waived : 0, moved: !!(h && h.chain.length) }; })
+    .sort((a, b) => a.name.localeCompare(b.name)).forEach((x) => {
+      const st = payStatus(x.got > 0 || x.waived > 0 ? { amount: x.got, waived: x.waived } : null, due);
+      const grp = due == null ? (x.got > 0 || x.moved ? 'paid' : 'unpaid') : st.kind === 'partial' ? 'partial' : st.kind === 'unpaid' ? 'unpaid' : 'paid';
+      g[grp].push({ ...x, bal: due == null ? null : st.kind === 'partial' ? st.left : st.kind === 'unpaid' ? due : 0, over: st.kind === 'reimburse' ? st.back : 0 });
+    });
+  return g;
+}
+function payShareText(s, filter, masked) {
+  const due = duePerHead(s), g = payShareGroups(s, masked), shown = filter === 'all' ? ['paid', 'partial', 'unpaid'] : [filter];
+  const label = { paid: 'PAID', partial: 'PARTIAL', unpaid: 'UNPAID' };
+  const line = (x, i, grp) => [`${i + 1}. ${x.name}`, ...(grp === 'unpaid' ? [] : [`paid ${peso(x.got)}`]), ...(x.bal == null ? [] : [`balance ${peso(x.bal)}`]), ...(x.over ? [`${peso(x.over)} to return`] : []), ...(x.waived ? [`${peso(x.waived)} waived`] : [])].join(' · ');
+  const people = shown.flatMap((k) => g[k]);
+  const collected = people.reduce((t, x) => t + x.got, 0), balance = due == null ? null : people.reduce((t, x) => t + (x.bal || 0), 0);
+  return [`Payment status · ${s.title} · ${fmtDate(s.start)}`, due == null ? 'No fee set for this session.' : `${peso(due)} per player`,
+    ...shown.flatMap((k) => ['', `${label[k]} (${g[k].length})`, ...(g[k].length ? g[k].map((x, i) => line(x, i, k)) : ['None'])]),
+    '', balance == null ? `Collected: ${peso(collected)}` : `Collected: ${peso(collected)} · Balance: ${peso(balance)}`].join('\n');
+}
+function paymentsPanel(s) {
+  const due = duePerHead(s);
+  const all = s.roster.map((r) => { const paid = slotPay(s, r.pid); return { r, p: P(r.pid), paid, st: payStatus(paid, due), moved: !!(paid && paid.chain.length) }; }).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
   const got = (x) => (x.paid ? (x.paid.amount == null ? due || 0 : x.paid.amount) : 0);
+  const waived = all.reduce((t, x) => t + (x.paid ? x.paid.waived || 0 : 0), 0), refunded = all.reduce((t, x) => t + (x.paid ? x.paid.refunded || 0 : 0), 0);
   const paidN = all.filter((x) => payCovered(x.st)).length, partialN = all.filter((x) => x.st.kind === 'partial').length;
   const collected = all.reduce((t, x) => t + got(x), 0);
-  const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x), 0), 0) : null;
+  const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x) - (x.paid ? x.paid.waived || 0 : 0), 0), 0) : null;
   const toReturn = due != null ? all.reduce((t, x) => t + (x.paid ? Math.max(got(x) - due, 0) : 0), 0) : 0;
   const cost = s.finance ? financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || 1).total : null;
   const f = S.ui.payF || 'all';
   const rows = all.filter((x) => f === 'all' || (f === 'paid' ? payCovered(x.st) : !payCovered(x.st)));
   return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay, or tap a card to record a partial amount. ROTRA only records it; money is collected outside the app.</p></div>
-      ${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
+      <div class="row">${all.length ? `<button class="btn sm" data-act="openPayShare" aria-haspopup="dialog">${I.share} Share status</button>` : ''}${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div></div>
     ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
       <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b>${partialN ? `<span class="small muted">${partialN} partial</span>` : ''}</div>
-      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}</div>
+      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}${waived ? `<span class="small muted">${peso(waived)} waived (not cash)</span>` : ''}${refunded ? `<span class="small muted">${peso(refunded)} refunded</span>` : ''}</div>
       <div class="card"><span class="label">Still due</span><b class="big tnum">${stillDue != null ? peso(stillDue) : '—'}</b></div>
       <div class="card"><span class="label">Against costs</span><b class="big tnum" style="color:${cost == null ? 'inherit' : collected >= cost ? 'var(--accent)' : 'var(--warn)'}">${cost == null ? '—' : collected >= cost ? `+${peso(collected - cost)}` : `−${peso(cost - collected)}`}</b>${cost != null ? `<span class="small muted">of ${peso(cost)} cost</span>` : ''}</div>
     </div>
     <div class="seg" role="group" aria-label="Show">${[['all', `Everyone · ${all.length}`], ['unpaid', `Not paid · ${all.length - paidN}`], ['paid', `Paid · ${paidN}`]].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payFilter" data-k="${k}">${l}</button>`).join('')}</div>
-    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : ''}">
-      <div class="pay-top">${faceBtn(p)}${sw(!!paid, 'togglePaid', `data-pid="${r.pid}"`, `${p.name} paid`)}</div>
-      <button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
-      <span class="pay-st">${paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button></div>`).join('')}</div>`
+    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st, moved }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : ''}">
+      <div class="pay-top">${faceBtn(p)}${sw(!!paid, 'togglePaid', `data-pid="${r.pid}"${moved ? ' disabled title="Paid through a slot transfer"' : ''}`, `${p.name} paid`)}</div>
+      ${moved ? `<button class="pay-body" data-act="slotHistory" data-pid="${r.pid}" aria-label="${esc(`Slot history for ${p.name}`)}" aria-haspopup="dialog"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
+      <span class="pay-st">${peso(got({ paid }))} received · via transfer</span>${paid.waived ? `<span class="pay-st">${peso(paid.waived)} waived</span>` : ''}</button>`
+      : `<button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
+      <span class="pay-st">${paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button>`}</div>`).join('')}</div>`
       : `<p class="small muted">${f === 'unpaid' ? 'Everyone has paid.' : f === 'paid' ? 'Nobody has paid yet.' : 'No players yet.'}</p>`}
   </section>`;
 }
@@ -4353,7 +4450,42 @@ const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open'
 const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
-const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length; };
+// #1011 slot transfers: a confirmed signed-in player asks to give their slot to another registered ROTRA player; the QM approves
+// or rejects before Start. Pending ones expire at Start and are cancelled with the session. Decided ones stay on the record.
+// #1012: an unclaimed transfer link (`to` still null) has nobody to approve, so it is not listed for the QM.
+const pendingTransfers = (s) => (s.status === 'prepared' ? (s.transfers || []) : []).filter((t) => t.status === 'pending' && t.to && R(s, t.pid)).sort((a, b) => a.at - b.at);
+const myTransfer = (s, pid) => (s.transfers || []).find((t) => t.pid === pid && t.status === 'pending') || null;
+const closeTransfers = (s, status) => (s.transfers || []).forEach((t) => { if (t.status === 'pending') { t.status = status; t.decidedAt = Date.now(); } });
+const RTR_SHAPE = /^RTR-[A-Z]{2}-[A-Z]{3}-\d{6}-\d{4}$/;
+// Exact RTR ID only, registered ROTRA players only (a saved player of this club or one found in Player Information). Never a guest
+// or an unclaimed person, never a name search.
+const transferRecipient = (rtr) => {
+  const mine = S.players.find((p) => !p.removed && p.identity === 'registered' && p.rtr === rtr);
+  if (mine) return { id: mine.id, name: mine.name, rtr: mine.rtr, sugg: mine.sugg ?? null, dir: null };
+  const g = DIRECTORY.find((x) => x.identity === 'registered' && x.rtr === rtr);
+  return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, dir: g } : null;
+};
+const transferTo = (t) => P(t.to) || (() => { const g = DIRECTORY.find((x) => x.id === t.to); return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, identity: 'registered' } : null; })();
+// #1012 transfer links: when the recipient has no ROTRA account the sender makes a single-claim link instead of picking an RTR ID.
+// It is a pending transfer with `link` (the token; the real app stores only its SHA-256 digest) and `to` null until the first
+// signed-in claimant takes it. It works exactly while pending: Reject, either side's Withdraw, Start and Cancel session all end it.
+const LINK_TOKEN = /^[A-Za-z0-9_-]{43}$/;
+const newLinkToken = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const transferLinkUrl = (s, t) => `${sessionLink(s)}?transfer=${t.link}`;
+const linkTransfer = (s, token) => (LINK_TOKEN.test(token || '') && (s.transfers || []).find((t) => t.link === token)) || null;
+// The link's state from the viewer's side, the same words as the real app's transferLinkState().
+function linkState(s, t, vid) {
+  if (!t) return 'closed';
+  const mine = !!vid && t.to === vid;
+  if (t.status === 'approved') return mine ? 'approved' : 'closed';
+  if (t.status === 'cancelled' || s.status === 'cancelled') return 'cancelled';
+  if (t.status === 'expired' || (t.status === 'pending' && s.status !== 'prepared')) return 'expired';
+  if (t.status !== 'pending') return 'closed';
+  if (vid && vid === t.pid) return 'own';
+  if (mine) return 'yours';
+  return t.to ? 'claimed' : 'open';
+}
+const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length + pendingTransfers(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 // D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
 const inviterOf = (s, r) => { if (!r.inviteCode) return null; const row = [...s.roster, ...(s.waitlist || [])].find((x) => x.inviteCode === r.inviteCode); return row ? P(row.pid) : null; };
@@ -4394,23 +4526,25 @@ function linkCard(s) {
   </section></div>`;
 }
 function requestsPanel(s, inSheet) {
-  const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
+  const joins = pendingReqs(s), drops = openDropOuts(s), trs = pendingTransfers(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
   // Owner comments, November 11, 2026: before Start there are only join requests and drop-out notices; once the session is live there
   // are only match requests (join requests close at Start; the Queue Master adds late players directly). So there are no tabs.
   const live = s.status === 'active';
   const tab = live ? 'match' : 'join';
-  const n = live ? mrs.length : joins.length + drops.length;
-  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests and drop-out notices from the session page'}. Nothing changes until you act on one.</p></div>`;
+  const n = live ? mrs.length : joins.length + drops.length + trs.length;
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests, drop-out notices and slot transfers from the session page'}. Nothing changes until you act on one.</p></div>`;
   const tabs = '';
   let body;
   if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
   else {
     const dropList = drops.length ? `<section class="stack tight" aria-labelledby="rq-drop-h"><h3 id="rq-drop-h" style="margin:0;font-size:14px">Can't make it · ${drops.length}</h3><p class="small muted">The slot stays until you remove the player.</p><div class="list">${drops.map((d) => dropOutRow(s, d)).join('')}</div></section>` : '';
-    const joinList = joins.length ? `<div class="stack tight">${drops.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
+    // #1011: pending slot transfers sit after the drop-out notices. Approve hands the slot over; the slot count never changes.
+    const trList = trs.length ? `<section class="stack tight" aria-labelledby="rq-tr-h"><h3 id="rq-tr-h" style="margin:0;font-size:14px">Slot transfers · ${trs.length}</h3><p class="small muted">Nothing changes until you approve. Requests still waiting at the start close.</p><div class="list">${trs.map((t) => transferRow(s, t)).join('')}</div></section>` : '';
+    const joinList = joins.length ? `<div class="stack tight">${drops.length || trs.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
       <div class="list">${joins.map((r) => joinReqCard(s, r, full)).join('')}</div></div>`
       : `<p class="small muted">No join requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Anyone who opens the session link can ask for a slot; they show up here.'}</p>`;
-    body = dropList + joinList;
+    body = dropList + trList + joinList;
   }
   return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests">${head}${tabs}<div id="rq-panel" role="tabpanel" aria-labelledby="rqt-${tab}" class="stack">${body}</div></section>`;
 }
@@ -4441,6 +4575,20 @@ function dropOutRow(s, d) {
   const p = P(d.pid);
   return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
       <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
+}
+// #1011: the sender, who they want to give the slot to (name and RTR ID), whether that player is waitlisted, their level here, Reject / Approve.
+// #1014: Reject and refund (only when cash was collected for the slot) opens D-REJECT-REFUND, which states the amount to hand back.
+function transferRow(s, t) {
+  const p = P(t.pid), to = transferTo(t) || { name: 'Unknown', rtr: '' };
+  const wl = waitOf(s).findIndex((w) => w.pid === t.to) + 1;
+  const lv = t.level ?? (wl ? waitOf(s)[wl - 1].level : null) ?? to.sugg ?? null;
+  // #1012: a claimed transfer link reads "Shared a transfer link" and "Claimed by NAME"; rejecting it ends the link.
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">${t.link ? 'Shared a transfer link' : 'Asks to transfer their slot'} · ${fmtWhen(t.claimedAt || t.at, { lower: true })}</p><p class="small"><b>${t.link ? 'Claimed by' : 'To'} ${esc(to.name)} · <span class="mono" style="font-weight:400">${esc(to.rtr)}</span></b></p></div>${wl ? chip(`Waitlist #${wl}`, 'ok') : chip('Not in this session')}</div>
+      <p class="small muted">Approving gives the slot to ${esc(to.name)}${wl ? ', who leaves the waitlist' : ''}. ${esc(p.name)} comes off the roster. The slot count stays the same.</p>
+      <p class="small"><b>Payment:</b> ${esc(transferPayText(transferPay(s, t)))} ${esc(to.name)} will be Paid in Full and owe ₱0. Collected cash stays the same.</p>
+      <div class="req-actions">${selectLevel(`tr-lv-${t.id}`, lv, `data-act-change="trLevel" data-id="${t.id}" aria-label="Level for ${esc(to.name)}"`, t.err && lv == null)}
+        <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button>${slotCash(s, t.pid) > 0 ? `<button class="btn sm" data-act="openRejectRefund" data-id="${t.id}" aria-haspopup="dialog">Reject and refund</button>` : ''}<button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
+      ${t.err ? `<span class="err">${esc(t.err)}</span>` : ''}</div>`;
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
 function matchReqCard(s, mr) {
@@ -4475,6 +4623,30 @@ const memberJoinOk = (s, v) => s.status === 'prepared' && s.acceptReq !== false 
 function wantField(s, want, act, err) {
   const full = slotsFullFor(s);
   return `<div class="field"><span>How do you want to join?</span><div class="seg" role="group" aria-label="How do you want to join?">${WANT_CHOICES.map(([v, l]) => `<button aria-pressed="${want === v}" ${act} data-v="${v}" ${v === 'slot' && full ? 'disabled title="All slots are taken"' : ''}>${l}</button>`).join('')}</div>${err ? `<span class="err">${esc(err)}</span>` : `<span class="hint">${full ? 'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.' : 'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'}</span>`}</div>`;
+}
+// #1012: the card a person sees on the session page opened from a transfer link (?transfer=<token>). Not signed in: sign up or
+// log in to claim. Signed in: Claim this slot (first claimant only), then the pending claim with Withdraw claim, or the slot once
+// approved. Every closed state says why and what to do. The sender's name is masked like every name on the public page.
+function transferLinkCard(s) {
+  const token = S.ui.trLink; if (!token || !S.ui.guest) return '';
+  const t = linkTransfer(s, token), v = pubViewer(), st = linkState(s, t, v ? v.id : null);
+  const sender = t ? pubNameText(P(t.pid)) : 'A player';
+  const head = ['open', 'yours', 'approved'].includes(st) ? `${esc(sender)} wants to give you their slot` : 'Transfer link';
+  const CLOSED = {
+    claimed: ['Someone else already claimed this transfer link.', 'Only the first person to claim a transfer link can. Ask the sender if they have another slot to give.'],
+    own: ['This is your own transfer link.', 'Send it to the player who\'ll take your slot. You can cancel it on My night.'],
+    closed: ['This transfer link no longer works.', 'It was cancelled, withdrawn or rejected. Ask the sender for a new link.'],
+    expired: ['This transfer link has expired.', 'Transfer links stop working when the session starts.'],
+    cancelled: ['This session was cancelled.', 'The transfer link no longer works.'],
+  };
+  let body;
+  if (CLOSED[st]) body = notice('warn', `<b>${CLOSED[st][0]}</b> ${CLOSED[st][1]}`);
+  else if (st === 'approved') body = notice('ok', '<b>The slot is yours.</b> The Queue Master approved the transfer. See you on court.');
+  else if (st === 'yours') body = `<p>You claimed ${esc(sender)}'s slot · the Queue Master decides before the session starts.</p><p class="small muted">Withdrawing gives the slot back to ${esc(sender)}, and this link stops working.</p><div class="row acts"><button class="btn" data-act="withdrawTransferClaim" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Withdraw claim</button></div>`;
+  else if (!v) body = `<p>Sign up or log in to ROTRA to claim it. The first person to claim it gets the slot once the Queue Master approves.</p><div class="row acts"><button class="btn primary" data-act="linkSignUp">Sign up to claim</button><button class="btn" data-act="linkSignUp" data-k="login">Log in</button></div>`;
+  else if (R(s, v.id)) body = notice('warn', 'You already have a slot in this session, so you can\'t claim this one.');
+  else body = `<p>Claim it and the Queue Master decides before the session starts. Only the first person to claim this link can.</p><div class="row acts"><button class="btn primary" data-act="claimTransferLink" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Claim this slot</button></div>`;
+  return `<section class="card stack" aria-labelledby="tl-h"><h2 id="tl-h" style="margin:0;font-size:16px">${head}</h2>${body}</section>`;
 }
 function joinCard(s) {
   if (s.status !== 'prepared' && s.status !== 'active') return '';
@@ -4672,7 +4844,7 @@ const RV_BY = [
   ['avail', 'Availability', (s, r) => (r.present ? 'Present' : 'Not present'), ['Present', 'Not present']],
   ['prior', 'Returning or first time', (s, r) => (P(r.pid).prior > 0 ? 'Returning' : 'First time here'), ['Returning', 'First time here']],
   ['profile', 'ROTRA profile', (s, r) => (P(r.pid).identity === 'registered' ? 'Has a ROTRA profile' : 'Guest'), ['Has a ROTRA profile', 'Guest']],
-  ['paid', 'Payment', (s, r) => ((s.payments || {})[r.pid] ? 'Paid' : 'Not paid'), ['Paid', 'Not paid']],
+  ['paid', 'Payment', (s, r) => (slotPay(s, r.pid) ? 'Paid' : 'Not paid'), ['Paid', 'Not paid']],
 ];
 // Artifact comment, November 13, 2026: the roster's level picker is a select menu, not the browser's select. The button is filled in
 // the level's band colour (blue Beginner, yellow Intermediate, red Advanced); the menu lists the three bands with their levels.
@@ -4699,7 +4871,7 @@ function rvRow(s, r, live) {
       </div>`;
 }
 function rvCard(s, r, live) {
-  const p = P(r.pid), paid = (s.payments || {})[r.pid], band = rvBand(r);
+  const p = P(r.pid), paid = slotPay(s, r.pid), band = rvBand(r);
   // First level: presence and skill level. Second level (muted, last row): profile, payment, suggestion.
   // #704: before Start session there is no Present switch or text; presence shows only once the session has started.
   const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : '';
@@ -4783,7 +4955,7 @@ function viewPrepare() {
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : reqCount(s) ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments', ...(live ? [] : ['settings'])].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
-      const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
+      const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length;
       const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`], ...(live ? [] : [['settings', 'Settings', null]])];
       return `${tabMenu('dd-prep', live ? 'Session settings section' : 'Preparation section', tabs, tab)}
       <div class="tabs has-dd" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
@@ -5627,6 +5799,12 @@ function myNight(s) {
     lines.push(`Confirmed · starts ${fmtDate(s.start)}, ${fmtTime(s.start)}`);
     if (d) lines.push('Told the QM you can\'t make it');
     else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
+    // #1011: one pending slot transfer per slot; the QM approves or rejects it before the start.
+    const tr = myTransfer(s, v.id), trTo = tr && transferTo(tr);
+    // #1012: a transfer link nobody has claimed yet reads its own line and Cancel link; once claimed it reads like a request.
+    if (tr && tr.link && !tr.to) { lines.push('Transfer link shared · waiting for someone to claim it'); acts.push('<button class="btn" data-act="withdrawTransfer">Cancel link</button>'); }
+    else if (tr) { lines.push(`Transfer to ${esc(trTo ? trTo.name : 'another player')} requested · the QM decides`); acts.push('<button class="btn" data-act="withdrawTransfer">Withdraw request</button>'); }
+    else acts.push('<button class="btn" data-act="openSlotTransfer">Transfer my slot</button>');
   } else if (s.status === 'finalized') {
     lines.push('Session finished'); stats = statBlock(0);
     // Artifact comment, November 13, 2026: no Match history button here; the history is right below on the page.
@@ -5675,7 +5853,8 @@ function viewPublic() {
   const why = (s.cancelReason || '').replace(/[.\s]+$/, '');
   // Artifact comment, November 13, 2026 ("so much white space"): on wide screens the join card and My night move to a
   // side column beside the tabs, instead of everything sitting in one 760px column.
-  const side = `${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
+  // #1012: the transfer link card goes first in the side column.
+  const side = `${transferLinkCard(s)}${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
   // Artifact comment, same day: My night sits right above the tabs, in the main column, at every width.
   const night = s.status === 'cancelled' ? '' : myNight(s);
   return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? `<b>Session page (prototype).</b> What this person sees after opening your session link.` : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>
@@ -5707,6 +5886,7 @@ function viewPublic() {
         ${recordedOf(s) ? '' : tile('Rankings', 'Not ranked', "Wins here don't count toward the ROTRA leaderboards or win rate.")}
       </div>
       ${s.notes ? `<div class="card stack tight"><span class="pf-l">Notes</span><p style="margin:0">${esc(s.notes)}</p></div>` : ''}
+      ${due != null && s.roster.length && s.status !== 'cancelled' ? `<div class="card between pay-share-card"><div class="stack tight"><h3 style="margin:0">Payment status</h3><p class="small muted" style="margin:0">Who has paid, who paid part and who still owes, as text you can copy or share.</p></div><button class="btn sm" data-act="openPayShare" data-pub="1" aria-haspopup="dialog">${I.share} Share payment status</button></div>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`; })()
     : tab === 'leaderboard' && pub && pub.slides.includes(0) ? pubLeaderboard(s, pub) : tab === 'leaderboard' ? '' : `<section class="stack">${pubHostsHtml(s)}${fullRoster && s.roster.length ? '<p class="small muted">Tap a player to see their profile and stats.</p>' : ''}${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
@@ -5965,6 +6145,32 @@ const SHEETS = {
       ${preview ? `<p class="small muted">Status: ${preview}</p>` : ''}
       <p class="small muted">ROTRA only records it; money is collected outside the app.</p>`,
       '<button class="btn" data-act="payAmountCancel">Cancel</button><button class="btn primary" data-act="savePayAmount">Save</button>');
+  },
+  // #1010: Share payment status. `pub` = opened from the public page (names masked like the rest of that page).
+  payShare() {
+    const sh = S.ui.sheet, s = cur(), f = sh.f || 'all', g = payShareGroups(s, sh.pub);
+    const n = { all: s.roster.length, paid: g.paid.length, partial: g.partial.length, unpaid: g.unpaid.length };
+    return sheetShell('Share payment status', `<div class="stack">
+      <div class="seg" role="group" aria-label="Show in the text">${[['all', 'All'], ['paid', 'Paid'], ['partial', 'Partial'], ['unpaid', 'Unpaid']].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payShareFilter" data-k="${k}">${l} · ${n[k]}</button>`).join('')}</div>
+      <pre class="pay-share-text" aria-label="Payment status text">${esc(payShareText(s, f, sh.pub))}</pre>
+      <p class="small muted">Collected is the cash received. ROTRA only writes the text; money is collected outside the app.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn" data-act="payShareNative">Share</button>' : ''}<button class="btn primary" data-act="payShareCopy">Copy text</button>`);
+  },
+  // #1013 Slot history: how the slot reached this player, oldest first. Each approved transfer: who gave it to whom, what the giver
+  // paid themselves (the first is the original payer), what was waived, when and by whom it was approved. Read-only and append-only.
+  slotHistory() {
+    const sh = S.ui.sheet, s = cur(), h = slotPay(s, sh.pid), due = duePerHead(s);
+    if (!h || !h.chain.length) return sheetShell('Slot history', '<p class="small muted">This player holds their own slot.</p>', '<button class="btn" data-act="closeSlotHistory">Close</button>');
+    let before = 0;
+    const steps = h.chain.map((t) => { const x = t.pay || { paid: 0, waived: 0 }, own = Math.max(x.paid - before, 0); before = x.paid;
+      return `<li><b>${esc(nm(t.pid))} → ${esc(nm(t.to))}</b><br><span class="small muted">${esc(nm(t.pid))} paid ${peso(own)} · ${x.waived ? `${peso(x.waived)} waived` : 'nothing waived'} · approved ${fmtWhen(t.decidedAt, { lower: true })} by the Queue Master${t.link ? ' · transfer link' : ''}</span></li>`; }).join('');
+    const st = payStatus(h, due);
+    return sheetShell(`Slot history · ${esc(nm(sh.pid))}`, `<div class="stack">
+      <p class="small muted">${esc(nm(sh.pid))} holds this slot through ${h.chain.length} approved transfer${h.chain.length === 1 ? '' : 's'}. ${esc(nm(h.chain[0].pid))} is the original payer. Past transfers are never changed.</p>
+      <ol class="stack tight" style="margin:0;padding-left:20px">${steps}</ol>
+      <dl class="kv"><dt>Cash collected for this slot</dt><dd>${peso(h.amount == null ? due || 0 : h.amount)}</dd><dt>Waived</dt><dd>${peso(h.waived || 0)} · not cash</dd><dt>Status</dt><dd>${payChip(st)}</dd></dl>
+      ${notice('', 'A waived amount is never collected cash. ROTRA moves no money; it only keeps the record.')}</div>`,
+      '<button class="btn" data-act="closeSlotHistory">Close</button>');
   },
   payments() { return sheetShell('Payments', paymentsPanel(cur()).replace(/^<section class="card stack" id="payments">/, '<section class="stack" id="payments">'), '<button class="btn" data-act="closeSheet">Done</button>', true); },
   postPreview() {
@@ -6798,12 +7004,59 @@ const SHEETS = {
       <p class="small muted">Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.</p>`,
       '<button class="btn" data-act="closeSheet">Keep queue</button><button class="btn danger fill" data-act="confirmClearQueue">Clear queue</button>');
   },
+  // #1011 Transfer my slot: the full RTR ID of another registered ROTRA player, Find, check the name, then Send transfer request.
+  slotTransfer(sh) {
+    const s = cur(), f = sh.found;
+    const found = f ? `<div class="li" style="padding:10px;border:1px solid var(--border);border-radius:10px">${avatar(P(f.id) || { id: f.id, name: f.name, identity: 'registered' })}<div class="main"><b>${esc(f.name)}</b><div class="small muted mono">${esc(f.rtr)}</div><p class="small muted">${f.wl ? `On the waitlist #${f.wl} · leaves the waitlist if approved` : 'Not in this session yet'}</p></div></div>` : '';
+    return sheetShell('Transfer my slot', `<p class="small muted">Give your slot to another ROTRA player. The Queue Master approves it before the session starts (${fmtDate(s.start)}, ${fmtTime(s.start)}); until then you keep your slot. Requests still waiting at the start close.</p>
+      <label class="field"><span>Their RTR ID</span><input class="input mono${sh.err ? ' bad' : ''}" id="st-rtr" data-bind="ui.sheet.q" value="${esc(sh.q || '')}" placeholder="RTR-PH-CEB-102926-0001" autocomplete="off" autocapitalize="characters" spellcheck="false" data-autofocus>${sh.err ? `<span class="err">${esc(sh.err)}</span>` : '<span class="hint">Ask them for the RTR ID on their ROTRA profile.</span>'}</label>
+      <button class="btn" data-act="findTransfer">Find</button>${found}
+      <div class="stack tight" style="border-top:1px solid var(--border);padding-top:14px"><b style="font-size:14px">No ROTRA account yet?</b><p class="small muted">Make a transfer link instead. They sign up or log in with it, and the first person to claim it gets your slot once the Queue Master approves. It stops working at the start.</p><button class="btn" data-act="createTransferLink">Create a transfer link</button></div>`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendTransfer" ${f ? '' : 'disabled'}>Send transfer request</button>`);
+  },
+  // #1012 Transfer link: shown once, right after it is made (the real app stores only the token's digest). QR, copy field, Share.
+  transferLink(sh) {
+    const s = cur(), t = (s.transfers || []).find((x) => x.id === sh.id); if (!t) return sheetShell('Transfer link', '<p class="small muted">This link is closed.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const link = transferLinkUrl(s, t);
+    // Static placeholder QR (finder squares + sample modules), like the Session QR; the real app encodes the link.
+    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
+    const dots = [[9,1],[12,3],[10,5],[13,7],[1,9],[4,10],[8,9],[11,11],[15,9],[18,10],[2,13],[9,14],[12,16],[16,13],[19,15],[14,19],[10,19],[17,18]];
+    const qr = `<div style="width:min(220px,100%);aspect-ratio:1;align-self:center;background:#fff;border-radius:16px;padding:14px"><svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the transfer link" style="display:block;width:100%;height:100%">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg></div>`;
+    return sheetShell('Transfer link', `<div class="stack">
+      <p class="small muted">Send this link to the player who'll take your slot. They sign up or log in to ROTRA, then claim it. Only the first person to claim it can; the Queue Master still approves, and you keep your slot until then.</p>
+      ${qr}
+      <div class="copy-field"><label class="label" for="transfer-link">Transfer link</label><div class="cf-box"><input id="transfer-link" readonly value="${esc(link)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="copyTransferLink" data-v="${esc(link)}" aria-label="Copy transfer link" title="Copy">${COPY_ICON}</button></div></div>
+      <p class="small muted">It stops working at the start (${fmtDate(s.start)}, ${fmtTime(s.start)}), or if the Queue Master rejects the claim or it is withdrawn; then make a new one. ROTRA shows this link only once: if you lose it, cancel it on My night and make a new one.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? `<button class="btn primary" data-act="shareTransferLink" data-v="${esc(link)}">Share</button>` : `<button class="btn primary" data-act="copyTransferLink" data-v="${esc(link)}">Copy link</button>`}`);
+  },
+  // #1014 D-REJECT-REFUND: the whole cash collected for the slot (never a waiver), what happens to the sender's registration and who
+  // gets the freed slot (the first waitlisted player with a level, FIFO). ROTRA only records the refund.
+  rejectRefund(sh) {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === sh.id);
+    if (!t) return sheetShell('Reject and refund', '<p class="small muted">This transfer was already decided.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const to = transferTo(t) || { name: 'the recipient' }, amount = slotCash(s, t.pid), w = firstWaiter(s), h = slotPay(s, t.pid);
+    return sheetShell('Reject and refund?', `<p><b>${esc(nm(t.pid))}</b> asked to transfer their slot to ${esc(to.name)}.</p>
+      <div class="card stack tight"><span class="label">Refund to hand back</span><b class="big tnum">${peso(amount)}</b><span class="small muted">The whole amount collected for this slot${h && h.waived ? ` (the ${peso(h.waived)} waived is not cash and is not refunded)` : ''}. Full refunds only.</span></div>
+      <p>Hand ${peso(amount)} back to ${esc(nm(t.pid))} outside ROTRA. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">${esc(nm(t.pid))}'s registration is cancelled and the slot opens. ${w ? `${esc(nm(w.pid))}, first on the waitlist, gets it.` : 'Nobody is waiting, so the slot stays open.'} ${esc(to.name)} doesn't get the slot. The payment and the refund both stay in the record.</p>
+      ${notice('bad', "This can't be undone.")}`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn danger" data-act="confirmRejectRefund" data-id="${t.id}">Reject and refund</button>`);
+  },
+  // #1014 D-SESSION-REFUND: record one manual refund on a cancelled session's Refund everyone who paid list.
+  sessionRefund(sh) {
+    const s = cur(), amount = slotCash(s, sh.pid);
+    if (refundOf(s, sh.pid) || amount <= 0) return sheetShell('Record refund', '<p class="small muted">This refund is already recorded.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    return sheetShell('Record refund?', `<p><b>${esc(nm(sh.pid))}</b> · ${peso(amount)}</p>
+      <p>Hand ${peso(amount)} back to ${esc(nm(sh.pid))} outside ROTRA, then record it here. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">Full refund of the cash collected. The payment and the refund both stay in the record.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn primary" data-act="confirmSessionRefund" data-pid="${esc(sh.pid)}">Record refund</button>`);
+  },
   cancelSession(sh) {
-    const s = cur(), pay = s.payments || {};
-    const paidN = s.roster.filter((r) => pay[r.pid]).length, wl = (s.waitlist || []).length;
+    const s = cur();
+    const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length, wl = (s.waitlist || []).length;
     return sheetShell(`Cancel ${esc(s.title)}?`, `<p>${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</p>
       <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} joined · ${wl} on the waitlist</p>
-      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. Refunds happen outside ROTRA.`) : ''}
+      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. After you cancel, the session record lists who to refund and how much. Refund them outside ROTRA, then record each refund.`) : ''}
       <label class="field"><span>Reason (optional)</span><input class="input" id="cancel-reason" data-bind="ui.sheet.reason" value="${esc(sh.reason || '')}" maxlength="120" autocomplete="off"></label>
       ${notice('bad', "This can't be undone. To play anyway, create a new session.")}`,
       '<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmCancelSession">Cancel session</button>');
@@ -7276,6 +7529,58 @@ const ACT = {
   // D-2026-11-09-03: self check-in, I'm leaving, I can't make it. All write to the roster; the QM's last action wins.
   imHere: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = true; r.presentAt = Date.now(); r.selfCheckedIn = true; r.selfCheckedInAt = Date.now(); r.selfLeft = false; if (!S.online) S.pending += 1; save(); render(); toast(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs'); },
   imLeaving: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = false; r.selfLeft = true; r.leftAt = Date.now(); const mr = openMatchReq(s, r.pid); if (mr) mr.status = 'closed'; if (!S.online) S.pending += 1; save(); render(); toast('Told the QM you\'re leaving'); },
+  // #1011 Transfer my slot (signed-in confirmed player, before the start only).
+  openSlotTransfer: () => { const s = cur(), v = pubViewer(); if (!v || s.status !== 'prepared' || !R(s, v.id) || myTransfer(s, v.id)) return; openSheet({ type: 'slotTransfer', q: '', found: null, err: '' }); },
+  findTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const q = (sh.q || '').trim().toUpperCase(); sh.q = q; sh.found = null; sh.err = '';
+    if (!RTR_SHAPE.test(q)) sh.err = 'Enter the full RTR ID, like RTR-PH-CEB-102926-0001.';
+    else {
+      const f = transferRecipient(q);
+      if (!f) sh.err = 'No registered ROTRA player has that RTR ID.';
+      else if (f.id === v.id) sh.err = 'That\'s your own RTR ID.';
+      else if (R(s, f.id)) sh.err = `${f.name} already has a slot in this session.`;
+      else sh.found = { ...f, wl: waitOf(s).findIndex((w) => w.pid === f.id) + 1 };
+    }
+    render();
+  },
+  sendTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const f = sh.found;
+    if (!f || f.rtr !== (sh.q || '').trim().toUpperCase()) { sh.found = null; sh.err = 'Tap Find to check the RTR ID first.'; render(); return; }
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    s.transfers = [...(s.transfers || []), { id: `t${Date.now()}`, pid: v.id, to: f.id, at: Date.now(), status: 'pending' }];
+    S.ui.sheet = null; save(); render(); toast(`Transfer to ${f.name} sent · the QM decides`);
+  },
+  withdrawTransfer: () => { const s = cur(), v = pubViewer(), t = v && myTransfer(s, v.id); if (!t) return; const unclaimed = t.link && !t.to; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast(unclaimed ? 'Transfer link cancelled' : 'Transfer request withdrawn'); },
+  // #1012 Create a transfer link (sender). One pending transfer per slot, so a link and an RTR ID request never coexist.
+  createTransferLink: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    const t = { id: `t${Date.now()}`, pid: v.id, to: null, link: newLinkToken(), at: Date.now(), status: 'pending' };
+    s.transfers = [...(s.transfers || []), t];
+    save(); openSheet({ type: 'transferLink', id: t.id }); toast('Transfer link ready · share it with the new player');
+  },
+  copyTransferLink: (d) => {
+    const done = () => toast('Transfer link copied');
+    try { navigator.clipboard.writeText(d.v).then(done, () => { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }); }
+    catch (e) { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }
+  },
+  shareTransferLink: (d) => { try { navigator.share({ title: 'Take my slot on ROTRA', url: d.v }).catch(() => {}); } catch (e) { /* share unavailable */ } },
+  // #1012 claimant side. Prototype only: Sign up / Log in signs in as a registered player who is not in this session (the real
+  // app uses the session link's registration, so identity and RTR ID work like any session link).
+  linkSignUp: (d) => { setPubAs('newplayer'); toast(d.k === 'login' ? 'Prototype: logged in through the transfer link' : 'Prototype: signed up through the transfer link'); },
+  claimTransferLink: () => {
+    const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t) return;
+    const st = linkState(s, t, v.id);
+    if (st !== 'open') { render(); toast(st === 'claimed' ? 'Someone else already claimed this transfer link.' : 'This transfer link no longer works. Ask the sender for a new link.'); return; }
+    if (R(s, v.id)) { toast('You already have a slot in this session, so you can\'t claim this one.'); return; }
+    // First claimant wins: the real app claims with one conditional update on the locked rows.
+    t.to = v.id; t.claimedAt = Date.now(); save(); render(); toast('Slot claimed · the QM decides');
+  },
+  withdrawTransferClaim: () => { const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t || linkState(s, t, v.id) !== 'yours') return; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast('Claim withdrawn · this link no longer works'); },
   cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
   // D-2026-11-09-05, player side: Request a match.
   openMatchReq: () => { const s = cur(), a = reqAllowed(s); if (!REQ_FORMATS.some((k) => a[k])) { toast('This session isn\'t taking match requests'); return; } openSheet({ type: 'matchReq', format: REQ_FORMATS.find((k) => a[k]), partners: [], opp: [] }); },
@@ -7366,6 +7671,50 @@ const ACT = {
   // D-2026-11-09-03: drop-out notices. The slot never frees by itself.
   keepDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'kept'; x.closedAt = Date.now(); commit(`${nm(x.pid)} stays on the roster`); render(); },
   removeDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'removed'; x.closedAt = Date.now(); s.roster = s.roster.filter((r) => r.pid !== x.pid); commit(`${nm(x.pid)} removed from the roster`); render(); },
+  // #1011, QM side: Approve hands the slot over in one change (the recipient takes the sender's place in slot order; a waitlisted
+  // recipient leaves the waitlist; the slot count never changes). Reject leaves the sender's slot and payment exactly as they were.
+  approveTransfer: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return;
+    const to = transferTo(t), wl = waitOf(s).find((w) => w.pid === t.to);
+    const lv = t.level ?? wl?.level ?? to?.sugg ?? null;
+    if (lv == null) { t.err = 'Choose a level for this club before approving.'; render(); const f = document.getElementById(`tr-lv-${t.id}`); if (f) f.focus(); return; }
+    if (R(s, t.to)) { t.err = `${to.name} already has a slot in this session.`; render(); return; }
+    const g = DIRECTORY.find((x) => x.id === t.to);
+    if (!P(t.to) && g) S.players.push({ id: g.id, name: g.name, nick: '', identity: 'registered', rtr: g.rtr, sugg: g.sugg ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' });
+    const i = s.roster.findIndex((r) => r.pid === t.pid), sender = nm(t.pid);
+    s.roster.splice(i, 1, { pid: t.to, level: +lv, present: false, locked: false, presentAt: Date.now() });
+    s.waitlist = (s.waitlist || []).filter((w) => w.pid !== t.to);
+    (s.requests || []).forEach((r) => { if (r.status === 'pending' && (r.pid === t.to || (to?.rtr && r.account === to.rtr))) r.status = 'closed'; });
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    // #1013: the money snapshot is taken before the slot changes hands; no payment is written or changed.
+    t.pay = transferPay(s, t);
+    t.status = 'approved'; t.decidedAt = Date.now(); t.level = +lv; t.fromWaitlist = !!wl; t.err = '';
+    commit(`${sender}'s slot now belongs to ${to.name}${t.pay.waived ? ` · ${peso(t.pay.waived)} waived` : ''}`); render();
+  },
+  // #1014 Reject and refund: the transfer is rejected, a full refund of the slot's cash is recorded (append-only; the payment stays
+  // as recorded), the sender's registration is cancelled and the first waitlisted player with a level takes the slot (FIFO).
+  openRejectRefund: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t || slotCash(s, t.pid) <= 0) return; openSheet({ type: 'rejectRefund', id: t.id }); },
+  confirmRejectRefund: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) { closeSheet(); return; }
+    const amount = slotCash(s, t.pid), sender = nm(t.pid);
+    if (amount <= 0 || refundOf(s, t.pid)) { closeSheet(); toast('Nothing was paid for this slot, so there is nothing to refund. Use Reject instead.'); return; }
+    t.status = 'rejected'; t.decidedAt = Date.now();
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: t.pid, amount, at: Date.now(), reason: 'transfer', transferId: t.id }];
+    s.roster = s.roster.filter((r) => r.pid !== t.pid);
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    const w = firstWaiter(s);
+    if (w) { s.waitlist = s.waitlist.filter((x) => x !== w); s.roster.push({ pid: w.pid, level: w.level, present: false, locked: false, presentAt: Date.now() }); }
+    S.ui.sheet = null; commit(`Transfer rejected · ${peso(amount)} refund recorded for ${sender}${w ? ` · ${nm(w.pid)} got the slot from the waitlist` : ' · the slot is open'}`); render();
+  },
+  openSessionRefund: (d) => { const s = cur(); if (s.status !== 'cancelled' || refundOf(s, d.pid) || slotCash(s, d.pid) <= 0) return; openSheet({ type: 'sessionRefund', pid: d.pid }); },
+  confirmSessionRefund: (d) => {
+    const s = cur(); if (!s || s.status !== 'cancelled' || !S.online) { closeSheet(); return; }
+    const amount = slotCash(s, d.pid);
+    if (refundOf(s, d.pid) || amount <= 0) { closeSheet(); return; }
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: d.pid, amount, at: Date.now(), reason: 'cancelled' }];
+    S.ui.sheet = null; commit(`Refund recorded · ${peso(amount)} to ${nm(d.pid)}`); render();
+  },
+  rejectTransfer: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return; t.status = 'rejected'; t.decidedAt = Date.now(); commit(`Transfer rejected · ${nm(t.pid)} keeps the slot`); render(); },
   // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.
   addMatchReq: (d) => {
     const s = cur(), mr = openMatchReqs(s).find((x) => x.id === d.id); if (!mr) return;
@@ -7402,6 +7751,8 @@ const ACT = {
     s.status = 'cancelled'; s.cancelledAt = Date.now(); s.cancelReason = reason || null;
     // Join requests close with the session; the record keeps them as closed.
     (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
+    // #1011: pending slot transfers are cancelled with the session.
+    closeTransfers(s, 'cancelled');
     S.ui.sheet = null; commit(`${s.title} cancelled`); go('history', s.id);
   },
   peekSession: (d) => openSheet({ type: 'peek', id: d.id }),
@@ -7793,8 +8144,18 @@ const ACT = {
   },
   openPayments: () => openSheet({ type: 'payments' }),
   payFilter: (d) => { S.ui.payF = d.k; render(); },
+  openPayShare: (d) => openSheet({ type: 'payShare', f: 'all', pub: !!d.pub, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null }),
+  payShareFilter: (d) => { S.ui.sheet.f = d.k; render(); },
+  payShareCopy: () => {
+    const sh = S.ui.sheet, text = payShareText(cur(), sh.f || 'all', sh.pub);
+    const fail = () => toast("Couldn't copy. Try again.");
+    try { navigator.clipboard.writeText(text).then(() => toast('Payment status copied'), fail); } catch (e) { fail(); }
+  },
+  payShareNative: () => { const sh = S.ui.sheet; try { navigator.share({ title: 'Payment status', text: payShareText(cur(), sh.f || 'all', sh.pub) }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   togglePaid: (d) => {
     const s = cur(); s.payments = s.payments || {};
+    // #1013: a slot paid through a transfer is locked; its history is read-only.
+    if (transferChainOf(s, d.pid).length) { toast("This slot was paid through a slot transfer, so its payment can't be changed here."); return; }
     if (paymentPending.size && [...paymentPending.values()][0].sid !== s.id) flushPayments();
     S.ui.paymentError = null;
     const before = paymentPending.get(d.pid) || { sid: s.id, pid: d.pid, before: s.payments[d.pid] };
@@ -7806,8 +8167,11 @@ const ACT = {
     } else paymentPending.set(d.pid, before);
     clearTimeout(paymentTimer); paymentTimer = setTimeout(flushPayments, 800); render();
   },
+  slotHistory: (d) => openSheet({ type: 'slotHistory', pid: d.pid, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null }),
+  closeSlotHistory: () => { S.ui.sheet = S.ui.sheet && S.ui.sheet.back; render(); },
   payAmount: (d) => {
     const s = S.sessions.find((x) => x.id === d.sid) || cur(), paid = (s.payments || {})[d.pid], due = duePerHead(s);
+    if (transferChainOf(s, d.pid).length) { ACT.slotHistory(d); return; }
     S.ui.payAmt = String(paid ? (paid.amount == null ? due ?? '' : paid.amount) : due ?? '');
     openSheet({ type: 'payAmount', sid: s.id, pid: d.pid, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null });
   },
@@ -7830,7 +8194,7 @@ const ACT = {
   markAllPaid: () => {
     flushPayments();
     const s = cur(); s.payments = s.payments || {};
-    s.roster.filter((r) => !s.payments[r.pid]).forEach((r) => ACT.togglePaid({ pid: r.pid }));
+    s.roster.filter((r) => !slotPay(s, r.pid)).forEach((r) => ACT.togglePaid({ pid: r.pid }));
     flushPayments();
   },
   giveSlot: (d) => {
@@ -7958,6 +8322,8 @@ const ACT = {
     // Owner comment, November 11, 2026: join requests end at Start. Pending ones close; the public page tells visitors to ask at the venue.
     const closed = (s.requests || []).filter((r) => r.status === 'pending');
     closed.forEach((r) => { r.status = 'closed'; r.closedAt = s.startedAt; });
+    // #1011: pending slot transfers expire at Start; every slot stays with its holder.
+    closeTransfers(s, 'expired');
     S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}${closed.length ? ` · ${closed.length} join request${closed.length === 1 ? '' : 's'} closed` : ''}`); render(); window.scrollTo(0, 0);
   },
   pane: (d) => { S.ui.pane = d.k; render(); },
@@ -8334,6 +8700,7 @@ const CHANGE = {
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },
   rvSet: (el) => { S.ui.rv = { ...(S.ui.rv || {}), [el.dataset.k]: el.value }; render(); },
+  trLevel: (el) => { const t = (cur().transfers || []).find((x) => x.id === el.dataset.id); if (!t) return; t.level = el.value === '' ? null : +el.value; t.err = ''; render(); },
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },
   spSet: (el) => { S.ui.spf = { ...(S.ui.spf || {}), [el.dataset.k]: el.value }; render(); },
   draftSel: (el) => { S.ui.draft[el.dataset.k] = el.value; if (el.dataset.k === 'repeat' && !S.ui.draft.repeatCount) S.ui.draft.repeatCount = 4; delete S.ui.errors.when; render(); },
@@ -8773,7 +9140,9 @@ function prototypePath() {
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
-  return `/queue${path ?? ''}${tab ? `?tab=${encodeURIComponent(tab)}` : ''}`;
+  // #1012: a transfer link's token stays on the session page's address.
+  const q = new URLSearchParams(); if (tab) q.set('tab', tab); if (S.screen === 'public' && S.ui.guest && S.ui.trLink) q.set('transfer', S.ui.trLink);
+  return `/queue${path ?? ''}${q.toString() ? `?${q}` : ''}`;
 }
 function applyPrototypeRoute(url) {
   flushPresence();
@@ -8785,6 +9154,8 @@ function applyPrototypeRoute(url) {
   const match = path.match(/^\/sessions\/([^/]+)(?:\/(preparation|edit|record|finishing|results|public-page|recovery))?$/);
   const guest = path.match(/^\/s\/([^/]+)$/);
   const tab = url.searchParams.get('tab');
+  // #1012: /s/<id>?transfer=<token> opens the transfer link card.
+  S.ui.trLink = guest && LINK_TOKEN.test(url.searchParams.get('transfer') || '') ? url.searchParams.get('transfer') : null;
   if (setting) {
     const entry = Object.entries(settingsSlugs).find(([, slug]) => slug === (setting[1] || 'club-identity'));
     if (!entry) return false;

@@ -55,6 +55,7 @@ import {
   requireState,
   touchSession,
 } from './session-store'
+import { myPendingSlotTransfer } from './slot-transfers'
 
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -809,6 +810,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
       select: { code: true },
     })
+    // Transfer my slot (#1011): the Player's own pending transfer, before Start only.
+    const slotTransfer =
+      row && session.state === 'prepared' ? await myPendingSlotTransfer(tx, row.id) : null
     const takesPart =
       session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
     const isLive = session.state === 'active' || session.state === 'finalizing'
@@ -869,6 +873,8 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       checkedIn: mark?.kind === 'checked-in',
       hasLeft: mark?.kind === 'left',
       cantMakeItSent: openNotice,
+      canTransfer: !!row && session.state === 'prepared',
+      slotTransfer,
       offline: false,
       games: result?.games ?? 0,
       won: result?.wins ?? 0,

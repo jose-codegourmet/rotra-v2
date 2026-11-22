@@ -6,10 +6,16 @@ import { readFileSync } from 'node:fs'
 import { computeFingerprint } from '../packages/rules-wasm/fingerprint.mjs'
 
 // Vitest files for rules the owner has decided: session cost, minimum games,
-// payment status and totals, substitution game credit, rank eligibility and award baselines.
+// payment status and totals, slot transfer waivers, manual full refunds, substitution game credit, rank eligibility
+// and award baselines.
 const DECIDED_MATH_TESTS = [
   'src/session-cost/sessionCost.rules.test.ts',
   'src/session-payment/sessionPayment.rules.test.ts',
+  // Slot transfer accounting and the payment status share (epic #1009, owner decisions #1015)
+  'src/session-payment/paymentShare.rules.test.ts',
+  'src/slot-transfer/transferAccounting.rules.test.ts',
+  // Manual full refunds and FIFO promotion (#1014, D-2026-11-22-06)
+  'src/session-payment/paymentRefund.rules.test.ts',
   'src/match/match.rules.test.ts',
   'src/session-result/sessionResult.rules.test.ts',
   'src/player/player.rules.test.ts',

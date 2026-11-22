@@ -1,6 +1,6 @@
 # Dialog and confirmation contracts
 
-**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html), where every dialog is a sheet. Updated November 6, 2026 for the On court step and substitution game credit ([log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). Updated November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)) for D-OVERFILL, D-COURTS-TIME, D-BAGGING-PAIR, D-PARTICIPANT-PROFILE and D-PHOTO-VIEWER.
+**Status:** Proposed copy and interaction for agreed irreversible/important actions. Exact visual styling is implementation work. Updated October 26, 2026: copy below matches the [ROTRA Queue prototype](../../../apps/mockup/queue-app/rotra-queue.html), where every dialog is a sheet. Updated November 6, 2026 for the On court step and substitution game credit ([log](../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)). Updated November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)) for D-OVERFILL, D-COURTS-TIME, D-BAGGING-PAIR, D-PARTICIPANT-PROFILE and D-PHOTO-VIEWER. Updated November 22, 2026 ([D-2026-11-22-06](../../mvp/decisions/2026-11-22.md#d-2026-11-22-06)) for D-REJECT-REFUND, D-SESSION-REFUND and the D-CANCEL-SESSION paid warning.
 
 Removing a waiting match, a roster player during preparation, a free court, or an inventory item takes effect immediately with a confirming toast and no dialog: none of them records or erases a played game.
 
@@ -32,9 +32,25 @@ The save re-checks: if they went on court meanwhile, nothing is deleted and the 
 
 Owner decision, November 6, 2026 ([log](../../mockup-changes/2026-11-06-queue-example-sessions-and-cancel.md)). Opened by **Cancel session** in a prepared session's Preparation header; never offered once the session has started.
 
-Title **Cancel TITLE?** Lines: “Sat, Nov 7 · 6:00–9:00 PM” (date · time range) and “N players joined · M on the waitlist”. When any roster player is marked paid, a warning: **“P players are marked paid. Refunds happen outside ROTRA.”** (“1 player is marked paid. …”). Field **Reason (optional)**, up to 120 characters. Notice (danger): **“This can't be undone. To play anyway, create a new session.”** Secondary **Keep session** (focused first); primary **Cancel session** (danger).
+Title **Cancel TITLE?** Lines: “Sat, Nov 7 · 6:00–9:00 PM” (date · time range) and “N players joined · M on the waitlist”. When any roster player is marked paid, a warning: **“P players are marked paid. After you cancel, the session record lists who to refund and how much. Refund them outside ROTRA, then record each refund.”** (“1 player is marked paid. …”; #1014, owner decision November 22, 2026). Field **Reason (optional)**, up to 120 characters. Notice (danger): **“This can't be undone. To play anyway, create a new session.”** Secondary **Keep session** (focused first); primary **Cancel session** (danger).
 
 On confirm the session becomes Cancelled with the cancelled time and the reason (empty reason saves none), pending join requests close, the toast reads **“TITLE cancelled”** and the cancelled [session record](modules/queue/results-sharing.md#q-history--session-record) opens. The save re-checks that the session is still prepared; if it started meanwhile, nothing is cancelled.
+
+## D-REJECT-REFUND — Reject and refund
+
+#1014, owner decisions November 22, 2026 ([D-2026-11-22-06](../../mvp/decisions/2026-11-22.md#d-2026-11-22-06); [log](../../mockup-changes/2026-11-22-queue-manual-refunds.md)). Opened by **Reject and refund** on a pending slot transfer in Requests, offered only when cash was collected for the slot.
+
+Title **Reject and refund?** Line: “**SENDER** asked to transfer their slot to RECIPIENT.” A card **Refund to hand back** with the amount (the whole cash collected for the slot) and “The whole amount collected for this slot (the ₱X waived is not cash and is not refunded). Full refunds only.” (the waiver part only when the slot carries one). Then “Hand ₱X back to SENDER outside ROTRA. ROTRA only records the refund; it moves no money.” and the muted line “SENDER's registration is cancelled and the slot opens. WAITER, first on the waitlist, gets it.” (or “Nobody is waiting, so the slot stays open.”) “RECIPIENT doesn't get the slot. The payment and the refund both stay in the record.” Notice (danger): “This can't be undone.” Secondary **Back**; primary **Reject and refund** (danger).
+
+On confirm: the transfer is rejected, the refund is recorded (the payment is unchanged), the sender comes off the roster and the first waitlisted player with a level takes the freed slot (FIFO). Toast “Transfer rejected · ₱X refund recorded for SENDER · WAITER got the slot from the waitlist” (or “· the slot is open”). Refused inline, nothing changed: “Nothing was paid for this slot, so there is nothing to refund. Use Reject instead.”, or “The payment for this slot changed: the full refund is now ₱X. Check and try again.”
+
+## D-SESSION-REFUND — Record refund
+
+#1014, owner decision November 22, 2026 ([D-2026-11-22-06](../../mvp/decisions/2026-11-22.md#d-2026-11-22-06)). Opened by **Record refund** on a cancelled session record's **Refund everyone who paid** list; online only.
+
+Title **Record refund?** Line: “**NAME** · ₱X”. “Hand ₱X back to NAME outside ROTRA, then record it here. ROTRA only records the refund; it moves no money.” Muted: “Full refund of the cash collected. The payment and the refund both stay in the record.” Secondary **Back**; primary **Record refund**.
+
+On confirm the refund is recorded once (recording it again changes nothing) and the row reads “Refunded ₱X · WHEN”. Toast “Refund recorded · ₱X to NAME”. Refused inline: “The payment for this slot changed: the full refund is now ₱X. Check and try again.”
 
 ## D-START-MATCH — Put on court, then Start match
 

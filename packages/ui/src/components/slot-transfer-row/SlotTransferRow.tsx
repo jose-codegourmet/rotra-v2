@@ -36,6 +36,12 @@ export type SlotTransferRowProps = {
   /** Approve with the level the Queue Master chose for the recipient at this club */
   onApprove: (level: PlayingLevel) => void
   onReject: () => void
+  /**
+   * **Reject and refund** (#1014): opens the D-REJECT-REFUND confirmation, which states the full
+   * refund. The button shows only with this handler and cash collected for the slot
+   * (`payment.paidMinor` above 0); a slot with nothing paid has plain Reject only.
+   */
+  onRejectAndRefund?: () => void
   isPending?: boolean
   error?: ReactNode
 }
@@ -47,7 +53,8 @@ const LEVEL_ERROR = 'Choose a level for this club before approving.'
  * they want to give the slot to (name and RTR ID), whether that player is on the waitlist, the
  * level the recipient plays at here, and Reject / Approve. A claimed transfer link (#1012) reads
  * “Claimed by NAME”; rejecting it ends the link. #1013: the payment line shows the waiver Approve
- * will record, before approving. Presentational: the caller owns the transfer mutations.
+ * will record, before approving. #1014: Reject and refund, when cash was collected for the slot,
+ * opens the caller's refund confirmation. Presentational: the caller owns the transfer mutations.
  */
 export function SlotTransferRow({
   senderName,
@@ -61,6 +68,7 @@ export function SlotTransferRow({
   payment,
   onApprove,
   onReject,
+  onRejectAndRefund,
   isPending = false,
   error,
 }: SlotTransferRowProps) {
@@ -126,6 +134,17 @@ export function SlotTransferRow({
           >
             Reject
           </Button>
+          {onRejectAndRefund && (payment?.paidMinor ?? 0) > 0 ? (
+            <Button
+              size="sm"
+              disabled={isPending}
+              onClick={onRejectAndRefund}
+              aria-haspopup="dialog"
+              aria-label={`Reject ${senderName}'s transfer and refund`}
+            >
+              Reject and refund
+            </Button>
+          ) : null}
           <Button
             size="sm"
             variant="primary"

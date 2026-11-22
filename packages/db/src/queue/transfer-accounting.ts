@@ -1,4 +1,5 @@
 import 'server-only'
+import type { LedgerRefund } from '@rotra/data/session-payment/refund-rules'
 import {
   type EntrySlotPayment,
   entrySlotPayment,
@@ -15,6 +16,8 @@ import type { Tx } from './session-store'
  * through `slotLedger`, so a slot's cash is counted once across a chain of transfers and a waiver is
  * never cash. Transfer rows are final once approved and the marks they froze are kept by a trigger
  * (`session_payment_marks_frozen_by_transfer`): the chain is append-only.
+ * #1014 (D-2026-11-22-06): manual full refunds (`session_payment_refunds`, append-only) come off the
+ * refunded entry's cash, so every reader counts net kept cash; the refunded marks stay, frozen.
  */
 
 type LedgerRow = LedgerTransfer & { fromName: string; toName: string; viaLink: boolean }
@@ -40,6 +43,13 @@ export async function slotLedger(tx: Tx, sessionId: string) {
     },
   })
   const marks = await tx.sessionPaymentMark.findMany({ where: { sessionId } })
+  const refundRows = await tx.sessionPaymentRefund.findMany({ where: { sessionId } })
+  const refunds: LedgerRefund[] = refundRows.map((r) => ({
+    pid: r.sessionPlayerId,
+    amountMinor: r.amountMinor,
+    refundedAt: r.refundedAt.getTime(),
+  }))
+  const refundByEntry = new Map(refundRows.map((r) => [r.sessionPlayerId, r]))
   const transfers: LedgerRow[] = rows.map((t) => ({
     id: t.id,
     pid: t.senderSessionPlayerId,
@@ -68,11 +78,14 @@ export async function slotLedger(tx: Tx, sessionId: string) {
       ownMark: mark ? { amountMinor: mark.amountMinor, markedAt: mark.markedAt.getTime() } : null,
       transfers,
       amountDue,
+      refunds,
     })
   }
   return {
     transfers,
     markOf: (entryId: string) => byEntry.get(entryId),
+    /** The manual full refund recorded on an entry (#1014), or undefined */
+    refundOf: (entryId: string) => refundByEntry.get(entryId),
     paymentOf,
     /**
      * A slot that came by transfer is Paid in Full through its history, and a mark frozen into a
@@ -80,8 +93,10 @@ export async function slotLedger(tx: Tx, sessionId: string) {
      */
     isLocked: (entryId: string) => {
       const payment = paymentOf(entryId, null)
-      return payment.chain.length > 0 || payment.frozen
+      return payment.chain.length > 0 || payment.frozen || refundByEntry.has(entryId)
     },
+    /** #1014: the entry was refunded; its marks are frozen (trigger) */
+    isRefunded: (entryId: string) => refundByEntry.has(entryId),
     /** The slot came by transfer: it already reads Paid, so a paid tick is a no-op */
     isCarried: (entryId: string) => paymentOf(entryId, null).chain.length > 0,
     /** The Payments read's `transfer` (waivers and the chain, ISO times), or null for an own slot */

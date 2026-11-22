@@ -20,8 +20,9 @@
 // payment mark is written or changed: the sender's mark stays on their released entry and is frozen
 // (trigger on session_payment_marks). Readers count the live holder's carried cash once.
 //
-// Shape kept ready for the later tickets of the epic, not built yet:
-// - #1014 refunds: a separate append-only refund record referencing this row.
+// Refunds (#1014, D-2026-11-22-06): **Reject and refund** rejects this row and writes one
+// append-only `session_payment_refunds` row that references it (financials.prisma); the row itself
+// reads `rejected`.
 
 enum SlotTransferStatus {
   pending
@@ -96,6 +97,8 @@ model SessionSlotTransfer {
   recipientEntry      SessionPlayer? @relation("SlotTransferRecipient", fields: [clubId, sessionId, recipientSessionPlayerId], references: [clubId, sessionId, id], onDelete: Restrict)
   decidedBy           Device?        @relation(fields: [clubId, decidedByDeviceId], references: [clubId, id], onDelete: Restrict)
   withdrawnBy         Player?        @relation("SlotTransferWithdrawnBy", fields: [withdrawnByPlayerId], references: [id], onDelete: Restrict)
+  /// Reject and refund (#1014): the manual full refund recorded with the rejection.
+  refunds             SessionPaymentRefund[]
 
   /// Scoped target for later rows that belong to one transfer (links #1012, refunds #1014).
   @@unique([clubId, sessionId, id])

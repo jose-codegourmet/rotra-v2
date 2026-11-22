@@ -11,6 +11,9 @@ enum RosterReleaseReason {
   removed
   /// An approved slot transfer (#1011) handed this entry's slot to another player.
   transferred
+  /// Reject and refund on a slot transfer (#1014): the registration was cancelled after a manual
+  /// full refund was recorded; the slot went to the waitlist (FIFO).
+  refunded
 
   @@map("roster_release_reason")
 }
@@ -69,7 +72,8 @@ model SessionPlayer {
   matchRequests     SessionMatchRequest[]     @relation("MatchRequestRequester")
   matchRequestSpots SessionMatchRequestSpot[] @relation("MatchRequestSpot")
 
-  paymentMark SessionPaymentMark?
+  paymentMark    SessionPaymentMark?
+  paymentRefunds SessionPaymentRefund[]
 
   dropOutNotices SessionDropOutNotice[]
 

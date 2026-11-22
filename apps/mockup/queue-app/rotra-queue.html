@@ -2671,7 +2671,7 @@ function syncLabel() {
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
   pickHost: 'Session', confirmHostTrust: 'Session', removeSessionHost: 'Session',
-  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', approveTransfer: 'Roster', rejectTransfer: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
+  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', approveTransfer: 'Roster', rejectTransfer: 'Roster', confirmRejectRefund: 'Payments', confirmSessionRefund: 'Payments', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
@@ -3600,7 +3600,7 @@ function cancelledExample() {
     roster: ['p2', 'p6', 'p10', 'p18', 'p23', 'p29'].map((pid, i) => ({ pid, level: lv(pid), present: false, locked: false, presentAt: start - (60 - i * 5) * 3600e3 })),
     waitlist: [{ pid: 'p27', level: lv('p27'), at: start - 30 * 3600e3 }], requests: [], matches: [], seq: 0, published: null,
     cancelledAt: start - 14 * 3600e3, cancelReason: 'Not enough players',
-    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 } } };
+    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 }, p10: { at: start - 38 * 3600e3, amount: 120 } } };
   s.minimum = sessionEstimate(s).low;
   return s;
 }
@@ -3615,6 +3615,8 @@ function upcomingExamples() {
     prep({ id: 'x-next-full', title: 'Club Doubles Night', start: at(1, 18), end: at(1, 21), ...BANILAD, courts: courts(2), notes: 'Doubles all night. Slots are full; confirmed guests join the waitlist.', roster: join(pidRange(1, 16)),
       waitlist: ['p21', 'p22', 'p25', 'p26'].map((pid, i) => ({ pid, level: lv(pid), at: now - (20 - i * 4) * 3600e3 })),
       payments: { p1: { at: now - 30 * 3600e3, amount: 200 }, p2: { at: now - 26 * 3600e3, amount: 200 }, p5: { at: now - 5 * 3600e3, amount: 200 } },
+      // #1014: Ana (p2) paid ₱200 and asks to transfer her slot. Reject and refund hands her ₱200 back and gives the slot to p21, first on the waitlist.
+      transfers: [{ id: 't-seed-refund', pid: 'p2', to: 'g4', at: now - 3 * 3600e3, status: 'pending' }],
       finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }] } }),
     prep({ id: 'x-next-partial', title: 'Beginners and Friends', start: at(3, 19), end: at(3, 21), ...LAHUG, courts: courts(3), notes: 'Relaxed games for newer players. Bring a friend.', roster: join(['p3', 'p6', 'p8', 'p10', 'p12', 'p15', 'p17', 'p18', 'p20', 'p23', 'p24', 'p27', 'p29', 'p30']),
       finance: { courtFee: 250, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 3 }] } }),
@@ -3710,6 +3712,23 @@ function viewHistory() {
 }
 // A cancelled session never started: no games, standings or slides, and it counts nowhere. Its roster, waitlist and
 // payment marks stay on the record, read-only.
+// #1014 (owner decision 2026-11-22, #1015): after a cancellation the record lists everyone who paid (Paid or Partial) with the whole cash
+// to hand back, never a waiver. The QM refunds outside ROTRA and records each refund (one per player, append-only).
+function refundRows(s) {
+  const due = duePerHead(s);
+  return s.roster.map((r) => { const h = slotPay(s, r.pid), rf = refundOf(s, r.pid), cash = slotCash(s, r.pid) + (rf ? rf.amount : 0);
+    const st = payStatus(cash > 0 ? { amount: cash, waived: h ? h.waived : 0 } : null, due);
+    return { pid: r.pid, name: P(r.pid).name, cash, rf, partial: st.kind === 'partial' }; })
+    .filter((x) => x.cash > 0).sort((a, b) => a.name.localeCompare(b.name));
+}
+function refundCard(s) {
+  const rows = refundRows(s); if (!rows.length) return '';
+  const left = rows.filter((x) => !x.rf), leftAmt = left.reduce((t, x) => t + x.cash, 0), done = rows.reduce((t, x) => t + (x.rf ? x.rf.amount : 0), 0);
+  return `<section class="card stack" aria-labelledby="refund-h"><div class="between"><div><h2 id="refund-h">Refund everyone who paid</h2><p class="small muted">ROTRA doesn't move money. Hand each amount back outside ROTRA, then record it here. Full refunds of the cash collected; waived amounts are not cash.</p></div>
+      <div class="stack tight" style="text-align:right"><b class="tnum">${left.length ? `${peso(leftAmt)} to refund · ${left.length}` : 'All refunds recorded'}</b>${done ? `<span class="small muted">${peso(done)} refunded</span>` : ''}</div></div>
+    <div class="list">${rows.map((x) => `<div class="li">${avatar(P(x.pid))}<div class="main"><b>${esc(x.name)}</b><p class="small muted">${x.partial ? 'Partial' : 'Paid'} · ${peso(x.cash)} collected</p></div>
+      ${x.rf ? `<span class="chip ok">${I.check} Refunded ${peso(x.rf.amount)} · ${fmtWhen(x.rf.at, { lower: true })}</span>` : `<button class="btn sm" data-act="openSessionRefund" data-pid="${esc(x.pid)}" aria-haspopup="dialog" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Record refund · ${peso(x.cash)}</button>`}</div>`).join('')}</div></section>`;
+}
 function cancelledRecord(s) {
   const wl = waitOf(s);
   const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length;
@@ -3717,7 +3736,7 @@ function cancelledRecord(s) {
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="stack tight"><span class="label">Session record · read-only</span>${sessTitle(s)}<p class="muted small">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
     <div class="row">${chip('Cancelled')}${s.cancelledAt ? `<span class="small muted">Cancelled ${fmtWhen(s.cancelledAt, { lower: true })}</span>` : ''}</div>
-    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid; refunds happen outside ROTRA.` : ''}`)}
+    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid: refund them outside ROTRA and record each refund below.` : ''}`)}
     <div class="tiles4">
       <div class="card"><span class="label">Joined</span><b class="big tnum">${s.roster.length}</b><span class="small muted">of ${capacityOf(s)} slots</span></div>
       <div class="card"><span class="label">Waitlist</span><b class="big tnum">${wl.length}</b></div>
@@ -3725,7 +3744,8 @@ function cancelledRecord(s) {
       <div class="card"><span class="label">Courts</span><b class="big tnum">${s.courts.length}</b></div>
     </div>
     <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button></div>
-    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = slotPay(s, r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
+    ${refundCard(s)}
+    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = slotPay(s, r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid && paid.refunded ? `Paid ${peso(paid.refunded + (paid.amount || 0))} · refunded` : paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
     ${wl.length ? `<section class="stack"><h2>Waitlist · ${wl.length}</h2><ol class="pub-wait">${wl.map((w) => `<li>${esc(P(w.pid).name)}</li>`).join('')}</ol></section>` : ''}
   </main>`;
 }
@@ -3812,13 +3832,22 @@ function transferChainOf(s, pid) {
   return chain;
 }
 const payFrozen = (s, pid) => { const m = (s.payments || {})[pid]; return !!m && approvedTransfers(s).some((t) => t.pid === pid && t.decidedAt >= m.at); };
-// What a roster player shows and totals: { amount (cash: own + carried), waived, at, chain } or null (nothing paid or carried).
+// #1014 manual full refunds (D-2026-11-22-06): s.refunds = [{ id, pid, amount, at, reason: 'transfer' | 'cancelled', transferId }].
+// Append-only, one per player; ROTRA moves no money and the payment itself is never changed. Every reader counts the cash kept
+// (received − refunded); the refund shows on its own line.
+const refundOf = (s, pid) => (s.refunds || []).find((x) => x.pid === pid) || null;
+// What a roster player shows and totals: { amount (cash kept: own + carried − refunded), waived, refunded, at, chain } or null.
 function slotPay(s, pid) {
   const due = duePerHead(s), own = payFrozen(s, pid) ? null : (s.payments || {})[pid], chain = transferChainOf(s, pid), last = chain[chain.length - 1];
-  if (!last) return own ? { amount: own.amount, waived: 0, at: own.at, chain } : null;
+  const rf = refundOf(s, pid), back = rf ? rf.amount : 0, net = (got) => Math.max(got - back, 0);
+  if (!last) return own ? { amount: back ? net(own.amount == null ? due || 0 : own.amount) : own.amount, waived: 0, refunded: back, at: own.at, chain } : null;
   const x = last.pay || { paid: 0, prior: 0, waived: 0 }, ownGot = own ? (own.amount == null ? due || 0 : own.amount) : 0;
-  return { amount: ownGot + x.paid, waived: x.prior + x.waived, at: own ? Math.max(own.at, last.decidedAt) : last.decidedAt, chain };
+  return { amount: net(ownGot + x.paid), waived: x.prior + x.waived, refunded: back, at: own ? Math.max(own.at, last.decidedAt) : last.decidedAt, chain };
 }
+// The whole cash the slot holds now (never a waiver): what a full refund hands back.
+const slotCash = (s, pid) => { const h = slotPay(s, pid), due = duePerHead(s); return h ? (h.amount == null ? due || 0 : h.amount) : 0; };
+// #1014 FIFO: the first waitlisted person with a level takes a freed slot, while one is open.
+const firstWaiter = (s) => (openSlots(s) > 0 ? waitOf(s).find((w) => w.level != null) : null) || null;
 // What Approve will record, shown before approving: the slot's cash, earlier waivers, and the new waiver (what it still owes).
 // An unpaid slot transfers the same way: the whole amount due is waived (assumption, D-2026-11-22-05).
 function transferPay(s, t) {
@@ -3859,7 +3888,7 @@ function paymentsPanel(s) {
   const due = duePerHead(s);
   const all = s.roster.map((r) => { const paid = slotPay(s, r.pid); return { r, p: P(r.pid), paid, st: payStatus(paid, due), moved: !!(paid && paid.chain.length) }; }).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
   const got = (x) => (x.paid ? (x.paid.amount == null ? due || 0 : x.paid.amount) : 0);
-  const waived = all.reduce((t, x) => t + (x.paid ? x.paid.waived || 0 : 0), 0);
+  const waived = all.reduce((t, x) => t + (x.paid ? x.paid.waived || 0 : 0), 0), refunded = all.reduce((t, x) => t + (x.paid ? x.paid.refunded || 0 : 0), 0);
   const paidN = all.filter((x) => payCovered(x.st)).length, partialN = all.filter((x) => x.st.kind === 'partial').length;
   const collected = all.reduce((t, x) => t + got(x), 0);
   const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x) - (x.paid ? x.paid.waived || 0 : 0), 0), 0) : null;
@@ -3872,7 +3901,7 @@ function paymentsPanel(s) {
     ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
       <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b>${partialN ? `<span class="small muted">${partialN} partial</span>` : ''}</div>
-      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}${waived ? `<span class="small muted">${peso(waived)} waived (not cash)</span>` : ''}</div>
+      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}${waived ? `<span class="small muted">${peso(waived)} waived (not cash)</span>` : ''}${refunded ? `<span class="small muted">${peso(refunded)} refunded</span>` : ''}</div>
       <div class="card"><span class="label">Still due</span><b class="big tnum">${stillDue != null ? peso(stillDue) : '—'}</b></div>
       <div class="card"><span class="label">Against costs</span><b class="big tnum" style="color:${cost == null ? 'inherit' : collected >= cost ? 'var(--accent)' : 'var(--warn)'}">${cost == null ? '—' : collected >= cost ? `+${peso(collected - cost)}` : `−${peso(cost - collected)}`}</b>${cost != null ? `<span class="small muted">of ${peso(cost)} cost</span>` : ''}</div>
     </div>
@@ -4548,6 +4577,7 @@ function dropOutRow(s, d) {
       <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
 }
 // #1011: the sender, who they want to give the slot to (name and RTR ID), whether that player is waitlisted, their level here, Reject / Approve.
+// #1014: Reject and refund (only when cash was collected for the slot) opens D-REJECT-REFUND, which states the amount to hand back.
 function transferRow(s, t) {
   const p = P(t.pid), to = transferTo(t) || { name: 'Unknown', rtr: '' };
   const wl = waitOf(s).findIndex((w) => w.pid === t.to) + 1;
@@ -4557,7 +4587,7 @@ function transferRow(s, t) {
       <p class="small muted">Approving gives the slot to ${esc(to.name)}${wl ? ', who leaves the waitlist' : ''}. ${esc(p.name)} comes off the roster. The slot count stays the same.</p>
       <p class="small"><b>Payment:</b> ${esc(transferPayText(transferPay(s, t)))} ${esc(to.name)} will be Paid in Full and owe ₱0. Collected cash stays the same.</p>
       <div class="req-actions">${selectLevel(`tr-lv-${t.id}`, lv, `data-act-change="trLevel" data-id="${t.id}" aria-label="Level for ${esc(to.name)}"`, t.err && lv == null)}
-        <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button><button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
+        <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button>${slotCash(s, t.pid) > 0 ? `<button class="btn sm" data-act="openRejectRefund" data-id="${t.id}" aria-haspopup="dialog">Reject and refund</button>` : ''}<button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
       ${t.err ? `<span class="err">${esc(t.err)}</span>` : ''}</div>`;
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
@@ -6999,12 +7029,34 @@ const SHEETS = {
       <p class="small muted">It stops working at the start (${fmtDate(s.start)}, ${fmtTime(s.start)}), or if the Queue Master rejects the claim or it is withdrawn; then make a new one. ROTRA shows this link only once: if you lose it, cancel it on My night and make a new one.</p></div>`,
       `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? `<button class="btn primary" data-act="shareTransferLink" data-v="${esc(link)}">Share</button>` : `<button class="btn primary" data-act="copyTransferLink" data-v="${esc(link)}">Copy link</button>`}`);
   },
+  // #1014 D-REJECT-REFUND: the whole cash collected for the slot (never a waiver), what happens to the sender's registration and who
+  // gets the freed slot (the first waitlisted player with a level, FIFO). ROTRA only records the refund.
+  rejectRefund(sh) {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === sh.id);
+    if (!t) return sheetShell('Reject and refund', '<p class="small muted">This transfer was already decided.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const to = transferTo(t) || { name: 'the recipient' }, amount = slotCash(s, t.pid), w = firstWaiter(s), h = slotPay(s, t.pid);
+    return sheetShell('Reject and refund?', `<p><b>${esc(nm(t.pid))}</b> asked to transfer their slot to ${esc(to.name)}.</p>
+      <div class="card stack tight"><span class="label">Refund to hand back</span><b class="big tnum">${peso(amount)}</b><span class="small muted">The whole amount collected for this slot${h && h.waived ? ` (the ${peso(h.waived)} waived is not cash and is not refunded)` : ''}. Full refunds only.</span></div>
+      <p>Hand ${peso(amount)} back to ${esc(nm(t.pid))} outside ROTRA. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">${esc(nm(t.pid))}'s registration is cancelled and the slot opens. ${w ? `${esc(nm(w.pid))}, first on the waitlist, gets it.` : 'Nobody is waiting, so the slot stays open.'} ${esc(to.name)} doesn't get the slot. The payment and the refund both stay in the record.</p>
+      ${notice('bad', "This can't be undone.")}`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn danger" data-act="confirmRejectRefund" data-id="${t.id}">Reject and refund</button>`);
+  },
+  // #1014 D-SESSION-REFUND: record one manual refund on a cancelled session's Refund everyone who paid list.
+  sessionRefund(sh) {
+    const s = cur(), amount = slotCash(s, sh.pid);
+    if (refundOf(s, sh.pid) || amount <= 0) return sheetShell('Record refund', '<p class="small muted">This refund is already recorded.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    return sheetShell('Record refund?', `<p><b>${esc(nm(sh.pid))}</b> · ${peso(amount)}</p>
+      <p>Hand ${peso(amount)} back to ${esc(nm(sh.pid))} outside ROTRA, then record it here. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">Full refund of the cash collected. The payment and the refund both stay in the record.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn primary" data-act="confirmSessionRefund" data-pid="${esc(sh.pid)}">Record refund</button>`);
+  },
   cancelSession(sh) {
     const s = cur();
     const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length, wl = (s.waitlist || []).length;
     return sheetShell(`Cancel ${esc(s.title)}?`, `<p>${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</p>
       <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} joined · ${wl} on the waitlist</p>
-      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. Refunds happen outside ROTRA.`) : ''}
+      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. After you cancel, the session record lists who to refund and how much. Refund them outside ROTRA, then record each refund.`) : ''}
       <label class="field"><span>Reason (optional)</span><input class="input" id="cancel-reason" data-bind="ui.sheet.reason" value="${esc(sh.reason || '')}" maxlength="120" autocomplete="off"></label>
       ${notice('bad', "This can't be undone. To play anyway, create a new session.")}`,
       '<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmCancelSession">Cancel session</button>');
@@ -7638,6 +7690,29 @@ const ACT = {
     t.pay = transferPay(s, t);
     t.status = 'approved'; t.decidedAt = Date.now(); t.level = +lv; t.fromWaitlist = !!wl; t.err = '';
     commit(`${sender}'s slot now belongs to ${to.name}${t.pay.waived ? ` · ${peso(t.pay.waived)} waived` : ''}`); render();
+  },
+  // #1014 Reject and refund: the transfer is rejected, a full refund of the slot's cash is recorded (append-only; the payment stays
+  // as recorded), the sender's registration is cancelled and the first waitlisted player with a level takes the slot (FIFO).
+  openRejectRefund: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t || slotCash(s, t.pid) <= 0) return; openSheet({ type: 'rejectRefund', id: t.id }); },
+  confirmRejectRefund: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) { closeSheet(); return; }
+    const amount = slotCash(s, t.pid), sender = nm(t.pid);
+    if (amount <= 0 || refundOf(s, t.pid)) { closeSheet(); toast('Nothing was paid for this slot, so there is nothing to refund. Use Reject instead.'); return; }
+    t.status = 'rejected'; t.decidedAt = Date.now();
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: t.pid, amount, at: Date.now(), reason: 'transfer', transferId: t.id }];
+    s.roster = s.roster.filter((r) => r.pid !== t.pid);
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    const w = firstWaiter(s);
+    if (w) { s.waitlist = s.waitlist.filter((x) => x !== w); s.roster.push({ pid: w.pid, level: w.level, present: false, locked: false, presentAt: Date.now() }); }
+    S.ui.sheet = null; commit(`Transfer rejected · ${peso(amount)} refund recorded for ${sender}${w ? ` · ${nm(w.pid)} got the slot from the waitlist` : ' · the slot is open'}`); render();
+  },
+  openSessionRefund: (d) => { const s = cur(); if (s.status !== 'cancelled' || refundOf(s, d.pid) || slotCash(s, d.pid) <= 0) return; openSheet({ type: 'sessionRefund', pid: d.pid }); },
+  confirmSessionRefund: (d) => {
+    const s = cur(); if (!s || s.status !== 'cancelled' || !S.online) { closeSheet(); return; }
+    const amount = slotCash(s, d.pid);
+    if (refundOf(s, d.pid) || amount <= 0) { closeSheet(); return; }
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: d.pid, amount, at: Date.now(), reason: 'cancelled' }];
+    S.ui.sheet = null; commit(`Refund recorded · ${peso(amount)} to ${nm(d.pid)}`); render();
   },
   rejectTransfer: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return; t.status = 'rejected'; t.decidedAt = Date.now(); commit(`Transfer rejected · ${nm(t.pid)} keeps the slot`); render(); },
   // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.

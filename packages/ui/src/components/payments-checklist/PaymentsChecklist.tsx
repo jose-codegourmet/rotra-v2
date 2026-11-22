@@ -18,10 +18,12 @@ export type PaymentsChecklistProps = {
     paid: number
     partial: number
     total: number
-    /** Σ cash received; never a waived amount */
+    /** Σ cash received and kept (net of manual refunds, #1014); never a waived amount */
     collected: number
     /** Σ waived on slots that came by transfer (#1013), a record and not cash; hint when above 0 */
     waived?: number
+    /** Σ manual full refunds recorded (#1014), handed back outside ROTRA; hint when above 0 */
+    refunded?: number
     stillDue: number | null
     /** Σ overpayments to return outside ROTRA; shown only when above 0 */
     toReimburse: number
@@ -116,6 +118,7 @@ export function PaymentsChecklist({
               [
                 totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : null,
                 totals.waived ? `${formatPeso(totals.waived)} waived (not cash)` : null,
+                totals.refunded ? `${formatPeso(totals.refunded)} refunded` : null,
               ]
                 .filter(Boolean)
                 .join(' · ') || undefined,

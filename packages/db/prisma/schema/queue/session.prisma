@@ -97,6 +97,7 @@ model QueueSession {
   joinRequests         SessionJoinRequest[]
   dropOutNotices       SessionDropOutNotice[]
   slotTransfers        SessionSlotTransfer[]
+  paymentRefunds       SessionPaymentRefund[]
   inviteCodes          SessionInviteCode[]
   assessments          ClubAssessment[]
   deviceSessionStreams DeviceSessionStream[]

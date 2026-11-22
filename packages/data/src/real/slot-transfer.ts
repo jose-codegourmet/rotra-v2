@@ -2,6 +2,7 @@ import type {
   ApproveSlotTransferInput,
   CreatedTransferLink,
   DecideSlotTransferInput,
+  RejectAndRefundSlotTransferInput,
   TransferLinkView,
   TransferRecipient,
 } from '../slot-transfer/slotTransfer.types'
@@ -89,7 +90,7 @@ export async function realWithdrawTransferClaim(slug: string, token: string) {
 
 // ---------- Queue Master (Requests) ----------
 
-const transferPath = (input: DecideSlotTransferInput, action: 'approve' | 'reject') =>
+const transferPath = (input: DecideSlotTransferInput, action: 'approve' | 'reject' | 'refund') =>
   `/api/sessions/${encodeURIComponent(input.sessionId)}/requests/transfers/${encodeURIComponent(input.transferId)}/${action}`
 
 /**
@@ -112,6 +113,19 @@ export async function realRejectSlotTransfer(input: DecideSlotTransferInput) {
   const done = await realRequest<{ transferId: string; message: string }>(
     transferPath(input, 'reject'),
     { method: 'POST', body: {} },
+  )
+  return accepted(null, done.message)
+}
+
+/**
+ * **Reject and refund** (#1014) with the full refund the Queue Master confirmed: toast “Transfer
+ * rejected · ₱X refund recorded for SENDER · NAME got the slot from the waitlist”. 409 when the
+ * slot's payment changed since or nothing was paid.
+ */
+export async function realRejectAndRefundSlotTransfer(input: RejectAndRefundSlotTransferInput) {
+  const done = await realRequest<{ transferId: string; message: string }>(
+    transferPath(input, 'refund'),
+    { method: 'POST', body: { expectedRefundMinor: input.expectedRefundMinor } },
   )
   return accepted(null, done.message)
 }

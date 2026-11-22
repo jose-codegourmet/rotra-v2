@@ -7,6 +7,7 @@ import type {
 } from '../session-cost/sessionCost.types'
 import { type PaymentTotals, paymentStatus } from '../session-payment/sessionPayment.rules'
 import type {
+  RecordSessionRefundInput,
   SetPaymentAmountInput,
   SetPaymentMarksInput,
 } from '../session-payment/sessionPayment.types'
@@ -61,6 +62,11 @@ export type WirePayments = {
     paid: { amount: WireMoney; at: string } | null
     /** The slot came by approved transfer (#1013): waivers and the chain; missing or null otherwise */
     transfer?: WireSlotPaymentTransfer | null
+    /**
+     * The manual full refund recorded for this player (#1014); `paid.amount` is already net of it.
+     * Missing on a server from before #1014.
+     */
+    refund?: { amount: WireMoney; at: string } | null
   }[]
   amountDue: number | null
   dueBasis: SessionCostInput['paymentMode']
@@ -94,6 +100,7 @@ export async function realGetSessionPayments(sessionId: string) {
         ? {
             amountMinor: minorOf(player.paid.amount),
             waivedMinor: player.transfer?.waivedMinor ?? 0,
+            refundedMinor: player.refund ? (minorOf(player.refund.amount) ?? 0) : 0,
           }
         : null
       return {
@@ -110,6 +117,9 @@ export async function realGetSessionPayments(sessionId: string) {
           : undefined,
         status: paymentStatus(mark, payments.amountDue),
         transfer: slotPaymentTransferOf(player.transfer),
+        refund: player.refund
+          ? { amount: minorOf(player.refund.amount) ?? 0, at: msOf(player.refund.at) }
+          : undefined,
       }
     }),
     amountDue: payments.amountDue,
@@ -191,4 +201,23 @@ export async function realMarkAllPaid(
     { method: 'POST', body: { operationId } },
   )
   return accepted({ count }, `${count} players marked paid`)
+}
+
+/**
+ * #1014 · **Record refund** on a cancelled session's Refund everyone who paid list: one manual full
+ * refund per player, append-only. Sends the amount shown; 409 when it no longer matches. A retry
+ * after a lost reply returns the refund already recorded.
+ */
+export async function realRecordSessionRefund(input: RecordSessionRefundInput) {
+  const done = await realRequest<{ message: string }>(
+    sessionPath(input.sessionId, 'payments/refunds'),
+    {
+      method: 'POST',
+      body: {
+        sessionPlayerId: input.sessionPlayerId,
+        expectedAmountMinor: input.expectedAmountMinor,
+      },
+    },
+  )
+  return accepted(null, done.message)
 }

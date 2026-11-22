@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 201 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 202 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -454,6 +454,7 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 201 · CANCELLED: 4 · 
 | [2026-11-20-queue-session-invite-photo-link](2026-11-20-queue-session-invite-photo-link.md) | Queue public page: the Session invite shows the inviter's own picture and an Invite link copy field | share-card (SessionInviteCard), copy-field | IN MOCK APP — PR #992 |
 | [2026-11-22-player-host-badge](2026-11-22-player-host-badge.md) | Player profile Clubs card shows a Host badge for clubs where the player is a trusted host | player-clubs-card | IN MOCK APP — #1007 |
 | [2026-11-22-queue-change-hosts](2026-11-22-queue-change-hosts.md) | Change a session's hosts before and during the session: a compact Hosts card | session-hosts-card, host-picker-sheet | IN MOCK APP — #1005 |
+| [2026-11-22-queue-manual-refunds](2026-11-22-queue-manual-refunds.md) | Queue: Reject and refund on a slot transfer, FIFO waitlist promotion, and Refund everyone who paid after a cancellation | refund-confirm-sheet (new), refund-list (new), slot-transfer-row (extended with `onRejectAndRefund`), payments-checklist (extended with `totals.refunded`), cancel-session-sheet (copy), session-record-header (copy) | IN MOCK APP — #1014 |
 | [2026-11-22-queue-past-session-hosts](2026-11-22-queue-past-session-hosts.md) | Finished sessions keep their hosts: Hosts on the session record | public-hosts, public-page-summary | IN MOCK APP — #1008 |
 | [2026-11-22-queue-payment-status-share](2026-11-22-queue-payment-status-share.md) | Queue: Share payment status, numbered Paid, Partial and Unpaid text, in Payments and on the public page | payment-status-share-sheet (new), payments-checklist (extended with `onShareStatus`), sheet, segmented-control | IN MOCK APP — #1010 |
 | [2026-11-22-queue-public-hosts](2026-11-22-queue-public-hosts.md) | Public session page: a compact Hosts section above Players and Waitlisted | public-hosts, public-participants | IN MOCK APP — #1006 |

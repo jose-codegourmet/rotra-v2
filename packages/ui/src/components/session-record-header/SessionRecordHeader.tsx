@@ -67,8 +67,8 @@ const LABEL = 'text-xs font-semibold tracking-[0.5px] text-fg2 uppercase'
 
 function paidCopy(n: number): string {
   return n === 1
-    ? ' 1 player was marked paid; refunds happen outside ROTRA.'
-    : ` ${n} players were marked paid; refunds happen outside ROTRA.`
+    ? ' 1 player was marked paid: refund them outside ROTRA and record each refund below.'
+    : ` ${n} players were marked paid: refund them outside ROTRA and record each refund below.`
 }
 
 /**

@@ -115,3 +115,8 @@ export const TransferredSlot: Story = {
   },
 }
 export const TransferredSlotLight: Story = { ...TransferredSlot, globals: { theme: 'light' } }
+/** #1014: a manual full refund was recorded: Collected is the cash kept, the refund shows apart */
+export const WithRefund: Story = {
+  args: { totals: { ...paymentTotalsFixture, collected: 1030000, refunded: 70000 } },
+}
+export const WithRefundLight: Story = { ...WithRefund, globals: { theme: 'light' } }

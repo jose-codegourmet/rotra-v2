@@ -7,6 +7,14 @@ import {
   normalizeSessionCost,
 } from '@rotra/data/session-cost/rules'
 import type { SessionCostInput } from '@rotra/data/session-cost/types'
+import {
+  fullRefundAmount,
+  PAYMENT_REFUNDED_LOCKED_ERROR,
+  REFUND_CHANGED_ERROR,
+  REFUND_NOT_CANCELLED_ERROR,
+  REFUND_NOTHING_TO_REFUND_ERROR,
+  sessionRefundToast,
+} from '@rotra/data/session-payment/refund-rules'
 import { paymentTotals, receivedAmount } from '@rotra/data/session-payment/rules'
 import { TRANSFER_PAYMENT_LOCKED_ERROR } from '@rotra/data/slot-transfer/transferAccounting.rules'
 import { formatPeso } from '@rotra/schema/money'
@@ -356,6 +364,7 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
         const transfer = ledger.transferOf(payment)
         const approvedAt = payment.chain[payment.chain.length - 1]?.decidedAt ?? 0
         const at = Math.max(own?.markedAt.getTime() ?? 0, transfer ? approvedAt : 0)
+        const refund = ledger.refundOf(p.id)
         return {
           sessionPlayerId: p.id,
           clubPlayerId: p.clubPlayerId,
@@ -368,6 +377,10 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
               }
             : null,
           transfer,
+          // #1014: the manual full refund recorded for this player; `paid.amount` is net of it.
+          refund: refund
+            ? { amount: toMoney(refund.amountMinor, refund.currency), at: toIso(refund.refundedAt) }
+            : null,
         }
       })
       .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
@@ -379,7 +392,10 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
       totals: paymentTotals({
         // `amountMinor` is the cash received (#479; a legacy null counts as today's amount due),
         // `waivedMinor` a transferred slot's waivers (#1013), never collected.
-        marks: entries.flatMap(({ payment }) => (payment.mark ? [payment.mark] : [])),
+        // #1014: `amountMinor` is net of a manual refund (net kept); `refundedMinor` is the refund.
+        marks: entries.flatMap(({ payment }) =>
+          payment.mark ? [{ ...payment.mark, refundedMinor: payment.refundedMinor }] : [],
+        ),
         total: roster.length,
         amountDue,
         cost: estimate?.total ?? null,
@@ -452,6 +468,9 @@ async function applyMark(
   // #1013: a slot paid through a transfer is already Paid (a tick is a no-op, never a second
   // payment); unticking it, or a mark frozen into a transfer, is refused.
   const ledger = await slotLedger(tx, entry.sessionId)
+  // #1014: a refunded entry's payment is history (its marks are frozen): never changed or re-paid.
+  if (ledger.isRefunded(entry.id))
+    throw new ServiceError('conflict', { payment: PAYMENT_REFUNDED_LOCKED_ERROR })
   if (ledger.isLocked(entry.id)) {
     if (input.paid && ledger.isCarried(entry.id))
       return { paid: true, amount: mark ? toMoney(mark.amountMinor, mark.currency) : null }
@@ -480,9 +499,14 @@ async function applyMark(
   return { paid: false, amount: null }
 }
 
-/** #1013: the entry's payment is part of a slot transfer's history (see `slotLedger`). */
-async function isPaymentLocked(tx: Tx, entry: SessionPlayer) {
-  return (await slotLedger(tx, entry.sessionId)).isLocked(entry.id)
+/**
+ * #1013: the entry's payment is part of a slot transfer's history (see `slotLedger`); #1014: or it
+ * was refunded. Returns the refusal to send, or null.
+ */
+async function paymentLockError(tx: Tx, entry: SessionPlayer) {
+  const ledger = await slotLedger(tx, entry.sessionId)
+  if (ledger.isRefunded(entry.id)) return PAYMENT_REFUNDED_LOCKED_ERROR
+  return ledger.isLocked(entry.id) ? TRANSFER_PAYMENT_LOCKED_ERROR : null
 }
 
 /**
@@ -573,8 +597,8 @@ export async function setPaymentAmount(
       return { paid: true, amount: toMoney(mark.amountMinor, mark.currency) }
     if (isOffRoster(entry))
       throw new ServiceError('invalid', { player: 'Player not in this session.' })
-    if (await isPaymentLocked(tx, entry))
-      throw new ServiceError('conflict', { payment: TRANSFER_PAYMENT_LOCKED_ERROR })
+    const locked = await paymentLockError(tx, entry)
+    if (locked) throw new ServiceError('conflict', { payment: locked })
     if (mark) await tx.sessionPaymentMark.delete({ where: key })
     if (!amountMinor) return { paid: false, amount: null }
     const created = await tx.sessionPaymentMark.create({
@@ -627,5 +651,61 @@ export async function markAllPaid(
       count++
     }
     return { count }
+  })
+}
+
+/**
+ * #1014 · **Record refund** on a cancelled session's **Refund everyone who paid** list (owner
+ * decision 2026-11-22, #1015; D-2026-11-22-06). ROTRA moves no money: one append-only
+ * `session_payment_refunds` row records that the Queue Master handed the player's whole cash back
+ * outside ROTRA (own cash plus cash carried in by transfers; never a waiver). The payment marks are
+ * never changed (a trigger freezes them). Idempotent per player: a retry, or a second tap, returns
+ * the refund already recorded. Refused unless the session is cancelled, when there is no cash to
+ * refund, and when the amount differs from the one the Queue Master was shown.
+ */
+export async function recordSessionRefund(
+  context: ClubContext,
+  sessionId: string,
+  input: { sessionPlayerId: unknown; expectedAmountMinor: unknown },
+) {
+  if (typeof input.sessionPlayerId !== 'string' || !UUID.test(input.sessionPlayerId))
+    throw new ServiceError('not_found')
+  const expected = input.expectedAmountMinor
+  if (typeof expected !== 'number' || !Number.isSafeInteger(expected) || expected < 0)
+    throw new ServiceError('invalid', { expectedAmountMinor: 'Enter the refund in centavos.' })
+  const sessionPlayerId = input.sessionPlayerId
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session, tx)
+    if (session.state !== 'cancelled')
+      throw new ServiceError('conflict', { refund: REFUND_NOT_CANCELLED_ERROR })
+    const entry = await tx.sessionPlayer.findUnique({ where: { id: sessionPlayerId } })
+    if (!entry || entry.sessionId !== sessionId || entry.clubId !== context.clubId)
+      throw new ServiceError('not_found')
+    const ledger = await slotLedger(tx, sessionId)
+    const done = ledger.refundOf(entry.id)
+    if (done) return { message: sessionRefundToast(entry.nameSnapshot, done.amountMinor) }
+    // The cancelled roster is the list (released entries and no-shows are not on it).
+    if (isOffRoster(entry))
+      throw new ServiceError('invalid', { player: 'Player not in this session.' })
+    const { estimate } = await estimateFor(tx, session)
+    const amountDue = amountDuePerHead(estimate)
+    const payment = ledger.paymentOf(entry.id, amountDue)
+    const amount = fullRefundAmount(receivedAmount(payment.mark, amountDue))
+    if (amount <= 0) throw new ServiceError('conflict', { refund: REFUND_NOTHING_TO_REFUND_ERROR })
+    if (expected !== amount)
+      throw new ServiceError('conflict', { refund: REFUND_CHANGED_ERROR(formatPeso(amount)) })
+    await tx.sessionPaymentRefund.create({
+      data: {
+        id: await derivedId(entry.id, 'refund'),
+        clubId: context.clubId,
+        sessionId,
+        sessionPlayerId: entry.id,
+        reason: 'session_cancelled',
+        amountMinor: amount,
+        refundedAt: new Date(),
+      },
+    })
+    return { message: sessionRefundToast(entry.nameSnapshot, amount) }
   })
 }

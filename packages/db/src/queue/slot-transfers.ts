@@ -3,6 +3,13 @@ import { isRtrId, normalizeRtrId } from '@rotra/data/player/rtr-id'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { amountDuePerHead } from '@rotra/data/session-cost/rules'
 import {
+  firstEligibleWaiter,
+  fullRefundAmount,
+  REFUND_CHANGED_ERROR,
+  REFUND_NOTHING_PAID_ERROR,
+  transferRefundToast,
+} from '@rotra/data/session-payment/refund-rules'
+import {
   isTransferLinkToken,
   TRANSFER_ALREADY_DECIDED_ERROR,
   TRANSFER_ALREADY_PENDING_ERROR,
@@ -46,10 +53,12 @@ import { toIso } from '../service/serialize'
 import { estimateFor } from './financials'
 import { clubPlayerForProfile } from './session-roster'
 import {
+  capacityOf,
   derivedId,
   LIVE_ENTRY,
   levelCodeFor,
   levelIdFor,
+  liveRoster,
   lockSession,
   mapDatabaseError,
   orderedWaitlist,
@@ -733,6 +742,100 @@ export function rejectSlotTransfer(context: ClubContext, sessionId: string, tran
     return {
       transferId: transfer.id,
       message: transferRejectedToast(sender?.nameSnapshot ?? 'The sender'),
+    }
+  })
+}
+
+/**
+ * **Reject and refund** (#1014, D-2026-11-22-06): rejects the transfer and records a manual full
+ * refund in one transaction on the locked session. ROTRA moves no money: the refund row records
+ * that the Queue Master handed the sender the slot's **whole** cash back outside ROTRA (own cash
+ * plus cash carried in by earlier transfers; never a waiver). The payment marks are not touched
+ * (a trigger freezes them). The sender's registration is cancelled (entry released, reason
+ * `refunded`; their open drop-out notice closes) and, while a slot is open, the first waitlisted
+ * person with a level takes it, in waitlist order (FIFO, `promoteWaiter`). Capacity never changes.
+ * Refused when nothing was paid (plain Reject instead) and when the amount differs from the one
+ * the Queue Master confirmed.
+ */
+export function rejectAndRefundSlotTransfer(
+  context: ClubContext,
+  sessionId: string,
+  input: { transferId: string; expectedRefundMinor?: unknown },
+) {
+  const expected = input.expectedRefundMinor
+  if (
+    expected !== undefined &&
+    expected !== null &&
+    (typeof expected !== 'number' || !Number.isSafeInteger(expected) || expected < 0)
+  )
+    throw new ServiceError('invalid', { expectedRefundMinor: 'Enter the refund in centavos.' })
+  return decision(context, sessionId, input.transferId, async (tx, session, transfer) => {
+    // An unclaimed transfer link (#1012) is not in Requests; the sender cancels it instead.
+    if (!transfer.recipientPlayerId)
+      throw new ServiceError('conflict', { transfer: TRANSFER_NOT_FOUND_ERROR })
+    const sender = await tx.sessionPlayer.findUnique({
+      where: { id: transfer.senderSessionPlayerId },
+    })
+    if (!sender || sender.releasedAt || sender.noShowAt)
+      throw new ServiceError('conflict', { transfer: TRANSFER_SENDER_GONE_ERROR })
+    // The slot's whole cash, read the same way as Approve's snapshot (#1013).
+    const { estimate } = await estimateFor(tx, session)
+    const amountDue = amountDuePerHead(estimate)
+    const ledger = await slotLedger(tx, session.id)
+    const amount = fullRefundAmount(
+      holdingOf(ledger.paymentOf(sender.id, amountDue), amountDue)?.cashMinor ?? 0,
+    )
+    if (amount <= 0) throw new ServiceError('conflict', { transfer: REFUND_NOTHING_PAID_ERROR })
+    if (typeof expected === 'number' && expected !== amount)
+      throw new ServiceError('conflict', { transfer: REFUND_CHANGED_ERROR(formatPeso(amount)) })
+    const now = new Date()
+    // Rejection ends a claimed link too: it worked only while pending (#1012).
+    await tx.sessionSlotTransfer.update({
+      where: { id: transfer.id },
+      data: { status: 'rejected', decidedAt: now },
+    })
+    await tx.sessionPaymentRefund.create({
+      data: {
+        id: await derivedId(transfer.id, 'refund'),
+        clubId: context.clubId,
+        sessionId: session.id,
+        sessionPlayerId: sender.id,
+        reason: 'transfer_rejected',
+        slotTransferId: transfer.id,
+        amountMinor: amount,
+        refundedAt: now,
+      },
+    })
+    await tx.sessionPlayer.update({
+      where: { id: sender.id },
+      data: { releasedAt: now, releaseReason: 'refunded', revision: { increment: 1 } },
+    })
+    await tx.sessionDropOutNotice.updateMany({
+      where: { sessionPlayerId: sender.id, status: 'open' },
+      data: { status: 'closed', closedAt: now },
+    })
+    const open = (await capacityOf(tx, session)) - (await liveRoster(tx, session.id)).length
+    const next = firstEligibleWaiter(
+      await orderedWaitlist(tx, session.id),
+      open,
+      (w) => w.skillLevelId != null,
+    )
+    let promotedName: string | null = null
+    if (next) {
+      const promoted = await promoteWaiter(
+        tx,
+        context,
+        session,
+        next,
+        await derivedId(transfer.id, 'promote'),
+        now,
+      )
+      promotedName = promoted.nameSnapshot
+    }
+    await recomputeMinimum(tx, await touchSession(tx, session))
+    return {
+      transferId: transfer.id,
+      message: transferRefundToast(sender.nameSnapshot, amount, promotedName),
     }
   })
 }

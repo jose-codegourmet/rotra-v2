@@ -34,13 +34,17 @@ export async function getSessionPayments(sessionId: string) {
   // waivers an approved transfer carried into it. Senders are off the roster, so cash counts once.
   const ledger = slotPaymentsIn(state, sessionId, amountDue)
   const entries = roster.map((p) => ({ p, payment: ledger.paymentOf(p.id) }))
-  const marks = entries.flatMap(({ payment }) => (payment.mark ? [payment.mark] : []))
+  // #1014: `amountMinor` is the cash kept (net of a manual refund); the refund is counted apart.
+  const marks = entries.flatMap(({ payment }) =>
+    payment.mark ? [{ ...payment.mark, refundedMinor: payment.refundedMinor }] : [],
+  )
   const players = entries
     .map(({ p, payment }) => {
       const clubPlayer = state.clubPlayers.find((c) => c.id === p.clubPlayerId)
       const own = payment.frozen ? undefined : ledger.markOf(p.id)
       const transfer = slotPaymentTransfer(state, payment)
       const approvedAt = transfer?.steps[transfer.steps.length - 1]?.approvedAt ?? 0
+      const refund = ledger.refundOf(p.id)
       return {
         sessionPlayerId: p.id,
         clubPlayerId: p.clubPlayerId,
@@ -54,6 +58,8 @@ export async function getSessionPayments(sessionId: string) {
           : undefined,
         status: paymentStatus(payment.mark, amountDue),
         transfer,
+        /** #1014: the manual full refund recorded for this player; `paid.amount` is net of it */
+        refund: refund ? { amount: refund.amountMinor, at: refund.refundedAt } : undefined,
       }
     })
     .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
@@ -77,7 +83,7 @@ export async function getSessionPayments(sessionId: string) {
  */
 function isPaymentLocked(state: MockState, sessionId: string, entryId: string) {
   const payment = slotPaymentsIn(state, sessionId, null).paymentOf(entryId)
-  return payment.chain.length > 0 || payment.frozen
+  return payment.chain.length > 0 || payment.frozen || payment.refundedMinor > 0
 }
 const isCarried = (state: MockState, sessionId: string, entryId: string) =>
   slotPaymentsIn(state, sessionId, null).paymentOf(entryId).chain.length > 0

@@ -62,11 +62,13 @@ export function isFullyPaid(status: PaymentStatus) {
  * `total` the roster size (unmarked players received nothing). A slot transfer (#1013) passes the
  * holder's cash (own + carried) as `amountMinor` and the slot's waivers as `waivedMinor`.
  * - paid = Paid + Reimburse; partial = Partial
- * - collected = Σ received cash; **never** a waived amount
+ * - collected = Σ received cash the club keeps; **never** a waived amount. A manual refund (#1014,
+ *   D-2026-11-22-06) is already out of `amountMinor` (net kept = received − refunded)
+ * - refunded = Σ refunded (`refundedMinor`, a record of cash handed back outside ROTRA)
  * - waived = Σ waived (a record, not cash)
  * - still due = Σ max(due − received − waived, 0) over the roster (null with no fee set)
  * - to reimburse = Σ max(received − due, 0) (0 with no fee set)
- * - against costs = collected − total cost (null without an estimate)
+ * - against costs = collected (net kept) − total cost (null without an estimate)
  */
 export function paymentTotals({
   marks,
@@ -74,7 +76,7 @@ export function paymentTotals({
   amountDue,
   cost,
 }: {
-  marks: { amountMinor: number | null; waivedMinor?: number }[]
+  marks: { amountMinor: number | null; waivedMinor?: number; refundedMinor?: number }[]
   total: number
   amountDue: number | null
   cost: number | null
@@ -84,6 +86,7 @@ export function paymentTotals({
     collected = 0,
     owed = 0,
     waived = 0,
+    refunded = 0,
     toReimburse = 0
   for (const mark of marks) {
     const status = paymentStatus(mark, amountDue)
@@ -91,6 +94,7 @@ export function paymentTotals({
     const markWaived = Math.max(mark.waivedMinor ?? 0, 0)
     collected += received
     waived += markWaived
+    refunded += Math.max(mark.refundedMinor ?? 0, 0)
     if (isFullyPaid(status)) paid++
     if (status.kind === 'partial') partial++
     if (amountDue !== null) {
@@ -104,6 +108,7 @@ export function paymentTotals({
     total,
     collected,
     waived,
+    refunded,
     stillDue: amountDue === null ? null : (total - marks.length) * amountDue + owed,
     toReimburse,
     againstCosts: cost === null ? null : collected - cost,

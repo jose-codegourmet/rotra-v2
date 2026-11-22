@@ -8,10 +8,22 @@ import { queueMutation, sessionIn } from '../mock/transaction'
 import { PLAYING_LEVELS } from '../player/player.types'
 import { playerSlot } from '../public-session/publicSession.rules'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
+import { slotCapacity } from '../queue-session/queueSession.rules'
 import { isRealDataMode } from '../real/mode'
-import { realApproveSlotTransfer, realRejectSlotTransfer } from '../real/slot-transfer'
+import {
+  realApproveSlotTransfer,
+  realRejectAndRefundSlotTransfer,
+  realRejectSlotTransfer,
+} from '../real/slot-transfer'
 import { sessionCostIn } from '../session-cost/fetchers'
 import { amountDuePerHead } from '../session-cost/sessionCost.rules'
+import {
+  firstEligibleWaiter,
+  fullRefundAmount,
+  REFUND_CHANGED_ERROR,
+  REFUND_NOTHING_PAID_ERROR,
+  transferRefundToast,
+} from '../session-payment/paymentRefund.rules'
 import { slotTransfersOf } from './closeSlotTransfers'
 import { slotPaymentsIn } from './slotPayments'
 import {
@@ -24,7 +36,11 @@ import {
   transferRecipientConfirmedError,
   transferRejectedToast,
 } from './slotTransfer.rules'
-import type { ApproveSlotTransferInput, DecideSlotTransferInput } from './slotTransfer.types'
+import type {
+  ApproveSlotTransferInput,
+  DecideSlotTransferInput,
+  RejectAndRefundSlotTransferInput,
+} from './slotTransfer.types'
 import {
   holdingOf,
   TRANSFER_WAIVER_CHANGED_ERROR,
@@ -172,5 +188,68 @@ export function rejectSlotTransfer(input: DecideSlotTransferInput) {
     t.decidedAt = Date.now()
     const sender = row?.nameSnapshot ?? s.players.find((p) => p.id === t.senderPlayerId)?.fullName
     return { data: null, text: transferRejectedToast(sender ?? 'The sender') }
+  })
+}
+
+/**
+ * **Reject and refund** (#1014, D-2026-11-22-06): the transfer is rejected and the Queue Master
+ * records that they handed the sender back the slot's **whole** cash outside ROTRA (full refunds
+ * only; a waiver is never refunded). In one write: an append-only refund record (the payment marks
+ * stay exactly as they are), the sender's registration is cancelled (their roster row goes; their
+ * open drop-out notice closes) and, while a slot is open, the first waitlisted person with a level
+ * takes it (FIFO, the waitlist's own order). Capacity never changes. Refused when nothing was paid
+ * (plain Reject instead) and when the amount differs from the one the Queue Master confirmed.
+ */
+export function rejectAndRefundSlotTransfer(input: RejectAndRefundSlotTransferInput) {
+  if (isRealDataMode()) return realRejectAndRefundSlotTransfer(input)
+  return transferMutation(input.sessionId, (s) => {
+    const { session, t, row } = pendingTransfer(s, input)
+    if (!row) fail(TRANSFER_SENDER_GONE_ERROR, 'conflict')
+    // A transfer link nobody has claimed (#1012) is not in Requests; the sender cancels it instead.
+    if (!t.recipientPlayerId) fail(TRANSFER_NOT_FOUND_ERROR, 'conflict')
+    const amountDue = amountDuePerHead(sessionCostIn(s, session.id)?.estimate ?? null)
+    const ledger = slotPaymentsIn(s, session.id, amountDue)
+    const amount = fullRefundAmount(holdingOf(ledger.paymentOf(row.id), amountDue)?.cashMinor ?? 0)
+    if (amount <= 0) fail(REFUND_NOTHING_PAID_ERROR, 'conflict')
+    if (input.expectedRefundMinor !== undefined && input.expectedRefundMinor !== amount)
+      fail(REFUND_CHANGED_ERROR(formatPeso(amount)), 'conflict')
+    const now = Date.now()
+    t.status = 'rejected'
+    t.decidedAt = now
+    s.paymentRefunds = [
+      ...(s.paymentRefunds ?? []),
+      {
+        id: crypto.randomUUID(),
+        sessionId: session.id,
+        sessionPlayerId: row.id,
+        reason: 'transfer_rejected',
+        transferId: t.id,
+        amountMinor: amount,
+        currency: 'PHP',
+        refundedAt: now,
+      },
+    ]
+    // The sender's registration is cancelled: the slot opens.
+    s.roster = s.roster.filter((r) => r.id !== row.id)
+    for (const d of s.dropOutNotices)
+      if (d.pid === row.id && d.status === 'open') {
+        d.status = 'closed'
+        d.closedAt = now
+      }
+    const capacity = slotCapacity(
+      s.courts.filter((c) => c.sessionId === session.id && !c.removedAt).length,
+      session.playersPerCourt,
+    )
+    const open = capacity - s.roster.filter((r) => r.sessionId === session.id).length
+    const waiting = s.waitlist
+      .filter((w) => w.sessionId === session.id)
+      .sort((a, b) => a.addedAt - b.addedAt)
+    const next = firstEligibleWaiter(waiting, open, (w) => !!w.level)
+    let promotedName: string | null = null
+    if (next) {
+      promoteWaiter(s, next, now)
+      promotedName = s.clubPlayers.find((p) => p.id === next.clubPlayerId)?.fullName ?? null
+    }
+    return { data: null, text: transferRefundToast(row.nameSnapshot, amount, promotedName) }
   })
 }

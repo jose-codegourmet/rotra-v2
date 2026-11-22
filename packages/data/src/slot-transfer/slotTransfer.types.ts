@@ -163,3 +163,10 @@ export type ApproveSlotTransferInput = DecideSlotTransferInput & {
    */
   expectedWaiverMinor?: number
 }
+/**
+ * **Reject and refund** (#1014): the full refund the Queue Master confirmed (the slot's whole cash);
+ * refused when the slot's payment changed since. Omitted: no check.
+ */
+export type RejectAndRefundSlotTransferInput = DecideSlotTransferInput & {
+  expectedRefundMinor?: number
+}

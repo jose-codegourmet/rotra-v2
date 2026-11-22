@@ -13,6 +13,7 @@
  *   each approval's `sender` entry is the previous approval's `recipient` entry.
  */
 import { formatPeso } from '@rotra/schema/money'
+import { type LedgerRefund, netKeptCash, refundedFor } from '../session-payment/paymentRefund.rules'
 import { receivedAmount } from '../session-payment/sessionPayment.rules'
 
 /** The money an approval writes on the transfer row, once; never changed after. */
@@ -136,32 +137,52 @@ export type EntrySlotPayment = {
   chain: LedgerTransfer[]
   /** The own mark is frozen into a transfer this entry sent (not counted here) */
   frozen: boolean
+  /**
+   * Cash refunded on this entry (#1014, D-2026-11-22-06), already taken out of `mark.amountMinor`
+   * (which is the cash the club still keeps). 0 when nothing was refunded.
+   */
+  refundedMinor: number
 }
 
 /**
  * A live roster entry's payment: its own mark (unless frozen) plus what the last approved transfer
  * carried into it. Cash is counted once across the chain: the senders' entries are off the roster.
+ * #1014: a manual refund recorded on the entry comes off its cash (net kept = received − refunded,
+ * never below 0); the payment marks themselves never change.
  */
 export function entrySlotPayment(input: {
   entryId: string
   ownMark: { amountMinor: number | null; markedAt: number } | null | undefined
   transfers: readonly LedgerTransfer[]
   amountDue: number | null
+  /** Refunds recorded in this session (#1014); missing means none */
+  refunds?: readonly LedgerRefund[]
 }): EntrySlotPayment {
   const frozen = isMarkFrozen(input.transfers, input.entryId, input.ownMark)
   const own = input.ownMark && !frozen ? input.ownMark : null
   const chain = transferChain(input.transfers, input.entryId)
   const last = chain[chain.length - 1]
-  if (!last)
-    return { mark: own ? { amountMinor: own.amountMinor, waivedMinor: 0 } : null, chain, frozen }
+  const refundedMinor = refundedFor(input.refunds, input.entryId)
+  if (!last) {
+    if (!own) return { mark: null, chain, frozen, refundedMinor }
+    // A legacy own mark with no amount keeps null unless a refund needs the number.
+    const amountMinor = refundedMinor
+      ? netKeptCash(receivedAmount(own, input.amountDue), refundedMinor)
+      : own.amountMinor
+    return { mark: { amountMinor, waivedMinor: 0 }, chain, frozen, refundedMinor }
+  }
   const carried = last.payment ? carriedHolding(last.payment) : { cashMinor: 0, waivedMinor: 0 }
   return {
     mark: {
-      amountMinor: receivedAmount(own, input.amountDue) + carried.cashMinor,
+      amountMinor: netKeptCash(
+        receivedAmount(own, input.amountDue) + carried.cashMinor,
+        refundedMinor,
+      ),
       waivedMinor: carried.waivedMinor,
     },
     chain,
     frozen,
+    refundedMinor,
   }
 }
 

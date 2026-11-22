@@ -63,7 +63,10 @@ import { salesSettingsSeed } from '../sales/sales.fixtures'
 import type { SalesSettings } from '../sales/sales.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
 import type { SessionHostRecord } from '../session-host/sessionHost.types'
-import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
+import type {
+  SessionPaymentMark,
+  SessionPaymentRefund,
+} from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import type {
   PlayerAwardHistory,
@@ -89,6 +92,8 @@ export type MockState = {
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
+  /** Manual full refunds (#1014), append-only; missing in older saved states */
+  paymentRefunds?: SessionPaymentRefund[]
   playerAccounts: typeof playerAccounts
   playerNotifications: Record<string, PlayerNotification[]>
   verificationReminderReads: Record<string, string>
@@ -244,6 +249,7 @@ function seedState(): MockState {
     ...financials,
     // #1013: tonight's sample marks for the slot transfer accounting (partial payer, chain giver)
     paymentMarks: [...financials.paymentMarks, ...requests.paymentMarks],
+    paymentRefunds: [],
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,

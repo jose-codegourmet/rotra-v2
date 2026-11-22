@@ -65,3 +65,14 @@ export const NotInSessionLight: Story = { globals: { theme: 'light' } }
 export const FromWaitlistLight: Story = { ...FromWaitlist, globals: { theme: 'light' } }
 export const NoLevelYetLight: Story = { ...NoLevelYet, globals: { theme: 'light' } }
 export const ErrorLight: Story = { ...ErrorState, globals: { theme: 'light' } }
+/** #1014: cash was collected for the slot, so Reject and refund is offered beside Reject */
+export const WithRejectAndRefund: Story = {
+  args: {
+    payment: { amountDueMinor: 90000, paidMinor: 50000, priorWaivedMinor: 0, waivedMinor: 40000 },
+    onRejectAndRefund: fn(),
+  },
+}
+export const WithRejectAndRefundLight: Story = {
+  ...WithRejectAndRefund,
+  globals: { theme: 'light' },
+}

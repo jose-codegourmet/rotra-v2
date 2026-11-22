@@ -38,6 +38,28 @@ export async function listTrustedHosts(context: ClubContext): Promise<TrustedHos
   }))
 }
 
+/**
+ * P-PROFILE · Clubs › Host badge (#1007, D-2026-11-22-01): the ids of the clubs where this ROTRA
+ * player is a current trusted host, read straight from the profile's own clubs read (no extra
+ * request). A club counts when it has a current trusted-host row (`removed_at` null) on a current
+ * saved player linked to the player (`player_id`), or on a record the Queue Master moved into
+ * that linked record (`linked_to_club_player_id`, the Same person step), so the surviving record
+ * decides. Removing trust ends the badge; the saved player stays. Nothing here grants a permission.
+ */
+export async function readHostClubIds(playerId: string): Promise<Set<string>> {
+  const rows = await prisma.clubTrustedHost.findMany({
+    where: {
+      removedAt: null,
+      OR: [
+        { clubPlayer: { playerId, removedAt: null } },
+        { clubPlayer: { removedAt: { not: null }, linkedTo: { playerId, removedAt: null } } },
+      ],
+    },
+    select: { clubId: true },
+  })
+  return new Set(rows.map((row) => row.clubId))
+}
+
 async function savedPlayerName(tx: Prisma.TransactionClient, clubId: string, clubPlayerId: string) {
   const row = await tx.clubPlayer.findFirst({
     where: { id: clubPlayerId, clubId, removedAt: null },

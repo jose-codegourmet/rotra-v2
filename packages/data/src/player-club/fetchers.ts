@@ -19,6 +19,11 @@ import {
  */
 export type PlayerClub = Pick<Club, 'id' | 'name' | 'initials' | 'logoUrl'> & {
   joinedVia?: 'club_link' | 'session_link' | 'club_added'
+  /**
+   * The player is a current trusted host of this club (Host badge, #1007, D-2026-11-22-01). Shown
+   * wherever the Clubs section shows; false once the club removes them from its trusted hosts.
+   */
+  isHost?: boolean
 }
 
 async function owner() {
@@ -47,8 +52,22 @@ export async function getPlayerClubs(
   await requireProfileAccess(playerId)
   const own = (await getSession('player'))?.account.id === playerId
   const state = readMockState()
+  const clubPlayers = state.clubPlayers
+  // A current trusted-host row counts for the surviving record: the player's own saved player, or a
+  // record the Queue Master moved into it (Same person).
+  const hostClubs = new Set(
+    (state.clubTrustedHosts ?? [])
+      .filter((h) => !h.removedAt)
+      .flatMap((h) => {
+        const cp = clubPlayers.find((p) => p.id === h.clubPlayerId)
+        const survivor = cp?.removedAt
+          ? clubPlayers.find((p) => p.id === cp.linkedToClubPlayerId)
+          : cp
+        return survivor && !survivor.removedAt && survivor.playerId === playerId ? [h.clubId] : []
+      }),
+  )
   const seen = new Set<string>()
-  return state.clubPlayers
+  return clubPlayers
     .filter((p) => p.playerId === playerId && !p.removedAt)
     .flatMap((p) => {
       const club = state.clubs.find((c) => c.id === p.clubId)
@@ -59,6 +78,7 @@ export async function getPlayerClubs(
         name: club.name,
         initials: club.initials,
         logoUrl: club.logoUrl,
+        isHost: hostClubs.has(club.id),
       }
       if (own)
         row.joinedVia =

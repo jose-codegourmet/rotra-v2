@@ -1,4 +1,5 @@
 import { Card } from '@rotra/ui/card'
+import { Chip } from '@rotra/ui/chip'
 import { ClubLogo } from '@rotra/ui/club-logo'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { Icon } from '@rotra/ui/icon'
@@ -10,6 +11,8 @@ export type PlayerClubRow = {
   logoUrl?: string | null
   /** How the player joined; shown on the own profile only (another player's rows never carry it) */
   joinedVia?: 'club_link' | 'session_link' | 'club_added'
+  /** A current trusted host of this club: shows the Host badge (#1007). Informational, never a permission. */
+  isHost?: boolean
   /** The club's public page (/clubs/[clubId], P-CLUB-PAGE); the whole row links there */
   clubPageHref: string
 }
@@ -50,6 +53,11 @@ export function PlayerClubsCard({ clubs, isOwn, onOpenClub }: PlayerClubsCardPro
                   <ClubLogo size="md" initials={club.initials} logoUrl={club.logoUrl} />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <b className="font-semibold [overflow-wrap:anywhere]">{club.name}</b>
+                    {club.isHost ? (
+                      <span className="mt-1 flex">
+                        <Chip tone="accent">Host</Chip>
+                      </span>
+                    ) : null}
                     {isOwn && club.joinedVia ? (
                       <span className="text-[13px] text-fg2">{via[club.joinedVia]}</span>
                     ) : null}

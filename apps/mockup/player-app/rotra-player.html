@@ -2088,11 +2088,15 @@ function clubsOf(p) {
   if (p.savedBy) return [{ id: p.savedBy }]; // unclaimed: the one club that saved them
   return [{ id: CLUB_IDS[hashStr(`club-${p.id}`) % CLUB_IDS.length] }];
 }
+// Epic #1002 (#1007): a club's current trusted host shows a Host badge on that club's row, wherever the Clubs section shows.
+// The Queue prototype seeds Miguel (u1) as a trusted host of Lahug Smash Club (c1); removing trust there removes the badge, never the membership.
+const TRUSTED_HOST_CLUBS = { u1: ['c1'] };
+const isHostOf = (p, clubId) => (TRUSTED_HOST_CLUBS[p.id] || []).includes(clubId);
 function clubsPanel(p, own) {
   const list = clubsOf(p).filter((c) => CLUB_DIR[c.id]);
   return `<section class="card stack"><h3>${own ? 'Your clubs' : 'Clubs'}</h3>${list.length ? `<div>${list.map((c) => {
     const club = CLUB_DIR[c.id];
-    return `<button type="button" class="crow mbtn" data-act="openClubCard" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
+    return `<button type="button" class="crow mbtn" data-act="openClubCard" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${isHostOf(p, c.id) ? `<span class="row" style="gap:6px">${chip('Host', 'ok')}</span>` : ''}${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
   }).join('')}</div>` : `<div class="empty">${own ? 'You\'re not in any club\'s saved players yet.' : 'No clubs yet.'}</div>`}</section>`;
 }
 

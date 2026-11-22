@@ -28,7 +28,7 @@ import type {
   QueueSessionSummary,
   SessionCourt,
 } from '../queue-session/queueSession.types'
-import { hostRegistrationText } from '../session-host/rules'
+import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {

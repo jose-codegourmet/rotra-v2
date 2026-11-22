@@ -5,7 +5,19 @@ import type { QueueSession } from '../generated/prisma/client'
 import { notifyWaitlistPlace } from '../player/notification-events'
 import { ServiceError } from '../service/errors'
 import { placeClubMember } from './session-roster'
-import { capacityOf, derivedId, LIVE_ENTRY, orderedWaitlist, type Tx } from './session-store'
+import {
+  capacityOf,
+  derivedId,
+  LIVE_ENTRY,
+  lockSession,
+  mapDatabaseError,
+  orderedWaitlist,
+  recomputeMinimum,
+  requireSessionAccess,
+  requireState,
+  type Tx,
+  touchSession,
+} from './session-store'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -98,6 +110,7 @@ export async function assignSessionHostsIn(
         hosts: `${clubPlayer.displayName} is not a trusted host. Pick them again to add them to your trusted hosts.`,
       })
     const at = new Date(now.getTime() + index)
+    if (session.state === 'active') await requireLevelToPlay(tx, context, session, clubPlayer, id)
     await tx.sessionHost.create({
       data: {
         id: await derivedId(operationId, `host:${id}`),
@@ -188,4 +201,127 @@ export async function assignSessionHostsIn(
     }
   }
   return result
+}
+
+/**
+ * Levels are locked once play starts, so a host who would take a place in a live session needs a
+ * saved level. A host already on the roster or waitlist needs nothing. Throws before any write.
+ */
+async function requireLevelToPlay(
+  tx: Tx,
+  context: ClubContext,
+  session: QueueSession,
+  clubPlayer: { displayName: string },
+  id: string,
+) {
+  const [waiting, entry, level] = await Promise.all([
+    tx.sessionWaitlistEntry.findUnique({
+      where: { sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: id } },
+    }),
+    tx.sessionPlayer.findUnique({
+      where: { sessionId_clubPlayerId: { sessionId: session.id, clubPlayerId: id } },
+    }),
+    tx.clubAssessment.findFirst({
+      where: { clubId: context.clubId, clubPlayerId: id },
+      select: { id: true },
+    }),
+  ])
+  if (waiting || (entry && !entry.releasedAt && !entry.noShowAt) || level) return
+  throw new ServiceError('invalid', {
+    hosts: `${clubPlayer.displayName} has no saved level. Add them as a player with a level first, then add them as a host.`,
+  })
+}
+
+const hostsText = ({ registered, waitlisted }: HostRegistration) => {
+  const n = (k: number) => `${k} host${k === 1 ? '' : 's'}`
+  return `${registered ? ` · ${n(registered)} registered` : ''}${waitlisted ? ` · ${n(waitlisted)} waitlisted` : ''}`
+}
+
+/** A session command on the locked session, before or during play (the revision is bumped). */
+async function hostCommand<T>(
+  context: ClubContext,
+  sessionId: string,
+  change: (tx: Tx, session: QueueSession) => Promise<T>,
+) {
+  if (!UUID.test(sessionId)) throw new ServiceError('not_found')
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const session = await lockSession(tx, context, sessionId)
+      await requireSessionAccess(context, session, tx)
+      requireState(session, ['prepared', 'active'], 'This session is closed.')
+      const result = await change(tx, session)
+      await recomputeMinimum(tx, await touchSession(tx, session))
+      return result
+    })
+  } catch (error) {
+    if (error instanceof ServiceError) throw error
+    mapDatabaseError(error)
+  }
+}
+
+async function savedPlayerName(tx: Tx, context: ClubContext, clubPlayerId: string) {
+  const row = UUID.test(clubPlayerId)
+    ? await tx.clubPlayer.findFirst({
+        where: { id: clubPlayerId, clubId: context.clubId },
+        select: { displayName: true, player: { select: { fullName: true } } },
+      })
+    : null
+  if (!row) throw new ServiceError('not_found', { player: 'Player not available.' })
+  return row.player?.fullName || row.displayName
+}
+
+/**
+ * Session management › Hosts › Add host (#1005, D-2026-11-22-01), before or during the session:
+ * the same rules as the setup (a current trusted host; a slot while one is open, else the waitlist;
+ * never a second registration). No role, permission or sign-in changes.
+ */
+export async function addSessionHost(
+  context: ClubContext,
+  sessionId: string,
+  input: { clubPlayerId: string; operationId?: string },
+) {
+  return hostCommand(context, sessionId, async (tx, session) => {
+    const name = await savedPlayerName(tx, context, input.clubPlayerId)
+    const current = await tx.sessionHost.findMany({
+      where: { clubId: context.clubId, sessionId, removedAt: null },
+      select: { clubPlayerId: true },
+    })
+    if (current.some((row) => row.clubPlayerId === input.clubPlayerId))
+      throw new ServiceError('conflict', { hosts: `${name} is already a host.` })
+    const registration = await assignSessionHostsIn(
+      tx,
+      context,
+      session,
+      [...current.map((row) => row.clubPlayerId), input.clubPlayerId],
+      input.operationId ?? crypto.randomUUID(),
+      new Date(),
+    )
+    return { registration, message: `${name} added as a host${hostsText(registration)}` }
+  })
+}
+
+/**
+ * Session management › Hosts › Remove (#1005): ends the host designation (`removed_at`) only. The
+ * player's slot or waitlist place and their trusted-host status are not touched.
+ */
+export async function removeSessionHost(
+  context: ClubContext,
+  sessionId: string,
+  input: { clubPlayerId: string },
+) {
+  return hostCommand(context, sessionId, async (tx) => {
+    const name = await savedPlayerName(tx, context, input.clubPlayerId)
+    const ended = await tx.sessionHost.updateMany({
+      where: {
+        clubId: context.clubId,
+        sessionId,
+        clubPlayerId: input.clubPlayerId,
+        removedAt: null,
+      },
+      data: { removedAt: new Date(), revision: { increment: 1 } },
+    })
+    if (ended.count === 0)
+      throw new ServiceError('conflict', { hosts: `${name} is not a host of this session.` })
+    return { clubPlayerId: input.clubPlayerId, message: `${name} removed as a host` }
+  })
 }

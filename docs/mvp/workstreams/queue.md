@@ -103,6 +103,7 @@ Prisma column); the Checked in themselves mark has no server clearing rules yet.
 | Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` applied 2026-11-11) | [D-2026-11-11-02](../decisions/2026-11-11.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
 | Club settings › Trusted hosts (`club_trusted_hosts`, `useTrustedHosts`) | in progress (mock app + real-mode service and Route Handlers; migration `20261122000100_club_trusted_hosts` applied to a local disposable database only) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1003 (epic #1002) |
 | Session setup › Hosts with auto-registration (`session_hosts`, `useSessionHosts`, `hostClubPlayerIds`) | in progress (mock app + real-mode service and Route Handler; migration `20261122000200_session_hosts` applied to a local disposable database only) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1004 (epic #1002) |
+| Session management › Hosts: add or remove hosts before and during the session (`useAddSessionHost`, `useRemoveSessionHost`, `POST`/`DELETE /api/sessions/[sessionId]/hosts`) | in progress (mock app + real-mode service and Route Handlers; no schema change) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1005 (epic #1002) |
 
 ### Obvious Queue bugs (#466, 2026-11-07)
 
@@ -139,7 +140,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-19-02](../decisions/2026-11-19.md#d-2026-11-19-02) to [D-2026-11-19-09](../decisions/2026-11-19.md#d-2026-11-19-09) — the November 19 console round: tabs and Settings, Correct Queue Time Format, time picker standard, live match controls, Edit player, exemption list, Regenerate removed, Embla (all mockup only, tickets needed).
 - [D-2026-11-19-12](../decisions/2026-11-19.md#d-2026-11-19-12) — session level restrictions (all levels, beginners only, beginners to intermediate, slots per level).
 - [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (Mode and Scoring cards, sign-in).
-- [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts and session host display (epic #1002; #1003 Club settings › Trusted hosts and #1004 session setup › Hosts built).
+- [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts and session host display (epic #1002; #1003 Club settings › Trusted hosts, #1004 session setup › Hosts and #1005 change hosts during a session built).
 
 ## Blocking open decisions
 

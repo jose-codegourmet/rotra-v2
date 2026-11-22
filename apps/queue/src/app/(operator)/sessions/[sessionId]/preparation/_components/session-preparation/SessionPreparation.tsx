@@ -59,6 +59,7 @@ import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { SessionHosts } from '@/app/(operator)/sessions/[sessionId]/_components/session-hosts/SessionHosts'
 import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
@@ -473,6 +474,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               {cost.isError ? (
                 <QueryError query={cost} title="Couldn't load the cost estimate." />
               ) : null}
+              <SessionHosts sessionId={sessionId} />
               <SessionLinkCard
                 link={sessionLink}
                 pendingCount={pendingRequests}

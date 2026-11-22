@@ -225,6 +225,7 @@
     "./session-done-sheet": "./src/components/session-done-sheet/SessionDoneSheet.tsx",
     "./session-games": "./src/components/session-games/SessionGames.tsx",
     "./session-link-card": "./src/components/session-link-card/SessionLinkCard.tsx",
+    "./session-hosts-card": "./src/components/session-hosts-card/SessionHostsCard.tsx",
     "./session-peek-sheet": "./src/components/session-peek-sheet/SessionPeekSheet.tsx",
     "./session-record-header": "./src/components/session-record-header/SessionRecordHeader.tsx",
     "./session-setup-card": "./src/components/session-setup-card/SessionSetupCard.tsx",

@@ -48,6 +48,8 @@
     "./session-host/query-keys": "./src/session-host/queryKeys.ts",
     "./session-host/fetchers": "./src/session-host/fetchers.ts",
     "./session-host/useSessionHosts": "./src/session-host/useSessionHosts.ts",
+    "./session-host/useAddSessionHost": "./src/session-host/useAddSessionHost.ts",
+    "./session-host/useRemoveSessionHost": "./src/session-host/useRemoveSessionHost.ts",
     "./fixtures/trusted-hosts": "./src/fixtures/trustedHosts.ts",
     "./fixtures/clubs": "./src/fixtures/clubs.ts",
     "./fixtures/venues": "./src/fixtures/venues.ts",

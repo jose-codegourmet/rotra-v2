@@ -20,7 +20,7 @@ import {
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
 import { assignSessionHosts } from '../session-host/fetchers'
-import { hostRegistrationText } from '../session-host/rules'
+import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
 import { saveToastText } from '../sync/fetchers'
 import {
@@ -258,9 +258,10 @@ export function updateQueueSession({
           removedAt: null,
         })),
       )
+      // A waiter without a level (a host with no saved level) is skipped, as the real service does.
       const b = rebalanceSlots(
         state.roster.filter((p) => p.sessionId === sessionId),
-        state.waitlist.filter((w) => w.sessionId === sessionId),
+        state.waitlist.filter((w) => w.sessionId === sessionId && w.level),
         slotCapacity(values.courts.length, budget),
       )
       const earliest =

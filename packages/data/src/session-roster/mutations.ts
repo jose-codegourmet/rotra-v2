@@ -583,8 +583,9 @@ export async function fillOpenSlots(sessionId: string) {
           0,
           capacity(s, sessionId) - s.roster.filter((r) => r.sessionId === sessionId).length,
         ),
+        // Entries without a level (a host with no saved level) are skipped, as the real service does.
         waiting = s.waitlist
-          .filter((w) => w.sessionId === sessionId)
+          .filter((w) => w.sessionId === sessionId && w.level)
           .sort((a, b) => a.addedAt - b.addedAt)
           .slice(0, open)
       for (const w of waiting) promoteWaiter(s, w)

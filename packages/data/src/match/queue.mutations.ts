@@ -5,6 +5,7 @@ import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transacti
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
 import { isRealDataMode } from '../real/mode'
+import { notInRealModeYet, swappedPartnersText } from './liveMatch.rules'
 import {
   allPlayers,
   completeLineup,
@@ -291,11 +292,22 @@ export function clearQueue(sessionId: string) {
 export const canClearQueue = (matches: Match[]) =>
   matches.some((match) => match.state === 'waiting')
 
+/**
+ * Two players on different teams trade places. Waiting and Getting ready: “switched sides”, and
+ * the match becomes manual and protected from regeneration. Playing (owner, November 19, 2026):
+ * “swapped partners”; no substitution is recorded, so the result follows the pairs as they are at
+ * Match done. On a court (Getting ready or Playing) it is mock only for now.
+ */
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
   return dispatch('queue.swapPlayers', input, () =>
     change(input.sessionId, (s) => {
-      const m = waiting(s, input.matchId, input.sessionId),
-        a = m.teamA.includes(input.a) ? input.a : input.b,
+      const m = s.matches.find((x) => x.id === input.matchId && x.sessionId === input.sessionId)
+      if (!m || m.decision || !['waiting', 'on_court', 'active'].includes(m.state))
+        throw new MockError('permission', 'Only a waiting match can be changed.')
+      // Offline in real mode this runs over the downloaded copy: only a waiting swap can be queued.
+      if (m.state !== 'waiting' && isRealDataMode())
+        throw new MockError('permission', notInRealModeYet('Swapping players on a court'))
+      const a = m.teamA.includes(input.a) ? input.a : input.b,
         b = m.teamB.includes(input.b) ? input.b : input.a
       if (a === b || !m.teamA.includes(a) || !m.teamB.includes(b))
         throw new MockError('permission', 'Choose one player from each team.')
@@ -304,11 +316,14 @@ export function swapPlayers(input: { sessionId: string; matchId: string; a: stri
       if (!pa || !pb) throw new MockError('permission', 'Player not available.')
       m.teamA = m.teamA.map((id) => (id === a ? b : id))
       m.teamB = m.teamB.map((id) => (id === b ? a : id))
-      validate(s, input.sessionId, m, true)
-      m.origin = 'manual'
-      m.manualProtected = true
       const nameA = queueMasterName(withClubNickname(s, pa)),
         nameB = queueMasterName(withClubNickname(s, pb))
+      if (m.state === 'active')
+        return { data: null, text: swappedPartnersText(m.matchNo, nameA, nameB) }
+      // The same players, so the session's format switches are only rechecked for a waiting match.
+      if (m.state === 'waiting') validate(s, input.sessionId, m, true)
+      m.origin = 'manual'
+      m.manualProtected = true
       return {
         data: null,
         text: `Match ${m.matchNo}: ${nameA} and ${nameB} switched sides · protected from regeneration`,

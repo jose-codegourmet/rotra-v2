@@ -63,6 +63,7 @@ Set in staging-verification 1.1. From `packages/db/.env.example` and [infrastruc
 | Variable | Value |
 |---|---|
 | `ROTRA_GO_API_URL` | the Go API's public address, for example `https://api-beta.rotra.club` |
+| `NEXT_PUBLIC_ROTRA_STREAM_URL` | the same address, for the browser: the origin the live stream opens on (B-41), in all three apps, together with `NEXT_PUBLIC_ROTRA_DATA_MODE=real`. Unset: no stream, Refresh as before. The Go API lists the app origins in `ROTRA_ALLOWED_ORIGINS` |
 | `ROTRA_GO_MOVED_AREAS` | the moved `/api/*` entries; applied only at staging-verification, with the stream-ticket route. A plain entry is a whole-segment prefix (`/api/auth`). An entry starting with `=` is one exact path where `*` is exactly one segment: `=/api/register/*/google` moves only Google registration (`POST /api/register/{clubId}/google`) and leaves `/api/register` and `/api/register/google` (the Admin link) in TypeScript. The password route `/api/register/{clubId}` has the same segment count as `/api/register/google`, so no entry can move one and not the other; it stays in TypeScript until the Admin-link registration is ported |
 | `ROTRA_PROXY_SECRET` | same as Railway |
 | `ROTRA_VISITOR_RECEIPT_SECRET` | same as Railway |

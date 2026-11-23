@@ -20,7 +20,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 8 | [x] | [go-writes-admin-player_20261113](./tracks/go-writes-admin-player_20261113/) — Admin and Player writes in Go | refactor | high | go-signed-in-reads | 4 / 4 |
 | 9 | [~] | [go-writes-queue_20261113](./tracks/go-writes-queue_20261113/) — Queue writes and offline contract in Go | refactor | critical | go-writes-admin-player | 5 / 9 |
 | 10 | [x] | [go-sign-in-catch-up_20261119](./tracks/go-sign-in-catch-up_20261119/) — Google sign-in and the guest claim in Go | feature | high | go-sign-in | 9 / 9 |
-| 11 | [ ] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
+| 11 | [~] | [live-updates_20261113](./tracks/live-updates_20261113/) — Live updates | feature | high | go-writes-queue (events), beta-stack (ticket route, B-41) | 2 / 5 |
 | 12 | [ ] | [pictures-buckets_20261113](./tracks/pictures-buckets_20261113/) — Pictures on Cloudflare R2 (Railway Buckets as the fallback, B-31) | refactor | medium | go-writes-admin-player | 3 / 4 |
 | 13 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–12) | 5 / 10 |
 | 14 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |

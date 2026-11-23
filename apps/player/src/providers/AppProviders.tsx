@@ -4,6 +4,7 @@ import { ThemeProvider } from '@rotra/ui/theme-provider'
 import { Toaster } from '@rotra/ui/toaster'
 import type { ReactNode } from 'react'
 import { AuthBridge } from './AuthBridge'
+import { LiveBridge } from './LiveBridge'
 import { QueryProvider } from './QueryProvider'
 import { StoreProvider } from './StoreProvider'
 import { THEME_STORAGE_KEY } from './themeStorageKey'
@@ -15,6 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <StoreProvider>
         <QueryProvider>
           <AuthBridge />
+          <LiveBridge />
           {children}
           <Toaster />
         </QueryProvider>

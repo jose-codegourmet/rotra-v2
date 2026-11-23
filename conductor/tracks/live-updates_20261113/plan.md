@@ -12,7 +12,7 @@ Ticket: #879 (one issue for the whole track, under epic #869).
 
 ## Phase 2: Apps (frontend PR)
 
-- [ ] **2.1** Stream client + query invalidation per app
+- [x] **2.1** Stream client + query invalidation per app (not run against a live stack; see the deviations)
 - [ ] **2.2** `make check`; manual two-browser check locally
 
 ## Deviations log
@@ -29,3 +29,8 @@ Ticket: #879 (one issue for the whole track, under epic #869).
 | 2026-11-23 | 1.2 | `idle_in_transaction_session_timeout` is set per connection (`SET` after connect, `DB_IDLE_IN_TX_TIMEOUT`, default 5 s), not as a startup parameter | PgBouncer refuses unknown startup parameters | The role setting (`ALTER ROLE ... SET`) is an ops step still to do |
 | 2026-11-23 | 1.3 | Every viewer, signed in or not, gets a `public-session:` topic's message with kind `changed` | A masked visitor must get no private data; the signed-in screens that need kinds use their club, session or player topics | Owner may unmask for signed-in Players |
 | 2026-11-23 | 1.1 | The TS helper (`packages/db/src/live/append-event.ts`) is called from `touchSession`, the match command wrapper, Create, Delete and Cancel session, and the end of a match (with `playerIds`). Left in TypeScript: club-level writes (club settings and invite, venues, saved players, inventory), the Admin and Player writes of the rows above, and Session done's `playerIds`. Verified on a throwaway database with a script, not by a test suite | Keeps the change small; the unmoved areas are whatever `ROTRA_GO_MOVED_AREAS` leaves in TypeScript | Listed here so they are done when those areas stay in TypeScript |
+| 2026-11-23 | 2.1 | New public env var `NEXT_PUBLIC_ROTRA_STREAM_URL` (the Go API origin for the browser). Added to `docs/backend/environment-setup.md` | `ROTRA_GO_API_URL` is server-only, the ticket answer carries no stream URL, and no public API origin existed | Set it per app on Vercel next to `NEXT_PUBLIC_ROTRA_DATA_MODE`; there are no app `.env.example` files |
+| 2026-11-23 | 2.1 | Invented: topic choice per app from existing context only. Queue: `club:<account id>`, `session:<id>` on `/sessions/<uuid>...`, `public-session:<slug>` on `/s/<slug>`; Player: `player:<account id>`; Admin: `admin` for the owner. Assumes the club account id is the club id and the player account id is the player id | No route or screen was added | A wrong id only costs a dropped topic or a refused ticket (silent fallback) |
+| 2026-11-23 | 2.1 | Invented: a stream closes after 60 s in a hidden tab and reopens with the last id on return; a refused ticket (401, 403, 404, 405, 429) stops the stream for that mount with no retry | The code has no convention for it; saves server streams and honors the 429 fallback | Easy to change in `live/liveStream.ts` |
+| 2026-11-23 | 2.1 | The Admin writes with no club add no event (row 1.1), so those Admin screens still need Refresh. Public session reads add `?minVersion=` only after a live message named a version | Server side gap, not the client's | See the 1.1 row |
+| 2026-11-23 | 2.1 | Not verified: a real browser against a local stack (no `NEXT_PUBLIC_ROTRA_STREAM_URL` run), so 2.2's two-browser check is not ticked | Not run | Manual check still to do |

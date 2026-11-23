@@ -74,6 +74,8 @@
     "./public-session/useSendDropOutNotice": "./src/public-session/useSendDropOutNotice.ts",
     "./public-session/useSessionInviteCode": "./src/public-session/useSessionInviteCode.ts",
     "./real/mode": "./src/real/mode.ts",
+    "./live/useLiveUpdates": "./src/live/useLiveUpdates.ts",
+    "./live/snapshotVersion": "./src/live/snapshotVersion.ts",
     "./real/client": "./src/real/client.ts",
     "./queue-session/types": "./src/queue-session/queueSession.types.ts",
     "./fixtures/session-history": "./src/fixtures/sessionHistory.ts",

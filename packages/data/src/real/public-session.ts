@@ -1,3 +1,4 @@
+import { minVersionQuery } from '../live/snapshotVersion'
 import { playerOrigin } from '../public-session/context'
 import type {
   MyJoinRequest,
@@ -21,7 +22,8 @@ const base = (slug: string) => `/api/public-sessions/${encodeURIComponent(slug)}
  * `PublicSessionNotFoundError`.
  */
 export function realGetPublicSession(slug: string) {
-  return realRequest<PublicSessionPage>(base(slug))
+  // After a live message the read asks for that snapshot version or newer (B-25); never part of the query key.
+  return realRequest<PublicSessionPage>(`${base(slug)}${minVersionQuery(slug)}`)
 }
 
 /**

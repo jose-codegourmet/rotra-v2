@@ -47,6 +47,8 @@ export function AdminPlayerFilters({
           options={[
             { value: 'all', label: 'All' },
             { value: 'registered', label: 'Registered' },
+            { value: 'verified', label: 'Verified' },
+            { value: 'unverified', label: 'Not verified' },
             { value: 'unclaimed', label: 'Unclaimed' },
             { value: 'details', label: 'Details required' },
           ]}

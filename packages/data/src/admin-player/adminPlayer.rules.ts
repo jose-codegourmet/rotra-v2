@@ -73,8 +73,11 @@ export function matchesAccountFilter(
   claimed: boolean,
   account: AdminPlayerAccountOption = 'all',
   detailsRequired = false,
+  verified = false,
 ): boolean {
   if (account === 'details') return !claimed && detailsRequired
+  if (account === 'verified') return claimed && verified
+  if (account === 'unverified') return claimed && !verified
   return account === 'all' || (account === 'registered' ? claimed : !claimed)
 }
 

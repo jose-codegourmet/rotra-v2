@@ -1,6 +1,6 @@
 # The waitlist is strictly first come, first served
 
-Status: IN MOCK APP — D-2026-11-23-06
+Status: IN MOCK APP — #1036
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `rebalanceSlots`, `stepDownToWait`, Setup › Courts budget notice

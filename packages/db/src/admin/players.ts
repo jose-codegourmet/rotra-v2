@@ -1,7 +1,8 @@
 import 'server-only'
+import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
 import { levelBandOf } from '@rotra/data/admin-player/management-rules'
 import { createdOnFromRtrId } from '@rotra/data/admin-player/rules'
-import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import type { AdminPlayer, AdminPlayerVerification } from '@rotra/data/admin-player/types'
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import type { AdminContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -85,6 +86,7 @@ async function readSharedEntryRows(id?: string): Promise<AdminPlayerRow[]> {
         archivedAt: null,
         revision: entry.revision.toString(),
         removalReason: 'Saved by its club only; the club manages this record',
+        verification: null,
       },
     ]
   })
@@ -158,8 +160,40 @@ async function readClubOnlyRecords(id?: string): Promise<AdminPlayerRow[]> {
       archivedAt: null,
       revision: record.revision.toString(),
       removalReason: 'Saved by its club only; the club manages this record',
+      verification: null,
     }
   })
+}
+
+/**
+ * D-2026-11-23-07: the derived status only. A pending email change doesn't change whether the
+ * player is verified, so the requests are left out here; the Verification card reads them.
+ */
+function verificationOf(
+  player: {
+    id: string
+    verificationOverride: string | null
+    account: { googleEmail: string | null } | null
+    privateContact: { email: string | null; phoneE164: string | null } | null
+  },
+  claimed: boolean,
+): AdminPlayerVerification | null {
+  if (!claimed || !player.account) return null
+  const v = deriveAccountVerification(
+    {
+      playerId: player.id,
+      googleEmail: player.account.googleEmail,
+      email: player.privateContact?.email ?? '',
+      phone: player.privateContact?.phoneE164 ?? '',
+    },
+    [],
+    player.verificationOverride === 'verified',
+  )
+  return {
+    verified: v.verified,
+    verifiedByAdmin: v.verifiedByAdmin,
+    completedSteps: v.completedSteps,
+  }
 }
 
 /**
@@ -183,7 +217,8 @@ export async function readAdminPlayerDirectory(
       hidePhoneFromClubs: true,
       revision: true,
       privateContact: { select: { phoneE164: true, email: true } },
-      account: { select: { claimedAt: true } },
+      verificationOverride: true,
+      account: { select: { claimedAt: true, googleEmail: true } },
       idAllocation: {
         select: {
           rtrId: true,
@@ -260,6 +295,7 @@ export async function readAdminPlayerDirectory(
         archivedAt: null,
         revision: player.revision.toString(),
         removalReason: "This part of ROTRA isn't connected to saved data yet.",
+        verification: verificationOf(player, claimed),
       },
     ]
   })

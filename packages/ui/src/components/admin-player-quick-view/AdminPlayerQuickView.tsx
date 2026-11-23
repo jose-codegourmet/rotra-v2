@@ -19,6 +19,7 @@ import { Field } from '@rotra/ui/field'
 import { Icon } from '@rotra/ui/icon'
 import { LEVEL_OPTION_GROUPS } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
+import { PlayerAccountChip } from '@rotra/ui/player-account-chip'
 import { ProfileBannerCard, ProfileStatsSection } from '@rotra/ui/profile-banner-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Sheet } from '@rotra/ui/sheet'
@@ -167,7 +168,7 @@ function QuickViewPanel({
         {mode === 'view' ? (
           <div className="flex flex-wrap gap-1.5">
             <Chip tone={level ? 'accent' : 'neutral'}>{level ?? 'No rank yet'}</Chip>
-            <Chip>{p.claimed ? 'Registered' : 'Unclaimed'}</Chip>
+            <PlayerAccountChip claimed={p.claimed} verification={p.verification} />
             {detailsRequired ? <Chip tone="warn">Details required</Chip> : null}
           </div>
         ) : (
@@ -322,7 +323,7 @@ function QuickViewPanel({
               chips={
                 <>
                   <Chip tone={level ? 'accent' : 'neutral'}>{level ?? 'No rank yet'}</Chip>
-                  <Chip>{p.claimed ? 'Registered' : 'Unclaimed'}</Chip>
+                  <PlayerAccountChip claimed={p.claimed} verification={p.verification} />
                   {detailsRequired ? <Chip tone="warn">Details required</Chip> : null}
                 </>
               }

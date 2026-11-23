@@ -8,7 +8,11 @@ export function directoryFilters(search: URLSearchParams): AdminPlayerListParams
   return {
     q: search.get('q') ?? '',
     account:
-      account === 'registered' || account === 'unclaimed' || account === 'details'
+      account === 'registered' ||
+      account === 'unclaimed' ||
+      account === 'verified' ||
+      account === 'unverified' ||
+      account === 'details'
         ? account
         : 'all',
     level:

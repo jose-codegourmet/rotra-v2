@@ -6,6 +6,8 @@ import {
   allPlayers,
   countedGames,
   courtNames,
+  courtsNeeded,
+  freeCourts,
   queueMasterName,
   substitutionCandidates,
   waitMinutes,
@@ -13,9 +15,13 @@ import {
 import type { Match } from '@rotra/data/match/types'
 import { useCompleteMatch } from '@rotra/data/match/useCompleteMatch'
 import { useInvalidateMatch } from '@rotra/data/match/useInvalidateMatch'
+import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
+import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
 import { useReplacePlayer } from '@rotra/data/match/useReplacePlayer'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
+import { useSwapFromMatch } from '@rotra/data/match/useSwapFromMatch'
+import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { MockError } from '@rotra/data/mock/errors'
 import {
   type QueueSession,
@@ -35,6 +41,7 @@ import type {
   MatchResultFormValues,
 } from '@rotra/ui/forms/match-result-form/schema'
 import { InvalidMatchSheet } from '@rotra/ui/invalid-match-sheet'
+import { MoveMatchSheet } from '@rotra/ui/move-match-sheet'
 import { PlayerActionSheet } from '@rotra/ui/player-action-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ReplacePlayerSheet } from '@rotra/ui/replace-player-sheet'
@@ -59,6 +66,12 @@ export type ActiveMatchProps = {
   now: number
   /** The active match to open (Open match on an in-game court card); null keeps the sheet closed */
   matchId: string | null
+  /**
+   * Open straight on Move match (the court card's ⋯ menu "Move to a free court", or a two-court match
+   * dropped on one court, which arrives preselected). Back closes everything instead of returning to
+   * the active sheet.
+   */
+  moveFirst?: { courtId?: string } | null
   onClose: () => void
 }
 
@@ -79,7 +92,16 @@ type Step =
   /** A player was tapped: "Change NAME?" (Substitute or Replace) */
   | { kind: 'player'; playerId: string }
   /** Replace during play: fixes a mistake; one operation per pair of players */
-  | { kind: 'replace'; outId: string | null; inId: string | null; operationId: string }
+  | {
+      kind: 'replace'
+      outId: string | null
+      inId: string | null
+      /** The opponent picked under Swap from match; null for none */
+      swapId: string | null
+      operationId: string
+    }
+  /** Move to a free court: the match keeps playing, same start time; one operation per set of courts */
+  | { kind: 'move'; courtIds: string[]; operationId: string }
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
@@ -110,8 +132,19 @@ const newOperationId = () => crypto.randomUUID()
  * each confirmation saves locally, the outcome is permanent at once and its toast ends in " · Saved
  * on this device, waiting to sync". Player cards open the profile with Back to match. After a
  * confirmed result the next-match picker (NextMatch, Q-NEXT-MATCH) opens for the first freed court.
+ * Q25 (mock mode): Pause match (first in the footer, usePauseMatch, no confirmation) toasts and closes
+ * the sheet, the match is Getting ready again; Move to a free court opens MoveMatchSheet (playing
+ * variant, useMoveCourt; `moveFirst` opens it directly, preselected for a dropped court); dragging a
+ * player onto someone in the other pair swaps partners (useSwapPlayers); Replace player's Swap players
+ * row trades the player with an opponent (useSwapFromMatch). Each toast is the command's message.
  */
-export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchProps) {
+export function ActiveMatch({
+  sessionId,
+  now,
+  matchId,
+  moveFirst = null,
+  onClose,
+}: ActiveMatchProps) {
   /** The next-match picker after a confirmed result; it outlives the active match sheet */
   const [next, setNext] = useState<NextMatchRequest | null>(null)
   const picker = <NextMatch sessionId={sessionId} request={next} onClose={() => setNext(null)} />
@@ -144,6 +177,7 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
         roster={roster.data.roster}
         matches={matches.data}
         match={match}
+        moveFirst={moveFirst}
         onClose={onClose}
         onRefresh={refresh}
         onCompleted={setNext}
@@ -152,7 +186,8 @@ export function ActiveMatch({ sessionId, now, matchId, onClose }: ActiveMatchPro
   )
 }
 
-type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId'> & {
+type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId' | 'moveFirst'> & {
+  moveFirst: { courtId?: string } | null
   session: QueueSession & { courts: SessionCourt[] }
   roster: SessionPlayer[]
   matches: Match[]
@@ -170,6 +205,7 @@ function OpenActiveMatch({
   roster,
   matches,
   match,
+  moveFirst,
   onClose,
   onRefresh,
   onCompleted,
@@ -178,8 +214,22 @@ function OpenActiveMatch({
   const invalidateMatch = useInvalidateMatch()
   const substitutePlayer = useSubstitutePlayer()
   const replacePlayer = useReplacePlayer()
+  const pauseMatch = usePauseMatch()
+  const moveCourt = useMoveCourt()
+  const swapPlayers = useSwapPlayers()
+  const swapFromMatch = useSwapFromMatch()
   const [message, setMessage] = useState<string | undefined>()
-  const [step, setStep] = useState<Step>({ kind: 'active' })
+  const [step, setStep] = useState<Step>(
+    moveFirst
+      ? {
+          kind: 'move',
+          courtIds: moveFirst.courtId ? [moveFirst.courtId] : [],
+          operationId: newOperationId(),
+        }
+      : { kind: 'active' },
+  )
+  // One Pause match operation per opening: a retry after a save failure replays it.
+  const pauseOperationId = useRef(newOperationId())
   const [error, setError] = useState<string | undefined>()
   const [profileId, setProfileId] = useState<string | null>(null)
   // One commit per attempt: a second tap can land before isPending reaches this render.
@@ -259,7 +309,11 @@ function OpenActiveMatch({
     completeMatch.isPending ||
     invalidateMatch.isPending ||
     substitutePlayer.isPending ||
-    replacePlayer.isPending
+    replacePlayer.isPending ||
+    pauseMatch.isPending ||
+    moveCourt.isPending ||
+    swapFromMatch.isPending ||
+    swapPlayers.isPending
   const begin = () => {
     if (committing.current || pending) return false
     committing.current = true
@@ -348,6 +402,92 @@ function OpenActiveMatch({
     if (step.kind !== 'replace' || !step.outId || !step.inId || !begin()) return
     replacePlayer.mutate(
       { matchId: match.id, outId: step.outId, inId: step.inId, operationId: step.operationId },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          go({ kind: 'active' })
+        },
+        onError: (err) => {
+          if (isRecheckFailure(err)) {
+            setMessage('Something changed. Review the match again.')
+            onRefresh()
+          } else onFailure(err)
+        },
+        onSettled,
+      },
+    )
+  }
+
+  /** Pause match: back to Getting ready at once, no confirmation; the owner's toast names the court */
+  const onPause = () => {
+    if (!begin()) return
+    pauseMatch.mutate(
+      { matchId: match.id, operationId: pauseOperationId.current },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          close()
+        },
+        onError: (err) => {
+          toast.error(errorMessage(err))
+          if (isRecheckFailure(err)) onRefresh()
+        },
+        onSettled,
+      },
+    )
+  }
+
+  const freeNow = freeCourts(session.courts, matches, now)
+  const needed = courtsNeeded(match) === 2 ? 2 : 1
+  /** Back from Move match: a menu- or drop-opened one closes everything, the button-opened one returns */
+  const backFromMove = () => {
+    if (committing.current) return
+    if (moveFirst) close()
+    else go({ kind: 'active' })
+  }
+  /** Move match: the match keeps playing on the new court(s); the owner rechecks they are still free */
+  const onConfirmMove = () => {
+    if (step.kind !== 'move' || step.courtIds.length !== needed || !begin()) return
+    moveCourt.mutate(
+      { matchId: match.id, courtIds: step.courtIds, operationId: step.operationId },
+      {
+        onSuccess: (result) => {
+          toast(result.message)
+          if (moveFirst) close()
+          else go({ kind: 'active' })
+        },
+        onError: (err) => {
+          if (isRecheckFailure(err)) {
+            setMessage('Something changed. Review the match again.')
+            onRefresh()
+          } else onFailure(err)
+        },
+        onSettled,
+      },
+    )
+  }
+
+  /** Dragging a player onto someone in the other pair swaps partners; not a substitution */
+  const onSwapPartners = (aId: string, bId: string) => {
+    if (!begin()) return
+    swapPlayers.mutate(
+      { sessionId: match.sessionId, matchId: match.id, a: aId, b: bId },
+      {
+        onSuccess: (result) => toast(result.message),
+        onError: (err) => {
+          toast.error(errorMessage(err))
+          if (isRecheckFailure(err)) onRefresh()
+        },
+        onSettled,
+      },
+    )
+  }
+
+  /** Swap players (Replace sheet): the player coming out trades places with an opponent */
+  const onSwapFromMatch = (outId: string, opponentId: string) => {
+    if (step.kind !== 'replace' || !begin()) return
+    swapFromMatch.mutate(
+      { matchId: match.id, outId, inId: opponentId, operationId: step.operationId },
       {
         onSuccess: (result) => {
           toast(result.message)
@@ -540,6 +680,7 @@ function OpenActiveMatch({
               kind: 'replace',
               outId: step.playerId,
               inId: null,
+              swapId: null,
               operationId: newOperationId(),
             })
           }
@@ -554,13 +695,16 @@ function OpenActiveMatch({
   if (step.kind === 'replace') {
     const free = substitutionCandidates(match, roster, matches)
     // A different pair of players is a different replacement: it gets its own operation.
-    const pick = (outId: string | null, inId: string | null) =>
+    const pick = (outId: string | null, inId: string | null, swapId: string | null) =>
       go({
         kind: 'replace',
         outId,
         inId,
+        swapId,
         operationId:
-          outId === step.outId && inId === step.inId ? step.operationId : newOperationId(),
+          outId === step.outId && inId === step.inId && swapId === step.swapId
+            ? step.operationId
+            : newOperationId(),
       })
     return (
       <>
@@ -574,13 +718,52 @@ function OpenActiveMatch({
           minimumGames={session.minimumGames}
           outId={step.outId}
           inId={step.inId}
-          onPickOut={(outId) => pick(outId, step.inId)}
-          onPickIn={(inId) => pick(step.outId, inId)}
+          onPickOut={(outId) => pick(outId, step.inId, null)}
+          onPickIn={(inId) => pick(step.outId, inId, null)}
+          onPickSwap={(opponentId) => pick(step.outId, null, opponentId)}
+          swapId={step.swapId}
+          onSwapFromMatch={onSwapFromMatch}
           onBack={() => {
             if (!committing.current) go({ kind: 'active' })
           }}
           onConfirm={onConfirmReplace}
-          isPending={replacePlayer.isPending}
+          isPending={replacePlayer.isPending || swapFromMatch.isPending}
+          message={message}
+          error={error}
+        />
+        {profile}
+      </>
+    )
+  }
+
+  if (step.kind === 'move') {
+    const moveStep = step
+    return (
+      <>
+        <MoveMatchSheet
+          open
+          onOpenChange={(open) => {
+            if (!open) backFromMove()
+          }}
+          matchNo={match.matchNo}
+          currentLabel={courtLabel}
+          courts={freeNow.map((c) => ({ id: c.id, label: c.label }))}
+          required={needed}
+          variant="playing"
+          value={moveStep.courtIds}
+          onChange={(courtIds) =>
+            go({
+              kind: 'move',
+              courtIds,
+              operationId:
+                [...courtIds].sort().join(',') === [...moveStep.courtIds].sort().join(',')
+                  ? moveStep.operationId
+                  : newOperationId(),
+            })
+          }
+          onBack={backFromMove}
+          onConfirm={onConfirmMove}
+          isPending={moveCourt.isPending}
           message={message}
           error={error}
         />
@@ -629,6 +812,13 @@ function OpenActiveMatch({
         substitutions={substitutions}
         onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
         onOpenProfile={openProfile}
+        onSwapPartners={onSwapPartners}
+        freeCourtCount={freeNow.length}
+        onMoveToFree={() =>
+          go({ kind: 'move', courtIds: [], operationId: newOperationId() })
+        }
+        onPause={onPause}
+        pausePending={pauseMatch.isPending}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />

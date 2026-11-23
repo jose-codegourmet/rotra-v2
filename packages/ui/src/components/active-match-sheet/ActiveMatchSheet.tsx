@@ -3,6 +3,7 @@
 import type { MatchFormat } from '@rotra/data/match/types'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
+import { Icon } from '@rotra/ui/icon'
 import { Sheet } from '@rotra/ui/sheet'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
 
@@ -52,6 +53,13 @@ export type ActiveMatchSheetProps = {
   freeCourtCount?: number
   /** Opens Move match (the playing variant) to pick a free court; omit to hide the button */
   onMoveToFree?: () => void
+  /**
+   * Pause match: first in the footer; takes the match back to Getting ready at once, no
+   * confirmation. Omit to hide the button.
+   */
+  onPause?: () => void
+  /** Pause match is saving: the button shows its spinner and cannot fire twice */
+  pausePending?: boolean
   /** Opens Mark match invalid? (Q-INVALID-MATCH) */
   onMarkInvalid: () => void
   /** Opens Match N result (Q-MATCH-DONE) */
@@ -83,7 +91,7 @@ function substitutionLine(s: ActiveMatchSubstitution) {
  * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the format
  * with the start time and minutes in, Team A VS Team B (drag a player onto someone in the other pair to
  * swap partners; a player's card opens Substitute or Replace, the picture opens the profile), one line per substitution (credit or neither), and the reminder that
- * closing the sheet does not end the game. Footer: Mark invalid (destructive) and the primary Match
+ * closing the sheet does not end the game. Footer: Pause match (when offered), Mark invalid (destructive) and the primary Match
  * done. No level
  * edits, past-result changes, reset or point-by-point scoring.
  */
@@ -102,6 +110,8 @@ export function ActiveMatchSheet({
   substitutions = [],
   freeCourtCount = 0,
   onMoveToFree,
+  onPause,
+  pausePending = false,
   onSelectPlayer,
   onOpenProfile,
   onSwapPartners,
@@ -116,6 +126,12 @@ export function ActiveMatchSheet({
       title={`Match ${matchNo} · ${courtLabel}`}
       footer={
         <>
+          {onPause ? (
+            <Button loading={pausePending} onClick={onPause}>
+              <Icon name="pause" size={14} />
+              Pause match
+            </Button>
+          ) : null}
           <Button variant="danger" onClick={onMarkInvalid}>
             Mark invalid
           </Button>

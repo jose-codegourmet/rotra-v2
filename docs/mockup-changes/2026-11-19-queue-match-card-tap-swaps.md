@@ -1,6 +1,6 @@
 # Queue app: in the match dialogs, a player's card swaps the player and the picture opens the profile
 
-Status: TICKETED — #1042
+Status: IN MOCK APP — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `faceTeam()` (card option), sheets `match` (Q-ACTIVE-MATCH) and `onCourt` (Q-ON-COURT), action `replaceFor`

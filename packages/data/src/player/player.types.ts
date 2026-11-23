@@ -91,6 +91,11 @@ export type PlayerProfile = {
   leaderboardPlaces?: LeaderboardPlace[]
   /** The one club whose version of an unclaimed player is public. */
   unclaimedSavedBy?: string
+  /**
+   * D-2026-11-23-07: whether a registered player is verified (the three checks or Verified by
+   * Admin). The result only; unset for an unclaimed player.
+   */
+  verified?: boolean
   /** Unset on an identity without a stored level reads as `public` (existing fixture identities). */
   profileVisibility?: ProfileVisibility
   /**

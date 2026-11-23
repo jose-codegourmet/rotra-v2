@@ -1,4 +1,5 @@
 import 'server-only'
+import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
 import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
@@ -18,7 +19,8 @@ const SOCIAL: SocialProvider[] = ['facebook', 'instagram', 'youtube', 'linkedin'
 
 /**
  * Public profile allowlist (`PlayerProfile`). No contacts, account or claim fields; the visibility
- * level is read so the projection can mask an always-private player (D-2026-11-12-01).
+ * level is read so the projection can mask an always-private player (D-2026-11-12-01). The
+ * verification facts are read only to derive `verified` (D-2026-11-23-07) and never leave here.
  */
 const PUBLIC_PLAYER_SELECT = {
   id: true,
@@ -40,6 +42,9 @@ const PUBLIC_PLAYER_SELECT = {
   personalDetails: true,
   idAllocation: { select: { rtrId: true } },
   socialLinks: { select: { provider: true, url: true } },
+  verificationOverride: true,
+  account: { select: { googleEmail: true } },
+  privateContact: { select: { email: true, phoneE164: true } },
 } satisfies Prisma.PlayerSelect
 
 type PublicPlayerRow = Prisma.PlayerGetPayload<{ select: typeof PUBLIC_PLAYER_SELECT }>
@@ -88,6 +93,21 @@ export function experienceUpdate(next: number | null, shown: number | null, now:
  * profile (D-2026-11-12-01) leaves here with the name masked, no nickname and no details; the
  * picture stays. `own` (the player's own read) keeps everything.
  */
+/** D-2026-11-23-07: the result only; undefined for an unclaimed player, who has no account. */
+function verifiedOf(row: PublicPlayerRow): boolean | undefined {
+  if (row.profileState !== 'claimed' || !row.account) return undefined
+  return deriveAccountVerification(
+    {
+      playerId: row.id,
+      googleEmail: row.account.googleEmail,
+      email: row.privateContact?.email ?? '',
+      phone: row.privateContact?.phoneE164 ?? '',
+    },
+    [],
+    row.verificationOverride === 'verified',
+  ).verified
+}
+
 function publicProfileDto(row: PublicPlayerRow, own = false) {
   if (!row.idAllocation) return null
   const links = Object.fromEntries(SOCIAL.map((p) => [p, ''])) as Record<SocialProvider, string>
@@ -105,6 +125,7 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
     bannerId: row.bannerId,
     profileVisibility: visibility,
     unclaimedSavedBy: savingClub?.club.name,
+    verified: verifiedOf(row),
     // Stats on your profile: the flags only. The Player app hides Latest stats and the Weekly
     // performance chart from everyone but the player, like mock mode.
     showProfileStats: row.showProfileStats,
@@ -215,6 +236,7 @@ async function readEntryProfile(entryId: string, viewerId: string | null) {
     bannerId: null,
     profileVisibility: 'public' as ProfileVisibility,
     unclaimedSavedBy: entry.clubPlayers.length === 1 ? first.club.name : undefined,
+    verified: undefined,
     showProfileStats: true,
     showWeeklyPerformance: true,
     playingStyle: own.playingStyle,

@@ -10,6 +10,8 @@ Accessible without login, subject to the player's [profile visibility](#profile-
 
 Supporting sections: permitted personal/playing-style information, optional experience, supported social links subject to the final visibility policy, and a read-only match-history entry point. Keep the product lean; do not add posts, followers, private messaging, equipment commerce, or club-discovery maps.
 
+**Verification** (owner, November 23, 2026, [D-2026-11-23-07](../../../../mvp/decisions/2026-11-23.md#d-2026-11-23-07); [log](../../../../mockup-changes/2026-11-23-player-public-verified-chip.md)): under the name, a registered player's profile shows **✓ Verified** (accent chip) or **Not verified** (neutral chip), to visitors and signed-in players. It shows the result only: no step count, no missing steps, and Verified by Admin reads **Verified**. Unclaimed players keep **Not registered yet** instead. Your own profile keeps **This is you** and the full status chip that opens Verification.
+
 Never show phone/email, claim status secrets, reset links, pending contact-change evidence, or private club Off Day labels. Club-assigned local levels may differ from shared rank; do not suggest every club must pair the player at the public level.
 
 RTR ID retains the original club founding-city/date context. Do not display it as proof of current residence or current club membership. No separate City/National/World ranking badge.

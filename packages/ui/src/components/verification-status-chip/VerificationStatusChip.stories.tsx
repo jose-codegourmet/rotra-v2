@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { VerificationStatusChip } from './VerificationStatusChip'
+import { PublicVerificationChip, VerificationStatusChip } from './VerificationStatusChip'
 
 const meta = {
   title: 'Player/VerificationStatusChip',
@@ -21,3 +21,13 @@ export const OneOfThreeLight: Story = { ...OneOfThree, globals: { theme: 'light'
 export const TwoOfThreeLight: Story = { ...TwoOfThree, globals: { theme: 'light' } }
 export const VerifiedLight: Story = { ...Verified, globals: { theme: 'light' } }
 export const VerifiedByAdminLight: Story = { ...VerifiedByAdmin, globals: { theme: 'light' } }
+
+/** Others see the result only on the public profile (D-2026-11-23-07). */
+const publicChips = (
+  <div className="flex flex-wrap gap-2">
+    <PublicVerificationChip verified />
+    <PublicVerificationChip verified={false} />
+  </div>
+)
+export const PublicResult: Story = { render: () => publicChips }
+export const PublicResultLight: Story = { render: () => publicChips, globals: { theme: 'light' } }

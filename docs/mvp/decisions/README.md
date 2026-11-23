@@ -102,6 +102,9 @@ This README holds the index, the status conventions and the entry template.
 | [D-2026-11-23-05](2026-11-23.md#d-2026-11-23-05) | Unclaimed players saved by clubs have a public profile in the Player app | approved 2026-11-23 | implemented (#1029, #1032) | none | [Player](../workstreams/player.md) |
 | [D-2026-11-23-06](2026-11-23.md#d-2026-11-23-06) | The waitlist is strictly first come, first served | approved 2026-11-23 | implemented (mockup, mock app, real services) | none | [Queue](../workstreams/queue.md) |
 | [D-2026-11-23-07](2026-11-23.md#d-2026-11-23-07) | Admin and the public profile show who is verified | approved 2026-11-23 | implemented (mockups, mock app, real reads) | #1037, #1038 | [Admin](../workstreams/admin.md), [Player](../workstreams/player.md) |
+| [D-2026-11-23-08](2026-11-23.md#d-2026-11-23-08) | Each scoring mode has an expected match length; the Playing court card shows the expected finish | approved 2026-11-23 | not started (mockup only) | Epic Q27 | [Queue](../workstreams/queue.md) |
+| [D-2026-11-23-09](2026-11-23.md#d-2026-11-23-09) | Plan Ahead uses free players and players whose court is finishing soon, ranked together | approved 2026-11-23 | not started (mockup only) | Epic Q27 | [Queue](../workstreams/queue.md) |
+| [D-2026-11-23-10](2026-11-23.md#d-2026-11-23-10) | The games badge opens a compact games dialog with Matches and Planned queue | approved 2026-11-23 | not started (mockup only) | Epic Q27 | [Queue](../workstreams/queue.md) |
 
 ## Status conventions
 

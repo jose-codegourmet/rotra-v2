@@ -1,6 +1,6 @@
 # Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate
 
-Status: NEW
+Status: TICKETED — #1090
 Date: 2026-11-20
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › profile (Recent sessions, Recent games), Sessions, the session dialog, Games (P-MATCH-HISTORY) second tab, Leaderboard "Who appears here"; fixtures `MIGS_SESSIONS` (new `m6`), helpers `U()`, `NOT_RANKED_NOTE`, `sessRecord()`

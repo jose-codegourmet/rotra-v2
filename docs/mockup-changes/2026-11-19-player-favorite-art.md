@@ -1,6 +1,6 @@
 # Player app: graphic on the favorite player step
 
-Status: NEW
+Status: TICKETED — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `FAV_ART`, `viewOnboard` (step 4), `.ob-banner`

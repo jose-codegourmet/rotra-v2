@@ -143,6 +143,9 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-19-12](../decisions/2026-11-19.md#d-2026-11-19-12) — session level restrictions (all levels, beginners only, beginners to intermediate, slots per level).
 - [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (Mode and Scoring cards, sign-in).
 - [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts and session host display (epic #1002; #1003 Club settings › Trusted hosts, #1004 session setup › Hosts and #1005 change hosts during a session, #1006 public Hosts section and #1008 finished sessions keep their hosts built).
+- [D-2026-11-23-08](../decisions/2026-11-23.md#d-2026-11-23-08) — expected match length per scoring mode and the Playing court card's expected finish (mockup only; Epic Q27).
+- [D-2026-11-23-09](../decisions/2026-11-23.md#d-2026-11-23-09) — Plan Ahead uses free and finishing-soon players, ranked together (mockup only; Epic Q27).
+- [D-2026-11-23-10](../decisions/2026-11-23.md#d-2026-11-23-10) — the games badge opens a compact games dialog with Matches and Planned queue (mockup only; Epic Q27).
 
 ## Blocking open decisions
 

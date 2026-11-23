@@ -1,6 +1,6 @@
 # Queue app: no Move to waitlist on the live Players card
 
-Status: NEW
+Status: TICKETED — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console › Players (`playersPane()`), Session settings › Roster and levels grid (`rvCard()`)

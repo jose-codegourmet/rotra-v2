@@ -1,6 +1,6 @@
 # Queue app: public session Details as cards
 
-Status: NEW
+Status: TICKETED — #1078
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewPublic` Details tab, `.pub-details`, `.pf-lead`, `.pf-big`, `.pf-grid`, `.pf-tile`, `.pf-l`

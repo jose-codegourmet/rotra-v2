@@ -1,6 +1,6 @@
 # Queue app: level rings on the public page's Courts now and Queue
 
-Status: NEW
+Status: TICKETED — #1078
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `pubLv`, `pubCourtSides`, `courtsNow`, public Queue tiles in `viewPublic`

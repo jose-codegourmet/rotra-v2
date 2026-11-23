@@ -1,6 +1,6 @@
 # Queue app: the Courts tab's upcoming queued matches use compact cards
 
-Status: NEW
+Status: TICKETED — #1061
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `upcomingPane()`, `queueCard(…, compact)`

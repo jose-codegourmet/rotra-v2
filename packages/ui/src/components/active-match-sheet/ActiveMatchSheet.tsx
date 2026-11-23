@@ -38,8 +38,16 @@ export type ActiveMatchSheetProps = {
   scoringLabel?: string
   /** Every substitution made so far, oldest first */
   substitutions?: ActiveMatchSubstitution[]
-  /** A player was tapped: opens "Change NAME?" (Substitute or Replace, PlayerActionSheet) */
+  /** A player's card was tapped: opens "Change NAME?" (Substitute or Replace, PlayerActionSheet) */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
+  /** A player's picture was tapped: opens their profile (its footer returns to this sheet) */
+  onOpenProfile: (playerId: string, team: MatchLineupTeam) => void
+  /**
+   * Two players in different pairs were swapped by dragging one onto the other (or ← / →): they
+   * swap partners. Reports the two session player ids; the owner changes the pairs. Omit to turn
+   * the drag off. Not recorded as a substitution.
+   */
+  onSwapPartners?: (aId: string, bId: string) => void
   /** How many courts are free right now; Move to a free court is disabled when fewer than the match needs */
   freeCourtCount?: number
   /** Opens Move match (the playing variant) to pick a free court; omit to hide the button */
@@ -73,8 +81,8 @@ function substitutionLine(s: ActiveMatchSubstitution) {
 
 /**
  * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the format
- * with the start time and minutes in, Team A VS Team B (no swapping once started; tapping a player
- * opens Substitute or Replace), one line per substitution (credit or neither), and the reminder that
+ * with the start time and minutes in, Team A VS Team B (drag a player onto someone in the other pair to
+ * swap partners; a player's card opens Substitute or Replace, the picture opens the profile), one line per substitution (credit or neither), and the reminder that
  * closing the sheet does not end the game. Footer: Mark invalid (destructive) and the primary Match
  * done. No level
  * edits, past-result changes, reset or point-by-point scoring.
@@ -95,6 +103,8 @@ export function ActiveMatchSheet({
   freeCourtCount = 0,
   onMoveToFree,
   onSelectPlayer,
+  onOpenProfile,
+  onSwapPartners,
   onMarkInvalid,
   onMatchDone,
 }: ActiveMatchSheetProps) {
@@ -124,9 +134,22 @@ export function ActiveMatchSheet({
         teamB={teamB}
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
+        onOpenProfile={onOpenProfile}
+        onSwap={
+          onSwapPartners
+            ? (from, to) => {
+                const a = (from.team === 'A' ? teamA : teamB)[from.index]
+                const b = (to.team === 'A' ? teamA : teamB)[to.index]
+                if (a && b) onSwapPartners(a.id, b.id)
+              }
+            : undefined
+        }
         playerActionLabel="Substitute or replace"
       />
-      <p className="m-0 text-[13px] text-fg2">Tap a player to substitute or replace them.</p>
+      <p className="m-0 text-[13px] text-fg2">
+        Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring
+        in someone from outside (substitute or replace), or their picture to see their profile.
+      </p>
       {substitutions.map((s, index) => (
         <p key={`${s.outName}-${s.inName}-${index}`} className="m-0 text-[13px] text-fg2">
           Substitution: {substitutionLine(s)}.

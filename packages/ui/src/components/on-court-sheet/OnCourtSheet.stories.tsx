@@ -99,6 +99,7 @@ function onCourt(match: Match, onCourtIds: string[], list: Match[]): OnCourtShee
     swapTarget,
     canMoveCourt: otherFree.length >= courtsNeeded(placed),
     onSelectPlayer: fn(),
+    onReplace: fn(),
     onSwap: fn(),
     onReplacePlayer: fn(),
     onMoveCourt: fn(),

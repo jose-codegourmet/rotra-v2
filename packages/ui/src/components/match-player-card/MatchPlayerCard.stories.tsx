@@ -1,5 +1,6 @@
 import type { MatchLineupPlayerFixture } from '@rotra/data/fixtures/match-lineups'
 import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
+import type { PlayingLevel } from '@rotra/data/player/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { MatchPlayerCard, type MatchPlayerCardProps } from './MatchPlayerCard'
@@ -43,6 +44,21 @@ export const AtMinimum: Story = {
   args: propsFor(everyoneMet.teamA[0], everyoneMet.minimumGames),
 }
 export const NoLevel: Story = { args: { level: null } }
+const band = (level: PlayingLevel): Story => ({ args: { level } })
+/** The picture's ring: Beginner, Intermediate and Advanced; grey with no level. Hover names the level. */
+export const Beginner: Story = band('beginner_mid')
+export const Intermediate: Story = band('intermediate_mid')
+export const Advanced: Story = band('advanced_mid')
+export const AdvancedLight: Story = { ...Advanced, globals: { theme: 'light' } }
+export const NoLevelLight: Story = { ...NoLevel, globals: { theme: 'light' } }
+/** Open match: the picture opens the profile, the card brings in someone from outside. Tab to see both focus rings. */
+export const SwappableVariant: Story = {
+  args: { variant: 'swappable', onOpenProfile: fn(), actionLabel: 'Substitute or replace' },
+}
+export const SwappableVariantLight: Story = {
+  ...SwappableVariant,
+  globals: { theme: 'light' },
+}
 /** The label gains the arrow-key hint; TeamLineup wraps it in a SwappablePlayer for the behaviour. */
 export const Swappable: Story = { args: { swappable: true } }
 export const LongName: Story = {

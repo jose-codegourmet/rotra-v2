@@ -628,6 +628,7 @@ function OpenActiveMatch({
         minimumGames={session.minimumGames}
         substitutions={substitutions}
         onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
+        onOpenProfile={openProfile}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />

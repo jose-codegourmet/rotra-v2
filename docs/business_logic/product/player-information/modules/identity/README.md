@@ -21,7 +21,7 @@ Four statuses (owner, November 16, 2026, [D-2026-11-16-04](../../../../../mvp/de
 
 **A club can never edit the email.** To fix a mistyped email the Queue Master deletes the record and adds the player again; the mistaken RTR ID is retired and never reused. Admin can edit the email.
 
-**Player lookup** (Queue › Add player › Player Information, and Saved players › Add player) is by **exact RTR ID or exact email only**, for registered and unclaimed players alike, plus an **exact social link for unclaimed players only** (#1019). There is no name search there; names are searched only within the club's own Saved players. A guest is never found by another club.
+**Player lookup** (Queue › Add player › Player Information, and Saved players › Add player) is by **exact RTR ID or exact email only**, for registered and unclaimed players alike, plus an **exact social link for unclaimed players only** (#1019). *Since [D-2026-11-23-01](../../../../../mvp/decisions/2026-11-23.md#d-2026-11-23-01):* unclaimed players are also found by part of their name, and results show the name and picture of the club that saved them first; the adding club still keeps its own name for them (prefilled). There is no name search there; names are searched only within the club's own Saved players. A guest is never found by another club.
 
 **On registration** the person keeps the RTR ID, and every club's record under that email joins the account with its games, with no Queue Master tap. When more than one club saved the email, a dialog shows each club's version as a card and the person picks one as their starting profile; every club's record joins whichever they pick.
 

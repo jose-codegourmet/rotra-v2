@@ -2181,9 +2181,10 @@ const DIRECTORY = [
   { id: 'g1', name: 'Paolo Reyes', identity: 'registered', rtr: 'RTR-PH-MNL-020326-0112', email: 'paolo.reyes@example.com', sugg: 6, rank: 'Rank 214' },
   { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', email: 'trish.mendoza@example.com', sugg: 5, rank: 'Rank 388' },
   { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', email: 'marco.lim@example.com', sugg: 4, rank: 'Rank 1,042' },
-  { id: 'g5', name: '', identity: 'unclaimed', rtr: 'RTR-PH-MNL-090126-0203', email: 'ivan.delarosa@example.com', sugg: null, rank: '' },
+  // Unclaimed players show the name and picture of the club that saved them first (owner, November 23, 2026).
+  { id: 'g5', name: 'Ivan Dela Rosa', pic: { kind: 'char', seed: 3 }, identity: 'unclaimed', rtr: 'RTR-PH-MNL-090126-0203', email: 'ivan.delarosa@example.com', sugg: null, rank: '' },
   // Saved by another club with a name and a Facebook link only (#1019).
-  { id: 'g6', name: '', identity: 'unclaimed', rtr: 'RTR-PH-CEB-111926-0141', email: '', social: { facebook: 'https://facebook.com/jun.bautista' }, sugg: null, rank: '' },
+  { id: 'g6', name: 'Jun Bautista', pic: { kind: 'char', seed: 5 }, identity: 'unclaimed', rtr: 'RTR-PH-CEB-111926-0141', email: '', social: { facebook: 'https://facebook.com/jun.bautista' }, sugg: null, rank: '' },
 ];
 
 function todayAt(h, m) { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
@@ -2357,7 +2358,6 @@ const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w)
 // Sample profile pictures: illustrated faces for players with a ROTRA profile. Guests and a few profiles
 // without an uploaded picture fall back to initials, as the public-page spec requires.
 // The face for another club's unclaimed player before this club names them.
-const NO_NAME = { id: 'no-name', name: 'Not registered', identity: 'guest' };
 const NO_PHOTO = new Set(['p10', 'p17', 'p20']);
 // Club-set pictures (owner request, Nov 9 2026): for a guest or unclaimed profile the club can set p.pic,
 // null (initials) | { kind: 'char', seed } | { kind: 'photo', src }. p.picPrev keeps the previous photo only
@@ -6798,9 +6798,9 @@ const SHEETS = {
     let body = `${club ? notice('', "Adding to your saved players. They won't be added to a session.") : notice('', `Adding to <b>${esc(s.title)}</b>.${live ? ' Late players get a level now, and it locks for the rest of the session.' : ''}`)}${sh.last && !sh.pick ? `<div role="status">${notice('ok', `${esc(sh.last)}${sh.added > 1 ? ` <span class="small muted">· ${sh.added} added so far</span>` : ''}`)}</div>` : ''}${full ? notice('warn', `<b>All ${capacityOf(s)} slots are taken.</b> New players go on the waitlist as #${waitOf(s).length + 1}. You can give them a slot later.`) : ''}`;
     if (sh.pick) {
       const p = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : P(sh.pick.id);
-      // Another club's unclaimed player has no name here: this club types its own (D-2026-11-16-04).
-      const own = sh.pick.dir && !p.name;
-      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(own ? NO_NAME : p)}<div class="main"><b>${own ? 'Not registered yet' : esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : idLine(p)}</p></div>${identChip(p)}</div>
+      // Another club's unclaimed player: shown with the first club's name and picture; this club keeps its own name for them, prefilled.
+      const own = sh.pick.dir && p.identity === 'unclaimed';
+      body += `<div class="card stack"><div class="li" style="padding:0">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${p.rtr ? `<span class="mono">${esc(p.rtr)}</span>` : idLine(p)}</p></div>${identChip(p)}</div>
         ${own ? `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-pname" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus><span class="hint">Your club's own name for them. Other clubs keep theirs until the player registers.</span></label>` : ''}
         ${p.phoneHidden ? '<p class="small muted">Phone hidden by player. Use their RTR ID or QR code instead.</p>' : ''}
         <div class="field"><span>Player Information suggestion</span><span class="small">${p.sugg != null ? esc(lvLabel(p.sugg)) : 'None yet'}</span></div>
@@ -6816,17 +6816,19 @@ const SHEETS = {
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
         <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
-      // D-2026-11-16-04: exact RTR ID or exact email only. No name search here.
+      // Exact RTR ID, email or social link (D-2026-11-16-04), or (owner, November 23, 2026) part of an unclaimed player's name.
       const key = (sh.q || '').trim().toLowerCase();
       const sk = socialKey(key)?.key;
       const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key || (!!sk && x.identity === 'unclaimed' && socialKeys(x).includes(sk));
       const mine = key ? saved().find((x) => hit(x) || DIRECTORY.some((g) => hit(g) && g.rtr === x.rtr)) : null;
-      const list = key && !mine ? DIRECTORY.filter(hit) : [];
+      const exact = key && !mine ? DIRECTORY.filter(hit) : [];
+      const byName = key.length >= 2 && !exact.length && !mine ? DIRECTORY.filter((g) => g.identity === 'unclaimed' && g.name.toLowerCase().includes(key) && !saved().some((x) => x.rtr === g.rtr)) : [];
+      const list = exact.length ? exact : byName;
       body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email or social link now; ROTRA looks them up after you reconnect.')
-        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID, email or social link" data-autofocus><span class="hint">Enter the full RTR ID, email or social link. Names are searched in your saved players only.</span></label>
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID, email or social link.' : 'Enter an RTR ID, email or social link to find a ROTRA player.'}</div>`}</div>
+        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="RTR ID, email, social link or name" data-autofocus><span class="hint">Enter the full RTR ID, email or social link, or an unclaimed player's name. Registered players are found by RTR ID or email only.</span></label>
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p)}<div class="main"><b>${esc(p.name)}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player matches.' : 'Enter an RTR ID, email, social link or name to find a ROTRA player.'}</div>`}</div>
         <p class="small muted">Confirm with the player before adding them.</p>
-        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com or facebook.com/jun.bautista.</p>`;
+        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com, facebook.com/jun.bautista or “jun”.</p>`;
     } else {
       body += `${club ? newPicEditor(sh) : ''}<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
@@ -8304,7 +8306,7 @@ const ACT = {
   },
   pickPlayer: (d) => {
     const sh = S.ui.sheet; const p = d.dir ? DIRECTORY.find((x) => x.id === d.id) : P(d.id);
-    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.err = ''; sh.name = '';
+    sh.pick = { id: d.id, dir: !!d.dir }; sh.level = p.sugg ?? null; sh.err = ''; sh.name = d.dir && p.identity === 'unclaimed' ? p.name : '';
     // Anyone with a level is added in one tap at that level, which can still be changed in the roster before
     // the session starts. A saved unclaimed player needs no identity check.
     if (p.sugg != null) { curAct = 'confirmAdd'; ACT.confirmAdd(); return; }
@@ -8314,7 +8316,7 @@ const ACT = {
     const sh = S.ui.sheet;
     if (sh.club) {
       // Saved players › Add player: a Player Information profile joins the saved players; the level is optional.
-      const g = DIRECTORY.find((x) => x.id === sh.pick.id), name = g.name || (sh.name || '').trim();
+      const g = DIRECTORY.find((x) => x.id === sh.pick.id), name = g.identity === 'unclaimed' ? (sh.name || '').trim() : g.name;
       if (!name) { sh.err = 'Enter a name.'; render(); return; }
       if (S.players.some((x) => x.rtr === g.rtr)) { sh.pick = null; sh.err = `${name} is already in your saved players.`; render(); return; }
       const level = sh.level == null || sh.level === '' ? null : +sh.level;
@@ -8323,7 +8325,7 @@ const ACT = {
       return;
     }
     const s = cur();
-    const dir = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : null, dirName = dir ? dir.name || (sh.name || '').trim() : '';
+    const dir = sh.pick.dir ? DIRECTORY.find((x) => x.id === sh.pick.id) : null, dirName = dir ? (dir.identity === 'unclaimed' ? (sh.name || '').trim() : dir.name) : '';
     if (dir && !dirName) { sh.err = 'Enter a name.'; render(); return; }
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club before adding.'; render(); return; }
     { const blk = sh.toWait ? '' : restrictBlock(s, +sh.level); if (blk && !sh.over) { sh.over = true; sh.err = `${blk} Press it again to add ${dir ? dirName : nm(sh.pick.id)} anyway.`; render(); return; } sh.over = false; }

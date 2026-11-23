@@ -749,10 +749,13 @@ export async function realLookupPlayer(q: string): Promise<PlayerLookup> {
   const wire = await realRequest<{
     player: Omit<DirectoryPlayer, 'rankLabel'> | null
     savedName: string | null
+    matches?: Omit<DirectoryPlayer, 'rankLabel'>[]
   }>(`/api/players?q=${encodeURIComponent(q)}`)
   return {
     player: wire.player ? { ...wire.player, rankLabel: 'Not ranked' } : null,
     savedName: wire.savedName,
+    // D-2026-11-23-01: unclaimed players found by name
+    matches: (wire.matches ?? []).map((p) => ({ ...p, rankLabel: 'Not ranked' })),
   }
 }
 

@@ -172,14 +172,9 @@ function CandidateRow({
         'hover:not-disabled:bg-elev disabled:cursor-not-allowed disabled:opacity-45 touch:min-h-12',
       )}
     >
-      <Avatar
-        name={candidate.ownNameRequired ? 'Not registered' : candidate.name}
-        src={candidate.ownNameRequired ? undefined : candidate.photoUrl}
-      />
+      <Avatar name={candidate.name || 'Not registered'} src={candidate.photoUrl} />
       <span className="flex min-w-0 flex-1 flex-col">
-        <b className="[overflow-wrap:anywhere]">
-          {candidate.ownNameRequired ? 'Not registered yet' : candidate.name}
-        </b>
+        <b className="[overflow-wrap:anywhere]">{candidate.name || 'Not registered yet'}</b>
         <span className="text-[13px] text-fg2">{subtitle}</span>
       </span>
       <IdentityChip identity={candidate.identity} detailsRequired={candidate.detailsRequired} />
@@ -306,7 +301,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     setPick({ candidate, source })
     setLevel(candidate.suggestion)
     setLevelError('')
-    setOwnName('')
+    // This club's own name for another club's unclaimed player starts as the name shown (D-2026-11-23-01).
+    setOwnName(candidate.ownNameRequired ? candidate.name : '')
     setNameError('')
   }
 
@@ -489,14 +485,14 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
               <>
                 <Field
                   label="Search Player Information"
-                  hint="Enter the full RTR ID, email or social link. Names are searched in your saved players only."
+                  hint="Enter the full RTR ID, email or social link, or an unclaimed player's name. Registered players are found by RTR ID or email only."
                 >
                   <TextInput
                     key={round}
                     type="search"
                     value={query}
                     onChange={(event) => changeQuery(event.target.value)}
-                    placeholder="Full RTR ID, email or social link"
+                    placeholder="RTR ID, email, social link or name"
                     autoComplete="off"
                   />
                 </Field>
@@ -543,8 +539,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                         {q && directorySavedName
                           ? `${directorySavedName} is already in your saved players.`
                           : q
-                            ? 'No ROTRA player has that RTR ID, email or social link.'
-                            : 'Enter an RTR ID, email or social link to find a ROTRA player.'}
+                            ? 'No ROTRA player matches.'
+                            : 'Enter an RTR ID, email, social link or name to find a ROTRA player.'}
                       </EmptyState>
                     )}
                   </div>

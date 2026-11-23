@@ -2,6 +2,7 @@ import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import { savedPlayerName, withClubNickname } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { clubPlayerForProfile, createClubPlayer } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { leaderboardLevels, leaderboardPlayers } from '../fixtures/players'
@@ -19,6 +20,7 @@ import { isRtrId, normalizeRtrId } from '../player/rtrId'
 import {
   accountByEmail,
   accountBySocialKey,
+  clubRecordsOf,
   isCurrentRecord,
   isUnclaimedPerson,
   savedDisplayName,
@@ -171,6 +173,47 @@ export async function addSavedPlayerToSession(input: AddSavedPlayerInput) {
 const NO_MATCH: PlayerLookup = { player: null, savedName: null }
 
 /**
+ * An unclaimed player as Player lookup shows them (D-2026-11-23-01): the name and picture of the
+ * club that saved them first. This club still enters its own name when it adds them.
+ */
+function unclaimedResult(s: MockState, player: { id: string; rtrId: string }): DirectoryPlayer {
+  const first = clubRecordsOf(s, player.id)[0]
+  const profile = s.playerProfiles.find((entry) => entry.playerId === player.id)
+  return {
+    id: player.id,
+    fullName: first?.fullName ?? profile?.fullName ?? '',
+    nickname: null,
+    rtrId: player.rtrId,
+    identity: 'unclaimed',
+    picture: first ? clubPictureState(first, profile?.picture ?? null).reference : null,
+    suggestion: null,
+    rankLabel: 'Not ranked',
+    ownNameRequired: true,
+  }
+}
+
+/** D-2026-11-23-01: unclaimed players whose name (any club's) contains the query, not saved here. */
+function unclaimedByName(s: MockState, query: string): DirectoryPlayer[] {
+  const q = query.trim().toLowerCase()
+  if (q.length < 2) return []
+  const mine = new Set(
+    s.clubPlayers
+      .filter((c) => c.clubId === DEMO_CLUB_ID && isCurrentRecord(c) && c.playerId)
+      .map((c) => c.playerId),
+  )
+  return s.players
+    .filter(
+      (p) =>
+        isUnclaimedPerson(s, p.id) &&
+        !mine.has(p.id) &&
+        !s.adminPlayerRecords[p.id]?.archivedAt &&
+        clubRecordsOf(s, p.id).some((r) => r.fullName.toLowerCase().includes(q)),
+    )
+    .slice(0, 20)
+    .map((p) => unclaimedResult(s, p))
+}
+
+/**
  * Player lookup (D-2026-11-16-04): the one ROTRA player, registered or unclaimed, whose RTR ID or
  * email is exactly what was typed. No name search (names are searched in the club's own saved
  * players only) and a guest is never found. Another club's unclaimed player comes back with the RTR
@@ -209,22 +252,10 @@ export async function lookupPlayer(q: string): Promise<PlayerLookup> {
       ? savedRecordBySocialKey(s, DEMO_CLUB_ID, link.key)
       : savedRecordByEmail(s, DEMO_CLUB_ID, query)
   if (saved) return { player: null, savedName: savedDisplayName(s, saved) }
-  if (!player || s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
+  if (!player) return { ...NO_MATCH, matches: unclaimedByName(s, query) }
+  if (s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
   if (isUnclaimedPerson(s, player.id))
-    return {
-      player: {
-        id: player.id,
-        fullName: '',
-        nickname: null,
-        rtrId: player.rtrId,
-        identity: 'unclaimed',
-        picture: null,
-        suggestion: null,
-        rankLabel: 'Not ranked',
-        ownNameRequired: true,
-      },
-      savedName: null,
-    }
+    return { player: unclaimedResult(s, player), savedName: null }
   const profile = s.playerProfiles.find((entry) => entry.playerId === player.id)
   if (!isListedInDirectory(profile)) return NO_MATCH
   const listed = leaderboardPlayers.findIndex((entry) => entry.id === player.id)

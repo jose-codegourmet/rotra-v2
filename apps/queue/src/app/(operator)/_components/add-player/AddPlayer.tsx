@@ -100,25 +100,23 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
 
   // The one exact match, or none. Another club's unclaimed player (ownNameRequired) has no name,
   // picture, level or rank to show: the sheet reads "Not registered yet" and asks for this club's name.
+  // The one exact match, or (D-2026-11-23-01) the unclaimed players whose name matches. Another
+  // club's unclaimed player shows the first club's name and picture; this club enters its own name.
   const found = lookup.data?.player
-  const directoryResults: AddPlayerCandidate[] = found
-    ? [
-        {
-          id: found.id,
-          name: found.fullName,
-          nickname: found.nickname,
-          photoUrl: found.ownNameRequired
-            ? undefined
-            : profilePictureSrc(found.picture, found.id, found.fullName),
-          rtrId: found.rtrId,
-          identity: found.identity,
-          suggestion: found.suggestion,
-          phoneHidden: found.phoneHidden,
-          ownNameRequired: found.ownNameRequired,
-          rankLabel: found.ownNameRequired ? undefined : rankLabel(found.rankLabel),
-        },
-      ]
-    : []
+  const directoryResults: AddPlayerCandidate[] = (
+    found ? [found] : (lookup.data?.matches ?? [])
+  ).map((p) => ({
+    id: p.id,
+    name: p.fullName,
+    nickname: p.nickname,
+    photoUrl: profilePictureSrc(p.picture, p.id, p.fullName),
+    rtrId: p.rtrId,
+    identity: p.identity,
+    suggestion: p.suggestion,
+    phoneHidden: p.phoneHidden,
+    ownNameRequired: p.ownNameRequired,
+    rankLabel: p.ownNameRequired ? undefined : rankLabel(p.rankLabel),
+  }))
 
   const options = {
     onSettled: () => {

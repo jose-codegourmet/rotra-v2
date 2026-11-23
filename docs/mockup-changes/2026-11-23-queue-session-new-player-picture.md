@@ -1,6 +1,6 @@
 # Add player › New player has the same fields in a session as in Saved players
 
-Status: NEW
+Status: IN MOCK APP — PR #1031
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheet `add` (New player), `confirmNew()`

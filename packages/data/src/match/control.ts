@@ -6,8 +6,19 @@ import { queueMutation } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
 import { sessionScoring } from '../queue-session/queueSession.types'
+import { isRealDataMode } from '../real/mode'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SyncArea } from '../sync/sync.types'
+import {
+  canMovePlaying,
+  canPauseMatch,
+  canSwapFromMatch,
+  movedCourtText,
+  notInRealModeYet,
+  pausedText,
+  swappedPlacesText,
+  tradedLineup,
+} from './liveMatch.rules'
 import {
   canMoveCourt,
   canPlace,
@@ -126,21 +137,75 @@ export function sendBackToQueue(input: { matchId: string; operationId: string })
     ),
   )
 }
+/** Mock only until real mode has the Route Handler (Q25): refuses before anything is written. */
+function requireMockMode(action: string) {
+  if (isRealDataMode()) throw new MockError('permission', notInRealModeYet(action))
+}
 /**
- * Move to another court (Q-ON-COURT): the On court match takes free open court(s) (two for 5v5)
- * and releases the ones it held. Still On court, nothing starts. In Auto Queue the court it left
- * is refilled in the same write. Allowed offline (auto filling pauses offline).
+ * Pause match (Q-CONSOLE court card, Q-ACTIVE-MATCH): a Playing match started by mistake goes back
+ * to Getting ready on the same court(s). The start time clears, so Start match gives it a fresh
+ * one; players, sides and substitutions stay and nothing is recorded. Not a timer pause. The court
+ * never frees, so Auto Queue does nothing. Mock only.
+ */
+export async function pauseMatch(input: { matchId: string; operationId: string }) {
+  requireMockMode('Pause match')
+  return control(input, 'pause', (s, m) => {
+    if (!canPauseMatch(m)) throw changed()
+    m.state = 'on_court'
+    m.startedAt = null
+    m.placedAt = m.placedAt ?? Date.now()
+    return pausedText(m.matchNo, courtNames(m, s.courts))
+  })
+}
+/**
+ * Move to another court (Q-ON-COURT, Q-ACTIVE-MATCH, court drag): the match takes free open
+ * court(s) (two for 5v5) and releases the ones it held. A Getting ready match stays On court and
+ * nothing starts; a Playing match (owner, November 19, 2026; mock only) keeps playing with the
+ * same start time. In Auto Queue the court it left is refilled in the same write. Allowed offline
+ * (auto filling pauses offline).
  */
 export function moveCourt(input: { matchId: string; courtIds: string[]; operationId: string }) {
   return dispatch('match.moveCourt', input, () =>
     control(input, 'move-court', (s, m) => {
-      if (!canMoveCourt(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
+      const playing = m.state === 'active'
+      // Offline in real mode this runs over the downloaded copy: a Playing move must not be queued.
+      if (playing) requireMockMode('Moving a playing match')
+      const allowed = playing ? canMovePlaying : canMoveCourt
+      if (!allowed(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
       const from = courtNames(m, s.courts)
       m.courtIds = [...input.courtIds]
       const placed = autoFillCourts(s, m.sessionId)
-      return `Match ${m.matchNo} moved from ${from} to ${courtNames(m, s.courts)} · getting ready${autoFillNote(s, placed)}`
+      return `${movedCourtText(m.matchNo, from, courtNames(m, s.courts), playing)}${autoFillNote(s, placed)}`
     }),
   )
+}
+/**
+ * Swap from match (Replace player sheet, Q-ON-COURT and Q-ACTIVE-MATCH): the player coming out and
+ * an opponent in this same match trade places; nobody new joins and no substitution is recorded.
+ * Like Replace player the match becomes manual and protected from regeneration. Mock only.
+ */
+export async function swapFromMatch(input: {
+  matchId: string
+  /** The player coming out. */
+  outId: string
+  /** The opponent in this match they trade places with. */
+  inId: string
+  operationId: string
+}) {
+  requireMockMode('Swap from match')
+  return control(input, 'swap-from-match', (s, m) => {
+    if (!canSwapFromMatch(m, input.outId, input.inId)) throw changed()
+    const out = s.roster.find((p) => p.id === input.outId),
+      opponent = s.roster.find((p) => p.id === input.inId)
+    if (!out || !opponent) throw changed()
+    const lineup = tradedLineup(m, input.outId, input.inId)
+    m.teamA = lineup.teamA
+    m.teamB = lineup.teamB
+    m.origin = 'manual'
+    m.manualProtected = true
+    const nameOf = (p: SessionPlayer) => queueMasterName(withClubNickname(s, p))
+    return swappedPlacesText(m.matchNo, nameOf(out), nameOf(opponent))
+  })
 }
 /**
  * Replace player (Q-ON-COURT): a plain lineup change on an On court match. The incoming player

@@ -1,3 +1,4 @@
+import { notInRealModeYet } from '../match/liveMatch.rules'
 import {
   computeStandings,
   courtNames,
@@ -327,6 +328,8 @@ export async function realSwapPlayers(input: {
 }) {
   const read = await lastRead(input.sessionId)
   const m = shownMatch(read, input.matchId)
+  if (m.state === 'on_court' || m.state === 'active')
+    throw new MockError('permission', notInRealModeYet('Swapping players on a court'))
   if (m.state !== 'waiting')
     throw new MockError('permission', 'Only a waiting match can be changed.')
   const a = m.teamA.includes(input.a) ? input.a : input.b,
@@ -448,6 +451,8 @@ export async function realMoveCourt(input: {
   requireOperationId(input.operationId)
   const { sessionId, courts } = await controlContext(input.matchId)
   const shown = shownMatch(await lastRead(sessionId), input.matchId)
+  if (shown.state === 'active')
+    throw new MockError('permission', notInRealModeYet('Moving a playing match'))
   const done = await freeingCommand<WireMatch>(sessionId, input.matchId, 'move', {
     operationId: input.operationId,
     courtIds: input.courtIds,

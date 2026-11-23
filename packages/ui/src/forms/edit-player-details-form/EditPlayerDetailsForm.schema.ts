@@ -12,6 +12,8 @@ import { z } from 'zod'
 export const editPlayerDetailsSchema = z.object({
   ...personalDetailsShape,
   ...socialLinksShape,
+  /** Level for this club: a playing level code, or '' for none */
+  level: z.string(),
   phone: z
     .string()
     .refine(

@@ -338,7 +338,9 @@ export function PlayerProfileSheet({
           </section>
         ) : null}
         <p className="m-0 text-[13px] text-fg2">
-          Levels are set per session while preparing a roster, not here.
+          {canInvite
+            ? 'Change their level for this club in Edit details. Each session can still set its own.'
+            : 'Levels are set per session while preparing a roster, not here.'}
         </p>
       </ProfileBannerCard>
     </Sheet>

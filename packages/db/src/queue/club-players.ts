@@ -6,6 +6,7 @@ import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import type { Prisma } from '../generated/prisma/client'
 import { readPlayerMatchHistory } from '../player/projections'
 import {
   normalizeEmail,
@@ -18,7 +19,7 @@ import {
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { clubPlayerForProfile, createClubPlayer } from './session-roster'
-import { levelCodeFor, mapDatabaseError } from './session-store'
+import { levelCodeFor, levelIdFor, mapDatabaseError } from './session-store'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -73,6 +74,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       nickname: true,
       addedAt: true,
       avatarRef: true,
+      savedSkillLevelId: true,
+      savedLevelAt: true,
       privateInput: { select: { phoneE164: true } },
       sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true, email: true } },
       player: {
@@ -90,7 +93,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       assessments: {
         orderBy: { assessedAt: 'desc' },
         take: 1,
-        select: { skillLevelId: true },
+        select: { skillLevelId: true, assessedAt: true },
       },
       rosterEntries: { select: { sessionId: true } },
     },
@@ -127,7 +130,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       bannerImageUrl: banner.bannerImageUrl,
       identity: registered ? 'registered' : entry || p.player || phone ? 'unclaimed' : 'guest',
       rtrId: registered ? (p.player?.idAllocation?.rtrId ?? null) : (entry?.rtrId ?? null),
-      playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
+      playingLevel: levelCodeFor(savedLevelOf(p)),
       phoneHidden: registered ? (p.player?.hidePhoneFromClubs ?? false) : false,
       hasPhone: Boolean((registered && p.player?.privateContact?.phoneE164) || phone),
       // #1019: an entry saved with a social link only has no email.
@@ -261,6 +264,38 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
   }
 }
 
+/**
+ * The level Saved players show: the one the club gave outside a session (Add player, Edit
+ * details) or the latest session assessment, whichever is newer.
+ */
+export function savedLevelOf(p: {
+  savedSkillLevelId: number | null
+  savedLevelAt: Date | null
+  assessments: { skillLevelId: number; assessedAt: Date }[]
+}) {
+  const assessed = p.assessments[0]
+  if (p.savedSkillLevelId == null || !p.savedLevelAt) return assessed?.skillLevelId ?? null
+  return assessed && assessed.assessedAt > p.savedLevelAt
+    ? assessed.skillLevelId
+    : p.savedSkillLevelId
+}
+
+/** Sets (or, with null, clears) the level the club gives a saved player outside a session. */
+export async function setSavedLevel(
+  tx: Prisma.TransactionClient,
+  clubId: string,
+  clubPlayerId: string,
+  level: string | null,
+  now: Date,
+) {
+  await tx.clubPlayer.update({
+    where: { clubId_id: { clubId, id: clubPlayerId } },
+    data: level
+      ? { savedSkillLevelId: levelIdFor(level), savedLevelAt: now, revision: { increment: 1 } }
+      : { savedSkillLevelId: null, savedLevelAt: null, revision: { increment: 1 } },
+  })
+}
+
 const alreadySaved = (name: string) =>
   new ServiceError('conflict', { player: `${name} is already in your saved players.` })
 
@@ -268,11 +303,11 @@ const alreadySaved = (name: string) =>
  * Saved players › Add player › Player Information: saves a lookup match to the club only, never to
  * a session. `playerId` is a registered player's id or an unclaimed person's shared entry id; for
  * the latter `name` is this club's own name for them (required). A person already saved is
- * refused. A level needs a session to be recorded (`club_assessments`), so none is stored here.
+ * refused. The level chosen, if any, is the saved level (`club_players.saved_skill_level_id`).
  */
 export async function addDirectoryPlayerToClub(
   context: ClubContext,
-  input: { operationId: string; playerId: string; name?: string | null },
+  input: { operationId: string; playerId: string; name?: string | null; level?: string | null },
 ) {
   await requireClubEntitlement(context)
   try {
@@ -286,6 +321,8 @@ export async function addDirectoryPlayerToClub(
         input.name,
       )
       if (!created) throw alreadySaved(clubPlayer.displayName)
+      if (input.level)
+        await setSavedLevel(tx, context.clubId, clubPlayer.id, input.level, new Date())
       return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName }
     })
   } catch (error) {
@@ -310,6 +347,8 @@ export async function addNewSavedPlayer(
     email?: string | null
     /** #1019: a social link is an entry key too, and wins over the email */
     socialLink?: string | null
+    /** The saved level, if one was chosen */
+    level?: string | null
   },
 ) {
   await requireClubEntitlement(context)
@@ -339,6 +378,8 @@ export async function addNewSavedPlayer(
         input,
         new Date(),
       )
+      if (input.level)
+        await setSavedLevel(tx, context.clubId, clubPlayer.id, input.level, new Date())
       return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName, emailWords: words }
     })
   } catch (error) {

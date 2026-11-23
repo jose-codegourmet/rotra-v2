@@ -149,7 +149,8 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
         {club ? (
           <ClubPictureField
             playerId="new-player"
-            name={form.watch('name')?.trim() || 'New player'}
+            // A fixed seed: the faces and initials don't redraw on every keystroke of the name.
+            name="New player"
             label="Profile picture (optional)"
             hint={NEW_PICTURE_HINT}
             picture={

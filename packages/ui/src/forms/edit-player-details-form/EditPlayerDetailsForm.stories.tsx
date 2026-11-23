@@ -9,6 +9,7 @@ const unclaimed: ClubPlayerDetails = {
   fullName: 'Faye Dimaculangan',
   nickname: null,
   phoneOnFile: false,
+  level: null,
   profile: {
     email: '',
     playingStyle: '',
@@ -33,6 +34,7 @@ const guestDetails: ClubPlayerDetails = {
   fullName: 'Tin Gonzaga',
   nickname: null,
   phoneOnFile: false,
+  level: null,
   profile: null,
 }
 const manyCharacters = Array.from({ length: 24 }, (_, index) => ({
@@ -78,6 +80,7 @@ export const Guest: Story = {
       fullName: 'Tin Gonzaga',
       nickname: null,
       phoneOnFile: false,
+      level: null,
       profile: null,
     },
   },

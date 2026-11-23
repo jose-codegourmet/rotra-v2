@@ -2,10 +2,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { takesClubPicture } from '@rotra/data/club-player/picture-rules'
 import type { ClubPlayerDetails, ClubPlayerPictureState } from '@rotra/data/club-player/types'
+import type { PlayingLevel } from '@rotra/data/player/types'
 import { socialLinkKeys } from '@rotra/schema/social-link'
 import { Button } from '@rotra/ui/button'
 import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { Field } from '@rotra/ui/field'
+import { LevelSelect } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
 import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
@@ -137,6 +139,22 @@ export function EditPlayerDetailsForm({
             </Notice>
           ) : null}
           <PersonalDetailsFields sections={['name']} disabled={isPending} />
+          <Field label="Level for this club" optional error={errors.level?.message}>
+            <Controller
+              control={form.control}
+              name="level"
+              render={({ field }) => (
+                <LevelSelect
+                  ref={field.ref}
+                  name={field.name}
+                  value={(field.value as PlayingLevel | '') || null}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  disabled={isPending}
+                />
+              )}
+            />
+          </Field>
           {emailOnFile ? (
             <Field label="Email">
               <p className="m-0 text-sm">

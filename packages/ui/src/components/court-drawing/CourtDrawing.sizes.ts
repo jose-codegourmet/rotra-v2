@@ -36,3 +36,15 @@ export function courtGameBadgeClass(n: number) {
       : '-top-[3px] -right-[7px] h-[clamp(17px,5.5cqw,22px)] min-w-[clamp(17px,5.5cqw,22px)] px-1 text-[length:clamp(10px,3.2cqw,13px)] leading-none',
   )
 }
+
+/**
+ * Prototype .pf.lv-*: a 3 px ring in the level band colour in place of the white edge; no level keeps
+ * the white edge. Applied to the picture (first child) so it wins over PlayerFaceButton's own ring.
+ */
+export function courtFaceRingClass(level: string | null) {
+  if (level?.startsWith('beginner')) return '[&>:first-child]:!ring-3 [&>:first-child]:!ring-lv-beg'
+  if (level?.startsWith('intermediate'))
+    return '[&>:first-child]:!ring-3 [&>:first-child]:!ring-lv-int'
+  if (level?.startsWith('advanced')) return '[&>:first-child]:!ring-3 [&>:first-child]:!ring-lv-adv'
+  return ''
+}

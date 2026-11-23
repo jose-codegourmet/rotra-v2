@@ -1,8 +1,17 @@
+'use client'
+
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
-import { courtFaceClass, courtFaceFrameClass, courtGameBadgeClass } from './CourtDrawing.sizes'
+import { type MouseEvent, useRef } from 'react'
+import { useCourtDrag } from './CourtDrawing.drag'
+import {
+  courtFaceClass,
+  courtFaceFrameClass,
+  courtFaceRingClass,
+  courtGameBadgeClass,
+} from './CourtDrawing.sizes'
 
 /** One player drawn on a court side */
 export type CourtPlayer = {
@@ -34,6 +43,18 @@ export type CourtDrawingProps = {
   onOpenProfile?: (playerId: string) => void
   /** Faces are named “NAME. View profile” (the public session page) instead of with their team */
   plainProfileLabel?: boolean
+  /**
+   * Getting ready and Playing courts: tapping the drawing anywhere but a face opens the match. It
+   * shows a grab cursor, brightens a little on hover and carries the tooltip "Open match". The
+   * Open match button stays for keyboards and screen readers.
+   */
+  onOpenMatch?: () => void
+  /**
+   * Makes the drawing draggable (mouse after 6 px, touch after press and hold). Dropping on a free
+   * court that carries `dropCourtId` (CourtCard) calls this with that court's id; anywhere else does
+   * nothing. A tap without dragging still opens the match.
+   */
+  onDragMove?: (courtId: string) => void
   className?: string
 }
 
@@ -75,8 +96,17 @@ export function CourtDrawing({
   showLevels = false,
   onOpenProfile,
   plainProfileLabel = false,
+  onOpenMatch,
+  onDragMove,
   className,
 }: CourtDrawingProps) {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const { onPointerDown } = useCourtDrag(rootRef, free ? undefined : onDragMove)
+  // A tap on a face opens the profile; only the rest of the drawing opens the match.
+  const onRootClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (e.target instanceof Element && e.target.closest('button')) return
+    onOpenMatch?.()
+  }
   const height = COURT_H * courts
   const label = free
     ? undefined
@@ -106,7 +136,7 @@ export function CourtDrawing({
                     : profileLabel(p, team, minimumGames)
                 }
                 onClick={() => onOpenProfile(p.id)}
-                className={courtFaceClass(n)}
+                className={cn(courtFaceClass(n), courtFaceRingClass(p.level))}
               />
             ) : (
               <div
@@ -118,7 +148,13 @@ export function CourtDrawing({
                   name={p.name}
                   src={p.photoUrl}
                   size={sizeFor(n) === 34 ? 36 : (sizeFor(n) as 24 | 28)}
-                  className="ring-2 ring-on-photo/90"
+                  className={cn(
+                    'ring-2 ring-on-photo/90',
+                    p.level && 'ring-3',
+                    p.level?.startsWith('beginner') && 'ring-lv-beg',
+                    p.level?.startsWith('intermediate') && 'ring-lv-int',
+                    p.level?.startsWith('advanced') && 'ring-lv-adv',
+                  )}
                 />
                 <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">
                   {p.shortName}
@@ -161,10 +197,19 @@ export function CourtDrawing({
     )
   }
 
+  const interactive = !free && (!!onOpenMatch || !!onDragMove)
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: a mouse and touch shortcut; the Open match button is the keyboard and screen-reader path
     <div
+      ref={rootRef}
+      title={interactive && onOpenMatch ? 'Open match' : undefined}
+      onClick={interactive && onOpenMatch ? onRootClick : undefined}
+      onPointerDown={interactive ? onPointerDown : undefined}
       className={cn(
         '@container relative overflow-hidden rounded-md',
+        interactive &&
+          'select-none transition-[filter] duration-150 [-webkit-touch-callout:none] hover:brightness-[1.08]',
+        interactive && (onDragMove ? 'cursor-grab' : 'cursor-pointer'),
         courts === 2 || tall ? 'aspect-[134/122]' : 'aspect-[134/61]',
         free
           ? '[--court-c:var(--color-court-free)] [--court-l:var(--color-court-free-line)]'

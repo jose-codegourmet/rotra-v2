@@ -7,6 +7,7 @@
   "status": "complete",
   "created": "2026-11-19",
   "updated": "2026-11-23",
+  "pr": "https://github.com/jose-codegourmet/rotra-v2/pull/1041",
   "depends_on": "go-sign-in",
   "phases": {
     "total": 3,

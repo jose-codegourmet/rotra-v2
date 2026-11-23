@@ -1,6 +1,6 @@
 # Queue app: tapping a busy court's drawing opens the match
 
-Status: TICKETED — #1042
+Status: IN MOCK APP — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtsPane()` (`.pitch.open-pitch`)

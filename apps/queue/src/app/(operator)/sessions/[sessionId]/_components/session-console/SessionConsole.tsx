@@ -77,7 +77,7 @@ export type MatchSheet =
   | { mode: 'suggest' }
   | { mode: 'regenerate' }
   /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
-  | { mode: 'active'; matchId: string }
+  | { mode: 'active'; matchId: string; move?: { courtId?: string } }
   /** Review and start, Start on a queue card, Pick another: the Start match and Choose match sheets (Queue › Match control) */
   | StartMatchRequest
 
@@ -386,7 +386,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               setSheet('add-court')
             }}
             {...matchEditing}
-            onOpenMatch={(matchId) => setMatchSheet({ mode: 'active', matchId })}
+            onOpenMatch={(matchId, move) => setMatchSheet({ mode: 'active', matchId, move })}
             onStartMatch={onStartMatch}
             onPickAnother={onPickAnother}
           />
@@ -478,6 +478,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         sessionId={sessionId}
         now={now}
         matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
+        moveFirst={matchSheet?.mode === 'active' ? (matchSheet.move ?? null) : null}
         onClose={() => setMatchSheet(null)}
       />
       <StartMatch

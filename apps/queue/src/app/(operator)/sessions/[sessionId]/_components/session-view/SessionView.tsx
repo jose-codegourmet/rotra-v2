@@ -1,6 +1,7 @@
 'use client'
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { canPauseMatch } from '@rotra/data/match/liveMatch.rules'
 import {
   activeMatchFor,
   countedGames,
@@ -23,6 +24,8 @@ import {
   waitMinutes,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
+import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
+import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
 import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
@@ -82,8 +85,13 @@ export type SessionViewProps = {
   onStartMatch?: (matchId: string, courtId?: string) => void
   /** Pick another on a free court: open the Start a match on Court X sheet (Queue › Match control). Hidden until given. */
   onPickAnother?: (courtId: string) => void
-  /** Open match on a Playing court card: open the active match sheet (Queue › Match control). Hidden until given. A Getting ready card's Open match opens the On court sheet here. */
-  onOpenMatch?: (matchId: string) => void
+  /**
+   * Open match on a Playing court card or its drawing: open the active match sheet (Queue › Match
+   * control). With `move` it opens straight on Move match (⋯ Move to a free court, or a two-court
+   * match dropped on a court, which arrives preselected). Hidden until given. A Getting ready
+   * card's Open match opens the On court sheet here.
+   */
+  onOpenMatch?: (matchId: string, move?: { courtId?: string }) => void
 }
 
 /**
@@ -137,6 +145,8 @@ export function SessionView({
   const undoEarlyOpen = useUndoCourtEarlyOpen()
   const placeOnCourt = usePlaceOnCourt()
   const startMatch = useStartMatch()
+  const pauseMatch = usePauseMatch()
+  const moveCourt = useMoveCourt()
   const setCourtFill = useSetCourtFillMode()
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
@@ -146,6 +156,8 @@ export function SessionView({
   const [onCourtId, setOnCourtId] = useState<string | null>(null)
   /** The court card's ⋯ menu Swap with #P opened the swap sheet directly (Cancel closes it) */
   const [swapFirst, setSwapFirst] = useState(false)
+  /** A two-court Getting ready match was dropped on a court: Move match opens with it preselected */
+  const [moveFirst, setMoveFirst] = useState<{ courtId?: string } | null>(null)
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
@@ -362,6 +374,36 @@ export function SessionView({
     startMatch.mutate({ matchId: m.id, courtIds: [], operationId: crypto.randomUUID() }, commit)
   }
 
+  /** Pause match from the card: back to Getting ready at once, no confirmation */
+  const pauseOnCourt = (m: Match) => {
+    if (committing.current || pauseMatch.isPending) return
+    committing.current = true
+    pauseMatch.mutate({ matchId: m.id, operationId: crypto.randomUUID() }, commit)
+  }
+  /**
+   * A drawing was dropped on a free court: a one-court match moves there with the command's toast;
+   * a two-court match opens Move match with that court preselected so the second can be chosen.
+   * Dropping on a busy court or on nothing never reaches here.
+   */
+  const dropOnCourt = (m: Match, courtId: string) => {
+    if (!free.some((c) => c.id === courtId) || free.length < courtsNeeded(m)) return
+    if (courtsNeeded(m) === 2) {
+      if (m.state === 'active') onOpenMatch?.(m.id, { courtId })
+      else {
+        setSwapFirst(false)
+        setMoveFirst({ courtId })
+        setOnCourtId(m.id)
+      }
+      return
+    }
+    if (committing.current || moveCourt.isPending) return
+    committing.current = true
+    moveCourt.mutate(
+      { matchId: m.id, courtIds: [courtId], operationId: crypto.randomUUID() },
+      commit,
+    )
+  }
+
   // A 5v5 on two courts draws once, as one merged card, under its first court.
   const covered = new Set<string>()
   const cards: CourtCardProps[] = []
@@ -384,6 +426,7 @@ export function SessionView({
         onOpenProfile: openProfile,
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
+        onDragMove: (courtId: string) => dropOnCourt(m, courtId),
         ...menuFor(c),
       }
       if (m.state === 'on_court') {
@@ -396,10 +439,12 @@ export function SessionView({
           onStartMatch: () => startOnCourt(m),
           onOpenMatch: () => {
             setSwapFirst(false)
+            setMoveFirst(null)
             setOnCourtId(m.id)
           },
           onSwap: () => {
             setSwapFirst(true)
+            setMoveFirst(null)
             setOnCourtId(m.id)
           },
           swapWith: swapWith
@@ -414,6 +459,9 @@ export function SessionView({
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
+        onPause: live && canPauseMatch(m) ? () => pauseOnCourt(m) : undefined,
+        onMoveToFree: onOpenMatch ? () => onOpenMatch(m.id, {}) : undefined,
+        noFreeCourt: free.length < courtsNeeded(m),
       })
       continue
     }
@@ -426,6 +474,7 @@ export function SessionView({
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
       notOpen: !courtOpen(c, now),
+      dropCourtId: free.some((f) => f.id === c.id) ? c.id : undefined,
       // "Free · N min": since the last match on it ended, or from the planned start, even when opened early (plain "Free" until then), or the session start.
       freeMinutes: live
         ? freeCourtMinutes(
@@ -548,9 +597,11 @@ export function SessionView({
         now={now}
         matchId={onCourtId}
         swapFirst={swapFirst}
+        moveFirst={moveFirst}
         onClose={() => {
           setOnCourtId(null)
           setSwapFirst(false)
+          setMoveFirst(null)
         }}
       />
     </>

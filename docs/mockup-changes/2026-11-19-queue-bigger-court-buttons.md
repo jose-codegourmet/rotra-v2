@@ -1,6 +1,6 @@
 # Queue app: bigger court buttons in Put on court and Move match
 
-Status: TICKETED — #1044
+Status: IN MOCK APP — #1044
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheets `dispatch` and `moveCourt` (`.court-pick`)

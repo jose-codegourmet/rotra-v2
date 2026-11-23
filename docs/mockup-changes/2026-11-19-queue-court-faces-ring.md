@@ -1,6 +1,6 @@
 # Queue app: faces on the court cards show the level ring
 
-Status: TICKETED — #1043
+Status: IN MOCK APP — #1043
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtSides()` (`.pf.lv-*`)

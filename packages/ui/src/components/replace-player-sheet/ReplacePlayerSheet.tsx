@@ -44,6 +44,16 @@ export type ReplacePlayerSheetProps = {
   inId: string | null
   onPickOut: (playerId: string) => void
   onPickIn: (playerId: string) => void
+  /**
+   * "Swap from match" (Replace only): the player coming out trades places with one of their
+   * opponents in this match, so the pairs change and nobody new comes in. The row shows only when
+   * onPickSwap is given; its tiles are the opponents of the player coming out, derived from inMatch.
+   */
+  onPickSwap?: (opponentId: string) => void
+  /** The opponent picked to swap with; null for none. Picking one from Suggestion or All players clears it (the owner owns this) */
+  swapId?: string | null
+  /** Swap players: the owner swaps the two inside the match. Needs outId and swapId */
+  onSwapFromMatch?: (outId: string, opponentId: string) => void
   /** The × ("Back to match N") and the backdrop return to the match without changing anything */
   onBack: () => void
   /** Replace player: the owner rechecks and runs the lineup change */
@@ -57,8 +67,9 @@ export type ReplacePlayerSheetProps = {
 }
 
 /**
- * "Replace a player in match N" in the SwapPickerSheet: Who's coming out?, Suggested (and All
- * players behind Other), then the note and Replace player (needs both players). Before Start it is
+ * "Replace a player in match N" in the SwapPickerSheet: Who's coming out?, Swap from match (when
+ * offered), Suggestion (and All players behind Other), then the note and Replace player (needs both
+ * players). Picking an opponent under Swap from match turns the action into Swap players. Before Start it is
  * a lineup change; during play the "Replace fixes a mistake" notice says the replacement gets the
  * whole game and the player taken out gets nothing. No credit question either way.
  */
@@ -74,6 +85,9 @@ export function ReplacePlayerSheet({
   inId,
   onPickOut,
   onPickIn,
+  onPickSwap,
+  swapId = null,
+  onSwapFromMatch,
   onBack,
   onConfirm,
   isPending = false,
@@ -81,6 +95,10 @@ export function ReplacePlayerSheet({
   error,
 }: ReplacePlayerSheetProps) {
   const title = `Replace a player in match ${matchNo}`
+  const out = inMatch.find((p) => p.id === outId)
+  const opponent = out ? inMatch.find((p) => p.id === swapId && p.team !== out.team) : undefined
+  const swapping = !!(onPickSwap && out && opponent)
+  const short = (p: ReplacePlayer) => p.shortName ?? p.name.split(' ')[0] ?? p.name
   return (
     <SwapPickerSheet
       open={open}
@@ -97,12 +115,29 @@ export function ReplacePlayerSheet({
       inId={inId}
       onPickOut={onPickOut}
       onPickIn={onPickIn}
+      swapFrom={
+        onPickSwap
+          ? {
+              opponents: out
+                ? inMatch
+                    .filter((p) => p.team !== out.team)
+                    .map((p) => ({ ...pickerPlayer(p, 'free'), team: p.team }))
+                : null,
+              pickedId: opponent?.id ?? null,
+              onPick: onPickSwap,
+            }
+          : undefined
+      }
       onBack={onBack}
       isPending={isPending}
       message={message}
       error={error}
       extra={
-        playing ? (
+        swapping && out && opponent ? (
+          <p className="m-0 text-[13px] text-fg2">
+            {short(out)} and {short(opponent)} swap places: each joins the other's partner.
+          </p>
+        ) : playing ? (
           <Notice>
             <b>Replace fixes a mistake.</b> Use it when the wrong player was put in this match. The
             record shows the replacement played the whole game, and the player taken out gets no
@@ -120,10 +155,13 @@ export function ReplacePlayerSheet({
         <Button
           variant="primary"
           loading={isPending}
-          disabled={!outId || !inId}
-          onClick={onConfirm}
+          disabled={swapping ? false : !outId || !inId}
+          onClick={() => {
+            if (swapping && outId && opponent) onSwapFromMatch?.(outId, opponent.id)
+            else onConfirm()
+          }}
         >
-          Replace player
+          {swapping ? 'Swap players' : 'Replace player'}
         </Button>
       }
     />

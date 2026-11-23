@@ -413,3 +413,58 @@ export const ReadOnlyMerged: Story = {
     teamB: merged.teamB.map(playerOf),
   },
 }
+
+/** Q25.1: Playing with Pause match (pause icon) beside Open match, and Move to a free court in the menu */
+export const PlayingWithPause: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn(), onDragMove: fn() }),
+}
+export const PlayingWithPauseLight: Story = { ...PlayingWithPause, globals: { theme: 'light' } }
+export const PlayingWithPauseMerged: Story = {
+  args: inGame(merged, { onPause: fn(), onMoveToFree: fn(), onDragMove: fn() }),
+}
+export const PlayingMoveToFreeMenu: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn() }),
+  play: openBusyMenu,
+}
+/** No court is free: Move to a free court is disabled with "No court is free" */
+export const PlayingNoFreeCourt: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn(), noFreeCourt: true }),
+  play: openBusyMenu,
+}
+export const PlayingNoFreeCourtLight: Story = { ...PlayingNoFreeCourt, globals: { theme: 'light' } }
+/** The drawing is a button on Getting ready too (tooltip "Open match"), draggable */
+export const GettingReadyDraggable: Story = { args: onCourt(ready, { onDragMove: fn() }) }
+export const GettingReadyMergedDraggable: Story = {
+  args: onCourt(merged, { onDragMove: fn() }),
+}
+const dropGrid: Decorator = (Story) => (
+  <div className="w-full max-w-3xl">
+    <Story />
+  </div>
+)
+/** Dragging: every free open court shows a dashed accent outline (forced here with `dragging`) */
+export const DraggingFreeCourtsOutlined: Story = {
+  decorators: [dropGrid],
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
+      <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
+      <CourtCard {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true })} />
+      <CourtCard {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })} />
+    </div>
+  ),
+}
+/** Drag hover: the court under the pointer is solid with a tint; the other free court stays dashed */
+export const DragHoverOnFreeCourt: Story = {
+  decorators: [dropGrid],
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
+      <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
+      <CourtCard {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true, dragOver: true })} />
+      <CourtCard {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })} />
+    </div>
+  ),
+}
+export const DragHoverOnFreeCourtLight: Story = {
+  ...DragHoverOnFreeCourt,
+  globals: { theme: 'light' },
+}

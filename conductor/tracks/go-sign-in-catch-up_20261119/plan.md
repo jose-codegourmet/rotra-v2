@@ -2,7 +2,7 @@
 
 **Track ID:** go-sign-in-catch-up_20261119 · **Spec:** [spec.md](./spec.md)
 
-Ticket: #977 (one issue for the whole track, under epic #869).
+Ticket: #977 (one issue for the whole track, under epic #869). **Merged 2026-11-23:** PR #1041 into `go-stack` (`8d972877`); #977 closed. Open follow-ups are in [tracks.md](../../tracks.md) (BL-19, BL-20, BL-21); the migration `20261123000300_google_trip_rate_action` is not applied anywhere yet.
 
 ## Phase 1: Decide
 

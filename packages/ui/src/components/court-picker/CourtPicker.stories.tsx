@@ -43,7 +43,20 @@ type Story = StoryObj<typeof meta>
 /** One court: the opening court is preselected and a pick replaces it. */
 export const OneCourt: Story = {}
 
-/** 5v5: two free courts are preselected; a third pick replaces the oldest. */
+/** A single free court: one tile. */
+export const OneFree: Story = {
+  args: { courts: [{ id: 'court-2', label: 'Court 2' }], value: [] },
+}
+
+/** Several free courts: the tiles wrap into a grid. */
+export const ManyFree: Story = {
+  args: {
+    courts: [1, 2, 3, 4, 5, 6].map((n) => ({ id: `court-${n}`, label: `Court ${n}` })),
+    value: ['court-2'],
+  },
+}
+
+/** Two-court match: two free courts are preselected; a third pick replaces the oldest. */
 export const TwoCourts: Story = {
   args: {
     courts: startMatchFixtures.fiveVFive.freeCourts,

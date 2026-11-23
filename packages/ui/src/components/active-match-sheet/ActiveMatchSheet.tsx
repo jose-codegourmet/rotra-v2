@@ -40,6 +40,10 @@ export type ActiveMatchSheetProps = {
   substitutions?: ActiveMatchSubstitution[]
   /** A player was tapped: opens "Change NAME?" (Substitute or Replace, PlayerActionSheet) */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
+  /** How many courts are free right now; Move to a free court is disabled when fewer than the match needs */
+  freeCourtCount?: number
+  /** Opens Move match (the playing variant) to pick a free court; omit to hide the button */
+  onMoveToFree?: () => void
   /** Opens Mark match invalid? (Q-INVALID-MATCH) */
   onMarkInvalid: () => void
   /** Opens Match N result (Q-MATCH-DONE) */
@@ -88,6 +92,8 @@ export function ActiveMatchSheet({
   minimumGames,
   scoringLabel = SCORING['31'].label,
   substitutions = [],
+  freeCourtCount = 0,
+  onMoveToFree,
   onSelectPlayer,
   onMarkInvalid,
   onMatchDone,
@@ -126,6 +132,20 @@ export function ActiveMatchSheet({
           Substitution: {substitutionLine(s)}.
         </p>
       ))}
+      {onMoveToFree ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            disabled={freeCourtCount < (format === 'fun_5v5' ? 2 : 1)}
+            onClick={onMoveToFree}
+          >
+            Move to a free court
+          </Button>
+          {freeCourtCount < (format === 'fun_5v5' ? 2 : 1) ? (
+            <span className="text-[13px] text-fg2">No court is free</span>
+          ) : null}
+        </div>
+      ) : null}
       <p className="m-0 text-[13px] text-fg2">
         The court stays in use until you confirm a winner or mark the match invalid. Closing this
         doesn't end the game.

@@ -16,6 +16,8 @@ const propsFor = (m: ActiveMatchFixture): ActiveMatchSheetProps => ({
   teamB: m.teamB,
   minimumGames: m.minimumGames,
   substitutions: m.substitutions,
+  freeCourtCount: 2,
+  onMoveToFree: fn(),
   onSelectPlayer: fn(),
   onMarkInvalid: fn(),
   onMatchDone: fn(),
@@ -32,6 +34,8 @@ type Story = StoryObj<typeof meta>
 
 /** A doubles match on Court 1, 30 minutes in */
 export const ActiveDoubles: Story = {}
+/** Move to a free court is disabled with "No court is free". */
+export const NoFreeCourt: Story = { args: { freeCourtCount: 0 } }
 /** A 5v5 fun game on both courts: "Court 1 + Court 2" */
 export const MergedFiveVsFive: Story = { args: propsFor(activeMatchFixtures.merged) }
 const { withSubstitutions } = activeMatchFixtures

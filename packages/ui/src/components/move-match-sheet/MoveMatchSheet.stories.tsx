@@ -35,8 +35,16 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Nothing chosen: Move match is disabled. */
-export const NothingChosen: Story = {}
+/** A Getting ready match: nothing chosen, Move match is disabled. */
+export const GettingReady: Story = {}
+
+/** A Playing match: "Now on Court 3. It keeps playing on the new court; its time doesn't restart." */
+export const Playing: Story = { args: { variant: 'playing', currentLabel: 'Court 3' } }
+
+/** A two-court match dropped on a court opens with that court already picked. */
+export const Preselected: Story = {
+  args: { variant: 'playing', currentLabel: 'Court 1 + Court 2', required: 2, value: ['court-3'] },
+}
 
 export const CourtChosen: Story = { args: { value: ['court-3'] } }
 

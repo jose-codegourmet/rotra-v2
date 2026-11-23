@@ -1,6 +1,6 @@
 # Saved players: the club gives a guest or unclaimed player a level outside a session, and edits it
 
-Status: NEW
+Status: IN MOCK APP — PR #1028
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheet `profile` (levels note); `editPlayer` and `add` already had the field

@@ -171,6 +171,7 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Send back to queue | Returns an On court match to the **top** of the queue and frees its court |
 | Swap with the queue | Puts the next ready waiting match on an On court match's court and moves the On court match into that match's queue place |
 | Available Players / Plan Ahead / Longest Wait / Fewest Games | Generate matches strategies |
+| Expected finish | An estimate of when a Playing match ends, from time only: the session's scoring mode (its typical and long match minutes) and the minutes played. ROTRA has no live score, so it never knows the real score or a deuce. Shown on the Playing court card and used by Plan Ahead (mockup, November 23, 2026). Code: `finishOf` |
 | Catch Up | Generate matches strategy with an explicitly chosen game target, separate from the session minimum. “Games each player should reach” prioritizes eligible players below that number; completed games, Main Queue waiting assignments and earlier drafts in this batch count toward reaching it in the plan. Planned games are not completed results |
 | Draft | A suggested future lineup held outside the Main Queue; neither queued nor played |
 | Regenerate | Rebuilds unprotected waiting matches; keeps protected manual ones |

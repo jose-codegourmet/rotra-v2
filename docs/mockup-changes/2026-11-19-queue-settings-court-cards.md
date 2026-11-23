@@ -1,6 +1,6 @@
 # Queue app: Settings › Courts shows court cards with editable times
 
-Status: NEW
+Status: TICKETED — #1072
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` (`courtMini`), `CHANGE.courtTime`, `CHANGE.courtFollow`

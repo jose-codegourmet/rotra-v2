@@ -1,6 +1,6 @@
 # Queue app: a playing match can move to a free court
 
-Status: NEW
+Status: TICKETED — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtMenu()`, sheet `match` (Q-ACTIVE-MATCH), sheet `moveCourt`, `confirmMove`

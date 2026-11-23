@@ -1,6 +1,6 @@
 # Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside
 
-Status: NEW
+Status: TICKETED — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheets `match` (Q-ACTIVE-MATCH) and `onCourt` (Q-ON-COURT), `swapSides()`

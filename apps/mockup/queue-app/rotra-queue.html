@@ -576,6 +576,17 @@ select.input.inline { width: auto; min-height: 42px; }
 .pf-g { position: absolute; top: -3px; right: -7px; min-width: clamp(17px, 5.5cqw, 22px); height: clamp(17px, 5.5cqw, 22px); padding: 0 4px; border-radius: 999px; display: grid; place-items: center; font-size: clamp(10px, 3.2cqw, 13px); font-weight: 800; line-height: 1; color: #0b0b0c; background: rgba(255, 255, 255, 0.9); }
 /* The badge takes the face ring's color: white at rest, accent on hover. */
 .pf:hover .pf-g { color: var(--on-accent); background: var(--accent); }
+/* Owner, November 23, 2026: the games badge opens the session's matches with that player highlighted. */
+.pf-g[data-act] { cursor: pointer; }
+.pf-g[data-act]:hover { color: var(--on-accent); background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+.pp-tabs { margin: 2px 0 4px; }
+.sgd-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sgd-who { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.sgd-who b { overflow-wrap: anywhere; }
+.sg-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.sg-row { display: flex; flex-direction: column; gap: 6px; }
+.gm-pl.me .avatar { outline: 3px solid var(--warn); outline-offset: 2px; }
+.gm-pl.me b { background: var(--warn); color: var(--on-accent); }
 .side.n4 .pf-g, .side.n5 .pf-g { min-width: 15px; height: 15px; font-size: 9px; right: -5px; }
 /* Players scale with the court's width (cqw): a wide court card gets bigger faces and names. */
 .pf .avatar { width: clamp(34px, 15cqw, 64px); height: clamp(34px, 15cqw, 64px); font-size: clamp(12px, 4.4cqw, 19px); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9); }
@@ -628,6 +639,14 @@ select.input.inline { width: auto; min-height: 42px; }
 @media (max-width: 480px) { .sg-p { flex-direction: column; align-items: flex-start; } .sg-p b { white-space: normal; } }
 .qmove { display: flex; flex-direction: column; gap: 4px; }
 .qgrid { display: grid; gap: 10px; }
+/* Generate Queue in two columns (owner artifact comment, November 23, 2026): strategy tabs and drafts on the left; Bagging
+   pairs (when on) and the Exemption list on the right. Narrower than 1280 px it stacks, the side cards first. */
+.gq-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.gq-main, .gq-side { min-width: 0; }
+/* Owner artifact comment, same day ("put this in a box or paper"): the strategy tabs, Generate and drafts sit in a card. */
+.gq-main.card { padding: 16px; gap: 14px; }
+.gq-drafts { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+@media (min-width: 1280px) { .gq-cols { grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); } .gq-main { grid-column: 1; grid-row: 1; } .gq-side { grid-column: 2; grid-row: 1; } }
 .qtile { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: var(--r); border: 1px solid var(--border-strong); background: var(--surface); min-width: 0; box-shadow: var(--shadow); }
 .qtile.ready { border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong)); }
 /* Owner artifact comment, November 19, 2026: a match that can go on a court now stands out. Brand rules: the accent border,
@@ -2001,12 +2020,14 @@ const MODES = {
 };
 
 // Scoring modes (Q22.1). One table drives setup, the result dialog, history and the seed data. A session with no value uses 16/31.
+// typical / long: expected match minutes, used by Plan Ahead and the Playing court card (finishOf). Owner, November 23, 2026:
+// 16/31 from the owner's shuttle cost sheet (15 min average, 20–25 min with deuce); the owner confirmed all five.
 const SCORING = {
-  '31': { label: '16/31', text: 'One game to 31. Change sides at 16. Deuce at 30–30.', target: 31, games: 1, deuce: true },
-  '31nd': { label: '16/31, no deuce', text: 'One game to 31. Change sides at 16. The first to 31 wins.', target: 31, games: 1, deuce: false },
-  '21': { label: '11/21', text: 'One game to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 1, deuce: true },
-  '21x3': { label: '11/21 × 3', text: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 3, deuce: true },
-  '21x3nd': { label: '21 × 3', text: 'Best of 3 games to 21. Change sides after each game. No deuce: the first to 21 wins.', target: 21, games: 3, deuce: false },
+  '31': { label: '16/31', text: 'One game to 31. Change sides at 16. Deuce at 30–30.', target: 31, games: 1, deuce: true, typical: 15, long: 25 },
+  '31nd': { label: '16/31, no deuce', text: 'One game to 31. Change sides at 16. The first to 31 wins.', target: 31, games: 1, deuce: false, typical: 15, long: 18 },
+  '21': { label: '11/21', text: 'One game to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 1, deuce: true, typical: 10, long: 15 },
+  '21x3': { label: '11/21 × 3', text: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.', target: 21, games: 3, deuce: true, typical: 25, long: 35 },
+  '21x3nd': { label: '21 × 3', text: 'Best of 3 games to 21. Change sides after each game. No deuce: the first to 21 wins.', target: 21, games: 3, deuce: false, typical: 25, long: 30 },
 };
 const SCORING_ORDER = ['31', '31nd', '21', '21x3', '21x3nd']; // integer-like keys would otherwise list first
 // Owner, November 19, 2026: pick the game points first, then a Deuce switch. Each points card maps to the scoring keys
@@ -2466,6 +2487,22 @@ const onCourt = (s) => s.matches.filter((m) => m.status === 'oncourt');
 // Matches holding a court: On court and Playing. Their players are busy everywhere else.
 const courtMatches = (s) => s.matches.filter((m) => m.status === 'oncourt' || m.status === 'active');
 const busyOf = (s, pid, except) => courtMatches(s).find((m) => m !== except && all(m).includes(pid));
+// Expected finish (owner, November 23, 2026). ROTRA has no live score, so this is an estimate from time only: the session's
+// scoring mode (typical / long minutes) and the minutes played. left = expected minutes left; tag = the lowercase wording for drafts.
+function finishOf(s, m) {
+  const sc = SCORING[scoringOf(s)];
+  if (m.status !== 'active' || !m.startedAt) return { phase: 'notStarted', left: sc.typical, text: 'Not started yet', tag: 'not started yet' };
+  const p = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
+  const left = Math.max(0, sc.typical - p);
+  if (p < sc.typical - 3) { const n = Math.max(1, left); return { phase: 'mid', left, text: `Ends in about ${n} min`, tag: `ends in about ${n} min` }; }
+  if (p < sc.typical) return { phase: 'soon', left, text: 'Finishing soon', tag: 'finishing soon' };
+  if (p < sc.long) return { phase: 'any', left: 0, text: `Could end any time${sc.deuce ? ' · may be in deuce' : ''}`, tag: 'could end any time' };
+  return { phase: 'long', left: 0, text: 'Running long', tag: 'running long' };
+}
+// Plan Ahead (owner, November 23, 2026): a busy player counts only when their court is Finishing soon, Could end any time
+// or Running long. Courts still mid-game (Ends in about N min) or Getting ready are left out.
+const endingSoon = (s, m) => ['soon', 'any', 'long'].includes(finishOf(s, m).phase);
+const aheadOk = (s, pid) => { const b = busyOf(s, pid); return !b || endingSoon(s, b); };
 const busyText = (s, m) => m.status === 'oncourt' ? `on ${courtsOf(s, m)}` : `playing on ${courtsOf(s, m)}`;
 const courtFill = (s) => (s.courtFill === 'auto' ? 'auto' : 'manual');
 const partialSet = (m) => new Set((m.subs || []).flatMap((x) => [x.out, x.in]));
@@ -3591,6 +3628,11 @@ function simulateLive(spec) {
   }
   // The newest match is still getting ready on its court.
   if (spec.ready) { const m = active(s).sort((a, b) => b.startedAt - a.startedAt)[0]; if (m) { m.status = 'oncourt'; m.placedAt = Math.max(m.startedAt, now - 2 * 6e4); delete m.startedAt; } }
+  // Expected finish example (owner, November 23, 2026): Playing courts in court order show each phase, Court 1 first
+  // "Finishing soon", then "Ends in about N min", "Could end any time" and "Running long", from the session's scoring mode.
+  { const sc = SCORING[scoringOf(s)], spread = [sc.typical - 2, Math.round(sc.typical / 3), Math.round((sc.typical + sc.long) / 2), sc.long + 2];
+    courts.map((c) => active(s).find((m) => m.status === 'active' && m.courts.includes(c.id))).filter(Boolean)
+      .forEach((m, i) => { m.startedAt = Math.max(start, now - spread[i % spread.length] * 6e4); }); }
   // Waiting matches: the longest-waiting free players first, then players still on court (planned ahead, so blocked).
   const busy = new Set(courtMatches(s).flatMap(all));
   const order = roster.filter((x) => x.present && !busy.has(x.pid)).sort((a, b) => restInfo(s, b.pid).mins - restInfo(s, a.pid).mins).map((x) => x.pid)
@@ -3682,20 +3724,44 @@ function ensureHistory() {
   S.histV = 7;
   save();
 }
-function historyMatch(s, m) {
+function historyMatch(s, m, hl, pill) {
   // Owner, November 15, 2026 ("please update these to use the court layout"): the session record's court columns draw each match as the
   // same small court as the finished session page's Match history (pubHistoryMatch, .gm*): "#N · start–end" (· Fun) as a corner pill,
   // faces with first names on dark pills (the winning pair ringed in the accent), the score (or "No score") and "◀ Won" / "Won ▶" on the
   // net, Invalid on a desaturated court. Team A is on the left. Faces open the player profile. Substitution lines stay under the court.
-  const invalid = m.status === 'invalid', wl = invalid ? null : m.winner === 'A';
-  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}" data-act="openProfile" data-id="${pid}" title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}. View profile">${avatar(P(pid))}<b>${esc(acctShort(pid))}</b></button>`;
+  const invalid = m.status === 'invalid', played = invalid || m.status === 'done', wl = !played || invalid ? null : m.winner === 'A';
+  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}${pid === hl ? ' me' : ''}" data-act="openProfile" data-id="${pid}"${hl ? ' data-back="1"' : ''} title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}${pid === hl ? ' (highlighted)' : ''}. View profile">${avatar(P(pid))}<b>${esc(acctShort(pid))}</b></button>`;
   const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
-  const score = invalid ? '' : gmScore(m, false);
-  const res = invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
+  const score = invalid || !played ? '' : gmScore(m, false);
+  const res = !played ? '<span class="gm-who">VS</span>' : invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${m.id}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${m.teamA.map((x) => esc(nm(x))).join(' and ')} versus ${m.teamB.map((x) => esc(nm(x))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
-    ${gmTop(m, false, `<span class="gm-fmt">#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}</span>`)}${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
+    ${gmTop(m, false, `<span class="gm-fmt">${pill || `#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}`}</span>`)}${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
     ${(m.subs || []).map((x) => `<p class="small muted">${esc(subLine(x, m))}</p>`).join('')}
   </article>`;
+}
+// Player profile tabs in a session (owner artifact comments, November 23, 2026). N matches: finished matches the player was
+// in, latest first, the player highlighted (the earlier D-SESSION-GAMES dialog, now this tab). Planned queue: the player's
+// waiting matches in the Main Queue, nearest first.
+const playedMatchesOf = (s, pid) => s.matches.filter((m) => (m.status === 'done' || m.status === 'invalid') && (all(m).includes(pid) || partialSet(m).has(pid))).sort((a, b) => (b.startedAt || 0) - (a.startedAt || 0));
+const plannedOf = (s, pid) => waiting(s).filter((m) => all(m).includes(pid));
+// Owner artifact comment, November 23, 2026 ("these 2 should be pills"): the Match History pill filter, the count in a badge.
+const ppTabsBar = (tabs, tab) => `<div class="cfilter pp-tabs" role="tablist" aria-label="Player">${tabs.map(([k, l, n]) => `<button type="button" role="tab" aria-selected="${tab === k}" aria-pressed="${tab === k}" data-act="ppTab" data-v="${k}"><span>${esc(l)}</span><span class="cf-n tnum">${n}</span></button>`).join('')}</div>`;
+function sessionGamesBody(s, pid) {
+  // Owner artifact comment, November 23, 2026 ("remove this"): no Their matches / All matches switch; only the player's matches.
+  const first = esc(short(pid)), mine = playedMatchesOf(s, pid);
+  const g = gamesOf(s, pid), adj = (R(s, pid) || {}).gamesAdj || 0, busy = busyOf(s, pid);
+  const tag = (m) => m.status === 'invalid' ? chip('Invalid · not counted', 'bad') : counted(m, pid) ? chip('Counts', 'ok') : chip('Not counted', 'warn');
+  const row = (m) => `<li class="sg-row"><div class="lh-time"><b class="tnum">${fmtTime(m.startedAt)}</b><span class="small muted">· ${esc(courtsOf(s, m))} · ${queueTime(Math.max(0, Math.round(((m.endedAt || m.startedAt) - m.startedAt) / 60000)))}</span><span style="margin-left:auto">${tag(m)}</span></div>${historyMatch(s, m, pid)}</li>`;
+  const sum = `<p class="small muted" style="margin:0">${g} game${g === 1 ? '' : 's'} played${adj ? ` · includes ${adj > 0 ? '+' : ''}${adj} set by hand` : ''}. Latest first.</p>`;
+  const now = busy ? notice('', `${first} is ${busy.status === 'oncourt' ? 'getting ready' : 'playing'} on ${esc(courtsOf(s, busy))} now (Match ${busy.seq}). It counts after Match done.`) : '';
+  return `<div class="stack">${sum}${now}${mine.length ? `<ol class="sg-list">${mine.map(row).join('')}</ol>` : `<div class="card empty">${first} has no finished matches yet this session.</div>`}</div>`;
+}
+function plannedQueueBody(s, pid) {
+  const first = esc(short(pid)), order = waiting(s), mine = plannedOf(s, pid), busy = busyOf(s, pid);
+  const row = (m) => { const at = order.indexOf(m) + 1, ahead = at - 1;
+    return `<li class="sg-row"><div class="lh-time"><b class="tnum">#${at} in the Main Queue</b><span class="small muted">· ${ahead ? `${ahead} match${ahead === 1 ? '' : 'es'} ahead` : 'next up'}</span>${m === mine[0] ? '<span class="chip ok" style="margin-left:auto">Nearest</span>' : ''}</div>${historyMatch(s, m, pid, `#${at} · ${esc(matchLabel(m))}`)}</li>`; };
+  const now = busy ? notice('', `${first} is ${busy.status === 'oncourt' ? 'getting ready' : 'playing'} on ${esc(courtsOf(s, busy))} now (Match ${busy.seq}).`) : '';
+  return `<div class="stack"><p class="small muted" style="margin:0">${first}'s waiting matches in the Main Queue, nearest first. The order can still change.</p>${now}${mine.length ? `<ol class="sg-list">${mine.map(row).join('')}</ol>` : `<div class="card empty">${first} isn't in the Main Queue right now.</div>`}</div>`;
 }
 // Live console › Match History (owner artifact comment, November 19, 2026): every finished match tonight, newest first, as the
 // same small courts as the session record. Filter by court; a match on two courts shows under each.
@@ -5085,7 +5151,7 @@ function courtSides(s, m) {
   const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => {
     const p = P(pid), r = R(s, pid);
     const g = gamesOf(s, pid);
-    return `<button class="pf lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="pf-n">${esc((s.status === 'finalized' ? acctShort : short)(pid))}</span></button>`;
+    return `<button class="pf lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${pid}" title="${esc(nm(pid))}'s games this session · tap to see them">${g}</span></span><span class="pf-n">${esc((s.status === 'finalized' ? acctShort : short)(pid))}</span></button>`;
   }).join('')}</div>`;
   return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`;
 }
@@ -5154,6 +5220,7 @@ function courtsPane(s) {
       const subs = (m.subs || []).length;
       return `<div class="court busy ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
         <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${elapsedTime(mins)}${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
+        ${(() => { const f = finishOf(s, m); return f.phase === 'soon' ? `<p class="small" style="color:var(--accent)">${esc(f.text)}</p>` : f.phase === 'long' ? `<p class="small" style="color:var(--warn)">${esc(f.text)}</p>` : `<p class="small muted">${esc(f.text)}</p>`; })()}
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button><button class="btn sm" data-act="pauseMatch" data-id="${m.id}" title="Back to Getting ready, for a match started by mistake">${I.q_pause} Pause match</button></div></div>`;
     }
     const notStarted = !courtOpen(s, c);
@@ -5209,7 +5276,7 @@ function autoState(s) {
 function queueFingerprint(s) { return JSON.stringify([s.status, s.singles, s.doubles, s.roster, s.courts, s.matches]); }
 const AUTO_DESCRIPTIONS = {
   available: 'Matches from players who are here and not on a court right now.',
-  ahead: 'Also uses players who are on court or mid-game. Their matches wait until their current game ends.',
+  ahead: 'Also uses players whose court is finishing soon, ranked with free players. Their matches wait until that game ends.',
   wait: 'Puts the players who have waited longest since their last game first.',
   fewest: 'Puts the players with the fewest games (played + already queued) first.',
   catchup: 'Helps players who are behind reach a number of games you choose.'
@@ -5222,12 +5289,13 @@ function autoWorkspace(s) {
   const draftsHint = !batch.cards.length ? 'Generate matches in this tab first to replace or remove drafts, or add them to the Main Queue.' : '';
   const selectionHint = !a.selected.length ? 'Select one or more drafts first to add a selection to the Main Queue.' : '';
   const disabled = (reason, id) => reason ? `disabled title="${esc(reason)}" aria-describedby="${id}"` : '';
-  const eligible = s.roster.some((r) => r.present && (tab === 'ahead' || !busyOf(s, r.pid)));
-  const empty = !eligible ? (tab === 'ahead' ? 'No present players. Mark arrivals present in Players.' : 'No one is free to play right now. Try Plan Ahead to include players who are mid-game.') : tab === 'catchup' && !validTarget ? 'Choose a game target, then Generate.' : !a.count ? 'Choose how many matches, then Generate.' : 'Generate matches to see suggestions here.';
+  const eligible = s.roster.some((r) => r.present && (tab === 'ahead' ? aheadOk(s, r.pid) : !busyOf(s, r.pid)));
+  const empty = !eligible ? (tab === 'ahead' ? (s.roster.some((r) => r.present) ? 'No one is free and no court is finishing soon. Try again in a few minutes.' : 'No present players. Mark arrivals present in Players.') : 'No one is free to play right now. Try Plan Ahead to include players whose court is finishing soon.') : tab === 'catchup' && !validTarget ? 'Choose a game target, then Generate.' : !a.count ? 'Choose how many matches, then Generate.' : 'Generate matches to see suggestions here.';
   return `<div class="between"><h2>Generate Queue</h2>${s.doubles ? `<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="small"><b>Bagging mode</b></span>${sw(baggingOn(s), 'toggleBagging', '', 'Bagging mode')}</label>` : ''}</div>
     <p class="small muted">Drafts are suggestions. Nothing joins the Main Queue until you add it.</p>
-    ${baggingOn(s) ? baggingCard(s) : ''}
-    ${exemptCard(s)}
+    <div class="gq-cols">
+    <aside class="gq-side stack" aria-label="Who Generate Queue uses">${baggingOn(s) ? baggingCard(s) : ''}${exemptCard(s)}</aside>
+    <section class="gq-main card stack" aria-label="Generate matches">
     <div class="seg" role="group" aria-label="Generation strategy">${Object.entries(AUTO_MODES).map(([k, label]) => `<button id="auto-tab-${k}" data-act="autoTab" data-k="${k}" aria-pressed="${tab === k}">${label}</button>`).join('')}</div>
     <p class="small muted">${AUTO_DESCRIPTIONS[tab]}</p>
     <div class="field"><span>How many matches?</span><div class="row">${[2,3,4,6].map((n) => `<button id="auto-count-${n}" class="btn sm" data-act="autoCount" data-n="${n}" aria-pressed="${a.count === n}">${n}</button>`).join('')}</div></div>
@@ -5236,8 +5304,9 @@ function autoWorkspace(s) {
     ${draftsHint ? `<p class="small muted" id="auto-drafts-hint">${draftsHint}</p>` : ''}
     <div class="row"><button class="btn primary" data-act="${batch.cards.length ? 'autoRegenerate' : 'autoGenerate'}" ${disabled(generationHint, 'auto-generate-hint')}>${batch.cards.length ? 'Generate again' : a.count ? `Generate ${a.count} matches` : 'Generate matches'}</button>${autoMoreMenu(batch, draftsHint || generationHint, draftsHint)}</div>
     ${a.error ? notice('warn', esc(a.error)) : ''}${stale ? notice('warn', 'The Main Queue changed since these were made. Check them before adding, or generate again.') : ''}${batch.stop ? (/^Made (\d+) of \1 matches\.$/.test(batch.stop) ? `<div><span class="chip">${esc(batch.stop)}</span></div>` : notice('', esc(batch.stop))) : ''}
-    ${batch.cards.length ? `<div class="qgrid" style="grid-template-columns:repeat(${queueCols(DRAFT_TILE_MIN)}, minmax(0, 1fr))">${batch.cards.map((m) => draftTile(s, m, batch, a.selected)).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
-    ${a.selected.length || batch.cards.length ? autoSelectionBar(s, a, batch) : ''}`;
+    ${batch.cards.length ? `<div class="qgrid gq-drafts">${batch.cards.map((m) => draftTile(s, m, batch, a.selected)).join('')}</div>` : eligible && (batch.stop || a.error) ? '' : `<div class="card empty">${empty}</div>`}
+    ${a.selected.length || batch.cards.length ? autoSelectionBar(s, a, batch) : ''}
+    </section></div>`;
 }
 // A picture with the level ring (Beginner, Intermediate, Advanced; grey with no level). Owner artifact comment, November 19, 2026.
 const ringAvatar = (s, pid) => { const r = R(s, pid); return `<span class="lv-ring lv-${r ? rvBand(r) : 'none'}" title="${esc(lvLabel(r ? r.level : null))}">${avatar(P(pid))}</span>`; };
@@ -5278,14 +5347,17 @@ function draftTile(s, m, batch, selected) {
   const pick = selected.indexOf(m.draftId) + 1;
   const attention = all(m).some((p) => !R(s, p) || !R(s, p).present);
   const playing = all(m).some((p) => busyOf(s, p));
+  // The draft waits for the busy match that finishes last among its players (expected finish, finishOf).
+  const busyMs = [...new Set(all(m).map((p) => busyOf(s, p)).filter(Boolean))];
+  const waitFor = busyMs.length ? busyMs.map((x) => ({ x, f: finishOf(s, x) })).reduce((a, b) => (b.f.left > a.f.left ? b : a)) : null;
+  const waitCourts = busyMs.map((x) => courtsOf(s, x));
+  const waitText = waitFor ? (busyMs.length > 1 ? `Waits for ${waitCourts.slice(0, -1).join(', ')} and ${waitCourts[waitCourts.length - 1]} · ${courtsOf(s, waitFor.x)} ${waitFor.f.tag}` : `Waits for ${waitCourts[0]} · ${waitFor.f.tag}`) : '';
   const status = attention ? `<span class="status-line warn">${I.alert} A player is no longer present. Generate again.</span>`
-    : playing ? `<span class="status-line muted">${I.info} A player is on court or playing now; this match waits until they are free.</span>`
+    : playing ? `<span class="status-line ${waitFor.f.phase === 'long' ? 'warn' : 'muted'}">${I.info} ${esc(waitText)}</span>`
     : `<span class="status-line muted">${I.info} ${esc(m.reason || 'Suggested by Generate matches')}</span>`;
-  const chips = (p) => {
-    const played = gamesOf(s, p), queued = queuedCount(s, p), suggested = batch.cards.filter((d) => all(d).includes(p)).length;
-    return [played ? `<span class="qchip">${played} played</span>` : '', queued ? `<span class="qchip">${queued} queued</span>` : '', suggested > 1 ? `<span class="qchip">${suggested} suggested</span>` : '', busyOf(s, p) ? `<span class="qchip warn">${busyOf(s, p).status === 'oncourt' ? 'On court' : 'Playing now'}</span>` : ''].join('');
-  };
-  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf">${avatar(P(p))}<span class="qf-n">${esc(short(p))}</span><span class="qchips">${chips(p)}</span></div>`).join('')}</div>`;
+  // Owner artifact comment, November 23, 2026: no "2 played · 2 suggested" chips. Each face has the level ring and the
+  // games badge, like the Main Queue tiles; the badge opens the player's games this session (D-SESSION-GAMES).
+  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span></div>`).join('')}</div>`;
   return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(matchLabel(m))}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
     ${pick ? `<span class="sel-badge" aria-hidden="true">${pick}</span>` : ''}
     <div class="qt-head">${chip('Draft')}${chip(matchLabel(m), 'solid')}</div>
@@ -5345,7 +5417,7 @@ function bagTeams(s, t) {
 function generateDrafts(s, tab, count, target, fixed) {
   // D-2026-11-13-07: players already in a waiting match in the Main Queue are never available to Generate matches.
   // Owner artifact comment, November 19, 2026: players on the exemption list are left out of generated matches.
-  const pool = s.roster.filter((r) => r.present && !exemptOf(s).includes(r.pid) && (tab === 'ahead' || !busyOf(s, r.pid))).map((r) => r.pid);
+  const pool = s.roster.filter((r) => r.present && !exemptOf(s).includes(r.pid) && (tab === 'ahead' ? aheadOk(s, r.pid) : !busyOf(s, r.pid))).map((r) => r.pid);
   const players = pool.filter((p) => !queuedCount(s, p));
   const inQueue = pool.length - players.length;
   const formats = [...(s.doubles ? ['doubles'] : []), ...(s.singles ? ['singles'] : [])];
@@ -5358,10 +5430,13 @@ function generateDrafts(s, tab, count, target, fixed) {
     if (tab === 'catchup' && players.every((p) => load[p] >= +target)) { stop = players.length ? `Everyone available reaches ${target} game${+target === 1 ? '' : 's'} with these matches.` : `Made 0 of ${count}: not enough free players for another match.`; break; }
     const fmt = formats.length === 2 ? (players.length >= 4 && i % 3 !== 2 ? 'doubles' : 'singles') : formats[0];
     const size = fmt === 'doubles' ? 4 : 2;
-    if (players.length < size) { stop = `Made ${out.length} of ${count}: not enough ${tab === 'ahead' ? 'present' : 'free'} players for another match.`; break; }
+    if (players.length < size) { stop = `Made ${out.length} of ${count}: not enough ${tab === 'ahead' ? 'free or finishing-soon' : 'free'} players for another match.`; break; }
+    // Plan Ahead (owner, November 23, 2026): free players and players on a finishing-soon court rank together by load;
+    // ties go to the soonest free (expected minutes left; free, Could end any time and Running long = 0).
+    const aheadLeft = (p) => { const b = busyOf(s, p); return b ? finishOf(s, b).left : 0; };
     const sorted = players.slice().sort((x,y) => {
       const wait = restInfo(s,y).mins - restInfo(s,x).mins;
-      const priority = tab === 'catchup' ? ((load[x] < +target ? 0 : 1) - (load[y] < +target ? 0 : 1)) || load[x]-load[y] : tab === 'wait' ? (load[x]-gamesOf(s,x))-(load[y]-gamesOf(s,y)) || wait : tab === 'ahead' ? Number(!!busyOf(s,x))-Number(!!busyOf(s,y)) || load[x]-load[y] : load[x]-load[y];
+      const priority = tab === 'catchup' ? ((load[x] < +target ? 0 : 1) - (load[y] < +target ? 0 : 1)) || load[x]-load[y] : tab === 'wait' ? (load[x]-gamesOf(s,x))-(load[y]-gamesOf(s,y)) || wait : tab === 'ahead' ? load[x]-load[y] || aheadLeft(x)-aheadLeft(y) : load[x]-load[y];
       return priority || wait || players.indexOf(x)-players.indexOf(y);
     });
     const pick = sorted.slice(0,size);
@@ -5426,7 +5501,7 @@ function queueCard(s, m, i, n, cols, compact = false) {
   };
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   // Owner artifact comment, November 19, 2026: each picture has the level ring and the player's games so far on it.
-  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
+  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
   // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
   const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(', ')}</span></div>`;
@@ -6355,6 +6430,17 @@ const SHEETS = {
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="exSave">Save list${sel.length ? ` · ${sel.length}` : ''}</button>`);
   },
   // #717 Set games played (D-SET-GAMES): one player or every roster player; the stored value is an adjustment, so games keep counting up afterwards.
+  // Owner artifact comments, November 23, 2026: the games badge opens a games dialog, not the profile. "make this information
+  // compact · this is a games dialog only with just name and skill": a one-line header (picture with the level ring, name,
+  // level), then the Matches and Planned queue pills. The face itself still opens the full profile.
+  sessionGames(sh) {
+    const s = cur(), pid = sh.pid, r = R(s, pid), p = P(pid);
+    const nPlayed = playedMatchesOf(s, pid).length, nPlanned = plannedOf(s, pid).length;
+    const tab = sh.tab === 'queue' ? 'queue' : 'matches';
+    const head = `<div class="sgd-head"><span class="lv-ring lv-${r ? rvBand(r) : 'none'}">${avatar(p)}</span><div class="sgd-who"><b>${esc(nm(pid))}</b><span class="small muted">${r && r.level != null ? esc(lvLabel(r.level)) : 'No level yet'}</span></div></div>`;
+    const body = `${head}${ppTabsBar([['matches', 'Matches', nPlayed], ['queue', 'Planned queue', nPlanned]], tab)}${tab === 'matches' ? sessionGamesBody(s, pid) : plannedQueueBody(s, pid)}`;
+    return sheetShell(`${esc(short(pid))}'s games`, body, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+  },
   setGames(sh) {
     const s = cur(), one = sh.pid ? R(s, sh.pid) : null, name = one ? nm(one.pid) : '', n = s.roster.length;
     const current = one ? gamesOf(s, one.pid) : null;
@@ -6493,7 +6579,7 @@ const SHEETS = {
       <p class="small muted" style="margin:0">${p.identity === 'registered' ? 'Levels are set per session while preparing a roster, not here.' : 'Change their level for this club in Edit details. Each session can still set its own.'}</p>
         </div>
       </div>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'registered' && !sh.back ? `<button class="btn" data-act="openClubNick" data-id="${p.id}">Club nickname</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ sessionGames: 'games', suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'registered' && !sh.back ? `<button class="btn" data-act="openClubNick" data-id="${p.id}">Club nickname</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
@@ -7524,6 +7610,8 @@ const ACT = {
   qView: (d) => { S.ui.qView = d.v === 'grid' ? 'grid' : 'slide'; render(); },
   qsStep: (d) => { const el = document.getElementById('qslide'); if (!el) return; const card = el.querySelector('.qtile'); const step = card ? card.offsetWidth + 10 : 300; el.scrollBy({ left: (+d.d || 1) * step, behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   lhCourt: (d) => { S.ui.lhCourt = d.v; render(); },
+  openSessionGames: (d) => openSheet({ type: 'sessionGames', pid: d.pid, tab: 'matches' }),
+  ppTab: (d) => { S.ui.sheet = { ...S.ui.sheet, tab: d.v }; render(); },
   ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else if (d.menu === 'dd-console') ACT.pane({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
   downloadSessionQr: () => toast(`${S.ui.sheet?.fmt === 'story' ? 'Story' : 'Post'} image downloaded (sample in this prototype)`),
   copyRtr: (d) => { try { navigator.clipboard.writeText(d.v); } catch (e) { /* clipboard unavailable */ } toast('RTR ID copied'); },

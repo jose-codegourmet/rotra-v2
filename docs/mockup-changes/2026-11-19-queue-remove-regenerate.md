@@ -1,6 +1,6 @@
 # Queue app: the Main Queue drops the Regenerate button
 
-Status: NEW
+Status: TICKETED — #1069
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `queuePane()` header (Main Queue)

@@ -1,6 +1,6 @@
 # Admin app: the player detail shows the player's gender
 
-Status: NEW
+Status: TICKETED — #1089
 Date: 2026-11-19
 App: admin
 Mockup: apps/mockup/admin-app/rotra-admin.html › player detail › Overview › Identity

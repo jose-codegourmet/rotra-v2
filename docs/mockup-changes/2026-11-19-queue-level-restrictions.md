@@ -1,6 +1,6 @@
 # Queue app: Restrictions in session preparation (which levels can take a slot)
 
-Status: NEW
+Status: TICKETED — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `RESTRICT`, `restrictOf`, `restrictBlock`, `restrictText`, `restrictError`,

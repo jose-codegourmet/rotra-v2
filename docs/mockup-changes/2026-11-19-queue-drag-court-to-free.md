@@ -1,6 +1,6 @@
 # Queue app: drag a busy court's drawing onto a free court to move the match
 
-Status: NEW
+Status: TICKETED — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtsPane()` (`data-free-court`), court drag (`cdrag`, `cdLift`, `cdMove`, `cdEnd`)

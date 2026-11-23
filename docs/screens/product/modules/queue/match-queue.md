@@ -20,7 +20,7 @@ Attention notice: “N waiting matches need attention. Edit the lineup to swap t
 
 **Queue card:**
 
-- **Pictures** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-card-faces-ring-games.md)): each player's picture has the level ring (Beginner, Intermediate, Advanced; grey with no level) and a small badge on the ring with their games so far, as on the court cards. The name and wait stay under it.
+- **Pictures** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-card-faces-ring-games.md)): each player's picture has the level ring (Beginner, Intermediate, Advanced; grey with no level) and a small badge on the ring with their games so far, as on the court cards. The name and wait stay under it. Tapping the badge opens [D-SESSION-GAMES](../../dialogs.md#d-session-games--a-players-games-this-session) (that player's matches this session, highlighted; owner, November 23, 2026 ([log](../../../../mockup-changes/2026-11-23-queue-games-badge-session-matches.md))); the rest of the picture opens the profile.
 - **Needs attention** has no border colour (owner artifact comment, November 19, 2026: “remove the yellow ones, green is enough”; [log](../../../../mockup-changes/2026-11-19-queue-no-attention-border.md)): such a card keeps its warning status line (icon and text) and the Main Queue header's “N need attention”; only ready cards are highlighted. Generate Queue drafts keep their warning border.
 - **Ready for court** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-ready-card-highlight.md)): a card that can go on a court now has the accent border, a light accent tint, the brand's accent glow (`shadow-accent`), a solid accent pill “✓ READY FOR COURT” on its top edge, the “Ready to start” status line and a primary **Put on court**. Other cards stay plain. The same card shows on the Courts tab's upcoming row.
 - Head: position “#P”, format chip (with the match category in front: “Mixed Doubles”, “Men's Doubles”, “Genderless 3v3 fun”; [D-2026-11-19-01](../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01); [log](../../../../mockup-changes/2026-11-19-queue-match-category-gender.md)), origin (**Generated**, **Suggested**, or a lock icon for Manual · protected), flow arrow, drag handle ⠿.
@@ -99,7 +99,9 @@ Formerly called Auto Queue; renamed 2026-11-06.
 
 Main Queue and Generate Queue are separate console tabs (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-console-tabs.md); mockup only); there is no switch between them inside the view. Generate Queue has Available Players, Plan Ahead, Longest Wait, Fewest Games and Catch Up tabs with retained draft batches. The Queue Master selects a match count (2 / 3 / 4 / 6; no default), explicitly generates, and chooses a Catch Up target when applicable. No draft starts or enters Main Queue automatically. Players already in any waiting match in the Main Queue are never available to Generate, in any tab ([D-2026-11-13-07](../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-07)).
 
-**Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, avatars, short names, VS, and the status line (the generation reason, “A player is playing now; this match waits until they are free.”, or a warn-tone attention reason). A **Draft** chip replaces #position; there is no handle and no Put on court / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
+**Layout (owner artifact comment, November 23, 2026; [log](../../../../mockup-changes/2026-11-23-queue-generate-two-columns.md)).** From 1280 px wide, Generate Queue has two columns under its heading and intro: the strategy tabs, count, Generate, results, drafts and selection bar on the left, in one card; Bagging pairs (when Bagging mode is on) and the Exemption list on the right (300–360 px). Narrower, it stacks with those two cards first. Drafts fill their column.
+
+**Draft tiles.** Drafts use the Main Queue tile (`MatchCard` with `draft`) in the same grid: format chip, pictures with the level ring and the games badge (no “N played”, “N queued”, “N suggested” or “Playing now” chips; owner artifact comment, November 23, 2026; the badge opens D-SESSION-GAMES), short names, VS, and the status line (the generation reason; when a player is busy, the court the draft waits for, which is the busy match that finishes last among its players: “Waits for Court 2 · ends in about 3 min”, “· finishing soon”, “· could end any time”, “· running long” (warn tone) or “· not started yet”; on two or more courts “Waits for Court 1 and Court 2 · Court 2 ends in about 8 min” with the same phase wording; or a warn-tone attention reason; [log](../../../../mockup-changes/2026-11-23-queue-plan-ahead-court-finish.md)). A **Draft** chip replaces #position; there is no handle and no Put on court / Edit / Remove. The border is dashed until picked. Drafts need wider tiles than queued matches (230 px or more) so a doubles team keeps its chips on one row. Under each name, small chips: “{n} played”, “{n} queued”, “{n} suggested” (only when another draft in the batch has them too) and “Playing now” (warn tone, Plan Ahead). Zero values are hidden and there is no mode prefix.
 
 **Picking works like Players.** The whole tile is a toggle (`role="button"`, `aria-pressed`; Space or Enter). Its accessible name is the match (“Draft Doubles: Migs and Dani vs Marco and Paolo, picked 2”), not “Select Doubles”. Picked tiles get the accent border, the inset ring and a pick-order badge, so the state does not rely on colour alone. Pick order across tabs is the order drafts are added in.
 
@@ -110,7 +112,7 @@ Header hint: “Drafts are suggestions. Nothing joins the Main Queue until you a
 | Tab | Description |
 |---|---|
 | Available Players | Matches from players who are here and not on a court right now. |
-| Plan Ahead | Also uses players who are mid-game. Their matches wait until their current game ends. |
+| Plan Ahead | Also uses players whose court is finishing soon, ranked with free players. Their matches wait until that game ends. A busy player counts only when their court's expected finish is Finishing soon, Could end any time or Running long; courts still mid-game (Ends in about N min) or Getting ready are left out. Free and finishing-soon players rank together by load; ties go to the soonest free (expected minutes left, free = 0). |
 | Longest Wait | Puts the players who have waited longest since their last game first. |
 | Fewest Games | Puts the players with the fewest games (played + already queued) first. |
 | Catch Up | Helps players who are behind reach a number of games you choose. |
@@ -138,7 +140,7 @@ Disabled controls have a title and accessible description pointing to a visible 
 Batch results are never errors. A full batch shows as a neutral chip; a shortfall or Catch Up note is an info notice. Use singular “game” / “match” and “is” for a count of one:
 
 - Full batch: “Made {n} of {n} matches.”
-- Not enough players: “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” in place of “free”.
+- Not enough players: “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “free or finishing-soon” in place of “free”.
 - Catch Up met in the plan: “Everyone available reaches {target} games with these matches.” Only eligible players are counted; currently playing players are excluded from Catch Up.
 - Catch Up unable to progress: “Made {k} of {n}: no other match helps anyone reach {target} games.”
 - Catch Up still short: append “{s} more games are still needed to reach {target}.”
@@ -147,8 +149,9 @@ Batch results are never errors. A full batch shows as a neutral chip; a shortfal
 Before generating, empty copy is “Choose how many matches, then Generate.”; Catch Up without a valid
 target says “Choose a game target, then Generate.” After choosing inputs, “Generate matches to see
 suggestions here.” No eligible players: “No one is free to play right now. Try Plan Ahead to include
-players who are mid-game.” In Plan Ahead with nobody present: “No present players. Mark arrivals
-present in Players.” A completed generation with no drafts shows its result without a contradictory
+players whose court is finishing soon.” In Plan Ahead with nobody present: “No present players. Mark arrivals
+present in Players.” In Plan Ahead with players present but none free and no court finishing soon: “No one is free
+and no court is finishing soon. Try again in a few minutes.” A completed generation with no drafts shows its result without a contradictory
 prompt to generate.
 
 Checkbox selections persist across tabs in selection order. The review says “Matches are added in

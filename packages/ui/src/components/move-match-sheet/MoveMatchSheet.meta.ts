@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const moveMatchSheetMeta = {
   name: 'MoveMatchSheet',
   description:
-    'Move match N for a match On court or Playing: where it is now and the free open courts to move it to (two for a 5v5). A Getting ready match stays getting ready; a Playing one keeps playing and its time doesn\'t restart.',
+    "Move match N for a match On court or Playing: where it is now and the free open courts to move it to (two for a 5v5). A Getting ready match stays getting ready; a Playing one keeps playing and its time doesn't restart.",
   usage: [
     'Open it from Move to another court in OnCourtSheet. Back returns to that sheet.',
     'Pass variant "playing" for a Playing match (open it from Move to a free court): the line reads "Now on Court 3. It keeps playing on the new court; its time doesn\'t restart." The default is Getting ready.',

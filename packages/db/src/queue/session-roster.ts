@@ -250,6 +250,11 @@ export async function createClubPlayer(
   const typedLink = input.socialLink?.trim() || ''
   const link = typedLink ? normalizeSocialLink(typedLink) : null
   if (typedLink && !link) throw new ServiceError('invalid', { socialLink: SOCIAL_LINK_ERROR })
+  // A phone is kept for an unclaimed player only: a guest (no email, no link) has none.
+  if (phone && !email && !link)
+    throw new ServiceError('invalid', {
+      phone: 'Add an email or a social link to save a phone, or leave the phone empty.',
+    })
   // #1019: a social link makes the record unclaimed, or links the unclaimed player who has it; the
   // link decides who they are, so the email's owner is not checked. One the club saved is refused.
   const linked = link ? await resolveSocialKey(tx, context.clubId, link.key, now, false) : null

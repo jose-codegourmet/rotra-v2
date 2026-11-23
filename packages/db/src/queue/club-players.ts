@@ -327,7 +327,10 @@ export async function addNewSavedPlayer(
           },
           select: { displayName: true },
         })
-        if (match) throw alreadySaved(match.displayName)
+        if (match)
+          throw new ServiceError('conflict', {
+            phone: `${match.displayName} already has this number.`,
+          })
       }
       const { clubPlayer, words } = await createClubPlayer(
         tx,

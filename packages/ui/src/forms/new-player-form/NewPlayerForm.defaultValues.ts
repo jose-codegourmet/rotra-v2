@@ -5,5 +5,6 @@ export const newPlayerFormDefaultValues: NewPlayerFormInput = {
   nickname: '',
   email: '',
   socialLink: '',
+  phone: '',
   level: '',
 }

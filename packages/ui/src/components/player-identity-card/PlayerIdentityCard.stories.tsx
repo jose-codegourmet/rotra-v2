@@ -77,6 +77,11 @@ export const OwnPhone: Story = {
 }
 
 export const PublicSignedIn: Story = { args: { compareSignedIn: true } }
+/** D-2026-11-23-07: others see Verified or Not verified under the name (the result only). */
+export const PublicVerified: Story = { args: { profile: { ...profile, verified: true } } }
+export const PublicVerifiedLight: Story = { ...PublicVerified, globals: { theme: 'light' } }
+export const PublicNotVerified: Story = { args: { profile: { ...profile, verified: false } } }
+export const PublicNotVerifiedLight: Story = { ...PublicNotVerified, globals: { theme: 'light' } }
 export const OwnLight: Story = { args: { isOwn: true }, globals: { theme: 'light' } }
 export const DuskBanner: Story = { args: { bannerKey: 'dusk' } }
 export const SunBannerLight: Story = { args: { bannerKey: 'sun' }, globals: { theme: 'light' } }

@@ -1262,6 +1262,7 @@ for (let i = 0; i < 1283; i++) {
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
     profilePrivate: PRIVATE_SEED.has(i) || ALWAYS_SEED.has(i), alwaysPrivate: ALWAYS_SEED.has(i), hiddenDir: HIDDEN_SEED.has(i),
     unclaimed: i in UNCLAIMED_SEED, savedBy: UNCLAIMED_SEED[i] || null, gender: FIXED_GENDER[i] || null,
+    verified: !(i in UNCLAIMED_SEED) && (h >>> 3) % 3 !== 0,
   });
 }
 
@@ -1568,6 +1569,10 @@ const hiddenFromViewer = (p) => !!p && p.id !== S.me && (!!p.alwaysPrivate || (!
 const isUnclaimed = (p) => !!p && p.claimed === false;
 const savedByName = (p) => (CLUB_DIR[p.savedBy] || CLUB_DIR.c1).name; // Jomar was saved by Lahug Smash Club
 const unclaimedChip = () => chip('Not registered yet', 'warn');
+// Owner, November 23, 2026: other people see whether a registered player is verified. Only the result shows here;
+// the steps (Google, phone, email) and whether Admin set it stay on the player's own Verification page.
+const isPublicVerified = (p) => (S.accounts[p.id] ? verifyOf(S.accounts[p.id]).ok : !!p.verified);
+const publicVerifyChip = (p) => isPublicVerified(p) ? chip(`${I.check} Verified`, 'ok') : chip('Not verified');
 const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
 const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: e.photo, face: e.face, photoUrl: e.photoUrl, level: e.level }); // picture stays visible: D-2026-11-11-11
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
@@ -1963,7 +1968,7 @@ function viewProfile() {
     <aside class="side stack">
       <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : isUnclaimed(p) ? `<div class="row">${unclaimedChip()}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : `<div class="row">${isUnclaimed(p) ? unclaimedChip() : publicVerifyChip(p)}</div>`}</div></div>
         ${isUnclaimed(p) && !own ? heroFacts(p, pos) : ''}
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>

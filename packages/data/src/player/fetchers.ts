@@ -1,4 +1,5 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
+import { accountVerificationIn } from '../account-verification/mockVerification'
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
@@ -155,6 +156,7 @@ export async function getPlayerProfile(
     ...profile,
     leaderboardPlaces: mockLeaderboard(state).places(playerId),
     unclaimedSavedBy,
+    verified: accountVerificationIn(state, playerId)?.verified,
   })
 }
 

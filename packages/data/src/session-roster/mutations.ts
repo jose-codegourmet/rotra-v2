@@ -326,10 +326,12 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   socialLink?: string
   /** Optional, private to the club; kept for an unclaimed player only */
   phone?: string
+  /** The new saved player's id, chosen on the device (see `RosterBatchOperation`) */
+  clubPlayerId?: string
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
-  const { player: p, how } = createClubPlayer(s, input),
+  const { player: p, how } = createClubPlayer(s, { ...input, id: input.clubPlayerId }),
     data = place(
       s,
       input.sessionId,

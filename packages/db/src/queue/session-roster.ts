@@ -44,6 +44,7 @@ import {
 } from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const NEW_PLAYER_EMAIL_ERROR = 'Enter an email address, like name@example.com, or leave it empty.'
 
 /**
@@ -231,10 +232,17 @@ export async function createClubPlayer(
     email?: string | null
     /** #1019: a social link is an entry key too, and wins over the email */
     socialLink?: string | null
+    /** An id chosen on the device (session Add player); else derived from the operation */
+    clubPlayerId?: string | null
   },
   now: Date,
 ) {
-  const id = await derivedId(operationId, 'club-player')
+  // The session Add player chooses the id on the device so the club-set picture can follow it
+  // (repeat-safe: a retried operation carries the same id); otherwise it comes from the operation.
+  const id =
+    input.clubPlayerId && UUID_RE.test(input.clubPlayerId)
+      ? input.clubPlayerId
+      : await derivedId(operationId, 'club-player')
   const existing = await tx.clubPlayer.findUnique({
     where: { clubId_id: { clubId: context.clubId, id } },
   })
@@ -465,6 +473,7 @@ export async function addNewPlayerToSession(
     /** D-2026-11-16-04: no email adds a guest; an email adds an unclaimed player or links one */
     email?: string | null
     socialLink?: string | null
+    clubPlayerId?: string | null
     level: string
   },
 ) {
@@ -483,6 +492,7 @@ async function addNewPlayerIn(
     phone?: string
     email?: string | null
     socialLink?: string | null
+    clubPlayerId?: string | null
     level: string
   },
 ) {
@@ -1147,6 +1157,7 @@ export type RosterBatchOperation =
       phone?: string
       email?: string | null
       socialLink?: string | null
+      clubPlayerId?: string | null
       level: string
     })
   | { op: 'remove'; operationId: string; rosterId: string }

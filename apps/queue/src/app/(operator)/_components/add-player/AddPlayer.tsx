@@ -8,6 +8,7 @@ import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { MockError } from '@rotra/data/mock/errors'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import type { RosterAddPlacement } from '@rotra/data/session-roster/mutations'
 import { ROSTER_DUPLICATE_ERROR } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
@@ -186,6 +187,34 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
 }
 
 /**
+ * Saves the Profile picture chosen on New player once the player exists (D-2026-11-09-12). A session
+ * add lands with the roster batch, so that batch is sent first (`flushFirst`). If the upload fails
+ * the player stays saved and the toast says to set the picture in Edit details.
+ */
+function useSaveNewPlayerPicture(flushFirst?: () => Promise<unknown>) {
+  const setPicture = useSetClubPlayerPicture()
+  return async (clubPlayerId: string, name: string, picture: ClubPictureChoice | null) => {
+    if (!picture) return
+    const fail = (error: unknown) =>
+      toast.error(
+        `${name.trim()} was saved, but the picture wasn't: ${errorMessage(error)} Set it in Edit details.`,
+      )
+    try {
+      await flushFirst?.()
+    } catch (error) {
+      fail(error)
+      return
+    }
+    setPicture.mutate(
+      picture.kind === 'photo'
+        ? { clubPlayerId, kind: 'photo', file: picture.file }
+        : { clubPlayerId, kind: 'character', characterId: picture.characterId },
+      { onError: fail },
+    )
+  }
+}
+
+/**
  * Q-ADD-PLAYER container. With a session it is shared by preparation (Add player) and the console
  * (Add late player): AddPlayerSheet on the saved, Player Information and new-player session adds.
  * Without one it is Saved players › Add player: the sheet's club context saves to the saved players
@@ -278,7 +307,8 @@ function SessionAddPlayer({
     })
   }
 
-  const submitNewPlayer = (values: NewPlayerFormValues) => {
+  const savePicture = useSaveNewPlayerPicture(() => flushSessionRoster(sessionId))
+  const submitNewPlayer = (values: NewPlayerFormValues, picture: ClubPictureChoice | null) => {
     if (!s || !roster.data) return
     placeOrAsk(values.name.trim(), (placement) => {
       if (!add.begin()) return
@@ -293,7 +323,13 @@ function SessionAddPlayer({
           level: values.level,
           ...placement,
         },
-        add.options,
+        {
+          ...add.options,
+          onSuccess: (result) => {
+            add.options.onSuccess(result)
+            void savePicture(result.data.clubPlayerId, values.name, picture)
+          },
+        },
       )
     })
   }
@@ -353,7 +389,7 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
     addDirectory.mutate({ playerId: candidate.id, level, name }, add.options)
   }
 
-  const setPicture = useSetClubPlayerPicture()
+  const savePicture = useSaveNewPlayerPicture()
   const submitNewPlayer = (values: NewSavedPlayerFormValues, picture: ClubPictureChoice | null) => {
     if (!add.begin()) return
     addNew.mutate(
@@ -369,23 +405,7 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
         ...add.options,
         onSuccess: (result) => {
           add.options.onSuccess(result)
-          // The picture chosen on New player is saved once the player exists (D-2026-11-09-12).
-          if (!picture) return
-          setPicture.mutate(
-            picture.kind === 'photo'
-              ? { clubPlayerId: result.data.clubPlayerId, kind: 'photo', file: picture.file }
-              : {
-                  clubPlayerId: result.data.clubPlayerId,
-                  kind: 'character',
-                  characterId: picture.characterId,
-                },
-            {
-              onError: (error) =>
-                toast.error(
-                  `${values.name.trim()} was saved, but the picture wasn't: ${errorMessage(error)} Set it in Edit details.`,
-                ),
-            },
-          )
+          void savePicture(result.data.clubPlayerId, values.name, picture)
         },
       },
     )

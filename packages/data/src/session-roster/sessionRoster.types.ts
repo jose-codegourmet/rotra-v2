@@ -199,6 +199,11 @@ export type RosterBatchOperation =
       socialLink?: string
       /** Optional, private to the club; kept for an unclaimed player only */
       phone?: string
+      /**
+       * The new saved player's id, chosen on the device so the club-set picture can be saved once
+       * the batch lands (the server derives one from `operationId` when absent)
+       */
+      clubPlayerId?: string
       level: PlayingLevel
     })
   | { op: 'remove'; operationId: string; rosterId: string }

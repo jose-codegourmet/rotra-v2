@@ -81,7 +81,8 @@ type AddPlayerSessionContext = {
   /** Club player ids already on the roster or waitlist */
   inSessionIds: string[]
   onConfirm: (input: AddPlayerConfirmInput) => void
-  onSubmitNewPlayer: (values: NewPlayerFormValues) => void
+  /** `picture` is the Profile picture chosen on New player, or null */
+  onSubmitNewPlayer: (values: NewPlayerFormValues, picture: ClubPictureChoice | null) => void
 }
 
 /**
@@ -91,7 +92,7 @@ type AddPlayerSessionContext = {
 type AddPlayerClubContext = {
   context: 'club'
   onConfirm: (input: AddPlayerClubConfirmInput) => void
-  /** `picture` is the Profile picture chosen on New player (Saved players only), or null */
+  /** `picture` is the Profile picture chosen on New player, or null */
   onSubmitNewPlayer: (values: NewSavedPlayerFormValues, picture: ClubPictureChoice | null) => void
 }
 

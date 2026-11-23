@@ -56,6 +56,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         phone: phone?.success ? phone.data : undefined,
         email: text(body.email) || null,
         socialLink: text(body.socialLink) || null,
+        clubPlayerId: text(body.clubPlayerId) || null,
         level,
         ...placementOf(body),
       }

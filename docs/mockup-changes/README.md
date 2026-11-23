@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 209 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 68 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 209 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -468,6 +468,7 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 209 · CANCELLED: 4 · 
 | [2026-11-23-queue-new-player-phone-picture](2026-11-23-queue-new-player-phone-picture.md) | Add player › New player takes a phone and, from Saved players, a profile picture | new-player-form, club-picture-field (moved out of edit-player-details-form) | IN MOCK APP — PR #1027 |
 | [2026-11-23-queue-public-skill-mix-capacity](2026-11-23-queue-public-skill-mix-capacity.md) | Public page: the Skill mix bar spans the slot budget | skill-distribution-bar, join-request-card | IN MOCK APP — PR #1024 |
 | [2026-11-23-queue-saved-player-level](2026-11-23-queue-saved-player-level.md) | Saved players: the club gives a guest or unclaimed player a level outside a session, and edits it | player-profile-sheet, edit-player-details-form, new-player-form, saved-player-card | IN MOCK APP — PR #1028 |
+| [2026-11-23-queue-session-new-player-picture](2026-11-23-queue-session-new-player-picture.md) | Add player › New player has the same fields in a session as in Saved players | new-player-form, add-player-sheet, club-picture-field | NEW |
 | [2026-11-23-queue-social-link-entry-key](2026-11-23-queue-social-link-entry-key.md) | Add player: a social link saves an unclaimed player without an email (#1019) | add-player-sheet, add-player-form, edit-player-details-form | IN MOCK APP — #1019 |
 | [2026-11-23-queue-unclaimed-name-search](2026-11-23-queue-unclaimed-name-search.md) | Player Information finds unclaimed players by name and shows their name and picture | add-player-sheet, player-confirm-card | IN MOCK APP — PR #1030 |
 <!-- status-index:end -->

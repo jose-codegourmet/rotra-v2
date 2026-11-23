@@ -72,6 +72,7 @@ export async function POST(
       phone: phone?.success ? phone.data : undefined,
       email: text(body.email) || null,
       socialLink: text(body.socialLink) || null,
+      clubPlayerId: text(body.clubPlayerId) || null,
       level: text(body.level),
       ...placementOf(body),
     })

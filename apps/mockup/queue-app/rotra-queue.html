@@ -2411,7 +2411,7 @@ function picEditor(p) {
         <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
         <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>`;
 }
-// Saved players › Add player › New player: the same picture choices, held on the sheet until Save player.
+// Add player › New player (Saved players and a session alike): the same picture choices, held on the sheet until the player is saved.
 function newPicEditor(sh) {
   const d = { id: 'new-player', name: (sh.name || '').trim() || 'New player', identity: 'guest', pic: sh.pic || null }, pc = d.pic, seeds = [0, 1, 2, 3, 4, 5, 6, 7];
   return `<div class="field"><span>Profile picture (optional)</span>
@@ -6830,7 +6830,7 @@ const SHEETS = {
         <p class="small muted">Confirm with the player before adding them.</p>
         <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com, facebook.com/jun.bautista or “jun”.</p>`;
     } else {
-      body += `${club ? newPicEditor(sh) : ''}<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
+      body += `${newPicEditor(sh)}<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
         ${genderField('add-gender', 'sheet', sh.gender)}
         <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Never shown publicly. If the email is already on ROTRA, they're linked to that player.</span></label>
@@ -8354,7 +8354,7 @@ const ACT = {
     if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
     // The email and the link both saved: the link decides who they are; the email is kept on the record.
     const keys = (p) => { const a = social ? applySocial(p, social) : ''; const b = email ? (social ? (p.email = email.toLowerCase(), a) : applyEmail(p, email)) : a; if (phone) p.noPhone = false; return b; };
-    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now(), ...(sh.club && sh.pic ? { pic: sh.pic } : {}) };
+    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now(), ...(sh.pic ? { pic: sh.pic } : {}) };
     if (sh.club) {
       // Saved players › Add player: a level only if one was chosen.
       np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;

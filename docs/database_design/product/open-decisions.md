@@ -53,7 +53,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 
 ## Record games (D-2026-11-18-06), built November 19, 2026
 
-Source: [D-2026-11-18-06](../../mvp/decisions/2026-11-18.md#d-2026-11-18-06). Built in Q23.8 (#976) as migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).
+Source: [D-2026-11-18-06](../../mvp/decisions/2026-11-18.md#d-2026-11-18-06). Built in Q23.8 (#976) as migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` held then, applied to the shared database 2026-11-23).
 
 - **Settled for the build (the owner authorized the proposed shape for the Q23 batch):** `queue_sessions.record_games`, boolean, default true, fixed once the session is no longer prepared (trigger); no backfill. Finishing an unrecorded session writes one `session_finalizations` row and nothing in the result, publication or player fact tables ([results publication](queue/modules/results-publication.md#a-session-with-record-games-off)).
 - **Needs the owner's eye before the shared database gets it:** the ticket's proposal named only the column. Match done with no result also needed `match_decisions_kind_check` widened (a completed decision may have no winner and no scores) and a trigger that ties that shape to the session ([matches](queue/modules/matches-queue.md#match_decisions)). No existing row changes.

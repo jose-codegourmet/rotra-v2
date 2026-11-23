@@ -21,8 +21,8 @@ Google sign-in ([D-2026-11-16-01](../../../docs/mvp/decisions/2026-11-16.md#d-20
 
 **Accepted when:**
 
-- [ ] The open points in D-2026-11-16-01 are answered, or the owner decides the Go stack ships without Google sign-in while the flag is off
-- [ ] If built: every route above has a Go counterpart with characterization tests, and the Go pass check in the apps (go-sign-in R7) has the Google session and deadline rules
+- [x] The open points in D-2026-11-16-01 are answered, or the owner decides the Go stack ships without Google sign-in while the flag is off (2026-11-22: ships without it)
+- [x] If built (not built; n/a): every route above has a Go counterpart with characterization tests, and the Go pass check in the apps (go-sign-in R7) has the Google session and deadline rules
 
 ### R2: A guest's invite link
 
@@ -33,8 +33,8 @@ Google sign-in ([D-2026-11-16-01](../../../docs/mvp/decisions/2026-11-16.md#d-20
 
 **Accepted when:**
 
-- [ ] A Go characterization test redeems a name-only guest's link and matches the TypeScript result
-- [ ] Any difference found is fixed in Go or logged as a deviation
+- [x] A Go characterization test redeems a name-only guest's link and matches the TypeScript result
+- [x] Any difference found is fixed in Go or logged as a deviation
 
 ## Scope
 

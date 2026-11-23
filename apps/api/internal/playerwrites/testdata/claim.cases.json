@@ -30,6 +30,22 @@
    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c1', 'c9000000-0000-4000-8000-000000000001', '+639175550401', 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
    "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES ('f7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-0000000000c1', sha256('rec-plain'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
   ],
+  "claim_guest": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c1', 'c9000000-0000-4000-8000-000000000001', NULL, 'Rita Record', 'Ri', TIMESTAMPTZ '2026-10-07 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c1', 'c9000000-0000-4000-8000-000000000001', '+639175550401', 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES ('f7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-0000000000c1', sha256('rec-plain'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c2', 'c9000000-0000-4000-8000-000000000001', NULL, 'Gary Guest', NULL, TIMESTAMPTZ '2026-10-09 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES ('f7000000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-0000000000c2', sha256('rec-guest'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+  ],
+  "claim_guest_and_phone": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000a1', 'c9000000-0000-4000-8000-000000000001', NULL, 'Newbie Tan', 'Newb', TIMESTAMPTZ '2026-10-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a2', 'c9000000-0000-4000-8000-000000000002', NULL, 'N. Tan', NULL, TIMESTAMPTZ '2026-10-02 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a3', 'c9000000-0000-4000-8000-000000000004', NULL, 'Other Person', NULL, TIMESTAMPTZ '2026-10-03 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a4', 'c9000000-0000-4000-8000-000000000004', NULL, 'Resolved Before', NULL, TIMESTAMPTZ '2026-10-04 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000a1', 'c9000000-0000-4000-8000-000000000001', '+639175550301', 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a2', 'c9000000-0000-4000-8000-000000000002', '+639175550301', 'conflicted', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a3', 'c9000000-0000-4000-8000-000000000004', '+639175550399', 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00'), ('e7000000-0000-4000-8000-0000000000a4', 'c9000000-0000-4000-8000-000000000004', '+639175550301', 'discarded', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c1', 'c9000000-0000-4000-8000-000000000001', NULL, 'Rita Record', 'Ri', TIMESTAMPTZ '2026-10-07 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c1', 'c9000000-0000-4000-8000-000000000001', '+639175550401', 'pending', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES ('f7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-0000000000c1', sha256('rec-plain'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('e7000000-0000-4000-8000-0000000000c2', 'c9000000-0000-4000-8000-000000000001', NULL, 'Gary Guest', NULL, TIMESTAMPTZ '2026-10-09 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, updated_at) VALUES ('f7000000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-0000000000c2', sha256('rec-guest'::bytea), 'active', TIMESTAMPTZ '2026-11-19 00:00:00+00', TIMESTAMPTZ '2026-11-27 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')"
+  ],
   "claim_shared": [
    "UPDATE player_id_counters SET last_sequence = 41",
    "INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, allocated_at, created_at, updated_at) VALUES ('5e000000-0000-4000-8000-000000000001', 'shared@example.test', 'RTR-PH-CEB-102926-0041', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 41, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
@@ -636,6 +652,111 @@
       "email": "other@example.test",
       "password": "correct horse",
       "phone": "",
+      "fullName": "Newbie Tan",
+      "nickname": "Newb",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "redactOptional": true,
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "claim_a_guests_link_takes_the_persons_own_email_and_phone",
+   "scenario": "claim_guest",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/rec-guest",
+     "who": null,
+     "body": {
+      "email": "newbie@example.test",
+      "password": "correct horse",
+      "phone": "0917 555 0302",
+      "fullName": "Newbie Tan",
+      "nickname": "Newb",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "redactOptional": true,
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "claim_a_guests_link_without_a_phone",
+   "scenario": "claim_guest",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/rec-guest",
+     "who": null,
+     "body": {
+      "email": "newbie@example.test",
+      "password": "correct horse",
+      "phone": "",
+      "fullName": "Newbie Tan",
+      "nickname": "Newb",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "redactOptional": true,
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "claim_a_guests_link_with_a_phone_of_other_records",
+   "scenario": "claim_guest_and_phone",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/rec-guest",
+     "who": null,
+     "body": {
+      "email": "newbie@example.test",
+      "password": "correct horse",
+      "phone": "0917 555 0311",
       "fullName": "Newbie Tan",
       "nickname": "Newb",
       "playingStyle": "",

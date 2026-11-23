@@ -864,8 +864,17 @@ CL_SHARED_LINKS = [
     "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, updated_at) VALUES ('%s', '%s', '+639175550398', 'pending', %s, %s)" % (REC(0xb2), NINJA, TS, TS),
     claim_link(3, NINJA, REC(0xb2), "rec-shared-ninja"),
 ]
+# A guest (D-2026-11-18-07, #966): a club record with a name only (no email, phone, private input or shared entry); its invite link is the
+# guest's own registration link, and the person types their own email and phone.
+CR_GUEST = REC(0xc2)
+CL_GUEST = [
+    "INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, updated_at) VALUES ('%s', '%s', NULL, 'Gary Guest', NULL, TIMESTAMPTZ '2026-10-09 00:00:00+00', %s)" % (CR_GUEST, SMASH, TS),
+    claim_link(4, SMASH, CR_GUEST, "rec-guest"),
+]
 claim_sc = dict(SCENARIOS)
 claim_sc["claim_plain"] = CL_PLAIN
+claim_sc["claim_guest"] = CL_PLAIN + CL_GUEST
+claim_sc["claim_guest_and_phone"] = REG_SCENARIOS["unclaimed_records"] + CL_PLAIN + CL_GUEST
 claim_sc["claim_shared"] = REG_SCENARIOS["shared_entry"] + CL_PLAIN + CL_SHARED_LINKS
 claim_sc["claim_shared_taken"] = REG_SCENARIOS["shared_entry_taken_id"] + CL_PLAIN + CL_SHARED_LINKS
 claim_sc["claim_shared_retired"] = REG_SCENARIOS["shared_entry_retired"] + CL_PLAIN + CL_SHARED_LINKS
@@ -899,6 +908,9 @@ case("claim_the_records_entry_decides_before_the_registering_email", [claim("rec
 case("claim_the_registering_email_entry_when_the_record_has_none", [claim("rec-plain", email="second@example.test", phone="")], scenario="claim_two_entries")
 case("claim_a_record_held_by_an_entry_and_other_records_with_the_phone", [claim("rec-shared", email="other@example.test")], scenario="claim_shared_and_phone")
 case("claim_a_record_with_a_phone_on_file_held_by_an_entry_resolves_the_input", [claim("rec-shared-ninja", email="other@example.test", phone="")], scenario="claim_shared")
+case("claim_a_guests_link_takes_the_persons_own_email_and_phone", [claim("rec-guest", phone="0917 555 0302")], scenario="claim_guest")
+case("claim_a_guests_link_without_a_phone", [claim("rec-guest", phone="")], scenario="claim_guest")
+case("claim_a_guests_link_with_a_phone_of_other_records", [claim("rec-guest", phone="0917 555 0311")], scenario="claim_guest_and_phone")
 # A retry after success saves no details again in Go on purpose (TestPostRetryAfterSuccess), so it is not a golden case.
 doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": claim_sc,
        "snapshot": [R_PLAYERS, R_CONTACTS, R_ALLOC, R_COUNTERS, R_ACCOUNTS, R_LINKS, R_MEMBERS, R_INPUTS, R_ENTRIES, R_SOCIAL, NOTES, AUDIT,

@@ -7,8 +7,8 @@ import { NICKNAME_MAX } from '@rotra/schema/personal-details'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
-import { cn } from '@rotra/ui/cn'
 import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
+import { cn } from '@rotra/ui/cn'
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
 import { levelLabel } from '@rotra/ui/level-pill'
@@ -182,7 +182,7 @@ export function EditLivePlayerSheet({
           <Avatar
             name={fullName}
             src={photoUrl}
-            size={56}
+            size={52}
             className="flex-none outline-3 outline-offset-[3px] outline-(--ring)"
           />
           <div className="flex min-w-0 flex-col gap-1">

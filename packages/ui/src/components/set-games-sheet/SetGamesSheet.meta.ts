@@ -18,6 +18,13 @@ export const setGamesSheetMeta = {
     'docs/screens/product/dialogs.md#d-set-games--set-games-played',
     'docs/business_logic/product/queue/modules/players/README.md#games-played-override-717',
   ],
-  variants: ['one player', 'one player changed', 'every player', 'every player with a range', 'pending', 'failed'],
+  variants: [
+    'one player',
+    'one player changed',
+    'every player',
+    'every player with a range',
+    'pending',
+    'failed',
+  ],
   related: ['Sheet', 'CountStepper', 'KeyValueList', 'PlayerPoolCard', 'ConfirmSheet'],
 } satisfies ComponentMeta

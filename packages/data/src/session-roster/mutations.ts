@@ -397,7 +397,8 @@ export function removeRosterPlayer(input: { sessionId: string; rosterId: string 
 }
 export type StepDownInput = { sessionId: string; rosterId: string; operationId?: string }
 /**
- * Move to waitlist (#735): the admitted player goes to the **front** of the waitlist, before and
+ * Move to waitlist (#735): the admitted player goes to the **back** of the waitlist (strict first
+ * come, first served by waitlist time, D-2026-11-23-06), before and
  * after Start. Their level rides on the waitlist entry and their paid mark (kept per club player)
  * stays, so both come back with a slot. Refused while they are in any waiting, On court or Playing
  * match. The mock leaderboard is built from the roster, so a stepped-down player's finished games
@@ -414,15 +415,13 @@ export function stepDownChange(s: MockState, input: StepDownInput, blocked?: str
     )
   )
     throw new MockError('conflict', blocked ?? stepDownBlockedText(nameIn(s, p)))
-  const waiting = s.waitlist.filter((w) => w.sessionId === input.sessionId)
-  const front = Math.min(Date.now(), ...waiting.map((w) => w.addedAt)) - 1
   s.roster = s.roster.filter((r) => r.id !== p.id)
   s.waitlist.push({
     id: crypto.randomUUID(),
     sessionId: input.sessionId,
     clubPlayerId: p.clubPlayerId,
     level: p.level,
-    addedAt: front,
+    addedAt: Date.now(),
   })
   return { data: null, text: `${p.nameSnapshot} moved to the waitlist` }
 }

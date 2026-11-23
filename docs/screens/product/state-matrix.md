@@ -40,7 +40,7 @@
 | Payments on a cancelled session | Marks shown read-only; changes refused: “Payments are not available for this session.” | Same | — |
 | Public page of a cancelled session | **Cancelled** chip and “This session is cancelled. REASON.”; no Request to join | Last synced copy | — |
 | Short on players (live) | Banner “N players present: enough for … X sit out each game.”; a free court that can't get a match says “Not enough free players.” | Same (derived from local state) | Same |
-| Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the front of the waitlist, new slots fill from it | Save disabled | — |
+| Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the end of the waitlist, new slots fill from it | Save disabled | — |
 | Generate final result slides | After valid finalization | Unavailable for an unfinished session | Wait for valid finalization |
 | Publish/download new results | From available valid finalized output and allowed access | No offline finalization workaround | Do not publish unverified provisional results |
 | Claim player/login/reset | Requires server-backed flow. Real mode (#400): not connected yet. Account mapping and claim-link rules are decided (2026-11-07, #244); the routes and staged claim provisioning are not built | Not a Queue offline feature | Resume the same account flow safely |

@@ -278,9 +278,10 @@ func skillMix(levels []pgtype.Int2) publicSkillMix {
 	return m
 }
 
-// orderedWaitlist is orderedWaitlist in session-store.ts: demoted entries first (latest demotion batch at the front,
-// each batch in its original slot order), then everyone else by arrival, the id last. Every time compares at the
-// millisecond the TypeScript's Date has, and a missing slot time counts as 0.
+// orderedWaitlist is orderedWaitlist in session-store.ts: strictly by the time each entry joined the waitlist (the
+// demotion time for a player moved off the roster, otherwise the arrival), a demotion batch in its original slot
+// order, the id last. Every time compares at the millisecond the TypeScript's Date has, and a missing slot time
+// counts as 0.
 func orderedWaitlist(rows []sqlcgen.ListPublicSessionWaitlistRow) []sqlcgen.ListPublicSessionWaitlistRow {
 	ms := func(t pgtype.Timestamptz) int64 {
 		if !t.Valid {
@@ -288,20 +289,19 @@ func orderedWaitlist(rows []sqlcgen.ListPublicSessionWaitlistRow) []sqlcgen.List
 		}
 		return t.Time.UnixMilli()
 	}
+	joined := func(r sqlcgen.ListPublicSessionWaitlistRow) int64 {
+		if r.DemotedAt.Valid {
+			return ms(r.DemotedAt)
+		}
+		return ms(r.AddedAt)
+	}
 	out := append([]sqlcgen.ListPublicSessionWaitlistRow(nil), rows...)
 	sort.SliceStable(out, func(i, j int) bool {
 		a, b := out[i], out[j]
-		if a.DemotedAt.Valid && b.DemotedAt.Valid {
-			if d := ms(b.DemotedAt) - ms(a.DemotedAt); d != 0 {
-				return d < 0
-			}
-			if d := ms(a.DemotedConfirmedAt) - ms(b.DemotedConfirmedAt); d != 0 {
-				return d < 0
-			}
-		} else if a.DemotedAt.Valid || b.DemotedAt.Valid {
-			return a.DemotedAt.Valid
+		if d := joined(a) - joined(b); d != 0 {
+			return d < 0
 		}
-		if d := ms(a.AddedAt) - ms(b.AddedAt); d != 0 {
+		if d := ms(a.DemotedConfirmedAt) - ms(b.DemotedConfirmedAt); d != 0 {
 			return d < 0
 		}
 		return a.ID.String() < b.ID.String()

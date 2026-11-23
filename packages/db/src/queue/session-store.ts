@@ -132,20 +132,25 @@ export function liveRoster(tx: Tx, sessionId: string) {
 }
 
 /**
- * Waitlist order (physical-schema.md, proposal pending #245): demoted entries first, latest demotion
- * batch at the front, each batch in original slot order; then everyone else by arrival; id last.
+ * When the entry joined the waitlist: the demotion time for a player moved off the roster, otherwise
+ * `added_at` (a confirmed join request keeps its requested_at).
+ */
+export function waitlistJoinedAt(entry: { addedAt: Date; demotedAt: Date | null }) {
+  return entry.demotedAt ?? entry.addedAt
+}
+
+/**
+ * Waitlist order (D-2026-11-23-06, replacing proposal #245): strictly first come, first served by
+ * the time each entry joined the waitlist; a demotion batch keeps its original slot order; id last.
  */
 export async function orderedWaitlist(tx: Tx, sessionId: string) {
   const rows = await tx.sessionWaitlistEntry.findMany({ where: { sessionId } })
-  return rows.sort((a, b) => {
-    if (a.demotedAt && b.demotedAt) {
-      const batch = b.demotedAt.getTime() - a.demotedAt.getTime()
-      if (batch) return batch
-      const slot = (a.demotedConfirmedAt?.getTime() ?? 0) - (b.demotedConfirmedAt?.getTime() ?? 0)
-      if (slot) return slot
-    } else if (a.demotedAt || b.demotedAt) return a.demotedAt ? -1 : 1
-    return a.addedAt.getTime() - b.addedAt.getTime() || a.id.localeCompare(b.id)
-  })
+  return rows.sort(
+    (a, b) =>
+      waitlistJoinedAt(a).getTime() - waitlistJoinedAt(b).getTime() ||
+      (a.demotedConfirmedAt?.getTime() ?? 0) - (b.demotedConfirmedAt?.getTime() ?? 0) ||
+      a.id.localeCompare(b.id),
+  )
 }
 
 export async function capacityOf(tx: Tx, session: QueueSession) {

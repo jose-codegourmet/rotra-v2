@@ -575,10 +575,10 @@ export async function removeRosterPlayerIn(tx: Tx, session: QueueSession, roster
 }
 
 /**
- * Move to waitlist (#735): the admitted player steps down to the **front** of the waitlist, before
+ * Move to waitlist (#735): the admitted player steps down to the **back** of the waitlist, before
  * and after Start. Like a budget demotion, the roster entry is released (reason `demoted`), so its
  * assessments, paid mark and finished matches stay on the record and regaining a slot reactivates
- * the same entry; the waitlist row carries the level and `demoted_at` puts it first. Refused while
+ * the same entry; the waitlist row carries the level and `demoted_at` is its waitlist time (D-2026-11-23-06). Refused while
  * the player is in any waiting, On court or Playing match. Repeat-safe on `operationId`.
  */
 export async function stepDownToWaitlist(

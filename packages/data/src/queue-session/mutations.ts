@@ -265,11 +265,8 @@ export function updateQueueSession({
         state.waitlist.filter((w) => w.sessionId === sessionId && w.level),
         slotCapacity(values.courts.length, budget),
       )
-      const earliest =
-        Math.min(
-          Date.now(),
-          ...state.waitlist.filter((w) => w.sessionId === sessionId).map((w) => w.addedAt),
-        ) - b.movedOut.length
+      // Moved-out players join the back of the waitlist in slot order (D-2026-11-23-06).
+      const movedAt = Date.now()
       state.roster = state.roster.filter((p) => !b.movedOut.some((m) => m.id === p.id))
       state.waitlist.push(
         ...b.movedOut.map((p, i) => ({
@@ -277,7 +274,7 @@ export function updateQueueSession({
           sessionId,
           clubPlayerId: p.clubPlayerId,
           level: p.level,
-          addedAt: earliest + i,
+          addedAt: movedAt + i,
         })),
       )
       for (const w of b.movedIn) promoteWaiter(state, w)

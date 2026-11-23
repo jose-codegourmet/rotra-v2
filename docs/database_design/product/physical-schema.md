@@ -139,8 +139,9 @@ nullable `no_show_at` on a live, level-locked entry instead of releasing it (CHE
 `session_players_no_show_check`: never both released and a no show); the live roster is
 `released_at IS NULL AND no_show_at IS NULL`, and Back to roster clears it.
 
-**Waitlist order (proposal, #245).** Demoted entries first (latest demotion batch at the front), each
-batch in original slot order (`demoted_confirmed_at`); then everyone else by `added_at`; `id` breaks
+**Waitlist order (D-2026-11-23-06, replacing proposal #245).** Strictly first come, first served by
+the time each entry joined the waitlist: `demoted_at` for a player moved off the roster, otherwise
+`added_at`; a demotion batch keeps its original slot order (`demoted_confirmed_at`); `id` breaks
 ties. Historical timestamps are never rewritten and there is no position column.
 
 **Roster/assessment cycle.** No fake history: insert the roster row with `assessment_id` null, insert

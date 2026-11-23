@@ -37,7 +37,7 @@ export type SubstitutionSheetProps = {
   matchNo: number
   /** Everyone in the match, Team A first, each with their team; the "Who's coming off?" tiles */
   inMatch: (SubstitutionPlayer & { team: 'A' | 'B' })[]
-  /** Present players not in this match and not playing elsewhere: Suggested and the top of All players */
+  /** Present players not in this match and not playing elsewhere: Suggestion and the top of All players */
   candidates: SubstitutionPlayer[]
   /** Everyone else on tonight's roster (away, on court or playing): greyed out in All players */
   others?: SwapPickerPlayer[]
@@ -88,7 +88,7 @@ function creditWarning(creditTo: SubstitutionCredit, outName: string, inName: st
 
 /**
  * Q-SUBSTITUTE in two steps. Pick, in the SwapPickerSheet: "Who's coming off?" tiles (noting Team A
- * or B), Suggested (with All players behind Other), or "No present player is free right now.",
+ * or B), Suggestion (with All players behind Other), or "No present player is free right now.",
  * and "Who gets this game?" (Nobody by default, the incoming player, or the outgoing player) with
  * "Started M min ago". Review substitution needs both players. Confirm (D-SUBSTITUTE): Out, In with
  * level, Team, Gets this game, and the credit warning, with Back and Confirm substitution. The owner

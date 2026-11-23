@@ -41,7 +41,7 @@ export type SwapPickerSheetProps = {
   outLabel: string
   /** The match's players, Team A first */
   inMatch: (SwapPickerPlayer & { team: 'A' | 'B' })[]
-  /** Everyone else on tonight's roster; free players feed Suggested and lead All players */
+  /** Everyone else on tonight's roster; free players feed Suggestion and lead All players */
   players: SwapPickerPlayer[]
   /** The session's minimum games */
   minimumGames: number
@@ -49,7 +49,17 @@ export type SwapPickerSheetProps = {
   inId: string | null
   onPickOut: (playerId: string) => void
   onPickIn: (playerId: string) => void
-  /** Under Suggested: the Replace notice, or the substitution's "Who gets this game?" */
+  /**
+   * Replace only: the "Swap from match" row between Who's coming out? and Suggestion. Omit for no
+   * row (Substitute). `opponents` is null until someone is coming out.
+   */
+  swapFrom?: {
+    opponents: (SwapPickerPlayer & { team: 'A' | 'B' })[] | null
+    /** The opponent picked to swap places with; null for none */
+    pickedId: string | null
+    onPick: (playerId: string) => void
+  }
+  /** Under Suggestion: the Replace notice, or the substitution's "Who gets this game?" */
   extra?: ReactNode
   /** The one primary action, the last row of the left column (Replace player / Review substitution) */
   action: ReactNode
@@ -170,7 +180,7 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
 
 /**
  * The player picker for Replace (before and during play) and Substitute (the prototype's
- * swapPicker). It opens compact: the title, Who's coming out/off, Suggested (seven free players
+ * swapPicker). It opens compact: the title, Who's coming out/off, Suggestion (seven free players
  * with the fewest games, longest rest first on ties, plus a dashed Other tile), the extra choice and
  * the one action. Other shows All players — search, a skill-level filter, a sort that reverses on a
  * second tap, pages of 24, free players first and the rest greyed out — beside the left column on
@@ -189,6 +199,7 @@ export function SwapPickerSheet({
   inId,
   onPickOut,
   onPickIn,
+  swapFrom,
   extra,
   action,
   onBack,
@@ -403,7 +414,38 @@ export function SwapPickerSheet({
                 ))}
               </div>
             </Section>
-            <Section label="Suggested">
+            {swapFrom ? (
+              <Section label="Swap from match">
+                {swapFrom.opponents ? (
+                  <>
+                    <div className="grid grid-cols-4 gap-2">
+                      {swapFrom.opponents.map((p) => (
+                        <Tile
+                          key={p.id}
+                          player={p}
+                          minimumGames={minimumGames}
+                          note={`Team ${p.team} · opponent`}
+                          pressed={p.id === swapFrom.pickedId}
+                          disabled={isPending}
+                          onClick={() => swapFrom.onPick(p.id)}
+                        />
+                      ))}
+                    </div>
+                    {swapFrom.pickedId ? null : (
+                      <p className="m-0 text-[13px] text-fg2">
+                        Swaps the player coming out with one of their opponents, so the pairs
+                        change. Nobody new comes in.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="m-0 text-[13px] text-fg2">
+                    Choose who's coming out to see who they can swap with.
+                  </p>
+                )}
+              </Section>
+            ) : null}
+            <Section label="Suggestion">
               {free.length ? (
                 <div className="grid grid-cols-4 gap-2">
                   {suggested.map((p) => (

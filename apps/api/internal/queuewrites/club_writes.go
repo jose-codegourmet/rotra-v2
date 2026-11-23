@@ -17,6 +17,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/identity"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/phone"
@@ -64,6 +65,9 @@ func (s *server) inClub(ctx context.Context, club pgtype.UUID, change func(t *tx
 	err := writes.InTx(ctx, s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
 		var err error
 		out, err = change(&txn{ctx: ctx, q: q, s: s, club: club})
+		if err == nil {
+			liveupdates.Note(ctx, club, pgtype.UUID{}) // a club-wide change: the club's screens re-read
+		}
 		return err
 	})
 	return out, err
@@ -93,7 +97,16 @@ func (s *server) regenerateInvite(r *http.Request, club pgtype.UUID) (writes.Res
 		if err != nil {
 			return writes.Result{}, err
 		}
-		n, err := q.RegenerateClubInviteCode(r.Context(), sqlcgen.RegenerateClubInviteCodeParams{Code: pgtype.Text{String: code, Valid: true}, Now: s.stamp(), ClubID: club})
+		// Each try is a small transaction of its own, so a clash rolls back only that try and the live-update event commits with the code (B-26).
+		var n int64
+		err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, tq *sqlcgen.Queries) error {
+			var err error
+			n, err = tq.RegenerateClubInviteCode(ctx, sqlcgen.RegenerateClubInviteCodeParams{Code: pgtype.Text{String: code, Valid: true}, Now: s.stamp(), ClubID: club})
+			if err == nil && n > 0 {
+				liveupdates.Note(ctx, club, pgtype.UUID{})
+			}
+			return err
+		})
 		if err != nil {
 			if !writes.IsUniqueViolation(err) || attempt+1 >= inviteAttempts {
 				return writes.Result{}, err

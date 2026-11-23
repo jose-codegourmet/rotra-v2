@@ -7,6 +7,7 @@ import {
 } from '@rotra/data/queue-session/queueSession.rules'
 import type { ClubContext } from '../auth/account-context'
 import type { Prisma, QueueSession } from '../generated/prisma/client'
+import { appendLiveUpdateEvent } from '../live/append-event'
 import { notifySpotConfirmed } from '../player/notification-events'
 import { requireClubEntitlement } from '../service/authorize'
 import { denyScope, ServiceError } from '../service/errors'
@@ -29,12 +30,22 @@ export async function lockSession(tx: Tx, context: Pick<ClubContext, 'clubId'>, 
   })
 }
 
-/** Bumps the session revision after any change to it or its roster, courts or waitlist. */
-export function touchSession(tx: Tx, session: QueueSession) {
-  return tx.queueSession.update({
+/**
+ * Bumps the session revision after any change to it or its roster, courts or waitlist, and adds the
+ * live-update event that tells open screens to re-read (B-26): the beta's writes that have not moved to
+ * the Go API update live through this one call.
+ */
+export async function touchSession(tx: Tx, session: QueueSession) {
+  const touched = await tx.queueSession.update({
     where: { id: session.id },
     data: { revision: { increment: 1 } },
   })
+  await appendLiveUpdateEvent(tx, {
+    clubId: session.clubId,
+    sessionId: session.id,
+    kind: 'session',
+  })
+  return touched
 }
 
 /**

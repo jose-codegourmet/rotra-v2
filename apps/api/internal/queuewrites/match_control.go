@@ -14,6 +14,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/match"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
@@ -851,6 +852,12 @@ func (s *server) decide(r *http.Request, club pgtype.UUID, operationID string, o
 		if err := t.q.EndMatch(t.ctx, sqlcgen.EndMatchParams{State: sqlcgen.MatchState(o.kind), Now: now, ID: row.m.ID}); err != nil {
 			return nil, err
 		}
+		// A match finished or made invalid changes its registered players' own results (B-50).
+		players, err := t.q.ListMatchRegisteredPlayers(t.ctx, row.m.ID)
+		if err != nil {
+			return nil, err
+		}
+		liveupdates.Note(t.ctx, t.club, t.sess.ID, players...)
 		d, err := t.q.GetMatchDecision(t.ctx, row.m.ID)
 		if err != nil {
 			return nil, err

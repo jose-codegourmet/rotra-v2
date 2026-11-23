@@ -127,6 +127,19 @@ func (q *Queries) GetPublishedResults(ctx context.Context, sessionID pgtype.UUID
 	return public_results, err
 }
 
+const getSessionSnapshotVersion = `-- name: GetSessionSnapshotVersion :one
+SELECT COALESCE(latest_event_id, 0)::bigint AS version FROM queue_sessions WHERE id = $1
+`
+
+// The session's snapshot version (B-25): the id of its newest live-update event, 0 before its first. Read in the same
+// repeatable-read snapshot as the page, so a copy is stamped with exactly what it shows.
+func (q *Queries) GetSessionSnapshotVersion(ctx context.Context, id pgtype.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, getSessionSnapshotVersion, id)
+	var version int64
+	err := row.Scan(&version)
+	return version, err
+}
+
 const listPublicSessionCourts = `-- name: ListPublicSessionCourts :many
 SELECT label
 FROM session_courts

@@ -19,8 +19,17 @@ const DrainingSeconds = 30
 
 // Config is everything the API reads from the environment.
 type Config struct {
-	Addr            string
-	DatabaseURL     string
+	Addr        string
+	DatabaseURL string
+	// DatabaseDirectURL is DATABASE_DIRECT_URL: a direct (unpooled) connection string for the live-update listener, because
+	// PgBouncer does not support LISTEN/NOTIFY (B-26). Empty means the listener uses DatabaseURL, which only works when that
+	// URL is itself direct (main logs a warning).
+	DatabaseDirectURL string
+	// DBIdleInTxTimeout is DB_IDLE_IN_TX_TIMEOUT: how long a transaction may sit idle before Postgres ends it. A write left
+	// open holds back every live update (B-48). Default 5 s; 0 turns the guard off.
+	DBIdleInTxTimeout time.Duration
+	// Stream is the live-update stream's limits (B-43).
+	Stream          Stream
 	LogLevel        slog.Level
 	ShutdownTimeout time.Duration
 	DBMaxConns      int32
@@ -50,6 +59,14 @@ type Config struct {
 	// Google is the Google OAuth client the Go API signs players in with (D-2026-11-16-01, track go-sign-in-catch-up). The zero value
 	// means unset: Continue with Google answers "unavailable" and nothing else changes.
 	Google Google
+}
+
+// Stream is the starting values of B-43, tuned after the first weeks: open streams per client IP, open streams in total, and
+// stream tickets per client IP per minute. Signed-in screens are never limited.
+type Stream struct {
+	MaxPerIP         int
+	MaxTotal         int
+	TicketsPerMinute int
 }
 
 // Google is the Google Cloud OAuth client (a Web application) and where the browser returns to. All three are set or none is.
@@ -159,6 +176,33 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 		{"RETENTION_LIVE_UPDATE_EVENTS_DAYS", &cfg.Housekeeping.LiveUpdateEventsDays},
 		{"RETENTION_AUTH_EVENTS_DAYS", &cfg.Housekeeping.AuthEventsDays},
 		{"RETENTION_AUTH_SESSIONS_DAYS", &cfg.Housekeeping.AuthSessionsDays},
+	} {
+		if v := get(f.name); v != "" {
+			n, err := strconv.Atoi(v)
+			if err != nil || n < 1 {
+				return Config{}, fmt.Errorf("%s must be a whole number of 1 or more, got %q", f.name, v)
+			}
+			*f.dst = n
+		}
+	}
+
+	cfg.DatabaseDirectURL = get("DATABASE_DIRECT_URL")
+	cfg.DBIdleInTxTimeout = 5 * time.Second
+	if v := get("DB_IDLE_IN_TX_TIMEOUT"); v != "" {
+		d, err := time.ParseDuration(v)
+		if err != nil || d < 0 {
+			return Config{}, fmt.Errorf("DB_IDLE_IN_TX_TIMEOUT must be a duration such as 5s (0 turns it off), got %q", v)
+		}
+		cfg.DBIdleInTxTimeout = d
+	}
+	cfg.Stream = Stream{MaxPerIP: 50, MaxTotal: 3000, TicketsPerMinute: 60}
+	for _, f := range []struct {
+		name string
+		dst  *int
+	}{
+		{"STREAM_MAX_PER_IP", &cfg.Stream.MaxPerIP},
+		{"STREAM_MAX_TOTAL", &cfg.Stream.MaxTotal},
+		{"STREAM_TICKETS_PER_MINUTE", &cfg.Stream.TicketsPerMinute},
 	} {
 		if v := get(f.name); v != "" {
 			n, err := strconv.Atoi(v)

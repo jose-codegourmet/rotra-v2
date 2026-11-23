@@ -83,6 +83,9 @@ model QueueSession {
   requestFormats       MatchFormat[]     @default([doubles]) @map("request_formats")
   /// Idempotency key of the create command.
   sourceCommandId      String            @unique @map("source_command_id") @db.Uuid
+  /// The session's snapshot version (B-25, B-49): the id of its newest live-update event, set in the same
+  /// transaction that adds the event. Null until the first event. No foreign key: events are deleted after 7 days.
+  latestEventId        BigInt?           @map("latest_event_id")
   createdAt            DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt            @default(1)

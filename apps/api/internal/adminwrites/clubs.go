@@ -17,6 +17,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/club"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
@@ -125,6 +126,7 @@ func (s *server) createClub(r *http.Request, p session.Principal) (writes.Result
 			return err
 		}
 		out.ClubID, out.Name = uuid.UUID(clubID.Bytes).String(), clubName
+		liveupdates.Note(ctx, clubID, pgtype.UUID{}) // the Admin lists show the new club
 		return nil
 	})
 	if writes.IsUniqueViolation(err) {

@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
@@ -384,7 +385,16 @@ func (s *server) cancelJoinRequest(r *http.Request, p session.Principal) (writes
 	if err != nil {
 		return writes.Result{}, err
 	}
-	n, err := q.CancelPendingJoinRequest(r.Context(), sqlcgen.CancelPendingJoinRequestParams{Now: s.stamp(), ID: pending})
+	// The guarded update runs in a small transaction of its own so the live-update event commits with it (B-26).
+	var n int64
+	err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, tq *sqlcgen.Queries) error {
+		var err error
+		n, err = tq.CancelPendingJoinRequest(ctx, sqlcgen.CancelPendingJoinRequestParams{Now: s.stamp(), ID: pending})
+		if err == nil && n > 0 {
+			liveupdates.Note(ctx, ps.club, ps.id)
+		}
+		return err
+	})
 	if err != nil {
 		return writes.Result{}, err
 	}

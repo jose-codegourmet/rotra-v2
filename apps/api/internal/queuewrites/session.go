@@ -11,6 +11,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessionsetup"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
@@ -90,6 +91,10 @@ func (s *server) lockedSession(ctx context.Context, club pgtype.UUID, sessionID 
 			}
 		}
 		out, err = change(t)
+		if err == nil {
+			// Whatever the command did, the session changed: its screens re-read (B-26). The lock above is held to the commit.
+			liveupdates.Note(ctx, club, id)
+		}
 		return err
 	})
 	return out, err

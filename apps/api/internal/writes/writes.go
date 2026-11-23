@@ -23,6 +23,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 )
 
 // Error is a ServiceError of the TypeScript services: a catalog code and optional field messages.
@@ -105,7 +106,14 @@ func InTx(ctx context.Context, pool *pgxpool.Pool, fn func(ctx context.Context, 
 		}
 	}()
 	if err := fn(ctx, sqlcgen.New(tx)); err != nil {
+		liveupdates.Discard(ctx) // event written iff the write commits
 		return err
+	}
+	// What the route noted becomes its live-update events in this same transaction (B-26); each one locks its session row
+	// first, so a session's events follow its commit order (B-49).
+	if err := liveupdates.Flush(ctx, tx); err != nil {
+		liveupdates.Discard(ctx)
+		return fmt.Errorf("adding live update events: %w", err)
 	}
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("committing write transaction: %w", err)

@@ -6,6 +6,7 @@ import {
 } from '@rotra/data/queue-session/queueSession.rules'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import { appendLiveUpdateEvent } from '../live/append-event'
 import { ServiceError } from '../service/errors'
 import { sessionDto } from './dto'
 import { closeSessionMatchRequests } from './match-request-store'
@@ -56,6 +57,7 @@ export async function cancelSession(
           revision: { increment: 1 },
         },
       })
+      await appendLiveUpdateEvent(tx, { clubId: context.clubId, sessionId, kind: 'session' })
       return sessionDto(updated)
     })
   } catch (error) {

@@ -22,6 +22,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/config"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/testpg"
 )
 
@@ -122,6 +123,15 @@ func NewEnvFull(t *testing.T, now time.Time, build BuildFull) *Env {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Every classified write route that answers 2xx must have told the screens (live updates): the whole write corpus is
+	// the audit of the event hooks.
+	liveupdates.Audit = func(o liveupdates.Observation) {
+		// A route that ran no transaction at all (an empty list of changes) wrote nothing to tell about.
+		if r, _ := liveupdates.Lookup(o.App, o.Pattern); o.Status >= 200 && o.Status < 300 && o.Transactions > 0 && o.Appended == 0 && !r.Replay {
+			t.Errorf("live updates: %s %s answered %d after a write and added no event", o.App, o.Pattern, o.Status)
+		}
+	}
+	t.Cleanup(func() { liveupdates.Audit = nil })
 	register := build(pool, e.Service, e.Store, log, e.Clock.Now)
 	e.Handler = httpapi.NewHandler(httpapi.Deps{Logger: log, Pinger: pool, Readiness: httpapi.NewReadiness(), ProxySecret: ProxySecret}, register)
 	return e

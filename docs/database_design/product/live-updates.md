@@ -2,11 +2,14 @@
 
 **Last verified:** 2026-11-15 · **Decisions:** [B-25, B-26, B-34, B-48, B-49, B-50](../../backend/open-decisions.md#settled)
 
-**Status:** Design approved by the owner November 15, 2026 (B-50). Not migration SQL and not built. The
-migration lands with go-writes-queue R4, and its SQL still needs owner sign-off. Under [B-36](../../backend/open-decisions.md#settled), Prisma
-in `packages/db` owns the schema until ship: a migration PR on `main` with owner sign-off, applied to
-Railway staging, then Supabase production. Follows [conventions](conventions.md) and the PostgreSQL
-table-design rules, with the exceptions listed below.
+**Status:** Design approved by the owner November 15, 2026 (B-50). **Built November 23, 2026 on the live-updates track, not applied
+anywhere shared:** the migration `20261123000400_live_update_events` and the Prisma model exist and were applied to throwaway test
+databases only. Its SQL **still needs owner sign-off** (B-36). Under [B-36](../../backend/open-decisions.md#settled), Prisma in
+`packages/db` owns the schema until ship: a migration PR on `main` with owner sign-off, applied to Railway staging, then Supabase
+production, **before** the API build that adds events is deployed (every Go write adds its event in its own transaction, so a database
+without the table fails those writes). Follows [conventions](conventions.md) and the PostgreSQL table-design rules, with the exceptions
+listed below. The migration also enables row level security, revokes the table from `anon`, `authenticated` and `PUBLIC`, and grants the
+Go API's role (`rotra_api`, as in `20261119000200`) `SELECT, INSERT, DELETE`.
 
 ## What it is for
 
@@ -129,14 +132,16 @@ model LiveUpdateEvent {
 }
 ```
 
-To check in the migration PR (not verified yet):
+Checked on a throwaway PostgreSQL 16 (November 23, 2026):
 
-- Prisma has no `xid8` type. `Unsupported` with a database default should still let Route Handlers call
-  `create()`. Confirm it does.
-- `GENERATED ALWAYS AS IDENTITY` and the `(xact_id, id)` index may need hand-written lines in the
-  migration SQL, if Prisma can't express them on an `Unsupported` column.
-- `xid8` and `pg_current_xact_id()` need Postgres 13 or later. Confirm this on Railway and on Supabase
-  production.
+- `prisma.liveUpdateEvent.create()` works on the `Unsupported("xid8")` field with its database default: the row gets the writer's
+  transaction id. The beta's Route Handlers append through raw SQL (`packages/db/src/live/append-event.ts`), which also locks the
+  session row and stores `latest_event_id`.
+- `GENERATED ALWAYS AS IDENTITY` and the `(xact_id, id)` index are in the migration SQL. The Prisma model declares the index
+  (`@@index([xactId, id], map: "live_update_events_cursor")`), and `prisma migrate diff` from the migrated database to the schema is
+  empty: nothing would drop the index or the identity.
+- Still to confirm: `xid8` and `pg_current_xact_id()` need Postgres 13 or later, so check the version on Railway and on Supabase
+  production before applying.
 
 ## Exceptions to the conventions
 

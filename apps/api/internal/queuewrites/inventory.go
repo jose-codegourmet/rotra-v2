@@ -1,6 +1,7 @@
 package queuewrites
 
 import (
+	"context"
 	"errors"
 	"math"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
@@ -163,7 +165,16 @@ func (s *server) stepInventoryStock(r *http.Request, club pgtype.UUID) (writes.R
 	}
 	itemID, _ := writes.ParseUUID(itemText)
 	q := sqlcgen.New(s.pool)
-	rows, err := q.StepInventoryStock(r.Context(), sqlcgen.StepInventoryStockParams{Delta: int32(delta), ID: itemID, ClubID: club})
+	// The update runs in a small transaction of its own so the live-update event commits with it (B-26); the reads stay outside.
+	var rows int64
+	err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, tq *sqlcgen.Queries) error {
+		var err error
+		rows, err = tq.StepInventoryStock(ctx, sqlcgen.StepInventoryStockParams{Delta: int32(delta), ID: itemID, ClubID: club})
+		if err == nil && rows > 0 {
+			liveupdates.Note(ctx, club, pgtype.UUID{})
+		}
+		return err
+	})
 	if err != nil {
 		return writes.Result{}, err
 	}
@@ -192,7 +203,13 @@ func (s *server) removeInventoryItem(r *http.Request, club pgtype.UUID) (writes.
 	}
 	itemID, _ := writes.ParseUUID(itemText)
 	q := sqlcgen.New(s.pool)
-	if _, err := q.RemoveInventoryItem(r.Context(), sqlcgen.RemoveInventoryItemParams{Now: s.stamp(), ID: itemID, ClubID: club}); err != nil {
+	if err := writes.InTx(r.Context(), s.pool, func(ctx context.Context, tq *sqlcgen.Queries) error {
+		if _, err := tq.RemoveInventoryItem(ctx, sqlcgen.RemoveInventoryItemParams{Now: s.stamp(), ID: itemID, ClubID: club}); err != nil {
+			return err
+		}
+		liveupdates.Note(ctx, club, pgtype.UUID{}) // in the same transaction (B-26)
+		return nil
+	}); err != nil {
 		return writes.Result{}, err
 	}
 	item, err := q.GetClubInventoryItem(r.Context(), sqlcgen.GetClubInventoryItemParams{ID: itemID, ClubID: club})

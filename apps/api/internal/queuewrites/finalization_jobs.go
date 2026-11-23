@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
 
@@ -41,6 +42,8 @@ func backoff(attempts int32) time.Duration {
 // driveQuietly is driveFinalizationJobs with its error swallowed, as the Route Handler does: the commit (or the read) stands, the jobs keep their
 // own status and the next read runs them again.
 func (s *server) driveQuietly(ctx context.Context, club, session pgtype.UUID, retryFailed bool) {
+	// GET finalization drives the jobs outside any write route's scope: their events still go out (B-26).
+	ctx = liveupdates.EnsureScope(ctx, liveupdates.KindFinalization)
 	if err := s.driveFinalizationJobs(ctx, club, session, retryFailed); err != nil {
 		s.log.Error("finalization: in-request jobs", "error", err.Error())
 	}
@@ -195,7 +198,19 @@ func (s *server) runJob(ctx context.Context, q *sqlcgen.Queries, job sqlcgen.Cla
 		return err
 	}
 	if job.SourceFinalizationID.Valid {
-		return s.settleFinalization(ctx, q, job.SourceFinalizationID)
+		if err := s.settleFinalization(ctx, q, job.SourceFinalizationID); err != nil {
+			return err
+		}
+		// The projection changed what the session's results and its players' own records show (B-50).
+		f, err := q.GetSessionFinalization(ctx, job.SourceFinalizationID)
+		if err != nil {
+			return err
+		}
+		players, err := q.ListFinalizationPlayerIDs(ctx, job.SourceFinalizationID)
+		if err != nil {
+			return err
+		}
+		liveupdates.Note(ctx, f.ClubID, job.SourceFinalizationID, players...)
 	}
 	return nil
 }

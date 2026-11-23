@@ -12,6 +12,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 )
 
 // Router collects handlers per pattern and per app, then registers each pattern once. net/http panics on a
@@ -36,7 +37,20 @@ func (rt *Router) Handle(pattern string, aud store.Audience, h http.Handler) {
 	if _, dup := m[aud]; dup {
 		panic("signedin: " + pattern + " is already handled for " + string(aud))
 	}
-	m[aud] = h
+	// A classified write route runs in a live-update scope: what its commands note is added as events when they commit.
+	m[aud] = liveupdates.Scoped(string(aud), pattern, h)
+}
+
+// Patterns lists every registered pattern with the audiences that answer it ("club", "player", "admin"), in registration
+// order. The live-updates audit reads it to check that every write route is classified.
+func (rt *Router) Patterns() map[string][]store.Audience {
+	out := make(map[string][]store.Audience, len(rt.patterns))
+	for _, p := range rt.patterns {
+		for aud := range rt.byApp[p] {
+			out[p] = append(out[p], aud)
+		}
+	}
+	return out
 }
 
 // Mount registers every pattern on the mux. A request whose app header is missing or unknown, or whose app has

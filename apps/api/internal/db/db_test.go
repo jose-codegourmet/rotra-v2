@@ -80,3 +80,26 @@ func TestOptionsDefaults(t *testing.T) {
 		t.Fatalf("default MaxConns = %d, want 10", got)
 	}
 }
+
+func TestIdleInTransactionTimeoutIsSetOnEveryConnectionTheOptionAsks(t *testing.T) {
+	dsn := testpg.NewDatabase(t)
+	ctx := context.Background()
+	p, err := db.Open(ctx, dsn, db.Options{MaxConns: 2, IdleInTxTimeout: 1500 * time.Millisecond})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer p.Close()
+	var got string
+	if err := p.Raw().QueryRow(ctx, `SHOW idle_in_transaction_session_timeout`).Scan(&got); err != nil || got != "1500ms" {
+		t.Fatalf("got %q (%v), want 1500ms", got, err)
+	}
+	// No option, no setting: the server's own default (off).
+	plain, err := db.Open(ctx, dsn, db.Options{MaxConns: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer plain.Close()
+	if err := plain.Raw().QueryRow(ctx, `SHOW idle_in_transaction_session_timeout`).Scan(&got); err != nil || got != "0" {
+		t.Fatalf("got %q (%v), want 0", got, err)
+	}
+}

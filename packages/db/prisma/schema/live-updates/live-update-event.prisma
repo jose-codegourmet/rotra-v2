@@ -1,0 +1,25 @@
+// Live-update events (live-updates R1, go-writes-queue R4; B-26, B-48, B-49, B-50): one short-lived "this
+// changed" note per write, added in the write's own transaction. No names, scores or results. The Go API's
+// publisher reads them in transaction order and pushes them to open streams; rows older than 7 days are
+// deleted (B-34). Design: docs/database_design/product/live-updates.md. The SQL needs owner sign-off (B-36).
+// Prisma has no xid8 type, so xact_id is Unsupported with the database default: neither Go nor a Route
+// Handler sets it, and the (xact_id, id) index and GENERATED ALWAYS identity live in the migration SQL.
+
+model LiveUpdateEvent {
+  /// One global number (B-49): the snapshot version of a session (B-25). Gaps are normal.
+  id        BigInt              @id @default(autoincrement())
+  /// The writing transaction's id (B-48). Filled by the database default, never by the writer.
+  xactId    Unsupported("xid8") @default(dbgenerated("pg_current_xact_id()")) @map("xact_id")
+  clubId    String              @map("club_id") @db.Uuid
+  /// Null for club-wide changes.
+  sessionId String?             @map("session_id") @db.Uuid
+  /// Registered players (players.id) whose own results changed: a match finished or made invalid, a session finalized.
+  playerIds String[]            @default([]) @map("player_ids") @db.Uuid
+  /// What changed (courts, queue, roster...). Plain text: Go owns the list (B-45).
+  kind      String
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  /// The publisher's read order (B-48) and every reconnect's catch-up. Only this index and the primary key (B-50).
+  @@index([xactId, id], map: "live_update_events_cursor")
+  @@map("live_update_events")
+}

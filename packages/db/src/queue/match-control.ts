@@ -14,6 +14,7 @@ import {
 import type { SubstitutionCredit } from '@rotra/data/match/types'
 import type { ClubContext } from '../auth/account-context'
 import type { MatchDecision, QueueSession } from '../generated/prisma/client'
+import { appendLiveUpdateEvent, registeredPlayersOfMatch } from '../live/append-event'
 import { ServiceError } from '../service/errors'
 import { loadMatch, type MatchRow, matchCommand, matchContext, matchDto } from './match-store'
 import { derivedId, type Tx } from './session-store'
@@ -774,6 +775,13 @@ async function decide(
       match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),
       decision: decisionDto(decision),
     }
+    // A match finished or made invalid changes its registered players' own night (B-50).
+    await appendLiveUpdateEvent(tx, {
+      clubId: session.clubId,
+      sessionId: session.id,
+      playerIds: await registeredPlayersOfMatch(tx, match.id),
+      kind: 'queue',
+    })
     autoPlaced = await autoFillCourts(tx, session, { ...options, operationId })
     return result
   })

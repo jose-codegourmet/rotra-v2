@@ -16,6 +16,15 @@ const ProxySecretHeader = "X-Rotra-Proxy-Secret"
 
 type clientIPKey struct{}
 
+type trustedKey struct{}
+
+// TrustedFrom reports whether the request carried the correct proxy secret (B-30): it came through an app's proxy.ts,
+// which sets the X-Rotra-App header. Only then may a handler believe that header.
+func TrustedFrom(ctx context.Context) bool {
+	t, _ := ctx.Value(trustedKey{}).(bool)
+	return t
+}
+
 // ClientIPFrom returns the trusted client IP: the forwarded one when the proxy secret was correct,
 // otherwise the connection's own address. "" outside a request.
 func ClientIPFrom(ctx context.Context) string {
@@ -69,7 +78,8 @@ func ProxyGuard(secret string) func(http.Handler) http.Handler {
 				WriteError(w, ErrNotFound, nil)
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), clientIPKey{}, ip)))
+			ctx := context.WithValue(r.Context(), clientIPKey{}, ip)
+			next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, trustedKey{}, trusted)))
 		})
 	}
 }

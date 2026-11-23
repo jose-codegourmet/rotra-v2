@@ -6,6 +6,7 @@ import type { SessionPlayer as RosterView } from '@rotra/data/session-roster/typ
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma, QueueSession } from '../generated/prisma/client'
+import { appendLiveUpdateEvent } from '../live/append-event'
 import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString, toIsoOrNull } from '../service/serialize'
@@ -197,6 +198,11 @@ export async function matchCommand<T>(
         where: { id: session.id },
         data: { queueRevision: { increment: 1 } },
         select: { queueRevision: true },
+      })
+      await appendLiveUpdateEvent(tx, {
+        clubId: session.clubId,
+        sessionId: session.id,
+        kind: 'queue',
       })
       return { result, queueRevision: toDecimalString(bumped.queueRevision) }
     })

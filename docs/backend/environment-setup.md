@@ -18,6 +18,8 @@ chat, a PR, a commit, a log or an `.env.example`. Values below are placeholders.
 | `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` = `30` | Drain streams on deploy (B-44) | old copy is killed at once | no | **not set** |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS` | Traces to Grafana (monitoring track) | telemetry off | headers: yes | **not set** (optional until monitoring) |
 | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_BASE` | Google sign-in for players (all three or none; [setup](google-sign-in-setup.md#in-the-go-api-track-go-sign-in-catch-up)) | Continue with Google answers "unavailable"; with only some of them, or a bad redirect base, Google stays off and the API logs a warning (it still starts) | secret: yes | **not set** (no Google OAuth client exists yet) |
+| `DATABASE_DIRECT_URL` | The live-update listener (LISTEN needs a direct, unpooled connection; PgBouncer does not support it, B-26) | the listener uses `DATABASE_URL` and the API logs a warning | yes | **not set** (needed once live updates are deployed) |
+| `DB_IDLE_IN_TX_TIMEOUT` (default `5s`), `STREAM_MAX_PER_IP` (50), `STREAM_MAX_TOTAL` (3000), `STREAM_TICKETS_PER_MINUTE` (60) | A write left open delays every live update (B-48); the stream limits (B-43) | defaults apply | no | leave unset; also `ALTER ROLE rotra_api SET idle_in_transaction_session_timeout = '5s'` |
 | `ROTRA_AUTH_EXTRA_PUBLIC_KEYS` | Key rotation only (B-47) | nothing | no | not needed now |
 | `ROTRA_AUTH_HASH_CONCURRENCY`, `DB_MAX_CONNS`, `LOG_LEVEL`, `PORT`, `SHUTDOWN_TIMEOUT`, `HOUSEKEEPING_*`, `RETENTION_*` | Tuning | defaults apply | no | leave unset; see `apps/api/README.md` |
 

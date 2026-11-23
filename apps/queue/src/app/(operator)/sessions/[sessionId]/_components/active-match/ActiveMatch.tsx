@@ -814,9 +814,7 @@ function OpenActiveMatch({
         onOpenProfile={openProfile}
         onSwapPartners={onSwapPartners}
         freeCourtCount={freeNow.length}
-        onMoveToFree={() =>
-          go({ kind: 'move', courtIds: [], operationId: newOperationId() })
-        }
+        onMoveToFree={() => go({ kind: 'move', courtIds: [], operationId: newOperationId() })}
         onPause={onPause}
         pausePending={pauseMatch.isPending}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}

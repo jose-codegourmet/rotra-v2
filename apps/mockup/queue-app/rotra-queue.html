@@ -2436,14 +2436,14 @@ const capacityOf = (s) => s.courts.length * perCourtOf(s);
 const waitOf = (s) => (s.waitlist || []).slice().sort((a, b) => a.at - b.at);
 const openSlots = (s) => Math.max(0, capacityOf(s) - s.roster.length);
 // First come, first served when a prepared session's slot budget changes: if it shrinks, the most recently
-// added players move to the front of the waitlist in the order they joined; if it grows, the front of the waitlist fills the new slots.
+// added players move to the back of the waitlist in the order they joined (D-2026-11-23-06); if it grows, the front of the waitlist fills the new slots.
 function rebalanceSlots(s) {
   const cap = capacityOf(s);
   if (s.roster.length > cap) {
     const out = s.roster.slice(cap);
-    const first = Math.min(Date.now(), ...(s.waitlist || []).map((w) => w.at));
+    const now = Date.now();
     s.roster = s.roster.slice(0, cap);
-    s.waitlist = [...out.map((r, i) => ({ pid: r.pid, level: r.level, at: first - (out.length - i) })), ...(s.waitlist || [])];
+    s.waitlist = [...(s.waitlist || []), ...out.map((r, i) => ({ pid: r.pid, level: r.level, at: now + i }))];
     return { moved: out.length, filled: 0 };
   }
   const take = waitOf(s).slice(0, openSlots(s));
@@ -4389,7 +4389,7 @@ function viewSetup() {
       ${(() => {
         const ex = d.id && S.sessions.find((x) => x.id === d.id), cap = d.courts.length * (+d.perCourt || 8);
         if (!ex || ex.status !== 'prepared') return '';
-        if (ex.roster.length > cap) return notice('warn', `<b>${ex.roster.length} players already have a slot.</b> With ${cap} slots, the last ${ex.roster.length - cap} added move to the front of the waitlist when you save, in the order they joined.`);
+        if (ex.roster.length > cap) return notice('warn', `<b>${ex.roster.length} players already have a slot.</b> With ${cap} slots, the last ${ex.roster.length - cap} added move to the end of the waitlist when you save, in the order they joined.`);
         const n = Math.min(cap - ex.roster.length, (ex.waitlist || []).length);
         return n ? notice('', `When you save, the first ${n} on the waitlist get the new slot${n > 1 ? 's' : ''}.`) : '';
       })()}
@@ -7369,15 +7369,14 @@ function needsOverfill(s, name, act, data, add) {
   S.ui.sheet = { type: 'overfill', name, act, data, add, back: S.ui.sheet };
   render(); return true;
 }
-// #735 (proposed): a player steps down to the front of the waitlist. Blocked while they are in any unfinished match.
+// #735: a player steps down to the back of the waitlist (strict first come, first served, D-2026-11-23-06). Blocked while they are in any unfinished match.
 function stepDownToWait(s, pid, self) {
   const r = R(s, pid); if (!r) return false;
   if (s.matches.some((m) => !['done', 'invalid'].includes(m.status) && all(m).includes(pid))) {
     toast(self ? "You're in a match. Ask the Queue Master to finish or remove it first." : `Finish or remove ${short(pid)}'s match first.`); return false;
   }
-  const first = Math.min(Date.now(), ...(s.waitlist || []).map((w) => w.at));
   s.roster = s.roster.filter((x) => x.pid !== pid);
-  s.waitlist = [{ pid, level: r.level, at: first - 1 }, ...(s.waitlist || [])];
+  s.waitlist = [...(s.waitlist || []), { pid, level: r.level, at: Date.now() }];
   commit(`${nm(pid)} moved to the waitlist · ${s.roster.length}/${capacityOf(s)}`);
   return true;
 }

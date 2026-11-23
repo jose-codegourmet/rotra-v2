@@ -90,7 +90,7 @@ Every agreed business module has a corresponding screen contract. The checks bel
 |---|---|---|
 | Optional session cost estimate; fees collected outside ROTRA | [Financials](modules/queue/financials-inventory.md) | Every field optional; entrance fee is a misc cost in the total; payment per player is break-even (rounds up) or custom with profit/loss; never public |
 | Paid / not-paid checklist | [Payments](modules/queue/financials-inventory.md) | Amount due is the full payment per head, never the entrance fee alone; works offline; no money moves |
-| Slot budget, first come first served | [Setup](modules/queue/session-setup.md), [roster](modules/queue/players-roster.md) | Courts × players per court; extra players waitlisted; reducing the budget moves the latest-added to the front of the waitlist in order |
+| Slot budget, first come first served | [Setup](modules/queue/session-setup.md), [roster](modules/queue/players-roster.md) | Courts × players per court; extra players waitlisted; reducing the budget moves the latest-added to the end of the waitlist in order |
 | Club name change needs approval | [Club settings](modules/queue/access-home.md), [Admin club detail](modules/admin/clubs-licenses.md) | Old name shown until approved; one pending request; cancellable |
 | Club password change | [Club settings](modules/queue/access-home.md) | Requires the correct current password; forgotten passwords reset by the platform owner |
 | Club settings online only | [Club settings](modules/queue/access-home.md) | Offline shows only the connection message |

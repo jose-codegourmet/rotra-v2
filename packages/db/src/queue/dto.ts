@@ -119,7 +119,8 @@ export function waitlistDto(entry: SessionWaitlistEntry, position: number) {
     sessionId: entry.sessionId,
     clubPlayerId: entry.clubPlayerId,
     level: levelCodeFor(entry.skillLevelId),
-    addedAt: toIso(entry.addedAt),
+    /** When they joined the waitlist (the move time for a player moved off the roster). */
+    addedAt: toIso(entry.demotedAt ?? entry.addedAt),
     position,
   }
 }

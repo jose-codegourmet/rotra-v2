@@ -174,7 +174,7 @@ These were open or unspecified before October 26, 2026.
 | License payment history | Visible to the club in Club settings with CSV export; payments still happen outside ROTRA |
 | Payment per player | The full amount each player pays: break-even by default, or a custom amount; the estimate shows profit or loss |
 | Entrance fee | A misc per-head cost listed for transparency and included in the total; never the amount a player owes |
-| Budget changes in preparation | First come, first served: players beyond a reduced budget move to the front of the waitlist in the order they joined; added slots fill from the waitlist |
+| Budget changes in preparation | First come, first served: players beyond a reduced budget move to the end of the waitlist in the order they joined (D-2026-11-23-06); added slots fill from the waitlist |
 | Identity check when adding | Registered (claimed) profiles are added in one tap at their Player Information level. The RTR ID / QR / phone confirmation for unclaimed profiles was withdrawn on November 11, 2026; whether it returns for another club's unclaimed player is open ([D-2026-11-16-04](../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)) |
 | Club password | The club changes it with the current password; the platform owner resets a forgotten one |
 | Club settings offline | Unavailable offline |

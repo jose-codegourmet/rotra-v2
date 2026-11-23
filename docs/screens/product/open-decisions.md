@@ -113,7 +113,7 @@ Recorded in the [mockup change log](../../mockup-changes/2026-11-06-queue-on-cou
 | Shuttle pricing and cost panels | Optional estimate in setup; inventory screen | Q-FINANCIALS, Q-INVENTORY |
 | Branding ownership | Logo: edited by the club. Name: club requests, platform owner approves in Admin | Q-CLUB, A-CLUB-DETAIL |
 | Payment per player vs entrance fee | Payment is the full amount (break-even or custom); entrance fee is a misc cost line | Q-FINANCIALS, Q-PAYMENTS |
-| Reducing the slot budget | Latest-added players move to the front of the waitlist on save | Q-SETUP, Q-PREPARE |
+| Reducing the slot budget | Latest-added players move to the end of the waitlist on save (D-2026-11-23-06) | Q-SETUP, Q-PREPARE |
 | Identity confirmation | Unclaimed profiles only; withdrawn November 11, 2026, and open again for another club's unclaimed player ([D-2026-11-16-04](../../mvp/decisions/2026-11-16.md#d-2026-11-16-04)) | Q-ADD-PLAYER, Q-IDENTIFY |
 | Queue reordering controls | Drag handle (arrow keys on the handle); no Earlier / Later buttons | Q-QUEUE |
 | Switching players between teams | Drag a player onto the other team (press and hold on touch; ← / → on keyboard); swaps, protects the waiting match. Since November 6, 2026 also allowed while On court, until Start match | Q-QUEUE, Q-SUGGEST, Q-MANUAL, Q-DISPATCH, Q-ON-COURT |

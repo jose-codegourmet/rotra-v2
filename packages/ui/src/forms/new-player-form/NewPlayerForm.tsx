@@ -57,7 +57,11 @@ type NewPlayerFormBaseProps = {
  */
 export type NewPlayerFormProps = NewPlayerFormBaseProps &
   (
-    | { context?: 'session'; onSubmit: (values: NewPlayerFormValues) => void }
+    | {
+        context?: 'session'
+        /** `picture` is the Profile picture chosen on the form, saved after the player is */
+        onSubmit: (values: NewPlayerFormValues, picture: ClubPictureChoice | null) => void
+      }
     | {
         context: 'club'
         /** `picture` is the Profile picture chosen on the form, saved after the player is */
@@ -118,7 +122,7 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
     values: NewSavedPlayerFormValues,
     picture: ClubPictureChoice | null,
   ) => void
-  // Saved players › Add player: the picture is held here until Save player (D-2026-11-09-12).
+  // The picture is held here until the player is saved (D-2026-11-09-12).
   const [picture, setPicture] = useState<ClubPictureChoice | null>(null)
   const [photoUrl, setPhotoUrl] = useState<string>()
   useEffect(() => {
@@ -142,39 +146,38 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
         noValidate
         className="flex flex-col gap-3.5"
         onSubmit={form.handleSubmit((values) => {
-          if (!isPending) onSubmit(values, club ? picture : null)
+          if (!isPending) onSubmit(values, picture)
         })}
       >
         {serverError ? <Notice tone="error">{serverError}</Notice> : null}
-        {club ? (
-          <ClubPictureField
-            playerId="new-player"
-            // A fixed seed: the faces and initials don't redraw on every keystroke of the name.
-            name="New player"
-            label="Profile picture (optional)"
-            hint={NEW_PICTURE_HINT}
-            picture={
-              picture?.kind === 'photo'
+        {/* Both Add player contexts have the same fields (owner, November 23, 2026). */}
+        <ClubPictureField
+          playerId="new-player"
+          // A fixed seed: the faces and initials don't redraw on every keystroke of the name.
+          name="New player"
+          label="Profile picture (optional)"
+          hint={NEW_PICTURE_HINT}
+          picture={
+            picture?.kind === 'photo'
+              ? {
+                  kind: 'photo',
+                  reference: photoUrl ?? null,
+                  characterId: null,
+                  previousSrc: null,
+                }
+              : picture?.kind === 'character'
                 ? {
-                    kind: 'photo',
-                    reference: photoUrl ?? null,
-                    characterId: null,
+                    kind: 'character',
+                    reference: `character:${picture.characterId}`,
+                    characterId: picture.characterId,
                     previousSrc: null,
                   }
-                : picture?.kind === 'character'
-                  ? {
-                      kind: 'character',
-                      reference: `character:${picture.characterId}`,
-                      characterId: picture.characterId,
-                      previousSrc: null,
-                    }
-                  : { kind: 'initials', reference: null, characterId: null, previousSrc: null }
-            }
-            onChange={setPicture}
-            onRemove={() => setPicture(null)}
-            pending={isPending}
-          />
-        ) : null}
+                : { kind: 'initials', reference: null, characterId: null, previousSrc: null }
+          }
+          onChange={setPicture}
+          onRemove={() => setPicture(null)}
+          pending={isPending}
+        />
         <Field label="Full or display name" error={errors.name?.message}>
           <Controller
             control={form.control}

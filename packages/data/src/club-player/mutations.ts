@@ -39,6 +39,8 @@ export type NewClubPlayerInput = {
   phone?: string | null
   /** #1019: a Facebook, Instagram, YouTube or LinkedIn link is an entry key too; it wins over the email */
   socialLink?: string | null
+  /** An id chosen on the device (session Add player), so the picture can follow; else a new one */
+  id?: string
 }
 
 const PHONE_ERROR = 'Enter a Philippine mobile number, like 0917 555 0142, or leave it empty.'
@@ -98,7 +100,7 @@ export function createClubPlayer(
     }
   }
   const player: ClubPlayer = {
-    id: crypto.randomUUID(),
+    id: input.id ?? crypto.randomUUID(),
     clubId: DEMO_CLUB_ID,
     playerId: null,
     fullName: input.name.trim(),

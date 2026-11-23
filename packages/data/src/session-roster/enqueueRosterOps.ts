@@ -302,6 +302,7 @@ export function enqueueAddNewPlayer(
       ...(email ? { email } : {}),
       ...(socialLink ? { socialLink } : {}),
       ...(phone ? { phone } : {}),
+      clubPlayerId,
       level: input.level,
     },
     preview: preview(

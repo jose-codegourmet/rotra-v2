@@ -600,6 +600,8 @@ export async function realAddNewPlayerToSession(input: {
   email?: string
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string
+  /** The new saved player's id chosen on the device */
+  clubPlayerId?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string

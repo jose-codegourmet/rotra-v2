@@ -6,6 +6,7 @@ import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { loginHasPassword } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
+import { readOwnDetails } from '../queue/club-player-own-details'
 import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
@@ -136,7 +137,10 @@ export async function readVisibleProfile(playerId: string, viewerId: string | nu
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,
   })
-  if (!row?.idAllocation) throw new ServiceError('not_found')
+  // An unclaimed player a club saved with an email or a social link is a shared entry, not a
+  // `players` row: its id is the entry's (D-2026-11-16-04, D-2026-11-23-01).
+  if (!row) return readEntryProfile(playerId, viewerId)
+  if (!row.idAllocation) throw new ServiceError('not_found')
   const own = viewerId === playerId
   const singleClub = row.profileState === 'unclaimed' && row.clubPlayers.length === 1
   if (!own && !singleClub) {
@@ -157,12 +161,68 @@ export async function readPublicProfile(playerId: string, viewerId: string | nul
 
 /** Find a player by RTR ID (public). Identifies a profile; never authorizes claiming. */
 export async function findPublicProfileByRtrId(rtrId: string, viewerId: string | null) {
+  const id = rtrId.trim().toUpperCase()
   const allocation = await prisma.playerIdAllocation.findUnique({
-    where: { rtrId: rtrId.trim().toUpperCase() },
+    where: { rtrId: id },
     select: { playerId: true },
   })
-  if (!allocation) throw new ServiceError('not_found')
-  return readVisibleProfile(allocation.playerId, viewerId)
+  if (allocation) return readVisibleProfile(allocation.playerId, viewerId)
+  // An unclaimed player saved by a club (shared entry): found by their RTR ID too.
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { rtrId: id, claimedPlayerId: null, retiredAt: null },
+    select: { id: true },
+  })
+  if (!entry) throw new ServiceError('not_found')
+  return readEntryProfile(entry.id, viewerId)
+}
+
+/**
+ * The public profile of an unclaimed player a club saved (a shared entry, D-2026-11-16-04): the
+ * name, nickname, picture and profile details of the club that saved them first, their RTR ID and
+ * "saved by" that club. Public while exactly one club has them; with more, signed-in players only,
+ * as for older unclaimed profiles. No rank, banner choice or leaderboard place.
+ */
+async function readEntryProfile(entryId: string, viewerId: string | null) {
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { id: entryId, claimedPlayerId: null, retiredAt: null },
+    select: {
+      id: true,
+      rtrId: true,
+      clubPlayers: {
+        where: { removedAt: null, linkedToClubPlayerId: null, playerId: null },
+        orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+        select: {
+          displayName: true,
+          nickname: true,
+          avatarRef: true,
+          club: { select: { name: true } },
+          privateInput: { select: { presetFields: true } },
+        },
+      },
+    },
+  })
+  const first = entry?.clubPlayers[0]
+  if (!entry || !first) throw new ServiceError('not_found')
+  if (entry.clubPlayers.length > 1 && !viewerId) throw new ServiceError('unauthenticated')
+  const own = readOwnDetails(first.privateInput?.presetFields)
+  const months = currentExperienceMonths(own.experienceMonths, own.experienceRecordedAt)
+  return {
+    playerId: entry.id,
+    rtrId: entry.rtrId,
+    fullName: first.displayName,
+    nickname: first.nickname,
+    picture: first.avatarRef,
+    bannerId: null,
+    profileVisibility: 'public' as ProfileVisibility,
+    unclaimedSavedBy: entry.clubPlayers.length === 1 ? first.club.name : undefined,
+    showProfileStats: true,
+    showWeeklyPerformance: true,
+    playingStyle: own.playingStyle,
+    experienceYears: months == null ? null : Math.floor(months / 12),
+    experienceMonths: months == null ? null : months % 12,
+    socialLinks: own.socialLinks,
+    ...(await resolvePlayerBanner(null)),
+  }
 }
 
 /** `MyAccount`: the signed-in player's own private contacts. Private, no-store. */

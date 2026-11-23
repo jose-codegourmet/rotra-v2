@@ -615,6 +615,17 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
 /** `maskAlwaysPrivate: false` only behind the Admin account boundary (A-PLAYER games). */
 export async function readPlayerMatchHistory(playerId: string, { maskAlwaysPrivate = true } = {}) {
   if (!UUID.test(playerId)) return []
+  // An unclaimed player saved by clubs (a shared entry, no `players` row): every club record's games.
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { id: playerId, claimedPlayerId: null, retiredAt: null },
+    select: { clubPlayers: { where: { removedAt: null }, select: { id: true, clubId: true } } },
+  })
+  if (entry) {
+    const sessions: Awaited<ReturnType<typeof readClubPlayerMatchHistory>> = []
+    for (const record of entry.clubPlayers)
+      sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+    return sessions
+  }
   return prisma.$transaction(async (tx) =>
     historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate),
   )

@@ -28,7 +28,8 @@ export async function readPlayerClubs(playerId: string) {
     where: { id: playerId },
     select: { profileVisibility: true, idAllocation: { select: { rtrId: true } } },
   })
-  if (!player?.idAllocation) throw new ServiceError('not_found')
+  if (!player) return readEntryClubs(playerId)
+  if (!player.idAllocation) throw new ServiceError('not_found')
   if (player.profileVisibility === 'always_private') return []
   const rows = await prisma.clubPlayer.findMany({
     where: { playerId, removedAt: null },
@@ -47,6 +48,35 @@ export async function readPlayerClubs(playerId: string) {
         initials: initials(club.name),
         logoUrl: club.logoRef,
         isHost: hostClubs.has(club.id),
+      },
+    ]
+  })
+}
+
+/** An unclaimed player saved by clubs (a shared entry): the clubs that saved them. */
+async function readEntryClubs(entryId: string) {
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { id: entryId, claimedPlayerId: null, retiredAt: null },
+    select: {
+      clubPlayers: {
+        where: { removedAt: null, linkedToClubPlayerId: null },
+        orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+        select: { club: { select: { id: true, name: true, logoRef: true } } },
+      },
+    },
+  })
+  if (!entry) throw new ServiceError('not_found')
+  const seen = new Set<string>()
+  return entry.clubPlayers.flatMap(({ club }) => {
+    if (seen.has(club.id)) return []
+    seen.add(club.id)
+    return [
+      {
+        id: club.id,
+        name: club.name,
+        initials: initials(club.name),
+        logoUrl: club.logoRef,
+        isHost: false,
       },
     ]
   })

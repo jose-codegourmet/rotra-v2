@@ -169,6 +169,7 @@
     "./swap-picker-sheet": "./src/components/swap-picker-sheet/SwapPickerSheet.tsx",
     "./player-face-button": "./src/components/player-face-button/PlayerFaceButton.tsx",
     "./player-face-button/helpers": "./src/components/player-face-button/PlayerFaceButton.helpers.ts",
+    "./player-name-block": "./src/components/player-name-block/PlayerNameBlock.tsx",
     "./player-nav": "./src/components/player-nav/PlayerNav.tsx",
     "./player-picker-sheet": "./src/components/player-picker-sheet/PlayerPickerSheet.tsx",
     "./player-pool-card": "./src/components/player-pool-card/PlayerPoolCard.tsx",

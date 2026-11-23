@@ -153,9 +153,14 @@ export const LevelBands: Story = {
 }
 export const LevelBandsLight: Story = { ...LevelBands, globals: { theme: 'light' } }
 
-const bandTeams = (levels: [CourtPlayer['level'], CourtPlayer['level'], CourtPlayer['level'], CourtPlayer['level']]) => ({
+const bandTeams = (
+  levels: [CourtPlayer['level'], CourtPlayer['level'], CourtPlayer['level'], CourtPlayer['level']],
+) => ({
   teamA: doubles.teamA.map<CourtPlayer>((player, i) => ({ ...player, level: levels[i] ?? null })),
-  teamB: doubles.teamB.map<CourtPlayer>((player, i) => ({ ...player, level: levels[i + 2] ?? null })),
+  teamB: doubles.teamB.map<CourtPlayer>((player, i) => ({
+    ...player,
+    level: levels[i + 2] ?? null,
+  })),
 })
 
 /** Level rings: a 3 px ring in the band colour on every picture (Beginner blue, Intermediate yellow, Advanced red); no level keeps the white edge. */
@@ -168,7 +173,12 @@ export const LevelRingsBeginner: Story = {
   args: bandTeams(['beginner_low', 'beginner_mid', 'beginner_high', 'beginner_low']),
 }
 export const LevelRingsIntermediate: Story = {
-  args: bandTeams(['intermediate_low', 'intermediate_mid', 'intermediate_high', 'intermediate_low']),
+  args: bandTeams([
+    'intermediate_low',
+    'intermediate_mid',
+    'intermediate_high',
+    'intermediate_low',
+  ]),
 }
 export const LevelRingsAdvanced: Story = {
   args: bandTeams(['advanced_low', 'advanced_mid', 'advanced_high', 'advanced_low']),
@@ -180,7 +190,10 @@ export const LevelRingsMerged: Story = {
     courts: 2,
     teamA: merged.teamA.map<CourtPlayer>((p, i) => ({
       ...p,
-      level: (['beginner_low', 'intermediate_mid', 'advanced_low', null, 'intermediate_low'] as const)[i] ?? null,
+      level:
+        (['beginner_low', 'intermediate_mid', 'advanced_low', null, 'intermediate_low'] as const)[
+          i
+        ] ?? null,
     })),
     teamB: merged.teamB,
     showLevels: false,

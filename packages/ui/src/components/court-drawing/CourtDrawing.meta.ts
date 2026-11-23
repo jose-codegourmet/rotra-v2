@@ -17,7 +17,8 @@ export const courtDrawingMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Live console › Courts › courtSVG(), courtSides() (.pitch, .open-pitch, .sides, .pf, .pf.lv-*, .pf-g), court drag (cdrag, cdLift, cdMove, cdEnd)',
+    screen:
+      'Live console › Courts › courtSVG(), courtSides() (.pitch, .open-pitch, .sides, .pf, .pf.lv-*, .pf-g), court drag (cdrag, cdLift, cdMove, cdEnd)',
   },
   docs: [
     'docs/screens/product/modules/queue/session-console.md',

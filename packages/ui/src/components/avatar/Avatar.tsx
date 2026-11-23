@@ -140,9 +140,9 @@ function AvatarFace({
  */
 export function Avatar({ onClick, onView, ...props }: AvatarProps) {
   if (!onClick) {
-    return <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} onView={onView} />
+    return <AvatarFace key={props.src ?? ''} {...props} onView={onView} />
   }
-  const face = <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} />
+  const face = <AvatarFace key={props.src ?? ''} {...props} />
   return (
     <button
       type="button"

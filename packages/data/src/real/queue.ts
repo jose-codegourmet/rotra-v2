@@ -724,6 +724,7 @@ export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetail
     body: {
       fullName: values.fullName,
       nickname: values.nickname,
+      level: values.level,
       phone: values.phone,
       email: values.email,
       playingStyle: values.playingStyle,
@@ -851,6 +852,8 @@ export async function realAddNewSavedPlayer(input: {
   email?: string | null
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string | null
+  /** The saved level, if one was chosen */
+  level?: string | null
 }) {
   const saved = await realRequest<{
     clubPlayerId: string
@@ -873,6 +876,8 @@ export async function realAddDirectoryPlayerToClub(input: {
   playerId: string
   /** This club's own name for another club's unclaimed player (`ownNameRequired`) */
   name?: string | null
+  /** The saved level, if one was chosen */
+  level?: string | null
 }) {
   const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
     method: 'POST',

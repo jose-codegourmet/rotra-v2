@@ -183,7 +183,7 @@ function savedLevel(level: PlayingLevel | null | undefined) {
  * never merged.
  */
 export function addNewSavedPlayer(input: NewClubPlayerInput & { level?: PlayingLevel | null }) {
-  // Real data: a level is only recorded with a session, so the player is saved without one.
+  // Real data: the level is the saved level (`club_players.saved_skill_level_id`).
   if (isRealDataMode()) return realAddNewSavedPlayer(input)
   return queueMutation({ area: 'Roster', clubAccess: true }, (s) => {
     const level = savedLevel(input.level)

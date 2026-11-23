@@ -91,6 +91,8 @@ export type ClubPlayerDetails = {
   nickname: string | null
   /** The club's own phone for an unclaimed player is on file; a guest never has one */
   phoneOnFile: boolean
+  /** Level for this club (the saved level, or the latest session one); null for none yet */
+  level: PlayingLevel | null
   /**
    * Edit details › Profile picture: what shows now and the previous photo, if any
    * (D-2026-11-09-12; stored on `club_players.avatar_ref` in real mode).
@@ -110,6 +112,8 @@ export type ClubPlayerDetails = {
 export type ClubPlayerDetailsInput = {
   fullName: string
   nickname: string
+  /** Level for this club: a playing level code, or '' for none */
+  level: string
   phone: string
   email: string
   playingStyle: string

@@ -22,7 +22,7 @@ Ticket: #878 (one issue for the whole track, under epic #869).
 
 ## Phase 4: Events
 
-- [ ] **4.1** Outbox event append in each write transaction
+- [ ] **4.1** Outbox event append in each write transaction (built on 2026-11-23 inside live-updates 1.1, branch `track/live-updates`; awaiting the owner's sign-off of the migration SQL and a decision on club-less writes)
 
 ## Phase 5: Switch
 

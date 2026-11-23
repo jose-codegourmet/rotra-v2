@@ -9,7 +9,11 @@ import {
 } from '@rotra/data/player-account/useGuestRegistration'
 import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
 import { usePlayerClubs } from '@rotra/data/player-club/usePlayerClubs'
-import { consumeSessionReturn, rememberSessionReturn } from '@rotra/data/public-session/context'
+import {
+  consumeSessionReturn,
+  rememberSessionReturn,
+  sessionReturn,
+} from '@rotra/data/public-session/context'
 import { AccountLinkStatus } from '@rotra/ui/account-link-status'
 import { LinkPage } from '@rotra/ui/account-link-status/link-page'
 import { ClaimForm } from '@rotra/ui/claim-form'
@@ -73,7 +77,12 @@ function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestR
         sessionTitle={result.sessionTitle}
         onBackToSession={
           result.sessionSlug
-            ? () => window.location.assign(queueSessionUrl(result.sessionSlug ?? ''))
+            ? () =>
+                // The explicit way back first: a transfer link (#1012) returns to its own
+                // `?transfer=` page; otherwise the session page itself.
+                window.location.assign(
+                  sessionReturn(returnTo) ?? queueSessionUrl(result.sessionSlug ?? ''),
+                )
             : undefined
         }
         firstName={result.firstName}

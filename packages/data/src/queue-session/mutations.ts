@@ -1,4 +1,5 @@
 import { courtWindowError } from '@rotra/schema/court-window'
+import { scoringOf } from '@rotra/schema/scoring'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -18,7 +19,10 @@ import {
 } from '../real/session-live'
 import { normalizeSessionCost } from '../session-cost/sessionCost.rules'
 import { validateSessionCost } from '../session-cost/validation'
+import { assignSessionHosts } from '../session-host/fetchers'
+import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionWaitlistEntry } from '../session-roster/sessionRoster.types'
+import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import { saveToastText } from '../sync/fetchers'
 import {
   atWhenLabel,
@@ -131,6 +135,7 @@ export function createQueueSession(input: QueueSessionInput) {
       )
     const seriesId = occurrences.length > 1 ? crypto.randomUUID() : null,
       ids: string[] = []
+    let hostText = ''
     for (const date of free) {
       const id = crypto.randomUUID()
       ids.push(id)
@@ -162,6 +167,7 @@ export function createQueueSession(input: QueueSessionInput) {
         alwaysRequireRequest: false,
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
         recordGames: input.recordGames ?? true,
+        scoring: scoringOf(input.scoring),
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
@@ -177,16 +183,22 @@ export function createQueueSession(input: QueueSessionInput) {
           removedAt: null,
         })),
       )
+      // Q-SETUP › Hosts (#1004): host rows and their roster places in the same write.
+      const placed = input.hostClubPlayerIds?.length
+        ? assignSessionHosts(state, id, input.hostClubPlayerIds)
+        : null
+      if (placed && !hostText) hostText = hostRegistrationText(placed)
       recomputeMinimum(state, id)
     }
     const created = ids.length,
       skipped = occurrences.length - created
     return {
       data: { firstSessionId: required(ids[0]), created, skipped },
-      text:
+      text: `${
         occurrences.length === 1
           ? 'Session created'
-          : `${created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`,
+          : `${created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`
+      }${hostText}`,
     }
   })
 }
@@ -233,6 +245,8 @@ export function updateQueueSession({
         ...(values.requestFormats ? { requestFormats: values.requestFormats } : {}),
         // Record games changes only here, while prepared: a started session refuses every edit.
         ...(values.recordGames === undefined ? {} : { recordGames: values.recordGames }),
+        // Scoring too (Q22): missing keeps the stored mode; an unknown value reads as 16/31.
+        ...(values.scoring === undefined ? {} : { scoring: scoringOf(values.scoring) }),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(
@@ -245,9 +259,10 @@ export function updateQueueSession({
           removedAt: null,
         })),
       )
+      // A waiter without a level (a host with no saved level) is skipped, as the real service does.
       const b = rebalanceSlots(
         state.roster.filter((p) => p.sessionId === sessionId),
-        state.waitlist.filter((w) => w.sessionId === sessionId),
+        state.waitlist.filter((w) => w.sessionId === sessionId && w.level),
         slotCapacity(values.courts.length, budget),
       )
       const earliest =
@@ -266,10 +281,14 @@ export function updateQueueSession({
         })),
       )
       for (const w of b.movedIn) promoteWaiter(state, w)
+      // Q-SETUP › Hosts (#1004): after the new budget, so new hosts take what is open now.
+      const placed = values.hostClubPlayerIds
+        ? assignSessionHosts(state, sessionId, values.hostClubPlayerIds)
+        : null
       recomputeMinimum(state, sessionId)
       return {
         data: s,
-        text: `Preparation saved${b.movedOut.length ? ` · ${b.movedOut.length} players moved to the waitlist` : b.movedIn.length ? ` · ${b.movedIn.length} players moved from the waitlist` : ''}`,
+        text: `Preparation saved${b.movedOut.length ? ` · ${b.movedOut.length} players moved to the waitlist` : b.movedIn.length ? ` · ${b.movedIn.length} players moved from the waitlist` : ''}${placed ? hostRegistrationText(placed) : ''}`,
       }
     },
   )
@@ -367,6 +386,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
         r.decidedAt = now
         closed++
       }
+    // #1011: pending slot transfers expire at Start; the slot stays with the sender.
+    closePendingSlotTransfers(state, sessionId, 'expired', now)
     return {
       data: s,
       text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}${joinRequestsClosedNote(closed)}`,
@@ -392,6 +413,7 @@ export function deleteSession(sessionId: string) {
     state.waitlist = state.waitlist.filter(other)
     state.joinRequests = state.joinRequests.filter(other)
     state.paymentMarks = state.paymentMarks.filter(other)
+    state.sessionHosts = (state.sessionHosts ?? []).filter(other)
     delete state.costEstimates[sessionId]
     delete state.downloads[sessionId]
     delete state.downloadInfo[sessionId]

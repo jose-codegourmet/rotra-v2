@@ -173,7 +173,7 @@ SELECT pg_temp.expect_rejected('score that disagrees with the winner', $q$
 SELECT pg_temp.expect_accepted('winner-only decision with null scores', $q$
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', 'B', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
--- Record games (Q23.8 #976). S2 is active and recorded, S3 is prepared. The unrecorded checks turn S2
+-- Record games (Q23.8 #976; D-2026-11-20-02: an unrecorded session takes a winner like any other). S2 is active and recorded, S3 is prepared. The unrecorded checks turn S2
 -- off with the lock trigger disabled for that one statement (rolled back with the check).
 SELECT pg_temp.expect_accepted('record games turned off while prepared (#976)', $q$
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a3' $q$);
@@ -182,13 +182,13 @@ SELECT pg_temp.expect_rejected('record games changed after start (#976)', $q$
 SELECT pg_temp.expect_rejected('no-result decision on a recorded session (#976)', $q$
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
-SELECT pg_temp.expect_accepted('no-result decision on an unrecorded session (#976)', $q$
+SELECT pg_temp.expect_rejected('no-result decision on an unrecorded session (D-2026-11-20-02)', $q$
   ALTER TABLE queue_sessions DISABLE TRIGGER queue_sessions_record_games_lock;
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a2';
   ALTER TABLE queue_sessions ENABLE TRIGGER queue_sessions_record_games_lock;
   INSERT INTO match_decisions (match_id, club_id, session_id, kind, source_operation_id, confirmed_at, actor_club_id)
   VALUES ('3a000000-0000-4000-8000-0000000a2001', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'completed', gen_random_uuid(), now(), 'c1000000-0000-4000-8000-00000000000a') $q$);
-SELECT pg_temp.expect_rejected('winner on an unrecorded session (#976)', $q$
+SELECT pg_temp.expect_accepted('winner on an unrecorded session (D-2026-11-20-02)', $q$
   ALTER TABLE queue_sessions DISABLE TRIGGER queue_sessions_record_games_lock;
   UPDATE queue_sessions SET record_games = false WHERE id = '5e000000-0000-4000-8000-0000000000a2';
   ALTER TABLE queue_sessions ENABLE TRIGGER queue_sessions_record_games_lock;
@@ -281,6 +281,159 @@ SELECT pg_temp.expect_rejected('club record invite for another club''s record', 
   INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, issued_at, expires_at, updated_at)
   VALUES ('cc000000-0000-4000-8000-0000000000a4', 'c1000000-0000-4000-8000-00000000000b', 'cb000000-0000-4000-8000-0000000000a2',
     decode(repeat('ef', 32), 'hex'), now(), now() + interval '7 days', now()) $q$);
+
+-- Trusted hosts (D-2026-11-22-01) --------------------------------------------------------------
+SELECT pg_temp.expect_accepted('trusted host from a guest saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('second current trusted-host row for one saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), now()) $q$);
+SELECT pg_temp.expect_accepted('trusted host removed and added again (history kept)', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, removed_at, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now() - interval '2 days', now() - interval '1 day', now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a3', now(), NULL, now()) $q$);
+SELECT pg_temp.expect_rejected('trusted host from another club''s saved player', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000b2', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('trusted host removed before it was added', $q$
+  INSERT INTO club_trusted_hosts (id, club_id, club_player_id, added_at, removed_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', 'cb000000-0000-4000-8000-0000000000a2', now(), now() - interval '1 day', now()) $q$);
+
+-- Session hosts (#1004, D-2026-11-22-01) -------------------------------------------------------
+SELECT pg_temp.expect_accepted('session host from a guest saved player', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now()) $q$);
+SELECT pg_temp.expect_rejected('second current host row for one saved player in a session', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now()) $q$);
+SELECT pg_temp.expect_accepted('session host removed and assigned again (history kept)', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, updated_at) VALUES
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now() - interval '2 hours', now() - interval '1 hour', 'Juan Dela Cruz', now()),
+    (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), NULL, 'Juan Dela Cruz', now()) $q$);
+SELECT pg_temp.expect_rejected('session host from another club''s saved player', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000b2', now(), 'Juan Dela Cruz', now()) $q$);
+SELECT pg_temp.expect_rejected('session host on another club''s session', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000b1', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now()) $q$);
+SELECT pg_temp.expect_rejected('session host removed before it was assigned', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a2', now(), now() - interval '1 hour', 'Juan Dela Cruz', now()) $q$);
+
+-- Session host snapshots (#1008, D-2026-11-22-01): finished sessions keep their hosts -----------
+SELECT pg_temp.expect_rejected('session host without a name snapshot', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('session host with a blank name snapshot', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a3', 'cb000000-0000-4000-8000-0000000000a3', now(), '  ', now()) $q$);
+SELECT pg_temp.expect_accepted('frozen host on a completed session, saved player deleted later', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES ('5b000000-0000-4000-8000-0000000000a1', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a2', '2026-10-20T09:00:00Z', 'Juan Dela Cruz', '2026-10-20T13:10:00Z', now());
+  UPDATE club_players SET removed_at = now() WHERE id = 'cb000000-0000-4000-8000-0000000000a2' $q$);
+SELECT pg_temp.expect_accepted('frozen host on an invalid session', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000b', '5e000000-0000-4000-8000-0000000000b1', 'cb000000-0000-4000-8000-0000000000b2', '2026-10-25T09:00:00Z', 'Tester Host', '2026-10-25T12:00:00Z', now()) $q$);
+SELECT pg_temp.expect_rejected('host frozen on a session that has not ended', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now(), now()) $q$);
+SELECT pg_temp.expect_rejected('host removed before the end is frozen', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, updated_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a3', '2026-10-20T09:00:00Z', '2026-10-20T11:00:00Z', 'Juan Dela Cruz', '2026-10-20T13:10:00Z', now()) $q$);
+SELECT pg_temp.expect_rejected('frozen host renamed', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES ('5b000000-0000-4000-8000-0000000000a2', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a3', '2026-10-20T09:00:00Z', 'Juan Dela Cruz', '2026-10-20T13:10:00Z', now());
+  UPDATE session_hosts SET name_snapshot = 'Someone Else' WHERE id = '5b000000-0000-4000-8000-0000000000a2' $q$);
+SELECT pg_temp.expect_rejected('frozen host ended after the session', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES ('5b000000-0000-4000-8000-0000000000a3', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a3', '2026-10-20T09:00:00Z', 'Juan Dela Cruz', '2026-10-20T13:10:00Z', now());
+  UPDATE session_hosts SET removed_at = now(), frozen_at = NULL WHERE id = '5b000000-0000-4000-8000-0000000000a3' $q$);
+SELECT pg_temp.expect_rejected('frozen host deleted', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, frozen_at, updated_at)
+  VALUES ('5b000000-0000-4000-8000-0000000000a4', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1', 'cb000000-0000-4000-8000-0000000000a3', '2026-10-20T09:00:00Z', 'Juan Dela Cruz', '2026-10-20T13:10:00Z', now());
+  DELETE FROM session_hosts WHERE id = '5b000000-0000-4000-8000-0000000000a4' $q$);
+SELECT pg_temp.expect_accepted('open session host freely removed (not frozen)', $q$
+  INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, updated_at)
+  VALUES ('5b000000-0000-4000-8000-0000000000a5', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a2', 'cb000000-0000-4000-8000-0000000000a3', now(), 'Juan Dela Cruz', now());
+  UPDATE session_hosts SET removed_at = now() WHERE id = '5b000000-0000-4000-8000-0000000000a5' $q$);
+
+-- Slot transfer accounting (#1013, D-2026-11-22-05) ---------------------------------------------
+-- Setup (rolled back with everything else): Juan's ₱700 slot in S1 went to Ana; nothing was owed.
+INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES ('5f000000-0000-4000-8000-0000000a1013', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1001', 'cb000000-0000-4000-8000-0000000000a1', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), 70000, 70000, 0, 0, 'PHP');
+SELECT pg_temp.expect_rejected('payment mark frozen by an approved slot transfer removed', $q$
+  DELETE FROM session_payment_marks WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1001' $q$);
+SELECT pg_temp.expect_accepted('payment mark of a slot never transferred removed (untick)', $q$
+  DELETE FROM session_payment_marks WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1002' $q$);
+SELECT pg_temp.expect_rejected('approved slot transfer waiver rewritten', $q$
+  UPDATE session_slot_transfers SET waived_minor = 0, amount_paid_minor = 0 WHERE id = '5f000000-0000-4000-8000-0000000a1013' $q$);
+SELECT pg_temp.expect_rejected('slot transfer waiver that is not what the slot still owed', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), 70000, 20000, 0, 10000, 'PHP') $q$);
+SELECT pg_temp.expect_rejected('approved slot transfer with no payment snapshot', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'cb000000-0000-4000-8000-0000000000a4', 'e1000000-0000-4000-8000-0000000a1004', false,
+    'approved', now(), now(), NULL, NULL, NULL, NULL, NULL) $q$);
+SELECT pg_temp.expect_rejected('payment snapshot on a pending slot transfer', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, amount_paid_minor)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'pending', now(), 0) $q$);
+SELECT pg_temp.expect_accepted('repeat transfer that waives the partial balance', $q$
+  INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1004', 'cb000000-0000-4000-8000-0000000000a4', '91000000-0000-4000-8000-000000000003',
+    '91000000-0000-4000-8000-000000000001', 'cb000000-0000-4000-8000-0000000000a2', 'e1000000-0000-4000-8000-0000000a1002', false,
+    'approved', now(), now(), 90000, 70000, 0, 20000, 'PHP') $q$);
+
+-- Manual full refunds (#1014, D-2026-11-22-06) -------------------------------------------------
+-- Setup (rolled back with everything else): Ana's transfer of her S1 slot was rejected and refunded.
+INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, decided_at)
+  VALUES ('5f000000-0000-4000-8000-0000000a1014', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'cb000000-0000-4000-8000-0000000000a2', '91000000-0000-4000-8000-000000000001',
+    '91000000-0000-4000-8000-000000000003', 'rejected', now(), now());
+INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, slot_transfer_id, amount_minor, refunded_at)
+  VALUES ('5d000000-0000-4000-8000-0000000a1014', 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'transfer_rejected', '5f000000-0000-4000-8000-0000000a1014', 70000, now());
+SELECT pg_temp.expect_rejected('payment mark of a refunded entry rewritten', $q$
+  UPDATE session_payment_marks SET amount_minor = 1 WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1002' $q$);
+SELECT pg_temp.expect_rejected('payment mark of a refunded entry removed', $q$
+  DELETE FROM session_payment_marks WHERE session_player_id = 'e1000000-0000-4000-8000-0000000a1002' $q$);
+SELECT pg_temp.expect_rejected('payment refund rewritten', $q$
+  UPDATE session_payment_refunds SET amount_minor = 1 WHERE id = '5d000000-0000-4000-8000-0000000a1014' $q$);
+SELECT pg_temp.expect_rejected('payment refund deleted', $q$
+  DELETE FROM session_payment_refunds WHERE id = '5d000000-0000-4000-8000-0000000a1014' $q$);
+SELECT pg_temp.expect_rejected('second refund for one roster entry', $q$
+  INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, slot_transfer_id, amount_minor, refunded_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1002', 'transfer_rejected', '5f000000-0000-4000-8000-0000000a1014', 70000, now()) $q$);
+SELECT pg_temp.expect_rejected('refund of nothing', $q$
+  INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1004', 'session_cancelled', 0, now()) $q$);
+SELECT pg_temp.expect_rejected('session refund on a session that was not cancelled', $q$
+  INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1004', 'session_cancelled', 70000, now()) $q$);
+SELECT pg_temp.expect_rejected('transfer refund on an approved transfer', $q$
+  INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, slot_transfer_id, amount_minor, refunded_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1001', 'transfer_rejected', '5f000000-0000-4000-8000-0000000a1013', 70000, now()) $q$);
+SELECT pg_temp.expect_rejected('transfer refund with no transfer', $q$
+  INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at)
+  VALUES (gen_random_uuid(), 'c1000000-0000-4000-8000-00000000000a', '5e000000-0000-4000-8000-0000000000a1',
+    'e1000000-0000-4000-8000-0000000a1004', 'transfer_rejected', 70000, now()) $q$);
 
 -- Restrictive deletion --------------------------------------------------------------------------
 SELECT pg_temp.expect_rejected('club deleted', $q$ DELETE FROM clubs WHERE id = 'c1000000-0000-4000-8000-00000000000a' $q$);

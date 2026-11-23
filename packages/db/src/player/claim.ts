@@ -157,9 +157,10 @@ async function findRecordLink(tokenDigest: Uint8Array<ArrayBuffer>) {
           nickname: true,
           playerId: true,
           removedAt: true,
+          avatarRef: true,
           club: { select: { name: true } },
           privateInput: { select: { phoneE164: true, email: true } },
-          sharedEntry: { select: { email: true, rtrId: true } },
+          sharedEntry: { select: { id: true, email: true, rtrId: true } },
         },
       },
     },
@@ -238,7 +239,8 @@ export async function readClaimLink(token: string) {
         : 'valid'
   return {
     status,
-    clubName: link.issuingClub.name,
+    // No issuing club only for an Admin-link registration's staging link (D-2026-11-20-01).
+    clubName: link.issuingClub?.name ?? 'ROTRA',
     preview: {
       playerId: link.player.id,
       fullName: link.player.fullName,
@@ -377,7 +379,13 @@ async function completeRecordClaim(
     if (current.state !== 'active') throw new ServiceError('forbidden', { link: EXPIRED })
     const now = new Date()
     const player = await tx.player.create({
-      data: { fullName: record.displayName, nickname: record.nickname, profileState: 'claimed' },
+      // D-2026-11-09-12 (owner, November 10, 2026): the club-set picture is the starting picture.
+      data: {
+        fullName: record.displayName,
+        nickname: record.nickname,
+        avatarRef: record.avatarRef,
+        profileState: 'claimed',
+      },
       select: { id: true, fullName: true, nickname: true },
     })
     const contact = await tx.playerPrivateContact.create({
@@ -390,10 +398,14 @@ async function completeRecordClaim(
     })
     // The record's own shared entry (saved with an email) keeps its RTR ID, as does an entry
     // under the registering email (D-2026-11-16-04).
-    const rtrId = await allocateRtrId(tx, player.id, record.clubId, now, [
-      record.sharedEntry?.email,
-      input.email,
-    ])
+    const rtrId = await allocateRtrId(
+      tx,
+      player.id,
+      record.clubId,
+      now,
+      [record.sharedEntry?.email, input.email],
+      record.sharedEntry?.id,
+    )
     await tx.playerAccount.create({
       data: {
         playerId: player.id,
@@ -410,7 +422,14 @@ async function completeRecordClaim(
       data: { playerId: player.id, nickname: null, revision: { increment: 1 } },
     })
     // Every other club's record under the same shared entry joins the account too.
-    await claimSharedEntry(tx, player.id, [record.sharedEntry?.email, input.email], now)
+    await claimSharedEntry(
+      tx,
+      player.id,
+      [record.sharedEntry?.email, input.email],
+      now,
+      null,
+      record.sharedEntry?.id,
+    )
     if (record.privateInput)
       await tx.clubPlayerPrivateInput.update({
         where: { clubPlayerId: record.id },

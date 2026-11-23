@@ -34,7 +34,9 @@ import { profileBanners } from '../fixtures/profileBanners'
 import { profileCharacters } from '../fixtures/profileCharacters'
 import { createQueueFixtures } from '../fixtures/queueSessions'
 import { rankingPolicyVersions } from '../fixtures/rankingSettings'
+import { createSessionHostFixtures } from '../fixtures/sessionHosts'
 import { createSessionPublicationFixtures } from '../fixtures/sessionPublications'
+import { createTrustedHostFixtures } from '../fixtures/trustedHosts'
 import { seedUnclaimedPlayers } from '../fixtures/unclaimedPlayers'
 import { venues } from '../fixtures/venues'
 import type { InventoryItem } from '../inventory/inventory.types'
@@ -60,7 +62,11 @@ import { isRealDataMode } from '../real/mode'
 import { salesSettingsSeed } from '../sales/sales.fixtures'
 import type { SalesSettings } from '../sales/sales.types'
 import type { SessionCostEstimate } from '../session-cost/sessionCost.types'
-import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
+import type { SessionHostRecord } from '../session-host/sessionHost.types'
+import type {
+  SessionPaymentMark,
+  SessionPaymentRefund,
+} from '../session-payment/sessionPayment.types'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import type {
   PlayerAwardHistory,
@@ -76,7 +82,9 @@ import type {
   SessionPlayer,
   SessionWaitlistEntry,
 } from '../session-roster/sessionRoster.types'
+import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
 import type { SaveOutcome, SessionIntegrity, SyncState } from '../sync/sync.types'
+import type { ClubTrustedHost } from '../trusted-host/trustedHost.types'
 import { NotConnectedError } from './errors'
 export type MockState = {
   passwordResetRequests: PasswordResetRequest[]
@@ -84,6 +92,8 @@ export type MockState = {
   inventory: InventoryItem[]
   costEstimates: Record<string, SessionCostEstimate>
   paymentMarks: SessionPaymentMark[]
+  /** Manual full refunds (#1014), append-only; missing in older saved states */
+  paymentRefunds?: SessionPaymentRefund[]
   playerAccounts: typeof playerAccounts
   playerNotifications: Record<string, PlayerNotification[]>
   verificationReminderReads: Record<string, string>
@@ -117,6 +127,16 @@ export type MockState = {
   venues: ClubVenue[]
   players: Player[]
   clubPlayers: ClubPlayer[]
+  /**
+   * Each club's trusted-host list (D-2026-11-22-01), current and removed rows. Absent in older
+   * saved states reads as none.
+   */
+  clubTrustedHosts?: ClubTrustedHost[]
+  /**
+   * Each session's host rows (#1004, D-2026-11-22-01), current and ended. Absent in older saved
+   * states reads as none.
+   */
+  sessionHosts?: SessionHostRecord[]
   sessions: QueueSession[]
   courts: SessionCourt[]
   roster: SessionPlayer[]
@@ -130,6 +150,8 @@ export type MockState = {
   matchRequests: MatchRequest[]
   /** Session invite codes (D-2026-11-09-08): one per Player and session */
   sessionInviteCodes: SessionInviteCode[]
+  /** Slot transfers (#1011) in every state; decided ones stay. Missing in older saved states */
+  slotTransfers?: SlotTransfer[]
   /** Every club's license terms (Admin A-LICENSE); Queue reads the demo club's as its payments */
   licensePayments: ClubLicenseTerm[]
   /** Admin: public-page retention per club (cancelled countdowns, failed or finished deletion) */
@@ -159,6 +181,8 @@ export type MockState = {
    * as none.
    */
   pendingEmails?: Record<string, string>
+  /** Lookup pending (#1019): the social link typed for a new player while offline, by club player id. */
+  pendingSocialLinks?: Record<string, string>
   /**
    * The highest RTR ID number given per place and day ('RTR-PH-CEB-102926-' → 12). It only goes
    * up, so a retired RTR ID, or one Admin moved to another place or date, is never given again.
@@ -185,7 +209,8 @@ function freeze<T>(value: T): DeepReadonly<T> {
 function seedState(): MockState {
   const now = Date.now(),
     { sessions, courts, roster, history, requests } = createQueueFixtures(now),
-    publicationFixtures = createSessionPublicationFixtures(now)
+    publicationFixtures = createSessionPublicationFixtures(now),
+    financials = createFinancialFixtures([...roster, ...history.roster], now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage
   // produced; an unrecorded one never reached that stage and has none.
   const resultSnapshots = Object.fromEntries(
@@ -223,7 +248,10 @@ function seedState(): MockState {
     ],
     adminPlayerRecords: {},
     ...createPlayerRankFixtures(),
-    ...createFinancialFixtures([...roster, ...history.roster], now),
+    ...financials,
+    // #1013: tonight's sample marks for the slot transfer accounting (partial payer, chain giver)
+    paymentMarks: [...financials.paymentMarks, ...requests.paymentMarks],
+    paymentRefunds: [],
     inventory: inventoryItems,
     playerProfiles,
     playerAccounts,
@@ -244,6 +272,8 @@ function seedState(): MockState {
     venues,
     players: [...players, ...requests.players],
     clubPlayers: [...clubPlayers, ...requests.clubPlayers],
+    clubTrustedHosts: createTrustedHostFixtures(now),
+    sessionHosts: createSessionHostFixtures(now),
     sessions,
     courts,
     roster: [...roster, ...history.roster],
@@ -252,6 +282,7 @@ function seedState(): MockState {
     dropOutNotices: requests.dropOutNotices,
     matchRequests: requests.matchRequests,
     sessionInviteCodes: requests.sessionInviteCodes,
+    slotTransfers: requests.slotTransfers,
     licensePayments: adminClubTerms,
     clubRetentionRecords: adminClubRetentionRecords,
     downloads: {},

@@ -1,6 +1,6 @@
 # Sessions
 
-**Last verified:** 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup only); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-22 for session hosts, finished sessions keep their hosts (#1008) ([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1004; mockup, mock app and real mode; migration applied locally only); 2026-11-18 for the Scoring setting ([D-2026-11-18-04](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); mockup and mock app, #988; real mode reads 16/31 until the migration); 2026-11-11 for join requests closing at Start, court time changes during a match and Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html).
 
@@ -25,8 +25,8 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 | Page · section | Fields and rules |
 |---|---|
 | 1 · Details | **Title** (required), date, start time, end time, **venue** (required, one field chosen from the club's saved venues). The end is on the session date or the next day, chosen with day buttons (never guessed), after the start and at most 24 hours later. The duration is shown |
-| 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", … |
-| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup only, November 18, 2026): one of five scoring modes, default 16/31 |
+| 1 · Courts | Number of courts booked (at least 1) and a label for each, defaulting to "Court 1", "Court 2", …; the optional **Hosts** (see [Session hosts](#session-hosts)) |
+| 2 · Formats and mode | Singles and Doubles switches for automatic generation; one session-wide mode: Chill, Fair, or Hard; **Scoring** (mockup and mock app, November 18, 2026; real mode reads 16/31 until the migration): one of five scoring modes, default 16/31 |
 | 2 · Minimum games | Minimum completed games per player: calculated by default, or set by the operator. Expected players defaults to the slot budget (courts × players per court) and follows it until the operator types a number; clearing it follows the slot budget again. An untouched value is saved empty, so the session keeps following its slots |
 | 3 · Financials | Optional cost estimate; see [Financials](../financials/README.md) |
 | 3 · Notes and review | Optional notes shown on the public page, plus a summary with an Edit link per section |
@@ -34,6 +34,21 @@ Setup is **three pages** (decided October 26, 2026, to make setting up a queue f
 A new session defaults to tomorrow, 7:00–10:00 PM, two courts, Doubles on, Singles off, Fair mode, 16/31 scoring, and expected players = the slot budget (courts × players per court) until the operator changes it.
 
 The venue may differ from the club's fixed founding address and never changes it.
+
+### Session hosts
+
+([D-2026-11-22-01](../../../../../mvp/decisions/2026-11-22.md#d-2026-11-22-01), #1004; [log](../../../../../mockup-changes/2026-11-22-queue-session-hosts.md).) A Queue Session's **Hosts** are optional: zero hosts is valid, and several are allowed. A host is one of the club's saved players; hosting is shown on the session and grants no role, permission or sign-in.
+
+- **Picking.** Setup page 1 › Courts › **Add host** lists the club's **trusted hosts** first (in list order), then the other saved players by name. A saved player already picked is not listed again. Picking another saved player asks first, because it **permanently adds them to the club's trusted-host list** ([players › Trusted hosts](../players/README.md#trusted-hosts)); confirming adds them to the list right away, even if the setup is not saved. A save refuses a new host who is not a trusted host by then.
+- **Auto-registration.** Saving gives each new host a host record and registers them as a player, unless they (or another saved record of the same ROTRA player) already hold a slot or a waitlist place: no duplicate registration. A host takes one slot (two hosts on a 16-slot session = 2/16) with their saved level, or no level (set in Roster and levels before Start). Capacity follows the existing preparation rule: past the open slots, the remaining hosts go on the **waitlist** in the order picked ([Slots and waitlist](../players/README.md#slots-and-waitlist)); the setup says so before saving. The save toast adds “· N hosts registered” / “· N hosts waitlisted”.
+- **Series.** Every date of a repeating series gets the same hosts, each registered on that date.
+- **Editing.** In Edit preparation, removing a host ends only the host record; their slot or waitlist place stays. Hosts kept from before are left as they are. A session that is deleted takes its host records with it.
+- **Changing hosts before and during the session** (#1005; [log](../../../../../mockup-changes/2026-11-22-queue-change-hosts.md)). The Overview of Q-PREPARE (prepared and live; the live console's Settings opens it) has a compact **Hosts** card with **Add host** and **Remove**, with club credentials and the existing queue controls only: no new role. Add host is the setup's picker, trusted-host confirmation included, with the same placement: a slot while one is open, otherwise the end of the waitlist, never a second registration. A host added to a live slot is present with a locked level, like any player admitted during play. Because levels are locked once play starts, a host who is not on the roster or waitlist and has no saved level is refused with a message to add them as a player with a level first.
+- **Remove** ends only the host record. It never withdraws the player (their slot or waitlist place stays) and never touches the club's trusted-host list. The other way round, **withdrawing, sitting out, stepping down to the waitlist or a no-show never removes a host record**: the host stays listed and the card says “Not on the roster”. Withdrawal and rejoin stay with the existing roster and waitlist controls. Changing hosts is online only.
+- A waitlisted host without a level (possible before Start) is skipped by the automatic fills; an explicit Give slot asks for a level first.
+- **On the public page** (#1006; [log](../../../../../mockup-changes/2026-11-22-queue-public-hosts.md)). The session's current hosts show in a compact **Hosts** section above Players and Waitlisted, whether or not they are playing. The section is **optional**: with no hosts it is hidden. A host who plays is in Hosts and Players but counts once toward the player count and capacity (hosts are never counted separately). Names, pictures and the profile tap follow the same public rule as Players: masked for visitors, full for a registered player seen by a signed-in Player, never the club's nickname. The hosts are part of the existing public read; no new request. Ending a host record removes them from the section; their Players tile stays.
+- **Finished sessions keep their hosts** (#1008; [log](../../../../../mockup-changes/2026-11-22-queue-past-session-hosts.md)). When the session ends (Session done, or Mark session invalid), the hosts current at that moment become its hosts for good, each with the name they had then. A host removed before the end is not a host of the finished session (the record stays as history). Removing a trusted host, deleting the saved player, renaming them or moving the record into another (Same person) changes nothing about a finished session: the public page and the session record keep showing those hosts, with the public page's masking. During an open session, Same person moves that session's current host record to the other saved player (or ends it, when that player already hosts the session), like the slot. A cancelled session is not frozen.
+- The host picker's trusted part reads the current trusted-host list only, so a removed trusted host is listed with the other saved players (picking them asks to trust them again).
 
 ### Times and days (owner decision, November 6, 2026)
 
@@ -82,13 +97,11 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 **Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
-While it is **off**, the session is run only and nothing is kept:
+While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-02](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only — the mock app and real mode still run the November 18 rule “run only, keep nothing”):
 
-- The queue, courts, presence, payments and minimum games work as usual. A finished game still counts toward each player's games for the night.
-- **Match done** asks for no winner and no score.
-- There is no Leaderboard, no standings, no result slides, no awards and nothing to publish.
-- Nothing goes to player records, player history or ranking.
-- The session still appears in the club's records, marked **Not recorded**, with its roster, games played against the minimum and financials.
+- Everything works as in a recorded session: the queue, courts, presence, payments and minimum games; **Match done** with a winner and score; the Leaderboard, Match History, standings, result slides, awards and Publish results; player records and each player's history in the Player app.
+- **The only difference:** the wins and losses are not part of the Top annual / monthly / weekly leaderboards' wins, the win rate or the shared rank ([ranking](../../../player-information/modules/ranking/README.md)).
+- The session shows a **Not ranked** chip (console, session record) and a **Rankings · Not ranked** tile on the public page.
 
 Open points are listed in the decision.
 
@@ -123,11 +136,15 @@ session nobody is confirmed in.
   session ends with Session done (or is invalid), never Cancelled.
 - **Final.** There is no undo. To play anyway, the club creates a new session.
 - **Confirm first.** The confirmation names the session, its date and time, how many players joined and how many
-  are on the waitlist, warns when any are marked paid ("Refunds happen outside ROTRA."), and takes an optional
+  are on the waitlist, warns when any are marked paid (the record will list who to refund and how much), and takes an optional
   **reason** (up to 120 characters). See [D-CANCEL-SESSION](../../../../../screens/product/dialogs.md#d-cancel-session--cancel-session).
 - **What it keeps.** The cancelled time and the reason (if any) are recorded. The roster, waitlist and payment
-  marks stay on the session, read-only. ROTRA does not refund anyone: refunds happen outside ROTRA, as with
-  every payment ([Financials](../financials/README.md#payments-checklist)). Payment marks can no longer change.
+  marks stay on the session, read-only. ROTRA moves no money: the Queue Master refunds outside ROTRA. The record
+  then lists **Refund everyone who paid** (paid and partially paid players with the whole cash to refund each) and
+  the Queue Master records each manual refund (#1014, owner decision November 22, 2026;
+  [Financials › Manual full refunds](../financials/README.md#manual-full-refunds-1014)). Payment marks can no
+  longer change; payment and refund records both stay in the history.
+- **What it cancels.** Pending slot transfers are cancelled, so their transfer links stop working (#1011, #1012).
 - **What it closes.** Pending join requests close; the public page shows **Cancelled** and the reason, and no
   join form. The session no longer counts toward venue or time clashes, and is not offered for download.
 - **What it counts toward.** Nothing: no games, standings, result slides, minimum, player records or ranking.

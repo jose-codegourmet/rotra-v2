@@ -16,6 +16,7 @@ import type {
   MatchLineup,
   MatchStatus,
   Placement,
+  ResultCheck,
   ResultInput,
   SessionCourt,
   SessionPlayer,
@@ -48,7 +49,7 @@ export const replacedLineup = (lineup: MatchLineup, outId: string, inId: string)
 export const swapTarget = (match: Match, ctx: MatchContext) =>
   run<SwapTarget | null>('match/swapTarget', { match, ...world(ctx) }, clock(ctx))
 export const validateResult = (input: ResultInput) =>
-  run<{ ok: boolean; error?: string }>('match/validateResult', input)
+  run<ResultCheck>('match/validateResult', input)
 export const matchStatus = (match: Match, ctx: MatchContext) =>
   run<MatchStatus>('match/matchStatus', { match, ...world(ctx) }, clock(ctx))
 export const completeLineup = (lineup: MatchLineup) =>

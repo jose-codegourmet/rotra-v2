@@ -1,5 +1,6 @@
 'use client'
 
+import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { KeyValueList } from '@rotra/ui/key-value-list'
@@ -26,6 +27,8 @@ export type SetupNotesReviewSectionProps = {
   onEditPage: (page: number) => void
   /** Queue › Financials adds the Costs row */
   costsReviewLine?: string
+  /** Q-SETUP › Hosts (#1004): the hosts' names in order; omitted hides the Hosts row */
+  hostNames?: string[]
 }
 
 /** Page 3 › Notes and review: the optional notes and the review list with Edit links. */
@@ -35,6 +38,7 @@ export function SetupNotesReviewSection({
   estimatedMinimum,
   onEditPage,
   costsReviewLine,
+  hostNames,
 }: SetupNotesReviewSectionProps) {
   const form = useFormContext<SessionSetupInput>()
   const values = useWatch({ control: form.control }) as SessionSetupInput
@@ -98,7 +102,11 @@ export function SetupNotesReviewSection({
         0,
       ),
     },
+    ...(hostNames
+      ? [{ label: 'Hosts', value: row(hostNames.length ? hostNames.join(', ') : 'None', 0) }]
+      : []),
     { label: 'Formats', value: row(`${formatsLabel(values)} · ${mode_?.label ?? ''}`, 1) },
+    { label: 'Scoring', value: row(scoringMode(values.scoring).label, 1) },
     {
       label: 'Record games',
       value: row(recordGamesLabel(values.recordGames !== false), 1),

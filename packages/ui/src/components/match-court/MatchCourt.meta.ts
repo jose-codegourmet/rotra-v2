@@ -8,6 +8,7 @@ export const matchCourtMeta = {
     'Other players’ matches: Team A on the left; the net box says “◀ Won” or “Won ▶”.',
     '`now` glows the court while the replay shows it on court; `invalid` desaturates it with an Invalid chip.',
     'Player variant: pass `cornerLabel` (the format, “Doubles”) instead of number/timeLabel; `action` is the top-right slot (the Share button), `notCounted` shows a “Not counted” chip with no winner rings, `note` and `dateLine` sit under the court; a face’s `badge` is its games badge (game N of that session). GameRow wraps this.',
+    'Best of 3 (Q22): `score` holds the games won (“2–1”) and `gameScores` every game read from the left side; each shows in a small pill on its own line under the corner pill. The caller flips both when the viewer played on Team B. Omit `gameScores` for a one-game score.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

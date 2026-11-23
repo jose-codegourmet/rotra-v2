@@ -2,7 +2,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { takesClubPicture } from '@rotra/data/club-player/picture-rules'
 import type { ClubPlayerDetails, ClubPlayerPictureState } from '@rotra/data/club-player/types'
+import { socialLinkKeys } from '@rotra/schema/social-link'
 import { Button } from '@rotra/ui/button'
+import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
@@ -12,7 +14,6 @@ import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
 import { useEffect, useId } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { type ClubPictureChoice, ClubPictureField } from './ClubPictureField'
 import { editPlayerDetailsDefaultValues } from './EditPlayerDetailsForm.defaultValues'
 import {
   type EditPlayerDetailsValues,
@@ -75,7 +76,9 @@ export function EditPlayerDetailsForm({
   // D-2026-11-16-04: a saved email is read-only. An older unclaimed record has none: its Email field
   // looks required and the Details required notice shows.
   const emailOnFile = Boolean(details.profile?.email.trim())
-  const detailsRequired = claim && !emailOnFile
+  // #1019: a player saved with a social link and no email is not Details required.
+  const detailsRequired =
+    claim && !emailOnFile && socialLinkKeys(details.profile?.socialLinks).length === 0
   useEffect(() => {
     if (serverError?.field)
       form.setError(serverError.field, { type: 'server', message: serverError.message })

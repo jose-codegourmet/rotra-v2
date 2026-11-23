@@ -1,4 +1,5 @@
 import 'server-only'
+import { socialLinkKeys } from '@rotra/schema/social-link'
 import type { Prisma } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { formatRtrId, nextPlayerSequence, rtrSyncDate } from './rtr-id'
@@ -35,6 +36,21 @@ export async function lockEmail(tx: Tx, email: string) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`email:${email}`}))`
 }
 
+/** Serializes everything that reads-then-writes one social link key (#1019). */
+export async function lockSocialKey(tx: Tx, key: string) {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`social:${key}`}))`
+}
+
+/**
+ * #1019: the open shared entry whose entry key is this normalized social link. Only unclaimed
+ * people are ever found by a link: the key is cleared when the entry is claimed or retired.
+ */
+export function openEntryBySocialKey(tx: Tx, key: string) {
+  return tx.sharedPlayerEntry.findFirst({
+    where: { socialKey: key, claimedPlayerId: null, retiredAt: null },
+  })
+}
+
 /**
  * The registered (claimed) player whose ROTRA email or connected Google email is `email`, or null.
  * The ROTRA email wins when the two belong to different accounts.
@@ -59,6 +75,11 @@ export function openEntryByEmail(tx: Tx, email: string) {
   })
 }
 
+/** The open shared entry with this id. */
+function openEntryById(tx: Tx, id: string) {
+  return tx.sharedPlayerEntry.findFirst({ where: { id, claimedPlayerId: null, retiredAt: null } })
+}
+
 /** The open shared entry with this RTR ID (an exact, normalized RTR ID). */
 export function openEntryByRtrId(tx: Tx, rtrId: string) {
   return tx.sharedPlayerEntry.findFirst({
@@ -71,7 +92,12 @@ export function openEntryByRtrId(tx: Tx, rtrId: string) {
  * the creating club's founding location and today's sync day, the same counter registered players
  * use, so the two never share a sequence. The caller holds the email lock.
  */
-async function createSharedEntry(tx: Tx, clubId: string, email: string, at: Date) {
+async function createSharedEntry(
+  tx: Tx,
+  clubId: string,
+  keys: { email: string | null; socialKey?: string | null },
+  at: Date,
+) {
   const club = await tx.club.findUniqueOrThrow({
     where: { id: clubId },
     select: { foundingLocation: true },
@@ -82,7 +108,8 @@ async function createSharedEntry(tx: Tx, clubId: string, email: string, at: Date
   return tx.sharedPlayerEntry.create({
     data: {
       id: crypto.randomUUID(),
-      email,
+      email: keys.email,
+      socialKey: keys.socialKey ?? null,
       rtrId: formatRtrId(location.countryCode, location.cityCode, syncDate, sequence),
       creatingClubId: clubId,
       locationCodeId: location.id,
@@ -99,7 +126,7 @@ export type EmailResolution =
   /** The email is a registered ROTRA player's */
   | { kind: 'registered'; email: string; playerId: string }
   /** An unclaimed person; `created` when this save made the entry and its RTR ID */
-  | { kind: 'unclaimed'; email: string; entryId: string; rtrId: string; created: boolean }
+  | { kind: 'unclaimed'; email: string | null; entryId: string; rtrId: string; created: boolean }
 
 /**
  * What a club's email resolves to (D-2026-11-16-04): the registered player who has it, else the
@@ -119,8 +146,96 @@ export async function resolveEmail(
   const open = await openEntryByEmail(tx, email)
   if (open) return { kind: 'unclaimed', email, entryId: open.id, rtrId: open.rtrId, created: false }
   if (!create) return null
-  const entry = await createSharedEntry(tx, clubId, email, now)
+  const entry = await createSharedEntry(tx, clubId, { email }, now)
   return { kind: 'unclaimed', email, entryId: entry.id, rtrId: entry.rtrId, created: true }
+}
+
+/**
+ * What a club's social link resolves to (#1019): the open shared entry whose key it is, else a new
+ * entry with a new RTR ID. Never a registered player: a link only finds unclaimed people. The email
+ * typed with it joins a new entry only when nobody on ROTRA has that email yet (the link wins when
+ * the two point to different people). `create: false` only reads. Takes the link lock first.
+ */
+export async function resolveSocialKey(
+  tx: Tx,
+  clubId: string,
+  key: string,
+  now: Date,
+  create = true,
+  email: string | null = null,
+): Promise<Extract<EmailResolution, { kind: 'unclaimed' }> | null> {
+  await lockSocialKey(tx, key)
+  const open = await openEntryBySocialKey(tx, key)
+  if (open)
+    return {
+      kind: 'unclaimed',
+      email: open.email,
+      entryId: open.id,
+      rtrId: open.rtrId,
+      created: false,
+    }
+  if (!create) return null
+  let freeEmail: string | null = null
+  if (email) {
+    await lockEmail(tx, email)
+    const taken = (await registeredPlayerByEmail(tx, email)) || (await openEntryByEmail(tx, email))
+    freeEmail = taken ? null : email
+  }
+  const entry = await createSharedEntry(tx, clubId, { email: freeEmail, socialKey: key }, now)
+  return {
+    kind: 'unclaimed',
+    email: freeEmail,
+    entryId: entry.id,
+    rtrId: entry.rtrId,
+    created: true,
+  }
+}
+
+/**
+ * Edit details saved this club's profile links for its unclaimed record (#1019, decisions 6 and
+ * 8): the entry's key follows them. A key no longer among the links is dropped, and the first link
+ * no other open entry holds becomes the key when the entry has none. With no email and no key left,
+ * this club's record goes back to being a guest (returns true): it stops pointing at the entry,
+ * which keeps its key for any other club that has the person and is retired when none does.
+ */
+export async function followClubLinks(
+  tx: Tx,
+  clubId: string,
+  clubPlayerId: string,
+  entryId: string,
+  links: Parameters<typeof socialLinkKeys>[0],
+  now: Date,
+) {
+  const entry = await tx.sharedPlayerEntry.findUnique({ where: { id: entryId } })
+  if (!entry || entry.claimedPlayerId || entry.retiredAt) return false
+  const keys = socialLinkKeys(links)
+  let key = entry.socialKey && keys.includes(entry.socialKey) ? entry.socialKey : null
+  if (!key)
+    for (const candidate of keys) {
+      await lockSocialKey(tx, candidate)
+      const holder = await openEntryBySocialKey(tx, candidate)
+      if (!holder || holder.id === entry.id) {
+        key = candidate
+        break
+      }
+    }
+  if (key || entry.email) {
+    if (key !== entry.socialKey)
+      await tx.sharedPlayerEntry.update({
+        where: { id: entry.id },
+        data: { socialKey: key, revision: { increment: 1 } },
+      })
+    return false
+  }
+  const others = await tx.clubPlayer.count({
+    where: { sharedEntryId: entry.id, removedAt: null, id: { not: clubPlayerId } },
+  })
+  await tx.clubPlayer.update({
+    where: { clubId_id: { clubId, id: clubPlayerId } },
+    data: { sharedEntryId: null, revision: { increment: 1 } },
+  })
+  if (!others) await retireEntryIfOrphan(tx, entry.id, now)
+  return true
 }
 
 /** The words after the name in the saved message, as the mock words them. */
@@ -210,7 +325,7 @@ export async function retireEntryIfOrphan(tx: Tx, entryId: string | null, now: D
   if (current) return false
   await tx.sharedPlayerEntry.update({
     where: { id: entryId },
-    data: { retiredAt: now, email: null, revision: { increment: 1 } },
+    data: { retiredAt: now, email: null, socialKey: null, revision: { increment: 1 } },
   })
   return true
 }
@@ -224,12 +339,15 @@ export async function adoptEntryAllocation(
   tx: Tx,
   playerId: string,
   emails: (string | null | undefined)[],
+  /** #1019: the claimed record's own entry, found by id (an entry saved with a link has no email) */
+  entryId?: string | null,
 ) {
-  for (const typed of emails) {
+  const own = entryId ? await openEntryById(tx, entryId) : null
+  for (const typed of own ? [null] : emails) {
     const email = normalizeEmail(typed)
-    if (!email) continue
-    await lockEmail(tx, email)
-    const entry = await openEntryByEmail(tx, email)
+    if (!own && !email) continue
+    if (email) await lockEmail(tx, email)
+    const entry = own ?? (email ? await openEntryByEmail(tx, email) : null)
     if (!entry) continue
     const taken = await tx.playerIdAllocation.findUnique({
       where: { rtrId: entry.rtrId },
@@ -268,9 +386,11 @@ export async function claimSharedEntry(
   emails: (string | null | undefined)[],
   now: Date,
   identityRecordId?: string | null,
+  /** #1019: the claimed record's own entry, found by id (an entry saved with a link has no email) */
+  entryId?: string | null,
 ) {
   const already = await tx.sharedPlayerEntry.findUnique({ where: { claimedPlayerId: playerId } })
-  let entry = already
+  let entry = already ?? (entryId ? await openEntryById(tx, entryId) : null)
   if (!entry)
     for (const typed of emails) {
       const email = normalizeEmail(typed)
@@ -290,7 +410,14 @@ export async function claimSharedEntry(
   if (!already)
     await tx.sharedPlayerEntry.update({
       where: { id: entry.id },
-      data: { claimedPlayerId: playerId, claimedAt: now, email: null, revision: { increment: 1 } },
+      // #1019: once claimed, the link is only a profile link: the key is cleared with the email.
+      data: {
+        claimedPlayerId: playerId,
+        claimedAt: now,
+        email: null,
+        socialKey: null,
+        revision: { increment: 1 },
+      },
     })
   const linked: { clubId: string; clubPlayerId: string }[] = []
   for (const record of records) {

@@ -2,7 +2,9 @@
 
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
+import { useSessionHosts } from '@rotra/data/session-host/useSessionHosts'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PublicHosts } from '@rotra/ui/public-hosts'
 import { RecordPlayerCard } from '@rotra/ui/record-player-card'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { useState } from 'react'
@@ -18,11 +20,15 @@ export type RecordPlayersTabProps = {
  * The Players tab of the session record (Q-HISTORY): "Players" with "Minimum N games · M below it"
  * ("Not counted" on an invalid session) and a RecordPlayerCard per roster player, most games first
  * then by name, ranked by the shared standings position. A picture opens the player profile dialog.
+ * Above the cards, the session's Hosts (#1008): the hosts it ended with, full names as kept then.
  */
 export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
   const invalid = record.state === 'invalid'
   const standings = useLiveStandings(sessionId)
   const { pictureOf } = useClubPlayerPictures()
+  // #1008: the hosts the session ended with, by the name kept at the finish (shown even after the
+  // saved player was deleted, moved into another record or taken off the trusted-host list).
+  const hosts = useSessionHosts(sessionId)
   const [profileId, setProfileId] = useState<string | null>(null)
 
   const rankOf = new Map(
@@ -39,6 +45,15 @@ export function RecordPlayersTab({ sessionId, record }: RecordPlayersTabProps) {
             ? 'Not counted'
             : `Minimum ${record.minimumGames} games · ${record.belowMinimumCount} below it`
         }
+      />
+      <PublicHosts
+        hosts={(hosts.data ?? []).map((h) => ({
+          id: h.id,
+          name: h.name,
+          pictureUrl: pictureOf(h.clubPlayerId),
+          masked: false,
+        }))}
+        note="The hosts this session ended with. Removing a trusted host or a saved player later doesn't change them."
       />
       <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-3">
         {players.map((p) => (

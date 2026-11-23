@@ -64,26 +64,29 @@ model Player {
   verificationOverrideBy String?                     @map("verification_override_by") @db.Uuid
   verificationOverrideAt DateTime?                   @map("verification_override_at") @db.Timestamptz(6)
 
-  verificationAdmin     AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
-  banner                ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
-  privateContact        PlayerPrivateContact?
-  account               PlayerAccount?
-  socialLinks           PlayerSocialLink[]
-  claimLinks            PlayerClaimLink[]
-  idAllocation          PlayerIdAllocation?
-  claimedSharedEntry    SharedPlayerEntry?
-  passwordResetRequests PlayerPasswordResetRequest[]
-  contactChanges        PlayerContactChangeRequest[]
-  notifications         PlayerNotification[]
-  adminEmailEdits       AdminPlayerEmailEdit[]
-  clubPlayers           ClubPlayer[]
-  resolvedInputs        ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
-  rosterEntries         SessionPlayer[]              @relation("SessionPlayerAtEntry")
-  assessments           ClubAssessment[]             @relation("AssessmentPlayer")
-  activeHold            ActivePlayerHold?            @relation("ActivePlayerHold")
-  joinRequests          SessionJoinRequest[]
-  dropOutNotices        SessionDropOutNotice[]
-  sessionInviteCodes    SessionInviteCode[]
+  verificationAdmin      AdminAccount?                @relation(fields: [verificationOverrideBy], references: [id], onDelete: Restrict)
+  banner                 ProfileBanner?               @relation(fields: [bannerId], references: [id], onDelete: Restrict)
+  privateContact         PlayerPrivateContact?
+  account                PlayerAccount?
+  socialLinks            PlayerSocialLink[]
+  claimLinks             PlayerClaimLink[]
+  idAllocation           PlayerIdAllocation?
+  claimedSharedEntry     SharedPlayerEntry?
+  passwordResetRequests  PlayerPasswordResetRequest[]
+  contactChanges         PlayerContactChangeRequest[]
+  notifications          PlayerNotification[]
+  adminEmailEdits        AdminPlayerEmailEdit[]
+  clubPlayers            ClubPlayer[]
+  resolvedInputs         ClubPlayerPrivateInput[]     @relation("ClubPlayerInputResolved")
+  rosterEntries          SessionPlayer[]              @relation("SessionPlayerAtEntry")
+  assessments            ClubAssessment[]             @relation("AssessmentPlayer")
+  activeHold             ActivePlayerHold?            @relation("ActivePlayerHold")
+  joinRequests           SessionJoinRequest[]
+  dropOutNotices         SessionDropOutNotice[]
+  slotTransfersSent      SessionSlotTransfer[]        @relation("SlotTransferSender")
+  slotTransfersReceived  SessionSlotTransfer[]        @relation("SlotTransferRecipient")
+  slotTransfersWithdrawn SessionSlotTransfer[]        @relation("SlotTransferWithdrawnBy")
+  sessionInviteCodes     SessionInviteCode[]
 
   facts          PlayerMatchFact[]          @relation("FactPlayer")
   rankCurrent    PlayerRankCurrent?
@@ -187,8 +190,9 @@ enum PlayerClaimLinkState {
 model PlayerClaimLink {
   id            String               @id @default(uuid(7)) @db.Uuid
   playerId      String               @map("player_id") @db.Uuid
-  /// The issuing club; its club_accounts row is the issuing account.
-  issuingClubId String               @map("issuing_club_id") @db.Uuid
+  /// The issuing club; its club_accounts row is the issuing account. Null only for the staging link
+  /// of a registration from the Admin link, which has no club (D-2026-11-20-01).
+  issuingClubId String?              @map("issuing_club_id") @db.Uuid
   /// SHA-256 of the opaque token.
   tokenDigest   Bytes                @unique @map("token_digest")
   state         PlayerClaimLinkState @default(active)
@@ -201,7 +205,7 @@ model PlayerClaimLink {
   revision      BigInt               @default(1)
 
   player      Player @relation(fields: [playerId], references: [id], onDelete: Restrict)
-  issuingClub Club   @relation(fields: [issuingClubId], references: [id], onDelete: Restrict)
+  issuingClub Club?  @relation(fields: [issuingClubId], references: [id], onDelete: Restrict)
 
   @@index([playerId, issuedAt(sort: Desc)])
   @@index([issuingClubId, issuedAt(sort: Desc)])

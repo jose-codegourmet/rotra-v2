@@ -368,15 +368,21 @@ export async function confirmGoogleLink(
 }
 
 /**
- * Google registration from a club or session invite. The Google account comes from the held
+ * Google registration from a club or session invite, or the Admin link (`clubId` null: the player
+ * picks a city or province, `cityCode`, and joins no club). The Google account comes from the held
  * sign-in (never from the request body), on a login with no ROTRA account. `account-match` when the
  * phone or the Google email already belongs to an account: nothing is created, and the held
  * sign-in stays so the player can correct the phone.
  */
 export async function registerWithGoogle(
   jar: GoogleCookies,
-  clubId: string,
-  input: { phoneE164: string; details: ClaimDetails; identityRecordId?: string | null },
+  clubId: string | null,
+  input: {
+    phoneE164: string
+    details: ClaimDetails
+    identityRecordId?: string | null
+    cityCode?: string | null
+  },
   sessionSlug?: string | null,
   inviteCode?: string | null,
 ) {

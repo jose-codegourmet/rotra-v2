@@ -1,4 +1,5 @@
 import { sessionRecordFixture } from '@rotra/data/fixtures/session-record'
+import { PublicHosts } from '@rotra/ui/public-hosts'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { PublicPageSummary } from './PublicPageSummary'
@@ -91,4 +92,32 @@ export const InvalidPhone: Story = {
 export const NotRecorded: Story = {
   args: { recorded: false, publication: null },
   globals: { viewport: { value: 'desktop' } },
+}
+
+/** Scoring (Q22): the session's scoring mode after Mode. */
+export const ScoringBestOfThree: Story = {
+  args: { details: { ...meta.args.details, scoring: '11/21 × 3' } },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const ScoringBestOfThreeLight: Story = {
+  ...ScoringBestOfThree,
+  globals: { theme: 'light', viewport: { value: 'desktop' } },
+}
+
+/**
+ * A finished session's Hosts (#1008): the host it ended with, by the name kept at the finish, even
+ * after the club took them off the trusted-host list. A host removed mid-session is not shown.
+ */
+const finishedHosts = (
+  <PublicHosts
+    hosts={[{ id: 'host-0', name: 'Aa***', pictureUrl: null, skillGroup: 'intermediate' }]}
+  />
+)
+export const WithHosts: Story = {
+  args: { hosts: finishedHosts },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const WithHostsPhoneLight: Story = {
+  args: { hosts: finishedHosts },
+  globals: { theme: 'light', viewport: { value: 'phone' } },
 }

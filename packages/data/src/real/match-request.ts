@@ -8,6 +8,7 @@ import type {
 } from '../match-request/matchRequest.types'
 import { playerOrigin } from '../public-session/context'
 import type { MatchRequestOptions, PublicMatchPlayer } from '../public-session/publicSession.types'
+import type { SlotTransferView } from '../slot-transfer/slotTransfer.types'
 import { saveToastText } from '../sync/fetchers'
 import type { SaveOutcome } from '../sync/sync.types'
 import { msOf, realRequest } from './client'
@@ -30,10 +31,12 @@ type WireDropOutNotice = Omit<DropOutNoticeView, 'at' | 'closedAt'> & {
   at: string
   closedAt: string | null
 }
-type WireSessionRequests = Omit<SessionRequests, 'match' | 'dropOuts'> & {
+type WireSessionRequests = Omit<SessionRequests, 'match' | 'dropOuts' | 'transfers'> & {
   match: WireRequestView[]
   /** Missing on a server from before I can't make it was connected */
   dropOuts?: WireDropOutNotice[]
+  /** Missing on a server from before slot transfers (#1011) */
+  transfers?: (Omit<SlotTransferView, 'at'> & { at: string })[]
 }
 
 /**
@@ -50,6 +53,7 @@ export async function realGetSessionRequests(sessionId: string): Promise<Session
       at: msOf(d.at),
       closedAt: d.closedAt === null ? null : msOf(d.closedAt),
     })),
+    transfers: (wire.transfers ?? []).map((t) => ({ ...t, at: msOf(t.at) })),
   }
 }
 

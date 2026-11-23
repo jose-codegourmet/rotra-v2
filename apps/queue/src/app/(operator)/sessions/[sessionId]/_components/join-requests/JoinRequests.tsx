@@ -9,18 +9,23 @@ import { useSessionRequests } from '@rotra/data/match-request/useSessionRequests
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
+import { firstEligibleWaiter } from '@rotra/data/session-payment/refund-rules'
 import { useConfirmRequest } from '@rotra/data/session-roster/useConfirmRequest'
 import { useDeclineJoinRequest } from '@rotra/data/session-roster/useDeclineJoinRequest'
 import { useJoinRequestHints } from '@rotra/data/session-roster/useJoinRequestHints'
 import { useKeepDropOut } from '@rotra/data/session-roster/useKeepDropOut'
 import { useRemoveDropOut } from '@rotra/data/session-roster/useRemoveDropOut'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { useApproveSlotTransfer } from '@rotra/data/slot-transfer/useApproveSlotTransfer'
+import { useRejectAndRefundSlotTransfer } from '@rotra/data/slot-transfer/useRejectAndRefundSlotTransfer'
+import { useRejectSlotTransfer } from '@rotra/data/slot-transfer/useRejectSlotTransfer'
 import { type JoinRequestDetails, JoinRequestsPanel } from '@rotra/ui/join-requests-panel'
 import { levelLabel } from '@rotra/ui/level-pill'
 import type { MatchRequestSpot } from '@rotra/ui/match-request-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { RefundConfirmSheet } from '@rotra/ui/refund-confirm-sheet'
 import { toast } from '@rotra/ui/toaster'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export type JoinRequestsProps = {
   sessionId: string
@@ -46,7 +51,10 @@ function whereLabel(where: RequestSpot['where']) {
 
 /**
  * Requests from the session page (Q18.12): JoinRequestsPanel without tabs. Before Start it lists
- * drop-out notices, then join requests; once live, match requests only (join requests close at
+ * drop-out notices, pending slot transfers (#1011: Approve with a level, Reject), then join
+ * requests (#1014: Reject and refund opens RefundConfirmSheet with the slot's whole cash, then the
+ * sender's registration is cancelled and the first eligible waitlisted player is promoted); once
+ * live, match requests only (join requests close at
  * Start). Join requests come from useSessionRoster; the ROTRA-player
  * hints, drop-out notices and match requests from useSessionRequests, and the shared rank from
  * useJoinRequestHints. Every decision toasts its result or its error; a refused decision leaves
@@ -63,6 +71,11 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const decline = useDeclineJoinRequest()
   const keep = useKeepDropOut()
   const remove = useRemoveDropOut()
+  const approveTransfer = useApproveSlotTransfer()
+  const rejectTransfer = useRejectSlotTransfer()
+  const rejectAndRefund = useRejectAndRefundSlotTransfer()
+  // #1014: the transfer whose Reject and refund confirmation is open
+  const [refundId, setRefundId] = useState<string | null>(null)
   const addMatch = useAddMatchRequestToQueue()
   const declineMatch = useDeclineMatchRequest()
 
@@ -85,10 +98,11 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
   const pending = joinRequests.filter((r) => r.status === 'pending').length
   const view = requests.data
   const dropOuts = view?.dropOuts ?? []
+  const transfers = view?.transfers ?? []
   const matchRequests = view?.match ?? []
   // No tabs: before Start the panel lists join requests and drop-out notices; live, match requests only.
   const live = s?.state === 'active'
-  const waiting = live ? matchRequests.length : pending + dropOuts.length
+  const waiting = live ? matchRequests.length : pending + dropOuts.length + transfers.length
   // The card only appears once something is waiting, so it stays hidden while loading; the sheet
   // always has a body and shows Skeleton rows until the roster arrives.
   const real = isRealDataMode()
@@ -164,51 +178,135 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
     decline.isPending ||
     keep.isPending ||
     remove.isPending ||
+    approveTransfer.isPending ||
+    rejectTransfer.isPending ||
+    rejectAndRefund.isPending ||
     addMatch.isPending ||
     declineMatch.isPending
 
+  // #1014: the open Reject and refund confirmation. The refund is the slot's whole cash (the Requests
+  // read's payment snapshot); the preview names who the freed slot goes to (FIFO, a level needed).
+  const refundTransfer = refundId ? transfers.find((t) => t.id === refundId) : undefined
+  const rosterCount = roster.data?.roster.length ?? 0
+  const nextWaiter = firstEligibleWaiter(
+    waitlistOrder,
+    capacity - (rosterCount - 1),
+    (w) => !!w.level,
+  )
+  const nextWaiterName = nextWaiter
+    ? (clubPlayers.data?.players.find((p) => p.id === nextWaiter.clubPlayerId)?.displayName ?? null)
+    : null
+  const closeRefund = () => {
+    if (!rejectAndRefund.isPending) setRefundId(null)
+  }
+  const confirmRefund = () => {
+    if (!refundTransfer?.payment || submitting.current) return
+    submitting.current = true
+    rejectAndRefund.mutate(
+      {
+        sessionId,
+        transferId: refundTransfer.id,
+        expectedRefundMinor: refundTransfer.payment.paidMinor,
+      },
+      {
+        onSettled: () => {
+          submitting.current = false
+        },
+        onSuccess: (result) => {
+          setRefundId(null)
+          toast(result.message)
+        },
+      },
+    )
+  }
+
   return (
-    <JoinRequestsPanel
-      loading={loading}
-      isPending={isPending}
-      serverError={
-        confirm.error || decline.error || session.error || roster.error || requestsError
-          ? errorMessage(
-              confirm.error ?? decline.error ?? session.error ?? roster.error ?? requestsError,
-            )
-          : undefined
-      }
-      requests={joinRequests}
-      requestDetails={requestDetails}
-      dropOuts={dropOuts.map((d) => ({
-        id: d.id,
-        name: d.name,
-        photoUrl: photoFor(d.pid),
-        timeLabel: formatTime(d.at),
-        isPending,
-        onRemove: () => run(remove.mutate, { sessionId, noticeId: d.id }),
-        onKeep: () => run(keep.mutate, { sessionId, noticeId: d.id }),
-      }))}
-      matchRequests={matchRequests.map((m) => ({
-        id: m.id,
-        requesterName: m.requester.name,
-        formatLabel: matchRequestFormatLabel(m.format),
-        requestedLabel: formatTime(m.at),
-        spots: [
-          spotOf('Requester', m.requester),
-          ...m.partners.map((p) => spotOf('Partner', p)),
-          ...m.opponents.map((p) => spotOf('Opponent', p)),
-        ],
-        isPending,
-        onAddToQueue: () => run(addMatch.mutate, { sessionId, requestId: m.id }),
-        onDecline: () => run(declineMatch.mutate, { sessionId, requestId: m.id }),
-      }))}
-      live={live}
-      slotsFull={slotsFull}
-      variant={variant}
-      className={className}
-      onConfirm={(requestId, level) => run(confirm.mutate, { requestId, level })}
-      onDecline={(requestId) => run(decline.mutate, requestId)}
-    />
+    <>
+      {refundTransfer?.payment ? (
+        <RefundConfirmSheet
+          open
+          onOpenChange={(open) => {
+            if (!open) closeRefund()
+          }}
+          variant="transfer"
+          name={refundTransfer.senderName}
+          recipientName={refundTransfer.recipientName}
+          amountMinor={refundTransfer.payment.paidMinor}
+          waivedMinor={refundTransfer.payment.priorWaivedMinor}
+          nextWaiterName={nextWaiterName}
+          onConfirm={confirmRefund}
+          isPending={rejectAndRefund.isPending}
+          error={rejectAndRefund.error ? errorMessage(rejectAndRefund.error) : undefined}
+        />
+      ) : null}
+      <JoinRequestsPanel
+        loading={loading}
+        isPending={isPending}
+        serverError={
+          confirm.error || decline.error || session.error || roster.error || requestsError
+            ? errorMessage(
+                confirm.error ?? decline.error ?? session.error ?? roster.error ?? requestsError,
+              )
+            : undefined
+        }
+        requests={joinRequests}
+        requestDetails={requestDetails}
+        dropOuts={dropOuts.map((d) => ({
+          id: d.id,
+          name: d.name,
+          photoUrl: photoFor(d.pid),
+          timeLabel: formatTime(d.at),
+          isPending,
+          onRemove: () => run(remove.mutate, { sessionId, noticeId: d.id }),
+          onKeep: () => run(keep.mutate, { sessionId, noticeId: d.id }),
+        }))}
+        transfers={transfers.map((t) => ({
+          id: t.id,
+          senderName: t.senderName,
+          senderPhotoUrl: photoFor(t.pid),
+          recipientName: t.recipientName,
+          recipientRtrId: t.recipientRtrId,
+          recipientWaitlistPosition: t.recipientWaitlistPosition,
+          suggestedLevel: t.suggestedLevel,
+          viaLink: t.viaLink ?? false,
+          // #1013: the waiver Approve records, shown first; Approve sends it back as the one seen.
+          payment: t.payment,
+          timeLabel: formatTime(t.at),
+          isPending,
+          onApprove: (level) =>
+            run(approveTransfer.mutate, {
+              sessionId,
+              transferId: t.id,
+              level,
+              expectedWaiverMinor: t.payment?.waivedMinor,
+            }),
+          onReject: () => run(rejectTransfer.mutate, { sessionId, transferId: t.id }),
+          onRejectAndRefund: () => {
+            rejectAndRefund.reset()
+            setRefundId(t.id)
+          },
+        }))}
+        matchRequests={matchRequests.map((m) => ({
+          id: m.id,
+          requesterName: m.requester.name,
+          formatLabel: matchRequestFormatLabel(m.format),
+          requestedLabel: formatTime(m.at),
+          spots: [
+            spotOf('Requester', m.requester),
+            ...m.partners.map((p) => spotOf('Partner', p)),
+            ...m.opponents.map((p) => spotOf('Opponent', p)),
+          ],
+          isPending,
+          onAddToQueue: () => run(addMatch.mutate, { sessionId, requestId: m.id }),
+          onDecline: () => run(declineMatch.mutate, { sessionId, requestId: m.id }),
+        }))}
+        live={live}
+        slotsFull={slotsFull}
+        variant={variant}
+        className={className}
+        onConfirm={(requestId, level) => run(confirm.mutate, { requestId, level })}
+        onDecline={(requestId) => run(decline.mutate, requestId)}
+      />
+    </>
   )
 }

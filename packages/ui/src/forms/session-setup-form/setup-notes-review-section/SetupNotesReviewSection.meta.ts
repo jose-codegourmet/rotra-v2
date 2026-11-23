@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const setupNotesReviewSectionMeta = {
   name: 'SetupNotesReviewSection',
   description:
-    'SessionSetupForm page 3 › Notes and review: the optional notes (shown on the public page) and the review list (Session, When, Repeats, Venue, Courts, Formats, Minimum, Costs) with Edit links back to each page.',
+    'SessionSetupForm page 3 › Notes and review: the optional notes (shown on the public page) and the review list (Session, When, Repeats, Venue, Courts, Formats, Scoring, Record games, Minimum, Costs) with Edit links back to each page.',
   usage: ["Rendered inside SessionSetupForm's FormProvider only."],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

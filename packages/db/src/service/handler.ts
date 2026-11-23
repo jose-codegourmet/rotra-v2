@@ -87,6 +87,8 @@ export async function handleAccountRequest<A extends AccountAudience>(
  */
 export const PUBLIC_READS = [
   'public-session.page',
+  /** Share payment status (#1010): masked names and amounts of the confirmed roster only */
+  'public-session.payment-status',
   'player.public-profile',
   'player.match-history',
   'player.public-clubs',
@@ -124,6 +126,8 @@ export async function handlePublicRead(
 export const VISITOR_COMMANDS = [
   'public-session.join-request',
   'public-session.my-request',
+  /** Transfer link card (#1012): anyone holding the link; signed in, where the viewer stands */
+  'public-session.transfer-link',
   'player.claim-link',
   'player.claim',
   'player.guest-registration',

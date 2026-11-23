@@ -2,6 +2,7 @@ import { dataMode } from '@rotra/api-proxy/data-mode'
 import { goApiEnabled } from '@rotra/api-proxy/go-forward'
 import { readFromGo } from '@rotra/api-proxy/go-read'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
+import { isTransferLinkToken } from '@rotra/data/slot-transfer/slotTransfer.rules'
 import { readPublicSession } from '@rotra/db/queue/public-session'
 import type { Metadata } from 'next'
 import { PublicSession } from './_components/public-session/PublicSession'
@@ -52,12 +53,20 @@ async function publicSessionTitle(slug: string) {
 
 export default async function PublicSessionPage(props: PageProps<'/s/[slug]'>) {
   const { slug } = await props.params
-  const { join, invite } = await props.searchParams
+  const { join, invite, transfer } = await props.searchParams
   // ?join=1: the visitor came back from the ROTRA Player login; open Request to join.
   // ?invite=<code>: a Session invite link; the code goes with Request to join as NAME.
+  // ?transfer=<token>: a transfer link (#1012); the token is only ever sent back to be checked.
   const inviteCode =
     typeof invite === 'string' && /^[A-Za-z0-9]{8}$/.test(invite) ? invite : undefined
+  const transferToken = isTransferLinkToken(transfer) ? transfer : undefined
   return (
-    <PublicSession slug={slug} viewer="visitor" openJoin={join === '1'} inviteCode={inviteCode} />
+    <PublicSession
+      slug={slug}
+      viewer="visitor"
+      openJoin={join === '1'}
+      inviteCode={inviteCode}
+      transferToken={transferToken}
+    />
   )
 }

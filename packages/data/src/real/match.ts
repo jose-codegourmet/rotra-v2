@@ -543,7 +543,7 @@ export async function realCompleteMatch(input: {
   )
   const m = matchOf(done.result.match)
   const winner = done.result.decision.winningTeam
-  // Record games off (D-2026-11-18-06): the server stores no winner, so the toast names none.
+  // Decisions are always won by a team (D-2026-11-20-02); the fallback covers an older reply.
   const text = winner
     ? `Team ${winner} wins match ${m.matchNo} · ${courtNames(m, courts)} free`
     : `Match ${m.matchNo} done · ${courtNames(m, courts)} free`

@@ -1,3 +1,4 @@
+import type { ScoringKey } from '@rotra/schema/scoring'
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionMode } from '../queue-session/queueSession.types'
@@ -5,6 +6,7 @@ import type {
   JoinRequestPlacement,
   SessionJoinRequest,
 } from '../session-roster/sessionRoster.types'
+import type { MySlotTransfer } from '../slot-transfer/slotTransfer.types'
 
 /**
  * The **Tonight ·** line on a profile card (#731): Playing · Court N, On court · getting ready ·
@@ -159,6 +161,11 @@ export type PublicSessionPage = {
   courts: string[]
   formats: { singles: boolean; doubles: boolean }
   mode: SessionMode
+  /**
+   * The session's scoring mode (Q22). Missing reads as 16/31 (`scoringOf`): sessions saved before
+   * the setting, and real mode, which does not store it yet.
+   */
+  scoring?: ScoringKey
   minimum: number
   notes?: string | null
   /** Total before the anonymous 12-tile server cap. */
@@ -166,6 +173,14 @@ export type PublicSessionPage = {
   participants: PublicSessionParticipant[]
   /** Aggregate skill-group counts over the full confirmed roster (never the waitlist), #474 */
   skillMix: PublicSkillMix
+  /**
+   * The session's current **Hosts** (epic #1002, D-2026-11-22-01), oldest first, with the same name,
+   * picture and level treatment as `participants` (masked for visitors, full for a registered player
+   * to a signed-in viewer). A host who plays is in `participants` too, and counts once in
+   * `participantCount`, `openSlots` and `slotBudget`, which read the roster only. Missing or empty:
+   * the page hides the Hosts section. Never the club's nickname (D-2026-11-18-03).
+   */
+  hosts?: PublicSessionParticipant[]
   /** Public-safe waitlisted players in waitlist order. */
   waitlist: PublicSessionParticipant[]
   openSlots: number
@@ -289,8 +304,11 @@ export type PublicHistoryMatch = {
   teamA: PublicMatchPlayer[]
   teamB: PublicMatchPlayer[]
   winningTeam: 'A' | 'B' | null
+  /** One game: the points. Best of 3 with `games`: the games each team won. */
   teamAScore: number | null
   teamBScore: number | null
+  /** Best of 3 (Q22): every game score, Team A first; null when none were entered. */
+  games?: { a: number; b: number }[] | null
   invalid: boolean
 }
 /**
@@ -348,6 +366,13 @@ export type MyNight = {
   hasLeft: boolean
   /** An open I can't make it notice (“Told the QM you can't make it”) */
   cantMakeItSent: boolean
+  /**
+   * Transfer my slot (#1011): true while the Player is confirmed and the session is Prepared, so
+   * the card offers the button. Missing on a server from before transfers reads false.
+   */
+  canTransfer?: boolean
+  /** The Player's own pending slot transfer (“Transfer to NAME requested · the QM decides”), or null */
+  slotTransfer?: MySlotTransfer | null
   /** The club device is offline: “Checked in · the QM will see it when their device syncs” */
   offline: boolean
   /** Counted games, wins and losses tonight; the viewer's own standing only */
@@ -422,6 +447,8 @@ export type PlayerSessionAccess = {
   joinRequest: MyJoinRequest | null
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /** Real mode: the Hosts section by the same signed-in name rule as `participants` (#1006) */
+  hosts?: PublicSessionParticipant[]
   /**
    * Real mode: **Courts now** for the signed-in Player (live sessions; empty otherwise). Missing in
    * mock mode, where the signed-in read carries it, and on a server from before it was connected.

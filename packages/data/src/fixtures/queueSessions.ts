@@ -1,11 +1,14 @@
 import type { MatchRequest } from '../match-request/matchRequest.types'
 import { publicSlugFor } from '../queue-session/queueSession.rules'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
+import type { SessionPaymentMark } from '../session-payment/sessionPayment.types'
 import type {
   DropOutNotice,
   SessionInviteCode,
   SessionPlayer,
 } from '../session-roster/sessionRoster.types'
+import type { SlotTransfer } from '../slot-transfer/slotTransfer.types'
+import { carriedHolding, transferSnapshot } from '../slot-transfer/transferAccounting.rules'
 import { DEMO_CLUB_ID } from './clubs'
 import {
   createAccountJoinRequestFixture,
@@ -18,6 +21,11 @@ import {
 import { clubPlayers, JOSE_PLAYER_ID } from './players'
 import { createSessionHistoryFixtures } from './sessionHistory'
 import { venues } from './venues'
+
+/** #1012 demo transfer link token (mock only) and the SHA-256 digest the store keeps for it. */
+export const TRANSFER_LINK_DEMO_TOKEN = 'Rotra-demo-transfer-link-for-tonight-0001xy'
+const TRANSFER_LINK_DEMO_DIGEST = '852292b9be2349e57ba7aff6ec1c7bba20a90950703a6b805e145b6f3ed9a7fb'
+
 /** Same relative dates as seedSessions/PAST and ensureHistory; reset uses a new seed time. */
 export function createQueueFixtures(now = Date.now()) {
   const at = (days: number, hour: number, minute = 0) => {
@@ -54,6 +62,8 @@ export function createQueueFixtures(now = Date.now()) {
     publicSlug: publicSlugFor('s-tonight'),
     acceptJoinRequests: true,
     alwaysRequireRequest: false,
+    // The live example plays the default 16/31 (Q22).
+    scoring: '31',
   }
   const history = createSessionHistoryFixtures(now)
   const sessions: QueueSession[] = [tonight, ...history.sessions]
@@ -157,7 +167,111 @@ export function createQueueFixtures(now = Date.now()) {
       matchId: null,
     },
   ]
+  // #1011: Jasper (confirmed tonight) asks to hand his slot to Russel, a registered club member
+  // who is not in the session yet. Approve gives Russel the slot; Reject leaves Jasper on the roster.
+  const jasper = roster[12]
+  const jasperPlayerId = clubPlayers.find((p) => p.id === jasper?.clubPlayerId)?.playerId
+  const russel = clubPlayers.find((p) => p.fullName === 'Russel' && p.playerId)
+  if (!jasper || !jasperPlayerId || !russel?.playerId)
+    throw new Error("Missing Jasper or Russel for tonight's slot transfer.")
+  const slotTransfers: SlotTransfer[] = [
+    {
+      id: 'slot-transfer-s-tonight-jasper',
+      sessionId: tonight.id,
+      pid: jasper.id,
+      senderClubPlayerId: jasper.clubPlayerId,
+      senderPlayerId: jasperPlayerId,
+      recipientPlayerId: russel.playerId,
+      recipientClubPlayerId: null,
+      recipientPid: null,
+      recipientWasWaitlisted: null,
+      status: 'pending',
+      requestedAt: now - 20 * 60000,
+      decidedAt: null,
+    },
+  ]
+  // #1012: the last registered player on tonight's first fourteen made a transfer link for a friend
+  // with no ROTRA account; nobody has claimed it yet, so it is not in the QM's Requests. The demo
+  // link is /s/tonight?transfer=TRANSFER_LINK_DEMO_TOKEN (the store keeps only the digest).
+  const linkSender = roster
+    .slice(0, 14)
+    .reverse()
+    .find((r) => r.id !== jasper.id && clubPlayers.find((p) => p.id === r.clubPlayerId)?.playerId)
+  const linkSenderPlayerId = clubPlayers.find((p) => p.id === linkSender?.clubPlayerId)?.playerId
+  if (linkSender && linkSenderPlayerId)
+    slotTransfers.push({
+      id: 'slot-transfer-s-tonight-link',
+      sessionId: tonight.id,
+      pid: linkSender.id,
+      senderClubPlayerId: linkSender.clubPlayerId,
+      senderPlayerId: linkSenderPlayerId,
+      recipientPlayerId: null,
+      linkTokenDigest: TRANSFER_LINK_DEMO_DIGEST,
+      claimedAt: null,
+      recipientClubPlayerId: null,
+      recipientPid: null,
+      recipientWasWaitlisted: null,
+      status: 'pending',
+      requestedAt: now - 8 * 60000,
+      decidedAt: null,
+    })
+  // #1013: Jasper paid ₱500 of tonight's ₱900, so his pending transfer shows "₱400 will be waived"
+  // before Approve. A registered club member who is not on tonight's roster paid ₱600 and gave the
+  // slot (approved yesterday) to the first other registered player on it: Paid in Full, ₱300 waived;
+  // their card opens the Slot history. The giver's mark stays on their released entry (off the
+  // mock roster), frozen into the transfer.
+  const tonightDue = 90000
+  const paymentMarks: SessionPaymentMark[] = [
+    {
+      sessionId: tonight.id,
+      sessionPlayerId: jasper.id,
+      amountMinor: 50000,
+      currency: 'PHP',
+      markedAt: now - 26 * 3600000,
+    },
+  ]
+  const holder = roster
+    .slice(0, 14)
+    .find(
+      (r) =>
+        r.id !== jasper.id &&
+        r.id !== linkSender?.id &&
+        clubPlayers.find((p) => p.id === r.clubPlayerId)?.playerId,
+    )
+  const holderPlayerId = clubPlayers.find((p) => p.id === holder?.clubPlayerId)?.playerId
+  const giver = clubPlayers.find(
+    (p) => p.playerId && p.id !== russel.id && !roster.some((r) => r.clubPlayerId === p.id),
+  )
+  if (holder && holderPlayerId && giver?.playerId) {
+    const giverEntryId = `${tonight.id}-transferred-1`
+    paymentMarks.push({
+      sessionId: tonight.id,
+      sessionPlayerId: giverEntryId,
+      amountMinor: 60000,
+      currency: 'PHP',
+      markedAt: now - 30 * 3600000,
+    })
+    const payment = transferSnapshot(tonightDue, { cashMinor: 60000, waivedMinor: 0 })
+    if (carriedHolding(payment).waivedMinor !== 30000) throw new Error('Unexpected fixture waiver.')
+    slotTransfers.unshift({
+      id: 'slot-transfer-s-tonight-approved',
+      sessionId: tonight.id,
+      pid: giverEntryId,
+      senderClubPlayerId: giver.id,
+      senderPlayerId: giver.playerId,
+      recipientPlayerId: holderPlayerId,
+      recipientClubPlayerId: holder.clubPlayerId,
+      recipientPid: holder.id,
+      recipientWasWaitlisted: false,
+      payment,
+      status: 'approved',
+      requestedAt: now - 27 * 3600000,
+      decidedAt: now - 25 * 3600000,
+    })
+  }
   const requests = {
+    slotTransfers,
+    paymentMarks,
     joinRequests: [
       createAccountJoinRequestFixture(now),
       ...createSessionPageJoinRequestFixtures(now),

@@ -24,9 +24,17 @@ export function useSessionPayments(sessionId: string) {
             at: batch.changedAt(player.clubPlayerId) ?? 0,
           })
         : undefined
-      // #479: status compares the amount received with today's amount due.
-      const status = paymentStatus(paid ? { amountMinor: paid.amount } : null, accepted.amountDue)
-      return { ...player, paid, status }
+      // #479: status compares the amount received with today's amount due. A transferred slot's
+      // waiver (#1013) counts toward Paid; `paid.amount` is already net of a refund (#1014).
+      const mark = paid
+        ? {
+            amountMinor: paid.amount,
+            waivedMinor: player.transfer?.waivedMinor ?? 0,
+            refundedMinor: player.refund?.amount ?? 0,
+          }
+        : null
+      const status = paymentStatus(mark, accepted.amountDue)
+      return { ...player, paid, status, mark }
     })
     .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name))
   return {
@@ -35,7 +43,7 @@ export function useSessionPayments(sessionId: string) {
       ...query.data,
       players,
       totals: paymentTotals({
-        marks: players.flatMap((p) => (p.paid ? [{ amountMinor: p.paid.amount }] : [])),
+        marks: players.flatMap((p) => (p.mark ? [p.mark] : [])),
         total: players.length,
         amountDue: query.data.amountDue,
         cost: query.data.totals.cost,

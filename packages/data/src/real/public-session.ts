@@ -25,6 +25,30 @@ export function realGetPublicSession(slug: string) {
 }
 
 /**
+ * Share payment status (#1010): the confirmed roster's masked names and amounts received. Null for
+ * a cancelled or invalid session; any failure hides the optional card instead of erroring the page.
+ */
+export async function realGetPublicPaymentStatus(slug: string) {
+  try {
+    const { paymentStatus } = await realRequest<{
+      paymentStatus: {
+        amountDue: number | null
+        rows: {
+          name: string
+          receivedMinor: number | null
+          /** #1013: waived on a transferred slot (never cash); missing before #1013 */
+          waivedMinor?: number
+          viaTransfer?: boolean
+        }[]
+      } | null
+    }>(`${base(slug)}/payment-status`)
+    return paymentStatus
+  } catch {
+    return null
+  }
+}
+
+/**
  * Request to join. `requestId` is the sheet's stable ID, so a retry with the same fields returns
  * the same request. The server keeps the visitor's receipt in an httpOnly cookie.
  */
@@ -62,7 +86,7 @@ export function realGetMyJoinRequest(slug: string) {
  * **Request to join as NAME** / **Cancel request**: credentialed calls to the Player app, which
  * reads the Player's own sign-in. No Player token or cookie is ever copied into the Queue app.
  */
-async function playerPost<T>(slug: string, action: string, body: Record<string, unknown>) {
+export async function playerPost<T>(slug: string, action: string, body: Record<string, unknown>) {
   const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
   if (!origin) throw new Error('Sign in with ROTRA Player to send a request.')
   return realRequest<T>(`${origin}${base(slug)}/${action}`, {
@@ -150,13 +174,18 @@ export async function realGetMyNight(slug: string): Promise<MyNight> {
   const origin = typeof location === 'undefined' ? null : playerOrigin(location.origin)
   if (!origin) throw new Error('Sign in with ROTRA Player to see your night.')
   const wire = await realRequest<
-    Omit<MyNight, 'matchRequest'> & {
+    Omit<MyNight, 'matchRequest' | 'slotTransfer'> & {
       matchRequest: (Omit<NonNullable<MyNight['matchRequest']>, 'at'> & { at: string }) | null
+      /** Missing on a server from before slot transfers (#1011) */
+      slotTransfer?: (Omit<NonNullable<MyNight['slotTransfer']>, 'at'> & { at: string }) | null
     }
   >(`${origin}${base(slug)}/my-night`, { credentials: 'include' })
   return {
     ...wire,
     matchRequest: wire.matchRequest && { ...wire.matchRequest, at: msOf(wire.matchRequest.at) },
+    slotTransfer: wire.slotTransfer
+      ? { ...wire.slotTransfer, at: msOf(wire.slotTransfer.at) }
+      : null,
   }
 }
 

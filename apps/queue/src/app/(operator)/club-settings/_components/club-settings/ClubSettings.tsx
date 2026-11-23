@@ -15,7 +15,9 @@ import { useSaveFacebookPost } from '@rotra/data/club/useSaveFacebookPost'
 import { useUpdateClubLogo } from '@rotra/data/club/useUpdateClubLogo'
 import { useUpdateSelfCheckIn } from '@rotra/data/club/useUpdateSelfCheckIn'
 import { useUpdateSessionDefaults } from '@rotra/data/club/useUpdateSessionDefaults'
+import { savedPlayerName } from '@rotra/data/club-player/clubNickname-rules'
 import { clubInviteUrl } from '@rotra/data/club-player/registration-url'
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useDeviceDownloads } from '@rotra/data/device/useDeviceDownloads'
 import { useExportPlayHistory } from '@rotra/data/device/useExportPlayHistory'
@@ -28,6 +30,9 @@ import { MockError } from '@rotra/data/mock/errors'
 import { PLAY_HISTORY_FILE_NAME } from '@rotra/data/outbox/types'
 import { useNowCard } from '@rotra/data/queue-session/useNowCard'
 import { useSyncState } from '@rotra/data/sync/useSyncState'
+import { useAddTrustedHost } from '@rotra/data/trusted-host/useAddTrustedHost'
+import { useRemoveTrustedHost } from '@rotra/data/trusted-host/useRemoveTrustedHost'
+import { useTrustedHosts } from '@rotra/data/trusted-host/useTrustedHosts'
 import { formatPeso } from '@rotra/schema/money'
 import { useAppShell } from '@rotra/ui/app-shell'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -41,14 +46,17 @@ import { ChangePasswordForm } from '@rotra/ui/forms/change-password-form'
 import { LicensePanel } from '@rotra/ui/license-panel'
 import { Notice } from '@rotra/ui/notice'
 import { PostPreviewSheet } from '@rotra/ui/post-preview-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { SessionDefaultsPanel } from '@rotra/ui/session-defaults-panel'
 import { SignOutSheet } from '@rotra/ui/sign-out-sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { ThisDevicePanel } from '@rotra/ui/this-device-panel'
 import { toast } from '@rotra/ui/toaster'
+import { type TrustedHostPerson, TrustedHostsPanel } from '@rotra/ui/trusted-hosts-panel'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { shortDateLabel } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { useOperatorShell } from '../../../_components/operator-shell/DockAction.context'
@@ -171,6 +179,64 @@ function LicenseSection({ clubName }: { clubName: string }) {
       payments={payments.data}
       onExport={exportCsv}
       sampleAmounts
+    />
+  )
+}
+
+/**
+ * Trusted hosts (D-2026-11-22-01): the club's trusted-host list, joined to its saved players, with
+ * Add (from saved players not on it) and Remove host. Only the list changes; no permission or
+ * sign-in does.
+ */
+function TrustedHostsSection({ clubId }: { clubId: string }) {
+  const hosts = useTrustedHosts(clubId)
+  const players = useClubPlayers()
+  const add = useAddTrustedHost()
+  const remove = useRemoveTrustedHost()
+  if (hosts.isError) return <QueryError query={hosts} title="Couldn't load your trusted hosts." />
+  if (players.isError)
+    return <QueryError query={players} title="Couldn't load your saved players." />
+  if (!hosts.data || !players.data) return <Skeleton className="h-64 rounded-lg" />
+  const saved = players.data.players
+  const personOf = (p: (typeof saved)[number]): TrustedHostPerson => ({
+    clubPlayerId: p.id,
+    name: p.fullName,
+    nickname: p.nickname,
+    clubNickname: p.clubNickname,
+    shortName: savedPlayerName(p),
+    photoUrl: profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName),
+    identity: p.identity,
+    detailsRequired: p.detailsRequired,
+  })
+  const byId = new Map(saved.map((p) => [p.id, p]))
+  const trusted = new Set(hosts.data.map((h) => h.clubPlayerId))
+  const rows = hosts.data.flatMap((h) => {
+    const p = byId.get(h.clubPlayerId)
+    return p ? [{ ...personOf(p), sinceLabel: `Trusted since ${shortDateLabel(h.addedAt)}` }] : []
+  })
+  return (
+    <TrustedHostsPanel
+      hosts={rows}
+      candidates={saved.filter((p) => !trusted.has(p.id)).map(personOf)}
+      isPending={add.isPending || remove.isPending}
+      onAdd={(clubPlayerId) =>
+        add.mutate(
+          { clubPlayerId },
+          {
+            onSuccess: (result) => toast(result.message),
+            onError: (error) => toast.error(errorMessage(error)),
+          },
+        )
+      }
+      onRemove={(clubPlayerId) =>
+        remove.mutate(
+          { clubPlayerId },
+          {
+            onSuccess: (result) => toast(result.message),
+            onError: (error) => toast.error(errorMessage(error)),
+          },
+        )
+      }
     />
   )
 }
@@ -420,6 +486,8 @@ export function ClubSettings({ section }: ClubSettingsProps) {
         })
       }}
     />
+  ) : section === 'hosts' ? (
+    <TrustedHostsSection clubId={data.id} />
   ) : section === 'post' ? (
     <FacebookPostSection key={data.postTemplate ?? 'default'} club={data} />
   ) : section === 'license' ? (

@@ -671,7 +671,7 @@ export async function substitutePlayer(
   })
 }
 
-/** `winningTeam` is null only for Match done on a session with Record games off (no result kept). */
+/** `winningTeam` is null only for a decision written before D-2026-11-20-02 (Record games off). */
 type Outcome =
   | {
       kind: 'completed'
@@ -809,9 +809,7 @@ export async function completeMatch(
     sessionId,
     input.matchId,
     input.operationId,
-    (session) => {
-      if (!session.recordGames)
-        return { kind: 'completed', winningTeam: null, teamAScore: null, teamBScore: null }
+    () => {
       const result = validateResult({
         winner: input.winningTeam,
         scoreA: input.teamAScore,

@@ -89,21 +89,27 @@ export function realConfirmGoogleLink(input: { playerId: string; googleEmail: st
 
 const number = (typed: string) => (typed ? Number(typed) : null)
 
-/** Club and session invites only; the Admin link (no club) isn't connected to saved data yet. */
+/**
+ * Club and session invites post to the club's route; the Admin link (no club) to its own, with the
+ * picked city in the form (`cityCode`).
+ */
 export async function realRegisterWithGoogle(
-  input: GoogleRegistrationInput & { clubId: string },
+  input: GoogleRegistrationInput,
 ): Promise<GoogleRegistrationResult> {
   const search = new URLSearchParams()
   if (input.sessionSlug) search.set('session', input.sessionSlug)
   if (input.clubInviteCode) search.set('k', input.clubInviteCode)
   const query = search.toString()
+  const path = input.clubId
+    ? `/api/register/${encodeURIComponent(input.clubId)}/google${query ? `?${query}` : ''}`
+    : '/api/register/google'
   const result = await realRequest<
     | { status: 'account-match' }
     | ({ status: 'registered' } & Omit<
         Extract<GoogleRegistrationResult, { outcome: 'registered' }>,
         'outcome'
       >)
-  >(`/api/register/${encodeURIComponent(input.clubId)}/google${query ? `?${query}` : ''}`, {
+  >(path, {
     method: 'POST',
     body: { values: input.values, identityRecordId: input.identityRecordId ?? null },
     fields: { experience: 'experienceYears' },
@@ -149,10 +155,14 @@ export function realCompleteClaimWithGoogle(input: {
   })
 }
 
-/** The invite card and the viewer's standing, for a club or session link. */
+/**
+ * The invite card and the viewer's standing, for a club or session link. A session link's
+ * `invite` (the Session invite code) names the inviting player when the server finds it.
+ */
 export function realGetInviteLanding(link: InviteLink & { clubId: string }, signal?: AbortSignal) {
   const search = new URLSearchParams()
   if (link.sessionSlug) search.set('session', link.sessionSlug)
+  if (link.sessionSlug && link.sessionInviteCode) search.set('invite', link.sessionInviteCode)
   if (link.clubInviteCode) search.set('k', link.clubInviteCode)
   const query = search.toString()
   return realRequest<InviteLanding>(

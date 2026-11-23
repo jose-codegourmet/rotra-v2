@@ -11,7 +11,7 @@ import {
   sessionMinutes,
   startBlocker,
 } from '@rotra/data/queue-session/queueSession.rules'
-import { recordsGames } from '@rotra/data/queue-session/types'
+import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useCancelSession } from '@rotra/data/queue-session/useCancelSession'
 import { useDeleteSession } from '@rotra/data/queue-session/useDeleteSession'
 import { useDownloadSession } from '@rotra/data/queue-session/useDownloadSession'
@@ -27,6 +27,7 @@ import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAccep
 import { useSetAlwaysRequireRequest } from '@rotra/data/session-roster/useSetAlwaysRequireRequest'
 import { courtNextDay } from '@rotra/schema/court-window'
 import { formatPeso } from '@rotra/schema/money'
+import { SCORING } from '@rotra/schema/scoring'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { CancelSessionSheet } from '@rotra/ui/cancel-session-sheet'
@@ -58,6 +59,7 @@ import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { SessionHosts } from '@/app/(operator)/sessions/[sessionId]/_components/session-hosts/SessionHosts'
 import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
@@ -430,6 +432,8 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}
                   modeDescription={MODES[s.sessionMode].text}
+                  scoringLabel={SCORING[sessionScoring(s)].label}
+                  scoringDescription={SCORING[sessionScoring(s)].text}
                   minimumGames={s.minimumGames}
                   minimum={
                     s.minimumIsCalculated
@@ -470,6 +474,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
               {cost.isError ? (
                 <QueryError query={cost} title="Couldn't load the cost estimate." />
               ) : null}
+              <SessionHosts sessionId={sessionId} />
               <SessionLinkCard
                 link={sessionLink}
                 pendingCount={pendingRequests}
@@ -559,6 +564,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           courts={courts.length}
           formatsLabel={formats}
           modeLabel={MODES[s.sessionMode].label}
+          scoringLabel={SCORING[sessionScoring(s)].label}
           minimumGames={s.minimumGames}
           recordGames={recordsGames(s)}
           rosterCount={rosterList.length}

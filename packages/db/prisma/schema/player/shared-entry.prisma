@@ -12,6 +12,10 @@
 model SharedPlayerEntry {
   id              String    @id @db.Uuid
   email           String?   @unique
+  /// #1019: the normalized social link (`facebook.com/name`) that is an entry key like the email.
+  /// Unique while the entry is open; cleared when it is claimed or retired. An open entry has an
+  /// email, a social key or both (CHECK in SQL).
+  socialKey       String?   @unique @map("social_key")
   /// Same format and uniqueness rules as `player_id_allocations.rtr_id` (CHECK in SQL).
   rtrId           String    @unique @map("rtr_id")
   /// The first club that saved the email; the RTR ID uses its founding location and that day.

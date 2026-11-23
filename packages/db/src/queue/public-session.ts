@@ -6,6 +6,7 @@ import {
   courtFreeSince,
   courtNames,
   holdsCourt,
+  sharePositions,
 } from '@rotra/data/match/match.rules'
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
@@ -38,6 +39,7 @@ import { closeStaleMatchRequests } from './match-request-store'
 import { peopleFor, readMyMatchRequest } from './match-requests'
 import { matchContext } from './match-store'
 import { readPublishedResults } from './results'
+import { endedState, shownHostRows } from './session-host-snapshots'
 import { placeClubMember, stepDownIn } from './session-roster'
 import {
   capacityOf,
@@ -53,6 +55,7 @@ import {
   requireState,
   touchSession,
 } from './session-store'
+import { myPendingSlotTransfer } from './slot-transfers'
 
 const BANDS: StatedBand[] = ['beginner', 'intermediate', 'advanced', 'unsure']
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -61,6 +64,14 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const TAKES_REQUESTS = ['prepared', 'active']
 /** Join requests end at Start (D-2026-11-11-11): none is created once the session is live. */
 const JOIN_REQUESTS_STARTED = 'The session has started, so online join requests are closed.'
+
+/**
+ * The picture a saved player shows: a registered player's own, else the one the club set for its
+ * guest or unclaimed player (D-2026-11-09-12), else initials.
+ */
+const pictureOf = (
+  clubPlayer: { avatarRef: string | null; player: { avatarRef: string | null } | null } | undefined,
+) => (clubPlayer?.player ? clubPlayer.player.avatarRef : (clubPlayer?.avatarRef ?? null))
 
 /** Rate/abuse guard (proposal pending #248): pending requests one session will hold at once. */
 export const MAX_PENDING_REQUESTS_PER_SESSION = 60
@@ -100,7 +111,11 @@ function withResultPictures(
     }
   }
   const out: Record<string, unknown> = { ...results }
-  if (Array.isArray(out.standings)) out.standings = out.standings.map(face)
+  // Published copies saved before shared positions (or with gaps) show 1, 1, 2 (owner, November 20, 2026).
+  if (Array.isArray(out.standings))
+    out.standings = sharePositions(
+      out.standings as { wins: number; losses: number; position: number }[],
+    ).map(face)
   if (Array.isArray(out.offDay)) out.offDay = out.offDay.map(face)
   if (out.awards && typeof out.awards === 'object') {
     const awards = out.awards as Record<string, unknown>
@@ -198,15 +213,31 @@ export async function readPublicSession(slug: string) {
     const courts = await liveCourts(tx, session.id)
     const roster = await liveRoster(tx, session.id)
     const waitlist = await orderedWaitlist(tx, session.id)
+    // Epic #1002 (#1006): the current hosts ride the same read, oldest first. Zero is valid. A
+    // finished session shows the rows frozen at its end, by their snapshot name (#1008).
+    const ended = endedState(session.state)
+    const hostRows = await tx.sessionHost.findMany({
+      where: { sessionId: session.id, ...shownHostRows(session.state) },
+      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+      select: { clubPlayerId: true, nameSnapshot: true },
+    })
     const clubPlayers = await tx.clubPlayer.findMany({
       where: {
         clubId: session.clubId,
-        id: { in: [...roster.map((r) => r.clubPlayerId), ...waitlist.map((w) => w.clubPlayerId)] },
+        id: {
+          in: [
+            ...roster.map((r) => r.clubPlayerId),
+            ...waitlist.map((w) => w.clubPlayerId),
+            ...hostRows.map((h) => h.clubPlayerId),
+          ],
+        },
       },
       select: {
         id: true,
         displayName: true,
+        avatarRef: true,
         player: { select: { avatarRef: true, profileVisibility: true, profileState: true } },
+        assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
     })
     const byId = new Map(clubPlayers.map((p) => [p.id, p]))
@@ -238,17 +269,36 @@ export async function readPublicSession(slug: string) {
         const clubPlayer = byId.get(entry.clubPlayerId)
         return {
           name: maskPublicName(entry.nameSnapshot),
-          pictureUrl: clubPlayer?.player?.avatarRef ?? null,
+          pictureUrl: pictureOf(clubPlayer),
           ...publicLevel(levelCodeFor(entry.skillLevelId)),
         }
       }),
       // #474: counts over the same roster as `participants`.
       skillMix: publicSkillMix(roster.map((entry) => levelCodeFor(entry.skillLevelId))),
+      // The Hosts section (#1006, D-2026-11-22-01): the same masked name and picture as Players. A
+      // host who plays is also in `participants`; capacity and counts read the roster only.
+      hosts: hostRows.flatMap((host) => {
+        const clubPlayer = byId.get(host.clubPlayerId)
+        if (!clubPlayer) return []
+        const placed = roster.find((r) => r.clubPlayerId === host.clubPlayerId)
+        const waiting = waitlist.find((w) => w.clubPlayerId === host.clubPlayerId)
+        const levelId =
+          placed?.skillLevelId ?? waiting?.skillLevelId ?? clubPlayer.assessments[0]?.skillLevelId
+        return [
+          {
+            name: maskPublicName(
+              ended ? host.nameSnapshot : (placed?.nameSnapshot ?? clubPlayer.displayName),
+            ),
+            pictureUrl: pictureOf(clubPlayer),
+            ...publicLevel(levelCodeFor(levelId ?? null)),
+          },
+        ]
+      }),
       waitlist: waitlist.map((w) => {
         const clubPlayer = byId.get(w.clubPlayerId)
         return {
           name: maskPublicName(clubPlayer?.displayName ?? ''),
-          pictureUrl: clubPlayer?.player?.avatarRef ?? null,
+          pictureUrl: pictureOf(clubPlayer),
           ...publicLevel(levelCodeFor(w.skillLevelId)),
         }
       }),
@@ -266,7 +316,7 @@ export async function readPublicSession(slug: string) {
               await readPublishedResults(session.id, tx),
               roster.map((entry) => ({
                 name: entry.nameSnapshot,
-                pictureUrl: byId.get(entry.clubPlayerId)?.player?.avatarRef ?? null,
+                pictureUrl: pictureOf(byId.get(entry.clubPlayerId)),
                 masked: isResultMasked(byId.get(entry.clubPlayerId)?.player),
               })),
             )
@@ -511,41 +561,62 @@ async function memberOf(tx: Tx, clubId: string, playerId: string) {
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
     where: { publicSlug: slug },
-    select: { id: true, clubId: true, publication: { select: { state: true } } },
+    select: { id: true, clubId: true, state: true, publication: { select: { state: true } } },
   })
   if (!session || session.publication?.state === 'deleted') throw new ServiceError('not_found')
   return prisma.$transaction(async (tx) => {
     const roster = await liveRoster(tx, session.id)
+    const linkedSelect = {
+      id: true,
+      playerId: true,
+      nickname: true,
+      avatarRef: true,
+      sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
+      player: {
+        select: {
+          avatarRef: true,
+          nickname: true,
+          profileState: true,
+          profileVisibility: true,
+          banner: { select: { id: true, image: true } },
+          idAllocation: { select: { rtrId: true } },
+        },
+      },
+    } as const
     const linked = await tx.clubPlayer.findMany({
       where: { id: { in: roster.map((entry) => entry.clubPlayerId) } },
+      select: linkedSelect,
+    })
+    // Epic #1002 (#1006): the current hosts get the same name and card rule as the roster. They
+    // never feed `fullRoster` below (a host who is not playing does not unlock the full roster).
+    // A finished session: the rows frozen at its end, by their snapshot name (#1008).
+    const ended = endedState(session.state)
+    const hostRows = await tx.sessionHost.findMany({
+      where: { sessionId: session.id, ...shownHostRows(session.state) },
+      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+      select: { clubPlayerId: true, nameSnapshot: true },
+    })
+    const hostPlayers = await tx.clubPlayer.findMany({
+      where: { id: { in: hostRows.map((h) => h.clubPlayerId) }, clubId: session.clubId },
       select: {
-        id: true,
-        playerId: true,
-        nickname: true,
-        sharedEntry: { select: { rtrId: true, claimedPlayerId: true, retiredAt: true } },
-        player: {
-          select: {
-            avatarRef: true,
-            nickname: true,
-            profileState: true,
-            profileVisibility: true,
-            banner: { select: { id: true, image: true } },
-            idAllocation: { select: { rtrId: true } },
-          },
-        },
+        ...linkedSelect,
+        displayName: true,
+        assessments: { orderBy: { assessedAt: 'desc' }, take: 1, select: { skillLevelId: true } },
       },
     })
     const shownBanners = await readShownProfileBanners(tx)
     const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
-    const pictures = new Map(linked.map((entry) => [entry.id, entry.player?.avatarRef ?? null]))
-    const people = new Map(linked.map((entry) => [entry.id, entry]))
+    const pictures = new Map(
+      [...linked, ...hostPlayers].map((entry) => [entry.id, pictureOf(entry)]),
+    )
+    const people = new Map([...linked, ...hostPlayers].map((entry) => [entry.id, entry]))
     /**
      * D-2026-11-09-02 for a signed-in Player, #731: a registered (claimed) player's full name,
      * nickname and RTR ID, and which card the tile opens; guests and unclaimed profiles stay
      * masked. An always-private player (D-2026-11-12-01) is masked for everyone but themselves,
      * keeps their picture and opens the private card.
      */
-    const person = (entry: (typeof roster)[number]) => {
+    const person = (entry: { clubPlayerId: string; nameSnapshot: string }) => {
       const club = people.get(entry.clubPlayerId)
       const registered = !!club?.playerId && club.player?.profileState === 'claimed'
       const isViewer = !!club?.playerId && club.playerId === context.playerId
@@ -673,6 +744,21 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),
+      // Epic #1002 (#1006): the Hosts section, the same name, picture and card as Players.
+      hosts: hostRows.flatMap((host) => {
+        const who = hostPlayers.find((p) => p.id === host.clubPlayerId)
+        if (!who) return []
+        const placed = roster.find((r) => r.clubPlayerId === who.id)
+        const nameSnapshot = ended ? host.nameSnapshot : (placed?.nameSnapshot ?? who.displayName)
+        const levelId = placed?.skillLevelId ?? who.assessments[0]?.skillLevelId ?? null
+        return [
+          {
+            ...person({ clubPlayerId: who.id, nameSnapshot }),
+            pictureUrl: pictureOf(who),
+            ...publicLevel(levelCodeFor(levelId)),
+          },
+        ]
+      }),
       courtsNow,
       queue: matches.map((match) => ({
         matchNo: match.matchNo,
@@ -747,6 +833,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       where: { sessionId_playerId: { sessionId: session.id, playerId: context.playerId } },
       select: { code: true },
     })
+    // Transfer my slot (#1011): the Player's own pending transfer, before Start only.
+    const slotTransfer =
+      row && session.state === 'prepared' ? await myPendingSlotTransfer(tx, row.id) : null
     const takesPart =
       session.state === 'prepared' || session.state === 'active' || session.state === 'finalizing'
     const isLive = session.state === 'active' || session.state === 'finalizing'
@@ -807,6 +896,8 @@ export async function readMyNight(context: PlayerContext, slug: string) {
       checkedIn: mark?.kind === 'checked-in',
       hasLeft: mark?.kind === 'left',
       cantMakeItSent: openNotice,
+      canTransfer: !!row && session.state === 'prepared',
+      slotTransfer,
       offline: false,
       games: result?.games ?? 0,
       won: result?.wins ?? 0,

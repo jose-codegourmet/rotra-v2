@@ -181,6 +181,10 @@ export type RosterBatchOperation =
       nickname?: string
       /** No email saves a guest; an email saves an unclaimed player or links a ROTRA player */
       email?: string
+      /** #1019: a social link is an entry key too, and wins over the email */
+      socialLink?: string
+      /** Optional, private to the club; kept for an unclaimed player only */
+      phone?: string
       level: PlayingLevel
     })
   | { op: 'remove'; operationId: string; rosterId: string }

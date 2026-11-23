@@ -11,13 +11,14 @@ import {
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
-import { recordsGames } from '@rotra/data/queue-session/types'
+import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
@@ -315,6 +316,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               <Chip>{MODE_LABELS[s.sessionMode]}</Chip>
               <Chip>{formats}</Chip>
               <Chip>Min {s.minimumGames} games</Chip>
+              <Chip>Scoring · {SCORING[sessionScoring(s)].label}</Chip>
               {unrecorded ? <NotRecordedChip /> : null}
             </span>
           }

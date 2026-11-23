@@ -1,4 +1,5 @@
 import 'server-only'
+import { PLAYER_GOOGLE_SIGN_IN_FLAG } from '@rotra/data/feature-flag/keys'
 import {
   NOTIFICATION_VISIBILITY_MS,
   VERIFICATION_REMINDER_ID,
@@ -11,6 +12,7 @@ import type { Prisma } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
 import { readVerification } from './account-verification'
+import { readPlayerFeatureFlag } from './feature-flags'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -19,6 +21,8 @@ function visibleTo(playerId: string, now: Date) {
 }
 
 async function reminderFor(tx: Prisma.TransactionClient, playerId: string, now: Date) {
+  // D-2026-11-18-01: no verification reminder while Google sign-in for players is off.
+  if (!(await readPlayerFeatureFlag(PLAYER_GOOGLE_SIGN_IN_FLAG, tx))) return null
   const current = await readVerification(tx, playerId)
   return current && !current.verification.verified
     ? verificationReminder(

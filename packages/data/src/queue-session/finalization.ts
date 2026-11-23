@@ -11,6 +11,7 @@ import { RealRequestError } from '../real/client'
 import { realFinalizeSession } from '../real/finalization'
 import { realInvalidateSession } from '../real/match'
 import { isRealDataMode } from '../real/mode'
+import { freezeSessionHosts } from '../session-host/sessionHost.history'
 import { createResultSnapshot } from '../session-result/sessionResult.rules'
 import { recordChange } from '../sync/fetchers'
 import { integrityIn } from '../sync/integrity'
@@ -215,6 +216,8 @@ async function run(
           now = Date.now()
         s.state = 'completed'
         s.finalizedAt = now
+        // #1008: the hosts current at the end are this session's hosts from now on.
+        freezeSessionHosts(draft, sessionId, now)
         // Finishing closes pending join requests, drop-out notices and match requests (kept, hidden).
         closeSessionRequests(draft, sessionId, now)
         const f = draft.finalizations[sessionId]
@@ -264,6 +267,8 @@ export function invalidateSession(input: { sessionId: string; reason: string }) 
     s.invalidReason = input.reason.trim()
     s.finalizedAt = null
     s.playerRecordsUpdatedAt = null
+    // #1008: an invalid session keeps the hosts it ended with, like a finished one.
+    freezeSessionHosts(state, input.sessionId)
     state.resultSnapshots = Object.fromEntries(
       Object.entries(state.resultSnapshots).filter(([id]) => id !== input.sessionId),
     )

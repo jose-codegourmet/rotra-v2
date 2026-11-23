@@ -1,4 +1,5 @@
 import 'server-only'
+import { sharePositions } from '@rotra/data/match/match.rules'
 import { ROWS_PER_FRAME } from '@rotra/data/session-result/sessionResult.rules'
 import type { SessionAwards, StandingRow } from '@rotra/data/session-result/types'
 import type { ClubContext } from '../auth/account-context'
@@ -46,7 +47,7 @@ function publicCopy(
 ) {
   const out: Record<string, Prisma.InputJsonValue> = {}
   if (slides.includes('standings'))
-    out.standings = (snapshot.standings as unknown as StandingRow[]).map((r) => ({
+    out.standings = sharePositions(snapshot.standings as unknown as StandingRow[]).map((r) => ({
       position: r.position,
       name: r.name,
       wins: r.wins,
@@ -125,7 +126,8 @@ export async function readSessionResults(context: ClubContext, sessionId: string
       id: snapshot.id,
       version: snapshot.version,
       calculationVersion: snapshot.calculationVersion,
-      standings: snapshot.standings,
+      // Saved rows never change; shown with shared positions without gaps (owner, November 20, 2026).
+      standings: sharePositions(snapshot.standings as unknown as StandingRow[]),
       awards: snapshot.awards,
       offDay: snapshot.offDay,
       generatedAt: toIso(snapshot.generatedAt),

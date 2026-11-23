@@ -8,6 +8,7 @@ export const joinRequestsMeta = {
     'Card variant on Preparation (Q-PREPARE) between the header and the tabs, titled "Requests · N": it renders nothing while nothing waits (no join request or drop-out notice; match requests never show before Start).',
     'Sheet variant inside the live Requests sheet behind Match requests · N (ConsoleHeaderActions at the upper right of the live console header, and the live Overview row): match requests only; always renders the panel body, including the empty text.',
     'Decisions and toasts: Confirm / Confirm guest / Confirm to waitlist through useConfirmRequest (a ROTRA player new to the club is saved as registered, "Joined via session link"; a guest request makes a new guest record), Decline through useDeclineJoinRequest, Remove from roster ("NAME removed from the roster") and Keep ("NAME stays on the roster"), Add to queue ("Match added to the queue", or the "Not enough present players to fill this FORMAT match" error) and match Decline ("NAME\'s match request declined"). A missing level never reaches the mutation: the panel asks for one first.',
+    'Slot transfers (#1011) from useSessionRequests().transfers, after the drop-out notices and counted in Requests · N: Approve with the level chosen on the row through useApproveSlotTransfer ("SENDER\'s slot now belongs to RECIPIENT"; a waitlisted recipient leaves the waitlist, the slot count is unchanged) and Reject through useRejectSlotTransfer ("Transfer rejected · SENDER keeps the slot"). Real mode reads and decides them through the Requests Route Handlers.',
     "Drop-out rows and named match spots show the saved player's picture (useClubPlayers, the same source as the Queue view); Remove from roster works in prepared and live sessions, as in the prototype.",
     'Real mode has no Requests read yet: its join requests still show and work; drop-out notices, match requests and hints are mock only.',
   ],
@@ -20,6 +21,7 @@ export const joinRequestsMeta = {
   related: [
     'JoinRequestsPanel',
     'DropOutNoticeRow',
+    'SlotTransferRow',
     'MatchRequestCard',
     'SessionLinkCard',
     'SessionPreparation',

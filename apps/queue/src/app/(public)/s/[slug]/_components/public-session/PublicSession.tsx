@@ -19,6 +19,7 @@ import { useJoinAsPlayer } from '@rotra/data/public-session/useJoinAsPlayer'
 import { useMyJoinRequest } from '@rotra/data/public-session/useMyJoinRequest'
 import { useMyNight } from '@rotra/data/public-session/useMyNight'
 import { usePublicMatchHistory } from '@rotra/data/public-session/usePublicMatchHistory'
+import { usePublicPaymentStatus } from '@rotra/data/public-session/usePublicPaymentStatus'
 import {
   usePublicSession,
   useSignedInPublicSession,
@@ -28,6 +29,10 @@ import { useSessionPageAccount } from '@rotra/data/public-session/useSessionPage
 import { useSessionPageSignOut } from '@rotra/data/public-session/useSessionPageSignOut'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
+import { useClaimTransferLink } from '@rotra/data/slot-transfer/useClaimTransferLink'
+import { useTransferLink } from '@rotra/data/slot-transfer/useTransferLink'
+import { useWithdrawTransferClaim } from '@rotra/data/slot-transfer/useWithdrawTransferClaim'
+import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -44,6 +49,7 @@ import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
+import { TransferLinkCard } from '@rotra/ui/transfer-link-card'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ClubCard } from '@/app/(public)/s/[slug]/_components/club-card/ClubCard'
@@ -56,6 +62,7 @@ import { ParticipantProfile } from '@/app/(public)/s/[slug]/_components/particip
 import { SessionAwards } from '@/app/(public)/s/[slug]/_components/session-awards/SessionAwards'
 import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
 import { SessionLeaderboard } from '@/app/(public)/s/[slug]/_components/session-leaderboard/SessionLeaderboard'
+import { PaymentStatusShareDialog } from '@/lib/PaymentStatusShareDialog'
 
 export type PublicSessionProps = {
   slug: string
@@ -68,6 +75,8 @@ export type PublicSessionProps = {
   openJoin?: boolean
   /** ?invite=<code> on the visitor's link: sent with Request to join as NAME ("Invited by NAME") */
   inviteCode?: string
+  /** ?transfer=<token> on the visitor's link (#1012): the transfer link card (claim, withdraw) */
+  transferToken?: string
 }
 
 const MODES = {
@@ -277,10 +286,18 @@ const savedTab = (value: unknown): SavedTab | null =>
  * started/cancelled notice) sits in a sticky 360 px side column (2026-11-13 wide layout log). No
  * operator controls.
  */
-export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: PublicSessionProps) {
+export function PublicSession({
+  slug,
+  viewer,
+  openJoin = false,
+  inviteCode,
+  transferToken,
+}: PublicSessionProps) {
   const offline = !useConnectivity().online
   const page = usePublicSession(slug, { visitor: viewer === 'visitor' })
   const mine = useMyJoinRequest(slug)
+  const paymentStatus = usePublicPaymentStatus(slug)
+  const [payShareOpen, setPayShareOpen] = useState(false)
   const playerAccess = usePlayerSessionAccess(slug, viewer === 'visitor')
   // The signed-in Player on the visitor's own page. Mock mode reads the mock Player sign-in. Real
   // mode has no Player session in this app: the Player app's access read (below) says who is
@@ -316,6 +333,15 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       ? { id: realPlayer.playerId, name: realPlayer.name }
       : null
   const night = useMyNight(slug, nightViewer?.id)
+  // #1012: a transfer link (`?transfer=<token>`), from this viewer's side. Real mode reads the
+  // Player app's own sign-in; the viewer id only keys the read so it refetches after sign-in.
+  const transferLink = useTransferLink(
+    slug,
+    viewer === 'visitor' ? transferToken : undefined,
+    nightViewer?.id ?? null,
+  )
+  const claimLink = useClaimTransferLink(slug)
+  const withdrawClaim = useWithdrawTransferClaim(slug)
   // Real mode (#850): a finished session's Match history from the Player app's own read; the mock
   // signed-in read carries it as `history`.
   const realHistory = usePublicMatchHistory(
@@ -571,6 +597,12 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
   })
   const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
   const waitlist = p.waitlist.map(tile)
+  // Hosts (#1006): the same name rule as Players. Real mode's signed-in names come from the Player
+  // app's access read, like `participants`; zero hosts hides the section.
+  const hosts = (access && !signedRead ? (access.hosts ?? p.hosts) : p.hosts)?.map((h, i) => ({
+    ...tile(h, i),
+    id: `host-${i}`,
+  }))
   // 2026-11-13-queue-public-faces-profile: for a signed-in player the faces on Courts now and the
   // Queue open the same profile card as the Participants tab.
   const openFace =
@@ -610,14 +642,52 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
       ? `/s/${encodeURIComponent(slug)}`
       : new URL(`/s/${encodeURIComponent(slug)}`, location.origin).href
   const resultsClub = { name: p.club.name, initials: p.club.initials, logoUrl: p.club.logoUrl }
+  // #1012: the transfer link card goes first in the side column. Signing up goes through the
+  // session link's registration (identity and RTR ID like any session link), back to this link.
+  const linkToken = transferToken ?? ''
+  const linkView = linkToken ? transferLink.data : undefined
+  const linkWrite = {
+    onSuccess: (done: { message: string }) => toast(done.message),
+    onError: (error: Error) => toast.error(error.message),
+  }
+  const linkCard = linkView ? (
+    <TransferLinkCard
+      state={linkView.state}
+      senderName={linkView.senderName}
+      signedIn={!!nightViewer}
+      claimBlock={linkView.claimBlock}
+      registerHref={
+        isRealDataMode() && p.club.id && typeof location !== 'undefined'
+          ? playerRegisterUrl(p.club.id, location.href, { join: false })
+          : undefined
+      }
+      logInHref={loginHref}
+      pending={claimLink.isPending || withdrawClaim.isPending}
+      offline={offline}
+      onClaim={() => {
+        if (nightViewer) claimLink.mutate({ token: linkToken, playerId: nightViewer.id }, linkWrite)
+      }}
+      onWithdraw={() => {
+        if (nightViewer)
+          withdrawClaim.mutate({ token: linkToken, playerId: nightViewer.id }, linkWrite)
+      }}
+    />
+  ) : null
   // The join card, or the started/cancelled notice: the side column from 1100 px.
-  const side =
+  const sideMain =
     p.status === 'cancelled' ? (
       <Notice tone="warn" title="This session is cancelled.">
         {cancelWhy ? `${cancelWhy}.` : null}
       </Notice>
     ) : card ? (
       <JoinRequestCard {...card} />
+    ) : null
+  const side =
+    linkCard || sideMain ? (
+      <>
+        {linkCard}
+        {sideMain}
+      </>
     ) : null
 
   return (
@@ -719,6 +789,8 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                   formats={p.formats}
                   modeLabel={mode.label}
                   modeDescription={mode.text}
+                  scoringLabel={scoringMode(p.scoring).label}
+                  scoringDescription={scoringMode(p.scoring).text}
                   minimumGames={p.minimum}
                   recorded={!unrecorded}
                   amountDuePerPlayer={p.amountDuePerPlayer}
@@ -781,6 +853,29 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
                     ) : undefined
                   }
                 />
+                {paymentStatus.data &&
+                paymentStatus.data.amountDue !== null &&
+                paymentStatus.data.rows.length > 0 ? (
+                  <Card className="flex flex-wrap items-center justify-between gap-3 p-4">
+                    <div className="min-w-0 basis-[240px] flex-1">
+                      <h2 className="m-0 text-base font-bold">Payment status</h2>
+                      <p className="m-0 mt-1 text-sm text-fg2">
+                        Who has paid, who paid part and who still owes, as text you can copy or
+                        share.
+                      </p>
+                    </div>
+                    <Button size="sm" onClick={() => setPayShareOpen(true)}>
+                      Share payment status
+                    </Button>
+                    <PaymentStatusShareDialog
+                      open={payShareOpen}
+                      onOpenChange={setPayShareOpen}
+                      heading={`${p.title} · ${date(p.start)}`}
+                      amountDue={paymentStatus.data.amountDue}
+                      rows={paymentStatus.data.rows}
+                    />
+                  </Card>
+                ) : null}
                 {finished && !unrecorded ? (
                   p.results && (p.results.awards || p.results.offDay) ? (
                     <SessionAwards
@@ -800,6 +895,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
               </TabsContent>
               <TabsContent value="participants">
                 <PublicParticipants
+                  hosts={hosts}
                   participants={participants}
                   participantCount={p.participantCount ?? p.participants.length}
                   uncapped={uncapped}
@@ -854,6 +950,7 @@ export function PublicSession({ slug, viewer, openJoin = false, inviteCode }: Pu
           open={inviteOpen}
           onOpenChange={setInviteOpen}
           inviterName={nightViewer.name}
+          inviterAvatarUrl={barAccount?.pictureUrl}
           clubName={p.club.name}
           clubInitials={p.club.initials}
           clubLogoUrl={p.club.logoUrl}

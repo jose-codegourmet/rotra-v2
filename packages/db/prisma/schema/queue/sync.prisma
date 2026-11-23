@@ -27,6 +27,7 @@ model Device {
   assessments          ClubAssessment[]
   decidedJoinRequests  SessionJoinRequest[]
   closedDropOutNotices SessionDropOutNotice[]
+  decidedSlotTransfers SessionSlotTransfer[]
   resolvedConflicts    SyncConflict[]
   matchDecisions       MatchDecision[]
 

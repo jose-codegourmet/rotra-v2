@@ -10,6 +10,7 @@ export type ClubSettingsSection =
   | 'identity'
   | 'invite'
   | 'defaults'
+  | 'hosts'
   | 'post'
   | 'license'
   | 'device'
@@ -23,6 +24,7 @@ const GROUPS: [string, [ClubSettingsSection, string][]][] = [
       ['identity', 'Club identity'],
       ['invite', 'Club invite link'],
       ['defaults', 'Session defaults'],
+      ['hosts', 'Trusted hosts'],
       ['post', 'Facebook post'],
     ],
   ],

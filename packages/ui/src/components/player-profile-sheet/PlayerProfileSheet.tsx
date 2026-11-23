@@ -152,9 +152,12 @@ export function PlayerProfileSheet({
   const [linking, setLinking] = useState<'copy' | 'share' | null>(null)
   const canInvite = identity === 'guest' || identity === 'unclaimed'
   const detailsRequired = detailsRequiredProp && identity === 'unclaimed'
+  // #1019: an unclaimed player saved with a social link and no email.
   const statusLine = detailsRequired
     ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet'
-    : STATUS[identity]
+    : identity === 'unclaimed' && !emailOnFile
+      ? 'Saved by your club with a social link. Not registered with ROTRA yet'
+      : STATUS[identity]
   const phone = phoneHidden
     ? 'Hidden by player'
     : identity === 'guest' || !phoneOnFile

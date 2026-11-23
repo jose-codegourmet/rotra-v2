@@ -17,14 +17,19 @@ import { useReplacePlayer } from '@rotra/data/match/useReplacePlayer'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
 import { MockError } from '@rotra/data/mock/errors'
-import { type QueueSession, recordsGames, type SessionCourt } from '@rotra/data/queue-session/types'
+import {
+  type QueueSession,
+  type SessionCourt,
+  sessionScoring,
+} from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
+import { SCORING } from '@rotra/schema/scoring'
 import { ActiveMatchSheet } from '@rotra/ui/active-match-sheet'
 import { ConfirmResultSheet } from '@rotra/ui/confirm-result-sheet'
-import { FinishMatchSheet } from '@rotra/ui/finish-match-sheet'
 import { MatchResultForm } from '@rotra/ui/forms/match-result-form'
+import { matchResultInputOf } from '@rotra/ui/forms/match-result-form/default-values'
 import type {
   MatchResultFormInput,
   MatchResultFormValues,
@@ -62,8 +67,6 @@ type Step =
   | { kind: 'active' }
   | { kind: 'result'; input: Partial<MatchResultFormInput> }
   | { kind: 'review'; values: MatchResultFormValues; operationId: string }
-  /** Record games off: "Finish match N?", no winner or score */
-  | { kind: 'finish'; operationId: string }
   | { kind: 'substitute'; outId: string | null; inId: string | null; creditTo: SubstitutionCredit }
   | {
       kind: 'confirm-sub'
@@ -216,6 +219,8 @@ function OpenActiveMatch({
   })
   const teamA = match.teamA.map(player)
   const teamB = match.teamB.map(player)
+  /** The session's scoring mode (Q22): what Match done asks for; missing reads as 16/31 */
+  const scoring = sessionScoring(session)
   const courtLabel = courtNames(match, session.courts)
   const courtLabels = match.courtIds.map(
     (id) => session.courts.find((c) => c.id === id)?.label ?? 'Court',
@@ -285,27 +290,10 @@ function OpenActiveMatch({
         winningTeam: values.winningTeam,
         teamAScore: values.teamAScore,
         teamBScore: values.teamBScore,
+        games: values.games,
         operationId,
         holdCourtId: freedCourtId,
       },
-      {
-        onSuccess: (result) => {
-          toast(result.message)
-          if (freedCourtId) onCompleted({ courtId: freedCourtId, matchNo: match.matchNo })
-          close()
-        },
-        onError: onFailure,
-        onSettled,
-      },
-    )
-  }
-
-  /** Record games off: the match ends with no winner and no score, and still counts as a game */
-  const onConfirmFinish = () => {
-    if (step.kind !== 'finish' || !begin()) return
-    const freedCourtId = match.courtIds[0]
-    completeMatch.mutate(
-      { matchId: match.id, operationId: step.operationId, holdCourtId: freedCourtId },
       {
         onSuccess: (result) => {
           toast(result.message)
@@ -419,11 +407,8 @@ function OpenActiveMatch({
   /** Review result passed validation: the confirm step, with what was entered kept for Back to result */
   const onReviewResult = (values: MatchResultFormValues) =>
     go({ kind: 'review', values, operationId: newOperationId() })
-  const resultInputOf = (values: MatchResultFormValues): Partial<MatchResultFormInput> => ({
-    winner: values.winningTeam,
-    scoreA: values.teamAScore === null ? '' : String(values.teamAScore),
-    scoreB: values.teamBScore === null ? '' : String(values.teamBScore),
-  })
+  const resultInputOf = (values: MatchResultFormValues): Partial<MatchResultFormInput> =>
+    matchResultInputOf(values, scoring)
 
   const profile = (
     // Back to match closes the profile; the sheet underneath is unchanged
@@ -442,28 +427,12 @@ function OpenActiveMatch({
           open
           onOpenChange={onOpenChange}
           matchNo={match.matchNo}
+          scoring={scoring}
           teamANames={names(match.teamA)}
           teamBNames={names(match.teamB)}
           onSubmit={onReviewResult}
           onBack={() => go({ kind: 'active' })}
           defaultValues={step.input}
-        />
-        {profile}
-      </>
-    )
-
-  if (step.kind === 'finish')
-    return (
-      <>
-        <FinishMatchSheet
-          open
-          onOpenChange={onOpenChange}
-          matchNumber={match.matchNo}
-          teamANames={names(match.teamA)}
-          teamBNames={names(match.teamB)}
-          onConfirm={onConfirmFinish}
-          isPending={completeMatch.isPending}
-          error={error}
         />
         {profile}
       </>
@@ -480,6 +449,7 @@ function OpenActiveMatch({
           teamBNames={names(match.teamB)}
           teamAScore={step.values.teamAScore}
           teamBScore={step.values.teamBScore}
+          games={step.values.games}
           courtLabels={courtLabels}
           onConfirm={onConfirmResult}
           onBack={() => go({ kind: 'result', input: resultInputOf(step.values) })}
@@ -650,6 +620,7 @@ function OpenActiveMatch({
         matchNo={match.matchNo}
         courtLabel={courtLabel}
         format={match.format}
+        scoringLabel={SCORING[scoring].label}
         startedAt={match.startedAt ?? now}
         now={now}
         teamA={teamA}
@@ -658,13 +629,7 @@ function OpenActiveMatch({
         substitutions={substitutions}
         onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
         onMarkInvalid={() => go({ kind: 'invalid', operationId: newOperationId() })}
-        onMatchDone={() =>
-          go(
-            recordsGames(session)
-              ? { kind: 'result', input: {} }
-              : { kind: 'finish', operationId: newOperationId() },
-          )
-        }
+        onMatchDone={() => go({ kind: 'result', input: {} })}
       />
       {profile}
     </>

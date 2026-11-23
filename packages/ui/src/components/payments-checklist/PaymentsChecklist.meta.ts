@@ -5,6 +5,7 @@ export const paymentsChecklistMeta = {
   usage: [
     'Use in preparation, console Payments and the session record Financials tab.',
     "Totals and player statuses come from paymentTotals / paymentStatus (@rotra/data/session-payment/rules): amount received against today's amount due (#479).",
+    'Slots that came by transfer (#1013) count their carried cash once and their waivers apart: Collected never includes a waiver ("₱X waived (not cash)" hint); their cards open the Slot history.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -17,6 +18,7 @@ export const paymentsChecklistMeta = {
     'all-paid',
     'none-paid',
     'no-fee',
+    'transferred-slot',
     'empty',
     'as-sheet',
   ],

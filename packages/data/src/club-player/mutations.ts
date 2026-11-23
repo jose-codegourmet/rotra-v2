@@ -1,3 +1,5 @@
+import { phoneField } from '@rotra/schema/phone'
+import { socialLinkAlreadySaved } from '@rotra/schema/social-link'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { leaderboardLevels } from '../fixtures/players'
 import { MockError } from '../mock/errors'
@@ -11,6 +13,7 @@ import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { savedPlayerName } from './clubNickname.rules'
 import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
 import { applyClubEmail, emailAlreadySaved, planClubEmail } from './email'
+import { applyClubSocial, planClubSocial, savedRecordForSocial } from './socialLink'
 
 function fail(text: string): never {
   throw new MockError('permission', text)
@@ -27,8 +30,42 @@ export const OWN_NAME_ERROR = 'Enter a name.'
 export type NewClubPlayerInput = {
   name: string
   nickname?: string | null
-  /** No email saves a guest; a phone is never asked (D-2026-11-16-04) */
+  /** No email saves a guest (D-2026-11-16-04) */
   email?: string | null
+  /**
+   * Optional, private to the club, kept for an unclaimed player only: refused with no email and no
+   * social link, since a guest has no phone (Add player › New player, November 23, 2026)
+   */
+  phone?: string | null
+  /** #1019: a Facebook, Instagram, YouTube or LinkedIn link is an entry key too; it wins over the email */
+  socialLink?: string | null
+}
+
+const PHONE_ERROR = 'Enter a Philippine mobile number, like 0917 555 0142, or leave it empty.'
+const PHONE_NEEDS_KEY = 'Add an email or a social link to save a phone, or leave the phone empty.'
+
+/** The new player's phone as E.164, or null; refuses a bad one, one with no key, or a taken one. */
+export function newPlayerPhone(
+  s: MockState,
+  input: Pick<NewClubPlayerInput, 'phone' | 'email' | 'socialLink'>,
+) {
+  if (!input.phone?.trim()) return null
+  const parsed = phoneField.safeParse(input.phone)
+  if (!parsed.success) throw new MockError('permission', PHONE_ERROR, { phone: PHONE_ERROR })
+  if (!input.email?.trim() && !input.socialLink?.trim())
+    throw new MockError('permission', PHONE_NEEDS_KEY, { phone: PHONE_NEEDS_KEY })
+  const taken = s.clubPlayers.find(
+    (p) =>
+      p.clubId === DEMO_CLUB_ID &&
+      !p.removedAt &&
+      !p.linkedToClubPlayerId &&
+      s.privatePhones[p.id] === parsed.data,
+  )
+  if (taken) {
+    const text = `${savedDisplayName(s, taken)} already has this number.`
+    throw new MockError('permission', text, { phone: text })
+  }
+  return parsed.data
 }
 
 /**
@@ -44,8 +81,16 @@ export function createClubPlayer(
   playingLevel: PlayingLevel | null = null,
 ): { player: ClubPlayer; how: string } {
   if (!input.name.trim()) fail('Enter your name.')
+  const phone = newPlayerPhone(s, input)
+  const social = planClubSocial(s, input.socialLink)
+  const sameLink = savedRecordForSocial(s, DEMO_CLUB_ID, social)
+  if (sameLink) {
+    const text = socialLinkAlreadySaved(savedDisplayName(s, sameLink))
+    throw new MockError('permission', text, { socialLink: text })
+  }
   const plan = planClubEmail(s, input.email)
-  if (plan.kind !== 'guest') {
+  // With a link the link decides who they are; the email's own owner is not checked (#1019).
+  if (plan.kind !== 'guest' && social.kind === 'none') {
     const same = savedRecordByEmail(s, DEMO_CLUB_ID, plan.email)
     if (same) {
       const text = emailAlreadySaved(savedDisplayName(s, same))
@@ -64,6 +109,11 @@ export function createClubPlayer(
     joinedVia: 'added',
   }
   s.clubPlayers.push(player)
+  if (phone) s.privatePhones[player.id] = phone
+  if (social.kind !== 'none') {
+    const email = plan.kind === 'new' || plan.kind === 'pending' ? plan.email : null
+    return { player, how: ` · ${applyClubSocial(s, player, social, email)}` }
+  }
   if (plan.kind === 'guest') return { player, how: ' as a guest' }
   return { player, how: ` · ${applyClubEmail(s, player, plan)}` }
 }

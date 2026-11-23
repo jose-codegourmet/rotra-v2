@@ -8,6 +8,11 @@ export type SkillDistributionBarProps = {
   counts: SkillDistributionCounts
   /** Small heading above the bar */
   label?: string
+  /**
+   * The slot budget. When set, the bar spans it: the colored segments are the counted players and a
+   * grey remainder is the open slots, so 4 of 24 taken fills a sixth. Without it the players fill the bar.
+   */
+  capacity?: number
   className?: string
 }
 
@@ -19,9 +24,12 @@ export type SkillDistributionBarProps = {
 export function SkillDistributionBar({
   counts,
   label = 'Skill mix',
+  capacity,
   className,
 }: SkillDistributionBarProps) {
   const segments = skillMixSegments(counts)
+  const taken = segments.reduce((sum, s) => sum + s.count, 0)
+  const open = capacity ? Math.max(0, capacity - taken) : 0
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -35,6 +43,18 @@ export function SkillDistributionBar({
           {segments.map((s) => (
             <SkillMixSegment key={s.key} segment={s} />
           ))}
+          {open > 0 ? (
+            <SkillMixSegment
+              segment={{
+                key: 'unrated',
+                label: 'Open slots',
+                count: open,
+                widthPct: capacity ? (open / capacity) * 100 : 0,
+                tip: open === 1 ? '1 open slot' : `${open} open slots`,
+                tone: 'bg-elev',
+              }}
+            />
+          ) : null}
         </div>
       ) : (
         <div aria-hidden className="h-2.5 w-full rounded-full bg-border" />

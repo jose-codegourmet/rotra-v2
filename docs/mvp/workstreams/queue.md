@@ -1,6 +1,6 @@
 # Workstream — Queue core
 
-**Last verified:** 2026-11-12 (round-2 status lines; code trace of `main` @ `aca899f2` for the rest; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-22 (trusted hosts and session hosts rows, D-2026-11-22-01); 2026-11-12 (round-2 status lines; code trace of `main` @ `aca899f2` for the rest; traced, not run) · [MVP hub](../README.md)
 
 Path traced: UI route in `apps/queue/src/app/(operator|auth|public)` → `packages/data/src/<domain>`
 fetcher (real branch) → `packages/data/src/real/*.ts` → `apps/queue/src/app/api/**/route.ts` →
@@ -101,6 +101,11 @@ Prisma column); the Checked in themselves mark has no server clearing rules yet.
 | Request formats per session (default option A), `requestFormats` | implemented (mock app only) | commit `3abfba67`; defaults decided 2026-11-10 ([D-2026-11-09-11](../decisions/2026-11-09.md#d-2026-11-09-11)) | #618 |
 | Games played override (Set games played, one player or all; `session_players.games_adjustment`) | in progress (mock app + real-mode services; migration `20261111000300_roster_games_adjustment` applied 2026-11-11) | [mockup log](../../mockup-changes/2026-11-11-queue-set-games-played.md) | #717 |
 | Join request: Join a slot / Be waitlisted choice, full-slots rule before start, Join from waitlist (`placement`) | in progress (mock app + real-mode services; migration `20261111000200` applied 2026-11-11) | [D-2026-11-11-02](../decisions/2026-11-11.md#d-2026-11-11-02); [mockup log](../../mockup-changes/2026-11-11-queue-join-request-slot-or-waitlist.md) | #706 |
+| Club settings › Trusted hosts (`club_trusted_hosts`, `useTrustedHosts`) | in progress (mock app + real-mode service and Route Handlers; migration `20261122000100_club_trusted_hosts` applied to a local disposable database only) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1003 (epic #1002) |
+| Session setup › Hosts with auto-registration (`session_hosts`, `useSessionHosts`, `hostClubPlayerIds`) | in progress (mock app + real-mode service and Route Handler; migration `20261122000200_session_hosts` applied to a local disposable database only) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1004 (epic #1002) |
+| Session management › Hosts: add or remove hosts before and during the session (`useAddSessionHost`, `useRemoveSessionHost`, `POST`/`DELETE /api/sessions/[sessionId]/hosts`) | in progress (mock app + real-mode service and Route Handlers; no schema change) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1005 (epic #1002) |
+| Finished sessions keep their hosts (`session_hosts.name_snapshot`, `frozen_at`; frozen at Session done and Mark session invalid; Hosts on the session record and a finished public page) | in progress (mock app + real-mode services; migration `20261122000300_session_host_snapshots` applied to a local disposable database only) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) | #1008 (epic #1002) |
+| Public session page › Hosts section (`hosts` on `PublicSessionPage`, `PublicHosts`; optional, hidden with no hosts; masked like Players) | in progress (mock app + real-mode public and Player access reads; no schema change) | [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) |
 
 ### Obvious Queue bugs (#466, 2026-11-07)
 
@@ -137,6 +142,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-19-02](../decisions/2026-11-19.md#d-2026-11-19-02) to [D-2026-11-19-09](../decisions/2026-11-19.md#d-2026-11-19-09) — the November 19 console round: tabs and Settings, Correct Queue Time Format, time picker standard, live match controls, Edit player, exemption list, Regenerate removed, Embla (all mockup only, tickets needed).
 - [D-2026-11-19-12](../decisions/2026-11-19.md#d-2026-11-19-12) — session level restrictions (all levels, beginners only, beginners to intermediate, slots per level).
 - [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (Mode and Scoring cards, sign-in).
+- [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts and session host display (epic #1002; #1003 Club settings › Trusted hosts, #1004 session setup › Hosts and #1005 change hosts during a session, #1006 public Hosts section and #1008 finished sessions keep their hosts built).
 
 ## Blocking open decisions
 

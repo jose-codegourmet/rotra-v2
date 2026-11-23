@@ -1,3 +1,4 @@
+import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -14,6 +15,8 @@ export type PublicPageSummaryDetails = {
   formats: string
   /** The mode label, e.g. "Fair" */
   mode: string
+  /** The scoring mode's label, e.g. "16/31" (SCORING[key].label); omitted reads as 16/31 */
+  scoring?: string
   /** The N in "N games per player" */
   minimum: number
 }
@@ -37,6 +40,11 @@ export type PublicPageSummaryProps = {
   publication: PublicPageSummaryPublication | null
   /** The N in "Participants · N" */
   participantCount: number
+  /**
+   * The Hosts section (PublicHosts) under the Participants heading, above the grid (#1006, #1008):
+   * on a finished session, the hosts it ended with. Omit with no hosts.
+   */
+  hosts?: ReactNode
   /** The participant cards (ParticipantCard from PublicParticipants), laid out in the grid */
   children?: ReactNode
   onOpenPublicPage: () => void
@@ -61,6 +69,7 @@ export function PublicPageSummary({
   details,
   publication,
   participantCount,
+  hosts,
   children,
   onOpenPublicPage,
   onPublish,
@@ -98,6 +107,7 @@ export function PublicPageSummary({
                 { label: 'Courts', value: details.courts },
                 { label: 'Formats', value: details.formats },
                 { label: 'Mode', value: details.mode },
+                { label: 'Scoring', value: details.scoring ?? SCORING['31'].label },
                 { label: 'Minimum', value: `${details.minimum} games per player` },
               ]}
             />
@@ -128,6 +138,7 @@ export function PublicPageSummary({
 
       <section aria-labelledby="public-page-participants-heading" className="flex flex-col gap-3">
         <h3 id="public-page-participants-heading">Participants · {participantCount}</h3>
+        {hosts}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,150px),1fr))] gap-2.5">
           {children}
         </div>

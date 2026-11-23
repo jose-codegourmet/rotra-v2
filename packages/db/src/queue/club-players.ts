@@ -2,6 +2,7 @@ import 'server-only'
 import { yearGameStats } from '@rotra/data/player/rules'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import type { ParticipantStatsRead } from '@rotra/data/public-session/types'
+import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -11,6 +12,7 @@ import {
   normalizeRtrId,
   openEntryByEmail,
   openEntryByRtrId,
+  openEntryBySocialKey,
   registeredPlayerByEmail,
 } from '../player/shared-entry'
 import { requireClubEntitlement } from '../service/authorize'
@@ -70,8 +72,9 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       displayName: true,
       nickname: true,
       addedAt: true,
+      avatarRef: true,
       privateInput: { select: { phoneE164: true } },
-      sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true } },
+      sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true, email: true } },
       player: {
         select: {
           avatarRef: true,
@@ -117,7 +120,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       fullName: (registered && p.player?.fullName) || p.displayName,
       nickname: registered ? (p.player?.nickname ?? null) : p.nickname,
       clubNickname: registered ? p.nickname?.trim() || null : null,
-      picture: registered ? (p.player?.avatarRef ?? null) : null,
+      // A guest or unclaimed player shows the picture the club set (D-2026-11-09-12).
+      picture: registered ? (p.player?.avatarRef ?? null) : p.avatarRef,
       pictureName: registered ? (p.player?.fullName ?? null) : null,
       bannerKey: banner.bannerKey,
       bannerImageUrl: banner.bannerImageUrl,
@@ -126,7 +130,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
       phoneHidden: registered ? (p.player?.hidePhoneFromClubs ?? false) : false,
       hasPhone: Boolean((registered && p.player?.privateContact?.phoneE164) || phone),
-      emailOnFile: Boolean(entry),
+      // #1019: an entry saved with a social link only has no email.
+      emailOnFile: Boolean(entry?.email),
       detailsRequired,
       sessionsHere: new Set(p.rosterEntries.map((r) => r.sessionId)).size,
       addedAt: p.addedAt.toISOString(),
@@ -161,6 +166,7 @@ const NO_MATCH: PlayerLookupDto = { player: null, savedName: null }
 
 /**
  * Player lookup (D-2026-11-16-04): the one ROTRA person whose RTR ID or email is exactly `query`
+ * (#1019: or, for an unclaimed person only, whose normalized social link is)
  * (RTR ID uppercased; email trimmed and lowercased), registered or unclaimed. No name search and
  * no phone lookup. When this club already saved them, `savedName` is this club's name for them
  * instead. Players who chose Hide me from Player Information (D-2026-11-12-01) are not found.
@@ -170,12 +176,16 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
   if (!q) return NO_MATCH
   const rtrId = normalizeRtrId(q)
   const email = rtrId ? null : normalizeEmail(q)
-  if (!rtrId && !email) return NO_MATCH
+  // #1019: an exact social link finds an unclaimed player only, never a registered one.
+  const link = rtrId || email ? null : normalizeSocialLink(q)
+  if (!rtrId && !email && !link) return NO_MATCH
   const entry = rtrId
     ? await openEntryByRtrId(prisma, rtrId)
     : email
       ? await openEntryByEmail(prisma, email)
-      : null
+      : link
+        ? await openEntryBySocialKey(prisma, link.key)
+        : null
   const playerId = entry
     ? null
     : rtrId
@@ -298,6 +308,8 @@ export async function addNewSavedPlayer(
     nickname?: string | null
     phone?: string | null
     email?: string | null
+    /** #1019: a social link is an entry key too, and wins over the email */
+    socialLink?: string | null
   },
 ) {
   await requireClubEntitlement(context)
@@ -315,7 +327,10 @@ export async function addNewSavedPlayer(
           },
           select: { displayName: true },
         })
-        if (match) throw alreadySaved(match.displayName)
+        if (match)
+          throw new ServiceError('conflict', {
+            phone: `${match.displayName} already has this number.`,
+          })
       }
       const { clubPlayer, words } = await createClubPlayer(
         tx,

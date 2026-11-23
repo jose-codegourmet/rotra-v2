@@ -384,11 +384,51 @@ func Swap(m model.Match, ctx model.Context) *SwapTarget {
 	return nil
 }
 
+// ScoringMode is one row of the scoring table (@rotra/schema/scoring SCORING): the points that win
+// a game, one game or best of 3, and whether target − 1 all goes to deuce (first to lead by 2, no cap).
+type ScoringMode struct {
+	Target int
+	Games  int
+	Deuce  bool
+}
+
+// Scoring is the scoring table by stored key. Labels and texts live with the UI copy in TypeScript.
+var Scoring = map[string]ScoringMode{
+	"31":     {Target: 31, Games: 1, Deuce: true},
+	"31nd":   {Target: 31, Games: 1, Deuce: false},
+	"21":     {Target: 21, Games: 1, Deuce: true},
+	"21x3":   {Target: 21, Games: 3, Deuce: true},
+	"21x3nd": {Target: 21, Games: 3, Deuce: false},
+}
+
+// DefaultScoring is 16/31: what a session with no (or an unknown) scoring mode reads as.
+const DefaultScoring = "31"
+
+// ScoringOf is the session's scoring mode: the stored key, or 16/31 when it is missing or unknown.
+func ScoringOf(key *string) ScoringMode {
+	if key != nil {
+		if m, ok := Scoring[*key]; ok {
+			return m
+		}
+	}
+	return Scoring[DefaultScoring]
+}
+
+// GameInput is one best-of-3 game score as entered. Nil means empty (null or missing).
+type GameInput struct {
+	A *float64 `json:"a"`
+	B *float64 `json:"b"`
+}
+
 // ResultInput is a result as the Queue Master entered it. Nil means empty (null or missing).
 type ResultInput struct {
-	Winner *string  `json:"winner"`
-	ScoreA *float64 `json:"scoreA"`
-	ScoreB *float64 `json:"scoreB"`
+	// Scoring is the session's scoring mode key; missing or unknown reads as 16/31.
+	Scoring *string  `json:"scoring"`
+	Winner  *string  `json:"winner"`
+	ScoreA  *float64 `json:"scoreA"`
+	ScoreB  *float64 `json:"scoreB"`
+	// Games is every game played, best of 3 only. ScoreA/ScoreB are then derived and not read.
+	Games []GameInput `json:"games"`
 }
 
 // ResultCheck is the outcome of [ValidateResult]: a winner, or an error message (one of the two is nil).
@@ -399,31 +439,173 @@ type ResultCheck struct {
 
 func isWholeNumber(f float64) bool { return !math.IsNaN(f) && !math.IsInf(f, 0) && f == math.Trunc(f) }
 
-// ValidateResult checks a result: a pair of whole-number scores that do not tie, or a picked winner.
+// isWhole is `typeof n === 'number' && Number.isInteger(n) && n >= 0`.
+func isWhole(f *float64) bool { return f != nil && isWholeNumber(*f) && *f >= 0 }
+
+func losingScoreMax(m ScoringMode) int {
+	if m.Deuce {
+		return m.Target - 2
+	}
+	return m.Target - 1
+}
+
+// The refusal copy, exactly as @rotra/schema/scoring words it.
+const (
+	pickWinnerError      = "Pick the winner."
+	everyGameScoreError  = "Enter a score for every game played, or clear them all."
+	undecidedGamesError  = "Pick who won each game. One pair must win 2 games to decide the match."
+	oneGameOnlyError     = "This scoring mode has one game. Enter one score, not game scores."
+	scoreDisagreesFormat = "The score says Team %s won, but Team %s is picked. Fix one of them."
+	gamesDisagreeFormat  = "The games say Team %s won, but Team %s is picked. Fix one of them."
+)
+
+// gameScoreError is the stored-score reading of gameScoreError in @rotra/schema/scoring: a side
+// above the target reads as a deuce entry, anything else as the single losing-score box. game is
+// the 0-based best-of-3 row, or -1 for a one-game result. Empty string means the score is valid.
+func gameScoreError(m ScoringMode, winner string, a, b *float64, game int) string {
+	T := m.Target
+	row := game >= 0
+	pre := ""
+	if row {
+		pre = fmt.Sprintf("Game %d: ", game+1)
+	}
+	rangeErr := fmt.Sprintf("%sEnter the losing score as a whole number from 0 to %d.", pre, losingScoreMax(m))
+	leadErr := fmt.Sprintf("%sA deuce game ends when one pair leads by 2, like %d–%d.", pre, T+1, T-1)
+	if !isWhole(a) || !isWhole(b) {
+		return rangeErr
+	}
+	av, bv := int(*a), int(*b)
+	by := "B"
+	if av > bv {
+		by = "A"
+	}
+	if m.Deuce && max(av, bv) > T {
+		// Two typed boxes: the game must end with one pair above the target, 2 ahead.
+		if av-bv != 2 && bv-av != 2 {
+			return leadErr
+		}
+		if by != winner {
+			return pre + fmt.Sprintf(scoreDisagreesFormat, by, winner)
+		}
+		return ""
+	}
+	// The single box: the winner's side is the target, the loser's side is the typed score.
+	if av != bv {
+		if by != winner {
+			return pre + fmt.Sprintf(scoreDisagreesFormat, by, winner)
+		}
+	} else if m.Deuce && av >= T-1 {
+		return leadErr
+	}
+	won, lost := av, bv
+	if winner == "B" {
+		won, lost = bv, av
+	}
+	if won != T {
+		return rangeErr
+	}
+	if lost > losingScoreMax(m) {
+		if m.Deuce && lost == T-1 {
+			sw := "Went to deuce"
+			if row {
+				sw = "Deuce for this game"
+			}
+			return fmt.Sprintf("%sAt %d–%d the game goes to deuce. Turn on %s and type both scores.", pre, T-1, T-1, sw)
+		}
+		return rangeErr
+	}
+	return ""
+}
+
+// ValidateResult is the scoring mode's result check (Q22). A winner-only result is valid in every
+// mode. One game: the winner must be picked and a score, if any, is one the mode can produce with
+// that winner. Best of 3: game scores, if any, are two games won by one pair or a split and a third,
+// each valid, agreeing with a picked winner (the games decide the winner when none is picked).
 func ValidateResult(in ResultInput) ResultCheck {
 	fail := func(msg string) ResultCheck { return ResultCheck{Error: &msg} }
 	win := func(team string) ResultCheck { return ResultCheck{Winner: &team} }
-	if in.ScoreA != nil || in.ScoreB != nil {
-		if in.ScoreA == nil || in.ScoreB == nil || !isWholeNumber(*in.ScoreA) || !isWholeNumber(*in.ScoreB) || *in.ScoreA < 0 || *in.ScoreB < 0 {
-			return fail("Enter both scores as whole numbers, or clear them.")
-		}
-		if *in.ScoreA == *in.ScoreB {
-			return fail("A tie can’t decide a winner. Correct the score, or clear it and pick a winner.")
-		}
-		byScore := "B"
-		if *in.ScoreA > *in.ScoreB {
-			byScore = "A"
-		}
-		// `winner && winner !== byScore`: an empty winner counts as none.
-		if in.Winner != nil && *in.Winner != "" && *in.Winner != byScore {
-			return fail(fmt.Sprintf("The score says Team %s won, but Team %s is picked. Fix one of them.", byScore, *in.Winner))
-		}
-		return win(byScore)
-	}
+	m := ScoringOf(in.Scoring)
+	winner := ""
 	if in.Winner != nil && (*in.Winner == "A" || *in.Winner == "B") {
-		return win(*in.Winner)
+		winner = *in.Winner
 	}
-	return fail("Pick a winner or enter the final score.")
+	if m.Games == 1 {
+		if len(in.Games) > 0 {
+			return fail(oneGameOnlyError)
+		}
+		if winner == "" {
+			return fail(pickWinnerError)
+		}
+		if in.ScoreA == nil && in.ScoreB == nil {
+			return win(winner)
+		}
+		if msg := gameScoreError(m, winner, in.ScoreA, in.ScoreB, -1); msg != "" {
+			return fail(msg)
+		}
+		return win(winner)
+	}
+	if len(in.Games) == 0 {
+		if in.ScoreA != nil || in.ScoreB != nil {
+			return fail(everyGameScoreError)
+		}
+		if winner == "" {
+			return fail(pickWinnerError)
+		}
+		return win(winner)
+	}
+	for _, g := range in.Games {
+		if g.A == nil || g.B == nil {
+			return fail(everyGameScoreError)
+		}
+	}
+	// A game nobody won (a tie, or not whole numbers) cannot be counted: its row says why.
+	for i, g := range in.Games {
+		if isWhole(g.A) && isWhole(g.B) && *g.A != *g.B {
+			continue
+		}
+		if msg := gameScoreError(m, "A", g.A, g.B, i); msg != "" {
+			return fail(msg)
+		}
+		return fail(undecidedGamesError)
+	}
+	winsOf := func(games []GameInput) (a, b int) {
+		for _, g := range games {
+			if *g.A > *g.B {
+				a++
+			} else if *g.B > *g.A {
+				b++
+			}
+		}
+		return a, b
+	}
+	decidedOf := func(a, b int) string {
+		switch {
+		case a >= 2:
+			return "A"
+		case b >= 2:
+			return "B"
+		}
+		return ""
+	}
+	decided := decidedOf(winsOf(in.Games))
+	firstTwo := decidedOf(winsOf(in.Games[:min(2, len(in.Games))]))
+	// Two games won by one pair, or a 1–1 split and a third: nothing after the match is decided.
+	if len(in.Games) > 3 || decided == "" || (len(in.Games) == 3 && firstTwo != "") {
+		return fail(undecidedGamesError)
+	}
+	if winner != "" && winner != decided {
+		return fail(fmt.Sprintf(gamesDisagreeFormat, decided, winner))
+	}
+	for i, g := range in.Games {
+		w := "B"
+		if *g.A > *g.B {
+			w = "A"
+		}
+		if msg := gameScoreError(m, w, g.A, g.B, i); msg != "" {
+			return fail(msg)
+		}
+	}
+	return win(decided)
 }
 
 // Credit is one credited substitute: the player and the side they count on. It marshals as the
@@ -588,8 +770,8 @@ func WaitMinutes(p model.Player, matches []model.Match, startedAt *int64, now in
 	return diff / 60000
 }
 
-// Standing is one row of the live standings. Position is shared by rows with the same wins and losses
-// and skips the shared places (1, 1, 3).
+// Standing is one row of the live standings. Position is shared by rows with the same wins and losses;
+// the next record takes the next number, without gaps (1, 1, 2).
 type Standing struct {
 	PlayerID string `json:"playerId"`
 	Name     string `json:"name"`
@@ -600,8 +782,8 @@ type Standing struct {
 }
 
 // ComputeStandings ranks players with counted games: most wins, then fewest losses (D-2026-11-18-05).
-// Rows with the same wins and losses share a position and the next position skips the shared places
-// (1, 1, 3). Nothing else separates players: the name ([collate.Compare]) only orders the rows inside a
+// Rows with the same wins and losses share a position and the next record takes the next number, without
+// gaps (1, 1, 2; owner, November 19, 2026). Nothing else separates players: the name ([collate.Compare]) only orders the rows inside a
 // shared position, and the sort is stable, so equal names keep roster order.
 func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 	rows := []Standing{}
@@ -634,10 +816,14 @@ func ComputeStandings(roster []model.Player, matches []model.Match) []Standing {
 		return collate.Compare(a.Name, b.Name)
 	})
 	for i := range rows {
-		if i > 0 && rows[i].Wins == rows[i-1].Wins && rows[i].Losses == rows[i-1].Losses {
+		// No gaps (owner, November 19, 2026): the next record takes the next number (1, 1, 2).
+		switch {
+		case i == 0:
+			rows[i].Position = 1
+		case rows[i].Wins == rows[i-1].Wins && rows[i].Losses == rows[i-1].Losses:
 			rows[i].Position = rows[i-1].Position
-		} else {
-			rows[i].Position = i + 1
+		default:
+			rows[i].Position = rows[i-1].Position + 1
 		}
 	}
 	return rows

@@ -12,6 +12,11 @@ import {
   realJoinClub,
   realLeaveClub,
 } from '../real/player-club'
+import {
+  activateClubMembership,
+  cancelPendingTransfersOnLeave,
+  endTrustedHostsOnLeave,
+} from './membership'
 
 /**
  * One club on a profile's clubs card (#766), in both modes. `joinedVia` is set only when the
@@ -19,6 +24,11 @@ import {
  */
 export type PlayerClub = Pick<Club, 'id' | 'name' | 'initials' | 'logoUrl'> & {
   joinedVia?: 'club_link' | 'session_link' | 'club_added'
+  /**
+   * The player is a current trusted host of this club (Host badge, #1007, D-2026-11-22-01). Shown
+   * wherever the Clubs section shows; false once the club removes them from its trusted hosts.
+   */
+  isHost?: boolean
 }
 
 async function owner() {
@@ -47,8 +57,22 @@ export async function getPlayerClubs(
   await requireProfileAccess(playerId)
   const own = (await getSession('player'))?.account.id === playerId
   const state = readMockState()
+  const clubPlayers = state.clubPlayers
+  // A current trusted-host row counts for the surviving record: the player's own saved player, or a
+  // record the Queue Master moved into it (Same person).
+  const hostClubs = new Set(
+    (state.clubTrustedHosts ?? [])
+      .filter((h) => !h.removedAt)
+      .flatMap((h) => {
+        const cp = clubPlayers.find((p) => p.id === h.clubPlayerId)
+        const survivor = cp?.removedAt
+          ? clubPlayers.find((p) => p.id === cp.linkedToClubPlayerId)
+          : cp
+        return survivor && !survivor.removedAt && survivor.playerId === playerId ? [h.clubId] : []
+      }),
+  )
   const seen = new Set<string>()
-  return state.clubPlayers
+  return clubPlayers
     .filter((p) => p.playerId === playerId && !p.removedAt)
     .flatMap((p) => {
       const club = state.clubs.find((c) => c.id === p.clubId)
@@ -59,6 +83,7 @@ export async function getPlayerClubs(
         name: club.name,
         initials: club.initials,
         logoUrl: club.logoUrl,
+        isHost: hostClubs.has(club.id),
       }
       if (own)
         row.joinedVia =
@@ -85,28 +110,8 @@ export async function joinClub({
   mockStore.update((draft) => {
     if (!draft.clubs.some((c) => c.id === clubId))
       throw new MockError('permission', 'This club link is not available.')
-    if (draft.clubPlayers.some((p) => p.playerId === id && p.clubId === clubId && !p.removedAt))
-      return
-    const removed = draft.clubPlayers.find(
-      (p) => p.playerId === id && p.clubId === clubId && p.removedAt,
-    )
-    if (removed) {
-      removed.removedAt = undefined
-      removed.joinedVia = 'club'
-      return
-    }
-    const profile = draft.playerProfiles.find((p) => p.playerId === id)
-    if (!profile) throw new MockError('permission', 'Sign in to join this club.')
-    draft.clubPlayers.push({
-      id: crypto.randomUUID(),
-      clubId,
-      playerId: id,
-      fullName: profile.fullName,
-      nickname: profile.nickname,
-      identity: 'registered',
-      playingLevel: null,
-      joinedVia: 'club',
-    })
+    if (!activateClubMembership(draft, id, clubId, 'club'))
+      throw new MockError('permission', 'Sign in to join this club.')
   })
   return { playerId: id, clubId }
 }
@@ -116,9 +121,18 @@ export async function leaveClub(clubId: string) {
   const id = await owner()
   checkMockSave()
   mockStore.update((draft) => {
-    // Keep a history tombstone, as the existing Saved players deletion does.
+    // Keep a history tombstone, as the existing Saved players deletion does. Leaving is never
+    // blocked; pending transfers the player is part of are cancelled with it, and their current
+    // trusted-host row ends (#1018).
+    const now = Date.now()
+    const left: string[] = []
     for (const player of draft.clubPlayers)
-      if (player.playerId === id && player.clubId === clubId) player.removedAt = Date.now()
+      if (player.playerId === id && player.clubId === clubId && !player.removedAt) {
+        player.removedAt = now
+        left.push(player.id)
+      }
+    cancelPendingTransfersOnLeave(draft, id, clubId, now)
+    endTrustedHostsOnLeave(draft, left, now)
   })
   return { playerId: id, clubId }
 }

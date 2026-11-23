@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-22 (session host snapshots, session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -433,3 +433,72 @@ only. It grants the Go API role `EXECUTE` on `rotra_player_compare` and the six 
 `GET /api/club` and `/api/club/invite`). The role name `rotra_api` is a placeholder chosen in the migration, not a
 name found in the repo: the block skips with a notice when the role does not exist. Confirm the role in Go's
 `DATABASE_URL` before applying.
+
+## D-2026-11-20-02 — Record games off takes a winner again
+
+`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
+2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
+of `match_decisions_record_games_guard()` only: every completed decision needs a winner, whatever the
+session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)
+and every table, column and row are unchanged, so no-result rows written under the November 19 rule
+stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
+([verification](verification.md)).
+
+## P12.7 — Registration from the Admin link (D-2026-11-20-01)
+
+`20261120000100_admin_link_registration` (#922; owner answer of November 20, 2026). **Written only:
+not applied to any database, not checked on a disposable one.** Two NOT NULL constraints dropped and
+one trigger function replaced; no table, column or row is added, dropped, moved or rewritten, and
+every existing row keeps its club.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `player_id_allocations` (changed) | unchanged | `creating_club_id` nullable: null means the RTR ID came from the Admin link, its place the founding city the player picked (`location_code_id`, as for every allocation). `player_id_allocations_guard()` now compares `creating_club_id` with `IS NOT DISTINCT FROM`, so Admin's RTR ID change also works on such a row; DELETE still refused | unchanged (`RESTRICT`) |
+| `player_claim_links` (changed) | unchanged | `issuing_club_id` nullable: null only for the staging link of an Admin-link registration; a link a club issues always has its club | unchanged (`RESTRICT`) |
+
+Apply it before deploying the code that writes these nulls (the Admin-link registration, password
+and Google, in real mode). The guard function stays revoked from PUBLIC. No grant, RLS or index change.
+
+## D-2026-11-22-01 — Trusted club hosts (#1003)
+
+`20261122000100_club_trusted_hosts` (epic #1002). **Status: written; applied to a local disposable
+database 2026-11-22 only; not applied to the shared database (owner sign-off needed).** One new table;
+nothing dropped, moved or rewritten.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `club_trusted_hosts` | PK `id`; unique `(club_id, id)`; index `(club_id, club_player_id)`; partial unique `club_trusted_hosts_one_current` `(club_id, club_player_id) WHERE removed_at IS NULL` | `removed_at` null or not before `added_at` | `club_id` → `clubs`; `(club_id, club_player_id)` → `club_players(club_id, id)` (RESTRICT) |
+
+RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
+(`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): rebuild with no drift, seed, 85/85 checks
+(five new trusted-host checks). Design: [sessions and roster › `club_trusted_hosts`](queue/modules/sessions-roster.md#club_trusted_hosts).
+
+## D-2026-11-22-01 — Session hosts (#1004)
+
+`20261122000200_session_hosts` (epic #1002). **Status: written; applied to a local disposable database
+2026-11-22 only; not applied to the shared database (owner sign-off needed).** One new table; nothing
+dropped, moved or rewritten.
+
+| Table | Keys and uniques | Checks and triggers | Scoped FKs |
+|---|---|---|---|
+| `session_hosts` | PK `id`; unique `(club_id, id)`; indexes `(club_id, session_id)`, `(club_id, club_player_id)`; partial unique `session_hosts_one_current` `(session_id, club_player_id) WHERE removed_at IS NULL` | `removed_at` null or not before `assigned_at` | `club_id` → `clubs`; `(club_id, session_id)` → `queue_sessions(club_id, id)`; `(club_id, club_player_id)` → `club_players(club_id, id)` (all RESTRICT) |
+
+RLS enabled; no anon/authenticated/PUBLIC grants. Checked on a disposable local database
+(`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432): 43 migrations, rebuild with no drift, seed,
+91/91 checks (six new session-host checks). Design: [sessions and roster › `session_hosts`](queue/modules/sessions-roster.md#session_hosts).
+
+## D-2026-11-22-01 — Session host snapshots (#1008)
+
+`20261122000300_session_host_snapshots` (epic #1002). **Status: written; applied to a local disposable
+database 2026-11-22 only; not applied to the shared database (owner sign-off needed).** Two columns on
+`session_hosts` (backfilled), two checks and one guard trigger; nothing dropped or moved.
+
+| Table | Columns | Checks and triggers |
+|---|---|---|
+| `session_hosts` | `name_snapshot` text NOT NULL (backfilled from the saved player: the ROTRA full name, else `display_name`); `frozen_at` timestamptz (backfilled to `finalized_at`, else `updated_at`, on the current rows of completed or invalid sessions) | `session_hosts_frozen_current_check`: `frozen_at` only with `removed_at` null; `session_hosts_name_snapshot_check`: not blank; trigger `session_hosts_frozen_guard` (BEFORE INSERT/UPDATE/DELETE): a frozen row is never changed or deleted, `frozen_at` only on a completed or invalid session |
+
+Checked on a disposable local database (`rotra_disposable_e1002`, Postgres 16 on 127.0.0.1:55432):
+44 migrations, rebuild with no drift, seed, 101/101 checks (ten new snapshot checks). The backfill was
+also run on a separate throwaway database seeded with host rows before the migration (names filled,
+completed/invalid current rows frozen, removed and open rows not). Design: [sessions and roster ›
+`session_hosts`](queue/modules/sessions-roster.md#session_hosts).

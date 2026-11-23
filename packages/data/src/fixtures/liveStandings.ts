@@ -5,7 +5,7 @@ import { createConsoleFixtures } from './consoleSessions'
 
 /** One row of the live leaderboard: the standings maths plus the player's locked level. */
 export type LiveStandingRow = {
-  /** Shared by players on the same wins and losses (1, 1, 3) */
+  /** Shared by players on the same wins and losses, without gaps (1, 1, 2) */
   position: number
   playerId: string
   name: string

@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       nickname: text(body.nickname) || null,
       phone: phone?.success ? phone.data : null,
       email: text(body.email) || null,
+      socialLink: text(body.socialLink) || null,
     })
     return { status: 201, body: saved }
   })

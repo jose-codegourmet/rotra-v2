@@ -2,6 +2,7 @@ import type { PublicSessionParticipant } from '@rotra/data/public-session/types'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
+import { PublicHosts } from '@rotra/ui/public-hosts'
 import { PublicParticipantTile } from '@rotra/ui/public-participant-tile'
 import type { SkillDistributionCounts } from '@rotra/ui/skill-distribution-bar'
 
@@ -28,6 +29,12 @@ export type PublicParticipant = Omit<PublicSessionParticipant, 'skillGroup' | 'l
 export type PublicWaitlistEntry = PublicParticipant
 
 export type PublicParticipantsProps = {
+  /**
+   * The session's Hosts (#1006), shown in a compact section above Players and Waitlisted. A host who
+   * plays is also in `participants`; hosts never change `participantCount` or `openSlots`. Missing or
+   * empty hides the section.
+   */
+  hosts?: PublicParticipant[]
   /** Public-safe masked names and levels, in roster order. */
   participants: PublicParticipant[]
   /** In admission order; never capped. */
@@ -61,6 +68,7 @@ const gridClass = 'm-0 grid list-none grid-cols-3 gap-x-[18px] gap-y-7 p-0 min-[
 
 /** Public participants: tiles, up to three rows for visitors (uncapped when signed in), then the waitlist. */
 export function PublicParticipants({
+  hosts = [],
   participants,
   waitlist = [],
   openSlots = 0,
@@ -90,6 +98,7 @@ export function PublicParticipants({
 
   return (
     <section aria-label="Participants" className={cn('flex min-w-0 flex-col gap-3', className)}>
+      <PublicHosts hosts={hosts} onOpenHost={onOpenParticipant} />
       {showHint ? (
         <p className="m-0 text-[13px] text-fg2">Tap a player to see their profile and stats.</p>
       ) : null}

@@ -160,7 +160,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           open={leaving}
           onOpenChange={setLeaving}
           title={`Leave ${club.name}?`}
-          consequence="You're removed from the club's saved players. Your past games stay."
+          consequence="You're removed from the club's saved players. Your past games, registrations and payments stay. Any pending slot transfer you're part of in this club's sessions is cancelled, and its link stops working. If you're one of the club's trusted hosts, that ends too and your Host badge goes; rejoining doesn't bring it back."
           confirmLabel="Leave club"
           backLabel="Cancel"
           isPending={leaveClub.isPending}

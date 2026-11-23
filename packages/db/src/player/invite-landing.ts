@@ -1,5 +1,6 @@
 import 'server-only'
 import { readClubInviteCode } from '@rotra/data/club/invite-code'
+import { shortPlayerName } from '@rotra/data/google-sign-in/rules'
 import type {
   InviteCardData,
   InviteLanding,
@@ -10,6 +11,8 @@ import { readPlayerSessionStanding } from '../queue/public-session'
 import { initials } from './club-page'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+/** A Session invite code as `session_invite_codes` stores it (its CHECK); else it is unknown. */
+const SESSION_INVITE_CODE = /^[a-z0-9]{6,16}$/
 
 /**
  * P-INVITE, P-JOIN-CLUB and P-JOIN-SESSION in real mode (#922): what a club or session invite link
@@ -18,12 +21,20 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
  *
  * The same link rules as registration (`guestRegistrationClub`): a club link needs the club's
  * current invite code; a session link needs that club's session with a live public page, not yet
- * started. Not in real mode yet, so never returned: the inviting player on a session invite (no
- * session invite codes are stored; `inviter` is always null and `own-invite` never happens) and the
- * Admin link (no club). `continueUrl` is filled in by the app, which knows the Queue origin.
+ * started. A session link's `invite` is the inviting player's Session invite code
+ * (`session_invite_codes`, made by `getSessionInviteCode`; D-2026-11-09-08, D-2026-11-20-01): when
+ * it is this session's, the card names that player (`inviter`) and the inviter themself sees
+ * `own-invite`. An unknown, malformed or other session's code shows no inviter, never an error.
+ * The Admin link (no club) needs nothing saved and is answered by the app. `continueUrl` is filled
+ * in by the app, which knows the Queue origin.
  */
 export async function readInviteLanding(
-  link: { clubId: string; sessionSlug?: string | null; clubInviteCode?: string | null },
+  link: {
+    clubId: string
+    sessionSlug?: string | null
+    clubInviteCode?: string | null
+    sessionInviteCode?: string | null
+  },
   viewerId: string | null,
 ): Promise<InviteLanding> {
   const viewer = viewerId
@@ -97,8 +108,10 @@ export async function readInviteLanding(
     return unavailable('session')
   // Session invites only work before the session starts (D-2026-11-09-11).
   if (session.state !== 'prepared') return unavailable('started')
+  const inviter = await readSessionInviter(session.id, link.sessionInviteCode)
   let state: InviteViewerState = ready
-  if (who) {
+  if (who && inviter?.playerId === who.playerId) state = { status: 'own-invite', ...who }
+  else if (who) {
     const standing = await readPlayerSessionStanding(who.playerId, session.id)
     if (standing.waitlistPosition !== null)
       state = { status: 'on-waitlist', ...who, position: standing.waitlistPosition }
@@ -116,9 +129,41 @@ export async function readInviteLanding(
         endsAt: session.scheduledEndAt.getTime(),
         venueName: session.venueName ?? '',
       },
-      inviter: null,
+      inviter,
       continueUrl: '',
     },
     viewer: state,
+  }
+}
+
+/**
+ * The player who made this Session invite code for this session, or null. The code is the only
+ * thing the link carries; the card shows the inviter's name as the mock does (full name, and the
+ * nickname or first name for "Invited by"). A lookup failure degrades to no inviter.
+ */
+async function readSessionInviter(sessionId: string, typed: string | null | undefined) {
+  const code = (typed ?? '').trim().toLowerCase()
+  if (!SESSION_INVITE_CODE.test(code)) return null
+  const saved = await prisma.sessionInviteCode
+    .findUnique({
+      where: { code },
+      select: {
+        sessionId: true,
+        player: { select: { id: true, fullName: true, nickname: true } },
+      },
+    })
+    .catch((error: unknown) => {
+      console.error(
+        '[invite-landing] session invite code',
+        error instanceof Error ? error.name : typeof error,
+      )
+      return null
+    })
+  if (!saved || saved.sessionId !== sessionId) return null
+  const { player } = saved
+  return {
+    playerId: player.id,
+    name: player.fullName,
+    shortName: shortPlayerName(player.fullName, player.nickname),
   }
 }

@@ -7,6 +7,7 @@ import type {
   ClubPlayerDetailsInput,
   ClubPlayerDetailsResult,
   DeleteImpact,
+  SetClubPlayerPictureInput,
 } from '../club-player/clubPlayer.types'
 import type { ClubPlayerView } from '../club-player/fetchers'
 import type { ClubVenue } from '../club-venue/clubVenue.types'
@@ -29,6 +30,8 @@ import type {
   QueueSessionSummary,
   SessionCourt,
 } from '../queue-session/queueSession.types'
+import { hostRegistrationText } from '../session-host/sessionHost.rules'
+import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
@@ -447,6 +450,7 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
     firstSessionId: string
     created: number
     skipped: number | null
+    hosts?: SessionHostRegistration | null
   }>('/api/sessions', {
     method: 'POST',
     body: {
@@ -468,9 +472,11 @@ export async function realCreateQueueSession(input: QueueSessionInput) {
   const series = input.repeat && input.repeat !== 'none'
   return accepted(
     { firstSessionId: data.firstSessionId, created: data.created, skipped },
-    !series
-      ? 'Session created'
-      : `${data.created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`,
+    `${
+      !series
+        ? 'Session created'
+        : `${data.created} sessions created${skipped ? ` · ${skipped} clashing date${skipped === 1 ? '' : 's'} skipped` : ''}`
+    }${data.hosts ? hostRegistrationText(data.hosts) : ''}`,
   )
 }
 
@@ -599,6 +605,8 @@ export async function realAddNewPlayerToSession(input: {
   phone?: string
   /** No email adds a guest; an email adds an unclaimed player or links one (D-2026-11-16-04) */
   email?: string
+  /** #1019: a social link is an entry key too, and wins over the email */
+  socialLink?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string
@@ -848,6 +856,8 @@ export async function realAddNewSavedPlayer(input: {
   phone?: string | null
   /** No email saves a guest; an email an unclaimed player or a linked one (D-2026-11-16-04) */
   email?: string | null
+  /** #1019: a social link is an entry key too, and wins over the email */
+  socialLink?: string | null
 }) {
   const saved = await realRequest<{
     clubPlayerId: string
@@ -876,4 +886,38 @@ export async function realAddDirectoryPlayerToClub(input: {
     body: { ...input, source: 'directory', operationId: crypto.randomUUID() },
   })
   return accepted({ clubPlayerId: saved.clubPlayerId }, `${saved.name} saved`)
+}
+
+/**
+ * Edit details › Profile picture (D-2026-11-09-12): Upload photo or Choose a character for the
+ * club's own guest or unclaimed player. The server crops a photo to a centred square, as mock mode.
+ */
+export async function realSetClubPlayerPicture(input: SetClubPlayerPictureInput) {
+  const form = new FormData()
+  form.set('kind', input.kind)
+  if (input.kind === 'photo') form.set('photo', input.file)
+  else form.set('id', input.characterId)
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'PATCH', body: form },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
+}
+
+/** Edit details › Profile picture › Remove: back to initials. */
+export async function realRemoveClubPlayerPicture(input: { clubPlayerId: string }) {
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'DELETE' },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
+}
+
+/** Edit details › Profile picture › Use previous picture. */
+export async function realRestorePreviousClubPlayerPicture(input: { clubPlayerId: string }) {
+  const saved = await realRequest<{ clubPlayerId: string; message: string }>(
+    `/api/club/players/${encodeURIComponent(input.clubPlayerId)}/picture`,
+    { method: 'POST' },
+  )
+  return accepted({ clubPlayerId: saved.clubPlayerId }, saved.message)
 }

@@ -3,11 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
+import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { Field } from '@rotra/ui/field'
 import { LevelSelect } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
+import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
 import { TextInput } from '@rotra/ui/text-input'
-import { useId } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { newPlayerFormDefaultValues } from './NewPlayerForm.defaultValues'
 import {
@@ -40,6 +42,13 @@ type NewPlayerFormBaseProps = {
    * email field says "That email is already NAME in your saved players." and nothing is saved.
    */
   emailSavedAs?: string
+  /**
+   * #1019: why the server refused the social link ("That social link is already NAME in your
+   * saved players."), shown under the field; nothing is saved.
+   */
+  socialLinkError?: string
+  /** Why the server refused the phone ("NAME already has this number."), shown under the field */
+  phoneError?: string
 }
 
 /**
@@ -49,11 +58,27 @@ type NewPlayerFormBaseProps = {
 export type NewPlayerFormProps = NewPlayerFormBaseProps &
   (
     | { context?: 'session'; onSubmit: (values: NewPlayerFormValues) => void }
-    | { context: 'club'; onSubmit: (values: NewSavedPlayerFormValues) => void }
+    | {
+        context: 'club'
+        /** `picture` is the Profile picture chosen on the form, saved after the player is */
+        onSubmit: (values: NewSavedPlayerFormValues, picture: ClubPictureChoice | null) => void
+      }
   )
 
 export const EMAIL_HINT =
-  "Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly."
+  "Never shown publicly. If the email is already on ROTRA, they're linked to that player."
+
+export const SOCIAL_LINK_HINT =
+  "Facebook, Instagram, YouTube or LinkedIn. Shown on their profile. If the link is already an unclaimed player on ROTRA, they're linked to that player."
+
+export const PHONE_HINT =
+  'Kept private. Only your club sees it. Saved with an email or a social link; a guest has no phone.'
+
+export const NEW_PICTURE_HINT =
+  'Shown wherever this player appears in your club. When they claim their profile they can change it.'
+
+export const ENTRY_KEY_NOTE =
+  "With an email or a social link they're saved as an unclaimed player and get an RTR ID. With neither, they're saved as a guest."
 
 export const emailSavedMessage = (name: string) =>
   `That email is already ${name} in your saved players.`
@@ -69,7 +94,8 @@ export function addPlayerSubmitLabel(
 }
 
 /**
- * Q-ADD-PLAYER › New player tab: name, optional nickname and email, and the level for this club.
+ * Q-ADD-PLAYER › New player tab: name, optional nickname, email and social link, and the level for
+ * this club.
  * Works offline; the container owns the add mutation and its toasts.
  */
 export function NewPlayerForm(props: NewPlayerFormProps) {
@@ -83,10 +109,24 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
     hideSubmit = false,
     defaultValues,
     emailSavedAs,
+    socialLinkError,
+    phoneError,
   } = props
   const club = props.context === 'club'
   // Both schemas share the fields; the club one only lets the level stay empty (null).
-  const onSubmit = props.onSubmit as (values: NewSavedPlayerFormValues) => void
+  const onSubmit = props.onSubmit as (
+    values: NewSavedPlayerFormValues,
+    picture: ClubPictureChoice | null,
+  ) => void
+  // Saved players › Add player: the picture is held here until Save player (D-2026-11-09-12).
+  const [picture, setPicture] = useState<ClubPictureChoice | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string>()
+  useEffect(() => {
+    if (picture?.kind !== 'photo') return setPhotoUrl(undefined)
+    const url = URL.createObjectURL(picture.file)
+    setPhotoUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [picture])
   const autoId = useId()
   const formId = id ?? `new-player${autoId}`
   const form = useForm<NewPlayerFormInput, unknown, NewSavedPlayerFormValues>({
@@ -102,10 +142,38 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
         noValidate
         className="flex flex-col gap-3.5"
         onSubmit={form.handleSubmit((values) => {
-          if (!isPending) onSubmit(values)
+          if (!isPending) onSubmit(values, club ? picture : null)
         })}
       >
         {serverError ? <Notice tone="error">{serverError}</Notice> : null}
+        {club ? (
+          <ClubPictureField
+            playerId="new-player"
+            name={form.watch('name')?.trim() || 'New player'}
+            label="Profile picture (optional)"
+            hint={NEW_PICTURE_HINT}
+            picture={
+              picture?.kind === 'photo'
+                ? {
+                    kind: 'photo',
+                    reference: photoUrl ?? null,
+                    characterId: null,
+                    previousSrc: null,
+                  }
+                : picture?.kind === 'character'
+                  ? {
+                      kind: 'character',
+                      reference: `character:${picture.characterId}`,
+                      characterId: picture.characterId,
+                      previousSrc: null,
+                    }
+                  : { kind: 'initials', reference: null, characterId: null, previousSrc: null }
+            }
+            onChange={setPicture}
+            onRemove={() => setPicture(null)}
+            pending={isPending}
+          />
+        ) : null}
         <Field label="Full or display name" error={errors.name?.message}>
           <Controller
             control={form.control}
@@ -143,6 +211,43 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
                 autoComplete="off"
                 placeholder="name@example.com"
               />
+            )}
+          />
+        </Field>
+        <Field
+          label="Social link"
+          optional
+          hint={errors.socialLink || socialLinkError ? undefined : SOCIAL_LINK_HINT}
+          error={errors.socialLink?.message ?? socialLinkError}
+        >
+          <Controller
+            control={form.control}
+            name="socialLink"
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder="https://facebook.com/yourname"
+              />
+            )}
+          />
+        </Field>
+        <p className="m-0 text-[13px] text-fg2">{ENTRY_KEY_NOTE}</p>
+        <Field
+          label="Phone"
+          optional
+          hint={errors.phone || phoneError ? undefined : PHONE_HINT}
+          error={errors.phone?.message ?? phoneError}
+        >
+          <Controller
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneOrEmailInput {...field} mode="phone" placeholder="0917 555 0142" />
             )}
           />
         </Field>

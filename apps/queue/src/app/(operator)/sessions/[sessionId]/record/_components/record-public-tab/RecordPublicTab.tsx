@@ -4,6 +4,8 @@ import { usePublicSession } from '@rotra/data/public-session/usePublicSession'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPublication } from '@rotra/data/session-result/useSessionPublication'
+import { scoringMode } from '@rotra/schema/scoring'
+import { PublicHosts } from '@rotra/ui/public-hosts'
 import { PublicPageSummary } from '@rotra/ui/public-page-summary'
 import { ParticipantCard } from '@rotra/ui/public-participants/participant-card'
 import { useRouter } from 'next/navigation'
@@ -25,8 +27,8 @@ const date = (at: number) =>
 
 /**
  * The Public page tab of the session record (Q-HISTORY): PublicPageSummary with what anyone with
- * the link sees (usePublicSession), what results are on the page (useSessionPublication) and the
- * participant cards. Open public page opens the operator preview; Publish results / Update
+ * the link sees (usePublicSession), what results are on the page (useSessionPublication), the
+ * Hosts section and the participant cards. Open public page opens the operator preview; Publish results / Update
  * publication opens PublishResultsSheet, never for an invalid session.
  */
 export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
@@ -56,6 +58,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
               .filter(Boolean)
               .join(' + ') || 'No standard format',
           mode: MODE_LABELS[p.mode],
+          scoring: scoringMode(p.scoring).label,
           minimum: p.minimum,
         }}
         publication={
@@ -69,6 +72,13 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
             : null
         }
         participantCount={p.participantCount ?? p.participants.length}
+        // Hosts (#1006, #1008): what the public page shows; on a finished session, the hosts it
+        // ended with, by the name kept then. Masked like the participants.
+        hosts={
+          p.hosts?.length ? (
+            <PublicHosts hosts={p.hosts.map((h, i) => ({ ...h, id: `host-${i}` }))} />
+          ) : undefined
+        }
         onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
         onPublish={() => setPublishOpen(true)}
       >

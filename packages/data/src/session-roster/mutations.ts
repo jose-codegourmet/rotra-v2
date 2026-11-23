@@ -1,3 +1,4 @@
+import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import { savedPlayerName, withClubNickname } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
@@ -17,10 +18,12 @@ import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import { isRtrId, normalizeRtrId } from '../player/rtrId'
 import {
   accountByEmail,
+  accountBySocialKey,
   isCurrentRecord,
   isUnclaimedPerson,
   savedDisplayName,
   savedRecordByEmail,
+  savedRecordBySocialKey,
 } from '../player/unclaimed'
 import { isListedInDirectory } from '../player/visibility.rules'
 import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
@@ -190,13 +193,21 @@ export async function lookupPlayer(q: string): Promise<PlayerLookup> {
   const byRtrId = isRtrId(query)
     ? s.players.find((p) => p.rtrId === normalizeRtrId(query))
     : undefined
-  const account = isRtrId(query) ? undefined : accountByEmail(s, query)
+  // #1019: an exact social link finds an unclaimed player only, never a registered one.
+  const link = isRtrId(query) || query.includes('@') ? null : normalizeSocialLink(query)
+  const account = isRtrId(query)
+    ? undefined
+    : link
+      ? accountBySocialKey(s, link.key)
+      : accountByEmail(s, query)
   const player = byRtrId ?? (account ? s.players.find((p) => p.id === account.playerId) : undefined)
   const saved = player
     ? s.clubPlayers.find(
         (c) => c.clubId === DEMO_CLUB_ID && c.playerId === player.id && isCurrentRecord(c),
       )
-    : savedRecordByEmail(s, DEMO_CLUB_ID, query)
+    : link
+      ? savedRecordBySocialKey(s, DEMO_CLUB_ID, link.key)
+      : savedRecordByEmail(s, DEMO_CLUB_ID, query)
   if (saved) return { player: null, savedName: savedDisplayName(s, saved) }
   if (!player || s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
   if (isUnclaimedPerson(s, player.id))
@@ -280,6 +291,10 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   nickname?: string
   /** No email adds a guest; an email adds an unclaimed player or links a ROTRA player */
   email?: string
+  /** #1019: a social link is an entry key too, and wins over the email */
+  socialLink?: string
+  /** Optional, private to the club; kept for an unclaimed player only */
+  phone?: string
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
@@ -583,8 +598,9 @@ export async function fillOpenSlots(sessionId: string) {
           0,
           capacity(s, sessionId) - s.roster.filter((r) => r.sessionId === sessionId).length,
         ),
+        // Entries without a level (a host with no saved level) are skipped, as the real service does.
         waiting = s.waitlist
-          .filter((w) => w.sessionId === sessionId)
+          .filter((w) => w.sessionId === sessionId && w.level)
           .sort((a, b) => a.addedAt - b.addedAt)
           .slice(0, open)
       for (const w of waiting) promoteWaiter(s, w)

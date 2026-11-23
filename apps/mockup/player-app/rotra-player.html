@@ -1266,6 +1266,10 @@ for (let i = 0; i < 1283; i++) {
 }
 
 const G = (fmt, partner, opp, res, score, kind = 'counted', note = '') => ({ fmt, partner, opp, res, score, kind, note });
+// Owner, November 20, 2026 (D-2026-11-20-02): a session the club ran with Record games off is "not ranked". Its games stay in the
+// player's record with the night's win or loss, but they never count toward the leaderboards' wins, the win rate or rank.
+const NOT_RANKED_NOTE = 'Not ranked session · doesn\'t count toward win rate or the leaderboards';
+const U = (fmt, partner, opp, res, score) => G(fmt, partner, opp, res, score, 'unranked', NOT_RANKED_NOTE);
 const MIGS_SESSIONS = [
   { id: 'm1', title: 'Sunday Night Queue', club: 'Lahug Smash Club', ago: 1, published: false, games: [
     G('Doubles', ['Bea Castillo'], ['Enzo Navarro', 'Kat Lim'], 'W', '21–18'),
@@ -1277,6 +1281,11 @@ const MIGS_SESSIONS = [
     G('Doubles', ['Paulo Garcia'], ['Marco Lopez', 'Bea Castillo'], 'W', '21–19'),
     G('Doubles', ['Kat Lim'], ['Enzo Navarro', 'Rafa Aquino'], 'L', '17–21'),
     G('Doubles', ['Dani Rivera'], ['Jomar dela Cruz', 'Iya Mercado'], 'W', null),
+  ] },
+  { id: 'm6', title: 'Saturday Doubles Night', club: 'Mandaue Shuttle Society', ago: 9, published: true, pos: 2, ranked: false, games: [
+    U('Doubles', ['Lara Uy'], ['Karl Sison', 'Janelle Go'], 'W', '31–24'),
+    U('Doubles', ['Ian Co'], ['Grace Lacson', 'Vince Tolentino'], 'W', '31–27'),
+    U('Doubles', ['Pia Tan'], ['Mark Reyes', 'Ramon Yap'], 'L', '22–31'),
   ] },
   { id: 'm3', title: 'Friday Night Smash', club: 'IT Park Badminton Club', ago: 18, published: true, pos: 7, games: [
     G('Doubles', ['Lara Uy'], ['Karl Sison', 'Janelle Go'], 'W', '21–16'),
@@ -1625,11 +1634,11 @@ function gameRow(g, who, ctx = null, at = null) {
   const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial, played(n))).join('');
   const res = partial ? '<span class="chip">Not counted</span>' : `<span class="chip ${won ? 'ok' : 'bad'}">${won ? 'Won' : 'Lost'}</span>`;
   const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
-  return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)} · not counted</div>` : ''}</div>`;
+  return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
 }
 // Owner, November 13, 2026: "in profile it should show latest sessions joined · when they click on the session then they will see their matches from there".
 // Replaces the Latest matches card: the four latest sessions this player played in, newest first; a row opens that session's matches in a dialog.
-const sessRecord = (s) => { const c = s.games.filter((g) => g.kind === 'counted'), w = c.filter((g) => g.res === 'W').length; return { w, l: c.length - w, n: s.games.length }; };
+const sessRecord = (s) => { const c = s.games.filter((g) => g.kind === 'counted' || g.kind === 'unranked'), w = c.filter((g) => g.res === 'W').length; return { w, l: c.length - w, n: s.games.length }; };
 const sessDate = (ago) => { const d = dayOf(ago); return `<span class="dblk" aria-hidden="true"><b>${d.getDate()}</b><span>${d.toLocaleDateString([], { month: 'short' })}</span></span>`; };
 // Artifact comment, November 13, 2026: the profile shows Recent sessions and Recent games, three items each, and every profile has a
 // Sessions page (/players/<id>/sessions) with every session the player joined.
@@ -1662,7 +1671,7 @@ function viewSessions() {
 function sessionBlock(s, kinds, own = false, who = null, gf = null) {
   const games = s.games.filter((g) => kinds.includes(g.kind) && (!gf || gf(g)));
   if (!games.length) return '';
-  return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</p></div>
+  return `<section class="sess"><div class="sess-head"><div style="min-width:0"><h3>${esc(s.title)}</h3><p class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}${s.ranked === false ? ` · ${chip('Not ranked', 'warn')}` : ''}</p></div>
     ${s.pageGone ? '<span class="small muted">Session page no longer available</span>' : `<button class="btn xs ghost" data-act="sessionPage" data-title="${esc(s.title)}">Session page ${I.ext}</button>`}</div>
     ${own && kinds.includes('counted') ? shareRow(s) : ''}
     ${games.map((g) => gameRow(g, who, own ? { sid: s.id, gi: s.games.indexOf(g) } : null, { s, gi: s.games.indexOf(g) })).join('')}</section>`;
@@ -1840,7 +1849,7 @@ function viewBoard() {
       <ul class="bul muted">
         <li><b style="color:var(--fg)">Top annual, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">50 players with the most wins</b> in standard matches in that year, month or week. Nothing else decides who is listed. Win rate breaks a tie.</li>
         <li>Each list starts again when a new year, month or week begins.</li>
-        <li>Fun games, partial games after a substitution, and invalid games or sessions don't count.</li>
+        <li>Fun games, partial games after a substitution, games from not-ranked sessions, and invalid games or sessions don't count.</li>
         <li>The mark beside a place shows the move since the period before: up, down, or <b style="color:var(--fg)">New</b> when the player wasn't on that list then. Point at it to see their earlier place.</li>
         <li>Players marked <b style="color:var(--fg)">Not registered yet</b> were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register.</li>
         <li>A player's skill rank is separate and isn't shown here. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
@@ -2079,11 +2088,15 @@ function clubsOf(p) {
   if (p.savedBy) return [{ id: p.savedBy }]; // unclaimed: the one club that saved them
   return [{ id: CLUB_IDS[hashStr(`club-${p.id}`) % CLUB_IDS.length] }];
 }
+// Epic #1002 (#1007): a club's current trusted host shows a Host badge on that club's row, wherever the Clubs section shows.
+// The Queue prototype seeds Miguel (u1) as a trusted host of Lahug Smash Club (c1); removing trust there removes the badge, never the membership.
+const TRUSTED_HOST_CLUBS = { u1: ['c1'] };
+const isHostOf = (p, clubId) => (TRUSTED_HOST_CLUBS[p.id] || []).includes(clubId);
 function clubsPanel(p, own) {
   const list = clubsOf(p).filter((c) => CLUB_DIR[c.id]);
   return `<section class="card stack"><h3>${own ? 'Your clubs' : 'Clubs'}</h3>${list.length ? `<div>${list.map((c) => {
     const club = CLUB_DIR[c.id];
-    return `<button type="button" class="crow mbtn" data-act="openClubCard" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
+    return `<button type="button" class="crow mbtn" data-act="openClubCard" data-id="${c.id}">${avatar({ name: club.name })}<span class="main"><b>${esc(club.name)}</b>${isHostOf(p, c.id) ? `<span class="row" style="gap:6px">${chip('Host', 'ok')}</span>` : ''}${own && c.via ? `<span class="small muted">${VIA[c.via]}</span>` : ''}</span><span class="muted" aria-hidden="true">${I.fwd}</span></button>`;
   }).join('')}</div>` : `<div class="empty">${own ? 'You\'re not in any club\'s saved players yet.' : 'No clubs yet.'}</div>`}</section>`;
 }
 
@@ -2416,7 +2429,7 @@ function viewHistory() {
   if (!p) return viewNotFound();
   if (hiddenFromViewer(p)) return viewPrivateGate(p);
   const tab = S.ui.hist;
-  const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial'];
+  const kinds = tab === 'counted' ? ['counted'] : ['fun', 'partial', 'unranked'];
   const f = tab === 'counted' && S.ui.wpf ? S.ui.wpf : null;
   const blocks = p.sessions.filter((s) => !f || (s.ago >= 0 && s.ago <= YEAR_DAYS() && dayOf(s.ago).getDay() === f.day)).map((s) => sessionBlock(s, kinds, p.id === S.me, p, f ? (g) => g.res === f.res : null)).filter(Boolean);
   const nC = countedAll(p.sessions), nF = p.sessions.reduce((n, s) => n + s.games.filter((g) => g.kind !== 'counted').length, 0);
@@ -2426,12 +2439,12 @@ function viewHistory() {
     ${weeklyPerf(p)}
     <div class="tabs" role="tablist" aria-label="Game type">
       <button role="tab" aria-selected="${tab === 'counted'}" data-act="histTab" data-v="counted">Singles and doubles ${chip(nC, 'solid')}</button>
-      <button role="tab" aria-selected="${tab !== 'counted'}" data-act="histTab" data-v="other">Fun and partial ${chip(nF, 'solid')}</button></div>
+      <button role="tab" aria-selected="${tab !== 'counted'}" data-act="histTab" data-v="other">Fun, partial and not ranked ${chip(nF, 'solid')}</button></div>
     ${tab !== 'counted' ? notice('', 'These games are kept in the record but don\'t count toward rank or the leaderboard.') : p.state === 'reassess' ? notice('warn', 'None of these games are from the last three months, so they no longer count toward the leaderboard.') : ''}
     ${p.state === 'processing' && tab === 'counted' ? notice('warn', 'Sunday Night Queue games are in, but the rank update from them is still processing.') : ''}
     ${(() => { /* Artifact comment, same day: three sessions per page, newest first. */
       const per = 3, pages = Math.max(1, Math.ceil(blocks.length / per)), pg = Math.min(Math.max(0, S.ui.histPage || 0), pages - 1);
-      return `<section class="card stack" style="gap:22px">${blocks.length ? blocks.slice(pg * per, (pg + 1) * per).join('') : `<div class="empty">${f ? 'No games match this filter.' : tab === 'counted' ? 'No recorded singles or doubles games yet.' : 'No fun or partial games.'}</div>`}
+      return `<section class="card stack" style="gap:22px">${blocks.length ? blocks.slice(pg * per, (pg + 1) * per).join('') : `<div class="empty">${f ? 'No games match this filter.' : tab === 'counted' ? 'No recorded singles or doubles games yet.' : 'No fun, partial or not-ranked games.'}</div>`}
         ${pages > 1 ? `<nav class="pager" aria-label="Session pages"><button type="button" class="btn sm" data-act="histPage" data-v="${pg - 1}" ${pg === 0 ? 'disabled' : ''}>${I.back} Newer</button><span class="small muted" aria-live="polite">Page ${pg + 1} of ${pages} · ${blocks.length} sessions</span><button type="button" class="btn sm" data-act="histPage" data-v="${pg + 1}" ${pg >= pages - 1 ? 'disabled' : ''}>Older ${I.fwd}</button></nav>` : ''}</section>`; })()}
   </main>`;
 }
@@ -3457,7 +3470,7 @@ function shareModel(sh) {
   }
   if (!s || (sh.kind === 'result' && s.published !== true)) return null;
   if (sh.kind === 'perf') {
-    const c = s.games.filter((g) => g.kind === 'counted'), w = c.filter((g) => g.res === 'W').length, l = c.length - w, rate = c.length ? Math.round((w / c.length) * 100) : 0;
+    const c = s.games.filter((g) => g.kind === 'counted' || g.kind === 'unranked'), w = c.filter((g) => g.res === 'W').length, l = c.length - w, rate = c.length ? Math.round((w / c.length) * 100) : 0;
     return { kind: 'perf', title: 'Share performance', top, link, blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` },
       { t: 'big', value: `${w}–${l}`, label: c.length ? `${rate}% won` : 'No counted games' },
       { t: 'stats', note: 'My session', items: [['Games', String(s.games.length)], ['Won', String(w)], ['Lost', String(l)], ...(s.published === true && s.pos ? [['Standing', `#${s.pos}`]] : [])] }] };
@@ -3660,7 +3673,7 @@ const SHEETS_SESSION = (sh) => {
   const p = profileOf(sh.id), x = p && p.sessions.find((y) => y.id === sh.sid);
   if (!x) return sheetWrap('Session', '<div class="empty">This session could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
   const r = sessRecord(x), who = p.id === S.me ? 'Your' : `${esc(p.nick || p.name)}'s`;
-  return sheetWrap(esc(x.title), `<div class="ls-head">${sessDate(x.ago)}<div class="main"><b>${fmtDay(x.ago)}</b><span class="small muted">${esc(x.club)}</span></div><span class="ls-rec big"><b class="tnum"><span class="w">${r.w}W</span> · <span class="l">${r.l}L</span></b><span class="small muted">counted</span></span></div>
+  return sheetWrap(esc(x.title), `<div class="ls-head">${sessDate(x.ago)}<div class="main"><b>${fmtDay(x.ago)}</b><span class="small muted">${esc(x.club)}${x.ranked === false ? ` · ${chip('Not ranked', 'warn')}` : ''}</span></div><span class="ls-rec big"><b class="tnum"><span class="w">${r.w}W</span> · <span class="l">${r.l}L</span></b><span class="small muted">counted</span></span></div>
     <div><span class="label">${who} matches · ${r.n}</span>${x.games.map((g, gi) => gameRow(g.kind === 'fun' ? { ...g, note: 'Fun game' } : g, p, p.id === S.me ? { sid: x.id, gi } : null, { s: x, gi })).join('')}</div>`,
     `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.id === S.me ? `<button class="btn" data-act="openShare" data-kind="perf" data-sid="${esc(x.id)}">${I.share} Share performance</button>` : ''}${x.pageGone ? '' : `<button class="btn primary" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}`);
 };
@@ -3781,7 +3794,7 @@ const SHEETS = {
     '<button class="btn" data-act="gCancel">Cancel</button>'),
   leaveClub: (sh) => {
     const c = CLUB_DIR[sh.id];
-    return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games stay.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
+    return sheetWrap(`Leave ${esc(c.name)}?`, '<p class="muted">You\'re removed from the club\'s saved players. Your past games, registrations and payments stay. Any pending slot transfer you\'re part of in this club\'s sessions is cancelled, and its link stops working. If you\'re one of the club\'s trusted hosts, that ends too and your Host badge goes; rejoining doesn\'t bring it back.</p>', `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn danger" data-act="leaveClub" data-id="${sh.id}">Leave club</button>`);
   },
   discard: () => sheetWrap('Discard your changes?', '<p class="muted">Your edits to your profile haven\'t been saved.</p>', '<button class="btn" data-act="closeSheet">Keep editing</button><button class="btn danger" data-act="discard">Discard changes</button>'),
   request: () => {
@@ -4182,6 +4195,8 @@ const ACT = {
   leaveClub: (el) => {
     const a = S.accounts[S.me], c = CLUB_DIR[el.dataset.id];
     a.clubs = (a.clubs || []).filter((x) => x.id !== el.dataset.id);
+    // #1018: leaving ends the player's trusted-host status in that club (the Host badge goes); rejoining never restores it.
+    if (TRUSTED_HOST_CLUBS[S.me]) TRUSTED_HOST_CLUBS[S.me] = TRUSTED_HOST_CLUBS[S.me].filter((id) => id !== el.dataset.id);
     S.ui.sheet = null; render(); toast(`You left ${c.name}`);
   },
   resendEmail: () => toast('Email sent again'),

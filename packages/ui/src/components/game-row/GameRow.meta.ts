@@ -9,6 +9,7 @@ export const gameRowMeta = {
     'Each face shows its games badge from `sessionGameNumber` (the game’s own for the owner, each player’s for the others): how many games they had played in that session, this one included.',
     'Pass `onShare` only on your own games: the round share icon opens Share game. Partial games never show it.',
     'Read-only: no result editing controls. A thin mapping onto MatchCourt’s Player variant; the court art lives there only.',
+    'Best of 3 (Q22): set `game.gameScores` (read from the player’s side) and `game.score` to the games won; each game score shows in a pill under the format pill.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

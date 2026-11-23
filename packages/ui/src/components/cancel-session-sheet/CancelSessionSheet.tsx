@@ -31,10 +31,14 @@ export type CancelSessionSheetProps = {
 
 const players = (n: number) => `${n} ${n === 1 ? 'player' : 'players'}`
 
+const AFTER_CANCEL =
+  'After you cancel, the session record lists who to refund and how much. Refund them outside ROTRA, then record each refund.'
+
+/** #1014 (owner decision 2026-11-22): the record lists the refunds after cancelling. */
 function paidWarning(n: number): string {
   return n === 1
-    ? '1 player is marked paid. Refunds happen outside ROTRA.'
-    : `${n} players are marked paid. Refunds happen outside ROTRA.`
+    ? `1 player is marked paid. ${AFTER_CANCEL}`
+    : `${n} players are marked paid. ${AFTER_CANCEL}`
 }
 
 /**

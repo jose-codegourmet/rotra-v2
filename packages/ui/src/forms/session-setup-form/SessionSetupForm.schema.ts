@@ -1,5 +1,6 @@
 import { courtWindowError, sessionWindowError } from '@rotra/schema/court-window'
 import { dateField, timeField } from '@rotra/schema/date'
+import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import {
   CUSTOM_FEE_ERROR,
   sessionFinancialsSchema,
@@ -67,11 +68,18 @@ export const sessionSetupSchema = z
     courtStarts: z.array(z.string()).default([]),
     courtEnds: z.array(z.string()).default([]),
     playersPerCourt: z.number().int().min(2).max(20),
+    /**
+     * Hosts (#1004, D-2026-11-22-01): the saved players (club player ids) hosting the session, in
+     * the order picked. Optional; every one is a trusted host by the time it is added here.
+     */
+    hostClubPlayerIds: z.array(z.string()).default([]),
     allowSingles: z.boolean(),
     allowDoubles: z.boolean(),
     /** Players can request: the formats a signed-in Player may ask for with Request a match */
     requestFormats: z.array(z.enum(REQUEST_FORMAT_VALUES)),
     sessionMode: z.enum(['chill', 'fair', 'hard']),
+    /** How games are scored (one of the five keys). A session saved before this field reads as 16/31. */
+    scoring: z.enum(['31', '31nd', '21', '21x3', '21x3nd']).default(DEFAULT_SCORING),
     /** Record games: off runs the night and keeps no results. A session saved before this field reads as on. */
     recordGames: z.boolean().default(true),
     minimumIsCalculated: z.boolean(),
@@ -138,12 +146,14 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'courtStarts',
     'courtEnds',
     'playersPerCourt',
+    'hostClubPlayerIds',
   ],
   [
     'allowSingles',
     'allowDoubles',
     'requestFormats',
     'sessionMode',
+    'scoring',
     'recordGames',
     'minimumIsCalculated',
     'minimumGames',

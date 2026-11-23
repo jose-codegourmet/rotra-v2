@@ -18,8 +18,12 @@ export type PaymentsChecklistProps = {
     paid: number
     partial: number
     total: number
-    /** Σ amount received */
+    /** Σ cash received and kept (net of manual refunds, #1014); never a waived amount */
     collected: number
+    /** Σ waived on slots that came by transfer (#1013), a record and not cash; hint when above 0 */
+    waived?: number
+    /** Σ manual full refunds recorded (#1014), handed back outside ROTRA; hint when above 0 */
+    refunded?: number
     stillDue: number | null
     /** Σ overpayments to return outside ROTRA; shown only when above 0 */
     toReimburse: number
@@ -34,6 +38,10 @@ export type PaymentsChecklistProps = {
   onSelectPlayer: (id: string) => void
   /** Card body tap: opens "Payment from <name>" (#479) */
   onEditAmount: (id: string) => void
+  /** Card body tap on a slot that came by transfer (#1013): opens its Slot history */
+  onOpenSlotHistory?: (id: string) => void
+  /** Opens Share payment status (#1010); the button is hidden when omitted */
+  onShareStatus?: () => void
   asSheet?: boolean
   disabled?: boolean
   saveError?: string
@@ -51,6 +59,8 @@ export function PaymentsChecklist({
   onMarkAllPaid,
   onSelectPlayer,
   onEditAmount,
+  onOpenSlotHistory,
+  onShareStatus,
   asSheet,
   disabled,
   saveError,
@@ -80,11 +90,18 @@ export function PaymentsChecklist({
             it; money is collected outside the app.
           </p>
         </div>
-        {players.some((p) => !p.paid) ? (
-          <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>
-            Mark all paid
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {onShareStatus && players.length ? (
+            <Button size="sm" onClick={onShareStatus}>
+              Share status
+            </Button>
+          ) : null}
+          {players.some((p) => !p.paid) ? (
+            <Button size="sm" disabled={disabled} onClick={onMarkAllPaid}>
+              Mark all paid
+            </Button>
+          ) : null}
+        </div>
       </div>
       {saveError ? <Notice tone="error">{saveError}</Notice> : null}
       <div className="grid grid-cols-2 gap-3 min-[800px]:grid-cols-4">
@@ -97,7 +114,14 @@ export function PaymentsChecklist({
           {
             label: 'Collected',
             value: formatPeso(totals.collected),
-            hint: totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : undefined,
+            hint:
+              [
+                totals.toReimburse ? `${formatPeso(totals.toReimburse)} to reimburse` : null,
+                totals.waived ? `${formatPeso(totals.waived)} waived (not cash)` : null,
+                totals.refunded ? `${formatPeso(totals.refunded)} refunded` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ') || undefined,
           },
           {
             label: 'Still due',
@@ -147,6 +171,7 @@ export function PaymentsChecklist({
               onTogglePaid={() => onTogglePaid(p.clubPlayerId)}
               onSelectPlayer={() => onSelectPlayer(p.clubPlayerId)}
               onEditAmount={() => onEditAmount(p.clubPlayerId)}
+              onOpenHistory={() => onOpenSlotHistory?.(p.clubPlayerId)}
               disabled={disabled}
             />
           ))}

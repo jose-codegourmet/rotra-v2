@@ -327,7 +327,7 @@
           "wins": 1,
           "losses": 1,
           "games": 2,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Zoe",
@@ -335,7 +335,7 @@
           "wins": 1,
           "losses": 2,
           "games": 3,
-          "position": 4
+          "position": 3
         },
         {
           "playerId": "Ben",
@@ -343,7 +343,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 5
+          "position": 4
         }
       ]
     },
@@ -515,7 +515,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 3
         }
       ]
     },
@@ -633,7 +633,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Dan",
@@ -641,12 +641,12 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
     {
-      "name": "three players on the same wins and losses share one position and the next is numbered after all three (1, 2, 2, 2, 5)",
+      "name": "three players on the same wins and losses share one position and the next takes the next number (1, 2, 2, 2, 3)",
       "input": {
         "roster": [
           {
@@ -844,12 +844,12 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 5
+          "position": 3
         }
       ]
     },
     {
-      "name": "two players on 4-2 share position 1 whoever won between them, and the next player is numbered 3 (1, 1, 3, 3, 5)",
+      "name": "two players on 4-2 share position 1 whoever won between them, and the next player is numbered 2 (1, 1, 2, 2, 3)",
       "input": {
         "roster": [
           {
@@ -1169,7 +1169,7 @@
           "wins": 1,
           "losses": 2,
           "games": 3,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Dan",
@@ -1177,7 +1177,7 @@
           "wins": 1,
           "losses": 2,
           "games": 3,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Eve",
@@ -1185,7 +1185,7 @@
           "wins": 0,
           "losses": 2,
           "games": 2,
-          "position": 5
+          "position": 3
         }
       ]
     },
@@ -1459,7 +1459,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Dan",
@@ -1467,7 +1467,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -1593,7 +1593,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "Eve",
@@ -1601,7 +1601,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -2095,7 +2095,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "s-tonight-player-8",
@@ -2103,7 +2103,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "s-tonight-player-4",
@@ -2111,7 +2111,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "s-tonight-player-3",
@@ -2119,7 +2119,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         }
       ]
     },
@@ -2225,7 +2225,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "p4",
@@ -2233,7 +2233,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -2371,7 +2371,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p5",
@@ -2379,7 +2379,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p4",
@@ -2387,7 +2387,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         }
       ]
     },
@@ -2493,7 +2493,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "p4",
@@ -2501,7 +2501,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -2607,7 +2607,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "p1",
@@ -2615,7 +2615,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -2807,7 +2807,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "p4",
@@ -2815,7 +2815,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -2953,7 +2953,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p6",
@@ -2961,7 +2961,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p5",
@@ -2969,7 +2969,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         }
       ]
     },
@@ -3075,7 +3075,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         },
         {
           "playerId": "p4",
@@ -3083,7 +3083,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 3
+          "position": 2
         }
       ]
     },
@@ -3221,7 +3221,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p6",
@@ -3229,7 +3229,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         },
         {
           "playerId": "p5",
@@ -3237,7 +3237,7 @@
           "wins": 0,
           "losses": 1,
           "games": 1,
-          "position": 4
+          "position": 2
         }
       ]
     }

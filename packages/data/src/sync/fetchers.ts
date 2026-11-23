@@ -1,4 +1,5 @@
 import { resolvePendingEmails } from '../club-player/email'
+import { resolvePendingSocialLinks } from '../club-player/socialLink'
 import { getConnectivity, subscribeConnectivity } from '../connectivity/connectivity'
 import { getMockDevState, subscribeMockSaveFailure } from '../mock/bridge'
 import { delay } from '../mock/latency'
@@ -91,6 +92,8 @@ async function reconcile() {
     state.sync.lastSyncedAt = now
     if (state.sync.problem === 'retry') state.sync.problem = undefined
     // Lookup pending (D-2026-11-16-04): players entered with an email while offline are looked up now.
+    // A social link wins over an email typed with it (#1019), so those are looked up first.
+    resolvePendingSocialLinks(state)
     resolvePendingEmails(state)
   })
 }

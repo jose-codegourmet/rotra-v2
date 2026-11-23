@@ -403,6 +403,8 @@ body.court-dragging { cursor: grabbing; }
 .time-pair .dt-field > svg:first-child { display: none; }
 .time-pair .dt-val { white-space: nowrap; font-size: 14px; }
 .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.pay-share-text { margin: 0; padding: 14px; max-height: 50vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+.pay-share-card { gap: 12px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r); padding: 3px; gap: 3px; flex-wrap: wrap; align-self: flex-start; }
 .seg button { border: 0; background: transparent; min-height: 36px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-weight: 600; color: var(--fg2); }
 .seg button[aria-pressed="true"] { background: var(--elev); color: var(--fg); }
@@ -417,6 +419,8 @@ body.court-dragging { cursor: grabbing; }
 .qc-top div span { font-size: 12px; color: var(--qc-dim); }
 .qc-club { width: 40px; height: 40px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--qc-accent); color: #0b0b0c; font-weight: 800; font-size: 14px; }
 .qc-club img, .qc-badge img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Owner, November 20, 2026: a Session invite shows the inviting player's own picture, not the club logo. */
+.qc-club svg { width: 100%; height: 100%; display: block; }
 .qc-mid h3 { margin: 0 0 6px; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--qc-fg); text-wrap: balance; }
 .qr-card.story .qc-mid h3 { font-size: 24px; }
 .qc-mid p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--qc-dim); }
@@ -1696,6 +1700,14 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 @media (max-width: 640px) { .pgrid.pub { grid-template-columns: repeat(3, minmax(0, 1fr)); } .pgrid.pub .pcard.pub .avatar { max-width: 88px; } .pub-cap .pgrid.pub > :nth-child(n+10) { display: none; } }
 @media (min-width: 641px) { .pub-cap .pgrid.pub > :nth-child(n+13) { display: none; } }
 .pub-cap { position: relative; }
+/* Epic #1002 (#1006): the public page's compact Hosts section, above Players and Waitlisted. */
+.pub-hosts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pub-host { display: flex; align-items: center; gap: 10px; min-height: 44px; max-width: 100%; box-sizing: border-box; padding: 4px 14px 4px 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); font: inherit; color: inherit; text-align: left; }
+.pub-host .avatar { width: 36px; height: 36px; flex: none; font-size: 13px; }
+.pub-host .ph-name { min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
+.pub-host.pub-link { cursor: pointer; }
+.pub-host .you-tag { padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; line-height: 1.4; }
+.pub-host.pub-link:hover { border-color: var(--border-strong); }
 .pub-more { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; padding-bottom: 6px; background: linear-gradient(to bottom, transparent, var(--bg) 70%); color: var(--fg); }
 .pub-more .pm-count { font-size: 13px; color: var(--fg2); }
 .pub-more .pm-text { font-weight: 700; }
@@ -2020,11 +2032,13 @@ const CARD_ART = {
 const scoringOf = (s) => (s && SCORING[s.scoring] ? s.scoring : '31');
 const scoringDef = (s) => SCORING[scoringOf(s)];
 // Owner, November 18, 2026: "the QM has the option record the session games or not. but the default is recorded".
-// Off: the queue, courts and minimum games still run, but no result is entered and nothing is kept (no standings, result
-// slides or awards; nothing goes to player records or rankings). Set on the session form, fixed once the session starts.
+// Set on the session form, fixed once the session starts.
 // Sessions saved before this change have no `recorded`: they read as recorded.
+// Owner, November 20, 2026: off still records the games like any session (winner and score, Leaderboard, Match History,
+// result slides, awards, publishing, and the games on each player's record). The only difference: its wins don't count
+// toward the ROTRA leaderboards or anyone's win rate.
 const recordedOf = (s) => !s || s.recorded !== false;
-const NOT_RECORDED = "<b>This session's games were not recorded.</b> It has no results, standings, result slides or awards, and it doesn't count toward player records or rankings.";
+const NOT_RANKED = "<b>This session isn't ranked.</b> Its games and results are recorded as usual, but its wins don't count toward the ROTRA leaderboards or anyone's win rate.";
 // Score of a finished match for display: { main, games } or null. Old matches only have scoreA/scoreB. `flip` shows Team B first.
 function scoreParts(m, flip) {
   if (!m || m.scoreA == null || m.scoreB == null) return null;
@@ -2168,6 +2182,8 @@ const DIRECTORY = [
   { id: 'g2', name: 'Trish Mendoza', identity: 'registered', rtr: 'RTR-PH-DVO-041926-0038', email: 'trish.mendoza@example.com', sugg: 5, rank: 'Rank 388' },
   { id: 'g4', name: 'Marco Lim', identity: 'registered', rtr: 'RTR-PH-ILO-071226-0009', email: 'marco.lim@example.com', sugg: 4, rank: 'Rank 1,042' },
   { id: 'g5', name: '', identity: 'unclaimed', rtr: 'RTR-PH-MNL-090126-0203', email: 'ivan.delarosa@example.com', sugg: null, rank: '' },
+  // Saved by another club with a name and a Facebook link only (#1019).
+  { id: 'g6', name: '', identity: 'unclaimed', rtr: 'RTR-PH-CEB-111926-0141', email: '', social: { facebook: 'https://facebook.com/jun.bautista' }, sugg: null, rank: '' },
 ];
 
 function todayAt(h, m) { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); }
@@ -2190,6 +2206,17 @@ function seedSessions() {
         { id: 'q-seed-paolo', account: 'RTR-PH-MNL-020326-0112', name: 'Paolo Reyes', nick: '', phone: '', band: 'Beginner', level: 6, at: Date.now() - 18 * 60000, status: 'pending' },
         { id: 'q-seed-kiko', name: 'Kiko Salazar', nick: '', phone: '', band: 'Intermediate', at: Date.now() - 9 * 60000, status: 'pending' },
       ],
+      // Epic #1002 (#1006): Miguel hosts and plays (Hosts and Players, one slot); Gab Torres hosts without playing (Hosts only).
+      hosts: [{ pid: 'p1', at: Date.now() - 36e5 }, { pid: 'p17', at: Date.now() - 36e5 + 1 }],
+      // #1011: Dani asks to hand her confirmed slot to Cara, a registered ROTRA player who is not in this session.
+      // #1013: Dani paid ₱500 of ₱900, so approving her transfer shows "₱400 will be waived" first. Nico paid ₱600 and gave his slot
+      // to Paulo yesterday: Paulo is Paid in Full (₱600 carried, ₱300 waived) and his card opens the slot history.
+      payments: { p13: { at: Date.now() - 26 * 3600e3, amount: 500 }, p26: { at: Date.now() - 30 * 3600e3, amount: 600 } },
+      transfers: [{ id: 't-seed-nico', pid: 'p26', to: 'p11', at: Date.now() - 27 * 3600e3, status: 'approved', decidedAt: Date.now() - 25 * 3600e3, level: 21, fromWaitlist: false, pay: { due: 900, paid: 600, prior: 0, waived: 300 } },
+        { id: 't-seed-dani', pid: 'p13', to: 'p25', at: Date.now() - 20 * 60000, status: 'pending' },
+        // #1012: p14 made a transfer link for a friend with no ROTRA account; nobody has claimed it, so it is not in Requests yet.
+        // Open /queue/s/s-tonight?transfer=Rotra-demo-transfer-link-for-tonight-0001xy to see the claim card.
+        { id: 't-seed-link', pid: 'p14', to: null, link: 'Rotra-demo-transfer-link-for-tonight-0001xy', at: Date.now() - 8 * 60000, status: 'pending' }],
       matches: [], seq: 0, published: null,
       finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 900, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] },
     },
@@ -2208,6 +2235,9 @@ PAST.forEach((x) => {
 });
 
 // The club's saved venues. Picking one fills the session venue, address and court fee; new names are added here.
+// Epic #1002 (#1003): Miguel (registered) and Gab Torres (unclaimed, no ROTRA account) start as trusted hosts.
+// Epic #1002 (#1008): Bea was a trusted host until two days ago; Sunday Night Queue (h2) still shows her as its host.
+function seedTrustedHosts() { return [{ pid: 'p1', added: Date.now() - 40 * 864e5 }, { pid: 'p17', added: Date.now() - 6 * 864e5 }, { pid: 'p2', added: Date.now() - 60 * 864e5, removed: Date.now() - 2 * 864e5 }]; }
 function seedVenues() {
   return [
     { id: 'v1', name: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City', courtFee: 350 },
@@ -2218,7 +2248,7 @@ function seedVenues() {
 function freshState() {
   return {
     v: 4, screen: 'login', online: true, syncing: false, pending: 0, lastSync: Date.now(), licenseExpired: false,
-    club: { name: 'Lahug Smash Club', initials: 'LS', founding: 'Founded at Salinas Dr, Lahug, Cebu City', license: 'Yearly license · active until Mar 31, 2027', description: 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.' },
+    club: { name: 'Lahug Smash Club', initials: 'LS', founding: 'Founded at Salinas Dr, Lahug, Cebu City', license: 'Yearly license · active until Mar 31, 2027', description: 'Friendly open play for all levels in Lahug. Bring your racket; shuttles are on us.', trustedHosts: seedTrustedHosts() },
     players: seedPlayers(), sessions: seedSessions(), inventory: seedInventory(), venues: seedVenues(), currentId: 's-tonight',
     ui: { sheet: null, pane: 'courts', slide: 0, pubTab: 'details', search: '', login: { user: 'lahug.smash', pass: '', show: false, err: '' }, draft: null, errors: {} },
   };
@@ -2256,6 +2286,60 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 // Public participant names (owner decision, Nov 7 2026; #475): each word → first letter + fixed "***"; blank → "Player".
 const maskName = (n) => { const w = String(n ?? '').trim().split(/\s+/).filter(Boolean); return w.length ? w.map((x) => `${Array.from(x)[0]}***`).join(' ') : 'Player'; };
 const P = (id) => S.players.find((p) => p.id === id);
+// Epic #1002 (#1003): the club's trusted-host list, drawn from its saved players. A removed entry keeps its dates.
+if (!S.club.trustedHosts) S.club.trustedHosts = seedTrustedHosts();
+const trustedHosts = () => (S.club.trustedHosts || []).filter((h) => !h.removed && P(h.pid) && !P(h.pid).removed);
+const isTrustedHost = (pid) => trustedHosts().some((h) => h.pid === pid);
+// Epic #1002 (#1004): a session's hosts. s.hosts keeps every row ({ pid, at, removed }); a removed row stays as history.
+const currentHostIds = (s) => ((s && s.hosts) || []).filter((h) => !h.removed).map((h) => h.pid);
+// Epic #1002 (#1008): a finished session keeps its hosts. Session done freezes the rows current at the end ({ frozen, name }),
+// so removing a trusted host, deleting the saved player or moving them into another record (Same person) changes nothing;
+// a host removed before the end is not a host of the finished session. Open sessions read their current rows.
+const isEnded = (s) => !!s && (s.status === 'finalized' || s.status === 'invalid');
+const sessionHostPeople = (s) => isEnded(s)
+  ? ((s && s.hosts) || []).filter((h) => h.frozen).map((h) => { const p = P(h.pid); return p ? { ...p, name: h.name || p.name } : null; }).filter(Boolean)
+  : currentHostIds(s).map((pid) => P(pid)).filter(Boolean);
+function freezeHosts(s) {
+  const now = Date.now();
+  ((s && s.hosts) || []).forEach((h) => { if (!h.removed && !h.frozen) { const p = P(h.pid); h.name = (p && !p.removed ? p.name : h.name) || (p ? p.name : ''); h.frozen = now; } });
+}
+// Saving setup: a new host is registered as a player unless already on the roster or waitlist. A slot while one is open,
+// otherwise the waitlist (the preparation rule). Their saved level comes with them. Removing a host keeps their registration.
+function applyHosts(s, ids) {
+  const now = Date.now(); let reg = 0, wait = 0;
+  s.hosts = s.hosts || [];
+  s.hosts.forEach((h) => { if (!h.removed && !ids.includes(h.pid)) h.removed = now; });
+  ids.forEach((pid, i) => {
+    if (s.hosts.some((h) => h.pid === pid && !h.removed)) return;
+    s.hosts.push({ pid, at: now + i });
+    if (R(s, pid) || (s.waitlist || []).some((w) => w.pid === pid)) return;
+    const lv = (P(pid) || {}).sugg ?? null;
+    // Epic #1002 (#1005): added during play, a host's slot is present and the level locks, like any player admitted live.
+    if (openSlots(s)) { const live = s.status === 'active'; s.roster.push({ pid, level: lv, present: live, locked: live, presentAt: now + i }); reg++; }
+    else { s.waitlist = [...(s.waitlist || []), { pid, level: lv, at: now + i }]; wait++; }
+  });
+  return { reg, wait };
+}
+// Epic #1002 (#1005): the compact Hosts card of Q-PREPARE and the live Settings. Add host reuses the Add host sheet (live mode);
+// Remove ends the host row only. The player keeps their slot or waitlist place, and withdrawing never removes a host.
+function hostsCard(s) {
+  const ids = currentHostIds(s), open = openSlots(s);
+  const where = (pid) => R(s, pid) ? 'Playing · has a slot' : (s.waitlist || []).some((w) => w.pid === pid) ? 'On the waitlist' : 'Not on the roster';
+  return `<section class="card ls-card" id="hosts-card" aria-labelledby="hc-h"><div class="between"><h3 id="hc-h">Hosts${ids.length ? ` · ${ids.length}` : ''}</h3><button type="button" class="btn sm" data-act="openHostPicker" data-live="1" ${saved().some((p) => !ids.includes(p.id)) ? '' : 'disabled'}>${I.plus || '+'} Add host</button></div>
+    ${ids.length ? `<div class="list">${ids.map((pid) => { const p = P(pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${where(pid)}</p></div>${chip('Host', 'ok')}<button type="button" class="btn sm ghost" data-act="removeSessionHost" data-id="${pid}" aria-label="Remove ${esc(p.name)} as a host">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted" style="margin:0">No hosts. Add your trusted hosts, or anyone from your saved players.</p>'}
+    <span class="hint small muted">${open ? `${open} slot${open === 1 ? '' : 's'} open. A new host takes one unless they're already in.` : "Every slot is taken. A new host who isn't in yet goes on the waitlist."} Removing a host keeps their player place${s.status === 'active' ? '' : ', and withdrawing keeps the host designation'}. Hosting doesn't let anyone sign in to Queue.</span></section>`;
+}
+// Adds one host to the current session (before or during play): the Q-SETUP rules (a slot while one is open, else the waitlist;
+// never a second registration). During play levels are locked, so a host who would take a place needs a saved level.
+function addLiveHost(pid) {
+  const s = cur(), p = P(pid); if (!s || !p || p.removed || currentHostIds(s).includes(pid)) return false;
+  if (s.status === 'active' && !R(s, pid) && !(s.waitlist || []).some((w) => w.pid === pid) && p.sugg == null) {
+    toast(`${p.name} has no saved level. Add them as a player with a level first, then add them as a host.`); return false;
+  }
+  const h = applyHosts(s, [...currentHostIds(s), pid]);
+  commit(`${p.name} added as a host${hostsText(h)}`); return true;
+}
+const hostsText = (h) => `${h.reg ? ` · ${h.reg} host${h.reg === 1 ? '' : 's'} registered` : ''}${h.wait ? ` · ${h.wait} host${h.wait === 1 ? '' : 's'} waitlisted` : ''}`;
 // Saved players the club still has. A deleted player stays in S.players so past sessions keep their name.
 const saved = () => S.players.filter((p) => !p.removed);
 const nm = (id) => { const p = P(id); return p ? p.name : 'Unknown'; };
@@ -2326,6 +2410,16 @@ function picEditor(p) {
         <span class="small muted" id="pic-chars-l">Choose a character</span>
         <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
         <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>`;
+}
+// Saved players › Add player › New player: the same picture choices, held on the sheet until Save player.
+function newPicEditor(sh) {
+  const d = { id: 'new-player', name: (sh.name || '').trim() || 'New player', identity: 'guest', pic: sh.pic || null }, pc = d.pic, seeds = [0, 1, 2, 3, 4, 5, 6, 7];
+  return `<div class="field"><span>Profile picture (optional)</span>
+        <div class="pic-edit">${avatar(d, 'xl')}<div class="stack tight"><span class="small muted">${!pc ? 'Initials' : pc.kind === 'photo' ? 'A photo' : 'A character'}</span>
+          <div class="row"><label class="btn sm" for="new-pic-file">Upload photo</label><input type="file" id="new-pic-file" class="sr-only" accept="image/*">${pc ? '<button class="btn sm ghost" data-act="newPicRemove">Remove</button>' : ''}</div></div></div>
+        <span class="small muted" id="new-pic-chars-l">Choose a character</span>
+        <div class="pic-grid" role="group" aria-labelledby="new-pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="newPicChar" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(d, n)}</span></button>`).join('')}</div>
+        <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it.</span></div>`;
 }
 const avatar = (p, cls = '') => (hasPhoto(p)
   ? `<span class="avatar photo ${cls}" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(p.name)}">${picInner(p)}</span>`
@@ -2588,7 +2682,8 @@ function syncLabel() {
 // Every saved change goes into a per-device sync log, grouped by the part of the session it touched, so the
 // status pill can show what has synced and what is still waiting on this device.
 const AREA = {
-  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', addMatchReq: 'Queue', declineMatchReq: 'Queue',
+  pickHost: 'Session', confirmHostTrust: 'Session', removeSessionHost: 'Session',
+  confirmReq: 'Roster', declineReq: 'Roster', keepDropOut: 'Roster', removeDropOut: 'Roster', approveTransfer: 'Roster', rejectTransfer: 'Roster', confirmRejectRefund: 'Payments', confirmSessionRefund: 'Payments', addMatchReq: 'Queue', declineMatchReq: 'Queue',
   togglePaid: 'Payments', markAllPaid: 'Payments', savePayAmount: 'Payments', togglePresent: 'Roster', allPresent: 'Roster', allAbsent: 'Roster', giveSlot: 'Roster', fillSlots: 'Roster', removeWait: 'Roster', confirmAdd: 'Roster', confirmNew: 'Roster', stepDown: 'Roster', pubStepDown: 'Roster', overfillYes: 'Roster', overfillWait: 'Roster', setLevel: 'Roster', saveEditPlayer: 'Roster', picChar: 'Roster', picRemove: 'Roster', picUsePrev: 'Roster', confirmDeletePlayer: 'Roster',
   confirmSetGames: 'Roster', saveEditLive: 'Roster', confirmStart: 'Session', confirmCancelSession: 'Session', confirmDeleteSession: 'Session', saveSetup: 'Session setup', confirmDone: 'Session done', confirmPublish: 'Published results',
   makeMatch: 'Queue', saveEditor: 'Queue', addSuggest: 'Queue', autoCommit: 'Queue', confirmRegen: 'Queue', move: 'Queue', moveTo: 'Queue', swapSides: 'Queue', removeWaiting: 'Queue',
@@ -2728,14 +2823,39 @@ const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
 const idLine = (p) => (p.rtr ? esc(p.rtr) : p.identity === 'unclaimed' ? 'Details required' : 'Guest');
 // D-2026-11-16-04: an unclaimed player needs an email. An older record with a phone and no email shows Details required
 // until the Queue Master adds the email or deletes the player.
-const needsEmail = (p) => !!p && p.identity === 'unclaimed' && !p.email;
+const needsEmail = (p) => !!p && p.identity === 'unclaimed' && !p.email && !socialKeys(p).length;
 // Registered and unclaimed players are ROTRA players with an RTR ID; a guest is a name in this club only.
-const onRotra = (p) => !!p && (p.identity === 'registered' || (p.identity === 'unclaimed' && !!p.email));
+const onRotra = (p) => !!p && (p.identity === 'registered' || (p.identity === 'unclaimed' && (!!p.email || socialKeys(p).length > 0)));
 const identChip = (p) => (needsEmail(p) ? chip('Details required', 'warn') : chip(IDENT[p.identity] || esc(p.identity), p.identity === 'registered' ? 'ok' : p.identity === 'pending' ? 'warn' : ''));
 const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 // One email is one person: a saved player in this club, or a ROTRA player elsewhere (registered or unclaimed).
 const dirByEmail = (v) => DIRECTORY.find((g) => g.email === v.trim().toLowerCase()) || null;
 const savedByEmail = (v, notId) => { const e = v.trim().toLowerCase(), g = dirByEmail(e); return saved().find((p) => p.id !== notId && ((p.email || '').toLowerCase() === e || (g && p.rtr === g.rtr))) || null; };
+// #1019: a social link is an entry key for an unclaimed player, like an email. Normalized before comparing:
+// any host alias (m., www., fb.com) becomes the provider's site, no query string, hash or trailing slash, lower case.
+const SOCIAL_HOSTS = { facebook: ['facebook.com', 'fb.com'], instagram: ['instagram.com'], youtube: ['youtube.com'], linkedin: ['linkedin.com'] };
+function socialKey(v) {
+  let u; try { u = new URL(/^https?:\/\//i.test(v.trim()) ? v.trim() : `https://${v.trim()}`); } catch (e) { return null; }
+  const host = u.hostname.toLowerCase().replace(/^(www\.|m\.|mobile\.)/, '');
+  const kind = Object.keys(SOCIAL_HOSTS).find((k) => SOCIAL_HOSTS[k].includes(host));
+  const path = u.pathname.replace(/\/+$/, '').toLowerCase();
+  if (!kind || !path || path === '/') return null;
+  return { kind, key: `${SOCIAL_HOSTS[kind][0]}${path}` };
+}
+const socialKeys = (p) => Object.values(p?.social || {}).map((v) => (v ? socialKey(v)?.key : null)).filter(Boolean);
+const dirBySocial = (v) => { const k = socialKey(v)?.key; return k ? DIRECTORY.find((g) => g.identity === 'unclaimed' && socialKeys(g).includes(k)) || null : null; };
+const savedBySocial = (v, notId) => { const k = socialKey(v)?.key, g = dirBySocial(v); return k ? saved().find((p) => p.id !== notId && p.identity !== 'registered' && (socialKeys(p).includes(k) || (g && p.rtr === g.rtr))) || null : null; };
+// Saving a social link makes the player unclaimed, or links them to the unclaimed player who already has it.
+// The link wins over the email when they point to two different unclaimed players. Offline the lookup waits for sync.
+function applySocial(p, link) {
+  const sk = socialKey(link), g = dirBySocial(link);
+  p.social = { ...(p.social || {}), [sk.kind]: link.trim() };
+  if (p.identity === 'guest') p.noPhone = true;
+  if (!S.online) { p.identity = 'pending'; return 'profile lookup after sync'; }
+  if (g) { p.identity = 'unclaimed'; p.rtr = g.rtr; return `already on ROTRA · ${g.rtr}`; }
+  if (p.identity !== 'unclaimed' && p.identity !== 'registered') { p.identity = 'unclaimed'; p.rtr = newRtr(); p.rtrNew = true; }
+  return `unclaimed · ${p.rtr}`;
+}
 // An unclaimed player gets an RTR ID when the club saves their email: the club's city code, today's date, the next number.
 const newRtr = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `RTR-PH-CEB-${z(d.getMonth() + 1)}${z(d.getDate())}${String(d.getFullYear()).slice(2)}-${String(86 + S.players.filter((p) => p.rtrNew).length).padStart(4, '0')}`; };
 // Saving an email makes a guest (or an older record) an unclaimed player, or links them when the email is already on ROTRA.
@@ -3283,7 +3403,7 @@ const LICENSE_PAYMENTS = [
 ];
 const fmtYmd = (v) => new Date(ymdToTime(v)).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 const CLUB_TABS = [
-  ['Club', [['identity', 'Club identity'], ['invite', 'Club invite link'], ['defaults', 'Session defaults'], ['post', 'Facebook post']]],
+  ['Club', [['identity', 'Club identity'], ['invite', 'Club invite link'], ['defaults', 'Session defaults'], ['hosts', 'Trusted hosts'], ['post', 'Facebook post']]],
   ['License', [['license', 'License and payments']]],
   ['This device', [['device', 'Downloads']]],
   ['Account', [['account', 'Account']]],
@@ -3343,6 +3463,9 @@ function viewClub() {
       ${(S.ui.feeOn ?? S.club.entranceFee != null) ? `<div class="field"><label for="club-fee" style="font-size:13px;font-weight:600;color:var(--fg2)">Amount per person</label><div class="row" style="flex-wrap:nowrap"><div class="money" style="flex:1"><span>₱</span><input class="input${S.ui.clubFeeErr ? ' bad' : ''}" id="club-fee" type="number" min="0" step="1" inputmode="numeric" data-bind="ui.clubFee" value="${esc(S.ui.clubFee ?? S.club.entranceFee ?? '')}" placeholder="0"></div><button class="btn" data-act="saveClubFee">Save</button></div>${S.ui.clubFeeErr ? `<span class="err">${esc(S.ui.clubFeeErr)}</span>` : '<span class="hint">It\'s added to each session\'s costs, so the payment per player covers it.</span>'}</div>` : ''}
       <div class="li" style="padding:0"><div class="main"><b>Players can check themselves in</b><p class="small muted">During a live session, confirmed ROTRA players can tap I'm here on the session page. Turn it off and only you mark presence.</p></div>${sw(S.club.selfCheckIn !== false, 'toggleSelfCheckIn', '', 'Players can check themselves in')}</div>
     </section>
+    <section class="card stack" id="club-hosts"><div class="between"><div><h2>Trusted hosts</h2><p class="small muted">Saved players your club trusts to host its sessions. When you create a session, they're listed first in the host picker. Hosting is shown on the session; it doesn't let them sign in to Queue.</p></div><button class="btn sm primary" data-act="openAddTrustedHost" ${saved().some((p) => !isTrustedHost(p.id)) ? '' : 'disabled'}>Add trusted host</button></div>
+      ${trustedHosts().length ? `<div class="list">${trustedHosts().map((h) => { const p = P(h.pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">Trusted since ${fmtShortDate(h.added)}</p></div>${identChip(p)}<button class="btn sm ghost" data-act="openRemoveTrustedHost" data-id="${p.id}" aria-label="Remove ${esc(p.name)} from trusted hosts">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted">No trusted hosts yet. Add saved players you trust to host your sessions.</p>'}
+      <p class="small muted">Removing a trusted host keeps them in your saved players, and sessions they already hosted still show them.</p></section>
     <section class="card stack" id="club-license"><div class="between"><h2>License</h2>${chip('Active', 'ok')}</div>
       <div class="tiles4">
         <div class="card"><span class="label">Plan</span><b class="big">Yearly</b></div>
@@ -3402,6 +3525,8 @@ function simulateHistory(spec) {
   const roster = spec.players.map((pid) => ({ pid, level: (P(pid) || {}).sugg ?? 4, present: true, locked: true, presentAt: start }));
   const lv = (pid) => roster.find((x) => x.pid === pid).level;
   const s = { id: spec.id, title: spec.title, start, end, venue: spec.venue, address: spec.address, courts, singles: false, doubles: true, mode: 'fair', scoring: spec.scoring || '31', minimum: spec.minimum, minAuto: spec.minAuto !== false, notes: spec.notes || '', status: spec.status, download: 'none', roster, matches: [], seq: 0, published: spec.published ? { slides: [0, 1], offDay: false, at: end } : null, startedAt: start, finalizedAt: end + 6e5, invalidReason: spec.reason || null, finance: spec.finance || null, payments: {} };
+  // Epic #1002 (#1008): the hosts the night ended with are frozen with their name; one removed mid-session stays unfrozen history.
+  s.hosts = (spec.hosts || []).map((h, i) => ({ pid: h.pid, at: start - 36e5 + i, ...(h.removedMin != null ? { removed: start + h.removedMin * 6e4 } : { name: (P(h.pid) || {}).name, frozen: s.finalizedAt }) }));
   if (spec.finance && spec.status === 'finalized') roster.forEach((x, i) => { if (i < roster.length - (spec.unpaid || 0)) s.payments[x.pid] = { at: start + (i % 40) * 6e4, amount: duePerHead(s) }; });
   const games = {}, free = {}, courtFree = {};
   roster.forEach((x) => { games[x.pid] = 0; free[x.pid] = start + Math.floor(r() * 20) * 6e4; });
@@ -3512,7 +3637,7 @@ function cancelledExample() {
     roster: ['p2', 'p6', 'p10', 'p18', 'p23', 'p29'].map((pid, i) => ({ pid, level: lv(pid), present: false, locked: false, presentAt: start - (60 - i * 5) * 3600e3 })),
     waitlist: [{ pid: 'p27', level: lv('p27'), at: start - 30 * 3600e3 }], requests: [], matches: [], seq: 0, published: null,
     cancelledAt: start - 14 * 3600e3, cancelReason: 'Not enough players',
-    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 } } };
+    finance: { courtFee: 300, entryFee: 80, custom: true, payFee: 250, shuttles: [{ itemId: 'inv2', tubes: 2 }] }, payments: { p2: { at: start - 40 * 3600e3, amount: 250 }, p10: { at: start - 38 * 3600e3, amount: 120 } } };
   s.minimum = sessionEstimate(s).low;
   return s;
 }
@@ -3527,6 +3652,8 @@ function upcomingExamples() {
     prep({ id: 'x-next-full', title: 'Club Doubles Night', start: at(1, 18), end: at(1, 21), ...BANILAD, courts: courts(2), notes: 'Doubles all night. Slots are full; confirmed guests join the waitlist.', roster: join(pidRange(1, 16)),
       waitlist: ['p21', 'p22', 'p25', 'p26'].map((pid, i) => ({ pid, level: lv(pid), at: now - (20 - i * 4) * 3600e3 })),
       payments: { p1: { at: now - 30 * 3600e3, amount: 200 }, p2: { at: now - 26 * 3600e3, amount: 200 }, p5: { at: now - 5 * 3600e3, amount: 200 } },
+      // #1014: Ana (p2) paid ₱200 and asks to transfer her slot. Reject and refund hands her ₱200 back and gives the slot to p21, first on the waitlist.
+      transfers: [{ id: 't-seed-refund', pid: 'p2', to: 'g4', at: now - 3 * 3600e3, status: 'pending' }],
       finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }] } }),
     prep({ id: 'x-next-partial', title: 'Beginners and Friends', start: at(3, 19), end: at(3, 21), ...LAHUG, courts: courts(3), notes: 'Relaxed games for newer players. Bring a friend.', roster: join(['p3', 'p6', 'p8', 'p10', 'p12', 'p15', 'p17', 'p18', 'p20', 'p23', 'p24', 'p27', 'p29', 'p30']),
       finance: { courtFee: 250, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 3 }] } }),
@@ -3534,13 +3661,13 @@ function upcomingExamples() {
 }
 // Example sessions, versioned by S.histV: a bump replaces these ids in older saves and leaves everything else alone.
 function ensureHistory() {
-  if (S.histV === 6) return;
+  if (S.histV === 7) return;
   // Older saves get the example players they're missing (levels already on the nine-step list by now).
   seedPlayers().forEach((p) => { if (!S.players.some((x) => x.id === p.id)) S.players.push({ ...p, sugg: p.sugg == null ? p.sugg : oldToNewLevel(p.sugg) }); });
   const ids = pidRange;
   const specs = [
     { id: 'h1', title: 'Thursday Open Play', ago: 3, h: 19, len: 3, courts: 3, players: ids(1, 18), minimum: 6, status: 'finalized', published: true, seed: 11, invalidSeq: [14], unpaid: 3, finance: { courtFee: 350, entryFee: 60, custom: true, payFee: 700, shuttles: [{ itemId: 'inv1', tubes: 4 }, { itemId: 'inv2', tubes: 2 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
-    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, scoring: '21x3', finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
+    { id: 'h2', title: 'Sunday Night Queue', ago: 7, h: 18, len: 3, courts: 3, players: ids(1, 15), minimum: 7, status: 'finalized', published: false, seed: 22, hosts: [{ pid: 'p2' }, { pid: 'p17', removedMin: 60 }], scoring: '21x3', finance: { courtFee: 350, entryFee: null, custom: false, payFee: null, shuttles: [{ itemId: 'inv2', tubes: 5 }] }, venue: 'Banilad Sports Hub', address: 'Gov. M. Cuenco Ave, Banilad, Cebu City' },
     { id: 'h3', title: 'Tuesday Drills', ago: 12, h: 19, len: 2, courts: 2, players: ids(3, 14), minimum: 4, status: 'invalid', seed: 33, venue: 'Lahug Covered Court', address: 'Salinas Dr, Lahug, Cebu City', reason: 'The original device was lost before its records synced, so this session could not be recorded.' },
     // An ordinary night, a full house (24 of 24 slots), over budget (27 of 24) and few players for the courts.
     { id: 'x-ordinary', title: 'Open Play Night', ago: 2, h: 19, len: 3, courts: 3, players: ids(5, 22), minimum: 6, status: 'finalized', published: true, seed: 44, unpaid: 2, finance: { courtFee: 350, entryFee: null, custom: true, payFee: 200, shuttles: [{ itemId: 'inv1', tubes: 3 }, { itemId: 'inv2', tubes: 2 }] }, ...BANILAD },
@@ -3552,7 +3679,7 @@ function ensureHistory() {
   S.sessions = S.sessions.filter((x) => !built.some((b) => b.id === x.id)).concat(built);
   // One live example, unless something is already live (one session at a time).
   if (!S.sessions.some((x) => x.status === 'active')) S.sessions.push(buildLive('full'));
-  S.histV = 6;
+  S.histV = 7;
   save();
 }
 function historyMatch(s, m) {
@@ -3609,7 +3736,7 @@ function viewHistory() {
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="stack tight"><span class="label">Session record · read-only</span>${sessTitle(s)}<p class="muted small">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
-    <div class="row">${invalid ? chip('Invalid session', 'bad') : chip('Completed', 'ok')}${invalid ? '' : !recordedOf(s) ? chip('Not recorded', 'warn') : chip(s.published ? 'Results published' : 'Results private', s.published ? 'ok' : '')}</div>
+    <div class="row">${invalid ? chip('Invalid session', 'bad') : chip('Completed', 'ok')}${invalid ? '' : chip(s.published ? 'Results published' : 'Results private', s.published ? 'ok' : '')}${invalid || recordedOf(s) ? '' : chip('Not ranked', 'warn')}</div>
     <div class="tiles4">
       <div class="card"><span class="label">Games</span><b class="big tnum">${invalid ? '—' : done.length}</b>${!invalid && played.length !== done.length ? `<span class="small muted">${played.length - done.length} invalid</span>` : ''}</div>
       <div class="card"><span class="label">Players</span><b class="big tnum">${s.roster.length}</b><span class="small muted">of ${capacityOf(s)} slots${s.roster.length > capacityOf(s) ? ` · ${s.roster.length - capacityOf(s)} additional players admitted` : ''}</span></div>
@@ -3622,14 +3749,31 @@ function viewHistory() {
 }
 // A cancelled session never started: no games, standings or slides, and it counts nowhere. Its roster, waitlist and
 // payment marks stay on the record, read-only.
+// #1014 (owner decision 2026-11-22, #1015): after a cancellation the record lists everyone who paid (Paid or Partial) with the whole cash
+// to hand back, never a waiver. The QM refunds outside ROTRA and records each refund (one per player, append-only).
+function refundRows(s) {
+  const due = duePerHead(s);
+  return s.roster.map((r) => { const h = slotPay(s, r.pid), rf = refundOf(s, r.pid), cash = slotCash(s, r.pid) + (rf ? rf.amount : 0);
+    const st = payStatus(cash > 0 ? { amount: cash, waived: h ? h.waived : 0 } : null, due);
+    return { pid: r.pid, name: P(r.pid).name, cash, rf, partial: st.kind === 'partial' }; })
+    .filter((x) => x.cash > 0).sort((a, b) => a.name.localeCompare(b.name));
+}
+function refundCard(s) {
+  const rows = refundRows(s); if (!rows.length) return '';
+  const left = rows.filter((x) => !x.rf), leftAmt = left.reduce((t, x) => t + x.cash, 0), done = rows.reduce((t, x) => t + (x.rf ? x.rf.amount : 0), 0);
+  return `<section class="card stack" aria-labelledby="refund-h"><div class="between"><div><h2 id="refund-h">Refund everyone who paid</h2><p class="small muted">ROTRA doesn't move money. Hand each amount back outside ROTRA, then record it here. Full refunds of the cash collected; waived amounts are not cash.</p></div>
+      <div class="stack tight" style="text-align:right"><b class="tnum">${left.length ? `${peso(leftAmt)} to refund · ${left.length}` : 'All refunds recorded'}</b>${done ? `<span class="small muted">${peso(done)} refunded</span>` : ''}</div></div>
+    <div class="list">${rows.map((x) => `<div class="li">${avatar(P(x.pid))}<div class="main"><b>${esc(x.name)}</b><p class="small muted">${x.partial ? 'Partial' : 'Paid'} · ${peso(x.cash)} collected</p></div>
+      ${x.rf ? `<span class="chip ok">${I.check} Refunded ${peso(x.rf.amount)} · ${fmtWhen(x.rf.at, { lower: true })}</span>` : `<button class="btn sm" data-act="openSessionRefund" data-pid="${esc(x.pid)}" aria-haspopup="dialog" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Record refund · ${peso(x.cash)}</button>`}</div>`).join('')}</div></section>`;
+}
 function cancelledRecord(s) {
-  const pay = s.payments || {}, wl = waitOf(s);
-  const paidN = s.roster.filter((r) => pay[r.pid]).length;
+  const wl = waitOf(s);
+  const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length;
   return `<main class="wrap">
     <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="stack tight"><span class="label">Session record · read-only</span>${sessTitle(s)}<p class="muted small">${fmtDate(s.start)} · ${fmtRange(s.start, s.end)} · ${esc(s.venue)}</p></div>
     <div class="row">${chip('Cancelled')}${s.cancelledAt ? `<span class="small muted">Cancelled ${fmtWhen(s.cancelledAt, { lower: true })}</span>` : ''}</div>
-    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid; refunds happen outside ROTRA.` : ''}`)}
+    ${notice('', `<b>${s.cancelReason ? `Reason: ${esc(s.cancelReason)}` : 'No reason given.'}</b> This session was cancelled before it started. It has no games, standings or result slides, and it doesn't count toward player records or rankings.${paidN ? ` ${paidN} player${paidN === 1 ? ' was' : 's were'} marked paid: refund them outside ROTRA and record each refund below.` : ''}`)}
     <div class="tiles4">
       <div class="card"><span class="label">Joined</span><b class="big tnum">${s.roster.length}</b><span class="small muted">of ${capacityOf(s)} slots</span></div>
       <div class="card"><span class="label">Waitlist</span><b class="big tnum">${wl.length}</b></div>
@@ -3637,15 +3781,15 @@ function cancelledRecord(s) {
       <div class="card"><span class="label">Courts</span><b class="big tnum">${s.courts.length}</b></div>
     </div>
     <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button></div>
-    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = pay[r.pid]; return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
+    ${refundCard(s)}
+    <section class="stack"><h2>Roster · ${s.roster.length}</h2>${s.roster.length ? `<div class="pgrid">${s.roster.map((r) => { const p = P(r.pid), paid = slotPay(s, r.pid); return `<div class="pcard">${avatar(p)}<div style="min-width:0"><b>${esc(p.name)}</b><p class="small muted">${esc(lvLabel(r.level))} · ${paid && paid.refunded ? `Paid ${peso(paid.refunded + (paid.amount || 0))} · refunded` : paid ? `Paid ${peso(paid.amount)}` : 'Not paid'}</p></div></div>`; }).join('')}</div>` : '<div class="card empty">Nobody had joined.</div>'}</section>
     ${wl.length ? `<section class="stack"><h2>Waitlist · ${wl.length}</h2><ol class="pub-wait">${wl.map((w) => `<li>${esc(P(w.pid).name)}</li>`).join('')}</ol></section>` : ''}
   </main>`;
 }
 function histResultsPane(s, { invalid, played }) {
   if (invalid) return notice('bad', `<b>This session has no official result.</b> ${esc(s.invalidReason || '')} It doesn't count toward player records or rankings, and there are no standings or result slides. Its partial records aren't shown as match history.`);
-  if (!recordedOf(s)) return notice('', NOT_RECORDED);
   const st = standings(s);
-  return `<div class="between"><h2>Standings</h2><div class="row">${st.length ? `<button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button>` : ''}<button class="btn sm" data-act="go" data-to="results">Result slides</button><button class="btn sm" data-act="openExport">Download images</button></div></div>
+  return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div class="between"><h2>Standings</h2><div class="row">${st.length ? `<button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button>` : ''}<button class="btn sm" data-act="go" data-to="results">Result slides</button><button class="btn sm" data-act="openExport">Download images</button></div></div>
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)); return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td><td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map(faceBtn).join('')}</span><b>${tiedNames(ps.map((p) => p.name))}</b></div></td><td class="n tnum"><b>${g.w}</b></td><td class="n tnum">${g.l}</td><td class="n tnum">${groupGames(g)}</td></tr>`; }).join('')}
     </tbody></table></div>` : '<div class="card empty">No counted games were recorded in this session.</div>'}`;
@@ -3653,7 +3797,6 @@ function histResultsPane(s, { invalid, played }) {
 // Its own tab: the replay card plus every match by court, in play order.
 function histNightPane(s, { invalid, played }) {
   if (invalid) return notice('bad', '<b>This session has no official result,</b> so there is no match history or replay. Its partial records aren\'t shown.');
-  if (!recordedOf(s)) return notice('', `${NOT_RECORDED} There is no match history or replay.`);
   return `<div class="stack"><div><h2>How the night ran</h2><p class="small muted">Play or drag the timeline to see the courts at any moment. Every match is listed below by court, in the order it was played; winners are highlighted.</p></div>
       ${replayCard(s)}
       <div class="hist-courts" style="--cols:${s.courts.length}">${s.courts.map((c) => {
@@ -3661,15 +3804,19 @@ function histNightPane(s, { invalid, played }) {
         return `<div class="hist-col"><div class="between"><h3>${esc(c.label)}</h3><span class="small muted">${ms.length} match${ms.length === 1 ? '' : 'es'}</span></div>${ms.map((m) => historyMatch(s, m)).join('') || '<p class="small muted">No matches.</p>'}</div>`;
       }).join('')}</div></div>`;
 }
+// Epic #1002 (#1008): the session record's Hosts, the compact #1006 chips with the club's full names. The hosts the session
+// ended with, by the name each had then; a later trusted-host removal, deletion or Same person move doesn't change them.
+const recordHostsHtml = (s) => { const hs = sessionHostPeople(s); return hs.length ? `<section class="stack tight" aria-label="Hosts"><h3>Hosts · ${hs.length}</h3><ul class="pub-hosts">${hs.map((p) => `<li><div class="pub-host">${avatar(p)}<span class="ph-name"><b>${esc(p.name)}</b></span></div></li>`).join('')}</ul><p class="small muted">The hosts this session ended with. Removing a trusted host or a saved player later doesn't change them.</p></section>` : ''; };
 function histPlayersPane(s, { invalid }) {
   const st = invalid ? [] : standings(s);
   const byPid = Object.fromEntries(st.map((r) => [r.pid, { ...r, rank: r.pos }]));
   const rows = s.roster.map((r) => ({ r, p: P(r.pid), g: gamesOf(s, r.pid), x: byPid[r.pid] })).sort((a, b) => b.g - a.g || a.p.name.localeCompare(b.p.name));
   const below = rows.filter((x) => x.g < s.minimum).length;
   return `<div class="between"><h2>Players</h2><span class="small muted">${invalid ? 'Not counted' : `Minimum ${s.minimum} games · ${below} below it`}</span></div>
+    ${recordHostsHtml(s)}
     <div class="pgrid2">${rows.map(({ r, p, g, x }) => `<article class="pcard2"><div class="pc-top">${avatar(p, 'xl')}${x ? `<span class="chip ${x.rank <= 3 ? 'ok' : ''}">#${x.rank}</span>` : ''}</div>
       <div class="stack tight" style="gap:2px"><span class="pc-name">${esc(p.name)}</span><span class="small muted">${esc(lvLabel(r.level))}</span></div>
-      ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div>${recordedOf(s) ? `<div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div>` : ''}</div>
+      ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div><div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div></div>
       ${g > s.minimum ? chip('Above minimum', 'ok') : g === s.minimum ? chip('Met minimum') : chip(`${s.minimum - g} short`, 'warn')}`}
     </article>`).join('')}</div>`;
 }
@@ -3679,7 +3826,7 @@ function histPublicPane(s, { invalid }) {
   const playerSignedIn = !!S.ui.playerSignedIn;
   const fullRoster = playerSignedIn && !!S.ui.playerConfirmed;
   return `<div class="between"><div><h2>Public page</h2><p class="small muted">What anyone with the session link sees. No sign-in needed.</p></div>
-      <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button>${invalid || !recordedOf(s) ? '' : `<button class="btn sm primary" data-act="openPublish">${pub ? 'Update publication' : 'Publish results'}</button>`}</div></div>
+      <div class="row"><button class="btn sm" data-act="go" data-to="public">Open public page</button>${invalid ? '' : `<button class="btn sm primary" data-act="openPublish">${pub ? 'Update publication' : 'Publish results'}</button>`}</div></div>
     <div class="grid2">
       <section class="card stack"><h3>Details</h3><dl class="kv">
         <dt>When</dt><dd>${fmtDate(s.start)}, ${fmtRange(s.start, s.end)}</dd><dt>Venue</dt><dd>${esc(s.venue)}</dd>
@@ -3689,7 +3836,7 @@ function histPublicPane(s, { invalid }) {
           : pub ? `<dl class="kv"><dt>Shared</dt><dd>${[pub.slides.includes(0) && 'Standings', pub.slides.includes(1) && 'Awards'].filter(Boolean).join(' and ') || 'Nothing'}</dd><dt>Off Day</dt><dd>${pub.offDay ? 'Shared' : 'Private'}</dd><dt>Published</dt><dd>${fmtDate(pub.at)} · ${fmtTime(pub.at)}</dd></dl>`
           : '<p class="small muted">Not shared yet. The page says results haven\'t been shared. Player records and ranks are already updated either way.</p>'}</section>
     </div>
-    <section class="stack"><h3>Participants · ${s.roster.length}</h3><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b></div></div>`; }).join('')}</div></section>`;
+    <section class="stack"><h3>Participants · ${s.roster.length}</h3>${pubHostsHtml(s)}<div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid), m = maskName(p.name); return `<div class="pcard pub lv-${rvBand(r)}" ${r.level != null ? `title="${esc(lvLabel(r.level))}"` : ''}>${pubAvatar(p)}<div style="min-width:0"><b>${esc(m)}</b></div></div>`; }).join('')}</div></section>`;
 }
 // Payments: a manual paid / not-paid checklist. ROTRA records who has paid; money changes hands outside the app.
 function duePerHead(s) {
@@ -3697,45 +3844,111 @@ function duePerHead(s) {
   if (s.finance.custom) return +s.finance.payFee || 0;
   return financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), playerCountOf(s)).share;
 }
-// #479: a payment keeps the amount received; status compares it with today's amount due.
+// #479: a payment keeps the amount received; status compares it with today's amount due. #1013: a slot transfer's waiver counts
+// toward Paid but is never cash, so only cash above the amount due is "to return".
 function payStatus(paid, due) {
   if (!paid) return { kind: 'unpaid' };
   if (due == null) return { kind: 'paid' };
-  const got = paid.amount == null ? due : paid.amount;
-  if (got === due) return { kind: 'paid' };
-  if (got <= 0) return { kind: 'unpaid' };
-  return got < due ? { kind: 'partial', left: due - got } : { kind: 'reimburse', back: got - due };
+  const got = paid.amount == null ? due : paid.amount, cov = got + (paid.waived || 0);
+  if (cov === due) return { kind: 'paid' };
+  if (cov <= 0) return { kind: 'unpaid' };
+  if (cov < due) return { kind: 'partial', left: due - cov };
+  return got > due ? { kind: 'reimburse', back: got - due } : { kind: 'paid' };
 }
+// #1013 transfer accounting (epic #1009, D-2026-11-22-05). Approve snapshots the slot's money on the transfer (t.pay = { due, paid,
+// prior, waived }) and never touches a payment. The recipient's slot carries the cash already collected (paid) and every waiver
+// (prior + waived): Paid in Full, ₱0 owed. The sender's payment stays as recorded on their record and is frozen into the slot, so
+// collected cash never changes. Repeat transfers append rows; the chain is read from them (each sender is the previous recipient).
+const approvedTransfers = (s) => (s.transfers || []).filter((t) => t.status === 'approved' && t.decidedAt);
+function transferChainOf(s, pid) {
+  const ap = approvedTransfers(s), latest = (f, before = Infinity) => ap.filter((t) => f(t) && t.decidedAt <= before).sort((a, b) => b.decidedAt - a.decidedAt)[0];
+  const inc = latest((t) => t.to === pid); if (!inc) return [];
+  const out = latest((t) => t.pid === pid); if (out && out.decidedAt >= inc.decidedAt) return [];
+  const chain = [inc];
+  for (;;) { const prev = latest((t) => t.to === chain[0].pid && !chain.includes(t), chain[0].decidedAt); if (!prev) break; chain.unshift(prev); }
+  return chain;
+}
+const payFrozen = (s, pid) => { const m = (s.payments || {})[pid]; return !!m && approvedTransfers(s).some((t) => t.pid === pid && t.decidedAt >= m.at); };
+// #1014 manual full refunds (D-2026-11-22-06): s.refunds = [{ id, pid, amount, at, reason: 'transfer' | 'cancelled', transferId }].
+// Append-only, one per player; ROTRA moves no money and the payment itself is never changed. Every reader counts the cash kept
+// (received − refunded); the refund shows on its own line.
+const refundOf = (s, pid) => (s.refunds || []).find((x) => x.pid === pid) || null;
+// What a roster player shows and totals: { amount (cash kept: own + carried − refunded), waived, refunded, at, chain } or null.
+function slotPay(s, pid) {
+  const due = duePerHead(s), own = payFrozen(s, pid) ? null : (s.payments || {})[pid], chain = transferChainOf(s, pid), last = chain[chain.length - 1];
+  const rf = refundOf(s, pid), back = rf ? rf.amount : 0, net = (got) => Math.max(got - back, 0);
+  if (!last) return own ? { amount: back ? net(own.amount == null ? due || 0 : own.amount) : own.amount, waived: 0, refunded: back, at: own.at, chain } : null;
+  const x = last.pay || { paid: 0, prior: 0, waived: 0 }, ownGot = own ? (own.amount == null ? due || 0 : own.amount) : 0;
+  return { amount: net(ownGot + x.paid), waived: x.prior + x.waived, refunded: back, at: own ? Math.max(own.at, last.decidedAt) : last.decidedAt, chain };
+}
+// The whole cash the slot holds now (never a waiver): what a full refund hands back.
+const slotCash = (s, pid) => { const h = slotPay(s, pid), due = duePerHead(s); return h ? (h.amount == null ? due || 0 : h.amount) : 0; };
+// #1014 FIFO: the first waitlisted person with a level takes a freed slot, while one is open.
+const firstWaiter = (s) => (openSlots(s) > 0 ? waitOf(s).find((w) => w.level != null) : null) || null;
+// What Approve will record, shown before approving: the slot's cash, earlier waivers, and the new waiver (what it still owes).
+// An unpaid slot transfers the same way: the whole amount due is waived (assumption, D-2026-11-22-05).
+function transferPay(s, t) {
+  const due = duePerHead(s), h = slotPay(s, t.pid), got = h ? (h.amount == null ? due || 0 : h.amount) : 0, prior = h ? h.waived : 0;
+  return { due, paid: got, prior, waived: due == null ? 0 : Math.max(due - got - prior, 0) };
+}
+const transferPayText = (x) => x.due == null ? 'No fee set: nothing to waive.' : x.waived ? `${peso(x.paid)} paid · ${peso(x.waived)} will be waived.` : `${peso(x.paid)} paid · fully paid, nothing to waive.`;
 const payCovered = (st) => st.kind === 'paid' || st.kind === 'reimburse';
 const payChip = (st) => st.kind === 'paid' ? '<span class="chip ok">Paid</span>'
   : st.kind === 'partial' ? `<span class="chip warn">Partial · ${peso(st.left)} left</span>`
   : st.kind === 'reimburse' ? `<span class="chip ok">Reimburse · ${peso(st.back)} to return</span>`
   : '<span class="chip">Unpaid</span>';
-function paymentsPanel(s) {
+// Payment status share (#1010, epic #1009; owner decisions 2026-11-22): numbered Paid / Partial / Unpaid text for the Queue Master's
+// Payments area and the public session page. Confirmed players and guests only (no waitlist). Collected is cash received: a waived
+// amount (slot transfers, a later ticket) lowers the balance but is never collected.
+function payShareGroups(s, masked) {
   const due = duePerHead(s), pay = s.payments || {};
-  const all = s.roster.map((r) => ({ r, p: P(r.pid), paid: pay[r.pid], st: payStatus(pay[r.pid], due) })).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
+  const g = { paid: [], partial: [], unpaid: [] };
+  s.roster.map((r) => { const h = slotPay(s, r.pid); return { name: masked ? maskName(P(r.pid).name) : P(r.pid).name, got: h ? (h.amount == null ? due || 0 : h.amount) : 0, waived: h ? h.waived : 0, moved: !!(h && h.chain.length) }; })
+    .sort((a, b) => a.name.localeCompare(b.name)).forEach((x) => {
+      const st = payStatus(x.got > 0 || x.waived > 0 ? { amount: x.got, waived: x.waived } : null, due);
+      const grp = due == null ? (x.got > 0 || x.moved ? 'paid' : 'unpaid') : st.kind === 'partial' ? 'partial' : st.kind === 'unpaid' ? 'unpaid' : 'paid';
+      g[grp].push({ ...x, bal: due == null ? null : st.kind === 'partial' ? st.left : st.kind === 'unpaid' ? due : 0, over: st.kind === 'reimburse' ? st.back : 0 });
+    });
+  return g;
+}
+function payShareText(s, filter, masked) {
+  const due = duePerHead(s), g = payShareGroups(s, masked), shown = filter === 'all' ? ['paid', 'partial', 'unpaid'] : [filter];
+  const label = { paid: 'PAID', partial: 'PARTIAL', unpaid: 'UNPAID' };
+  const line = (x, i, grp) => [`${i + 1}. ${x.name}`, ...(grp === 'unpaid' ? [] : [`paid ${peso(x.got)}`]), ...(x.bal == null ? [] : [`balance ${peso(x.bal)}`]), ...(x.over ? [`${peso(x.over)} to return`] : []), ...(x.waived ? [`${peso(x.waived)} waived`] : [])].join(' · ');
+  const people = shown.flatMap((k) => g[k]);
+  const collected = people.reduce((t, x) => t + x.got, 0), balance = due == null ? null : people.reduce((t, x) => t + (x.bal || 0), 0);
+  return [`Payment status · ${s.title} · ${fmtDate(s.start)}`, due == null ? 'No fee set for this session.' : `${peso(due)} per player`,
+    ...shown.flatMap((k) => ['', `${label[k]} (${g[k].length})`, ...(g[k].length ? g[k].map((x, i) => line(x, i, k)) : ['None'])]),
+    '', balance == null ? `Collected: ${peso(collected)}` : `Collected: ${peso(collected)} · Balance: ${peso(balance)}`].join('\n');
+}
+function paymentsPanel(s) {
+  const due = duePerHead(s);
+  const all = s.roster.map((r) => { const paid = slotPay(s, r.pid); return { r, p: P(r.pid), paid, st: payStatus(paid, due), moved: !!(paid && paid.chain.length) }; }).sort((a, b) => (!!a.paid - !!b.paid) || a.p.name.localeCompare(b.p.name));
   const got = (x) => (x.paid ? (x.paid.amount == null ? due || 0 : x.paid.amount) : 0);
+  const waived = all.reduce((t, x) => t + (x.paid ? x.paid.waived || 0 : 0), 0), refunded = all.reduce((t, x) => t + (x.paid ? x.paid.refunded || 0 : 0), 0);
   const paidN = all.filter((x) => payCovered(x.st)).length, partialN = all.filter((x) => x.st.kind === 'partial').length;
   const collected = all.reduce((t, x) => t + got(x), 0);
-  const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x), 0), 0) : null;
+  const stillDue = due != null ? all.reduce((t, x) => t + Math.max(due - got(x) - (x.paid ? x.paid.waived || 0 : 0), 0), 0) : null;
   const toReturn = due != null ? all.reduce((t, x) => t + (x.paid ? Math.max(got(x) - due, 0) : 0), 0) : 0;
   const cost = s.finance ? financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || 1).total : null;
   const f = S.ui.payF || 'all';
   const rows = all.filter((x) => f === 'all' || (f === 'paid' ? payCovered(x.st) : !payCovered(x.st)));
   return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay, or tap a card to record a partial amount. ROTRA only records it; money is collected outside the app.</p></div>
-      ${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div>
+      <div class="row">${all.length ? `<button class="btn sm" data-act="openPayShare" aria-haspopup="dialog">${I.share} Share status</button>` : ''}${all.some((x) => !x.paid) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div></div>
     ${S.ui.paymentError ? notice('bad', esc(S.ui.paymentError)) : ''}
     <div class="tiles4">
       <div class="card"><span class="label">Paid</span><b class="big tnum">${paidN}<span class="small muted">/${all.length}</span></b>${partialN ? `<span class="small muted">${partialN} partial</span>` : ''}</div>
-      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}</div>
+      <div class="card"><span class="label">Collected</span><b class="big tnum">${peso(collected)}</b>${toReturn ? `<span class="small muted">${peso(toReturn)} to reimburse</span>` : ''}${waived ? `<span class="small muted">${peso(waived)} waived (not cash)</span>` : ''}${refunded ? `<span class="small muted">${peso(refunded)} refunded</span>` : ''}</div>
       <div class="card"><span class="label">Still due</span><b class="big tnum">${stillDue != null ? peso(stillDue) : '—'}</b></div>
       <div class="card"><span class="label">Against costs</span><b class="big tnum" style="color:${cost == null ? 'inherit' : collected >= cost ? 'var(--accent)' : 'var(--warn)'}">${cost == null ? '—' : collected >= cost ? `+${peso(collected - cost)}` : `−${peso(cost - collected)}`}</b>${cost != null ? `<span class="small muted">of ${peso(cost)} cost</span>` : ''}</div>
     </div>
     <div class="seg" role="group" aria-label="Show">${[['all', `Everyone · ${all.length}`], ['unpaid', `Not paid · ${all.length - paidN}`], ['paid', `Paid · ${paidN}`]].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payFilter" data-k="${k}">${l}</button>`).join('')}</div>
-    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : ''}">
-      <div class="pay-top">${faceBtn(p)}${sw(!!paid, 'togglePaid', `data-pid="${r.pid}"`, `${p.name} paid`)}</div>
-      <button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
-      <span class="pay-st">${paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button></div>`).join('')}</div>`
+    ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st, moved }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : ''}">
+      <div class="pay-top">${faceBtn(p)}${sw(!!paid, 'togglePaid', `data-pid="${r.pid}"${moved ? ' disabled title="Paid through a slot transfer"' : ''}`, `${p.name} paid`)}</div>
+      ${moved ? `<button class="pay-body" data-act="slotHistory" data-pid="${r.pid}" aria-label="${esc(`Slot history for ${p.name}`)}" aria-haspopup="dialog"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
+      <span class="pay-st">${peso(got({ paid }))} received · via transfer</span>${paid.waived ? `<span class="pay-st">${peso(paid.waived)} waived</span>` : ''}</button>`
+      : `<button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
+      <span class="pay-st">${paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button>`}</div>`).join('')}</div>`
       : `<p class="small muted">${f === 'unpaid' ? 'Everyone has paid.' : f === 'paid' ? 'Nobody has paid yet.' : 'No players yet.'}</p>`}
   </section>`;
 }
@@ -4005,7 +4218,7 @@ function restrictError(d) {
   if (BAND_KEYS.some(([b]) => !Number.isInteger(+rs.slots[b] || 0) || (+rs.slots[b] || 0) < 0)) return 'Use whole numbers, 0 or more.';
   return sum === cap ? '' : `The slots add up to ${sum}; this session has ${cap} (${d.courts.length} court${d.courts.length === 1 ? '' : 's'} × ${+d.perCourt || 8}).`;
 }
-const draftFrom = (s, day) => ({ ...draftFrom0(s, day), restrict: s ? JSON.parse(JSON.stringify({ slots: {}, ...restrictOf(s) })) : { k: 'all', slots: {} } });
+const draftFrom = (s, day) => ({ ...draftFrom0(s, day), hosts: currentHostIds(s), restrict: s ? JSON.parse(JSON.stringify({ slots: {}, ...restrictOf(s) })) : { k: 'all', slots: {} } });
 function draftFrom0(s, day) {
   const pad = (n) => String(n).padStart(2, '0');
   const d = new Date(s ? s.start : day || todayAt(19, 0) + 864e5);
@@ -4089,6 +4302,22 @@ const setupCourtSVG = () => `<svg class="sc-svg" viewBox="0 0 134 61" role="img"
 let setupCourtDialog = '';
 // “4 HR”, “1 HR 30 MIN”, “45 MIN” for the setup summary.
 const durLabel = (mins) => { const h = Math.floor(mins / 60), m = mins % 60; return [h ? `${h} HR` : '', m ? `${m} MIN` : ''].filter(Boolean).join(' ') || '0 MIN'; };
+// Epic #1002 (#1004): the optional Hosts field (page 1 › Courts). Hosts are shown on the session, never a sign-in.
+// Each new host takes one slot unless already registered; past the open slots they go on the waitlist (the preparation rule).
+function setupHosts(d, cap) {
+  const ids = d.hosts || (d.hosts = []);
+  const ex = d.id ? S.sessions.find((x) => x.id === d.id) : null, kept = currentHostIds(ex);
+  const inAlready = (pid) => !!ex && (!!R(ex, pid) || (ex.waitlist || []).some((w) => w.pid === pid));
+  const fresh = ids.filter((pid) => !kept.includes(pid) && !inAlready(pid));
+  const open = Math.max(0, cap - (ex ? ex.roster.length : 0)), wait = Math.max(0, fresh.length - open);
+  const pl = (n) => `${n} host${n === 1 ? '' : 's'}`;
+  const sub = (pid) => kept.includes(pid) || inAlready(pid) ? (R(ex, pid) ? 'Already has a slot' : (ex.waitlist || []).some((w) => w.pid === pid) ? 'Already on the waitlist' : 'Hosting this session')
+    : fresh.indexOf(pid) < open ? 'Gets a player slot' : 'Goes on the waitlist';
+  return `<div class="field" id="f-hosts"><div class="between"><span>Hosts <span class="muted" style="font-weight:400">· optional</span></span><button type="button" class="btn sm" data-act="openHostPicker" ${saved().some((p) => !ids.includes(p.id)) ? '' : 'disabled'}>${I.plus || '+'} Add host</button></div>
+    ${ids.length ? `<div class="list">${ids.map((pid) => { const p = P(pid); return `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b><p class="small muted">${sub(pid)}</p></div>${chip('Host', 'ok')}<button type="button" class="btn sm ghost" data-act="removeDraftHost" data-id="${pid}" aria-label="Remove ${esc(p.name)} as a host">Remove</button></div>`; }).join('')}</div>` : '<p class="small muted">No hosts. Add your trusted hosts, or anyone from your saved players.</p>'}
+    ${fresh.length ? notice(wait ? 'warn' : 'ok', wait ? `<b>Only ${open} slot${open === 1 ? '' : 's'} open.</b> The last ${pl(wait)} go${wait === 1 ? 'es' : ''} on the waitlist when you save, like any player added to a full session.` : `<b>${pl(fresh.length)} take${fresh.length === 1 ? 's' : ''} ${fresh.length} of ${ex ? `the ${open} open` : cap} slot${(ex ? open : cap) === 1 ? '' : 's'}.</b> Each host is registered as a player when you save.`) : ''}
+    <span class="hint">Hosts are shown on the session. Each one is also registered as a player and takes one slot, unless they're already in. Hosting doesn't let anyone sign in to Queue.${d.id ? ' Removing a host keeps their player slot.' : ''}</span></div>`;
+}
 function viewSetup() {
   const d = S.ui.draft;
   const e = S.ui.errors;
@@ -4165,7 +4394,8 @@ function viewSetup() {
         return n ? notice('', `When you save, the first ${n} on the waitlist get the new slot${n > 1 ? 's' : ''}.`) : '';
       })()}
       ${e.courts ? `<span class="err">${esc(e.courts)} Press a court to fix it.</span>` : ''}
-      <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>`,
+      <p class="hint">You can still add or remove free courts during the session; slots follow the court count.</p>
+      ${setupHosts(d, slots)}`,
     `<div class="li" style="padding:0"><div class="main"><h3>Singles</h3><p class="small muted">Include standard singles when generating matches.</p></div>${sw(d.singles, 'toggleDraft', 'data-k="singles"', 'Singles')}</div>
       <div class="li" style="padding:0"><div class="main"><h3>Doubles</h3><p class="small muted">Include standard doubles when generating matches.</p></div>${sw(d.doubles, 'toggleDraft', 'data-k="doubles"', 'Doubles')}</div>
       ${!d.singles && !d.doubles ? notice('warn', 'With both formats off, Generate matches has nothing to make. Only manual fun games would be possible.') : ''}
@@ -4189,7 +4419,7 @@ function viewSetup() {
               <div class="score-sum">${I.check}<span><b>${SCORING[sel].label}</b> · ${SCORING[sel].text}</span></div>`; })() + `<span class="hint">How games are scored tonight. The match result dialog asks only for what this needs.</span>`; })()}</div>
       <div class="field">${(() => { const ex = d.id && S.sessions.find((x) => x.id === d.id), locked = !!ex && ex.status !== 'prepared', on = d.recorded !== false;
         return `<div class="between"><span>Record games</span>${locked ? chip(on ? 'On' : 'Off') : sw(on, 'toggleDraft', 'data-k="recorded"', 'Record games')}</div>
-          <span class="hint">${on ? 'Results, standings, result slides and awards are kept, and games count toward player records.' : "Games aren't recorded: Match done asks for no result. The queue, courts and minimum games still work, but there are no standings, result slides or awards, and nothing goes to player records or rankings."}${locked ? " Record games can't change after Start." : ''}</span>`; })()}</div>`,
+          <span class="hint">${on ? 'Results, standings, result slides and awards are kept, and wins count toward the ROTRA leaderboards and win rate.' : "Games and results are recorded as usual, but wins don't count toward the ROTRA leaderboards or anyone's win rate."}${locked ? " Record games can't change after Start." : ''}</span>`; })()}</div>`,
     `<div class="between"><span>Minimum completed games per player</span>${d.minAuto ? chip('Calculated', 'ok') : chip('Set by you')}</div>
       <div class="fgrid">
         ${rosterN ? `<div class="field"><span>Players</span><span>${rosterN} on the roster</span><span class="hint">Updates as you add or remove players.</span></div>`
@@ -4208,10 +4438,11 @@ function viewSetup() {
           ${!d.id && d.repeat && d.repeat !== 'none' ? (() => { const occ = occurrences(d), ok = occ.filter((o) => !o.clash).length; return `<dt>Repeats</dt><dd>${REPEATS[d.repeat]} · ${ok} session${ok === 1 ? '' : 's'}${occ.length - ok ? ` <span class="small" style="color:var(--warn)">(${occ.length - ok} clashing date${occ.length - ok > 1 ? 's' : ''} skipped)</span>` : ''}</dd>`; })() : ''}
           <dt>Venue</dt><dd>${esc(d.venue || '—')}${d.address ? `<br><span class="small muted">${esc(d.address)}</span>` : ''}</dd>
           <dt>Courts</dt><dd>${d.courts.map((c) => esc(c)).join(', ')} · ${+d.perCourt || 8} per court (${d.courts.length * (+d.perCourt || 8)} slots) <button class="btn xs ghost" data-act="wizGo" data-k="0">Edit</button></dd>
+          <dt>Hosts</dt><dd>${(d.hosts || []).length ? d.hosts.map((pid) => esc((P(pid) || { name: '?' }).name)).join(', ') : 'None'} <button class="btn xs ghost" data-act="wizGo" data-k="0">Edit</button></dd>
           <dt>Formats</dt><dd>${fmtFormats(d)} · ${MODES[d.mode].label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Levels</dt><dd>${restrictText(d)} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Scoring</dt><dd>${(SCORING[d.scoring] || SCORING['31']).label} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
-          <dt>Record games</dt><dd>${d.recorded !== false ? 'On' : 'Off · no results kept'} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
+          <dt>Record games</dt><dd>${d.recorded !== false ? 'On' : 'Off · not ranked'} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Minimum</dt><dd>${d.minAuto ? est.low : esc(d.minimum)} games per player ${d.minAuto ? '(calculated)' : ''} <button class="btn xs ghost" data-act="wizGo" data-k="1">Edit</button></dd>
           <dt>Costs</dt><dd>${(() => { const c = financeCalc(d, d.courts.length, durMins, nPlayers); return `${peso(c.total)} total · players pay ${peso(c.perHead)}${c.custom ? ' (custom)' : ' (break-even)'} · ${resultText(c)}`; })()}</dd>
         </dl></div>`,
@@ -4256,7 +4487,42 @@ const openDropOuts = (s) => (s.dropOuts || []).filter((x) => x.status === 'open'
 const mrNamed = (mr) => [mr.pid, ...(mr.partners || []), ...(mr.opponents || [])].filter(Boolean);
 // D-2026-11-09-05: a match request closes by itself when anyone named stops being present.
 const closeStaleMatchReqs = (s) => { openMatchReqs(s).forEach((mr) => { if (mrNamed(mr).some((pid) => !(R(s, pid) || {}).present)) mr.status = 'closed'; }); };
-const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length; };
+// #1011 slot transfers: a confirmed signed-in player asks to give their slot to another registered ROTRA player; the QM approves
+// or rejects before Start. Pending ones expire at Start and are cancelled with the session. Decided ones stay on the record.
+// #1012: an unclaimed transfer link (`to` still null) has nobody to approve, so it is not listed for the QM.
+const pendingTransfers = (s) => (s.status === 'prepared' ? (s.transfers || []) : []).filter((t) => t.status === 'pending' && t.to && R(s, t.pid)).sort((a, b) => a.at - b.at);
+const myTransfer = (s, pid) => (s.transfers || []).find((t) => t.pid === pid && t.status === 'pending') || null;
+const closeTransfers = (s, status) => (s.transfers || []).forEach((t) => { if (t.status === 'pending') { t.status = status; t.decidedAt = Date.now(); } });
+const RTR_SHAPE = /^RTR-[A-Z]{2}-[A-Z]{3}-\d{6}-\d{4}$/;
+// Exact RTR ID only, registered ROTRA players only (a saved player of this club or one found in Player Information). Never a guest
+// or an unclaimed person, never a name search.
+const transferRecipient = (rtr) => {
+  const mine = S.players.find((p) => !p.removed && p.identity === 'registered' && p.rtr === rtr);
+  if (mine) return { id: mine.id, name: mine.name, rtr: mine.rtr, sugg: mine.sugg ?? null, dir: null };
+  const g = DIRECTORY.find((x) => x.identity === 'registered' && x.rtr === rtr);
+  return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, dir: g } : null;
+};
+const transferTo = (t) => P(t.to) || (() => { const g = DIRECTORY.find((x) => x.id === t.to); return g ? { id: g.id, name: g.name, rtr: g.rtr, sugg: g.sugg ?? null, identity: 'registered' } : null; })();
+// #1012 transfer links: when the recipient has no ROTRA account the sender makes a single-claim link instead of picking an RTR ID.
+// It is a pending transfer with `link` (the token; the real app stores only its SHA-256 digest) and `to` null until the first
+// signed-in claimant takes it. It works exactly while pending: Reject, either side's Withdraw, Start and Cancel session all end it.
+const LINK_TOKEN = /^[A-Za-z0-9_-]{43}$/;
+const newLinkToken = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const transferLinkUrl = (s, t) => `${sessionLink(s)}?transfer=${t.link}`;
+const linkTransfer = (s, token) => (LINK_TOKEN.test(token || '') && (s.transfers || []).find((t) => t.link === token)) || null;
+// The link's state from the viewer's side, the same words as the real app's transferLinkState().
+function linkState(s, t, vid) {
+  if (!t) return 'closed';
+  const mine = !!vid && t.to === vid;
+  if (t.status === 'approved') return mine ? 'approved' : 'closed';
+  if (t.status === 'cancelled' || s.status === 'cancelled') return 'cancelled';
+  if (t.status === 'expired' || (t.status === 'pending' && s.status !== 'prepared')) return 'expired';
+  if (t.status !== 'pending') return 'closed';
+  if (vid && vid === t.pid) return 'own';
+  if (mine) return 'yours';
+  return t.to ? 'claimed' : 'open';
+}
+const reqCount = (s) => { closeStaleMatchReqs(s); return s.status === 'active' ? openMatchReqs(s).length : pendingReqs(s).length + openDropOuts(s).length + pendingTransfers(s).length; };
 const inClub = (r) => !!r.account && saved().some((p) => p.rtr === r.account);
 // D-2026-11-09-08: "Invited by NAME" from the invite code the join request carried.
 const inviterOf = (s, r) => { if (!r.inviteCode) return null; const row = [...s.roster, ...(s.waitlist || [])].find((x) => x.inviteCode === r.inviteCode); return row ? P(row.pid) : null; };
@@ -4275,6 +4541,9 @@ function mergePlayer(fromId, toId) {
     (x.matchRequests || []).forEach((mr) => { mr.pid = swap(mr.pid); mr.partners = (mr.partners || []).map((x) => x && swap(x)); mr.opponents = (mr.opponents || []).map((x) => x && swap(x)); });
     (x.dropOuts || []).forEach((d) => { d.pid = swap(d.pid); });
     if (x.payments && x.payments[fromId]) { x.payments[toId] = x.payments[toId] || x.payments[fromId]; delete x.payments[fromId]; }
+    // Epic #1002 (#1008): a current host row of an open session moves too (ends if the other player already hosts it).
+    // A finished session keeps its frozen host row and name on the moved record.
+    if (!isEnded(x)) (x.hosts || []).forEach((h) => { if (h.pid !== fromId || h.removed) return; if (currentHostIds(x).includes(toId)) h.removed = Date.now(); else h.pid = toId; });
   });
   to.prior = (to.prior || 0) + (from.prior || 0);
   from.removed = true; from.linkedTo = toId;
@@ -4294,23 +4563,25 @@ function linkCard(s) {
   </section></div>`;
 }
 function requestsPanel(s, inSheet) {
-  const joins = pendingReqs(s), drops = openDropOuts(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
+  const joins = pendingReqs(s), drops = openDropOuts(s), trs = pendingTransfers(s), mrs = openMatchReqs(s), done = (s.requests || []).filter((r) => r.status !== 'pending');
   const full = s.status !== 'active' && openSlots(s) === 0;
   // Owner comments, November 11, 2026: before Start there are only join requests and drop-out notices; once the session is live there
   // are only match requests (join requests close at Start; the Queue Master adds late players directly). So there are no tabs.
   const live = s.status === 'active';
   const tab = live ? 'match' : 'join';
-  const n = live ? mrs.length : joins.length + drops.length;
-  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests and drop-out notices from the session page'}. Nothing changes until you act on one.</p></div>`;
+  const n = live ? mrs.length : joins.length + drops.length + trs.length;
+  const head = inSheet ? '' : `<div><h2>Requests${n ? ` · ${n}` : ''}</h2><p class="small muted">${live ? 'Match requests from players on the session page' : 'Join requests, drop-out notices and slot transfers from the session page'}. Nothing changes until you act on one.</p></div>`;
   const tabs = '';
   let body;
   if (tab === 'match') body = mrs.length ? `<div class="list">${mrs.map((mr) => matchReqCard(s, mr)).join('')}</div>` : '<p class="small muted">No match requests. Present players can ask for a match from the session page.</p>';
   else {
     const dropList = drops.length ? `<section class="stack tight" aria-labelledby="rq-drop-h"><h3 id="rq-drop-h" style="margin:0;font-size:14px">Can't make it · ${drops.length}</h3><p class="small muted">The slot stays until you remove the player.</p><div class="list">${drops.map((d) => dropOutRow(s, d)).join('')}</div></section>` : '';
-    const joinList = joins.length ? `<div class="stack tight">${drops.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
+    // #1011: pending slot transfers sit after the drop-out notices. Approve hands the slot over; the slot count never changes.
+    const trList = trs.length ? `<section class="stack tight" aria-labelledby="rq-tr-h"><h3 id="rq-tr-h" style="margin:0;font-size:14px">Slot transfers · ${trs.length}</h3><p class="small muted">Nothing changes until you approve. Requests still waiting at the start close.</p><div class="list">${trs.map((t) => transferRow(s, t)).join('')}</div></section>` : '';
+    const joinList = joins.length ? `<div class="stack tight">${drops.length || trs.length ? `<h3 style="margin:0;font-size:14px">Join requests · ${joins.length}</h3>` : ''}<p class="small muted">Check each one is a real person you expect (ask at the door, or match their name) before confirming. Oldest first.${full ? ' Slots are full, so confirmed players go on the waitlist.' : ''}</p>
       <div class="list">${joins.map((r) => joinReqCard(s, r, full)).join('')}</div></div>`
       : `<p class="small muted">No join requests waiting.${done.length ? ` ${done.filter((r) => r.status === 'confirmed').length} confirmed, ${done.filter((r) => r.status === 'declined').length} declined so far.` : ' Anyone who opens the session link can ask for a slot; they show up here.'}</p>`;
-    body = dropList + joinList;
+    body = dropList + trList + joinList;
   }
   return `<section class="${inSheet ? '' : 'card '}stack" id="join-requests">${head}${tabs}<div id="rq-panel" role="tabpanel" aria-labelledby="rqt-${tab}" class="stack">${body}</div></section>`;
 }
@@ -4341,6 +4612,20 @@ function dropOutRow(s, d) {
   const p = P(d.pid);
   return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">Says they can't make it · ${fmtWhen(d.at, { lower: true })}</p></div></div>
       <div class="row"><button class="btn sm" data-act="removeDropOut" data-id="${d.id}">Remove from roster</button><button class="btn sm" data-act="keepDropOut" data-id="${d.id}">Keep</button></div></div>`;
+}
+// #1011: the sender, who they want to give the slot to (name and RTR ID), whether that player is waitlisted, their level here, Reject / Approve.
+// #1014: Reject and refund (only when cash was collected for the slot) opens D-REJECT-REFUND, which states the amount to hand back.
+function transferRow(s, t) {
+  const p = P(t.pid), to = transferTo(t) || { name: 'Unknown', rtr: '' };
+  const wl = waitOf(s).findIndex((w) => w.pid === t.to) + 1;
+  const lv = t.level ?? (wl ? waitOf(s)[wl - 1].level : null) ?? to.sugg ?? null;
+  // #1012: a claimed transfer link reads "Shared a transfer link" and "Claimed by NAME"; rejecting it ends the link.
+  return `<div class="req-row"><div class="li" style="padding:0">${avatar(p)}<div class="main">${nameB(p)}<p class="small muted">${t.link ? 'Shared a transfer link' : 'Asks to transfer their slot'} · ${fmtWhen(t.claimedAt || t.at, { lower: true })}</p><p class="small"><b>${t.link ? 'Claimed by' : 'To'} ${esc(to.name)} · <span class="mono" style="font-weight:400">${esc(to.rtr)}</span></b></p></div>${wl ? chip(`Waitlist #${wl}`, 'ok') : chip('Not in this session')}</div>
+      <p class="small muted">Approving gives the slot to ${esc(to.name)}${wl ? ', who leaves the waitlist' : ''}. ${esc(p.name)} comes off the roster. The slot count stays the same.</p>
+      <p class="small"><b>Payment:</b> ${esc(transferPayText(transferPay(s, t)))} ${esc(to.name)} will be Paid in Full and owe ₱0. Collected cash stays the same.</p>
+      <div class="req-actions">${selectLevel(`tr-lv-${t.id}`, lv, `data-act-change="trLevel" data-id="${t.id}" aria-label="Level for ${esc(to.name)}"`, t.err && lv == null)}
+        <div class="row"><button class="btn sm" data-act="rejectTransfer" data-id="${t.id}">Reject</button>${slotCash(s, t.pid) > 0 ? `<button class="btn sm" data-act="openRejectRefund" data-id="${t.id}" aria-haspopup="dialog">Reject and refund</button>` : ''}<button class="btn sm primary" data-act="approveTransfer" data-id="${t.id}">Approve</button></div></div>
+      ${t.err ? `<span class="err">${esc(t.err)}</span>` : ''}</div>`;
 }
 // D-2026-11-09-05: each named player with games against the minimum, level, and where they are right now.
 function matchReqCard(s, mr) {
@@ -4376,6 +4661,30 @@ function wantField(s, want, act, err) {
   const full = slotsFullFor(s);
   return `<div class="field"><span>How do you want to join?</span><div class="seg" role="group" aria-label="How do you want to join?">${WANT_CHOICES.map(([v, l]) => `<button aria-pressed="${want === v}" ${act} data-v="${v}" ${v === 'slot' && full ? 'disabled title="All slots are taken"' : ''}>${l}</button>`).join('')}</div>${err ? `<span class="err">${esc(err)}</span>` : `<span class="hint">${full ? 'All slots are taken, so you join the waitlist. The Queue Master gives slots as they open.' : 'A slot is yours once the Queue Master confirms. The waitlist keeps your place until a slot opens.'}</span>`}</div>`;
 }
+// #1012: the card a person sees on the session page opened from a transfer link (?transfer=<token>). Not signed in: sign up or
+// log in to claim. Signed in: Claim this slot (first claimant only), then the pending claim with Withdraw claim, or the slot once
+// approved. Every closed state says why and what to do. The sender's name is masked like every name on the public page.
+function transferLinkCard(s) {
+  const token = S.ui.trLink; if (!token || !S.ui.guest) return '';
+  const t = linkTransfer(s, token), v = pubViewer(), st = linkState(s, t, v ? v.id : null);
+  const sender = t ? pubNameText(P(t.pid)) : 'A player';
+  const head = ['open', 'yours', 'approved'].includes(st) ? `${esc(sender)} wants to give you their slot` : 'Transfer link';
+  const CLOSED = {
+    claimed: ['Someone else already claimed this transfer link.', 'Only the first person to claim a transfer link can. Ask the sender if they have another slot to give.'],
+    own: ['This is your own transfer link.', 'Send it to the player who\'ll take your slot. You can cancel it on My night.'],
+    closed: ['This transfer link no longer works.', 'It was cancelled, withdrawn or rejected. Ask the sender for a new link.'],
+    expired: ['This transfer link has expired.', 'Transfer links stop working when the session starts.'],
+    cancelled: ['This session was cancelled.', 'The transfer link no longer works.'],
+  };
+  let body;
+  if (CLOSED[st]) body = notice('warn', `<b>${CLOSED[st][0]}</b> ${CLOSED[st][1]}`);
+  else if (st === 'approved') body = notice('ok', '<b>The slot is yours.</b> The Queue Master approved the transfer. See you on court.');
+  else if (st === 'yours') body = `<p>You claimed ${esc(sender)}'s slot · the Queue Master decides before the session starts.</p><p class="small muted">Withdrawing gives the slot back to ${esc(sender)}, and this link stops working.</p><div class="row acts"><button class="btn" data-act="withdrawTransferClaim" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Withdraw claim</button></div>`;
+  else if (!v) body = `<p>Sign up or log in to ROTRA to claim it. The first person to claim it gets the slot once the Queue Master approves.</p><div class="row acts"><button class="btn primary" data-act="linkSignUp">Sign up to claim</button><button class="btn" data-act="linkSignUp" data-k="login">Log in</button></div>`;
+  else if (R(s, v.id)) body = notice('warn', 'You already have a slot in this session, so you can\'t claim this one.');
+  else body = `<p>Claim it and the Queue Master decides before the session starts. Only the first person to claim this link can.</p><div class="row acts"><button class="btn primary" data-act="claimTransferLink" ${S.online ? '' : 'disabled title="You\'re offline. Reconnect and try again."'}>Claim this slot</button></div>`;
+  return `<section class="card stack" aria-labelledby="tl-h"><h2 id="tl-h" style="margin:0;font-size:16px">${head}</h2>${body}</section>`;
+}
 function joinCard(s) {
   if (s.status !== 'prepared' && s.status !== 'active') return '';
   const v = pubViewer();
@@ -4401,7 +4710,7 @@ function joinCard(s) {
     if (req && req.status === 'declined') return `<section class="card stack join-card">${notice('bad', '<b>Request not accepted</b><br>The Queue Master didn\'t confirm this request. Contact them if you think it\'s a mistake.')}</section>`;
     if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
     return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
-    ${s.roster.length ? skillMix(s.roster) : ''}
+    ${s.roster.length ? skillMix(s.roster, capacityOf(s)) : ''}
     <p class="small muted">${s.status === 'active' ? 'The Queue Master can admit additional players. ' : open ? '' : 'Confirmed players join the waitlist. '}${memberJoinOk(s, v) ? `You're a member of ${esc(S.club.name)}, so you get your place right away.` : 'One tap sends your request and the Queue Master confirms it.'}</p>
     ${wantField(s, pubWantOf(s), 'data-act="pubWant"')}
     ${memberJoinOk(s, v) ? `<button class="btn primary jc-btn" data-act="memberJoin">${pubWantOf(s) === 'waitlist' ? 'Join the waitlist as' : 'Join as'} ${esc(v.name)}</button>` : `<button class="btn primary jc-btn" data-act="sendPlayerJoin">Request to join as ${esc(v.name)}</button>`}</section>`;
@@ -4419,7 +4728,7 @@ function joinCard(s) {
   if (s.status === 'active') return '<section class="card join-card"><p class="small muted">The session has started, so online join requests are closed. Ask the Queue Master at the venue to add you.</p></section>';
   if (s.acceptReq === false) return '<section class="card join-card"><p class="small muted">This session isn\'t taking requests online. Contact the Queue Master to play.</p></section>';
   return `<section class="card stack join-card"><div class="jc-top"><h2>Want to play?</h2>${slots}</div>
-    ${s.roster.length ? skillMix(s.roster) : ''}
+    ${s.roster.length ? skillMix(s.roster, capacityOf(s)) : ''}
     <p class="small muted">${open ? '' : 'Confirmed guests join the waitlist. '}Send a quick request and the Queue Master confirms it.</p>
     <button class="btn primary jc-btn" data-act="openJoin">Request to join</button></section>`;
 }
@@ -4468,7 +4777,7 @@ function prepOverview(s) {
         <dt>Mode</dt><dd>${MODES[s.mode].label} · <span class="muted">${MODES[s.mode].text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Levels</dt><dd>${restrictText(s)}</dd>
         <dt>Scoring</dt><dd>${scoringDef(s).label} · <span class="muted">${scoringDef(s).text}</span>${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
-        <dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · no results kept'}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
+        <dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · not ranked'}${live ? ' · <span class="small muted">Fixed after start</span>' : ''}</dd>
         <dt>Minimum</dt><dd>${s.minimum} completed games per player<br><span class="small muted">${live ? `Fixed after start · ${s.minAuto !== false ? 'Calculated before start' : 'Set by you'}.` : s.minAuto !== false ? `Calculated: ${playerCountOf(s)} players on ${est.usable} court${est.usable > 1 ? 's' : ''} for ${fmtDur(s.start, s.end)} gives about ${est.low}–${est.high} games each. Updates as the roster changes.` : `Set by you. The estimate suggests ${est.low}–${est.high}.`}</span></dd>
         <dt>Roster</dt><dd>${s.roster.length} confirmed · ${present} present</dd>
         ${s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected); return `<dt>Costs</dt><dd>${peso(c.total)} estimated · ${peso(c.share)} a player to break even<br><span class="small muted">Players pay ${peso(c.perHead)}${c.custom ? ' (custom amount)' : ' (break-even)'}</span> · ${resultText(c)}</dd>`; })() : ''}${live && s.notes ? `<dt>Notes</dt><dd>${esc(s.notes)}</dd>` : ''}</dl>
@@ -4478,6 +4787,7 @@ function prepOverview(s) {
         <div class="row"><button class="btn sm" data-act="download" ${!S.online || s.download === 'downloading' ? 'disabled' : ''}>${s.download === 'ready' ? 'Update download' : 'Download for offline use'}</button></div>
         ${!S.online ? '<p class="small muted">Downloading needs an internet connection.</p>' : ''}</section>` : ''}
     </div>
+    ${hostsCard(s)}
     ${linkCard(s)}`;
 }
 // Settings tab during a live session: the setup summary as cards (owner artifact comment, November 19, 2026).
@@ -4522,7 +4832,7 @@ function liveSettings(s, est, present, allLink) {
       <div class="ls-rows">${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off', reqOn.length ? 'Formats players can ask for' : 'Players can\'t request matches')}</div>
       <div class="row acts"><button class="btn sm" data-act="openAdd">Add player</button><button class="btn sm${reqCount(s) ? ' attn' : ''}" data-act="openRequests">Match requests · ${reqCount(s)}</button></div></section>`;
   const rules = `<section class="card ls-card" aria-labelledby="ls-rules-h"><div class="between"><h3 id="ls-rules-h">Game rules</h3>${fixed}</div>
-      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? 'calculated' : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? 'calculated' : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · not ranked'}</span></div></div>
       <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}</div></section>`;
   const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
     return `<section class="card ls-card" aria-labelledby="ls-money-h"><div class="between"><h3 id="ls-money-h">Costs</h3></div>
@@ -4533,7 +4843,7 @@ function liveSettings(s, est, present, allLink) {
   // Owner, November 19, 2026 ("all over the place"): courts in one row, then a 2×2 grid of even-height cards
   // (Game rules | Players, Costs | Notes), labels and values in two aligned columns.
   return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div>${allLink ? `<button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button>` : ''}</div>
-    <div class="ls-grid">${courts}${rules}${players}${money}${notes}</div></section>`;
+    <div class="ls-grid">${courts}${rules}${players}${hostsCard(s)}${money}${notes}</div></section>`;
 }
 // Settings tab before start (owner artifact comment, November 19, 2026): the setup as cards, each with Edit opening that step
 // of the session editor. Replaces the header's Edit preparation button.
@@ -4550,7 +4860,7 @@ function prepSettings(s) {
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.courts.length}</b><span>Courts booked</span></div><div class="ls-stat"><b class="tnum">${capacityOf(s)}</b><span>Slots · ${per} a court</span></div></div>
       <div class="ls-rows">${s.courts.map((c) => row(esc(c.label), fmtWhenRange(courtStart(s, c), courtUntil(s, c)), c.until ? 'Set time' : 'Follows session end')).join('')}</div></section>`;
   const rules = `<section class="card ls-card" aria-labelledby="ps-rules-h">${head('ps-rules-h', 'Game rules', 1)}
-      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? `calculated (${est.low}–${est.high})` : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · no results kept'}</span></div></div>
+      <div class="ls-stats"><div class="ls-stat"><b class="tnum">${s.minimum}</b><span>Minimum games each · ${s.minAuto !== false ? `calculated (${est.low}–${est.high})` : 'set by you'}</span></div><div class="ls-stat"><b>${recordedOf(s) ? 'On' : 'Off'}</b><span>Record games${recordedOf(s) ? '' : ' · not ranked'}</span></div></div>
       <div class="ls-rows">${row('Formats', fmtFormats(s))}${row('Mode', MODES[s.mode].label, MODES[s.mode].text)}${row('Scoring', scoringDef(s).label, scoringDef(s).text)}${row('Match requests', reqOn.length ? reqOn.join(', ') : 'Off')}</div></section>`;
   const money = s.finance ? (() => { const c = financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || s.expected);
     return `<section class="card ls-card" aria-labelledby="ps-money-h">${head('ps-money-h', 'Costs', 2)}
@@ -4558,7 +4868,7 @@ function prepSettings(s) {
       <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div></section>`; })() : '';
   const notes = `<section class="card ls-card" aria-labelledby="ps-notes-h">${head('ps-notes-h', 'Notes', 2)}<p class="small${s.notes ? '' : ' muted'}" style="margin:0;white-space:pre-line">${s.notes ? esc(s.notes) : 'No notes. Notes show on the public session page.'}</p></section>`;
   return `<section class="stack" aria-labelledby="ps-h"><div class="ls-head"><div><h2 id="ps-h">Settings</h2><p class="small muted">Everything set when the session was made. Edit opens that part of the session editor; saving needs an internet connection.</p></div></div>
-    <div class="ls-grid">${when}${courts}${rules}${money}${notes}</div></section>`;
+    <div class="ls-grid">${when}${courts}${rules}${hostsCard(s)}${money}${notes}</div></section>`;
 }
 // ---------- Q-PREPARE ----------
 // Roster and levels panel. Level tabs follow each player's level family; Group by splits the list into headed
@@ -4571,7 +4881,7 @@ const RV_BY = [
   ['avail', 'Availability', (s, r) => (r.present ? 'Present' : 'Not present'), ['Present', 'Not present']],
   ['prior', 'Returning or first time', (s, r) => (P(r.pid).prior > 0 ? 'Returning' : 'First time here'), ['Returning', 'First time here']],
   ['profile', 'ROTRA profile', (s, r) => (P(r.pid).identity === 'registered' ? 'Has a ROTRA profile' : 'Guest'), ['Has a ROTRA profile', 'Guest']],
-  ['paid', 'Payment', (s, r) => ((s.payments || {})[r.pid] ? 'Paid' : 'Not paid'), ['Paid', 'Not paid']],
+  ['paid', 'Payment', (s, r) => (slotPay(s, r.pid) ? 'Paid' : 'Not paid'), ['Paid', 'Not paid']],
 ];
 // Artifact comment, November 13, 2026: the roster's level picker is a select menu, not the browser's select. The button is filled in
 // the level's band colour (blue Beginner, yellow Intermediate, red Advanced); the menu lists the three bands with their levels.
@@ -4598,7 +4908,7 @@ function rvRow(s, r, live) {
       </div>`;
 }
 function rvCard(s, r, live) {
-  const p = P(r.pid), paid = (s.payments || {})[r.pid], band = rvBand(r);
+  const p = P(r.pid), paid = slotPay(s, r.pid), band = rvBand(r);
   // First level: presence and skill level. Second level (muted, last row): profile, payment, suggestion.
   // #704: before Start session there is no Present switch or text; presence shows only once the session has started.
   const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : '';
@@ -4610,14 +4920,16 @@ function rvCard(s, r, live) {
         ${live ? '' : `<div class="rv-meta">${rvStepDown(r, p)}</div>`}
       </article>`;
 }
-function skillMix(rows) {
+// Public join card: the bar spans the slot budget (cap), so 4 of 24 taken fills a sixth; the grey remainder is open slots.
+function skillMix(rows, cap) {
   const n = (g) => rows.filter((r) => (r.level == null ? 'No level' : LEVELS[r.level].band) === g).length;
   const items = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level']].map(([k, l]) => [k, l, n(l)]).filter(([, , c]) => c > 0);
   const total = items.reduce((t, [, , c]) => t + c, 0);
+  const open = cap ? cap - total : 0;
   if (!total) return '<div class="skill-mix"><div class="sm-head"><b>Skill mix</b><span>No players yet</span></div><div class="sm-bar empty"></div></div>';
   const tip = (l, c) => (l === 'No level' ? `${c} with no level` : `${l}: ${c} player${c === 1 ? '' : 's'}`);
   return `<div class="skill-mix"><div class="sm-head"><b>Skill mix</b></div>
-    <div class="sm-bar" role="group" aria-label="Skill mix">${items.map(([k, l, c]) => `<i class="sm-${k}" style="flex-grow:${c}" tabindex="0" role="img" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}"></i>`).join('')}</div></div>`;
+    <div class="sm-bar" role="group" aria-label="Skill mix">${items.map(([k, l, c]) => `<i class="sm-${k}" style="flex-grow:${c}" tabindex="0" role="img" data-tip="${tip(l, c)}" aria-label="${tip(l, c)}"></i>`).join('')}${open > 0 ? `<i class="sm-open" style="flex-grow:${open}" tabindex="0" role="img" data-tip="${open} open slot${open === 1 ? '' : 's'}" aria-label="${open} open slot${open === 1 ? '' : 's'}"></i>` : ''}</div></div>`;
 }
 // One box for the roster tab: slots used and skill mix in a single bar. The bar spans the slot budget; colored segments are the
 // confirmed players by skill group, the grey remainder is open slots. Hover or focus a segment for its count.
@@ -4682,7 +4994,7 @@ function viewPrepare() {
     ${live ? notice('', 'Preparation values are read-only during play. Mode, formats, minimum and playing levels are fixed after start. Use the live controls in Overview to manage courts, time, arrivals, requests and payments.') : reqCount(s) ? requestsPanel(s) : ''}
     ${(() => {
       const tab = ['overview', 'roster', 'waitlist', 'payments', ...(live ? [] : ['settings'])].includes(S.ui.prepTab) ? S.ui.prepTab : 'overview';
-      const paidN = Object.keys(s.payments || {}).filter((pid) => R(s, pid)).length;
+      const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length;
       const tabs = [['overview', 'Overview', null], ['roster', 'Roster and levels', `${s.roster.length}/${capacityOf(s)}`], ['waitlist', 'Waitlist', (s.waitlist || []).length], ['payments', 'Payments', `${paidN}/${s.roster.length} paid`], ...(live ? [] : [['settings', 'Settings', null]])];
       return `${tabMenu('dd-prep', live ? 'Session settings section' : 'Preparation section', tabs, tab)}
       <div class="tabs has-dd" role="tablist" aria-label="${live ? 'Session settings' : 'Preparation'}">${tabs.map(([k, l, n]) => `<button role="tab" id="ptb-${k}" aria-selected="${tab === k}" aria-controls="prep-panel" data-act="prepTab" data-k="${k}">${l}${n != null ? ` <span class="chip">${n}</span>` : ''}</button>`).join('')}</div>
@@ -4708,7 +5020,7 @@ function viewConsole() {
   const endSt = endStatus(s);
   return `<main class="wrap">
     <div class="between">
-      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}${recordedOf(s) ? '' : chip('Not recorded', 'warn')}</div>
+      <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}${recordedOf(s) ? '' : chip('Not ranked', 'warn')}</div>
         ${sessTitle(s)}<p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
         ${(() => { const n = reqCount(s), open = S.ui.courtMenu === 'live-more'; return `<div class="row live-acts" style="flex:none;justify-content:flex-end;gap:8px">
           <button class="btn sm${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>
@@ -4730,9 +5042,9 @@ function viewConsole() {
         ['queue', 'Main Queue', waiting(s).length, ' waiting'],
         ['generate', 'Generate Queue', null, ''],
         ['roster', 'Players', `${s.roster.filter((r) => r.present).length}/${s.roster.length}`, ' present'],
-        recordedOf(s) && ['board', 'Leaderboard', lead, ''],
+        ['board', 'Leaderboard', lead, ''],
         // Owner artifact comment, November 19, 2026: "please add Match History".
-        recordedOf(s) && ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
+        ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
         ['settings', 'Settings', null, ''],
       ].filter(Boolean);
       const on = tabs.some(([k]) => k === pane) ? pane : 'live';
@@ -4745,8 +5057,8 @@ function viewConsole() {
       // Owner, November 19, 2026: the Players picker sits under the Main Queue, so matches can be made while watching the queue.
       : pane === 'queue' ? `<section class="stack" aria-label="Main Queue">${queuePane(s)}</section><section class="stack mq-players" aria-label="Players">${playersPane(s)}</section>`
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
-      : pane === 'board' && recordedOf(s) ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
-      : pane === 'history' && recordedOf(s) ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
+      : pane === 'board' ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
+      : pane === 'history' ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
       : pane === 'settings' ? `<section class="stack" aria-label="Settings">${liveSettings(s, sessionEstimate(s), s.roster.filter((r) => r.present).length, true)}${linkCard(s)}</section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
@@ -5182,9 +5494,8 @@ function playersPane(s) {
     <p class="small muted">Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.</p>`;
 }
 function boardPane(s) {
-  if (!recordedOf(s)) return notice('', NOT_RECORDED);
   const st = standings(s);
-  return `<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
+  return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th><th class="n">Win %</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)), lvs = [...new Set(g.rows.map((r) => { const lv = R(s, r.pid); return lvLabel(lv ? lv.level : null); }))]; return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td>
         <td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map((p) => { const r = R(s, p.id); return faceBtn(p).replace('class="face-btn"', `class="face-btn lv-ring lv-${r ? rvBand(r) : 'none'}"`); }).join('')}</span><div style="min-width:0"><b>${tiedNames(ps.map((p) => p.name))}</b><div class="small muted">${esc(lvs.join(', '))}</div></div></div></td>
@@ -5226,7 +5537,6 @@ function restInfo(s, pid) {
 
 // ---------- Results (Q-RESULTS) ----------
 function standings(s) {
-  if (!recordedOf(s)) return [];
   const done = s.matches.filter((m) => m.status === 'done');
   const rows = s.roster.map((r) => {
     let w = 0, l = 0;
@@ -5334,8 +5644,7 @@ function viewResults() {
 // ---------- Q-FINALIZE-PROGRESS ----------
 function viewFinalizing() {
   const st = S.ui.finalStage || 0;
-  // Record games off: nothing goes to player records and there are no slides, so those two steps are not run.
-  const steps = recordedOf(cur()) ? ['Checking session records', 'Finishing the session', 'Updating player records', 'Preparing result slides'] : ['Checking session records', 'Finishing the session'];
+  const steps = ['Checking session records', 'Finishing the session', 'Updating player records', 'Preparing result slides'];
   return `<main class="wrap narrow"><section class="card stack"><h1>Finishing ${esc(cur().title)}</h1>
     <ol class="list" style="list-style:none;padding:0;margin:0">${steps.map((t, k) => `<li class="li"><span style="width:18px;${k < st ? 'color:var(--accent)' : 'color:var(--fg2)'}">${k < st ? I.check : k === st ? '…' : '·'}</span><span class="main ${k <= st ? '' : 'muted'}">${t}</span></li>`).join('')}</ol>
     <p class="small muted" aria-live="polite">${st >= steps.length ? 'Done.' : steps[st] + '…'}</p></section></main>`;
@@ -5360,6 +5669,9 @@ const pubAvatarOf = (p) => (showsFull(p) || (pubSignedIn() && alwaysPrivate(p)) 
 // Signed-in Players can open a participant's profile card. A guest's card says there is no profile yet.
 // The viewer's own tile carries a “You” label (owner request, November 9, 2026).
 const pubTile = (p, cls, title, inner) => { const me = !!p && pubViewer()?.id === p.id; const body = me ? `${inner}<span class="you-tag">You</span>` : inner; cls = me ? `${cls} me` : cls; return pubSignedIn() && p ? `<button type="button" class="${cls} pub-link" data-act="pubProfile" data-id="${esc(p.id)}" ${title} aria-label="${me ? `${esc(p.name)} (you) · view your profile` : `${esc(showsFull(p) ? p.name : maskName(p.name))} · view profile`}">${body}</button>` : `<div class="${cls}" ${title}>${body}</div>`; };
+// Epic #1002 (#1006): the Hosts section of the public page. The same masking, picture and profile-tap rule as the Players tiles;
+// a host who plays is in Players too and counts once toward capacity (hosts are never counted here). Zero hosts: no section.
+const pubHostsHtml = (s) => { const hs = sessionHostPeople(s); return hs.length ? `<section class="stack" aria-label="Hosts"><h3>Hosts · ${hs.length}</h3><ul class="pub-hosts">${hs.map((p) => `<li>${pubTile(p, 'pub-host', '', `${pubAvatarOf(p)}<span class="ph-name">${pubNameHtml(p)}</span>`)}</li>`).join('')}</ul></section>` : ''; };
 // Owner, November 13, 2026: "in the public view of the Queue session, clicking on player avatars should open the profile dialog".
 // For a signed-in player, every face on the page (Courts now, the Queue) opens the same profile card as the Participants tiles. Visitors keep plain faces.
 const pubFace = (p, cls, label, inner) => (pubSignedIn() && p
@@ -5402,7 +5714,6 @@ function pubLeaderboard(s, pub) {
     <p class="small muted">Wins first, then fewer losses. Players with the same wins and losses share a position. Counted games only.</p></section>`;
 }
 function pubHistory(s, pub) {
-  if (!recordedOf(s)) return '<section class="stack" id="pub-history" aria-label="Match history"><h2>Match history</h2><p class="small muted">This session\'s games were not recorded.</p></section>';
   if (!pubSignedIn()) return '<section class="stack" id="pub-history" aria-label="Match history"><h2>Match history</h2><p class="small muted">Log in with ROTRA Player to see the match history.</p></section>';
   // Artifact comment, same day: two tabs, Yours and All, and the count big and green.
   const me = pubViewer()?.id, played = s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').sort((a, b) => b.seq - a.seq);
@@ -5421,7 +5732,7 @@ const playerJoinReq = (s, pid) => (s.requests || []).filter((x) => x.pid === pid
 const openMatchReq = (s, pid) => (s.matchRequests || []).find((x) => x.pid === pid && x.status === 'open') || null;
 const openDropOut = (s, pid) => (s.dropOuts || []).find((x) => x.pid === pid && x.status === 'open') || null;
 // Results the public page may show: the publication, or the proto-bar's published/unpublished override on a finished session.
-const pubResults = (s) => !recordedOf(s) ? null : (S.ui.pubPubOverride === 'hide' ? null : S.ui.pubPubOverride === 'show' ? s.published || { slides: [0, 1], offDay: false, at: s.finalizedAt || Date.now() } : s.published);
+const pubResults = (s) => (S.ui.pubPubOverride === 'hide' ? null : S.ui.pubPubOverride === 'show' ? s.published || { slides: [0, 1], offDay: false, at: s.finalizedAt || Date.now() } : s.published);
 // Prototype audience options for the current session; a stage is offered only when a roster row is in it.
 function pubStageOptions(s) {
   const live = s.status === 'active';
@@ -5527,6 +5838,12 @@ function myNight(s) {
     lines.push(`Confirmed · starts ${fmtDate(s.start)}, ${fmtTime(s.start)}`);
     if (d) lines.push('Told the QM you can\'t make it');
     else acts.push('<button class="btn" data-act="cantMakeIt">I can\'t make it</button>');
+    // #1011: one pending slot transfer per slot; the QM approves or rejects it before the start.
+    const tr = myTransfer(s, v.id), trTo = tr && transferTo(tr);
+    // #1012: a transfer link nobody has claimed yet reads its own line and Cancel link; once claimed it reads like a request.
+    if (tr && tr.link && !tr.to) { lines.push('Transfer link shared · waiting for someone to claim it'); acts.push('<button class="btn" data-act="withdrawTransfer">Cancel link</button>'); }
+    else if (tr) { lines.push(`Transfer to ${esc(trTo ? trTo.name : 'another player')} requested · the QM decides`); acts.push('<button class="btn" data-act="withdrawTransfer">Withdraw request</button>'); }
+    else acts.push('<button class="btn" data-act="openSlotTransfer">Transfer my slot</button>');
   } else if (s.status === 'finalized') {
     lines.push('Session finished'); stats = statBlock(0);
     // Artifact comment, November 13, 2026: no Match history button here; the history is right below on the page.
@@ -5575,7 +5892,8 @@ function viewPublic() {
   const why = (s.cancelReason || '').replace(/[.\s]+$/, '');
   // Artifact comment, November 13, 2026 ("so much white space"): on wide screens the join card and My night move to a
   // side column beside the tabs, instead of everything sitting in one 760px column.
-  const side = `${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
+  // #1012: the transfer link card goes first in the side column.
+  const side = `${transferLinkCard(s)}${s.status === 'cancelled' ? `<section class="card stack join-card">${notice('warn', `<b>This session is cancelled.</b>${why ? ` ${esc(why)}.` : ''}`)}</section>` : joinCard(s)}`.trim();
   // Artifact comment, same day: My night sits right above the tabs, in the main column, at every width.
   const night = s.status === 'cancelled' ? '' : myNight(s);
   return `<div class="proto-bar"><div class="in"><span>${S.ui.guest ? `<b>Session page (prototype).</b> What this person sees after opening your session link.` : '<b>Public page preview.</b> What anyone with the session link sees, no sign-in needed.'}</span><button class="btn xs" data-act="go" data-to="${back}">${I.back} Back to Queue app</button></div>
@@ -5604,11 +5922,12 @@ function viewPublic() {
         ${tile('Scoring', scoringDef(s).label, scoringDef(s).text)}
         ${tile('Minimum', `${s.minimum} games`, 'per player')}
         ${due == null ? '' : tile('Payment', due ? `${peso(due)}` : 'Free', due ? 'per player · paid at the venue' : '')}
-        ${recordedOf(s) ? '' : tile('Results', 'Not recorded', 'No results, standings or awards for this session.')}
+        ${recordedOf(s) ? '' : tile('Rankings', 'Not ranked', "Wins here don't count toward the ROTRA leaderboards or win rate.")}
       </div>
       ${s.notes ? `<div class="card stack tight"><span class="pf-l">Notes</span><p style="margin:0">${esc(s.notes)}</p></div>` : ''}
+      ${due != null && s.roster.length && s.status !== 'cancelled' ? `<div class="card between pay-share-card"><div class="stack tight"><h3 style="margin:0">Payment status</h3><p class="small muted" style="margin:0">Who has paid, who paid part and who still owes, as text you can copy or share.</p></div><button class="btn sm" data-act="openPayShare" data-pub="1" aria-haspopup="dialog">${I.share} Share payment status</button></div>` : ''}
       <p class="small muted">Slots are confirmed by the Queue Master. Last updated ${fmtWhen(S.lastSync, { lower: true })}${S.pending ? '. Recent changes from the venue haven’t synced yet.' : '.'}</p></section>`; })()
-    : tab === 'leaderboard' && pub && pub.slides.includes(0) ? pubLeaderboard(s, pub) : tab === 'leaderboard' ? '' : `<section class="stack">${fullRoster && s.roster.length ? '<p class="small muted">Tap a player to see their profile and stats.</p>' : ''}${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
+    : tab === 'leaderboard' && pub && pub.slides.includes(0) ? pubLeaderboard(s, pub) : tab === 'leaderboard' ? '' : `<section class="stack">${pubHostsHtml(s)}${fullRoster && s.roster.length ? '<p class="small muted">Tap a player to see their profile and stats.</p>' : ''}${s.roster.length ? `<div class="${fullRoster ? '' : 'pub-cap'}"><div class="pgrid pub">${s.roster.map((r) => { const p = P(r.pid); return pubTile(p, `pcard pub lv-${rvBand(r)}`, r.level != null ? `title="${esc(lvLabel(r.level))}"` : '', `${pubAvatarOf(p)}<div style="min-width:0">${pubNameHtml(p)}</div>`); }).join('')}${s.status === 'finalized' ? '' : Array.from({ length: Math.max(0, capacityOf(s) - s.roster.length) }, () => '<div class="pcard pub empty" aria-hidden="true"><span class="avatar"></span><div><b>Open</b></div></div>').join('')}</div>${!fullRoster && s.roster.length > 9 ? `<div class="pub-more ${s.roster.length > 12 ? 'more-d' : ''}"><span class="pm-count">${s.roster.length} players are in</span>${s.acceptReq === false || !['prepared', 'active'].includes(s.status) ? '<span class="pm-text">Full roster is for confirmed participants.</span>' : `<span class="small muted">Full roster is for confirmed participants.</span><button class="btn primary pm-btn" data-act="openJoin">${I.lock} Join to see the full roster</button>`}</div>` : ''}</div>` : '<div class="card empty">Players have not been added yet.</div>'}${(s.waitlist || []).length ? `<h3>Waitlist · ${s.waitlist.length}</h3><div class="pgrid pub wl">${waitOf(s).map((w, i) => { const p = P(w.pid); return pubTile(p, `pcard pub lv-${rvBand(w)}`, w.level != null ? `title="${esc(lvLabel(w.level))}"` : '', `<span class="wl-av">${pubAvatarOf(p)}<i class="wl-n" aria-hidden="true">${i + 1}</i></span><div style="min-width:0"><span class="sr-only">Waitlist number ${i + 1}: </span>${pubNameHtml(p)}</div>`); }).join('')}</div><p class="small muted">Waitlisted players get a slot if one opens, in this order. Ask the Queue Master.</p>` : ''}</section>`}
     ${tab === 'details' && playerSignedIn && s.status === 'active' ? courtsNow(s) : ''}
     ${tab === 'details' && s.status === 'finalized' ? pubHistory(s, pub) : ''}${tab === 'details' && s.status !== 'finalized' ? `<section class="stack" aria-label="Queue"><h2>Queue</h2>${playerSignedIn ? `<p class="small muted">Read-only · Last synced queue</p>${(() => {
         const q = s.matches.filter((m) => m.status === 'waiting').sort((a, b) => a.pos - b.pos);
@@ -5620,7 +5939,7 @@ function viewPublic() {
         return `<div class="pq-first">${tile(q[0], 0)}</div>${q.length > 1 ? `<div class="pq-scroll" tabindex="0" role="region" aria-label="Rest of the queue, #2 onward, scrolls"><div class="pq-grid">${q.slice(1).map((m, i) => tile(m, i + 1)).join('')}</div></div>` : ''}`;
       })()}` : '<p class="small muted">Log in with ROTRA Player to see the queue.</p>'}</section>` : ''}
     ${s.status === 'finalized' && tab === 'details' ? (pub ? (pub.slides.includes(1) || pub.offDay ? pubAwards(s, pub) : '')
-      : recordedOf(s) ? '<section class="card empty">Results for this session have not been shared.</section>' : '') : ''}
+      : '<section class="card empty">Results for this session have not been shared.</section>') : ''}
   </div></main>`;
 }
 
@@ -5866,6 +6185,32 @@ const SHEETS = {
       <p class="small muted">ROTRA only records it; money is collected outside the app.</p>`,
       '<button class="btn" data-act="payAmountCancel">Cancel</button><button class="btn primary" data-act="savePayAmount">Save</button>');
   },
+  // #1010: Share payment status. `pub` = opened from the public page (names masked like the rest of that page).
+  payShare() {
+    const sh = S.ui.sheet, s = cur(), f = sh.f || 'all', g = payShareGroups(s, sh.pub);
+    const n = { all: s.roster.length, paid: g.paid.length, partial: g.partial.length, unpaid: g.unpaid.length };
+    return sheetShell('Share payment status', `<div class="stack">
+      <div class="seg" role="group" aria-label="Show in the text">${[['all', 'All'], ['paid', 'Paid'], ['partial', 'Partial'], ['unpaid', 'Unpaid']].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payShareFilter" data-k="${k}">${l} · ${n[k]}</button>`).join('')}</div>
+      <pre class="pay-share-text" aria-label="Payment status text">${esc(payShareText(s, f, sh.pub))}</pre>
+      <p class="small muted">Collected is the cash received. ROTRA only writes the text; money is collected outside the app.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn" data-act="payShareNative">Share</button>' : ''}<button class="btn primary" data-act="payShareCopy">Copy text</button>`);
+  },
+  // #1013 Slot history: how the slot reached this player, oldest first. Each approved transfer: who gave it to whom, what the giver
+  // paid themselves (the first is the original payer), what was waived, when and by whom it was approved. Read-only and append-only.
+  slotHistory() {
+    const sh = S.ui.sheet, s = cur(), h = slotPay(s, sh.pid), due = duePerHead(s);
+    if (!h || !h.chain.length) return sheetShell('Slot history', '<p class="small muted">This player holds their own slot.</p>', '<button class="btn" data-act="closeSlotHistory">Close</button>');
+    let before = 0;
+    const steps = h.chain.map((t) => { const x = t.pay || { paid: 0, waived: 0 }, own = Math.max(x.paid - before, 0); before = x.paid;
+      return `<li><b>${esc(nm(t.pid))} → ${esc(nm(t.to))}</b><br><span class="small muted">${esc(nm(t.pid))} paid ${peso(own)} · ${x.waived ? `${peso(x.waived)} waived` : 'nothing waived'} · approved ${fmtWhen(t.decidedAt, { lower: true })} by the Queue Master${t.link ? ' · transfer link' : ''}</span></li>`; }).join('');
+    const st = payStatus(h, due);
+    return sheetShell(`Slot history · ${esc(nm(sh.pid))}`, `<div class="stack">
+      <p class="small muted">${esc(nm(sh.pid))} holds this slot through ${h.chain.length} approved transfer${h.chain.length === 1 ? '' : 's'}. ${esc(nm(h.chain[0].pid))} is the original payer. Past transfers are never changed.</p>
+      <ol class="stack tight" style="margin:0;padding-left:20px">${steps}</ol>
+      <dl class="kv"><dt>Cash collected for this slot</dt><dd>${peso(h.amount == null ? due || 0 : h.amount)}</dd><dt>Waived</dt><dd>${peso(h.waived || 0)} · not cash</dd><dt>Status</dt><dd>${payChip(st)}</dd></dl>
+      ${notice('', 'A waived amount is never collected cash. ROTRA moves no money; it only keeps the record.')}</div>`,
+      '<button class="btn" data-act="closeSlotHistory">Close</button>');
+  },
   payments() { return sheetShell('Payments', paymentsPanel(cur()).replace(/^<section class="card stack" id="payments">/, '<section class="stack" id="payments">'), '<button class="btn" data-act="closeSheet">Done</button>', true); },
   postPreview() {
     const smp = postSample();
@@ -5945,6 +6290,8 @@ const SHEETS = {
   },
   sessionQr(sh) {
     const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    // Owner, November 20, 2026 ("my profile pic is not shown"; "there is no share link input with copy too"): the invite card shows the
+    // inviter's own picture, and the sheet has the Invite link copy field under the card.
     // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
     const inv = !club && sh.invite ? P(sh.invite) : null, invRow = inv ? R(s, inv.id) || (s.waitlist || []).find((w) => w.pid === inv.id) : null;
     const invLink = club ? clubInviteLink() : inv ? `${sessionLink(s)}?invite=${invRow.inviteCode}` : sessionLink(s);
@@ -5956,14 +6303,15 @@ const SHEETS = {
     const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
     // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
     const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
-      <div class="qc-top"><span class="qc-club">${mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
+      <div class="qc-top"><span class="qc-club">${inv ? picInner(inv) : mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
       <div class="qc-mid">${club ? `<h3>${esc(S.club.name)} invites you to play</h3><p>Register with ROTRA and join the club</p>` : `<h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}${inv ? `<br>${esc(S.club.name)}` : ''}</p>`}</div>
       <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>${inv && full ? 'Waitlist open' : 'Scan to join'}</b><span class="mono">${esc(invLink)}</span></div>
       <div class="qc-foot">${rotraLogoDark('qc-logo')}</div></div>`;
     return sheetShell(club ? 'Share club invite' : inv ? 'Session invite' : 'Session QR', `<div class="stack" style="align-items:center;text-align:center">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
       ${card}
-      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}</div>`,
+      <p class="small muted">${club ? 'Scanning opens the club registration page.' : 'Scanning opens the public session page.'} ${fmt === 'story' ? 'Story size (9:16) for Facebook and Instagram stories.' : 'Post size (4:5) for Facebook and Instagram feeds.'} ${club ? 'Download the image to share it or print it.' : inv ? 'The Queue Master sees who invited each person who joins through it.' : 'Download the image to share it or print it.'}</p>${club ? '<button class="btn" style="width:100%" data-act="copyClubInvite">Copy invite link</button>' : ''}
+      ${inv ? `<div class="copy-field"><label class="label" for="invite-link">Invite link</label><div class="cf-box"><input id="invite-link" readonly value="${esc(invLink)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="copyInvite" data-v="${esc(invLink)}" aria-label="Copy invite link" title="Copy">${COPY_ICON}</button></div></div>` : ''}</div>`,
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
         : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
   },
@@ -6030,6 +6378,39 @@ const SHEETS = {
       <p class="small muted">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</p>`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="setGamesNext">Next</button>`);
   },
+  // Epic #1002 (#1003): Club settings › Trusted hosts. Picks from saved players not trusted yet; guests and unclaimed players can host too.
+  addTrustedHost(sh) {
+    const q = (sh.q || '').trim().toLowerCase();
+    const list = saved().filter((p) => !isTrustedHost(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
+    return sheetShell('Add trusted host', `<p class="small muted">Pick a saved player your club trusts to host its sessions.</p>
+      <input class="input" id="th-q" type="search" placeholder="Search saved players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search saved players" data-autofocus>
+      ${list.length ? `<div class="list">${list.map((p) => `<div class="li">${avatar(p, 'md')}<div class="main"><b>${esc(p.name)}</b>${p.nick ? `<p class="small muted">“${esc(p.nick)}”</p>` : ''}</div>${identChip(p)}<button class="btn sm" data-act="addTrustedHost" data-id="${p.id}" aria-label="Add ${esc(p.name)} as a trusted host">Add</button></div>`).join('')}</div>` : '<p class="small muted">No saved player matches.</p>'}`,
+      '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+  removeTrustedHost(sh) {
+    const p = P(sh.id);
+    return sheetShell(`Remove ${esc(p.name)} from trusted hosts?`, `<p>${esc(short(p.id))} stays in your saved players. Sessions they already hosted still show them as a host.</p>
+      <p class="small muted">They won't be listed first in the host picker any more${p.identity === 'registered' ? ', and their ROTRA profile stops showing the Host badge for your club' : ''}.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Keep host</button><button class="btn danger" data-act="confirmRemoveTrustedHost" data-id="${p.id}">Remove host</button>`);
+  },
+  // Epic #1002 (#1004): Session setup › Hosts › Add host. Trusted hosts first, then other saved players; hosts already picked are left out.
+  hostPicker(sh) {
+    // Live mode (#1005): the picked hosts are the session's current hosts, not the setup draft's.
+    const d = S.ui.draft, q = (sh.q || '').trim().toLowerCase(), ids = sh.live ? currentHostIds(cur()) : (d && d.hosts) || [];
+    const list = saved().filter((p) => !ids.includes(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q)));
+    const trusted = trustedHosts().map((h) => P(h.pid)).filter((p) => list.includes(p)), others = list.filter((p) => !isTrustedHost(p.id)).sort((a, b) => a.name.localeCompare(b.name));
+    const row = (p, t) => `<button class="opt" data-act="pickHost" data-id="${p.id}" aria-label="${t ? `Add ${esc(p.name)} as a host` : `Add ${esc(p.name)} as a host and a trusted host`}">${avatar(p)}<div class="main"><b>${esc(p.name)}</b>${p.nick ? `<div class="small muted">“${esc(p.nick)}”</div>` : ''}</div>${t ? chip('Trusted host', 'ok') : identChip(p)}</button>`;
+    return sheetShell('Add host', `<input class="input" id="hp-q" type="search" placeholder="Search saved players by name" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" aria-label="Search saved players" data-autofocus>
+      <div class="stack tight"><span class="label">Trusted hosts</span>${trusted.length ? `<div class="sel-list">${trusted.map((p) => row(p, true)).join('')}</div>` : `<p class="small muted">${trustedHosts().length ? 'No trusted host left to pick.' : 'No trusted hosts yet.'}</p>`}</div>
+      <div class="stack tight"><span class="label">Other saved players</span>${others.length ? `<div class="sel-list">${others.map((p) => row(p, false)).join('')}</div><p class="small muted">Picking one asks first: it adds them to your club's trusted hosts.</p>` : '<p class="small muted">No saved player matches.</p>'}</div>`,
+      '<button class="btn" data-act="closeSheet">Done</button>');
+  },
+  confirmHostTrust(sh) {
+    const p = P(sh.id);
+    return sheetShell(`Add ${esc(p.name)} as a trusted host?`, `<p>This permanently adds ${esc(short(p.id))} to your club's trusted hosts, so they're listed first in the host picker from now on. You can remove them later in Club settings › Trusted hosts.</p>
+      <p class="small muted">They host this session and are registered as a player unless they're already in. Hosting doesn't let them sign in to Queue.</p>`,
+      `<button class="btn" data-act="openHostPicker" ${sh.live ? 'data-live="1" ' : ''}data-autofocus>Back</button><button class="btn primary" data-act="confirmHostTrust" data-id="${p.id}">Add trusted host</button>`);
+  },
   regenClubInvite() {
     return sheetShell('Regenerate the club invite link?', '<p>The old link and every image with its QR stop working. People who already joined keep their place.</p>',
       '<button class="btn" data-act="closeSheet" data-autofocus>Cancel</button><button class="btn primary" data-act="regenClubInvite">Regenerate</button>');
@@ -6078,7 +6459,7 @@ const SHEETS = {
   profile(sh) {
     const p = P(sh.id);
     const city = regCity(p);
-    const status = { registered: 'Registered ROTRA player', unclaimed: needsEmail(p) ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet' : 'Saved by your club with their email. Not registered with ROTRA yet', guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
+    const status = { registered: 'Registered ROTRA player', unclaimed: needsEmail(p) ? 'Saved by your club with a phone and no email. Not registered with ROTRA yet' : (p.email ? 'Saved by your club with their email. Not registered with ROTRA yet' : 'Saved by your club with a social link. Not registered with ROTRA yet'), guest: 'Guest, no ROTRA profile', pending: 'Profile lookup after the session syncs' }[p.identity];
     // Owner comment, November 11, 2026: the same banner profile card as the participant profile, with the club-private rows below.
     const s = cur(), r = s ? R(s, p.id) : null;
     const a = r ? busyOf(s, p.id) : null, qi = r ? waiting(s).findIndex((m) => all(m).includes(p.id)) : -1;
@@ -6328,7 +6709,7 @@ const SHEETS = {
     // A guest's link is their own too: registering through it claims this record (D-2026-11-18-07).
     const link = playerInviteLink(p);
     return sheetShell(claim ? `Invite ${esc(p.name)} to claim their profile` : `Invite ${esc(p.name)} to ROTRA`, `
-      <p>${claim ? 'Your club saved them with their email. This link lets them turn that record into a ROTRA account' : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
+      <p>${claim ? `Your club saved them with ${p.email ? 'their email' : 'a social link'}. This link lets them turn that record into a ROTRA account` : 'This link lets them create a ROTRA account'} with their phone and email, so their games and rank follow them to every club.</p>
       ${S.online ? `<div class="field"><span>Invite link</span><div class="invite-link"><input class="input" id="invite-link" readonly value="${link}" aria-label="Invite link"><button class="btn sm primary" data-act="copyInvite" data-v="${link}">Copy link</button></div><span class="hint">Send it any way you like, such as Messenger or SMS. Works once and lasts 7 days. Opening Invite again makes a new link and cancels this one. Sample link in this prototype.</span></div>`
         : notice('warn', 'Making an invite link needs an internet connection.')}
       <p class="small muted">${claim ? '' : 'This record becomes theirs when they register: their games here stay with them. '}The link only sets up their account. It doesn't book them into a session; you still add players to each session yourself.</p>`,
@@ -6437,19 +6818,23 @@ const SHEETS = {
     } else if (tab === 'global') {
       // D-2026-11-16-04: exact RTR ID or exact email only. No name search here.
       const key = (sh.q || '').trim().toLowerCase();
-      const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key;
+      const sk = socialKey(key)?.key;
+      const hit = (x) => (x.rtr || '').toLowerCase() === key || (x.email || '').toLowerCase() === key || (!!sk && x.identity === 'unclaimed' && socialKeys(x).includes(sk));
       const mine = key ? saved().find((x) => hit(x) || DIRECTORY.some((g) => hit(g) && g.rtr === x.rtr)) : null;
       const list = key && !mine ? DIRECTORY.filter(hit) : [];
-      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email now; ROTRA looks them up after you reconnect.')
-        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID or email" data-autofocus><span class="hint">Enter the full RTR ID or email. Names are searched in your saved players only.</span></label>
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID or email.' : 'Enter an RTR ID or email to find a ROTRA player.'}</div>`}</div>
+      body += !S.online ? notice('warn', 'Player Information search needs internet. Add them as a new player with their email or social link now; ROTRA looks them up after you reconnect.')
+        : `<label class="field"><span>Search Player Information</span><input class="input" id="add-gq" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Full RTR ID, email or social link" data-autofocus><span class="hint">Enter the full RTR ID, email or social link. Names are searched in your saved players only.</span></label>
+        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}" data-dir="1">${avatar(p.name ? p : NO_NAME)}<div class="main"><b>${p.name ? esc(p.name) : 'Not registered yet'}</b><div class="small muted"><span class="mono">${esc(p.rtr)}</span>${p.rank ? ` · ${esc(p.rank)}` : ''}</div></div>${identChip(p)}</button>`).join('') || `<div class="empty">${mine ? `${esc(mine.name)} is already in your saved players.` : key ? 'No ROTRA player has that RTR ID, email or social link.' : 'Enter an RTR ID, email or social link to find a ROTRA player.'}</div>`}</div>
         <p class="small muted">Confirm with the player before adding them.</p>
-        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112 or ivan.delarosa@example.com.</p>`;
+        <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com or facebook.com/jun.bautista.</p>`;
     } else {
-      body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
+      body += `${club ? newPicEditor(sh) : ''}<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
         ${genderField('add-gender', 'sheet', sh.gender)}
-        <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Without an email they're saved as a guest. With one they're saved as an unclaimed player and get an RTR ID. If the email is already on ROTRA, they're linked to that player. Never shown publicly.</span></label>
+        <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Never shown publicly. If the email is already on ROTRA, they're linked to that player.</span></label>
+        <label class="field"><span>Social link (optional)</span><input class="input${sh.err && sh.errK === 'social' ? ' bad' : ''}" id="add-social" type="url" inputmode="url" data-bind="ui.sheet.social" value="${esc(sh.social || '')}" placeholder="https://facebook.com/yourname"><span class="hint">Facebook, Instagram, YouTube or LinkedIn. Shown on their profile. If the link is already an unclaimed player on ROTRA, they're linked to that player.</span></label>
+        <p class="small muted">With an email or a social link they're saved as an unclaimed player and get an RTR ID. With neither, they're saved as a guest.</p>
+        <label class="field"><span>Phone (optional)</span><input class="input${sh.err && sh.errK === 'phone' ? ' bad' : ''}" id="add-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" placeholder="0917 555 0142"><span class="hint">Kept private. Only your club sees it. Saved with an email or a social link; a guest has no phone.</span></label>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
       return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
@@ -6460,7 +6845,7 @@ const SHEETS = {
     const s = cur(), now = Date.now(), late = startNeedsEnd(s, now);
     const endPicker = late ? `${notice('warn', `This session was planned for ${plannedFor(s)}. Set a new end time to start.`)}
       ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'st-end', value: sh.endAt, days: daysBetween(now, now + 864e5), base: dayStart(now), ok: (t) => t > now && t <= now + 864e5, set: (t) => { sh.endAt = t; }, autofocus: true })}` : '';
-    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Levels</dt><dd>${restrictText(s)}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · no results kept'}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
+    return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Levels</dt><dd>${restrictText(s)}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · not ranked'}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
       ${notice('', "Every player's level locks now. Players you add later get a level when you add them, and it locks too.")}
       ${!S.online ? notice('warn', 'Starting needs an internet connection.') : ''}`,
       `<button class="btn" data-act="closeSheet">Back</button><button class="btn primary" data-act="confirmStart" ${!S.online || (late && !(sh.endAt > now)) ? 'disabled' : ''}>Start session</button>`);
@@ -6569,9 +6954,6 @@ const SHEETS = {
     const s = cur();
     const m = s.matches.find((x) => x.id === sh.id);
     const sc = scoringDef(s), T = sc.target, nmT = (x) => esc(listNames(x === 'A' ? m.teamA : m.teamB));
-    if (!recordedOf(s)) return sheetShell(`Finish match ${m.seq}?`, `<p>Games aren't recorded in this session, so no result is entered. The game still counts toward each player's games.</p>
-        <dl class="kv"><dt>Team A</dt><dd>${nmT('A')}</dd><dt>Team B</dt><dd>${nmT('B')}</dd></dl>`,
-        '<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="confirmUnrecorded" data-autofocus>Match done</button>');
     if (sh.step === 'review') {
       const r = sh.res, w = r.winner, p = scoreParts(r, false);
       return sheetShell('Confirm match result', `
@@ -6665,12 +7047,59 @@ const SHEETS = {
       <p class="small muted">Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards.</p>`,
       '<button class="btn" data-act="closeSheet">Keep queue</button><button class="btn danger fill" data-act="confirmClearQueue">Clear queue</button>');
   },
+  // #1011 Transfer my slot: the full RTR ID of another registered ROTRA player, Find, check the name, then Send transfer request.
+  slotTransfer(sh) {
+    const s = cur(), f = sh.found;
+    const found = f ? `<div class="li" style="padding:10px;border:1px solid var(--border);border-radius:10px">${avatar(P(f.id) || { id: f.id, name: f.name, identity: 'registered' })}<div class="main"><b>${esc(f.name)}</b><div class="small muted mono">${esc(f.rtr)}</div><p class="small muted">${f.wl ? `On the waitlist #${f.wl} · leaves the waitlist if approved` : 'Not in this session yet'}</p></div></div>` : '';
+    return sheetShell('Transfer my slot', `<p class="small muted">Give your slot to another ROTRA player. The Queue Master approves it before the session starts (${fmtDate(s.start)}, ${fmtTime(s.start)}); until then you keep your slot. Requests still waiting at the start close.</p>
+      <label class="field"><span>Their RTR ID</span><input class="input mono${sh.err ? ' bad' : ''}" id="st-rtr" data-bind="ui.sheet.q" value="${esc(sh.q || '')}" placeholder="RTR-PH-CEB-102926-0001" autocomplete="off" autocapitalize="characters" spellcheck="false" data-autofocus>${sh.err ? `<span class="err">${esc(sh.err)}</span>` : '<span class="hint">Ask them for the RTR ID on their ROTRA profile.</span>'}</label>
+      <button class="btn" data-act="findTransfer">Find</button>${found}
+      <div class="stack tight" style="border-top:1px solid var(--border);padding-top:14px"><b style="font-size:14px">No ROTRA account yet?</b><p class="small muted">Make a transfer link instead. They sign up or log in with it, and the first person to claim it gets your slot once the Queue Master approves. It stops working at the start.</p><button class="btn" data-act="createTransferLink">Create a transfer link</button></div>`,
+      `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="sendTransfer" ${f ? '' : 'disabled'}>Send transfer request</button>`);
+  },
+  // #1012 Transfer link: shown once, right after it is made (the real app stores only the token's digest). QR, copy field, Share.
+  transferLink(sh) {
+    const s = cur(), t = (s.transfers || []).find((x) => x.id === sh.id); if (!t) return sheetShell('Transfer link', '<p class="small muted">This link is closed.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const link = transferLinkUrl(s, t);
+    // Static placeholder QR (finder squares + sample modules), like the Session QR; the real app encodes the link.
+    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
+    const dots = [[9,1],[12,3],[10,5],[13,7],[1,9],[4,10],[8,9],[11,11],[15,9],[18,10],[2,13],[9,14],[12,16],[16,13],[19,15],[14,19],[10,19],[17,18]];
+    const qr = `<div style="width:min(220px,100%);aspect-ratio:1;align-self:center;background:#fff;border-radius:16px;padding:14px"><svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the transfer link" style="display:block;width:100%;height:100%">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg></div>`;
+    return sheetShell('Transfer link', `<div class="stack">
+      <p class="small muted">Send this link to the player who'll take your slot. They sign up or log in to ROTRA, then claim it. Only the first person to claim it can; the Queue Master still approves, and you keep your slot until then.</p>
+      ${qr}
+      <div class="copy-field"><label class="label" for="transfer-link">Transfer link</label><div class="cf-box"><input id="transfer-link" readonly value="${esc(link)}" onfocus="this.select()"><button type="button" class="cf-btn" data-act="copyTransferLink" data-v="${esc(link)}" aria-label="Copy transfer link" title="Copy">${COPY_ICON}</button></div></div>
+      <p class="small muted">It stops working at the start (${fmtDate(s.start)}, ${fmtTime(s.start)}), or if the Queue Master rejects the claim or it is withdrawn; then make a new one. ROTRA shows this link only once: if you lose it, cancel it on My night and make a new one.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? `<button class="btn primary" data-act="shareTransferLink" data-v="${esc(link)}">Share</button>` : `<button class="btn primary" data-act="copyTransferLink" data-v="${esc(link)}">Copy link</button>`}`);
+  },
+  // #1014 D-REJECT-REFUND: the whole cash collected for the slot (never a waiver), what happens to the sender's registration and who
+  // gets the freed slot (the first waitlisted player with a level, FIFO). ROTRA only records the refund.
+  rejectRefund(sh) {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === sh.id);
+    if (!t) return sheetShell('Reject and refund', '<p class="small muted">This transfer was already decided.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    const to = transferTo(t) || { name: 'the recipient' }, amount = slotCash(s, t.pid), w = firstWaiter(s), h = slotPay(s, t.pid);
+    return sheetShell('Reject and refund?', `<p><b>${esc(nm(t.pid))}</b> asked to transfer their slot to ${esc(to.name)}.</p>
+      <div class="card stack tight"><span class="label">Refund to hand back</span><b class="big tnum">${peso(amount)}</b><span class="small muted">The whole amount collected for this slot${h && h.waived ? ` (the ${peso(h.waived)} waived is not cash and is not refunded)` : ''}. Full refunds only.</span></div>
+      <p>Hand ${peso(amount)} back to ${esc(nm(t.pid))} outside ROTRA. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">${esc(nm(t.pid))}'s registration is cancelled and the slot opens. ${w ? `${esc(nm(w.pid))}, first on the waitlist, gets it.` : 'Nobody is waiting, so the slot stays open.'} ${esc(to.name)} doesn't get the slot. The payment and the refund both stay in the record.</p>
+      ${notice('bad', "This can't be undone.")}`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn danger" data-act="confirmRejectRefund" data-id="${t.id}">Reject and refund</button>`);
+  },
+  // #1014 D-SESSION-REFUND: record one manual refund on a cancelled session's Refund everyone who paid list.
+  sessionRefund(sh) {
+    const s = cur(), amount = slotCash(s, sh.pid);
+    if (refundOf(s, sh.pid) || amount <= 0) return sheetShell('Record refund', '<p class="small muted">This refund is already recorded.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
+    return sheetShell('Record refund?', `<p><b>${esc(nm(sh.pid))}</b> · ${peso(amount)}</p>
+      <p>Hand ${peso(amount)} back to ${esc(nm(sh.pid))} outside ROTRA, then record it here. ROTRA only records the refund; it moves no money.</p>
+      <p class="small muted">Full refund of the cash collected. The payment and the refund both stay in the record.</p>`,
+      `<button class="btn" data-act="closeSheet" data-autofocus>Back</button><button class="btn primary" data-act="confirmSessionRefund" data-pid="${esc(sh.pid)}">Record refund</button>`);
+  },
   cancelSession(sh) {
-    const s = cur(), pay = s.payments || {};
-    const paidN = s.roster.filter((r) => pay[r.pid]).length, wl = (s.waitlist || []).length;
+    const s = cur();
+    const paidN = s.roster.filter((r) => slotPay(s, r.pid)).length, wl = (s.waitlist || []).length;
     return sheetShell(`Cancel ${esc(s.title)}?`, `<p>${fmtDate(s.start)} · ${fmtRange(s.start, s.end)}</p>
       <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} joined · ${wl} on the waitlist</p>
-      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. Refunds happen outside ROTRA.`) : ''}
+      ${paidN ? notice('warn', `${paidN} player${paidN === 1 ? ' is' : 's are'} marked paid. After you cancel, the session record lists who to refund and how much. Refund them outside ROTRA, then record each refund.`) : ''}
       <label class="field"><span>Reason (optional)</span><input class="input" id="cancel-reason" data-bind="ui.sheet.reason" value="${esc(sh.reason || '')}" maxlength="120" autocomplete="off"></label>
       ${notice('bad', "This can't be undone. To play anyway, create a new session.")}`,
       '<button class="btn" data-act="closeSheet" data-autofocus>Keep session</button><button class="btn danger" data-act="confirmCancelSession">Cancel session</button>');
@@ -7051,6 +7480,41 @@ const ACT = {
   openClubInvite: () => openSheet({ type: 'sessionQr', kind: 'club', fmt: 'post' }),
   copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
+  openAddTrustedHost: () => openSheet({ type: 'addTrustedHost', q: '' }),
+  // Epic #1002 (#1004): Session setup › Hosts. A non-trusted saved player needs the confirmation, which adds them to the trusted hosts.
+  openHostPicker: (d) => openSheet({ type: 'hostPicker', q: '', live: !!(d && d.live) }),
+  pickHost: (d) => {
+    const live = !!(S.ui.sheet && S.ui.sheet.live), p = P(d.id);
+    // Epic #1002 (#1005): during or before the session (Q-PREPARE Hosts card). A non-trusted saved player needs the same confirmation.
+    if (live) {
+      if (!p || p.removed) return;
+      if (!isTrustedHost(p.id)) { openSheet({ type: 'confirmHostTrust', id: p.id, live: true }); return; }
+      S.ui.sheet = null; if (!addLiveHost(p.id)) save(); render(); return;
+    }
+    const dr = S.ui.draft; if (!dr || !p || p.removed || (dr.hosts || []).includes(p.id)) return;
+    if (!isTrustedHost(p.id)) { openSheet({ type: 'confirmHostTrust', id: p.id }); return; }
+    (dr.hosts = dr.hosts || []).push(p.id); S.ui.sheet = null; render(); toast(`${p.name} added as a host`);
+  },
+  confirmHostTrust: (d) => {
+    if (S.ui.sheet && S.ui.sheet.live) {
+      const p = P(d.id); if (!p || p.removed) return;
+      // The level check comes first, so a refused host is not added to the trusted hosts.
+      const s = cur(); if (s.status === 'active' && !R(s, p.id) && !(s.waitlist || []).some((w) => w.pid === p.id) && p.sugg == null) { S.ui.sheet = null; render(); toast(`${p.name} has no saved level. Add them as a player with a level first, then add them as a host.`); return; }
+      if (!isTrustedHost(p.id)) (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() });
+      S.ui.sheet = null; addLiveHost(p.id); render(); return;
+    }
+    const dr = S.ui.draft, p = P(d.id); if (!dr || !p || p.removed) return;
+    if (!isTrustedHost(p.id)) (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() });
+    if (!(dr.hosts || []).includes(p.id)) (dr.hosts = dr.hosts || []).push(p.id);
+    S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts and as a host`);
+  },
+  // Epic #1002 (#1005): ends the host row only; the player keeps their slot or waitlist place and stays a trusted host.
+  removeSessionHost: (d) => { const s = cur(), row = ((s && s.hosts) || []).find((h) => h.pid === d.id && !h.removed); if (!row) return; row.removed = Date.now(); commit(`${nm(d.id)} removed as a host`); render(); },
+  removeDraftHost: (d) => { const dr = S.ui.draft; if (!dr) return; dr.hosts = (dr.hosts || []).filter((x) => x !== d.id); render(); toast(`${nm(d.id)} removed as a host`); },
+  addTrustedHost: (d) => { const p = P(d.id); if (!p || p.removed || isTrustedHost(p.id)) return; (S.club.trustedHosts = S.club.trustedHosts || []).push({ pid: p.id, added: Date.now() }); S.ui.sheet = null; save(); render(); toast(`${p.name} added to trusted hosts`); },
+  openRemoveTrustedHost: (d) => openSheet({ type: 'removeTrustedHost', id: d.id }),
+  // Soft: the entry keeps its dates (history); the saved player and past session hosts are untouched.
+  confirmRemoveTrustedHost: (d) => { const p = P(d.id); (S.club.trustedHosts || []).forEach((h) => { if (h.pid === d.id && !h.removed) h.removed = Date.now(); }); S.ui.sheet = null; save(); render(); toast(`${p.name} removed from trusted hosts`); },
   regenClubInvite: () => { S.club.inviteCode = Array.from({ length: 8 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join(''); save(); closeSheet(); render(); toast('Club invite link regenerated'); },
   // D-2026-11-09-10: only the current and previous logo are kept.
   useLogoPrev: () => { const c = S.club.logo; S.club.logo = S.club.logoPrev; S.club.logoPrev = c || null; save(); render(); toast('Previous logo restored'); },
@@ -7108,6 +7572,58 @@ const ACT = {
   // D-2026-11-09-03: self check-in, I'm leaving, I can't make it. All write to the roster; the QM's last action wins.
   imHere: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = true; r.presentAt = Date.now(); r.selfCheckedIn = true; r.selfCheckedInAt = Date.now(); r.selfLeft = false; if (!S.online) S.pending += 1; save(); render(); toast(S.online ? 'Checked in' : 'Checked in · the QM will see it when their device syncs'); },
   imLeaving: () => { const s = cur(), r = R(s, pubViewer()?.id); if (!r) return; r.present = false; r.selfLeft = true; r.leftAt = Date.now(); const mr = openMatchReq(s, r.pid); if (mr) mr.status = 'closed'; if (!S.online) S.pending += 1; save(); render(); toast('Told the QM you\'re leaving'); },
+  // #1011 Transfer my slot (signed-in confirmed player, before the start only).
+  openSlotTransfer: () => { const s = cur(), v = pubViewer(); if (!v || s.status !== 'prepared' || !R(s, v.id) || myTransfer(s, v.id)) return; openSheet({ type: 'slotTransfer', q: '', found: null, err: '' }); },
+  findTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const q = (sh.q || '').trim().toUpperCase(); sh.q = q; sh.found = null; sh.err = '';
+    if (!RTR_SHAPE.test(q)) sh.err = 'Enter the full RTR ID, like RTR-PH-CEB-102926-0001.';
+    else {
+      const f = transferRecipient(q);
+      if (!f) sh.err = 'No registered ROTRA player has that RTR ID.';
+      else if (f.id === v.id) sh.err = 'That\'s your own RTR ID.';
+      else if (R(s, f.id)) sh.err = `${f.name} already has a slot in this session.`;
+      else sh.found = { ...f, wl: waitOf(s).findIndex((w) => w.pid === f.id) + 1 };
+    }
+    render();
+  },
+  sendTransfer: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    const f = sh.found;
+    if (!f || f.rtr !== (sh.q || '').trim().toUpperCase()) { sh.found = null; sh.err = 'Tap Find to check the RTR ID first.'; render(); return; }
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    s.transfers = [...(s.transfers || []), { id: `t${Date.now()}`, pid: v.id, to: f.id, at: Date.now(), status: 'pending' }];
+    S.ui.sheet = null; save(); render(); toast(`Transfer to ${f.name} sent · the QM decides`);
+  },
+  withdrawTransfer: () => { const s = cur(), v = pubViewer(), t = v && myTransfer(s, v.id); if (!t) return; const unclaimed = t.link && !t.to; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast(unclaimed ? 'Transfer link cancelled' : 'Transfer request withdrawn'); },
+  // #1012 Create a transfer link (sender). One pending transfer per slot, so a link and an RTR ID request never coexist.
+  createTransferLink: () => {
+    const s = cur(), v = pubViewer(), sh = S.ui.sheet; if (!sh || sh.type !== 'slotTransfer' || !v) return;
+    if (s.status !== 'prepared') { sh.err = 'The session has started. Slot transfers close at the start.'; render(); return; }
+    if (myTransfer(s, v.id)) { S.ui.sheet = null; render(); toast('Your transfer request is already sent.'); return; }
+    const t = { id: `t${Date.now()}`, pid: v.id, to: null, link: newLinkToken(), at: Date.now(), status: 'pending' };
+    s.transfers = [...(s.transfers || []), t];
+    save(); openSheet({ type: 'transferLink', id: t.id }); toast('Transfer link ready · share it with the new player');
+  },
+  copyTransferLink: (d) => {
+    const done = () => toast('Transfer link copied');
+    try { navigator.clipboard.writeText(d.v).then(done, () => { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }); }
+    catch (e) { const i = document.getElementById('transfer-link'); if (i) i.select(); toast('Select the link and copy it'); }
+  },
+  shareTransferLink: (d) => { try { navigator.share({ title: 'Take my slot on ROTRA', url: d.v }).catch(() => {}); } catch (e) { /* share unavailable */ } },
+  // #1012 claimant side. Prototype only: Sign up / Log in signs in as a registered player who is not in this session (the real
+  // app uses the session link's registration, so identity and RTR ID work like any session link).
+  linkSignUp: (d) => { setPubAs('newplayer'); toast(d.k === 'login' ? 'Prototype: logged in through the transfer link' : 'Prototype: signed up through the transfer link'); },
+  claimTransferLink: () => {
+    const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t) return;
+    const st = linkState(s, t, v.id);
+    if (st !== 'open') { render(); toast(st === 'claimed' ? 'Someone else already claimed this transfer link.' : 'This transfer link no longer works. Ask the sender for a new link.'); return; }
+    if (R(s, v.id)) { toast('You already have a slot in this session, so you can\'t claim this one.'); return; }
+    // First claimant wins: the real app claims with one conditional update on the locked rows.
+    t.to = v.id; t.claimedAt = Date.now(); save(); render(); toast('Slot claimed · the QM decides');
+  },
+  withdrawTransferClaim: () => { const s = cur(), v = pubViewer(), t = linkTransfer(s, S.ui.trLink); if (!v || !t || linkState(s, t, v.id) !== 'yours') return; t.status = 'withdrawn'; t.decidedAt = Date.now(); t.withdrawnBy = v.id; save(); render(); toast('Claim withdrawn · this link no longer works'); },
   cantMakeIt: () => { const s = cur(), v = pubViewer(); if (!v || openDropOut(s, v.id)) return; s.dropOuts = [...(s.dropOuts || []), { id: `d${Date.now()}`, pid: v.id, at: Date.now(), status: 'open' }]; save(); render(); toast('Told the QM you can\'t make it'); },
   // D-2026-11-09-05, player side: Request a match.
   openMatchReq: () => { const s = cur(), a = reqAllowed(s); if (!REQ_FORMATS.some((k) => a[k])) { toast('This session isn\'t taking match requests'); return; } openSheet({ type: 'matchReq', format: REQ_FORMATS.find((k) => a[k]), partners: [], opp: [] }); },
@@ -7198,6 +7714,50 @@ const ACT = {
   // D-2026-11-09-03: drop-out notices. The slot never frees by itself.
   keepDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'kept'; x.closedAt = Date.now(); commit(`${nm(x.pid)} stays on the roster`); render(); },
   removeDropOut: (d) => { const s = cur(), x = (s.dropOuts || []).find((y) => y.id === d.id); if (!x) return; x.status = 'closed'; x.decision = 'removed'; x.closedAt = Date.now(); s.roster = s.roster.filter((r) => r.pid !== x.pid); commit(`${nm(x.pid)} removed from the roster`); render(); },
+  // #1011, QM side: Approve hands the slot over in one change (the recipient takes the sender's place in slot order; a waitlisted
+  // recipient leaves the waitlist; the slot count never changes). Reject leaves the sender's slot and payment exactly as they were.
+  approveTransfer: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return;
+    const to = transferTo(t), wl = waitOf(s).find((w) => w.pid === t.to);
+    const lv = t.level ?? wl?.level ?? to?.sugg ?? null;
+    if (lv == null) { t.err = 'Choose a level for this club before approving.'; render(); const f = document.getElementById(`tr-lv-${t.id}`); if (f) f.focus(); return; }
+    if (R(s, t.to)) { t.err = `${to.name} already has a slot in this session.`; render(); return; }
+    const g = DIRECTORY.find((x) => x.id === t.to);
+    if (!P(t.to) && g) S.players.push({ id: g.id, name: g.name, nick: '', identity: 'registered', rtr: g.rtr, sugg: g.sugg ?? null, prior: 0, base: null, added: Date.now(), joinedVia: 'session' });
+    const i = s.roster.findIndex((r) => r.pid === t.pid), sender = nm(t.pid);
+    s.roster.splice(i, 1, { pid: t.to, level: +lv, present: false, locked: false, presentAt: Date.now() });
+    s.waitlist = (s.waitlist || []).filter((w) => w.pid !== t.to);
+    (s.requests || []).forEach((r) => { if (r.status === 'pending' && (r.pid === t.to || (to?.rtr && r.account === to.rtr))) r.status = 'closed'; });
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    // #1013: the money snapshot is taken before the slot changes hands; no payment is written or changed.
+    t.pay = transferPay(s, t);
+    t.status = 'approved'; t.decidedAt = Date.now(); t.level = +lv; t.fromWaitlist = !!wl; t.err = '';
+    commit(`${sender}'s slot now belongs to ${to.name}${t.pay.waived ? ` · ${peso(t.pay.waived)} waived` : ''}`); render();
+  },
+  // #1014 Reject and refund: the transfer is rejected, a full refund of the slot's cash is recorded (append-only; the payment stays
+  // as recorded), the sender's registration is cancelled and the first waitlisted player with a level takes the slot (FIFO).
+  openRejectRefund: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t || slotCash(s, t.pid) <= 0) return; openSheet({ type: 'rejectRefund', id: t.id }); },
+  confirmRejectRefund: (d) => {
+    const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) { closeSheet(); return; }
+    const amount = slotCash(s, t.pid), sender = nm(t.pid);
+    if (amount <= 0 || refundOf(s, t.pid)) { closeSheet(); toast('Nothing was paid for this slot, so there is nothing to refund. Use Reject instead.'); return; }
+    t.status = 'rejected'; t.decidedAt = Date.now();
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: t.pid, amount, at: Date.now(), reason: 'transfer', transferId: t.id }];
+    s.roster = s.roster.filter((r) => r.pid !== t.pid);
+    (s.dropOuts || []).forEach((x) => { if (x.pid === t.pid && x.status === 'open') { x.status = 'closed'; x.closedAt = Date.now(); } });
+    const w = firstWaiter(s);
+    if (w) { s.waitlist = s.waitlist.filter((x) => x !== w); s.roster.push({ pid: w.pid, level: w.level, present: false, locked: false, presentAt: Date.now() }); }
+    S.ui.sheet = null; commit(`Transfer rejected · ${peso(amount)} refund recorded for ${sender}${w ? ` · ${nm(w.pid)} got the slot from the waitlist` : ' · the slot is open'}`); render();
+  },
+  openSessionRefund: (d) => { const s = cur(); if (s.status !== 'cancelled' || refundOf(s, d.pid) || slotCash(s, d.pid) <= 0) return; openSheet({ type: 'sessionRefund', pid: d.pid }); },
+  confirmSessionRefund: (d) => {
+    const s = cur(); if (!s || s.status !== 'cancelled' || !S.online) { closeSheet(); return; }
+    const amount = slotCash(s, d.pid);
+    if (refundOf(s, d.pid) || amount <= 0) { closeSheet(); return; }
+    s.refunds = [...(s.refunds || []), { id: `rf${Date.now()}`, pid: d.pid, amount, at: Date.now(), reason: 'cancelled' }];
+    S.ui.sheet = null; commit(`Refund recorded · ${peso(amount)} to ${nm(d.pid)}`); render();
+  },
+  rejectTransfer: (d) => { const s = cur(), t = pendingTransfers(s).find((x) => x.id === d.id); if (!t) return; t.status = 'rejected'; t.decidedAt = Date.now(); commit(`Transfer rejected · ${nm(t.pid)} keeps the slot`); render(); },
   // D-2026-11-09-05, QM side: Add to queue makes a waiting match at the end of the Main Queue, filling Anyone spots with the present players who have the fewest games.
   addMatchReq: (d) => {
     const s = cur(), mr = openMatchReqs(s).find((x) => x.id === d.id); if (!mr) return;
@@ -7234,6 +7794,8 @@ const ACT = {
     s.status = 'cancelled'; s.cancelledAt = Date.now(); s.cancelReason = reason || null;
     // Join requests close with the session; the record keeps them as closed.
     (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
+    // #1011: pending slot transfers are cancelled with the session.
+    closeTransfers(s, 'cancelled');
     S.ui.sheet = null; commit(`${s.title} cancelled`); go('history', s.id);
   },
   peekSession: (d) => openSheet({ type: 'peek', id: d.id }),
@@ -7375,6 +7937,8 @@ const ACT = {
     openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', gender: p.gender || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });
   },
   // Club-set picture for a guest or unclaimed profile: applies at once, like the club logo (D-2026-11-09-10).
+  newPicChar: (d) => { S.ui.sheet.pic = { kind: 'char', seed: +d.k }; render(); },
+  newPicRemove: () => { S.ui.sheet.pic = null; render(); },
   picChar: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = { kind: 'char', seed: +d.k }; commit(`Picture updated · ${p.name}`); render(); },
   picRemove: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = null; commit(`Using initials · ${p.name}`); render(); },
   picUsePrev: (d) => { const p = P(d.id); if (!p || !p.picPrev) return; const c = picOf(p); p.pic = p.picPrev; p.picPrev = c && c.kind === 'photo' ? c : null; commit(`Previous picture restored · ${p.name}`); render(); },
@@ -7385,11 +7949,16 @@ const ACT = {
     if (d.phone.trim() && !/^(09\d{9}|639\d{9})$/.test(digits)) err.phone = 'Enter a Philippine mobile number, like 0917 555 0142.';
     const email = p.email ? '' : d.email.trim();
     if (email && !emailOk(email)) err.email = 'Enter an email address, like name@example.com.';
+    for (const k of ['facebook', 'instagram', 'youtube', 'linkedin']) if (d[k].trim() && socialKey(d[k])?.kind !== k) err[k] = `Enter a ${k === 'youtube' ? 'YouTube' : k === 'linkedin' ? 'LinkedIn' : k[0].toUpperCase() + k.slice(1)} profile link.`;
     const exp = expError(d); if (exp) err.exp = exp;
     sh.err = err;
     if (Object.keys(err).length) { render(); return; }
     Object.assign(p, { name: d.name.trim(), nick: d.nick.trim(), gender: d.gender || null, sugg: d.level, style: d.style.trim(), expY: d.expY, expM: d.expM, sinceM: d.sinceM, sinceY: d.sinceY, social: { facebook: d.facebook.trim(), instagram: d.instagram.trim(), youtube: d.youtube.trim(), linkedin: d.linkedin.trim() } });
     if (d.phone.trim()) p.noPhone = false;
+    // #1019: no email and no social link left means no entry key, so they go back to being a guest.
+    if (p.identity === 'unclaimed' && !p.email && !email && !socialKeys(p).length) { p.identity = 'guest'; p.rtr = null; S.ui.sheet = { type: 'profile', id: p.id }; commit(`Details saved · ${p.name} · now a guest`); render(); return; }
+    // #1019: a player saved with a link only keeps their RTR ID; the email joins them when nobody else has it.
+    if (email && p.identity === 'unclaimed' && p.rtr && socialKeys(p).length) { if (!dirByEmail(email) && !savedByEmail(email, p.id)) p.email = email.toLowerCase(); S.ui.sheet = { type: 'profile', id: p.id }; commit(`Details saved · ${p.name}`); render(); return; }
     // One email is one person: an email that is already a saved player asks before the two records become one.
     const same = email ? savedByEmail(email, p.id) : null;
     if (same) { S.ui.sheet = { type: 'sameEmail', id: p.id, to: same.id }; commit(`Details saved · ${p.name}`); render(); return; }
@@ -7545,7 +8114,8 @@ const ACT = {
     const est = estimateGames(courts.length, Math.round((end - start) / 60000), (existing && existing.roster.length) || +d.expected || courts.length * (+d.perCourt || 8), perGameOf(d));
     const fields = { title: d.title.trim(), start, end, venue: d.venue.trim(), address: d.address.trim(), courts, singles: d.singles, doubles: d.doubles, reqFormats: { ...reqDefaults(d), ...(d.reqFormats || {}) }, mode: d.mode, scoring: SCORING[d.scoring] ? d.scoring : '31', recorded: d.recorded !== false, minimum: d.minAuto ? est.low : +d.minimum, minAuto: d.minAuto, expected: d.expectedAuto ? null : +d.expected || null, perCourt: +d.perCourt || 8, restrict: d.restrict && d.restrict.k === 'slots' ? { k: 'slots', slots: Object.fromEntries(BAND_KEYS.map(([b]) => [b, +d.restrict.slots[b] || 0])) } : { k: (d.restrict && d.restrict.k) || 'all' }, notes: d.notes.trim(), finance };
     let bal = { moved: 0, filled: 0 };
-    if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); }
+    let hb = { reg: 0, wait: 0 };
+    if (d.id) { const s = S.sessions.find((x) => x.id === d.id); Object.assign(s, fields); if (s.status === 'prepared') bal = rebalanceSlots(s); hb = applyHosts(s, d.hosts || []); }
     let made = 1, skipped = 0;
     if (!d.id) {
       // One prepared session per free date; clashing dates are skipped, never created.
@@ -7554,12 +8124,15 @@ const ACT = {
       free.forEach((o, i) => {
         const id = `s${Date.now()}${i}`;
         S.sessions.push({ id, ...JSON.parse(JSON.stringify(fields)), courts: courts.map((c) => ({...c, startsAt: c.startsAt ? c.startsAt + o.start - start : null, until: c.until ? c.until + o.start - start : null})), start: o.start, end: o.end, seriesId, status: 'prepared', download: 'none', roster: [], matches: [], seq: 0, published: null });
-        if (i === 0) S.currentId = id;
+        // Epic #1002 (#1004): every date gets the same hosts, each registered as a player.
+        const h = applyHosts(S.sessions[S.sessions.length - 1], d.hosts || []);
+        if (i === 0) { S.currentId = id; hb = h; }
       });
       made = free.length; skipped = occ.length - free.length;
     }
     const pl = (n) => `${n} player${n === 1 ? '' : 's'}`;
-    const msg = d.id ? `Preparation saved${bal.moved ? ` · ${pl(bal.moved)} moved to the waitlist` : bal.filled ? ` · ${pl(bal.filled)} moved from the waitlist` : ''}` : made > 1 ? `${made} sessions created${skipped ? ` · ${skipped} clashing date${skipped > 1 ? 's' : ''} skipped` : ''}` : 'Session created';
+    let msg = d.id ? `Preparation saved${bal.moved ? ` · ${pl(bal.moved)} moved to the waitlist` : bal.filled ? ` · ${pl(bal.filled)} moved from the waitlist` : ''}` : made > 1 ? `${made} sessions created${skipped ? ` · ${skipped} clashing date${skipped > 1 ? 's' : ''} skipped` : ''}` : 'Session created';
+    msg += hostsText(hb);
     S.lastSync = Date.now(); logSync(d.id ? `${fields.title}: preparation saved` : `${fields.title}: ${msg.toLowerCase()}`); save(); go('prepare'); toast(msg);
   },
   download: () => {
@@ -7621,8 +8194,18 @@ const ACT = {
   },
   openPayments: () => openSheet({ type: 'payments' }),
   payFilter: (d) => { S.ui.payF = d.k; render(); },
+  openPayShare: (d) => openSheet({ type: 'payShare', f: 'all', pub: !!d.pub, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null }),
+  payShareFilter: (d) => { S.ui.sheet.f = d.k; render(); },
+  payShareCopy: () => {
+    const sh = S.ui.sheet, text = payShareText(cur(), sh.f || 'all', sh.pub);
+    const fail = () => toast("Couldn't copy. Try again.");
+    try { navigator.clipboard.writeText(text).then(() => toast('Payment status copied'), fail); } catch (e) { fail(); }
+  },
+  payShareNative: () => { const sh = S.ui.sheet; try { navigator.share({ title: 'Payment status', text: payShareText(cur(), sh.f || 'all', sh.pub) }).catch(() => {}); } catch (e) { /* share unavailable */ } },
   togglePaid: (d) => {
     const s = cur(); s.payments = s.payments || {};
+    // #1013: a slot paid through a transfer is locked; its history is read-only.
+    if (transferChainOf(s, d.pid).length) { toast("This slot was paid through a slot transfer, so its payment can't be changed here."); return; }
     if (paymentPending.size && [...paymentPending.values()][0].sid !== s.id) flushPayments();
     S.ui.paymentError = null;
     const before = paymentPending.get(d.pid) || { sid: s.id, pid: d.pid, before: s.payments[d.pid] };
@@ -7634,8 +8217,11 @@ const ACT = {
     } else paymentPending.set(d.pid, before);
     clearTimeout(paymentTimer); paymentTimer = setTimeout(flushPayments, 800); render();
   },
+  slotHistory: (d) => openSheet({ type: 'slotHistory', pid: d.pid, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null }),
+  closeSlotHistory: () => { S.ui.sheet = S.ui.sheet && S.ui.sheet.back; render(); },
   payAmount: (d) => {
     const s = S.sessions.find((x) => x.id === d.sid) || cur(), paid = (s.payments || {})[d.pid], due = duePerHead(s);
+    if (transferChainOf(s, d.pid).length) { ACT.slotHistory(d); return; }
     S.ui.payAmt = String(paid ? (paid.amount == null ? due ?? '' : paid.amount) : due ?? '');
     openSheet({ type: 'payAmount', sid: s.id, pid: d.pid, back: S.ui.sheet && S.ui.sheet.type === 'payments' ? S.ui.sheet : null });
   },
@@ -7658,11 +8244,13 @@ const ACT = {
   markAllPaid: () => {
     flushPayments();
     const s = cur(); s.payments = s.payments || {};
-    s.roster.filter((r) => !s.payments[r.pid]).forEach((r) => ACT.togglePaid({ pid: r.pid }));
+    s.roster.filter((r) => !slotPay(s, r.pid)).forEach((r) => ACT.togglePaid({ pid: r.pid }));
     flushPayments();
   },
   giveSlot: (d) => {
     const s = cur(); const w = (s.waitlist || []).find((x) => x.pid === d.pid); if (!w) return;
+    // Epic #1002 (#1005): a host with no saved level waits without one; a slot needs a level first.
+    if (w.level == null) { toast('Choose a level before giving a slot.'); return; }
     if (needsOverfill(s, nm(w.pid), 'giveSlot', d, false)) return;
     const over = !openSlots(s);
     s.waitlist = s.waitlist.filter((x) => x.pid !== d.pid);
@@ -7670,7 +8258,8 @@ const ACT = {
     commit(`${nm(w.pid)} got a slot${s.status === 'active' ? ' · level locked' : ''}${over ? ` · now ${s.roster.length} players for ${capacityOf(s)} slots` : ''}`); render();
   },
   fillSlots: () => {
-    const s = cur(); const take = waitOf(s).slice(0, openSlots(s));
+    // Waiters without a level (a host with no saved level) are skipped.
+    const s = cur(); const take = waitOf(s).filter((w) => w.level != null).slice(0, openSlots(s));
     take.forEach((w) => { s.roster.push({ pid: w.pid, level: w.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() }); });
     s.waitlist = (s.waitlist || []).filter((w) => !take.includes(w));
     commit(`${take.length} player${take.length > 1 ? 's' : ''} moved from the waitlist`); render();
@@ -7746,25 +8335,36 @@ const ACT = {
     afterAdd(sh, `${nm(pid)} added · ${lvLabel(+sh.level)}${s.status === 'active' ? ' · level locked' : ''}`);
   },
   confirmNew: () => {
-    const sh = S.ui.sheet, name = (sh.name || '').trim(), email = (sh.email || '').trim();
+    const sh = S.ui.sheet, name = (sh.name || '').trim(), email = (sh.email || '').trim(), social = (sh.social || '').trim();
+    sh.errK = '';
     if (!name) { sh.err = 'Enter a name.'; render(); return; }
+    // #1019: a social link is an entry key too. It must be a profile on one of the four sites.
+    if (social && !socialKey(social)) { sh.err = 'Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty.'; sh.errK = 'social'; render(); return; }
+    // A phone is kept for an unclaimed player only (a guest is a name only, D-2026-11-16-04).
+    const phone = (sh.phone || '').trim(), phoneDigits = phone.replace(/\D/g, '');
+    if (phone && !/^(09\d{9}|639\d{9})$/.test(phoneDigits)) { sh.err = 'Enter a Philippine mobile number, like 0917 555 0142, or leave it empty.'; sh.errK = 'phone'; render(); return; }
+    if (phone && !email && !social) { sh.err = 'Add an email or a social link to save a phone, or leave the phone empty.'; sh.errK = 'phone'; render(); return; }
+    const sameSocial = social ? savedBySocial(social) : null;
+    if (sameSocial) { sh.err = `That social link is already ${sameSocial.name} in your saved players.`; sh.errK = 'social'; render(); return; }
     // D-2026-11-16-04: no email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player.
     if (email && !emailOk(email)) { sh.err = 'Enter an email address, like name@example.com, or leave it empty.'; render(); return; }
-    const same = email ? savedByEmail(email) : null;
+    const same = email && !social ? savedByEmail(email) : null;
     if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
-    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
+    // The email and the link both saved: the link decides who they are; the email is kept on the record.
+    const keys = (p) => { const a = social ? applySocial(p, social) : ''; const b = email ? (social ? (p.email = email.toLowerCase(), a) : applyEmail(p, email)) : a; if (phone) p.noPhone = false; return b; };
+    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now(), ...(sh.club && sh.pic ? { pic: sh.pic } : {}) };
     if (sh.club) {
       // Saved players › Add player: a level only if one was chosen.
       np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;
       S.players.push(np);
-      afterAdd(sh, `${name} saved${email ? ` · ${applyEmail(np, email)}` : ' as a guest'}`);
+      afterAdd(sh, `${name} saved${email || social ? ` · ${keys(np)}` : ' as a guest'}`);
       return;
     }
     const s = cur();
     if (sh.level == null || sh.level === '') { sh.err = 'Choose a level for this club.'; render(); return; }
     { const blk = sh.toWait ? '' : restrictBlock(s, +sh.level); if (blk && !sh.over) { sh.over = true; sh.err = `${blk} Press it again to add ${name} anyway.`; render(); return; } sh.over = false; }
     if (!sh.toWait && needsOverfill(s, name, 'confirmNew', undefined, true)) return;
-    const pid = np.id, how = email ? ` · ${applyEmail(np, email)}` : ' as a guest';
+    const pid = np.id, how = email || social ? ` · ${keys(np)}` : ' as a guest';
     S.players.push(np);
     if (sh.toWait) { s.waitlist = [...(s.waitlist || []), { pid, level: +sh.level, at: Date.now() }]; afterAdd(sh, `${name} added to the waitlist as #${s.waitlist.length}`); return; }
     s.roster.push({ pid, level: +sh.level, present: s.status === 'active', locked: s.status === 'active', presentAt: Date.now() });
@@ -7783,6 +8383,8 @@ const ACT = {
     // Owner comment, November 11, 2026: join requests end at Start. Pending ones close; the public page tells visitors to ask at the venue.
     const closed = (s.requests || []).filter((r) => r.status === 'pending');
     closed.forEach((r) => { r.status = 'closed'; r.closedAt = s.startedAt; });
+    // #1011: pending slot transfers expire at Start; every slot stays with its holder.
+    closeTransfers(s, 'expired');
     S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}${closed.length ? ` · ${closed.length} join request${closed.length === 1 ? '' : 's'} closed` : ''}`); render(); window.scrollTo(0, 0);
   },
   pane: (d) => { S.ui.pane = d.k; render(); },
@@ -7936,16 +8538,6 @@ const ACT = {
     sh.res = r; sh.winner = r.winner; sh.err = ''; sh.step = 'review'; render();
   },
   clearScores: () => { const sh = S.ui.sheet; [sh, ...(sh.g || [])].forEach((o) => { o.lose = ''; o.a = ''; o.b = ''; }); sh.err = ''; render(); },
-  // A session with Record games off: the match ends with no winner and no score.
-  confirmUnrecorded: () => {
-    const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
-    if (!m || m.status !== 'active' || recordedOf(s)) { closeSheet(); return; }
-    m.status = 'done'; m.winner = null; m.endedAt = Date.now();
-    const first = m.courts[0];
-    const placed = autoFill(s, { only: s.courts.map((c) => c.id).filter((id) => id !== first) });
-    S.ui.sheet = { type: 'nextMatch', court: first, seq: m.seq, err: '' };
-    commit(`Match ${m.seq} done · ${courtsOf(s, m)} free${autoNote(s, placed)}`); render();
-  },
   confirmResult: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id), r = sh.res;
     if (m.status !== 'active') { closeSheet(); return; }
@@ -8140,8 +8732,8 @@ const ACT = {
     S.ui.sheet = null; S.ui.finalStage = 0; S.screen = 'finalizing'; render();
     const tick = () => {
       S.ui.finalStage += 1; render();
-      if (S.ui.finalStage < (recordedOf(s) ? 4 : 2)) setTimeout(tick, 650);
-      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'games not recorded'; s.status = 'finalized'; s.finalizedAt = Date.now(); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go(rec ? 'results' : 'history'); toast(`Session finished · ${note}`); }, 500);
+      if (S.ui.finalStage < 4) setTimeout(tick, 650);
+      else setTimeout(() => { const rec = recordedOf(s), note = rec ? 'player records updated' : 'player records updated, not ranked'; s.status = 'finalized'; s.finalizedAt = Date.now(); freezeHosts(s); S.lastSync = Date.now(); curAct = 'confirmDone'; logSync(`${s.title} finished · ${note}`); save(); go('results'); toast(`Session finished · ${note}`); }, 500);
     };
     setTimeout(tick, 650);
   },
@@ -8169,6 +8761,7 @@ const CHANGE = {
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },
   rvSet: (el) => { S.ui.rv = { ...(S.ui.rv || {}), [el.dataset.k]: el.value }; render(); },
+  trLevel: (el) => { const t = (cur().transfers || []).find((x) => x.id === el.dataset.id); if (!t) return; t.level = el.value === '' ? null : +el.value; t.err = ''; render(); },
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },
   spSet: (el) => { S.ui.spf = { ...(S.ui.spf || {}), [el.dataset.k]: el.value }; render(); },
   draftSel: (el) => { S.ui.draft[el.dataset.k] = el.value; if (el.dataset.k === 'repeat' && !S.ui.draft.repeatCount) S.ui.draft.repeatCount = 4; delete S.ui.errors.when; render(); },
@@ -8185,6 +8778,21 @@ function setPath(path, value) {
   o[keys[keys.length - 1]] = value;
 }
 // Club-set player photo: same centre-crop as the logo; read locally, no network.
+// Add player › New player: the photo is cropped like Edit details and kept on the sheet until Save player.
+function loadNewPlayerPic(file) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { toast('Choose an image file'); return; }
+  if (file.size > 4 * 1024 * 1024) { toast('Choose an image under 4 MB'); return; }
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const side = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 256, 256);
+    S.ui.sheet.pic = { kind: 'photo', src: c.toDataURL('image/png') }; URL.revokeObjectURL(img.src); render();
+  };
+  img.onerror = () => toast('That image could not be read');
+  img.src = URL.createObjectURL(file);
+}
 function loadPlayerPic(file, id) {
   const p = P(id);
   if (!file || !p || p.identity === 'registered') return;
@@ -8307,6 +8915,7 @@ function onBind(e) {
   if (el.id === 'rp-range') { stopReplay(); replayTo(+el.value); return; }
   if (el.id === 'logo-file') { if (e.type === 'change') loadLogo(el.files && el.files[0]); return; }
   if (el.id === 'play-history-file') { if (e.type === 'change') importPlayHistory(el.files && el.files[0]); return; }
+  if (el.id === 'new-pic-file') { if (e.type === 'change') loadNewPlayerPic(el.files && el.files[0]); return; }
   if (el.id === 'pic-file') { if (e.type === 'change') loadPlayerPic(el.files && el.files[0], el.dataset.id); return; }
   if (el.dataset.actChange) { if (e.type === 'change') { curAct = el.dataset.actChange; CHANGE[el.dataset.actChange](el); } return; }
   if (!el.dataset.bind) return;
@@ -8595,7 +9204,7 @@ window.addEventListener('resize', () => {
 // ---------- Prototype routes (same paths as apps/queue, under /queue) ----------
 let prototypeRouter;
 const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players' };
-const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
+const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', hosts: 'trusted-hosts', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
 const sessionSuffixes = { prepare: '/preparation', console: '', history: '/record', finalizing: '/finishing', results: '/results' };
 function prototypePath() {
   let path = queuePaths[S.screen];
@@ -8608,7 +9217,9 @@ function prototypePath() {
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
-  return `/queue${path ?? ''}${tab ? `?tab=${encodeURIComponent(tab)}` : ''}`;
+  // #1012: a transfer link's token stays on the session page's address.
+  const q = new URLSearchParams(); if (tab) q.set('tab', tab); if (S.screen === 'public' && S.ui.guest && S.ui.trLink) q.set('transfer', S.ui.trLink);
+  return `/queue${path ?? ''}${q.toString() ? `?${q}` : ''}`;
 }
 function applyPrototypeRoute(url) {
   flushPresence();
@@ -8620,6 +9231,8 @@ function applyPrototypeRoute(url) {
   const match = path.match(/^\/sessions\/([^/]+)(?:\/(preparation|edit|record|finishing|results|public-page|recovery))?$/);
   const guest = path.match(/^\/s\/([^/]+)$/);
   const tab = url.searchParams.get('tab');
+  // #1012: /s/<id>?transfer=<token> opens the transfer link card.
+  S.ui.trLink = guest && LINK_TOKEN.test(url.searchParams.get('transfer') || '') ? url.searchParams.get('transfer') : null;
   if (setting) {
     const entry = Object.entries(settingsSlugs).find(([, slug]) => slug === (setting[1] || 'club-identity'));
     if (!entry) return false;

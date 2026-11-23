@@ -1,3 +1,4 @@
+import { type ScoringKey, scoringOf } from '@rotra/schema/scoring'
 export type SessionMode = 'chill' | 'fair' | 'hard'
 /** The Manual Queue | Auto Queue switch. Auto places the next ready match On court; it never starts one. */
 export type CourtFillMode = 'manual' | 'auto'
@@ -49,7 +50,16 @@ export type QueueSession = {
    * true (sessions saved before the switch). Read it through `recordsGames`. Fixed once started.
    */
   recordGames?: boolean
+  /**
+   * **Scoring** (Q22, D-2026-11-18-04): how games are scored; the match result check follows it.
+   * Missing means 16/31 (sessions saved before the setting). Read it through `sessionScoring`.
+   * Fixed once started.
+   */
+  scoring?: ScoringKey
 }
+/** The session's scoring mode: the stored value, or 16/31 when missing or unknown. */
+export const sessionScoring = (session: Pick<QueueSession, 'scoring'> | null | undefined) =>
+  scoringOf(session?.scoring)
 /**
  * Whether the session keeps results: the one place the Record games default lives (missing reads
  * as on). An unrecorded session has no winner, score, standings, awards, result slides or
@@ -119,12 +129,20 @@ export type QueueSessionInput = Pick<
   | 'expectedPlayers'
   | 'requestFormats'
   | 'recordGames'
+  | 'scoring'
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
   courts: { label: string; startsAt?: number; openUntil?: number | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
   occurrences?: number
+  /**
+   * Q-SETUP › Hosts (#1004, D-2026-11-22-01): the saved players (club player ids) hosting the
+   * session after this save, in the order picked. Every date of a series gets the same hosts. New
+   * hosts must be trusted hosts; each is registered as a player (a slot, or the waitlist once full)
+   * unless already registered. Left out = hosts unchanged; [] = no hosts.
+   */
+  hostClubPlayerIds?: string[]
 }
 /** Q-SESSION-DONE read model; the pending count is the same one that drives the SyncStatus pill. */
 export type SessionDoneReview = {

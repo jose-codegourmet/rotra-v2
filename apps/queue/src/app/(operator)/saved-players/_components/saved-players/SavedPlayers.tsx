@@ -452,6 +452,7 @@ export function SavedPlayers() {
           }}
           name={invitee.fullName}
           identity={invitee.identity}
+          emailOnFile={invitee.emailOnFile}
           link={invite.data?.url}
           offline={offline}
           onCopy={copyLink}

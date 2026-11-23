@@ -1,3 +1,8 @@
+import {
+  validateResult as checkResult,
+  type ResultCheck,
+  type ResultValues,
+} from '@rotra/schema/scoring'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
 import { queueMasterName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
@@ -352,7 +357,8 @@ export function waitMinutes(
 }
 /**
  * Session standings (D-2026-11-18-05): most wins, then fewest losses. Players with the same wins and
- * the same losses share one `position`, and the next position skips the shared places (1, 1, 3).
+ * the same losses share one `position`, and the next record takes the next number, without gaps
+ * (1, 1, 2; owner, November 19, 2026).
  * Nothing else separates players: the name only orders the rows inside a shared position. Read
  * `position` from the row, never an array index.
  */
@@ -378,12 +384,28 @@ export function computeStandings(roster: SessionPlayer[], matches: Match[]) {
     })
     .filter((r) => r.games > 0)
     .sort((a, b) => b.wins - a.wins || a.losses - b.losses || a.name.localeCompare(b.name))
-  rows.forEach((row, i) => {
-    const above = rows[i - 1]
-    row.position =
-      above && above.wins === row.wins && above.losses === row.losses ? above.position : i + 1
-  })
-  return rows
+  return sharePositions(rows)
+}
+/**
+ * Standings positions without gaps (owner, November 19, 2026): players with the same wins and losses
+ * share one position, and the next record takes the next number (1, 1, 2). `rows` must already be in
+ * standings order. Also applied when showing saved standings, so results saved before shared
+ * positions (unique 1, 2, 3…) or with gaps (1, 1, 3) show the same way; the saved rows never change.
+ */
+export function sharePositions<R extends { wins: number; losses: number; position: number }>(
+  rows: readonly R[],
+): R[] {
+  const out: R[] = []
+  for (const row of rows) {
+    const above = out[out.length - 1]
+    const position = !above
+      ? 1
+      : above.wins === row.wins && above.losses === row.losses
+        ? above.position
+        : above.position + 1
+    out.push({ ...row, position })
+  }
+  return out
 }
 /** Games of a standings position: one number, or the range when its players counted different games. */
 export type StandingsGames = number | { min: number; max: number }
@@ -530,42 +552,13 @@ export function swapTarget(m: Match, ctx: MatchContext): SwapTarget | null {
   const match = waiting[index]
   return match ? { match, position: index + 1 } : null
 }
-export type ResultInput = {
-  winner?: 'A' | 'B' | null
-  scoreA?: number | null
-  scoreB?: number | null
-}
-export function validateResult(
-  input: ResultInput,
-): { winner: 'A' | 'B'; error: null } | { winner: null; error: string } {
-  const { winner, scoreA, scoreB } = input
-  if (scoreA != null || scoreB != null) {
-    if (
-      scoreA == null ||
-      scoreB == null ||
-      !Number.isInteger(scoreA) ||
-      !Number.isInteger(scoreB) ||
-      scoreA < 0 ||
-      scoreB < 0
-    )
-      return { winner: null, error: 'Enter both scores as whole numbers, or clear them.' }
-    if (scoreA === scoreB)
-      return {
-        winner: null,
-        error: 'A tie can’t decide a winner. Correct the score, or clear it and pick a winner.',
-      }
-    const byScore = scoreA > scoreB ? 'A' : 'B'
-    if (winner && winner !== byScore)
-      return {
-        winner: null,
-        error: `The score says Team ${byScore} won, but Team ${winner} is picked. Fix one of them.`,
-      }
-    return { winner: byScore, error: null }
-  }
-  return winner === 'A' || winner === 'B'
-    ? { winner, error: null }
-    : { winner: null, error: 'Pick a winner or enter the final score.' }
-}
+/**
+ * The mode's result check (Q22, shared rule): one game needs the picked winner and a score the
+ * session's scoring mode can produce; best of 3 takes every game score in `games`. Missing scoring
+ * reads as 16/31. Lives in `@rotra/schema/scoring` so the result form and the data layer share it.
+ */
+export type ResultInput = ResultValues
+export const validateResult = (input: ResultInput): ResultCheck => checkResult(input)
 export function substitutionCandidates(m: Match, roster: SessionPlayer[], matches: Match[]) {
   return roster.filter(
     (p) =>

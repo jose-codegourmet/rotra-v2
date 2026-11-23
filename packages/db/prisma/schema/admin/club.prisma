@@ -54,6 +54,8 @@ model Club {
   clubPlayers      ClubPlayer[]
   venues           ClubVenue[]
   queueSessions    QueueSession[]
+  trustedHosts     ClubTrustedHost[]
+  sessionHosts     SessionHost[]
   reservation      ClubSessionReservation?
 
   inventoryItems InventoryItem[]

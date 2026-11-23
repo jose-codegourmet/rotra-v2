@@ -172,3 +172,11 @@ export const VisitorNoCourtsNow: Story = {
     ),
   },
 }
+
+export const ScoringBestOfThree: Story = {
+  args: {
+    scoringLabel: '11/21 × 3',
+    scoringDescription: 'Best of 3 games to 21. Change sides at 11. Deuce at 20–20.',
+  },
+}
+export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }

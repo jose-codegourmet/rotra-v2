@@ -96,12 +96,15 @@ model QueueSession {
   waitlistEntries      SessionWaitlistEntry[]
   joinRequests         SessionJoinRequest[]
   dropOutNotices       SessionDropOutNotice[]
+  slotTransfers        SessionSlotTransfer[]
+  paymentRefunds       SessionPaymentRefund[]
   inviteCodes          SessionInviteCode[]
   assessments          ClubAssessment[]
   deviceSessionStreams DeviceSessionStream[]
   syncConflicts        SyncConflict[]
   matches              Match[]
   matchRequests        SessionMatchRequest[]
+  hosts                SessionHost[]
 
   costEstimate SessionCostEstimate?
 

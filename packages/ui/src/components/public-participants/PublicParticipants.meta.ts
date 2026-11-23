@@ -12,6 +12,7 @@ export const publicParticipantsMeta = {
     'Pass openSlots, finished, acceptJoinRequests and onRequestToJoin from the public page. The callback opens Request to join; it never grants a slot or expands the roster.',
     'The cap hides entries after nine at widths up to 640 px and twelve above that. The fade and join prompt appear only when confirmed participants exceed that width’s cap.',
     'Finished sessions have no open placeholders or Request to join button. Without uncapped they retain the roster cap and explain that full roster is for confirmed participants. Waitlist tiles remain uncapped and keep admission order.',
+    'Hosts (#1006): pass hosts to show the compact Hosts section (PublicHosts) above Players and Waitlisted. A host who plays is also in participants and counts once in participantCount and openSlots, which come from the roster. Zero hosts hides the section. Hosts use the same name and picture rule as the tiles.',
     'Skill mix belongs to the Want to play? card; the deprecated skillMix and hasProfile props are ignored during consumer migration.',
     'Use existing roster components for the operator post-session roster with levels and payments.',
   ],
@@ -21,6 +22,7 @@ export const publicParticipantsMeta = {
   },
   docs: ['docs/screens/product/modules/queue/public-session.md'],
   related: [
+    'PublicHosts',
     'PublicParticipantTile',
     'ParticipantCard',
     'Avatar',

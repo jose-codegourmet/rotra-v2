@@ -52,3 +52,9 @@ export const PhoneLight: Story = {
   args: { onShare: () => {} },
   globals: { theme: 'light', viewport: { value: 'phone' } },
 }
+
+/** Best of 3 (Q22): "2–1" and every game score in a pill under the format pill. */
+export const BestOfThreeGames: Story = {
+  args: { game: { ...withFaces(0, 0), score: '2–1', gameScores: ['21–18', '15–21', '21–19'] } },
+}
+export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }

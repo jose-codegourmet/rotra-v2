@@ -42,6 +42,8 @@ describe('payment totals', () => {
       partial: 1,
       total: 3,
       collected: 135000,
+      waived: 0,
+      refunded: 0,
       stillDue: 75000,
       toReimburse: 0,
       againstCosts: -65000,
@@ -64,6 +66,8 @@ describe('payment totals', () => {
       partial: 0,
       total: 3,
       collected: 0,
+      waived: 0,
+      refunded: 0,
       stillDue: null,
       toReimburse: 0,
       againstCosts: null,
@@ -74,5 +78,51 @@ describe('payment totals', () => {
     expect(
       paymentTotals({ marks: [{ amountMinor: 70000 }], total: 1, amountDue: 70000, cost: 65000 }),
     ).toMatchObject({ stillDue: 0, againstCosts: 5000 })
+  })
+})
+describe('waived amounts from slot transfers (#1013)', () => {
+  const due = 70000
+  it('a waiver makes the slot Paid but is never cash', () => {
+    expect(paymentStatus({ amountMinor: 50000, waivedMinor: 20000 }, due)).toEqual({ kind: 'paid' })
+    expect(paymentStatus({ amountMinor: 0, waivedMinor: 70000 }, due)).toEqual({ kind: 'paid' })
+    expect(paymentStatus({ amountMinor: 20000, waivedMinor: 20000 }, due)).toEqual({
+      kind: 'partial',
+      left: 30000,
+    })
+  })
+  it('only cash above the amount due is to return; a waiver past it is just Paid', () => {
+    // The fee dropped after the approval waived ₱200 of ₱700.
+    expect(paymentStatus({ amountMinor: 50000, waivedMinor: 20000 }, 60000)).toEqual({
+      kind: 'paid',
+    })
+    expect(paymentStatus({ amountMinor: 50000, waivedMinor: 20000 }, 40000)).toEqual({
+      kind: 'reimburse',
+      toReturn: 10000,
+    })
+  })
+  it('totals count cash as collected and waivers separately', () => {
+    expect(
+      paymentTotals({
+        marks: [
+          { amountMinor: 50000, waivedMinor: 20000 },
+          { amountMinor: 0, waivedMinor: 70000 },
+          { amountMinor: 70000 },
+        ],
+        total: 4,
+        amountDue: due,
+        cost: 200000,
+      }),
+    ).toEqual({
+      paid: 3,
+      partial: 0,
+      total: 4,
+      collected: 120000,
+      waived: 90000,
+      refunded: 0,
+      stillDue: 70000,
+      toReimburse: 0,
+      againstCosts: -80000,
+      cost: 200000,
+    })
   })
 })

@@ -127,6 +127,8 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
           m.teamAScore != null && m.teamBScore != null
             ? { teamA: m.teamAScore, teamB: m.teamBScore }
             : null,
+        // Best of 3 (Q22): every game score, Team A first; the column shows each under the match pill
+        games: m.games,
         invalid: m.invalid,
         substitutions: m.substitutions,
         substitutionCredits: m.substitutionCredits,

@@ -7,6 +7,7 @@ import { useGoogleDeadline } from '@rotra/data/google-sign-in/useGoogleDeadline'
 import { toast } from '@rotra/ui/toaster'
 import { VerificationPage, type VerificationPageProps } from '@rotra/ui/verification-page'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useGooglePicker } from '@/app/_components/google-sign-in/useGooglePicker'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useContactChangeSheet } from '../../../_components/contact-change-sheet/useContactChangeSheet'
@@ -35,7 +36,13 @@ export function AccountVerification() {
     googleEnabled ? connectWith : undefined,
   )
 
-  if (signedOut) return null
+  // D-2026-11-18-01: while Google sign-in is off there is no verification to do (two of its three
+  // steps need Google), so the page sends the player to their profile.
+  useEffect(() => {
+    if (!googleEnabled && playerId) router.replace(`/players/${encodeURIComponent(playerId)}`)
+  }, [googleEnabled, playerId, router])
+
+  if (signedOut || !googleEnabled) return null
 
   let state: VerificationPageProps['state'] = { kind: 'loading' }
   if (verification.data && deadline.data) {

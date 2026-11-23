@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatPeso } from '@rotra/schema/money'
+import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
@@ -27,6 +28,7 @@ import { sessionSetupDefaultValues } from './SessionSetupForm.defaultValues'
 import {
   durationMinutes,
   isEnterSubmitTarget,
+  type SetupCardArt,
   setupSubmitAction,
   slotBudget,
 } from './SessionSetupForm.helpers'
@@ -40,6 +42,10 @@ import {
 import { SetupCourtsSection } from './setup-courts-section/SetupCourtsSection'
 import { SetupDetailsSection } from './setup-details-section/SetupDetailsSection'
 import { SetupFormatsSection } from './setup-formats-section/SetupFormatsSection'
+import {
+  SetupHostsSection,
+  type SetupHostsSectionProps,
+} from './setup-hosts-section/SetupHostsSection'
 import { SetupMinimumSection } from './setup-minimum-section/SetupMinimumSection'
 import { SetupNotesReviewSection } from './setup-notes-review-section/SetupNotesReviewSection'
 
@@ -81,6 +87,15 @@ export type SessionSetupFormProps = {
   initialPage?: number
   /** The session has started: Record games shows as a read-only On / Off chip */
   recordGamesLocked?: boolean
+  /** The session has started: Scoring is read-only */
+  scoringLocked?: boolean
+  /** Illustration URLs for the Mode and Scoring cards (apps/queue/public/art/session-setup) */
+  cardArt?: SetupCardArt
+  /**
+   * Page 1 › Courts › Hosts (#1004, D-2026-11-22-01): the saved players, the trusted-host action
+   * and the placement rule. Omitted hides the Hosts field and its review row.
+   */
+  hosts?: Omit<SetupHostsSectionProps, 'editing' | 'rosterCount'>
   financials?: Omit<
     SessionFinancialsFieldsProps,
     'courts' | 'durationMinutes' | 'players' | 'venueRate'
@@ -120,7 +135,10 @@ export function SessionSetupForm({
   costsReviewLine,
   initialPage = 0,
   recordGamesLocked = false,
+  scoringLocked = false,
+  cardArt,
   financials,
+  hosts,
   ref,
 }: SessionSetupFormProps) {
   const form = useForm<SessionSetupInput, unknown, SessionSetupValues>({
@@ -130,6 +148,8 @@ export function SessionSetupForm({
       ...initialValues,
       // A session saved before Record games existed has no value and reads as on.
       recordGames: initialValues?.recordGames ?? true,
+      // A session saved before Scoring existed has no value and reads as 16/31.
+      scoring: initialValues?.scoring ?? DEFAULT_SCORING,
       // A stored or restored number is the QM's own; empty follows the slot budget.
       expectedIsAuto: initialValues?.expectedIsAuto ?? !initialValues?.expectedPlayers?.trim(),
     },
@@ -284,10 +304,21 @@ export function SessionSetupForm({
       onOpenVenuePicker={() => onOpenVenuePicker(values.venue.venueId)}
       onViewClash={onViewClash}
     />,
-    <SetupCourtsSection key="courts" editContext={editContext} />,
+    <div key="courts" className="flex flex-col gap-3.5">
+      <SetupCourtsSection editContext={editContext} />
+      {hosts ? (
+        <SetupHostsSection
+          {...hosts}
+          editing={mode === 'edit'}
+          rosterCount={editContext?.rosterCount ?? 0}
+        />
+      ) : null}
+    </div>,
     <SetupFormatsSection
       key="formats"
       recordGamesLocked={recordGamesLocked}
+      scoringLocked={scoringLocked}
+      cardArt={cardArt}
       allowedRequestFormats={values.requestFormats}
       onRequestFormatsChange={(formats) =>
         form.setValue('requestFormats', formats, { shouldDirty: true })
@@ -318,6 +349,13 @@ export function SessionSetupForm({
       estimatedMinimum={estimatedMinimum}
       onEditPage={goTo}
       costsReviewLine={costsLine}
+      hostNames={
+        hosts
+          ? (values.hostClubPlayerIds ?? []).map(
+              (h) => hosts.people.find((p) => p.clubPlayerId === h)?.name ?? 'Saved player',
+            )
+          : undefined
+      }
     />,
   ]
 

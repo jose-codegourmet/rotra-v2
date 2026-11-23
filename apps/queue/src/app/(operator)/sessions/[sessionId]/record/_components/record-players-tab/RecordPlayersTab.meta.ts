@@ -8,7 +8,8 @@ export const recordPlayersTabMeta = {
     'Rendered inside SessionRecord\'s "Players" TabsContent with { sessionId, record: SessionRecordSummary }; the cards come from record.playerSummaries and the ranks from useLiveStandings.',
     'An invalid session renders every card in the not-counted variant with no rank.',
     'A player picture opens the Q03 player profile dialog (PlayerProfile) with footer Close.',
+    'Above the cards, the Hosts chips (PublicHosts, full names, with a note) from useSessionHosts: on a finished session the hosts it ended with, by the name kept at the finish (#1008). No hosts: nothing renders.',
   ],
   docs: ['docs/screens/product/modules/queue/results-sharing.md#q-history--session-record'],
-  related: ['SessionRecord', 'RecordPlayerCard', 'RecordTabHeader', 'PlayerProfile'],
+  related: ['SessionRecord', 'RecordPlayerCard', 'RecordTabHeader', 'PublicHosts', 'PlayerProfile'],
 } satisfies ComponentMeta

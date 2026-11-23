@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionPreparationMeta = {
   name: 'SessionPreparation',
   description:
-    'Q-PREPARE container: PageHeader with the public page icon and responsive preparation actions (DeleteSessionSheet on useDeleteSession), the JoinRequests card ("Requests · N", no tabs) above the tabs while a join request or drop-out notice waits, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionLinkCard on useSetAcceptJoinRequests and useSetAlwaysRequireRequest), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock\'s Start session pill through useDockAction.',
+    'Q-PREPARE container: PageHeader with the public page icon and responsive preparation actions (DeleteSessionSheet on useDeleteSession), the JoinRequests card ("Requests · N", no tabs) above the tabs while a join request or drop-out notice waits, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionHosts (the Hosts card, prepared and live, #1005), SessionLinkCard on useSetAcceptJoinRequests and useSetAlwaysRequireRequest), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock\'s Start session pill through useDockAction.',
   usage: [
     'Rendered by /sessions/[sessionId]/preparation; active sessions show read-only Session settings with the existing live sheets and Continue session dock action; finalized/invalid sessions go to the record and finalizing sessions to finishing, unknown ids to notFound().',
     'Active sessions reuse CourtsAndTime, AddPlayer, JoinRequests (the "Requests" sheet behind Match requests · N, match requests only) and PaymentsPanel in sheets. Start, delete, edit and pre-start download controls are absent; fixed minimum copy uses the stored target.',
@@ -22,6 +22,7 @@ export const sessionPreparationMeta = {
     'JoinRequests',
     'SessionLinkCard',
     'SessionSetupCard',
+    'SessionHosts',
     'DeviceDownloadCard',
     'StartSessionBar',
     'StartSessionSheet',

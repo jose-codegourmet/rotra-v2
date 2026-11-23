@@ -8,6 +8,7 @@ import {
   courtFreeSince,
   courtNames,
   holdsCourt,
+  sharePositions,
   waitMinutes,
 } from '../match/match.rules'
 import type { Match } from '../match/match.types'
@@ -25,7 +26,7 @@ import {
 } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { recordsGames } from '../queue-session/queueSession.types'
+import { recordsGames, sessionScoring } from '../queue-session/queueSession.types'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
@@ -34,11 +35,17 @@ import {
   realGetMyJoinRequest,
   realGetMyNight,
   realGetPublicMatchHistory,
+  realGetPublicPaymentStatus,
   realGetPublicSession,
   realSendJoinRequest,
 } from '../real/public-session'
 import { sessionCostIn } from '../session-cost/fetchers'
+import { amountDuePerHead } from '../session-cost/sessionCost.rules'
+import { shownSessionHostRows } from '../session-host/sessionHost.history'
+import { receivedAmount } from '../session-payment/sessionPayment.rules'
 import { submitJoinRequest } from '../session-roster/mutations'
+import { slotPaymentsIn } from '../slot-transfer/slotPayments'
+import { mySlotTransfer } from '../slot-transfer/slotTransferViews'
 import { playerOrigin } from './context'
 import {
   linkedClubPlayerIds,
@@ -127,7 +134,9 @@ function publishedResults(
   viewerClubPlayerIds?: ReadonlySet<string>,
 ): PublicSessionResults | null {
   const publication = state.publications[sessionId],
-    snapshot = state.resultSnapshots[sessionId],
+    saved = state.resultSnapshots[sessionId],
+    // Shown with shared positions without gaps (owner, November 20, 2026); the saved rows never change.
+    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) },
     session = state.sessions.find((s) => s.id === sessionId)
   // An unrecorded session has no results, whatever rows exist for it.
   if (!publication || !snapshot || (session && !recordsGames(session))) return null
@@ -401,6 +410,45 @@ function projectQueue(
   }))
 }
 
+/**
+ * The Hosts section (#1006, D-2026-11-22-01): the session's current host rows through the same
+ * person rule as Players (`publicPerson`). The roster or waitlist entry's snapshot and level win; a
+ * host who is not placed uses the saved player's name and level. Never counted in capacity. A
+ * finished session (#1008) shows the rows frozen when it ended, by their snapshot name, even when
+ * the saved player was deleted, moved into another record or taken off the trusted-host list.
+ */
+function projectHosts(
+  state: MockState,
+  sessionId: string,
+  viewer: Viewer | null,
+): PublicSessionParticipant[] {
+  const s = state.sessions.find((x) => x.id === sessionId)
+  const ended = s?.state === 'completed' || s?.state === 'invalid'
+  // #1008: a finished session shows the hosts frozen at its end, by the name each had then.
+  return shownSessionHostRows(state, sessionId).flatMap((h) => {
+    const p = state.clubPlayers.find((x) => x.id === h.clubPlayerId)
+    if (!p) return []
+    const placed =
+      state.roster.find((r) => r.sessionId === sessionId && r.clubPlayerId === p.id) ??
+      state.waitlist.find((w) => w.sessionId === sessionId && w.clubPlayerId === p.id)
+    const names = ended
+      ? {
+          fullName: h.nameSnapshot,
+          nickname: placed && 'nameSnapshot' in placed ? placed.nicknameSnapshot : p.nickname,
+        }
+      : placed && 'nameSnapshot' in placed
+        ? { fullName: placed.nameSnapshot, nickname: placed.nicknameSnapshot }
+        : { fullName: p.fullName, nickname: p.nickname }
+    return [
+      participantOf(
+        publicPerson(state, p.id, names, viewer),
+        placed?.level ?? p.playingLevel,
+        viewer !== null,
+      ),
+    ]
+  })
+}
+
 function project(
   state: MockState,
   slug: string,
@@ -432,6 +480,7 @@ function project(
     courts: courts.map((c) => c.label),
     formats: { singles: s.allowSingles, doubles: s.allowDoubles },
     mode: s.sessionMode,
+    scoring: sessionScoring(s),
     minimum: s.minimumGames,
     notes: s.notes || null,
     participantCount: roster.length,
@@ -449,6 +498,7 @@ function project(
       ),
     ),
     skillMix: publicSkillMix(roster.map((r) => r.level)),
+    hosts: projectHosts(state, s.id, viewer),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === s.id)
       .sort((a, b) => a.addedAt - b.addedAt)
@@ -585,6 +635,7 @@ function projectHistory(
       winningTeam: m.winningTeam,
       teamAScore: m.teamAScore,
       teamBScore: m.teamBScore,
+      games: m.games,
       invalid: m.invalid,
     }))
     .sort((a, b) => b.number - a.number)
@@ -707,6 +758,8 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
           (d) => d.sessionId === session.id && d.pid === row.id && d.status === 'open',
         )
       : false,
+    canTransfer: !!row && session.state === 'prepared',
+    slotTransfer: row ? mySlotTransfer(live, session.id, row.id) : null,
     offline: getConnectivity() === 'offline',
     games: standing?.games ?? 0,
     won: standing?.wins ?? 0,
@@ -961,4 +1014,41 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
         teamB: team(match.teamB),
       })),
   }
+}
+
+/**
+ * Payment status share on the public page (#1010; owner decision 2026-11-22, #1015): the confirmed
+ * roster's payments as share rows, names masked like every other public name. Read from the last
+ * synced state; real mode reads the visitor-safe `payment-status` Route Handler. A cancelled or invalid session returns null.
+ */
+export async function getPublicPaymentStatus(slug: string): Promise<{
+  amountDue: number | null
+  rows: {
+    name: string
+    receivedMinor: number | null
+    waivedMinor?: number
+    viaTransfer?: boolean
+  }[]
+} | null> {
+  if (isRealDataMode()) return realGetPublicPaymentStatus(slug)
+  await delay()
+  const { state } = serverState()
+  const session = sessionBySlug(state, slug)
+  if (session.state === 'invalid' || session.state === 'cancelled') return null
+  const amountDue = amountDuePerHead(sessionCostIn(state, session.id)?.estimate ?? null)
+  // #1013: the cash an approved slot transfer carried and its waivers count for the holder, once.
+  const ledger = slotPaymentsIn(state, session.id, amountDue)
+  const rows = state.roster
+    .filter((p) => p.sessionId === session.id)
+    .map((p) => {
+      const payment = ledger.paymentOf(p.id)
+      return {
+        name: maskPublicName(p.nameSnapshot),
+        receivedMinor: payment.mark ? receivedAmount(payment.mark, amountDue) : null,
+        waivedMinor: payment.mark?.waivedMinor ?? 0,
+        viaTransfer: payment.chain.length > 0,
+      }
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return { amountDue, rows }
 }

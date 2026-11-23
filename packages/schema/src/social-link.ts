@@ -68,3 +68,49 @@ export const socialLinksShape = {
   youtube: socialLinkField('youtube'),
   linkedin: socialLinkField('linkedin'),
 }
+
+/**
+ * #1019: a social link is an entry key for an unclaimed player, like an email. Two links that
+ * normalize to the same key are one person while unclaimed. Normalizing: the scheme may be left
+ * out; `www.`, `m.` and `mobile.` and the provider's other hosts (fb.com, youtu.be) become its
+ * site; the query string, hash and trailing slash are dropped; lower case. A bare site with no
+ * profile path is not a link. Registered players are never matched by a link.
+ */
+export type NormalizedSocialLink = {
+  provider: SocialProvider
+  /** e.g. `facebook.com/jun.bautista` */
+  key: string
+  /** The link as typed, trimmed, with `https://` added when the scheme was left out */
+  url: string
+}
+
+export const SOCIAL_LINK_ERROR =
+  'Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty.'
+
+/** New player: the link typed already belongs to one of the club's saved players. */
+export const socialLinkAlreadySaved = (name: string) =>
+  `That social link is already ${name} in your saved players.`
+
+export function normalizeSocialLink(typed: string | null | undefined): NormalizedSocialLink | null {
+  const value = typed?.trim() ?? ''
+  if (!value) return null
+  const url = /^https?:\/\//i.test(value) ? value : `https://${value}`
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return null
+  }
+  const host = parsed.hostname.toLowerCase().replace(/^(www\.|m\.|mobile\.)/, '')
+  const entry = SOCIAL_PROVIDERS.find((p) => (p.hosts as readonly string[]).includes(host))
+  const path = parsed.pathname.replace(/\/+$/, '').toLowerCase()
+  if (!entry || !path) return null
+  return { provider: entry.key, key: `${entry.hosts[0]}${path}`, url }
+}
+
+/** The entry keys of a set of profile links (empty and malformed links are skipped). */
+export function socialLinkKeys(links: Partial<Record<SocialProvider, string>> | null | undefined) {
+  return Object.values(links ?? {})
+    .map((link) => normalizeSocialLink(link)?.key)
+    .filter((key): key is string => !!key)
+}

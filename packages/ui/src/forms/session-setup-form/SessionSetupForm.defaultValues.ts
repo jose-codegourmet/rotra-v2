@@ -1,3 +1,4 @@
+import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import { sessionFinancialsDefaultValues } from '@rotra/ui/forms/session-financials-fields/default-values'
 import { slotBudget } from './SessionSetupForm.helpers'
 import type { SessionSetupInput } from './SessionSetupForm.schema'
@@ -29,11 +30,13 @@ export function sessionSetupDefaultValues(playersPerCourt = 8): SessionSetupInpu
     courtStarts: ['', ''],
     courtEnds: ['', ''],
     playersPerCourt,
+    hostClubPlayerIds: [],
     allowSingles: false,
     allowDoubles: true,
     // 2 v 2 on, 1 v 1 follows Singles (off), fun formats off: the data package's default.
     requestFormats: ['doubles'],
     sessionMode: 'fair',
+    scoring: DEFAULT_SCORING,
     recordGames: true,
     minimumIsCalculated: true,
     minimumGames: '4',

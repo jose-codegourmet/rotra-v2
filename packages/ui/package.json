@@ -20,6 +20,7 @@
     "./auto-queue-sheet": "./src/components/auto-queue-sheet/AutoQueueSheet.tsx",
     "./auto-queue-workspace": "./src/components/auto-queue-workspace/AutoQueueWorkspace.tsx",
     "./avatar": "./src/components/avatar/Avatar.tsx",
+    "./club-picture-field": "./src/components/club-picture-field/ClubPictureField.tsx",
     "./bagging-games-row": "./src/components/bagging-games-row/BaggingGamesRow.tsx",
     "./bagging-pair-sheet": "./src/components/bagging-pair-sheet/BaggingPairSheet.tsx",
     "./bagging-pairs-card": "./src/components/bagging-pairs-card/BaggingPairsCard.tsx",

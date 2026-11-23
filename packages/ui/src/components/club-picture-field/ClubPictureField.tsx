@@ -27,13 +27,18 @@ export type ClubPictureFieldProps = {
   /** A problem the caller met, such as "That image could not be read" */
   error?: string
   pending?: boolean
+  /** Field label; Add player › New player reads "Profile picture (optional)" */
+  label?: string
+  /** The line under the characters; Add player › New player leaves out the keep-two sentence */
+  hint?: string
 }
 
 const KIND_LABEL = { photo: 'A photo', character: 'A character', initials: 'Initials' } as const
 
 /**
- * Edit details › Profile picture. Every choice applies at once, independent of Save details. The
- * picture shown here is the one the club set; the file is read and cropped by the caller.
+ * The club-set picture of a guest or unclaimed player (D-2026-11-09-12): Upload photo, Remove,
+ * Use previous picture and the character grid. Edit details applies every choice at once;
+ * Add player › New player holds it until Save player. The file is read and cropped by the caller.
  */
 export function ClubPictureField({
   playerId,
@@ -45,6 +50,8 @@ export function ClubPictureField({
   onUsePrevious,
   error,
   pending = false,
+  label = 'Profile picture',
+  hint = 'Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.',
 }: ClubPictureFieldProps) {
   const fileId = useId()
   const charsLabelId = useId()
@@ -91,7 +98,7 @@ export function ClubPictureField({
       role="group"
       aria-label="Profile picture"
     >
-      <span className="text-[13px] font-semibold text-fg2">Profile picture</span>
+      <span className="text-[13px] font-semibold text-fg2">{label}</span>
       <div className="flex items-start gap-4">
         <Avatar name={name} src={currentSrc} size={64} />
         <div className="flex min-w-0 flex-col gap-1.5">
@@ -175,10 +182,7 @@ export function ClubPictureField({
           aria-label="Characters"
         />
       ) : null}
-      <span className="text-xs font-normal text-fg2">
-        Shown wherever this player appears in your club. When they claim their profile they can
-        change it. Only the current and previous photo are kept.
-      </span>
+      <span className="text-xs font-normal text-fg2">{hint}</span>
       <span aria-live="polite" className="text-[13px] font-semibold text-error empty:hidden">
         {shownError}
       </span>

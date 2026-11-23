@@ -293,6 +293,8 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   email?: string
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string
+  /** Optional, private to the club; kept for an unclaimed player only */
+  phone?: string
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {

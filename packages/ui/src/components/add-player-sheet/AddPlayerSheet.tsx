@@ -3,6 +3,7 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
+import type { ClubPictureChoice } from '@rotra/ui/club-picture-field'
 import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { Field } from '@rotra/ui/field'
@@ -90,7 +91,8 @@ type AddPlayerSessionContext = {
 type AddPlayerClubContext = {
   context: 'club'
   onConfirm: (input: AddPlayerClubConfirmInput) => void
-  onSubmitNewPlayer: (values: NewSavedPlayerFormValues) => void
+  /** `picture` is the Profile picture chosen on New player (Saved players only), or null */
+  onSubmitNewPlayer: (values: NewSavedPlayerFormValues, picture: ClubPictureChoice | null) => void
 }
 
 export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContext) & {
@@ -127,6 +129,8 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   newPlayerEmailSavedAs?: string
   /** New player: why the social link was refused (#1019), shown under the field */
   newPlayerSocialLinkError?: string
+  /** New player: why the phone was refused ("NAME already has this number.") */
+  newPlayerPhoneError?: string
   /** Tab shown when the sheet opens; Saved players (Player Information in the club context) unless a story or container says otherwise */
   initialTab?: AddPlayerTab
 }
@@ -202,6 +206,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     directorySavedName,
     newPlayerEmailSavedAs,
     newPlayerSocialLinkError,
+    newPlayerPhoneError,
     isPending = false,
     serverError,
     serverErrorReturnsToList = false,
@@ -562,6 +567,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 serverError={serverError}
                 emailSavedAs={newPlayerEmailSavedAs}
                 socialLinkError={newPlayerSocialLinkError}
+                phoneError={newPlayerPhoneError}
                 onSubmit={props.onSubmitNewPlayer}
               />
             ) : (
@@ -575,6 +581,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                 serverError={serverError}
                 emailSavedAs={newPlayerEmailSavedAs}
                 socialLinkError={newPlayerSocialLinkError}
+                phoneError={newPlayerPhoneError}
                 onSubmit={props.onSubmitNewPlayer}
               />
             )

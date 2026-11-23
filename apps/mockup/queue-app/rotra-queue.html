@@ -2411,6 +2411,16 @@ function picEditor(p) {
         <div class="pic-grid" role="group" aria-labelledby="pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="picChar" data-id="${p.id}" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(p, n)}</span></button>`).join('')}</div>
         <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it. Only the current and previous photo are kept.</span></div>`;
 }
+// Saved players › Add player › New player: the same picture choices, held on the sheet until Save player.
+function newPicEditor(sh) {
+  const d = { id: 'new-player', name: (sh.name || '').trim() || 'New player', identity: 'guest', pic: sh.pic || null }, pc = d.pic, seeds = [0, 1, 2, 3, 4, 5, 6, 7];
+  return `<div class="field"><span>Profile picture (optional)</span>
+        <div class="pic-edit">${avatar(d, 'xl')}<div class="stack tight"><span class="small muted">${!pc ? 'Initials' : pc.kind === 'photo' ? 'A photo' : 'A character'}</span>
+          <div class="row"><label class="btn sm" for="new-pic-file">Upload photo</label><input type="file" id="new-pic-file" class="sr-only" accept="image/*">${pc ? '<button class="btn sm ghost" data-act="newPicRemove">Remove</button>' : ''}</div></div></div>
+        <span class="small muted" id="new-pic-chars-l">Choose a character</span>
+        <div class="pic-grid" role="group" aria-labelledby="new-pic-chars-l">${seeds.map((n) => `<button type="button" class="pic-opt" data-act="newPicChar" data-k="${n}" aria-pressed="${!!(pc && pc.kind === 'char' && pc.seed === n)}" aria-label="Character ${n + 1}"><span class="avatar photo" aria-hidden="true">${faceSVG(d, n)}</span></button>`).join('')}</div>
+        <span class="hint">Shown wherever this player appears in your club. When they claim their profile they can change it.</span></div>`;
+}
 const avatar = (p, cls = '') => (hasPhoto(p)
   ? `<span class="avatar photo ${cls}" role="img" data-photo="${esc(p.id)}" aria-label="Profile picture of ${esc(p.name)}">${picInner(p)}</span>`
   : `<span class="avatar ${cls}" aria-hidden="true">${esc(initials(p.name))}</span>`);
@@ -6818,12 +6828,13 @@ const SHEETS = {
         <p class="small muted">Confirm with the player before adding them.</p>
         <p class="small muted">Prototype: try RTR-PH-MNL-020326-0112, ivan.delarosa@example.com or facebook.com/jun.bautista.</p>`;
     } else {
-      body += `<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
+      body += `${club ? newPicEditor(sh) : ''}<label class="field"><span>Full or display name</span><input class="input${sh.err && !(sh.name || '').trim() ? ' bad' : ''}" id="add-name" data-bind="ui.sheet.name" value="${esc(sh.name || '')}" data-autofocus></label>
         <label class="field"><span>Nickname (optional)</span><input class="input" id="add-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick || '')}"></label>
         ${genderField('add-gender', 'sheet', sh.gender)}
         <label class="field"><span>Email (optional)</span><input class="input" id="add-email" type="email" inputmode="email" data-bind="ui.sheet.email" value="${esc(sh.email || '')}" placeholder="name@example.com"><span class="hint">Never shown publicly. If the email is already on ROTRA, they're linked to that player.</span></label>
         <label class="field"><span>Social link (optional)</span><input class="input${sh.err && sh.errK === 'social' ? ' bad' : ''}" id="add-social" type="url" inputmode="url" data-bind="ui.sheet.social" value="${esc(sh.social || '')}" placeholder="https://facebook.com/yourname"><span class="hint">Facebook, Instagram, YouTube or LinkedIn. Shown on their profile. If the link is already an unclaimed player on ROTRA, they're linked to that player.</span></label>
         <p class="small muted">With an email or a social link they're saved as an unclaimed player and get an RTR ID. With neither, they're saved as a guest.</p>
+        <label class="field"><span>Phone (optional)</span><input class="input${sh.err && sh.errK === 'phone' ? ' bad' : ''}" id="add-phone" type="tel" inputmode="tel" data-bind="ui.sheet.phone" value="${esc(sh.phone || '')}" placeholder="0917 555 0142"><span class="hint">Kept private. Only your club sees it. Saved with an email or a social link; a guest has no phone.</span></label>
         <label class="field"><span>${levelLabel}</span>${selectLevel('add-level-new', sh.level, 'data-bind="ui.sheet.level" data-num', !!sh.err && sh.level == null)}</label>
         ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}`;
       return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button><button class="btn primary" data-act="confirmNew">${primary}</button>`);
@@ -7926,6 +7937,8 @@ const ACT = {
     openSheet({ type: 'editPlayer', id: p.id, d: { name: p.name, nick: p.nick || '', gender: p.gender || '', level: p.sugg ?? null, phone: '', email: p.email || '', style: p.style || '', expY: p.expY || '', expM: p.expM || '', sinceM: p.sinceM || '', sinceY: p.sinceY || '', facebook: p.social?.facebook || '', instagram: p.social?.instagram || '', youtube: p.social?.youtube || '', linkedin: p.social?.linkedin || '' } });
   },
   // Club-set picture for a guest or unclaimed profile: applies at once, like the club logo (D-2026-11-09-10).
+  newPicChar: (d) => { S.ui.sheet.pic = { kind: 'char', seed: +d.k }; render(); },
+  newPicRemove: () => { S.ui.sheet.pic = null; render(); },
   picChar: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = { kind: 'char', seed: +d.k }; commit(`Picture updated · ${p.name}`); render(); },
   picRemove: (d) => { const p = P(d.id); if (!p || p.identity === 'registered') return; const c = picOf(p); if (c && c.kind === 'photo') p.picPrev = c; p.pic = null; commit(`Using initials · ${p.name}`); render(); },
   picUsePrev: (d) => { const p = P(d.id); if (!p || !p.picPrev) return; const c = picOf(p); p.pic = p.picPrev; p.picPrev = c && c.kind === 'photo' ? c : null; commit(`Previous picture restored · ${p.name}`); render(); },
@@ -8327,6 +8340,10 @@ const ACT = {
     if (!name) { sh.err = 'Enter a name.'; render(); return; }
     // #1019: a social link is an entry key too. It must be a profile on one of the four sites.
     if (social && !socialKey(social)) { sh.err = 'Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty.'; sh.errK = 'social'; render(); return; }
+    // A phone is kept for an unclaimed player only (a guest is a name only, D-2026-11-16-04).
+    const phone = (sh.phone || '').trim(), phoneDigits = phone.replace(/\D/g, '');
+    if (phone && !/^(09\d{9}|639\d{9})$/.test(phoneDigits)) { sh.err = 'Enter a Philippine mobile number, like 0917 555 0142, or leave it empty.'; sh.errK = 'phone'; render(); return; }
+    if (phone && !email && !social) { sh.err = 'Add an email or a social link to save a phone, or leave the phone empty.'; sh.errK = 'phone'; render(); return; }
     const sameSocial = social ? savedBySocial(social) : null;
     if (sameSocial) { sh.err = `That social link is already ${sameSocial.name} in your saved players.`; sh.errK = 'social'; render(); return; }
     // D-2026-11-16-04: no email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player.
@@ -8334,8 +8351,8 @@ const ACT = {
     const same = email && !social ? savedByEmail(email) : null;
     if (same) { sh.err = `That email is already ${same.name} in your saved players.`; render(); return; }
     // The email and the link both saved: the link decides who they are; the email is kept on the record.
-    const keys = (p) => { const a = social ? applySocial(p, social) : ''; const b = email ? (social ? (p.email = email.toLowerCase(), a) : applyEmail(p, email)) : a; return b; };
-    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now() };
+    const keys = (p) => { const a = social ? applySocial(p, social) : ''; const b = email ? (social ? (p.email = email.toLowerCase(), a) : applyEmail(p, email)) : a; if (phone) p.noPhone = false; return b; };
+    const np = { id: `p${Date.now()}`, name, nick: (sh.nick || '').trim(), gender: sh.gender || null, identity: 'guest', rtr: null, sugg: null, prior: 0, base: null, added: Date.now(), ...(sh.club && sh.pic ? { pic: sh.pic } : {}) };
     if (sh.club) {
       // Saved players › Add player: a level only if one was chosen.
       np.sugg = sh.level == null || sh.level === '' ? null : +sh.level;
@@ -8761,6 +8778,21 @@ function setPath(path, value) {
   o[keys[keys.length - 1]] = value;
 }
 // Club-set player photo: same centre-crop as the logo; read locally, no network.
+// Add player › New player: the photo is cropped like Edit details and kept on the sheet until Save player.
+function loadNewPlayerPic(file) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { toast('Choose an image file'); return; }
+  if (file.size > 4 * 1024 * 1024) { toast('Choose an image under 4 MB'); return; }
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const side = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 256, 256);
+    S.ui.sheet.pic = { kind: 'photo', src: c.toDataURL('image/png') }; URL.revokeObjectURL(img.src); render();
+  };
+  img.onerror = () => toast('That image could not be read');
+  img.src = URL.createObjectURL(file);
+}
 function loadPlayerPic(file, id) {
   const p = P(id);
   if (!file || !p || p.identity === 'registered') return;
@@ -8883,6 +8915,7 @@ function onBind(e) {
   if (el.id === 'rp-range') { stopReplay(); replayTo(+el.value); return; }
   if (el.id === 'logo-file') { if (e.type === 'change') loadLogo(el.files && el.files[0]); return; }
   if (el.id === 'play-history-file') { if (e.type === 'change') importPlayHistory(el.files && el.files[0]); return; }
+  if (el.id === 'new-pic-file') { if (e.type === 'change') loadNewPlayerPic(el.files && el.files[0]); return; }
   if (el.id === 'pic-file') { if (e.type === 'change') loadPlayerPic(el.files && el.files[0], el.dataset.id); return; }
   if (el.dataset.actChange) { if (e.type === 'change') { curAct = el.dataset.actChange; CHANGE[el.dataset.actChange](el); } return; }
   if (!el.dataset.bind) return;

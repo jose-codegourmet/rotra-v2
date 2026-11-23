@@ -3,7 +3,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { savedPlayerName } from '../club-player/clubNickname.rules'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubEmailWords, emailAlreadySaved, planClubEmail } from '../club-player/email'
-import { OWN_NAME_ERROR } from '../club-player/mutations'
+import { newPlayerPhone, OWN_NAME_ERROR } from '../club-player/mutations'
 import { clubPlayerKeys } from '../club-player/queryKeys'
 import { clubSocialWords, planClubSocial, savedRecordForSocial } from '../club-player/socialLink'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
@@ -285,6 +285,9 @@ export function enqueueAddNewPlayer(
   if (!name) throw new MockError('permission', 'Enter your name.')
   const email = input.email?.trim() || undefined
   const socialLink = input.socialLink?.trim() || undefined
+  const phone = input.phone?.trim() || undefined
+  // Checked as the tap happens, like the email (mock store only; the server checks it in real mode).
+  if (phone && !isRealDataMode()) newPlayerPhone(readMockState(), { phone, email, socialLink })
   const emailWords = newPlayerEmailWords(email, socialLink)
   const place = placement(client, input.sessionId, input.toWaitlist, input.allowOverfill)
   const clubPlayerId = crypto.randomUUID()
@@ -298,6 +301,7 @@ export function enqueueAddNewPlayer(
       nickname: input.nickname?.trim() || undefined,
       ...(email ? { email } : {}),
       ...(socialLink ? { socialLink } : {}),
+      ...(phone ? { phone } : {}),
       level: input.level,
     },
     preview: preview(

@@ -35,5 +35,13 @@ export const playerPoolCardMeta = {
     'with Set games played',
     'with profile button',
   ],
-  related: ['PlayerPoolToolbar', 'SelectionBar', 'SetGamesSheet', 'RosterRow', 'PlayerNameBlock', 'Switch', 'Avatar'],
+  related: [
+    'PlayerPoolToolbar',
+    'SelectionBar',
+    'SetGamesSheet',
+    'RosterRow',
+    'PlayerNameBlock',
+    'Switch',
+    'Avatar',
+  ],
 } satisfies ComponentMeta

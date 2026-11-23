@@ -5,7 +5,6 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
-import { IconButton } from '@rotra/ui/icon-button'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
@@ -22,9 +21,14 @@ export type PlayerPoolCardStatus =
   | { kind: 'free' }
 
 export type PlayerPoolCardProps = {
+  /** The full name: the screen-reader label and the hover text */
   name: string
+  /** The player's own nickname; shown when there is no club nickname */
+  nickname?: string | null
+  /** The club nickname (registered players only); shown first */
+  clubNickname?: string | null
   photoUrl?: string
-  /** The level locked for this session; null when none was set */
+  /** The level locked for this session; null when none was set. Shown as the picture's ring, not as text */
   level: PlayingLevel | null
   /** Counted games so far */
   games: number
@@ -46,17 +50,17 @@ export type PlayerPoolCardProps = {
   /** The Present switch; toggling it never changes the selection */
   onPresentChange: (present: boolean) => void
   /**
-   * Set games played… (#717, D-SET-GAMES): shows a small ghost pencil button at the card's top right.
-   * Tapping it never selects the card.
+   * Set games played… (D-SET-GAMES): makes Current in the games strip a button (dashed underline,
+   * hover tint, focus ring). Pressing it never selects the card; Total is not clickable.
    */
   onSetGames?: () => void
   /**
-   * Move to waitlist (#735): a secondary button on the card's last row. Tapping it never selects
-   * the card. The container blocks it with a toast while the player is in a match.
+   * Edit player (D-EDIT-LIVE-PLAYER): a ghost pencil button at the card's top right named
+   * “Edit NAME”. Pressing it never selects the card.
    */
-  onStepDown?: () => void
+  onEdit?: () => void
   /**
-   * No show (cancelled): a ghost button in error colour next to Move to waitlist. Pass it only for a
+   * No show (cancelled): a ghost button in error colour on the card's last row. Pass it only for a
    * live player who is away, has played no games and is in no match; it opens the confirmation.
    */
   onNoShow?: () => void
@@ -81,13 +85,24 @@ function statusText(status: PlayerPoolCardStatus) {
   }
 }
 
+const RING = {
+  beginner: '[--ring:var(--lv-beg)]',
+  intermediate: '[--ring:var(--lv-int)]',
+  advanced: '[--ring:var(--lv-adv)]',
+  none: '[--ring:var(--lv-none)]',
+} as const
+
 /**
- * One player in the live Players view (the prototype's .pc3): a role=button card with picture, name,
- * locked level, played and for-the-night totals, wait time, status and the Present switch. Tapping, Enter
- * or Space toggles selection; selected cards show their pick order in a badge.
+ * One player in the live Players view (the prototype's .pc3): a role=button card with the picture in
+ * a level-band ring, one name (club nickname, nickname, full name; two lines at most), the
+ * Current | Total games strip, wait time, status and the Present switch. Tapping, Enter or Space
+ * toggles selection; selected cards show their pick order in a badge. No Move to waitlist: the
+ * session is already running.
  */
 export function PlayerPoolCard({
   name,
+  nickname,
+  clubNickname,
   photoUrl,
   level,
   games,
@@ -103,11 +118,13 @@ export function PlayerPoolCard({
   onToggleSelect,
   onPresentChange,
   onSetGames,
-  onStepDown,
+  onEdit,
   onNoShow,
   onOpenProfile,
   className,
 }: PlayerPoolCardProps) {
+  const shownName = clubNickname?.trim() || nickname?.trim() || name
+  const band = level ? (level.split('_')[0] as keyof typeof RING) : 'none'
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
   const presenceCaption =
     present && selfCheckedInAt != null
@@ -132,7 +149,7 @@ export function PlayerPoolCard({
       aria-label={`${name}, ${levelLabel(level)}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       onClick={onToggleSelect}
       onKeyDown={onKeyDown}
-      className={cn(playerPoolCardVariants({ state }), className)}
+      className={cn(playerPoolCardVariants({ state }), RING[band], className)}
     >
       {selected && pickOrder !== undefined ? (
         <span
@@ -143,6 +160,7 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       <div className="flex min-w-0 items-center gap-2">
+        {/* The ring is the level band; hovering the picture names the level. */}
         {onOpenProfile ? (
           // The picture button sits inside the card: stop its clicks and keys from selecting the card.
           // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
@@ -155,57 +173,105 @@ export function PlayerPoolCard({
               name={name}
               src={photoUrl}
               size={40}
+              title={levelLabel(level)}
               onClick={onOpenProfile}
-              className={cn(state === 'away' && 'opacity-55 grayscale')}
+              className={cn(
+                'outline-[3px] outline-offset-2 outline-(--ring)',
+                state === 'away' && 'opacity-55 grayscale',
+              )}
             />
           </span>
         ) : (
-          <Avatar
-            name={name}
-            src={photoUrl}
-            size={40}
-            className={cn(state === 'away' && 'opacity-55 grayscale')}
-          />
+          <span className="flex-none" title={levelLabel(level)}>
+            <Avatar
+              name={name}
+              src={photoUrl}
+              size={40}
+              className={cn(
+                'outline-[3px] outline-offset-2 outline-(--ring)',
+                state === 'away' && 'opacity-55 grayscale',
+              )}
+            />
+          </span>
         )}
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] leading-tight font-bold [overflow-wrap:anywhere]">{name}</div>
-          <div className="text-[11px] leading-[1.3] text-fg2">{levelLabel(level)}</div>
+          {/* One name; the full name is the hover text and the card's screen-reader label keeps it. */}
+          <div
+            title={name}
+            className="line-clamp-2 overflow-hidden text-[13px] leading-tight font-bold [overflow-wrap:anywhere]"
+          >
+            {shownName}
+          </div>
         </div>
-        {onSetGames ? (
-          // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
+        {onEdit ? (
+          // The pencil sits inside the card: stop its clicks and keys from selecting the card.
           // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
           <span
-            className="flex-none"
+            className="flex-none self-start"
             onClick={(event) => event.stopPropagation()}
             onKeyDown={(event) => event.stopPropagation()}
           >
-            <IconButton
-              variant="ghost"
+            <Button
               size="xs"
-              label={`Set games played… ${name}`}
-              title="Set games played…"
-              onClick={onSetGames}
+              variant="ghost"
+              aria-label={`Edit ${name}`}
+              title="Edit player"
+              onClick={onEdit}
             >
               <Icon name="edit" size={16} />
-            </IconButton>
+            </Button>
           </span>
         ) : null}
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
       <div
         role="group"
-        className="grid grid-cols-2 gap-2"
+        className="grid grid-cols-[1fr_1px_1fr] items-stretch overflow-hidden rounded-md border border-border-strong bg-bg"
         aria-label={`${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       >
-        <div className="flex min-w-0 flex-col gap-0.5 rounded-md bg-bg px-2.5 py-2">
-          <b className="text-2xl leading-none font-extrabold tabular-nums">{games}</b>
-          <span className="text-[11px] text-fg2">played</span>
-        </div>
-        <div className="flex min-w-0 flex-col gap-0.5 rounded-md bg-accent-subtle px-2.5 py-2">
-          <b className="text-2xl leading-none font-extrabold text-accent tabular-nums">
+        {onSetGames ? (
+          // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
+          // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+          <span
+            className="flex min-w-0"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              title="Games played so far"
+              aria-label={`${games} games played. Set games played for ${name}`}
+              onClick={onSetGames}
+              className="flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-px border-0 bg-transparent px-1 py-1.5 text-inherit transition-colors hover:bg-accent-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
+            >
+              <b className="text-lg leading-[1.1] font-extrabold tabular-nums">{games}</b>
+              <span className="text-[10px] font-semibold tracking-[0.4px] text-fg2 uppercase underline decoration-dashed underline-offset-[3px]">
+                Current
+              </span>
+            </button>
+          </span>
+        ) : (
+          <div
+            title="Games played so far"
+            className="flex min-w-0 flex-col items-center gap-px px-1 py-1.5"
+          >
+            <b className="text-lg leading-[1.1] font-extrabold tabular-nums">{games}</b>
+            <span className="text-[10px] font-semibold tracking-[0.4px] text-fg2 uppercase">
+              Current
+            </span>
+          </div>
+        )}
+        <i aria-hidden className="my-1.5 bg-border-strong" />
+        <div
+          title="Played plus queued for the night"
+          className="flex min-w-0 flex-col items-center gap-px px-1 py-1.5"
+        >
+          <b className="text-lg leading-[1.1] font-extrabold text-accent tabular-nums">
             {forTheNight}
           </b>
-          <span className="text-[11px] text-fg2">for the night</span>
+          <span className="text-[10px] font-semibold tracking-[0.4px] text-fg2 uppercase">
+            Total
+          </span>
         </div>
       </div>
       <div className="flex flex-nowrap items-center justify-between gap-3">
@@ -242,7 +308,7 @@ export function PlayerPoolCard({
         </span>
       ) : null}
       {presencePending ? <span className="text-[11px] text-fg2">Saving presence…</span> : null}
-      {onStepDown || onNoShow ? (
+      {onNoShow ? (
         // The button sits inside the card: stop its clicks and keys from reaching the card's selection.
         // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
         <span
@@ -250,22 +316,15 @@ export function PlayerPoolCard({
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          {onStepDown ? (
-            <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
-              Move to waitlist
-            </Button>
-          ) : null}
-          {onNoShow ? (
-            <Button
-              size="xs"
-              variant="ghost"
-              className="text-error"
-              aria-label={`Mark ${name} as No show (cancelled)`}
-              onClick={onNoShow}
-            >
-              No show (cancelled)
-            </Button>
-          ) : null}
+          <Button
+            size="xs"
+            variant="ghost"
+            className="text-error"
+            aria-label={`Mark ${name} as No show (cancelled)`}
+            onClick={onNoShow}
+          >
+            No show (cancelled)
+          </Button>
         </span>
       ) : null}
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}

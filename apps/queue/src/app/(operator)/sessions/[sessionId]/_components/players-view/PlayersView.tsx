@@ -25,10 +25,6 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import {
-  inUnfinishedMatch,
-  stepDownBlockedText,
-} from '@rotra/data/session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
@@ -41,7 +37,6 @@ import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromW
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
-import { useStepDownToWaitlist } from '@rotra/data/session-roster/useStepDownToWaitlist'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -62,7 +57,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
@@ -149,14 +144,12 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
-  const stepDown = useStepDownToWaitlist()
   const noShows = useSessionNoShows(sessionId)
   const markNoShow = useMarkNoShow()
   const undoNoShow = useUndoNoShow()
   /** The roster id whose "Mark NAME as No show?" confirmation is open */
   const [noShowFor, setNoShowFor] = useState<string | null>(null)
   const [noShowError, setNoShowError] = useState<string | undefined>()
-  const steppingDown = useRef(new Set<string>())
   /** Admit player on a full roster waits for D-OVERFILL (#735) */
   const [overfillWaiter, setOverfillWaiter] = useState<string | null>(null)
   /** Set games played: one roster id, or 'all' */
@@ -286,20 +279,6 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   })
   const overfillEntry = entries.find((w) => w.id === overfillWaiter)
   const giveSlotTo = (waitlistId: string) => giveSlot.mutate({ sessionId, waitlistId }, options)
-  /** Move to waitlist (#735): blocked with a toast while the player is in any unfinished match. */
-  const stepDownPlayer = (player: SessionPlayer) => {
-    if (inUnfinishedMatch(player.id, all)) {
-      toast(stepDownBlockedText(queueMasterName(player)))
-      return
-    }
-    if (steppingDown.current.has(player.id)) return
-    steppingDown.current.add(player.id)
-    setPicked((prev) => prev.filter((id) => id !== player.id))
-    stepDown.mutate(
-      { sessionId, rosterId: player.id, operationId: crypto.randomUUID() },
-      { ...options, onSettled: () => steppingDown.current.delete(player.id) },
-    )
-  }
   const noShowTarget = rosterList.find((p) => p.id === noShowFor)
   const noShowList = noShows.data ?? []
   const confirmNoShow = (player: SessionPlayer) => {
@@ -383,7 +362,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             return (
               <PlayerPoolCard
                 key={row.player.id}
-                name={queueMasterName(row.player)}
+                name={row.player.nameSnapshot}
+                nickname={row.player.nicknameSnapshot}
+                clubNickname={row.player.clubNickname}
                 photoUrl={photoFor(row.player)}
                 level={row.player.level}
                 games={row.games}
@@ -401,9 +382,6 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 onSetGames={() => {
                   setSetGamesError(undefined)
                   void setPresence.flush().then(() => setSetGamesFor(row.player.id))
-                }}
-                onStepDown={() => {
-                  void setPresence.flush().then(() => stepDownPlayer(row.player))
                 }}
                 // No show (cancelled): after Start, away, no games and in no match (#839).
                 onNoShow={

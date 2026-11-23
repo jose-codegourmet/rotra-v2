@@ -39,6 +39,10 @@ export type RosterPanelPlayer = {
   /** The session player's id, passed back through the callbacks */
   id: string
   name: string
+  /** The player's own nickname, for the club-facing name block */
+  nickname?: string | null
+  /** The club nickname (registered players only) */
+  clubNickname?: string | null
   photoUrl?: string
   identity: Identity
   suggestion: PlayingLevel | null
@@ -145,6 +149,8 @@ function PlayerList({
           <RosterCard
             key={p.id}
             name={p.name}
+            nickname={p.nickname}
+            clubNickname={p.clubNickname}
             photoUrl={p.photoUrl}
             identity={p.identity}
             suggestion={p.suggestion}
@@ -162,6 +168,7 @@ function PlayerList({
             onPresentChange={(present) => onPresentChange(p.id, present)}
             onRemove={() => onRemove(p.id)}
             onStepDown={onStepDown ? () => onStepDown(p.id) : undefined}
+            hideStepDown={readOnly}
             compactOnPhone
           />
         ))}
@@ -174,6 +181,8 @@ function PlayerList({
         <RosterRow
           key={p.id}
           name={p.name}
+          nickname={p.nickname}
+          clubNickname={p.clubNickname}
           photoUrl={p.photoUrl}
           identity={p.identity}
           suggestion={p.suggestion}

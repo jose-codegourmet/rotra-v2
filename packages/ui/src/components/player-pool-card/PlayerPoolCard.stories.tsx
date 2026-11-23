@@ -63,20 +63,21 @@ export const Available: Story = {}
 export const Playing: Story = { args: playing }
 /** Not present: greyed picture, "Away", Present switch off */
 export const Away: Story = { args: away }
-/** Away, no games, in no match: No show (cancelled) next to Move to waitlist */
-export const AwayNoShow: Story = { args: { ...away, games: 0, onStepDown: fn(), onNoShow: fn() } }
+/** Away, no games, in no match: No show (cancelled) is the only button (no Move to waitlist during play) */
+export const AwayNoShow: Story = { args: { ...away, games: 0, forTheNight: 0, onNoShow: fn() } }
 export const AwayNoShowLight: Story = { ...AwayNoShow, globals: { theme: 'light' } }
 /** Present and already in a waiting match */
 export const Queued: Story = { args: queued }
 /** Picked for the next match: accent ring and the pick-order badge */
 export const SelectedWithOrder: Story = { args: { selected: true, pickOrder: 2 } }
 export const NoLevel: Story = { args: { level: null } }
-/** The live console passes onSetGames: a ghost pencil button opens Set games played (#717) */
+/** The live console passes onSetGames: Current is a button (dashed underline, hover tint) that opens Set games played */
 export const WithSetGames: Story = { args: { onSetGames: fn() } }
 /** The picture opens the profile card; the rest of the card still selects. */
 export const WithProfileButton: Story = { args: { onOpenProfile: fn(), onSetGames: fn() } }
+/** Clamped at two lines with an ellipsis */
 export const LongName: Story = {
-  args: { name: `${free.name} Bautista Villareal de la Cruz` },
+  args: { name: `${free.name} Bautista Villareal de la Cruz Santos Dela Rosa` },
 }
 
 /** Tap, Enter or Space toggles selection; the Present switch is its own control */
@@ -159,9 +160,34 @@ export const SelectedLight: Story = {
 export const SelfCheckedInLight: Story = { ...SelfCheckedIn, globals: { theme: 'light' } }
 export const LeftLight: Story = { ...Left, globals: { theme: 'light' } }
 
-// #735: Move to waitlist on the Players card; the container blocks it with a toast while in a match.
-export const WithMoveToWaitlist: Story = { args: { onSetGames: fn(), onStepDown: fn() } }
-export const WithMoveToWaitlistLight: Story = {
-  ...WithMoveToWaitlist,
-  globals: { theme: 'light' },
+/** No games: 0 | 0 */
+export const NoGames: Story = { args: { ...free, games: 0, forTheNight: 0, onSetGames: fn() } }
+/** Queued games: Total is higher than Current */
+export const QueuedGames: Story = { args: { ...queued, onSetGames: fn() } }
+export const WithSetGamesLight: Story = { ...WithSetGames, globals: { theme: 'light' } }
+
+/** Each level band colours the picture ring; hover the picture to read the level */
+const BANDS = ['beginner_low', 'intermediate_mid', 'advanced_high', null] as const
+export const LevelRings: Story = {
+  decorators: [
+    (Story) => (
+      <div className={`max-w-4xl ${GRID}`}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <>
+      {BANDS.map((level) => (
+        <PlayerPoolCard key={level ?? 'none'} {...free} level={level} />
+      ))}
+    </>
+  ),
 }
+export const LevelRingsLight: Story = { ...LevelRings, globals: { theme: 'light' } }
+
+/** One name: club nickname first, then nickname, then the full name; hover shows the full name */
+export const ClubNickname: Story = { args: { nickname: 'Migs', clubNickname: 'Migo' } }
+export const NicknameOnly: Story = { args: { nickname: 'Migs' } }
+export const FullNameOnly: Story = {}
+export const ClubNicknameLight: Story = { ...ClubNickname, globals: { theme: 'light' } }

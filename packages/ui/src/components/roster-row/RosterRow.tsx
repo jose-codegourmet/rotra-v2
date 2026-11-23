@@ -11,11 +11,16 @@ import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelDiffIndicator } from '@rotra/ui/level-diff-indicator'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { LevelSelectMenu } from '@rotra/ui/level-select-menu'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { Switch } from '@rotra/ui/switch'
 import { useId } from 'react'
 
 export type RosterRowProps = {
   name: string
+  /** The player's own nickname; the name block shows club nickname, nickname, then `name` (full name) */
+  nickname?: string | null
+  /** The club nickname (registered players only) */
+  clubNickname?: string | null
   photoUrl?: string
   identity: Identity
   /** The Player Information suggestion; null when there is none */
@@ -52,6 +57,8 @@ export type RosterRowProps = {
  */
 export function RosterRow({
   name,
+  nickname,
+  clubNickname,
   photoUrl,
   identity,
   suggestion,
@@ -82,7 +89,7 @@ export function RosterRow({
       <div className="flex min-w-0 items-center gap-3">
         <Avatar name={name} src={photoUrl} onClick={onOpenProfile} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <b className="font-semibold [overflow-wrap:anywhere]">{name}</b>
+          <PlayerNameBlock fullName={name} nickname={nickname} clubNickname={clubNickname} />
           <div className="flex flex-wrap items-center gap-1.5">
             <IdentityChip identity={identity} />
             <span className="text-[13px] text-fg2">

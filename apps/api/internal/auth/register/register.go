@@ -101,7 +101,7 @@ func (h *handlers) post(w http.ResponseWriter, r *http.Request) {
 		writes.Write(w, r, h.log, err)
 		return
 	}
-	f, issues := parseForm(body)
+	f, issues := parseForm(body, false)
 	if issues != nil {
 		writes.Write(w, r, h.log, writes.Fail(httpapi.ErrInvalid, issues))
 		return

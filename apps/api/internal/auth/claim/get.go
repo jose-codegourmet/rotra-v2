@@ -111,8 +111,9 @@ func (l *recordLink) view(now time.Time) *linkView {
 			FullName: l.DisplayName, Nickname: text(l.Nickname),
 			MaskedPhone: maskedPhone(l.InputPhone),
 		},
-		// recordPresetOf: the club typed only a name, a nickname and an email.
-		Preset: linkPreset{FullName: l.DisplayName, Nickname: orEmpty(l.Nickname), Email: orEmpty(l.InputEmail)},
+		// recordPresetOf: the club typed only a name, a nickname and an email; the email of the record's shared entry comes first
+		// (BL-14: sharedEntry?.email ?? privateInput?.email).
+		Preset: linkPreset{FullName: l.DisplayName, Nickname: orEmpty(l.Nickname), Email: firstEmail(l.SharedEntryEmail, l.InputEmail)},
 	}
 	if l.PlayerID.Valid {
 		id := uuidOf(l.PlayerID).String()
@@ -164,6 +165,14 @@ func (l *playerLink) view(now time.Time, links []sqlcgen.ListPlayerSocialLinksRo
 		}
 	}
 	return v
+}
+
+// firstEmail is `a ?? b` over two nullable emails.
+func firstEmail(a, b pgtype.Text) string {
+	if a.Valid {
+		return a.String
+	}
+	return orEmpty(b)
 }
 
 func maskedPhone(t pgtype.Text) string {

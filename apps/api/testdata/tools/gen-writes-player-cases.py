@@ -169,7 +169,7 @@ EVERYTHING = [PLAYERS, LINKS, NOTES, ACCOUNTS, MEMBERS, CLUBS, REQUESTS, CONTACT
 
 SCENARIOS = {
     "base": [],
-    # Past the Google deadline (2026-12-31 Manila time) with the flag on: a player with no Google account is refused.
+    # The flag on (the Google gate also needs the deadline to have passed; the Google routes need only the flag).
     "gate_on": ["UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"],
     "alice_hidden_banner": ["UPDATE players SET banner_id = 'ember' WHERE id = '%s'" % ALICE],
     "dan_left_smash": ["UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"],
@@ -922,3 +922,211 @@ with open(os.path.join(OUT, "claim.cases.json"), "w") as f:
     json.dump(doc, f, indent=1, ensure_ascii=False)
     f.write("\n")
 print("ok")
+
+
+# ---------------------------------------------------------------- Google sign-in (track go-sign-in-catch-up, D-2026-11-16-01)
+# The seven Google routes. There is no Google and no Supabase here: only what the TypeScript decides before it needs the provider is
+# capturable (the flag, the request's own checks, and "nothing was held"). The trip to Google, the held account and the decisions
+# that follow are pinned in Go against a fake Google (internal/auth/google tests) and compared with the TypeScript, with the held state
+# stubbed, by the googleflow group below. Cookies and the redirect's origin are Go's own and are not compared.
+google_cases = []
+case = mk(google_cases)
+
+def gstep(method, path, body=None, raw=None, ignore=None):
+    out = step(method, path, None, body=body, raw=raw)
+    if ignore:
+        out["ignoreHeaders"] = ignore
+    return out
+
+G_BODY = {"fullName": "Gina Google", "nickname": "", "playingStyle": "", "experienceYears": "", "experienceMonths": "", "facebook": "", "instagram": "", "youtube": "", "linkedin": "", "phone": "0917 555 0305"}
+G_CLAIM = {"fullName": "Gina Google", "nickname": "", "playingStyle": "", "experienceYears": None, "experienceMonths": None, "socialLinks": {"facebook": "", "instagram": "", "youtube": "", "linkedin": ""}, "phone": ""}
+G_ROUTES = {
+    "start": gstep("POST", "/api/auth/google/start", {"intent": "login", "key": "login", "returnTo": "/me"}),
+    "callback": gstep("GET", "/api/auth/google/callback?code=x&state=y", ignore=["location", "set-cookie"]),
+    "outcome read": gstep("GET", "/api/auth/google/outcome"),
+    "outcome take": gstep("POST", "/api/auth/google/outcome", ignore=["set-cookie"]),
+    "link": gstep("POST", "/api/auth/google/link", {"playerId": ALICE, "googleEmail": "alice@example.test"}),
+    "unclaimed": gstep("GET", "/api/auth/google/unclaimed?email=sam%40example.test"),
+    "claim": gstep("POST", "/api/claim/anything/google", G_CLAIM),
+    "register": gstep("POST", "/api/register/%s/google?k=%s" % (SMASH, SMASH_K), {"values": G_BODY}),
+}
+for label, st in G_ROUTES.items():
+    case("flag_off_%s_is_not_found" % label.replace(" ", "_"), [st])
+    if label != "start":  # a valid start asks the provider for the URL: not capturable here
+        case("flag_on_without_a_held_google_%s" % label.replace(" ", "_"), [st], scenario="gate_on")
+
+for label, body in {
+    "an_unknown_intent": {"intent": "admin", "key": "login", "returnTo": "/me"},
+    "no_intent": {"key": "login"},
+    "a_bad_key": {"intent": "login", "key": "Not A Key"},
+    "a_long_key": {"intent": "login", "key": "a" * 25},
+}.items():
+    case("start_%s" % label, [gstep("POST", "/api/auth/google/start", body)], scenario="gate_on")
+case("start_a_body_that_is_not_an_object", [gstep("POST", "/api/auth/google/start", raw="[1]")], scenario="gate_on")
+case("start_a_body_that_is_not_json", [gstep("POST", "/api/auth/google/start", raw="nope")], scenario="gate_on")
+case("callback_without_a_flow_cookie_goes_to_login", [gstep("GET", "/api/auth/google/callback?code=x&state=y", ignore=["location", "set-cookie"])], scenario="gate_on")
+case("outcome_read_with_nothing_waiting", [gstep("GET", "/api/auth/google/outcome")], scenario="gate_on")
+case("unclaimed_with_no_email", [gstep("GET", "/api/auth/google/unclaimed")], scenario="gate_on")
+case("link_with_a_body_that_is_not_an_object", [gstep("POST", "/api/auth/google/link", raw="[]")], scenario="gate_on")
+case("claim_with_a_bad_phone_before_anything_is_held", [gstep("POST", "/api/claim/anything/google", dict(G_CLAIM, phone="12345"))], scenario="gate_on")
+case("claim_with_a_body_that_is_not_an_object", [gstep("POST", "/api/claim/anything/google", raw="[1]")], scenario="gate_on")
+case("register_with_a_form_that_fails_its_schema", [gstep("POST", "/api/register/%s/google?k=%s" % (SMASH, SMASH_K), {"values": dict(G_BODY, fullName="", phone="12")})], scenario="gate_on")
+case("register_with_no_values", [gstep("POST", "/api/register/%s/google?k=%s" % (SMASH, SMASH_K), {})], scenario="gate_on")
+case("register_with_values_that_are_not_an_object", [gstep("POST", "/api/register/%s/google?k=%s" % (SMASH, SMASH_K), {"values": "x"})], scenario="gate_on")
+case("register_with_a_wrong_invite_code_and_nothing_held", [gstep("POST", "/api/register/%s/google?k=WRONG" % SMASH, {"values": G_BODY})], scenario="gate_on")
+case("register_with_a_body_that_is_not_an_object", [gstep("POST", "/api/register/%s/google?k=%s" % (SMASH, SMASH_K), raw="[1]")], scenario="gate_on")
+
+doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": SCENARIOS, "snapshot": [PLAYERS, ACCOUNTS, CONTACTS, LOGINS], "cases": google_cases}
+names = [c["name"] for c in google_cases]
+assert len(names) == len(set(names)), "duplicate case names in google"
+with open(os.path.join(OUT, "google.cases.json"), "w") as f:
+    json.dump(doc, f, indent=1, ensure_ascii=False)
+    f.write("\n")
+print("ok google")
+
+# ---------------------------------------------------------------- Google sign-in, flag on, after the trip to Google (group googleflow)
+# What the routes decide once Google has been through (D-2026-11-16-01), compared with the TypeScript. Only what the browser holds is
+# stubbed: in the TypeScript the held Google sign-in is a provider session and the result a cookie, and a case declares both in one
+# cookie, "capture-google" (base64url JSON: held {subject, email, name, googleOnly}, result {key, intent, outcome, email, name}). The
+# capture's mock of google-oauth.ts answers readPendingGoogle / readGoogleResult from it; the Go replay turns it into Go's own sealed
+# cookies. Every decision, service and database write runs for real on both sides. The Set-Cookie of every answer is not compared
+# (Go's cookies are its own): internal/auth/google tests pin their names and clearing. The sign-in identity of a new Google account
+# is Go's own (auth_identities), so this group's snapshot has no logins table.
+import base64
+flow_cases = []
+case = mk(flow_cases)
+
+def gcookie(held=None, result=None):
+    raw = json.dumps({k: v for k, v in {"held": held, "result": result}.items() if v is not None}, separators=(",", ":"))
+    return "capture-google=" + base64.urlsafe_b64encode(raw.encode()).decode().rstrip("=")
+
+def fstep(method, path, who=None, body=None, raw=None, held=None, result=None, redact=None):
+    out = step(method, path, who, body=body, raw=raw, redact=redact)
+    if held is not None or result is not None:
+        out["cookie"] = gcookie(held, result)
+    out["ignoreHeaders"] = ["set-cookie"]
+    if redact:
+        out["redactOptional"] = True
+    return out
+
+NEW_SUB = SUB(80)
+def held_of(email, name="Gina Google", subject=NEW_SUB, google_only=True):
+    return {"subject": subject, "email": email, "name": name, "googleOnly": google_only}
+def result_of(outcome, intent="login", email="", name="", key="login"):
+    return {"key": key, "intent": intent, "outcome": outcome, "email": email, "name": name}
+
+GINA = "gina.google@example.test"
+H_GINA = held_of(GINA)
+H_BOB = held_of("bob@example.test", "Bob Santos", subject=B_S, google_only=False)   # the provider attached Google to Bob's own login
+H_FAY = held_of("fay@example.test", "Fay Disabled", subject=F_S, google_only=False)  # a disabled account
+H_SHARED = held_of("shared@example.test", "Shared Person")                           # an email a club saved (open shared entry)
+OUTC = "/api/auth/google/outcome"
+LINK = "/api/auth/google/link"
+UNCL = "/api/auth/google/unclaimed"
+CLAIM_G = lambda token: "/api/claim/%s/google" % token
+REG_G = "/api/register/%s/google?k=%s" % (SMASH, SMASH_K)
+CLAIM_REDACT = ["playerId", "session.account.id"]
+
+gs = dict(REG_SCENARIOS)
+gs["flow_cards"] = SCENARIOS["gate_on"] + REG_SCENARIOS["shared_entry"]
+gs["flow_claim_plain"] = SCENARIOS["gate_on"] + CL_PLAIN
+gs["flow_claim_shared"] = SCENARIOS["gate_on"] + REG_SCENARIOS["shared_entry"] + CL_PLAIN + CL_SHARED_LINKS
+gs["flow_claim_guest"] = SCENARIOS["gate_on"] + CL_PLAIN + CL_GUEST
+gs["flow_claim_taken_google"] = SCENARIOS["gate_on"] + CL_PLAIN + ["UPDATE player_accounts SET google_email = '%s' WHERE player_id = '%s'" % (GINA, CARLA)]
+CLEAR_RESETS = "DELETE FROM player_password_reset_requests"
+gs["flow_reset_on"] = SCENARIOS["gate_on"] + [CLEAR_RESETS]
+gs["flow_reset_off"] = [CLEAR_RESETS]
+gs["flow_link_taken"] = SCENARIOS["gate_on"] + ["UPDATE player_accounts SET google_email = 'bob@example.test' WHERE player_id = '%s'" % CARLA]
+
+# GET outcome: what is waiting, and for which screen.
+case("flow_peek_a_held_result", [fstep("GET", OUTC, held=H_GINA, result=result_of("held", "register", GINA, "Gina Google", "invite"))], scenario="gate_on")
+case("flow_peek_a_signed_in_result", [fstep("GET", OUTC, A_S, result=result_of("signed-in", "login", "alice@example.test", "Alice Reyes"))], scenario="gate_on")
+case("flow_peek_a_failed_result", [fstep("GET", OUTC, result=result_of("failed", "login"))], scenario="gate_on")
+case("flow_peek_a_not_connected_result", [fstep("GET", OUTC, result=result_of("not-connected", "login", GINA, "Gina Google"))], scenario="gate_on")
+case("flow_peek_a_result_with_a_bad_key", [fstep("GET", OUTC, result=result_of("taken", "login", GINA, key="Bad Key"))], scenario="gate_on")
+case("flow_peek_a_result_with_a_bad_intent", [fstep("GET", OUTC, result=result_of("taken", "admin", GINA))], scenario="gate_on")
+case("flow_peek_a_result_with_an_unknown_outcome", [fstep("GET", OUTC, result=result_of("welcome", "login", GINA))], scenario="gate_on")
+
+# POST outcome: what the callback decided, in the shapes the screens read.
+case("flow_outcome_signed_in", [fstep("POST", OUTC, A_S, result=result_of("signed-in", "login", "alice@example.test", "Alice Reyes"))], scenario="gate_on")
+case("flow_outcome_signed_in_with_nobody_signed_in", [fstep("POST", OUTC, result=result_of("signed-in", "login", "alice@example.test", "Alice Reyes"))], scenario="gate_on")
+case("flow_outcome_signed_in_for_a_player_with_no_google", [fstep("POST", OUTC, B_S, result=result_of("signed-in", "login", "bob@example.test", "Bob Santos"))], scenario="gate_on")
+case("flow_outcome_held_asks_to_connect", [fstep("POST", OUTC, held=H_BOB, result=result_of("held", "register", "bob@example.test", "Bob Santos", "invite"))], scenario="gate_on")
+case("flow_outcome_held_is_a_new_account", [fstep("POST", OUTC, held=H_GINA, result=result_of("held", "register", GINA, "Gina Google", "invite"))], scenario="gate_on")
+case("flow_outcome_held_is_a_new_account_with_identity_cards", [fstep("POST", OUTC, held=H_SHARED, result=result_of("held", "register", "shared@example.test", "Shared Person", "invite"))], scenario="flow_cards")
+case("flow_outcome_held_of_a_disabled_account", [fstep("POST", OUTC, held=H_FAY, result=result_of("held", "register", "fay@example.test", "Fay Disabled", "invite"))], scenario="gate_on")
+case("flow_outcome_held_with_nothing_held", [fstep("POST", OUTC, result=result_of("held", "register", GINA, "Gina Google", "invite"))], scenario="gate_on")
+case("flow_outcome_not_connected", [fstep("POST", OUTC, result=result_of("not-connected", "login", GINA, "Gina Google"))], scenario="gate_on")
+case("flow_outcome_taken", [fstep("POST", OUTC, result=result_of("taken", "register", GINA, "Gina Google", "invite"))], scenario="gate_on")
+case("flow_outcome_connected", [fstep("POST", OUTC, A_S, result=result_of("connected", "connect", "alice@example.test", "Alice Reyes", "connect"))], scenario="gate_on")
+case("flow_outcome_failed", [fstep("POST", OUTC, result=result_of("failed", "login"))], scenario="gate_on")
+
+# POST link: the player's one yes.
+case("flow_link_connects_google_and_signs_in", [fstep("POST", LINK, held=H_BOB, body={"playerId": BOB, "googleEmail": "bob@example.test"})], scenario="gate_on")
+case("flow_link_with_the_email_typed_in_capitals", [fstep("POST", LINK, held=H_BOB, body={"playerId": BOB, "googleEmail": "  Bob@Example.TEST "})], scenario="gate_on")
+case("flow_link_for_another_player_is_forbidden", [fstep("POST", LINK, held=H_BOB, body={"playerId": ALICE, "googleEmail": "bob@example.test"})], scenario="gate_on")
+case("flow_link_with_another_email_is_forbidden", [fstep("POST", LINK, held=H_BOB, body={"playerId": BOB, "googleEmail": "someone@example.test"})], scenario="gate_on")
+case("flow_link_for_a_disabled_account_is_forbidden", [fstep("POST", LINK, held=H_FAY, body={"playerId": FAY, "googleEmail": "fay@example.test"})], scenario="gate_on")
+case("flow_link_for_an_email_with_no_account_is_forbidden", [fstep("POST", LINK, held=H_GINA, body={"playerId": BOB, "googleEmail": GINA})], scenario="gate_on")
+case("flow_link_when_another_account_has_that_google", [fstep("POST", LINK, held=H_BOB, body={"playerId": BOB, "googleEmail": "bob@example.test"})], scenario="flow_link_taken")
+case("flow_link_with_nothing_held", [fstep("POST", LINK, body={"playerId": BOB, "googleEmail": "bob@example.test"})], scenario="gate_on")
+
+# GET unclaimed: the identity cards of the held Google email.
+case("flow_unclaimed_cards_of_the_held_email", [fstep("GET", UNCL + "?email=shared%40example.test", held=H_SHARED)], scenario="flow_cards")
+case("flow_unclaimed_email_typed_in_capitals", [fstep("GET", UNCL + "?email=%20Shared%40Example.TEST", held=H_SHARED)], scenario="flow_cards")
+case("flow_unclaimed_no_club_saved_the_email", [fstep("GET", UNCL + "?email=" + quote(GINA, safe=""), held=H_GINA)], scenario="flow_cards")
+case("flow_unclaimed_for_another_email_than_the_held_one", [fstep("GET", UNCL + "?email=shared%40example.test", held=H_GINA)], scenario="flow_cards")
+case("flow_unclaimed_for_an_email_that_has_an_account", [fstep("GET", UNCL + "?email=bob%40example.test", held=H_BOB)], scenario="gate_on")
+
+# POST claim with Google.
+def cg(token, held=None, result=None, body=None, **kw):
+    out = fstep("POST", CLAIM_G(token), body=body if body is not None else G_CLAIM, held=held, result=result, redact=CLAIM_REDACT)
+    return out
+case("flow_claim_a_record_with_a_phone_on_file", [cg("rec-plain", held=H_GINA)], scenario="flow_claim_plain")
+case("flow_claim_takes_the_details_of_the_form", [cg("rec-plain", held=H_GINA, body=dict(G_CLAIM, fullName="Gina Q. Google", nickname="Gigi", playingStyle="Net player", experienceYears=3, experienceMonths=4, socialLinks={"facebook": "https://facebook.com/gina", "instagram": "", "youtube": "", "linkedin": ""}))], scenario="flow_claim_plain")
+case("flow_claim_a_guests_record_takes_the_typed_phone", [cg("rec-guest", held=H_GINA, body=dict(G_CLAIM, phone="0917 555 0302"))], scenario="flow_claim_guest")
+case("flow_claim_a_guest_needs_a_phone", [cg("rec-guest", held=H_GINA)], scenario="flow_claim_guest")
+case("flow_claim_a_record_held_by_an_entry_with_the_entry_email", [cg("rec-shared", held=H_SHARED, body=dict(G_CLAIM, phone="0917 555 0303"))], scenario="flow_claim_shared")
+case("flow_claim_a_record_held_by_an_entry_with_another_google_email", [cg("rec-shared", held=held_of("other.google@example.test"), body=dict(G_CLAIM, phone="0917 555 0303"))], scenario="flow_claim_shared")
+case("flow_claim_a_record_held_by_an_entry_needs_a_phone", [cg("rec-shared", held=H_SHARED)], scenario="flow_claim_shared")
+case("flow_claim_with_the_email_of_an_account_is_taken", [cg("rec-plain", held=H_BOB)], scenario="flow_claim_plain")
+case("flow_claim_with_a_google_connected_elsewhere_is_taken", [cg("rec-plain", held=H_GINA)], scenario="flow_claim_taken_google")
+case("flow_claim_taken_by_the_callback", [cg("rec-plain", result=result_of("taken", "claim", GINA, "Gina Google", "claim"))], scenario="flow_claim_plain")
+case("flow_claim_with_a_result_that_is_not_taken_and_nothing_held", [cg("rec-plain", result=result_of("failed", "claim", key="claim"))], scenario="flow_claim_plain")
+case("flow_claim_an_unknown_link", [cg("nope", held=H_GINA)], scenario="flow_claim_plain")
+
+# POST registration with Google (from a club link).
+def rg(held=None, result=None, vals=None, path=None, **kw):
+    out = fstep("POST", path or REG_G, body={"values": vals if vals is not None else G_BODY}, held=held, result=result, redact=CLAIM_REDACT)
+    return out
+# A registration's staging link is keyed on the Google login: the TypeScript on the provider's user id, Go (which has no provider user)
+# on the Google email, so the link's token digest differs by design; the rest of the row is compared.
+LINK_TOKEN = {"player_claim_links": ["token_digest"]}
+case("flow_register_through_a_club_link", [rg(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_with_every_detail", [rg(held=H_GINA, vals=dict(G_BODY, fullName="Gina Q. Google", nickname="Gigi", playingStyle="Net player", experienceYears="3", experienceMonths="4", facebook="https://facebook.com/gina"))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_a_phone_an_account_has_is_a_match", [rg(held=H_GINA, vals=dict(G_BODY, phone="0917 555 0001"))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_the_email_of_an_account_is_a_match", [rg(held=H_BOB)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_with_the_email_of_a_clubs_open_entry", [rg(held=H_SHARED)], scenario="flow_cards", redact=LINK_TOKEN)
+case("flow_register_with_a_wrong_invite_code", [rg(held=H_GINA, path="/api/register/%s/google?k=WRONG" % SMASH)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_with_nothing_held", [rg()], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_twice_resumes_the_same_registration", [rg(held=H_GINA), rg(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+
+# P-FORGOT with Google on: an account that signs in with Google and has no password is told so, and no request is made for Admin review.
+RESETS = {"name": "player_password_reset_requests", "sql": "SELECT email, player_id, status::text AS status FROM player_password_reset_requests ORDER BY email, id", "redact": []}
+RESET = lambda email: fstep("POST", "/api/auth/password-reset", body={"email": email})
+case("flow_reset_a_google_only_account_signs_in_with_google", [RESET("carla@example.test")], scenario="flow_reset_on")
+case("flow_reset_the_address_typed_in_capitals", [RESET("  Carla@Example.TEST ")], scenario="flow_reset_on")
+case("flow_reset_an_account_with_google_and_a_password_is_asked_to_wait", [RESET("alice@example.test")], scenario="flow_reset_on")
+case("flow_reset_a_password_account_with_no_google", [RESET("bob@example.test")], scenario="flow_reset_on")
+case("flow_reset_an_unknown_address", [RESET("nobody@example.test")], scenario="flow_reset_on")
+case("flow_reset_a_google_only_account_while_the_flag_is_off", [RESET("carla@example.test")], scenario="flow_reset_off")
+
+flow_doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": gs,
+            "snapshot": [R_PLAYERS, R_CONTACTS, R_ALLOC, R_COUNTERS, R_ACCOUNTS, R_LINKS, R_MEMBERS, R_INPUTS, R_ENTRIES, R_SOCIAL, NOTES, AUDIT, RESETS],
+            "cases": flow_cases}
+names = [c["name"] for c in flow_cases]
+assert len(names) == len(set(names)), "duplicate case names in googleflow"
+with open(os.path.join(OUT, "googleflow.cases.json"), "w") as f:
+    json.dump(flow_doc, f, indent=1, ensure_ascii=False)
+    f.write("\n")
+print("ok googleflow")

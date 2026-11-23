@@ -193,3 +193,47 @@ func (e *env) playerOnly(t testing.TB) uuid.UUID {
 	e.exec(t, `INSERT INTO players (id, full_name, updated_at) VALUES ($1, 'Linked', now())`, id)
 	return id
 }
+
+// BL-14: the form's starting email is the record's shared entry's email first, then the intake's (recordPresetOf:
+// sharedEntry?.email ?? privateInput?.email).
+func TestGetRecordLinkPresetEmailPrefersTheSharedEntry(t *testing.T) {
+	e := newEnv(t)
+	club := e.club(t, "Lahug Smash Club")
+	for name, o := range map[string]struct {
+		entryEmail, intakeEmail, want string
+	}{
+		"entry only":        {"entry@club.test", "", "entry@club.test"},
+		"entry and intake":  {"entry2@club.test", "intake@club.test", "entry2@club.test"},
+		"intake only":       {"", "intake@club.test", "intake@club.test"},
+		"neither":           {"", "", ""},
+		"closed entry/none": {"", "intake@club.test", "intake@club.test"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			token, rec := e.recordLink(t, club, recordOpts{name: "Ana Reyes", phone: "+639185550177", email: o.intakeEmail})
+			if o.entryEmail != "" {
+				entry := uuid.New()
+				e.exec(t, `INSERT INTO player_id_counters (location_code_id, sync_date, last_sequence) VALUES ($1, DATE '2026-11-17', 99) ON CONFLICT DO NOTHING`, e.location(t, "PH", "CEB"))
+				e.exec(t, `INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, allocated_at, created_at, updated_at)
+				  VALUES ($1, $2, $3, $4, $5, 'PH', 'CEB', DATE '2026-11-17', $6, now(), now(), now())`,
+					entry, o.entryEmail, "RTR-PH-CEB-111726-"+pad4(int(e.seq.Add(1))), club, e.location(t, "PH", "CEB"), e.seq.Load())
+				e.exec(t, `UPDATE club_players SET shared_entry_id = $1 WHERE id = $2`, entry, rec)
+			}
+			w := e.get(token)
+			if w.Code != http.StatusOK {
+				t.Fatalf("%d %s", w.Code, w.Body.String())
+			}
+			got := decode(t, w).(map[string]any)["link"].(map[string]any)["preset"].(map[string]any)["email"]
+			if got != o.want {
+				t.Fatalf("preset email %v, want %q", got, o.want)
+			}
+		})
+	}
+}
+
+func pad4(n int) string {
+	s := itoa(n)
+	for len(s) < 4 {
+		s = "0" + s
+	}
+	return s
+}

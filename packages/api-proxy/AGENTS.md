@@ -17,10 +17,19 @@ subpath per file, no barrels, no dependency beyond `server-only`.
 `X-Rotra-App` and sets it itself next to the proxy secret; Go trusts the header only for that reason.
 `readFromGo(path, { app })` does the same for a server-side read (the Player claim page).
 
+## Moved areas: prefixes and exact paths
+
+`ROTRA_GO_MOVED_AREAS` is a comma-separated list. A plain entry (`/api/auth`) is a whole-segment prefix. An entry that starts
+with `=` is one exact path, with `*` standing for exactly one non-empty segment: `=/api/register/*/google` matches
+`/api/register/<clubId>/google` and nothing else (not `/api/register`, `/api/register/google` or a deeper path). Use it for a
+route whose siblings stay in TypeScript. It cannot tell `/api/register/{clubId}` from `/api/register/google` (same segments),
+so the password registration cannot move on its own. Tests: `pnpm --filter @rotra/api-proxy test` (`node --test`, no new
+dependency; not part of `make check`).
+
 ## Checking Go sign-in locally
 
 `ROTRA_GO_MOVED_AREAS` must include `/api/auth` and `/api/claim` (whole-segment prefixes), for example
-`/api/stream/ticket,/api/auth,/api/claim`, with `ROTRA_GO_API_URL` and `ROTRA_PROXY_SECRET` set.
+`/api/stream/ticket,/api/auth,/api/claim,=/api/register/*/google`, with `ROTRA_GO_API_URL` and `ROTRA_PROXY_SECRET` set.
 With Go in front, `proxy.ts` never calls Supabase and guards pages with the pass cookie only.
 
 Stay on TypeScript on purpose until their tracks land, so they fail after a Go sign-in:

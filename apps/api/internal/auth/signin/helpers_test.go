@@ -68,6 +68,8 @@ type env struct {
 	svc      *session.Service
 	handler  http.Handler
 	seq      atomic.Int64
+	// hook, when set, is the Deps.PlayerSession of the routes.
+	hook func(http.ResponseWriter, *http.Request, uuid.UUID)
 }
 
 // newEnv migrates a throwaway database and serves the sign-in routes behind the real proxy guard.
@@ -119,7 +121,12 @@ func newEnv(t *testing.T, mut ...func(*config.AuthTuning)) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
-	register, err := signin.Register(signin.Deps{Service: e.svc, Store: e.st, Verifier: e.verifier, Clock: e.clk.Now, Logger: log})
+	register, err := signin.Register(signin.Deps{Service: e.svc, Store: e.st, Verifier: e.verifier, Clock: e.clk.Now, Logger: log,
+		PlayerSession: func(w http.ResponseWriter, r *http.Request, id uuid.UUID) {
+			if e.hook != nil {
+				e.hook(w, r, id)
+			}
+		}})
 	if err != nil {
 		t.Fatal(err)
 	}

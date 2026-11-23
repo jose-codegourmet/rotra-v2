@@ -148,7 +148,9 @@ func (h *handlers) signIn(w http.ResponseWriter, r *http.Request, aud store.Audi
 	}
 	hasher := h.svc.Hasher()
 	passwordOK, needsRehash := false, false
-	if found {
+	// A login made with Google has no password (an empty hash, see claim.Finish.GoogleEmail): any password is wrong for it, and
+	// that is not a data fault to log.
+	if found && ident.PasswordHash != "" {
 		passwordOK, needsRehash, err = hasher.Verify(ctx, pw, ident.PasswordHash)
 		if errors.Is(err, password.ErrMalformedHash) || errors.Is(err, password.ErrUnsupportedScheme) {
 			// A stored hash nobody can read is a data fault, not something to show: log it, refuse like any
@@ -220,6 +222,9 @@ func (h *handlers) signIn(w http.ResponseWriter, r *http.Request, aud store.Audi
 		return
 	}
 	h.setCookies(w, r, aud, issued.AccessPass, issued.RefreshPass, issued.RefreshExpiresAt)
+	if aud == store.AudiencePlayer && h.onPlayer != nil {
+		h.onPlayer(w, r, acct.id)
+	}
 	httpapi.WriteJSON(w, http.StatusOK, resp, httpapi.Private)
 }
 

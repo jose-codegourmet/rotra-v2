@@ -359,3 +359,26 @@ func TestRateLimitedErrorRoundsRetryAfterUp(t *testing.T) {
 		}
 	}
 }
+
+func TestGoogleTripLimitHasItsOwnCounterApartFromPasswordSignIn(t *testing.T) {
+	e := newEnv(t, func(c *config.AuthTuning) {
+		c.Limits.GoogleTripIP = config.AuthLimit{Max: 3, Window: 15 * time.Minute}
+		c.Limits.IPAttempts = config.AuthLimit{Max: 3, Window: 15 * time.Minute}
+	})
+	l := e.svc.Limiter()
+	for i := 0; i < 3; i++ {
+		if err := l.CheckGoogleTrip(e.ctx, "203.0.113.9"); err != nil {
+			t.Fatalf("trip %d: %v", i, err)
+		}
+	}
+	if rl, ok := limited(l.CheckGoogleTrip(e.ctx, "203.0.113.9")); !ok || rl.RetryAfterSeconds() != 900 {
+		t.Fatalf("the 4th trip in 15 minutes is limited: %v", rl)
+	}
+	// Used up, it leaves the password sign-in of the same IP (every app's) untouched.
+	if _, ok := limited(l.BeginSignIn(e.ctx, attempt("x", "203.0.113.9"))); ok {
+		t.Fatal("Google trips must not use up password sign-in")
+	}
+	if err := l.CheckGoogleTrip(e.ctx, "203.0.113.10"); err != nil {
+		t.Fatalf("another IP: %v", err)
+	}
+}

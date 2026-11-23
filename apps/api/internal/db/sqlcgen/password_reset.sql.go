@@ -80,8 +80,9 @@ func (q *Queries) FindResetRequestByDigest(ctx context.Context, digest []byte) (
 const getResetAccountByEmail = `-- name: GetResetAccountByEmail :one
 
 SELECT c.player_id, c.email, a.auth_provider, a.auth_subject, a.disabled_at AS account_disabled_at,
-       a.contact_sync_status,
-       (i.id IS NOT NULL AND i.audience = 'player' AND i.disabled_at IS NULL)::bool AS identity_usable
+       a.contact_sync_status, a.google_email,
+       (i.id IS NOT NULL AND i.audience = 'player' AND i.disabled_at IS NULL)::bool AS identity_usable,
+       (i.id IS NOT NULL AND i.password_hash <> '')::bool AS identity_has_password
 FROM player_private_contacts c
 JOIN player_accounts a ON a.player_id = c.player_id
 LEFT JOIN auth_identities i ON i.id = a.auth_subject
@@ -89,13 +90,15 @@ WHERE c.email = $1
 `
 
 type GetResetAccountByEmailRow struct {
-	PlayerID          pgtype.UUID
-	Email             pgtype.Text
-	AuthProvider      string
-	AuthSubject       pgtype.UUID
-	AccountDisabledAt pgtype.Timestamptz
-	ContactSyncStatus PlayerContactSyncStatus
-	IdentityUsable    bool
+	PlayerID            pgtype.UUID
+	Email               pgtype.Text
+	AuthProvider        string
+	AuthSubject         pgtype.UUID
+	AccountDisabledAt   pgtype.Timestamptz
+	ContactSyncStatus   PlayerContactSyncStatus
+	GoogleEmail         pgtype.Text
+	IdentityUsable      bool
+	IdentityHasPassword bool
 }
 
 // Admin-reviewed player password recovery (go-sign-in 3.4). Ports of the Prisma calls in
@@ -114,7 +117,9 @@ func (q *Queries) GetResetAccountByEmail(ctx context.Context, email pgtype.Text)
 		&i.AuthSubject,
 		&i.AccountDisabledAt,
 		&i.ContactSyncStatus,
+		&i.GoogleEmail,
 		&i.IdentityUsable,
+		&i.IdentityHasPassword,
 	)
 	return i, err
 }

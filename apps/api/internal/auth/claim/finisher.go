@@ -8,6 +8,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/profile"
 )
 
@@ -33,6 +34,9 @@ func (h *handlers) finisher() *Finisher { return &Finisher{h: h} }
 type Finish struct {
 	Token, Email, Password, Phone string
 	Details                       profile.Input
+	// GoogleEmail, when set, makes this a claim with Google: Email is that email, Password is ignored, and the identity has no
+	// password (see submission.googleEmail).
+	GoogleEmail string
 	// OnRefusal, when set, sees each refusal of the claim before it is answered: a code and its field messages. It answers
 	// and returns true to take the refusal over.
 	OnRefusal func(w http.ResponseWriter, code httpapi.ErrorCode, fields map[string]string) bool
@@ -45,7 +49,7 @@ type SignedIn = signedIn
 // Complete claims the staged link, or, when it was claimed before, proves the password against the account (the retry of a
 // lost answer), and calls then with the account. Every refusal is answered by Complete itself, in the claim's envelope.
 func (f *Finisher) Complete(w http.ResponseWriter, r *http.Request, in Finish, then SignedIn) {
-	s := submission{email: in.Email, password: in.Password, phone: in.Phone, input: in.Details}
+	s := submission{email: in.Email, password: in.Password, phone: in.Phone, input: in.Details, googleEmail: in.GoogleEmail}
 	if in.OnRefusal != nil {
 		s.onRefusal = func(w http.ResponseWriter, p *problem) bool { return in.OnRefusal(w, p.code, p.fields) }
 	}
@@ -61,3 +65,31 @@ func (f *Finisher) Issue(w http.ResponseWriter, r *http.Request, ident store.Ide
 func (f *Finisher) Unexpected(w http.ResponseWriter, r *http.Request, msg string, err error) {
 	f.h.unexpected(w, r, msg, err)
 }
+
+// Refusal is a refusal in the Route Handlers' vocabulary: a ServiceError code and its field messages.
+type Refusal struct {
+	Code   httpapi.ErrorCode
+	Fields map[string]string
+}
+
+// GoogleFinish reads the body of POST /api/claim/{token}/google and builds the claim's Finish for the Google email (D-2026-11-16-01):
+// the typed phone (used only when the profile has none on file; one on file is never replaced here), then the profile
+// details. The password is not part of it.
+func GoogleFinish(r *http.Request, token, googleEmail string) (Finish, *Refusal) {
+	body, ok := readObject(r)
+	if !ok {
+		return Finish{}, &Refusal{Code: httpapi.ErrInvalid}
+	}
+	var phone string
+	if typed := fields.JSTrim(str(body["phone"])); typed != "" {
+		p, ok := fields.ParsePHMobile(typed)
+		if !ok {
+			return Finish{}, &Refusal{Code: httpapi.ErrInvalid, Fields: map[string]string{"phone": msgPhoneRoute}}
+		}
+		phone = p
+	}
+	return Finish{Token: token, Email: googleEmail, GoogleEmail: googleEmail, Phone: phone, Details: detailsOf(body)}, nil
+}
+
+// Limited answers a limiter refusal as the 429 envelope; any other limiter failure is a 503, like the claim's.
+func (f *Finisher) Limited(w http.ResponseWriter, r *http.Request, err error) { f.h.limited(w, r, err) }

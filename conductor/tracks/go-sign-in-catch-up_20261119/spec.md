@@ -21,8 +21,8 @@ Google sign-in ([D-2026-11-16-01](../../../docs/mvp/decisions/2026-11-16.md#d-20
 
 **Accepted when:**
 
-- [x] The open points in D-2026-11-16-01 are answered, or the owner decides the Go stack ships without Google sign-in while the flag is off (2026-11-22: ships without it)
-- [x] If built (not built; n/a): every route above has a Go counterpart with characterization tests, and the Go pass check in the apps (go-sign-in R7) has the Google session and deadline rules
+- [x] The open points in D-2026-11-16-01 are answered, or the owner decides the Go stack ships without Google sign-in while the flag is off (2026-11-23: build it; design answers in the plan, 1.1)
+- [x] If built: every route above has a Go counterpart with characterization tests (captured from the TypeScript with the held Google account and the result stubbed; a fake Google for the trip itself), and the Go pass check in the apps (go-sign-in R7) has the Google session and deadline rules. Admin-link registration stays TypeScript (BL-19)
 
 ### R2: A guest's invite link
 
@@ -45,3 +45,19 @@ Google sign-in ([D-2026-11-16-01](../../../docs/mvp/decisions/2026-11-16.md#d-20
 ## Testing
 
 Go: strict TDD, characterization tests first for ported routes, real Postgres in tests, ≥ 80% coverage ([workflow](../../workflow.md)).
+
+## Environment and what Google needs (2026-11-23)
+
+Template: [apps/api/.env.example](../../../apps/api/.env.example). Full steps: [google-sign-in-setup](../../../docs/backend/google-sign-in-setup.md#in-the-go-api-track-go-sign-in-catch-up).
+
+| Where | Variable or step | Notes |
+|---|---|---|
+| Go API (Railway) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` (secret), `GOOGLE_OAUTH_REDIRECT_BASE` | All three or none. **Never stops the API:** with none, only some, or a redirect base that is not an origin, Google stays off, the API logs a warning (never a value) and Continue with Google answers "unavailable" |
+| Go API | `ROTRA_AUTH_SIGNING_KEY` | Google cookies are signed with a key derived from it; with it unset the API serves no auth routes at all (the same as before) |
+| Go API | `ROTRA_AUTH_LIMIT_GOOGLE_TRIP_IP` (optional) | `100/15m` by default; its own counter `google_trip` |
+| Database | Migration `20261123000300_google_trip_rate_action` | Allows the `google_trip` action. Apply before deploying this code |
+| Google Cloud | An OAuth client (Web application), scopes `openid email profile` | Authorized redirect URI `<player origin>/api/auth/google/callback` (add `http://localhost:9001/...` for local) |
+| Player app (Vercel) | `ROTRA_GO_API_URL`, `ROTRA_PROXY_SECRET`, `ROTRA_GO_MOVED_AREAS` with `/api/auth`, `/api/claim` and `=/api/register/*/google` | Set at staging-verification |
+| Admin app | Flag `player_google_sign_in` on | Off by default; every Google route answers 404 until then |
+
+No Supabase setting is used by the Go version.

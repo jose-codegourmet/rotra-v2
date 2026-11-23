@@ -245,3 +245,48 @@ func TestRoutesAnswer500ForAnUnexpectedFailure(t *testing.T) {
 	}
 	wantJSON(t, w, obj{"error": obj{"code": "internal", "message": "Something went wrong."}})
 }
+
+// With player_google_sign_in on (P12, #922), an account that signs in with Google and has no password answers signsInWithGoogle and
+// makes no request for Admin review: there is no password to reset. Everything else, and the flag off, is the plain acknowledgement.
+func TestForgotTellsAGoogleOnlyAccountToUseGoogle(t *testing.T) {
+	e := newEnv(t)
+	flag := func(on bool) {
+		e.exec(t, `INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'g', 't', $1, now()) ON CONFLICT (key) DO UPDATE SET value = $1`, on)
+	}
+	googleOnly := e.player(t, acctOpts{google: "g.only@example.test", noPassword: true})
+	withPassword := e.player(t, acctOpts{google: "both@example.test"})
+	disabled := e.player(t, acctOpts{google: "off@example.test", noPassword: true, disabled: true})
+	noGoogle := e.player(t, acctOpts{noPassword: true})
+	ask := func(email string) string {
+		w := e.do(req{method: "POST", path: "/api/auth/password-reset", app: "player", body: jsonBody(obj{"email": email}), ip: "203.0.113.9"})
+		if w.Code != http.StatusOK {
+			t.Fatalf("%d %s", w.Code, w.Body.String())
+		}
+		return strings.TrimSpace(w.Body.String())
+	}
+	requests := func() int { return e.count(t, `SELECT count(*) FROM player_password_reset_requests`) }
+
+	// Flag off, or missing: exactly the acknowledgement of every other address, and a request is saved.
+	if got := ask(googleOnly.email); got != `{"acknowledged":true}` || requests() != 1 {
+		t.Fatalf("flag missing: %s, %d requests", got, requests())
+	}
+	flag(false)
+	e.exec(t, `DELETE FROM player_password_reset_requests`)
+	if got := ask(googleOnly.email); got != `{"acknowledged":true}` || requests() != 1 {
+		t.Fatalf("flag off: %s, %d requests", got, requests())
+	}
+	e.exec(t, `DELETE FROM player_password_reset_requests`)
+	flag(true)
+	if got := ask(googleOnly.email); got != `{"acknowledged":true,"signsInWithGoogle":true}` || requests() != 0 {
+		t.Fatalf("flag on: %s, %d requests", got, requests())
+	}
+	if got := ask(strings.ToUpper(googleOnly.email)); got != `{"acknowledged":true,"signsInWithGoogle":true}` {
+		t.Fatalf("the address is normalized: %s", got)
+	}
+	for name, a := range map[string]acct{"has a password": withPassword, "disabled": disabled, "no Google": noGoogle} {
+		if got := ask(a.email); got != `{"acknowledged":true}` || requests() == 0 {
+			t.Fatalf("%s: %s", name, got)
+		}
+		e.exec(t, `DELETE FROM player_password_reset_requests`)
+	}
+}

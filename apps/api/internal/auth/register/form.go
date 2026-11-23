@@ -53,22 +53,32 @@ var linkProviders = []struct{ key, label, example string }{
 	{"linkedin", "LinkedIn", "https://linkedin.com/in/yourname"},
 }
 
-// parseForm validates the body. fields is nil when it is valid.
-func parseForm(b writes.Body) (form, map[string]string) {
+// parseForm validates the body. fields is nil when it is valid. withGoogle is the Google registration's form
+// (googleRegistrationSchema: the registration form without the email and the password): there is no attempt either, because the
+// attempt is keyed on the Google account, and the email is Google's, never the body's.
+func parseForm(b writes.Body, withGoogle bool) (form, map[string]string) {
 	issues := map[string]string{}
 	var f form
 
-	if s, ok := stringField(b, "attempt", issues, "attempt"); ok {
-		if !attemptRE.MatchString(s) {
-			issues["attempt"] = msgAttempt
+	if !withGoogle {
+		if s, ok := stringField(b, "attempt", issues, "attempt"); ok {
+			if !attemptRE.MatchString(s) {
+				issues["attempt"] = msgAttempt
+			}
+			f.attempt = s
 		}
-		f.attempt = s
 	}
 
 	raw, present := b["values"]
 	v, isObject := raw.(map[string]any)
 	if !isObject {
-		issues["values"] = notA("object", raw, present)
+		if withGoogle {
+			// The Google route parses body.values on its own (googleRegistrationSchema.safeParse), so a refusal of the root has no
+			// path and the Route Handler keys it by `undefined`: path.at(-1) of [].
+			issues["undefined"] = notA("object", raw, present)
+		} else {
+			issues["values"] = notA("object", raw, present)
+		}
 		return f, issues
 	}
 	vals := writes.Body(v)
@@ -113,12 +123,14 @@ func parseForm(b writes.Body) (form, map[string]string) {
 		f.details.Links[p.key] = s
 	}
 
-	if s, ok := stringField(vals, "email", issues, "email"); ok {
-		s = fields.JSTrim(s)
-		if !emailRE.MatchString(s) {
-			issues["email"] = msgEmail
+	if !withGoogle {
+		if s, ok := stringField(vals, "email", issues, "email"); ok {
+			s = fields.JSTrim(s)
+			if !emailRE.MatchString(s) {
+				issues["email"] = msgEmail
+			}
+			f.email = publicreads.JSToLower(s)
 		}
-		f.email = publicreads.JSToLower(s)
 	}
 	if s, ok := stringField(vals, "phone", issues, "phone"); ok {
 		e164, valid := fields.ParsePHMobile(s)
@@ -127,11 +139,13 @@ func parseForm(b writes.Body) (form, map[string]string) {
 		}
 		f.phone = e164
 	}
-	if s, ok := stringField(vals, "password", issues, "password"); ok {
-		if s == "" {
-			issues["password"] = msgPassword
+	if !withGoogle {
+		if s, ok := stringField(vals, "password", issues, "password"); ok {
+			if s == "" {
+				issues["password"] = msgPassword
+			}
+			f.password = s
 		}
-		f.password = s
 	}
 	// cityCode is optional text the route ignores; only its type is checked.
 	if raw, has := vals["cityCode"]; has {

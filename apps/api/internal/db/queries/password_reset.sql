@@ -7,8 +7,9 @@
 -- disabled.
 -- name: GetResetAccountByEmail :one
 SELECT c.player_id, c.email, a.auth_provider, a.auth_subject, a.disabled_at AS account_disabled_at,
-       a.contact_sync_status,
-       (i.id IS NOT NULL AND i.audience = 'player' AND i.disabled_at IS NULL)::bool AS identity_usable
+       a.contact_sync_status, a.google_email,
+       (i.id IS NOT NULL AND i.audience = 'player' AND i.disabled_at IS NULL)::bool AS identity_usable,
+       (i.id IS NOT NULL AND i.password_hash <> '')::bool AS identity_has_password
 FROM player_private_contacts c
 JOIN player_accounts a ON a.player_id = c.player_id
 LEFT JOIN auth_identities i ON i.id = a.auth_subject

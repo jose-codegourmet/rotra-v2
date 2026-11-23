@@ -120,7 +120,7 @@ func (h *handlers) attempt(w http.ResponseWriter, r *http.Request, s submission,
 		s.write(w, refuse(httpapi.ErrInvalid, ferr.Field, ferr.Message))
 		return nil, true
 	}
-	if *hash == "" {
+	if *hash == "" && s.googleEmail == "" {
 		*hash, err = h.svc.Hasher().Hash(ctx, s.password)
 		if err != nil {
 			h.unavailable(w, r, "hashing a password failed", err)
@@ -165,6 +165,12 @@ var afterLinkRead func(stage string)
 // way it does on the sign-in route.
 func (h *handlers) retry(w http.ResponseWriter, r *http.Request, s submission, playerID uuid.UUID, then signedIn) {
 	ctx := r.Context()
+	if s.googleEmail != "" {
+		// A claim made with Google has no password to prove: the held Google sign-in was the proof, and it is gone once the
+		// claim committed (claimWithGoogle: a retry after success finds no held sign-in and fails).
+		s.write(w, refuse(httpapi.ErrInvalid, "google", msgGoogleFailed))
+		return
+	}
 	limiter := h.svc.Limiter()
 	attempt := session.SignInAttempt{Audience: store.AudiencePlayer, LoginKey: s.email, IP: httpapi.ClientIPFrom(ctx)}
 	if err := limiter.BeginSignIn(ctx, attempt); err != nil {
@@ -195,7 +201,7 @@ func (h *handlers) prove(ctx context.Context, s submission, playerID uuid.UUID) 
 	if err != nil {
 		return store.Identity{}, false, err
 	}
-	if !usable || ident.LoginKey != s.email {
+	if !usable || ident.LoginKey != s.email || ident.PasswordHash == "" { // no password: a login made with Google
 		_, err := hasher.VerifyUnknown(ctx, s.password)
 		return store.Identity{}, false, err
 	}

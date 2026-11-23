@@ -10,11 +10,17 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/adminwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/claim"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/google"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/password"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/recovery"
@@ -104,7 +110,7 @@ func run() error {
 		if err != nil {
 			return err
 		}
-		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log})
+		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log, PlayerSession: playerGateHint(pool.Raw(), log, time.Now)})
 		if err != nil {
 			return err
 		}
@@ -122,6 +128,29 @@ func run() error {
 			return err
 		}
 		routes = append(routes, registerRoutes)
+		// Google sign-in for players (D-2026-11-16-01), behind the player_google_sign_in flag: every route answers 404 while it is off.
+		// Without a Google client (GOOGLE_OAUTH_*) the routes still exist and Continue with Google answers "unavailable".
+		var googleClient *google.Client
+		if cfg.Google.Set() {
+			googleClient = google.NewClient(cfg.Google.ClientID, cfg.Google.ClientSecret, google.Production, nil, nil)
+		} else if cfg.Google.Problem != "" {
+			log.Warn("Google sign-in is off: "+cfg.Google.Problem, "effect", "Continue with Google answers unavailable")
+		} else {
+			log.Info("GOOGLE_OAUTH_CLIENT_ID is not set: Continue with Google answers unavailable")
+		}
+		googleHandlers, err := google.New(google.Deps{
+			Pool: pool.Raw(), Service: svc, Store: authStore, Client: googleClient, Sealer: google.NewSealer(cfg.AuthSigningKey),
+			RedirectBase: cfg.Google.RedirectBase, Logger: log,
+		})
+		if err != nil {
+			return err
+		}
+		routes = append(routes, googleHandlers.Routes())
+		registerGoogleRoutes, err := register.RegisterGoogle(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log}, googleHandlers)
+		if err != nil {
+			return err
+		}
+		routes = append(routes, registerGoogleRoutes)
 		// Admin-reviewed password recovery: the two public Player routes. The Admin list (signedin) and review
 		// (adminwrites) routes call the same service.
 		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
@@ -207,4 +236,23 @@ func run() error {
 	stop()
 	<-hkDone // the loop has released its lock and connection before the pool closes
 	return err
+}
+
+// playerGateHint keeps the Player proxy's navigation hint for the Google deadline gate in step with the signed-in player, on the
+// password sign-in and the session read (syncGoogleGateHint). Before the deadline it only clears a leftover hint and reads
+// nothing; a failed read leaves the hint as it is.
+func playerGateHint(pool *pgxpool.Pool, log *slog.Logger, now func() time.Time) func(http.ResponseWriter, *http.Request, uuid.UUID) {
+	return func(w http.ResponseWriter, r *http.Request, playerID uuid.UUID) {
+		secure := r.TLS != nil || strings.EqualFold(strings.TrimSpace(strings.Split(r.Header.Get("X-Forwarded-Proto"), ",")[0]), "https")
+		required := false
+		if signedin.GoogleDeadlinePassed(now()) {
+			var err error
+			required, err = signedin.GoogleRequired(r.Context(), pool, now, pgtype.UUID{Bytes: playerID, Valid: true})
+			if err != nil {
+				log.WarnContext(r.Context(), "reading the Google gate failed", slog.Any("error", err))
+				return
+			}
+		}
+		google.SetGateHint(w, r, required, secure)
+	}
 }

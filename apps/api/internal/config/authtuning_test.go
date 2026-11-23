@@ -23,6 +23,7 @@ func TestAuthTuningDefaults(t *testing.T) {
 			ResetRequestIP: AuthLimit{30, time.Hour},
 			RefreshIP:      AuthLimit{600, time.Minute},
 			RefreshSession: AuthLimit{30, time.Minute},
+			GoogleTripIP:   AuthLimit{100, 15 * time.Minute},
 		},
 	}
 	if cfg.AuthTuning != want {

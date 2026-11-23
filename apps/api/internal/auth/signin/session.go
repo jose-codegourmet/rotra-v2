@@ -69,6 +69,9 @@ func (h *handlers) readSession(w http.ResponseWriter, r *http.Request, aud store
 	case !found:
 		httpapi.WriteJSON(w, http.StatusOK, signedOutBody(aud, false), httpapi.Private)
 	default:
+		if aud == store.AudiencePlayer && h.onPlayer != nil {
+			h.onPlayer(w, r, p.AccountID)
+		}
 		httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)
 	}
 }

@@ -22,6 +22,9 @@ Pinned in `Makefile` (`SQLC_VERSION`, now v1.30.0); run `make sqlc` after editin
 `sqlc.yaml` reads the Prisma migrations directly (`migrations/*/migration.sql`, sorted by name = Prisma's apply order):
 all 31 parse as plain SQL, no explicit file list needed.
 
+Environment: copy [.env.example](.env.example) (placeholders only; the guide is `docs/backend/environment-setup.md`). The Google
+sign-in variables are optional and never stop the API from starting.
+
 ## Tracing
 
 OpenTelemetry via standard env, service name `rotra-api` (`OTEL_SERVICE_NAME` overrides). Off unless
@@ -50,6 +53,16 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
   trimming), compared in constant time and never logged. Unset: `POST /api/public-sessions/{slug}/join-request` answers 503
   `unavailable` once the body and the slug are valid, and `GET .../my-request` answers 503 only for a request holding a cookie, as the Route
   Handlers do.
+
+## Google sign-in (D-2026-11-16-01)
+
+`internal/auth/google` is Google sign-in for players: the OpenID Connect code flow done by the API itself (standard library only), the
+routes `/api/auth/google/{start,callback,outcome,link,unclaimed}` and `/api/claim/{token}/google`, and (in `internal/auth/register`)
+`/api/register/{clubId}/google`. Every route is 404 while the `player_google_sign_in` flag is off. Variables, all three or none:
+`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_BASE` (the Player app's origin; Google returns to
+`<base>/api/auth/google/callback`, which the Player app's proxy forwards). Without them Continue with Google answers 503. The tests use a
+fake Google (`internal/auth/google/fake_test.go`), and a `google` golden captured from the TypeScript for what it decides before the
+provider; nothing has run against real Google. Design and differences: [setup](../../docs/backend/google-sign-in-setup.md#in-the-go-api-track-go-sign-in-catch-up).
 
 ## Housekeeping (B-34)
 

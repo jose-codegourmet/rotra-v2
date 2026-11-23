@@ -64,6 +64,9 @@ func GoogleRequired(ctx context.Context, pool *pgxpool.Pool, now func() time.Tim
 	return (&server{pool: pool, now: now}).googleRequired(r, viewer{ID: id})
 }
 
+// GoogleDeadlinePassed is isGoogleDeadlinePassed(GOOGLE_SIGN_IN_DEADLINE.date): the deadline day ends at midnight in the Philippines.
+func GoogleDeadlinePassed(now time.Time) bool { return !now.Before(googleDeadline) }
+
 // GoogleRequiredMessage is GOOGLE_REQUIRED, the message of the refusal.
 const GoogleRequiredMessage = googleRequiredMessage
 

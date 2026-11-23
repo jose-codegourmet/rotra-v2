@@ -1,6 +1,6 @@
 # Player Information finds unclaimed players by name and shows their name and picture
 
-Status: NEW
+Status: IN MOCK APP — PR #1030
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheet `add` (Player Information tab, pick card), `pickPlayer`, `confirmAdd`; `DIRECTORY`

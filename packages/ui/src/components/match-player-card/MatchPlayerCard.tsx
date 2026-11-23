@@ -1,8 +1,8 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
-import { levelLabel } from '@rotra/ui/level-pill'
 import { Icon } from '@rotra/ui/icon'
+import { levelLabel } from '@rotra/ui/level-pill'
 import type { Ref } from 'react'
 
 export type MatchPlayerCardTeam = 'A' | 'B'

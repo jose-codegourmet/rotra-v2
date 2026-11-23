@@ -122,12 +122,18 @@ export type SessionInviteCode = {
 export type DirectoryPlayer = {
   /** The public player id: what the add commands take as `playerId` */
   id: string
-  /** '' for another club's unclaimed player: no club is shown another club's name */
+  /**
+   * An unclaimed player another club saved shows the name of the club that saved them first
+   * (D-2026-11-23-01)
+   */
   fullName: string
   nickname: string | null
   rtrId: string
   identity: 'registered' | 'unclaimed'
-  /** Their own profile picture as an avatar reference, or null for initials (always null for unclaimed) */
+  /**
+   * Their own profile picture as an avatar reference, or null for initials. For an unclaimed player:
+   * the picture the club that saved them first set (D-2026-11-23-01)
+   */
   picture: string | null
   /** Their Player Information level, or null when they have none yet (always null for unclaimed) */
   suggestion: PlayingLevel | null
@@ -135,8 +141,8 @@ export type DirectoryPlayer = {
   rankLabel: string
   phoneHidden?: boolean
   /**
-   * Another club's unclaimed player: "Not registered yet" with the RTR ID only. The add commands
-   * then need `name`, this club's own name for them.
+   * Another club's unclaimed player: the add commands need `name`, this club's own name for them
+   * (the sheet prefills it with `fullName`).
    */
   ownNameRequired?: boolean
 }
@@ -147,7 +153,15 @@ export type DirectoryPlayer = {
  * and `savedName` is this club's name for them ("NAME is already in your saved players."). Both
  * null: nothing typed yet, or "No ROTRA player has that RTR ID or email."
  */
-export type PlayerLookup = { player: DirectoryPlayer | null; savedName: string | null }
+export type PlayerLookup = {
+  player: DirectoryPlayer | null
+  savedName: string | null
+  /**
+   * D-2026-11-23-01: with no exact match, the unclaimed players whose name contains the query (two
+   * letters or more), leaving out anyone already in this club's saved players. Absent reads as none.
+   */
+  matches?: DirectoryPlayer[]
+}
 
 /** Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL); omitted on an ordinary add. */
 type AddPlacementFlags = { allowOverfill?: boolean; toWaitlist?: boolean }

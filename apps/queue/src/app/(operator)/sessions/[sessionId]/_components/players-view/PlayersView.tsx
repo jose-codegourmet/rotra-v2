@@ -671,7 +671,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           games={Math.min(99, editRowData.games)}
           present={editPlayer.present}
           picture={
-            editKind === 'unclaimed' && pictureDetails.data && editClubPlayer
+            editKind === 'unclaimed' && pictureDetails.data?.picture && editClubPlayer
               ? {
                   playerId: editClubPlayer.playerId ?? editClubPlayer.id,
                   picture: pictureDetails.data.picture,

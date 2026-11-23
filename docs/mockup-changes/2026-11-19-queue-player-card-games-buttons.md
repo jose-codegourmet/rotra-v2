@@ -1,6 +1,6 @@
 # Queue app: the Players card's Current opens Set games played
 
-Status: TICKETED — #1042
+Status: IN MOCK APP — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `playersPane()` (`.pc3-games`)

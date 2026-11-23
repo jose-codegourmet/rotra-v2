@@ -1,6 +1,6 @@
 # Queue app: club-facing player lists show the club nickname first, then nickname, then full name
 
-Status: TICKETED — #1048
+Status: IN MOCK APP — #1048
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `nameB(p)`, `nameParts(p)`; used by `rvRow`, `rvCard`, waitlist rows, can't-make-it requests, minimum-games rows, Add player picker, Change player and No show dialogs

@@ -38,7 +38,13 @@ export type ClaimLinkPreview = {
   fullName: string
   nickname: string | null
   rtrId: string | null
+  /** An avatar reference: a photo URL or `character:<id>`; null for initials */
   picture: string | null
+  /**
+   * The id a `character:` picture is drawn from, as the club's Saved players card draws it (a club
+   * record's shared entry or its own id). Absent: `playerId`.
+   */
+  pictureSeedId?: string | null
   /** e.g. '+63 918 ••• ••77'; the full number never leaves the mock store in this flow */
   maskedPhone: string
 }

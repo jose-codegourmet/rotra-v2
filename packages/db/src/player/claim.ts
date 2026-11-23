@@ -197,8 +197,8 @@ function recordPresetOf(record: NonNullable<Awaited<ReturnType<typeof findRecord
 /**
  * P-CLAIM read (`ClaimLink`): public identity, a masked phone and what the club entered for the form
  * (Queue › Edit details), including the email it typed. Nothing the player set is ever here: the
- * profile is unclaimed. A club record's link shows no RTR ID (given when they register) and no
- * picture.
+ * profile is unclaimed. A club record's link shows its RTR ID when saved with an email or a link,
+ * and the picture the club set.
  */
 export async function readClaimLink(token: string) {
   const found = await findLink(token)
@@ -221,7 +221,9 @@ export async function readClaimLink(token: string) {
         nickname: link.clubPlayer.nickname,
         // Saved with an email: the RTR ID the person keeps (D-2026-11-16-04); else none yet.
         rtrId: link.clubPlayer.sharedEntry?.rtrId ?? null,
-        picture: null,
+        // The picture the club set (D-2026-11-09-12), drawn as on its Saved players card.
+        picture: link.clubPlayer.avatarRef,
+        pictureSeedId: link.clubPlayer.sharedEntry?.id ?? link.clubPlayer.id,
         maskedPhone: link.clubPlayer.privateInput?.phoneE164
           ? maskPhone(link.clubPlayer.privateInput.phoneE164)
           : '',

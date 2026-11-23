@@ -418,7 +418,15 @@ function PlayingCourtCard({
         menu={
           <CourtMenu
             busy
-            {...{ label, onMoveToFree, noFreeCourt, onChangeLabel, onEdit, onUndoEarlyOpen, onRemove }}
+            {...{
+              label,
+              onMoveToFree,
+              noFreeCourt,
+              onChangeLabel,
+              onEdit,
+              onUndoEarlyOpen,
+              onRemove,
+            }}
           />
         }
       />

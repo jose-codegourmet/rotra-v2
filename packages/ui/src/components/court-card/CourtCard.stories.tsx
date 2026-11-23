@@ -448,8 +448,12 @@ export const DraggingFreeCourtsOutlined: Story = {
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
       <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
-      <CourtCard {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true })} />
-      <CourtCard {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })} />
+      <CourtCard
+        {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true })}
+      />
+      <CourtCard
+        {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })}
+      />
     </div>
   ),
 }
@@ -459,8 +463,16 @@ export const DragHoverOnFreeCourt: Story = {
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
       <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
-      <CourtCard {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true, dragOver: true })} />
-      <CourtCard {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })} />
+      <CourtCard
+        {...free(courtAt(1), [playing, ready], {
+          dropCourtId: courtAt(1).id,
+          dragging: true,
+          dragOver: true,
+        })}
+      />
+      <CourtCard
+        {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })}
+      />
     </div>
   ),
 }

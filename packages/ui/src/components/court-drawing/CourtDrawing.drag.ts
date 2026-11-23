@@ -77,7 +77,8 @@ function move(d: Drag, x: number, y: number) {
   if (!d.ghost) return
   d.ghost.style.transform = `translate(${x - d.x}px, ${y - d.y}px)`
   const hit = document.elementFromPoint(x, y)
-  const target = hit instanceof Element ? hit.closest<HTMLElement>(`[${COURT_DROP_ATTRIBUTE}]`) : null
+  const target =
+    hit instanceof Element ? hit.closest<HTMLElement>(`[${COURT_DROP_ATTRIBUTE}]`) : null
   if (d.over && d.over !== target) d.over.removeAttribute(COURT_OVER_ATTRIBUTE)
   d.over = target
   if (target) target.setAttribute(COURT_OVER_ATTRIBUTE, '')

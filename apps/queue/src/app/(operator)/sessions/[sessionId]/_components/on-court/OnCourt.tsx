@@ -391,6 +391,11 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
           }
           canMoveCourt={free.length >= courtsNeeded(match)}
           onSelectPlayer={openProfile}
+          onReplace={(playerId) => {
+            setOutId(playerId)
+            setInId(null)
+            go('replace')
+          }}
           // Switching sides on an On court match has no command yet (swapPlayers takes waiting
           // matches only), so dragging does nothing until one exists.
           onSwap={() => {}}

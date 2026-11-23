@@ -49,8 +49,10 @@ export type OnCourtSheetProps = {
   swapTarget?: OnCourtSwapTarget | null
   /** False when no free open court is left (two for 5v5): Move to another court is disabled */
   canMoveCourt?: boolean
-  /** Opens the player's profile */
+  /** A player's picture was tapped: opens their profile */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
+  /** A player's card was tapped: opens Replace player with that player picked to come off */
+  onReplace: (playerId: string, team: MatchLineupTeam) => void
   /** Switch the players at the two slots (drag or ← / →); teams stay open until Start match */
   onSwap: (from: SwapSlot, to: SwapSlot) => void
   /** Opens Replace a player in match N: a plain lineup change, no substitution, no credit question */
@@ -103,6 +105,7 @@ export function OnCourtSheet({
   swapTarget,
   canMoveCourt = true,
   onSelectPlayer,
+  onReplace,
   onSwap,
   onReplacePlayer,
   onMoveCourt,
@@ -148,12 +151,15 @@ export function OnCourtSheet({
         teamA={teamA}
         teamB={teamB}
         minimumGames={minimumGames}
-        onSelectPlayer={onSelectPlayer}
+        onSelectPlayer={onReplace}
+        onOpenProfile={onSelectPlayer}
         onSwap={onSwap}
+        playerActionLabel="Replace player"
       />
       <p className="m-0 text-[13px] text-fg2">
-        Drag a player onto someone on the other team to switch sides. Placed {placedLabel}; the time
-        starts when you tap Start match.
+        Drag a player onto someone in the other pair to swap partners. Tap a player's card to
+        replace them with someone from outside, or their picture to see their profile. Placed{' '}
+        {placedLabel}; the time starts when you tap Start match.
       </p>
       {blockReason ? (
         <Notice tone="error">

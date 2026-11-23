@@ -47,7 +47,28 @@ type Config struct {
 	// AuthTuning is the optional ROTRA_AUTH_* configuration: refresh grace window, revocation cache TTL and
 	// rate limits (B-29, B-30, B-62).
 	AuthTuning AuthTuning
+	// Google is the Google OAuth client the Go API signs players in with (D-2026-11-16-01, track go-sign-in-catch-up). The zero value
+	// means unset: Continue with Google answers "unavailable" and nothing else changes.
+	Google Google
 }
+
+// Google is the Google Cloud OAuth client (a Web application) and where the browser returns to. All three are set or none is.
+type Google struct {
+	// ClientID is GOOGLE_OAUTH_CLIENT_ID.
+	ClientID string
+	// ClientSecret is GOOGLE_OAUTH_CLIENT_SECRET. Never log it: the config is never printed whole.
+	ClientSecret string
+	// RedirectBase is GOOGLE_OAUTH_REDIRECT_BASE: the Player app's own origin. Google sends the browser back to
+	// RedirectBase + /api/auth/google/callback, which the Player app's proxy forwards to Go.
+	RedirectBase string
+	// Problem is why Google sign-in was left off when the three variables were set only in part or the redirect base is not an
+	// origin. The API still starts (a missing or half-set Google client must never take the whole backend down); main logs it.
+	// It never holds a value of the variables.
+	Problem string
+}
+
+// Set reports whether Google sign-in is configured.
+func (g Google) Set() bool { return g.ClientID != "" }
 
 // Housekeeping is the B-34 cleanup loop: how often it runs, rows per delete statement, and how many
 // days each growing table keeps its rows.
@@ -173,6 +194,17 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 		}
 		cfg.AuthExtraPublicKeys = ks
 	}
+
+	google := Google{ClientID: get("GOOGLE_OAUTH_CLIENT_ID"), ClientSecret: get("GOOGLE_OAUTH_CLIENT_SECRET"), RedirectBase: get("GOOGLE_OAUTH_REDIRECT_BASE")}
+	if google != (Google{}) {
+		switch {
+		case google.ClientID == "" || google.ClientSecret == "" || google.RedirectBase == "":
+			google = Google{Problem: "GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET and GOOGLE_OAUTH_REDIRECT_BASE must all be set, or none"}
+		case !validOrigin(google.RedirectBase):
+			google = Google{Problem: "GOOGLE_OAUTH_REDIRECT_BASE must be the Player app's exact origin such as https://player.rotra.club (no path or trailing slash)"}
+		}
+	}
+	cfg.Google = google
 
 	tuning, err := loadAuthTuning(get)
 	if err != nil {

@@ -82,6 +82,7 @@ const (
 	ActionResetRequest RateAction = "reset_request"
 	ActionClaim        RateAction = "claim"
 	ActionRefresh      RateAction = "refresh"
+	ActionGoogleTrip   RateAction = "google_trip"
 )
 
 // TouchInterval is how often last_seen_at is written at most (design: once a minute keeps churn low).

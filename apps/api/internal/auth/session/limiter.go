@@ -92,6 +92,7 @@ func validateLimits(l config.AuthLimits) (time.Duration, error) {
 	for name, lim := range map[string]config.AuthLimit{
 		"login failures": l.LoginFailures, "device attempts": l.DeviceAttempts, "ip attempts": l.IPAttempts,
 		"claim": l.ClaimIP, "reset request": l.ResetRequestIP, "refresh ip": l.RefreshIP, "refresh session": l.RefreshSession,
+		"google trip": l.GoogleTripIP,
 	} {
 		if lim.Max < 1 || lim.Window < time.Second {
 			return 0, fmt.Errorf("session: the %s limit needs at least 1 attempt and a window of at least 1s", name)
@@ -233,6 +234,13 @@ func (l *Limiter) checkIP(ctx context.Context, ip string, action store.RateActio
 // CheckClaim counts one claim attempt against the client IP.
 func (l *Limiter) CheckClaim(ctx context.Context, ip string) error {
 	return l.checkIP(ctx, ip, store.ActionClaim, l.limits.ClaimIP)
+}
+
+// CheckGoogleTrip counts one Continue with Google callback (the step that asks Google) against the client IP. It has its own
+// counter, apart from the sign-in attempts the password sign-in of every app shares, so a venue finishing Google trips can
+// never lock the Queue Master out (the contract names no limit for it; the starting value is 100 per 15 minutes).
+func (l *Limiter) CheckGoogleTrip(ctx context.Context, ip string) error {
+	return l.checkIP(ctx, ip, store.ActionGoogleTrip, l.limits.GoogleTripIP)
 }
 
 // CheckResetRequest counts one password reset request against the client IP.

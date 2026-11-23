@@ -28,9 +28,20 @@ const maxEmailUnits = 254
 //
 // A malformed address is the only refusal, and it carries no account information.
 func (r *Recovery) Submit(ctx context.Context, email string) error {
+	_, err := r.submit(ctx, email)
+	return err
+}
+
+// googleFlag is the platform flag that gates Google sign-in for players (D-2026-11-18-01).
+const googleFlag = "player_google_sign_in"
+
+// submit is Submit with what the route also answers: signsInWithGoogle is true when, with player_google_sign_in on, the address is
+// of an enabled account that signs in with Google and has no password. There is no password to reset, so no request is made
+// for Admin review (submitPasswordResetRequest, P12 #922).
+func (r *Recovery) submit(ctx context.Context, email string) (signsInWithGoogle bool, err error) {
 	address := strings.ToLower(fields.JSTrim(email))
 	if !validAddress(address) {
-		return refuse(httpapi.ErrInvalid, "email", msgEmail)
+		return false, refuse(httpapi.ErrInvalid, "email", msgEmail)
 	}
 	q := sqlcgen.New(r.pool)
 	var playerID pgtype.UUID
@@ -38,8 +49,13 @@ func (r *Recovery) Submit(ctx context.Context, email string) error {
 	switch {
 	case errors.Is(err, pgx.ErrNoRows): // unknown address, or a contact with no account
 	case err != nil:
-		return fmt.Errorf("recovery: reading the account of a reset request: %w", err)
+		return false, fmt.Errorf("recovery: reading the account of a reset request: %w", err)
 	default:
+		if row.GoogleEmail.Valid && !row.AccountDisabledAt.Valid && !row.IdentityHasPassword {
+			if on, ferr := q.GetFeatureFlagValue(ctx, googleFlag); ferr == nil && on {
+				return true, nil
+			}
+		}
 		a := accountFrom(row.Email, pgtype.Text{String: row.AuthProvider, Valid: true}, row.AuthSubject, row.AccountDisabledAt,
 			sqlcgen.NullPlayerContactSyncStatus{PlayerContactSyncStatus: row.ContactSyncStatus, Valid: true}, row.IdentityUsable)
 		if a.eligible(address) {
@@ -50,9 +66,9 @@ func (r *Recovery) Submit(ctx context.Context, email string) error {
 		ID: pgUUID(store.NewID()), Email: address, PlayerID: playerID, Now: pgtype.Timestamptz{Time: r.clock(), Valid: true},
 	})
 	if err != nil {
-		return fmt.Errorf("recovery: saving a reset request: %w", err)
+		return false, fmt.Errorf("recovery: saving a reset request: %w", err)
 	}
-	return nil
+	return false, nil
 }
 
 // validAddress is /^[^\s@]+@[^\s@]+\.[^\s@]+$/ with JavaScript's \s, at most 254 UTF-16 units. A NUL is refused

@@ -312,6 +312,8 @@ type acctOpts struct {
 	identityOff    bool   // the identity is disabled
 	noRTR          bool
 	noAccount      bool
+	google         string // google_email: Google is connected to the account
+	noPassword     bool   // the login was made with Google: an empty password hash
 }
 
 type acct struct {
@@ -365,6 +367,9 @@ func (e *env) player(t testing.TB, o acctOpts) acct {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if o.noPassword {
+			hash = ""
+		}
 		ident, err := e.st.InsertIdentity(e.ctx, store.NewIdentity{Audience: store.AudiencePlayer, LoginKey: o.email, PasswordHash: hash, PasswordScheme: store.SchemeArgon2id, Now: base})
 		if err != nil {
 			t.Fatal(err)
@@ -378,8 +383,12 @@ func (e *env) player(t testing.TB, o acctOpts) acct {
 	if o.disabled {
 		disabled = base
 	}
-	e.exec(t, `INSERT INTO player_accounts (player_id, auth_provider, auth_subject, claimed_at, contact_sync_version, contact_sync_status, disabled_at, updated_at)
-	  VALUES ($1, $2, $3, $4, 1, $5::player_contact_sync_status, $6, now())`, a.player, o.provider, subject, base, o.syncStatus, disabled)
+	var google, linked any
+	if o.google != "" {
+		google, linked = o.google, base
+	}
+	e.exec(t, `INSERT INTO player_accounts (player_id, auth_provider, auth_subject, claimed_at, contact_sync_version, contact_sync_status, disabled_at, google_email, google_linked_at, updated_at)
+	  VALUES ($1, $2, $3, $4, 1, $5::player_contact_sync_status, $6, $7, $8, now())`, a.player, o.provider, subject, base, o.syncStatus, disabled, google, linked)
 	return a
 }
 

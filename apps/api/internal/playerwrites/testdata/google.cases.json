@@ -1,0 +1,559 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "players",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "redact": []
+  },
+  {
+   "name": "player_accounts",
+   "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "player_private_contacts",
+   "sql": "SELECT player_id, phone_e164, email, updated_at, revision::text AS revision FROM player_private_contacts ORDER BY player_id",
+   "redact": []
+  },
+  {
+   "name": "player_logins",
+   "sql": "SELECT id, login_key, revision::text AS revision FROM auth_identities WHERE audience = 'player' ORDER BY id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "flag_off_start_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "body": {
+      "intent": "login",
+      "key": "login",
+      "returnTo": "/me"
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_off_callback_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/callback?code=x&state=y",
+     "who": null,
+     "ignoreHeaders": [
+      "location",
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_callback",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/callback?code=x&state=y",
+     "who": null,
+     "ignoreHeaders": [
+      "location",
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "flag_off_outcome_read_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/outcome",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_outcome_read",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/outcome",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "flag_off_outcome_take_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/outcome",
+     "who": null,
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_outcome_take",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/outcome",
+     "who": null,
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "flag_off_link_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/link",
+     "who": null,
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000001",
+      "googleEmail": "alice@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_link",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/link",
+     "who": null,
+     "body": {
+      "playerId": "d4000000-0000-4000-8000-000000000001",
+      "googleEmail": "alice@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_off_unclaimed_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/unclaimed?email=sam%40example.test",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_unclaimed",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/unclaimed?email=sam%40example.test",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "flag_off_claim_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/anything/google",
+     "who": null,
+     "body": {
+      "fullName": "Gina Google",
+      "nickname": "",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      },
+      "phone": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_claim",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/anything/google",
+     "who": null,
+     "body": {
+      "fullName": "Gina Google",
+      "nickname": "",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      },
+      "phone": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_off_register_is_not_found",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "flag_on_without_a_held_google_register",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_an_unknown_intent",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "body": {
+      "intent": "admin",
+      "key": "login",
+      "returnTo": "/me"
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_no_intent",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "body": {
+      "key": "login"
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_a_bad_key",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "body": {
+      "intent": "login",
+      "key": "Not A Key"
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_a_long_key",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "body": {
+      "intent": "login",
+      "key": "aaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_a_body_that_is_not_an_object",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "rawBody": "[1]"
+    }
+   ]
+  },
+  {
+   "name": "start_a_body_that_is_not_json",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/start",
+     "who": null,
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "callback_without_a_flow_cookie_goes_to_login",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/callback?code=x&state=y",
+     "who": null,
+     "ignoreHeaders": [
+      "location",
+      "set-cookie"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "outcome_read_with_nothing_waiting",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/outcome",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "unclaimed_with_no_email",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "GET",
+     "path": "/api/auth/google/unclaimed",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "link_with_a_body_that_is_not_an_object",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/auth/google/link",
+     "who": null,
+     "rawBody": "[]"
+    }
+   ]
+  },
+  {
+   "name": "claim_with_a_bad_phone_before_anything_is_held",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/anything/google",
+     "who": null,
+     "body": {
+      "fullName": "Gina Google",
+      "nickname": "",
+      "playingStyle": "",
+      "experienceYears": null,
+      "experienceMonths": null,
+      "socialLinks": {
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": ""
+      },
+      "phone": "12345"
+     }
+    }
+   ]
+  },
+  {
+   "name": "claim_with_a_body_that_is_not_an_object",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/claim/anything/google",
+     "who": null,
+     "rawBody": "[1]"
+    }
+   ]
+  },
+  {
+   "name": "register_with_a_form_that_fails_its_schema",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "12"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "register_with_no_values",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "register_with_values_that_are_not_an_object",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {
+      "values": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "register_with_a_wrong_invite_code_and_nothing_held",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=WRONG",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "register_with_a_body_that_is_not_an_object",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "rawBody": "[1]"
+    }
+   ]
+  }
+ ]
+}

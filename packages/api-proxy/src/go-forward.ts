@@ -3,8 +3,11 @@
  * every export here is inert and each app's `proxy.ts` behaves exactly as before.
  *
  * - `ROTRA_GO_API_URL`: base URL of the Go API (no trailing slash needed).
- * - `ROTRA_GO_MOVED_AREAS`: comma-separated `/api/...` path prefixes that Go owns; empty = none.
- *   Matches whole path segments: `/api/sessions` covers `/api/sessions/x`, never `/api/sessions-export`.
+ * - `ROTRA_GO_MOVED_AREAS`: comma-separated `/api/...` entries that Go owns; empty = none. A plain entry is
+ *   a path prefix and matches whole path segments: `/api/sessions` covers `/api/sessions/x`, never
+ *   `/api/sessions-export`. An entry that starts with `=` is one exact path: `=/api/register/*\/google`
+ *   matches only a path with the same segments, where `*` is exactly one non-empty segment. It is for a
+ *   route whose siblings stay in TypeScript.
  * - `ROTRA_PROXY_SECRET`: sent as `X-Rotra-Proxy-Secret` so Go trusts the forwarded client IP.
  */
 export const PROXY_SECRET_HEADER = 'X-Rotra-Proxy-Secret'
@@ -21,13 +24,30 @@ export function goApiEnabled(): boolean {
 function movedAreas(): string[] {
   return (process.env.ROTRA_GO_MOVED_AREAS ?? '')
     .split(',')
-    .map((area) => area.trim().replace(/\/+$/, ''))
-    .filter((area) => area.startsWith('/'))
+    .map((area) => area.trim())
+    .filter((area) => area.startsWith('/') || area.startsWith('=/'))
+    .map((area) => (area.startsWith('=') ? area : area.replace(/\/+$/, '')))
 }
 
-/** Whole-segment prefix match. */
+const segmentsOf = (path: string) => path.replace(/\/+$/, '').split('/')
+
+/** An exact entry (`=/a/*\/b`): same number of segments; each equal, or `*` for one non-empty segment. */
+function matchesExact(pattern: string, path: string): boolean {
+  const want = segmentsOf(pattern)
+  const got = segmentsOf(path)
+  return (
+    want.length === got.length &&
+    want.every((segment, i) => (segment === '*' ? got[i] !== '' : segment === got[i]))
+  )
+}
+
+/** Whole-segment prefix match for a plain entry; one exact path (with `*` segments) for an `=` entry. */
 export function isMovedPath(path: string): boolean {
-  return movedAreas().some((area) => path === area || path.startsWith(`${area}/`))
+  return movedAreas().some((area) =>
+    area.startsWith('=')
+      ? matchesExact(area.slice(1), path)
+      : path === area || path.startsWith(`${area}/`),
+  )
 }
 
 // Hop-by-hop headers (RFC 9110) plus the ones fetch must set itself.

@@ -13,7 +13,7 @@ Ticket: #997 (one issue for the whole track, under epic #869).
 ## Phase 2: Guide and example file
 
 - [x] **2.1** Write `docs/backend/environment-setup.md` (first draft with the missing variables and the commands; 1.3 completes the status column)
-- [ ] **2.2** Add `apps/api/.env.example` with every variable the Go config reads (placeholders only; link from `apps/api/README.md`)
+- [x] **2.2** Add `apps/api/.env.example` with every variable the Go config reads (placeholders only; link from `apps/api/README.md`) (2026-11-23, added in go-sign-in-catch-up with the Google block; README linked)
 - [ ] **2.3** Link the guide from `docs/backend/README.md` and `docs/backend/infrastructure.md`
 
 ## Phase 3: Set and verify (owner acts; stop and ask)

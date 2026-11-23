@@ -297,3 +297,52 @@ func TestLoadVisitorReceiptSecret(t *testing.T) {
 		t.Fatalf("error %v", err)
 	}
 }
+
+func TestLoadGoogleSignInUnsetByDefault(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Google != (Google{}) {
+		t.Fatalf("Google sign-in must be unset by default, got %+v", cfg.Google)
+	}
+}
+
+func TestLoadGoogleSignIn(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{
+		"DATABASE_URL":               "postgres://x",
+		"GOOGLE_OAUTH_CLIENT_ID":     " id.apps.googleusercontent.com ",
+		"GOOGLE_OAUTH_CLIENT_SECRET": "s3cret",
+		"GOOGLE_OAUTH_REDIRECT_BASE": "https://player.rotra.club",
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := Google{ClientID: "id.apps.googleusercontent.com", ClientSecret: "s3cret", RedirectBase: "https://player.rotra.club"}
+	if cfg.Google != want {
+		t.Fatalf("got %+v, want %+v", cfg.Google, want)
+	}
+}
+
+func TestLoadGoogleSignInHalfSetLeavesItOffWithoutStoppingTheAPI(t *testing.T) {
+	for name, env := range map[string]map[string]string{
+		"id only":          {"GOOGLE_OAUTH_CLIENT_ID": "id"},
+		"secret only":      {"GOOGLE_OAUTH_CLIENT_SECRET": "topsecretvalue"},
+		"no redirect base": {"GOOGLE_OAUTH_CLIENT_ID": "id", "GOOGLE_OAUTH_CLIENT_SECRET": "topsecretvalue"},
+		"bad redirect":     {"GOOGLE_OAUTH_CLIENT_ID": "id", "GOOGLE_OAUTH_CLIENT_SECRET": "topsecretvalue", "GOOGLE_OAUTH_REDIRECT_BASE": "https://player.rotra.club/"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			env["DATABASE_URL"] = "postgres://x"
+			cfg, err := Load(lookup(env))
+			if err != nil {
+				t.Fatalf("a bad Google setting must not stop the API: %v", err)
+			}
+			if cfg.Google.Set() || cfg.Google.Problem == "" || cfg.Google.ClientSecret != "" {
+				t.Fatalf("Google must be off with a reason and no secret: %+v", cfg.Google)
+			}
+			if strings.Contains(cfg.Google.Problem, "topsecretvalue") {
+				t.Fatalf("the reason leaks the secret: %v", cfg.Google.Problem)
+			}
+		})
+	}
+}

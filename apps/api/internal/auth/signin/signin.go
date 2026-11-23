@@ -13,6 +13,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/pass"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
@@ -31,6 +33,10 @@ type Deps struct {
 	Clock func() time.Time
 	// Logger may be nil: then nothing is logged.
 	Logger *slog.Logger
+	// PlayerSession, when set, runs for a Player session as it is answered: after a password sign-in and on a session read that
+	// finds a signed-in player. It is where the Google deadline gate's navigation hint is kept in step with the account
+	// (syncGoogleGateHint); it may set cookies and must not write a body.
+	PlayerSession func(w http.ResponseWriter, r *http.Request, playerID uuid.UUID)
 }
 
 type handlers struct {
@@ -39,6 +45,7 @@ type handlers struct {
 	verifier *pass.Verifier
 	now      func() time.Time
 	log      *slog.Logger
+	onPlayer func(w http.ResponseWriter, r *http.Request, playerID uuid.UUID)
 }
 
 // Register builds the routes. They are not in the proxy guard's open list, so they answer 404 without the
@@ -47,7 +54,7 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Service == nil || d.Store == nil || d.Verifier == nil {
 		return nil, errors.New("signin: routes need a session service, a store and a verifier")
 	}
-	h := &handlers{svc: d.Service, st: d.Store, verifier: d.Verifier, now: d.Clock, log: d.Logger}
+	h := &handlers{svc: d.Service, st: d.Store, verifier: d.Verifier, now: d.Clock, log: d.Logger, onPlayer: d.PlayerSession}
 	if h.now == nil {
 		h.now = time.Now
 	}

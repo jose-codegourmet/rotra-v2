@@ -8,6 +8,8 @@
 //   contact         POST /api/account/contact-change
 //   register        POST /api/register/{clubId}   (a visitor: no session)
 //   claim           POST /api/claim/{token}       (a visitor, a club record's link: RTR ID by the entry email, claimSharedEntry)
+//   googleflow      the Google routes after the trip to Google, with the held Google sign-in and the result stubbed (see the mock below)
+//   google          the seven Google sign-in routes (D-2026-11-16-01): only what is decided before the provider is needed; no Google here
 //
 //   docker run -d --rm --name rotra-capture-pg -e POSTGRES_PASSWORD=test -p 127.0.0.1:55461:5432 postgres:16-alpine
 //   source ~/.nvm/nvm.sh && nvm use
@@ -58,7 +60,63 @@ vi.mock('../../../../packages/db/src/auth/supabase-provider-admin.ts', async (im
     )
     return rows[0]?.present ?? false
   },
+  // Whether any ROTRA account is mapped to this provider login: here the account's sign-in subject, whatever its provider.
+  loginHasRotraAccount: async (subject) => {
+    const { rows } = await globalThis.__captureDb.query(
+      `SELECT EXISTS (SELECT 1 FROM player_accounts WHERE auth_subject = $1) AS present`,
+      [subject],
+    )
+    return rows[0].present
+  },
 }))
+
+// The held Google sign-in and the result of a trip to Google (group googleflow). In the TypeScript the held sign-in is a provider
+// session and the result a cookie; there is no Google and no Supabase here, so a case declares both in one cookie, `capture-google`
+// (base64url JSON: held {subject, email, name, googleOnly}, result {key, intent, outcome, email, name}), and only the reads of what the
+// browser holds are answered from it. Every decision, service and database write after them runs for real. The signed-in player is
+// the step's subject, as everywhere in this harness.
+const googleStub = (jar) => {
+  const value = jar.cookies.getAll().find((cookie) => cookie.name === 'capture-google')?.value
+  return value ? JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) : {}
+}
+vi.mock('../../../../packages/db/src/auth/google-oauth.ts', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+  ...actual,
+  currentPlayerSession: async () => {
+    const { currentSubject } = await import('./capture-writes-base.mjs')
+    const subject = currentSubject()
+    return subject ? { subject, oauth: true, sessionId: null } : null
+  },
+  // The result goes through the real reader (its key, intent and outcome checks), from the cookie the TypeScript itself would have set.
+  readGoogleResult: (jar) => {
+    const result = googleStub(jar).result
+    if (!result) return null
+    const value = Buffer.from(JSON.stringify(result), 'utf8').toString('base64url')
+    return actual.readGoogleResult({ cookies: { getAll: () => [{ name: 'rotra-player-google-result', value }] } })
+  },
+  readPendingGoogle: async (jar) => {
+    const held = googleStub(jar).held
+    if (!held) return null
+    // The provider's own user for this Google login (auth.users in Supabase): the account made for it points at it.
+    await globalThis.__captureDb.query(
+      `INSERT INTO auth_identities (id, audience, login_key, password_hash, password_scheme, password_changed_at, created_at, updated_at, revision)
+       VALUES ($1, 'player', $2, '', 'argon2id', now(), now(), now(), 1) ON CONFLICT DO NOTHING`,
+      [held.subject, held.email],
+    )
+    return {
+      subject: held.subject,
+      google: { email: held.email, name: held.name },
+      googleOnly: held.googleOnly,
+      tokens: { accessToken: 'held-access', refreshToken: 'held-refresh' },
+    }
+  },
+  promotePendingGoogle: async () => true,
+  dropPendingGoogle: async () => undefined,
+  dropGoogleSession: async () => undefined,
+  signOutPlayerHere: async () => undefined,
+  }
+})
 
 // The registration signs the new player up and in through Supabase. There is no Supabase here, and only its calls are replaced
 // (an in-memory provider, reset before every case): createLogin keeps one login per email under the operation that made it, as
@@ -102,7 +160,7 @@ afterAll(async () => {
   await capture?.close()
 })
 
-for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'contact', 'register', 'claim']) {
+for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'contact', 'register', 'claim', 'google', 'googleflow']) {
   test(name, async () => {
     await captureWrites({ db: capture.db, testdata, name, apiDir, beforeCase: () => globalThis.__logins.clear() })
   })

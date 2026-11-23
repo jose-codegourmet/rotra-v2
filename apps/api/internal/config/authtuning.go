@@ -28,6 +28,9 @@ type AuthLimits struct {
 	// values are generous so a venue whose phones all refresh in the same minute is never limited.
 	RefreshIP      AuthLimit
 	RefreshSession AuthLimit
+	// GoogleTripIP: Continue with Google callbacks per trusted client IP, counted once per trip and apart from IPAttempts so a venue
+	// finishing Google trips never uses up password sign-in (Queue and Admin share that counter).
+	GoogleTripIP AuthLimit
 }
 
 // AuthTuning is everything about sign-in that is configuration rather than contract.
@@ -57,6 +60,7 @@ func DefaultAuthTuning() AuthTuning {
 			ResetRequestIP: AuthLimit{Max: 30, Window: time.Hour},
 			RefreshIP:      AuthLimit{Max: 600, Window: time.Minute},
 			RefreshSession: AuthLimit{Max: 30, Window: time.Minute},
+			GoogleTripIP:   AuthLimit{Max: 100, Window: 15 * time.Minute},
 		},
 	}
 }
@@ -125,6 +129,7 @@ func loadAuthTuning(get func(string) string) (AuthTuning, error) {
 		{"ROTRA_AUTH_LIMIT_RESET_REQUEST_IP", &t.Limits.ResetRequestIP},
 		{"ROTRA_AUTH_LIMIT_REFRESH_IP", &t.Limits.RefreshIP},
 		{"ROTRA_AUTH_LIMIT_REFRESH_SESSION", &t.Limits.RefreshSession},
+		{"ROTRA_AUTH_LIMIT_GOOGLE_TRIP_IP", &t.Limits.GoogleTripIP},
 	} {
 		v := get(f.name)
 		if v == "" {

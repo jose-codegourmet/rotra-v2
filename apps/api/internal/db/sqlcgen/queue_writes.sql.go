@@ -179,7 +179,7 @@ func (q *Queries) GetClubAssessmentByOperation(ctx context.Context, operationID 
 }
 
 const getClubPlayerByID = `-- name: GetClubPlayerByID :one
-SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id FROM club_players WHERE id = $1
+SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id, avatar_ref, avatar_previous_ref FROM club_players WHERE id = $1
 `
 
 func (q *Queries) GetClubPlayerByID(ctx context.Context, id pgtype.UUID) (ClubPlayer, error) {
@@ -198,12 +198,14 @@ func (q *Queries) GetClubPlayerByID(ctx context.Context, id pgtype.UUID) (ClubPl
 		&i.RemovedAt,
 		&i.LinkedToClubPlayerID,
 		&i.SharedEntryID,
+		&i.AvatarRef,
+		&i.AvatarPreviousRef,
 	)
 	return i, err
 }
 
 const getClubPlayerOfPlayer = `-- name: GetClubPlayerOfPlayer :one
-SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id FROM club_players WHERE club_id = $1 AND player_id = $2 ORDER BY id LIMIT 1
+SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id, avatar_ref, avatar_previous_ref FROM club_players WHERE club_id = $1 AND player_id = $2 ORDER BY id LIMIT 1
 `
 
 type GetClubPlayerOfPlayerParams struct {
@@ -228,12 +230,14 @@ func (q *Queries) GetClubPlayerOfPlayer(ctx context.Context, arg GetClubPlayerOf
 		&i.RemovedAt,
 		&i.LinkedToClubPlayerID,
 		&i.SharedEntryID,
+		&i.AvatarRef,
+		&i.AvatarPreviousRef,
 	)
 	return i, err
 }
 
 const getClubPlayerOfSharedEntry = `-- name: GetClubPlayerOfSharedEntry :one
-SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id FROM club_players WHERE club_id = $1 AND shared_entry_id = $2 ORDER BY id LIMIT 1
+SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id, avatar_ref, avatar_previous_ref FROM club_players WHERE club_id = $1 AND shared_entry_id = $2 ORDER BY id LIMIT 1
 `
 
 type GetClubPlayerOfSharedEntryParams struct {
@@ -257,6 +261,8 @@ func (q *Queries) GetClubPlayerOfSharedEntry(ctx context.Context, arg GetClubPla
 		&i.RemovedAt,
 		&i.LinkedToClubPlayerID,
 		&i.SharedEntryID,
+		&i.AvatarRef,
+		&i.AvatarPreviousRef,
 	)
 	return i, err
 }
@@ -293,7 +299,7 @@ func (q *Queries) GetOpenSharedEntryByID(ctx context.Context, entryID pgtype.UUI
 }
 
 const getQueueClubPlayerOfClub = `-- name: GetQueueClubPlayerOfClub :one
-SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id FROM club_players WHERE club_id = $1 AND id = $2
+SELECT id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at, revision, removed_at, linked_to_club_player_id, shared_entry_id, avatar_ref, avatar_previous_ref FROM club_players WHERE club_id = $1 AND id = $2
 `
 
 type GetQueueClubPlayerOfClubParams struct {
@@ -318,6 +324,8 @@ func (q *Queries) GetQueueClubPlayerOfClub(ctx context.Context, arg GetQueueClub
 		&i.RemovedAt,
 		&i.LinkedToClubPlayerID,
 		&i.SharedEntryID,
+		&i.AvatarRef,
+		&i.AvatarPreviousRef,
 	)
 	return i, err
 }

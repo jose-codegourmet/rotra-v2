@@ -174,6 +174,16 @@ func (w *writer) identity(playerID uuid.UUID, contactRevision int64) (store.Iden
 	if err != nil {
 		return store.Identity{}, fmt.Errorf("claim: creating the player account: %w", err)
 	}
+	if w.s.googleEmail != "" {
+		err = w.q.RecordNewPlayerGoogle(w.ctx, sqlcgen.RecordNewPlayerGoogleParams{Email: pgtype.Text{String: w.s.googleEmail, Valid: true}, Now: pgTime(w.now), PlayerID: pgUUID(playerID)})
+		if err != nil {
+			return store.Identity{}, fmt.Errorf("claim: recording Google on the account: %w", err)
+		}
+		// The Google email is the ROTRA email, confirmed at once.
+		if err := w.q.ConfirmPrivateContactEmail(w.ctx, sqlcgen.ConfirmPrivateContactEmailParams{Now: pgTime(w.now), PlayerID: pgUUID(playerID)}); err != nil {
+			return store.Identity{}, fmt.Errorf("claim: confirming the Google email: %w", err)
+		}
+	}
 	return ident, nil
 }
 
@@ -293,7 +303,7 @@ func asProblem(err error) *problem {
 	switch {
 	case pg.Code == "23505" && pg.ConstraintName == "player_private_contacts_phone_e164_key":
 		return refuse(httpapi.ErrConflict, "phone", msgPhoneTaken)
-	case pg.Code == "23505" && pg.ConstraintName == "player_private_contacts_email_key":
+	case pg.Code == "23505" && (pg.ConstraintName == "player_private_contacts_email_key" || pg.ConstraintName == "player_accounts_google_email_key"):
 		return refuse(httpapi.ErrConflict, "email", msgEmailTaken)
 	case pg.Code == "23514" && pg.ConstraintName == "player_private_contacts_email_check":
 		return refuse(httpapi.ErrInvalid, "email", msgEmailInvalid)

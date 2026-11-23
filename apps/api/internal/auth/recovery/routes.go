@@ -72,11 +72,17 @@ func (r *Recovery) submitRoute(w http.ResponseWriter, req *http.Request) {
 		httpapi.WriteError(w, httpapi.ErrInvalid, nil)
 		return
 	}
-	if err := r.Submit(req.Context(), str(body["email"])); err != nil {
+	google, err := r.submit(req.Context(), str(body["email"]))
+	if err != nil {
 		r.fail(w, req, err)
 		return
 	}
-	httpapi.WriteJSON(w, http.StatusOK, map[string]bool{"acknowledged": true}, httpapi.Private)
+	// signsInWithGoogle is there only for an account that signs in with Google and has no password (flag on).
+	out := struct {
+		Acknowledged      bool `json:"acknowledged"`
+		SignsInWithGoogle bool `json:"signsInWithGoogle,omitempty"`
+	}{true, google}
+	httpapi.WriteJSON(w, http.StatusOK, out, httpapi.Private)
 }
 
 // resetRoute is POST /api/auth/reset-password. It sets no cookie: the player signs in with the new password.

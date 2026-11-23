@@ -1135,6 +1135,48 @@ func (ns NullPaymentMode) Value() (driver.Value, error) {
 	return string(ns.PaymentMode), nil
 }
 
+type PaymentRefundReason string
+
+const (
+	PaymentRefundReasonTransferRejected PaymentRefundReason = "transfer_rejected"
+	PaymentRefundReasonSessionCancelled PaymentRefundReason = "session_cancelled"
+)
+
+func (e *PaymentRefundReason) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PaymentRefundReason(s)
+	case string:
+		*e = PaymentRefundReason(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PaymentRefundReason: %T", src)
+	}
+	return nil
+}
+
+type NullPaymentRefundReason struct {
+	PaymentRefundReason PaymentRefundReason
+	Valid               bool // Valid is true if PaymentRefundReason is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPaymentRefundReason) Scan(value interface{}) error {
+	if value == nil {
+		ns.PaymentRefundReason, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PaymentRefundReason.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPaymentRefundReason) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PaymentRefundReason), nil
+}
+
 type PlayerClaimLinkState string
 
 const (
@@ -1702,8 +1744,10 @@ func (ns NullResultSlide) Value() (driver.Value, error) {
 type RosterReleaseReason string
 
 const (
-	RosterReleaseReasonDemoted RosterReleaseReason = "demoted"
-	RosterReleaseReasonRemoved RosterReleaseReason = "removed"
+	RosterReleaseReasonDemoted     RosterReleaseReason = "demoted"
+	RosterReleaseReasonRemoved     RosterReleaseReason = "removed"
+	RosterReleaseReasonTransferred RosterReleaseReason = "transferred"
+	RosterReleaseReasonRefunded    RosterReleaseReason = "refunded"
 )
 
 func (e *RosterReleaseReason) Scan(src interface{}) error {
@@ -1868,6 +1912,52 @@ func (ns NullSkillCategory) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.SkillCategory), nil
+}
+
+type SlotTransferStatus string
+
+const (
+	SlotTransferStatusPending   SlotTransferStatus = "pending"
+	SlotTransferStatusApproved  SlotTransferStatus = "approved"
+	SlotTransferStatusRejected  SlotTransferStatus = "rejected"
+	SlotTransferStatusWithdrawn SlotTransferStatus = "withdrawn"
+	SlotTransferStatusExpired   SlotTransferStatus = "expired"
+	SlotTransferStatusCancelled SlotTransferStatus = "cancelled"
+)
+
+func (e *SlotTransferStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = SlotTransferStatus(s)
+	case string:
+		*e = SlotTransferStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for SlotTransferStatus: %T", src)
+	}
+	return nil
+}
+
+type NullSlotTransferStatus struct {
+	SlotTransferStatus SlotTransferStatus
+	Valid              bool // Valid is true if SlotTransferStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullSlotTransferStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.SlotTransferStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.SlotTransferStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullSlotTransferStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.SlotTransferStatus), nil
 }
 
 type SocialProvider string
@@ -2408,6 +2498,8 @@ type ClubPlayer struct {
 	RemovedAt            pgtype.Timestamptz
 	LinkedToClubPlayerID pgtype.UUID
 	SharedEntryID        pgtype.UUID
+	AvatarRef            pgtype.Text
+	AvatarPreviousRef    pgtype.Text
 }
 
 type ClubPlayerClaimLink struct {
@@ -2462,6 +2554,17 @@ type ClubSessionReservation struct {
 	SessionID  pgtype.UUID
 	AcquiredAt pgtype.Timestamptz
 	CreatedAt  pgtype.Timestamptz
+}
+
+type ClubTrustedHost struct {
+	ID           pgtype.UUID
+	ClubID       pgtype.UUID
+	ClubPlayerID pgtype.UUID
+	AddedAt      pgtype.Timestamptz
+	RemovedAt    pgtype.Timestamptz
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+	Revision     int64
 }
 
 type ClubVenue struct {
@@ -3010,6 +3113,20 @@ type SessionFinalization struct {
 	Revision                int64
 }
 
+type SessionHost struct {
+	ID           pgtype.UUID
+	ClubID       pgtype.UUID
+	SessionID    pgtype.UUID
+	ClubPlayerID pgtype.UUID
+	AssignedAt   pgtype.Timestamptz
+	RemovedAt    pgtype.Timestamptz
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+	Revision     int64
+	NameSnapshot string
+	FrozenAt     pgtype.Timestamptz
+}
+
 type SessionInviteCode struct {
 	ID        pgtype.UUID
 	ClubID    pgtype.UUID
@@ -3074,6 +3191,19 @@ type SessionPaymentMark struct {
 	SourceOperationID pgtype.UUID
 	ActorClubID       pgtype.UUID
 	DeviceID          pgtype.UUID
+}
+
+type SessionPaymentRefund struct {
+	ID              pgtype.UUID
+	ClubID          pgtype.UUID
+	SessionID       pgtype.UUID
+	SessionPlayerID pgtype.UUID
+	Reason          PaymentRefundReason
+	SlotTransferID  pgtype.UUID
+	AmountMinor     int32
+	Currency        string
+	RefundedAt      pgtype.Timestamptz
+	CreatedAt       pgtype.Timestamptz
 }
 
 type SessionPlayer struct {
@@ -3159,6 +3289,32 @@ type SessionShuttlePlanLine struct {
 	Position        int16
 }
 
+type SessionSlotTransfer struct {
+	ID                       pgtype.UUID
+	ClubID                   pgtype.UUID
+	SessionID                pgtype.UUID
+	SenderSessionPlayerID    pgtype.UUID
+	SenderClubPlayerID       pgtype.UUID
+	SenderPlayerID           pgtype.UUID
+	RecipientPlayerID        pgtype.UUID
+	RecipientClubPlayerID    pgtype.UUID
+	RecipientSessionPlayerID pgtype.UUID
+	RecipientWasWaitlisted   pgtype.Bool
+	Status                   SlotTransferStatus
+	RequestedAt              pgtype.Timestamptz
+	DecidedAt                pgtype.Timestamptz
+	DecidedByDeviceID        pgtype.UUID
+	WithdrawnByPlayerID      pgtype.UUID
+	CreatedAt                pgtype.Timestamptz
+	ClaimedAt                pgtype.Timestamptz
+	LinkTokenDigest          []byte
+	AmountDueMinor           pgtype.Int4
+	AmountPaidMinor          pgtype.Int4
+	Currency                 pgtype.Text
+	PriorWaivedMinor         pgtype.Int4
+	WaivedMinor              pgtype.Int4
+}
+
 type SessionWaitlist struct {
 	ID                 pgtype.UUID
 	ClubID             pgtype.UUID
@@ -3190,6 +3346,7 @@ type SharedPlayerEntry struct {
 	CreatedAt       pgtype.Timestamptz
 	UpdatedAt       pgtype.Timestamptz
 	Revision        int64
+	SocialKey       pgtype.Text
 }
 
 type SkillLevel struct {

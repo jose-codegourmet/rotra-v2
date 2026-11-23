@@ -28,6 +28,8 @@ const (
 	msgPhoneRoute   = "Enter a Philippine mobile number, like 0917 555 0142."
 	msgEmailInvalid = "Enter an email address, like name@example.com."
 	msgPassEmpty    = "Enter a password."
+	// msgGoogleFailed is FAILED in google-sign-in.ts, the one sentence for every way a Google trip does not finish.
+	msgGoogleFailed = "Couldn't finish with Google. Try again."
 )
 
 // problem is a refusal in the Route Handlers' vocabulary: a ServiceError code and its field messages.
@@ -51,6 +53,10 @@ type submission struct {
 	// onRefusal, when set, sees every refusal before it is answered; true means it answered. Only the guest registration
 	// sets it (a taken email is its "account-match").
 	onRefusal func(w http.ResponseWriter, p *problem) bool
+	// googleEmail is set when the claim is made with Google (D-2026-11-16-01): email is then the Google email, the sign-in
+	// identity has no password (an empty hash: it signs in with Google only), and the account records Google as connected
+	// in the same transaction.
+	googleEmail string
 }
 
 // write answers a refusal, unless onRefusal did.
@@ -117,16 +123,22 @@ func parse(body map[string]any) (submission, *problem) {
 	if err := password.Validate(s.password); err != nil {
 		return s, refuse(httpapi.ErrInvalid, "password", password.Message(err))
 	}
+	s.input = detailsOf(body)
+	return s, nil
+}
+
+// detailsOf reads the profile details of a claim body, as the claim routes read them.
+func detailsOf(body map[string]any) profile.Input {
 	links, _ := body["socialLinks"].(map[string]any) // not an object: every link reads ''
-	s.input = profile.Input{
+	in := profile.Input{
 		FullName: str(body["fullName"]), Nickname: str(body["nickname"]), PlayingStyle: str(body["playingStyle"]),
 		ExperienceYears: intOrNull(body["experienceYears"]), ExperienceMonths: intOrNull(body["experienceMonths"]),
 		Links: map[string]string{},
 	}
 	for _, p := range []string{"facebook", "instagram", "youtube", "linkedin"} {
-		s.input.Links[p] = str(links[p])
+		in.Links[p] = str(links[p])
 	}
-	return s, nil
+	return in
 }
 
 // validEmail is what the table's CHECK accepts (one @ with something on both sides and no white space; the

@@ -1,12 +1,12 @@
 # Google sign-in for players: owner setup (#896) and how the code uses Supabase Auth
 
-**Last verified:** 2026-11-20. **Status:** real mode is **written but not run against Google**: no
+**Last verified:** 2026-11-23. **Status:** real mode is **written but not run against Google**: no
 sign-in has been tried, because the Google Cloud OAuth client and the Supabase provider (#896) are
 not set up yet. Migration `20261118000200_player_google_sign_in` is applied to the shared database
 (owner, November 20, 2026); `20261120000100_admin_link_registration` is applied to the shared database 2026-11-22 (owner request).
 Decisions: [D-2026-11-16-01](../mvp/decisions/2026-11-16.md#d-2026-11-16-01),
 [D-2026-11-20-01](../mvp/decisions/2026-11-20.md#d-2026-11-20-01). Ticket: #922.
-Built on Supabase Auth in the Player app's real mode; it moves to the Go API with B-04 (#875).
+Built on Supabase Auth in the Player app's real mode. The Go API has its own version (see [In the Go API](#in-the-go-api-track-go-sign-in-catch-up)), built on November 23, 2026 and tested only against a fake Google; the Supabase steps below are for the TypeScript version.
 
 Everything here is off while the platform feature flag `player_google_sign_in` is off.
 
@@ -119,3 +119,42 @@ and `SUPABASE_SECRET_KEY` it already has, and builds the callback URL from the r
   `session_join_requests.invite_code_id` yet (the invite card does name the inviter).
 - Rate limits and a sign-in audit trail of their own: Supabase's limits apply; the Go API's
   (B-04) replace them.
+
+## In the Go API (track go-sign-in-catch-up)
+
+**Status: built and tested against a fake Google only.** No Google Cloud OAuth client exists, so nothing here has run against
+Google. Owner answers (2026-11-23): Go talks to Google itself, the Google email identifies the player, and Google-only logins are not
+imported. Everything stays behind `player_google_sign_in`: with the flag off (or missing) every route answers 404.
+
+**What the owner sets up for Go** (no secret goes in the repo):
+
+1. A Google Cloud OAuth client (Web application). Authorized redirect URI: `<player origin>/api/auth/google/callback`, for example
+   `https://player.rotra.club/api/auth/google/callback` and `http://localhost:9001/api/auth/google/callback`. The Player app's proxy
+   forwards `/api/auth/*` to Go, so the browser returns to the Player app and Go answers. Scopes: `openid`, `email`, `profile` only.
+2. Three variables on the Go service (all or none; with only some, or a redirect base that is not an origin, Google stays off and the API logs a warning, it still starts): `GOOGLE_OAUTH_CLIENT_ID`,
+   `GOOGLE_OAUTH_CLIENT_SECRET` (secret) and `GOOGLE_OAUTH_REDIRECT_BASE` (the Player app's exact origin, no path). Without them the
+   routes exist and Continue with Google answers "unavailable". No Supabase setting is used.
+3. The Player app needs `/api/auth` and `/api/claim` in `ROTRA_GO_MOVED_AREAS` (already there for Go sign-in).
+
+| Step | Where (`apps/api/internal/auth/google`) |
+|---|---|
+| Start: state, PKCE and nonce in a signed 10 minute cookie; answers Google's URL | `google.go` |
+| Callback: checks state, exchanges the code, verifies the ID token, decides, signs in or holds, redirects | `google.go`, `oidc.go`, `decide.go` |
+| The screen reads what was decided (once); the player's yes; the identity cards | `decide.go`, `identities.go` |
+| Claim with Google | `claim.go` and `claim.Finish.GoogleEmail` |
+| Google registration from a club or session invite | `internal/auth/register/google.go` |
+
+How it differs from the TypeScript version (all logged in the track's plan):
+
+- **No provider session.** The held Google account (`rotra-player-google-held`) is a signed cookie with the verified email and name,
+  never a session. A Go session is issued only after ROTRA's record says Google is connected (`google_email`) or the player says yes,
+  so the rule "a session started by Google only counts for an account with Google" holds by construction.
+- **The Google email identifies the player.** A Google account that changes its email at Google must be connected again.
+- **A login made with Google has no password** (an empty hash). Password sign-in refuses it, and password reset answers
+  `signsInWithGoogle` while the flag is on.
+- **Google callbacks are rate limited** per IP, once per trip (starting is not counted), under their own counter `google_trip` (100 per 15 minutes, `ROTRA_AUTH_LIMIT_GOOGLE_TRIP_IP`), apart from the sign-in attempts every app's password sign-in shares. Outcome and link are not counted.
+- **The cookies are signed** (key derived from the pass signing key); the flow, result and return cookie names are the same.
+- **The Admin link's registration** (`/register`, picked city) is not in Go, for password or Google; it stays in the Player app, so
+  `/api/register` is not in the moved areas. Google registration moves with the exact-path entry `=/api/register/*/google`; password `/api/register/{clubId}` cannot be separated from `/api/register/google` by a path pattern and stays in the Player app (BL-19).
+- **The deadline gate** runs on Go's Player routes as before; Go also keeps the proxy's `rotra-player-google-gate` hint in step on the
+  password sign-in and the session read, and Google sign-in, Connect and the player's yes clear it.

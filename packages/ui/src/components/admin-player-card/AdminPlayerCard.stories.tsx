@@ -22,6 +22,11 @@ const registered: AdminPlayer = {
   registeredOn: '2026-10-05',
   levelIndex: 5,
   rankStatus: { kind: 'board', text: 'Intermediate Mid · on the overall leaderboard' },
+  verification: { verified: false, verifiedByAdmin: false, completedSteps: 2 },
+}
+const verified: AdminPlayer = {
+  ...registered,
+  verification: { verified: true, verifiedByAdmin: false, completedSteps: 3 },
 }
 const unclaimed: AdminPlayer = { ...managementPlayer, email: 'alex.reyes@example.com' }
 /** Two clubs saved the same unclaimed person, each under its own name. */
@@ -50,6 +55,9 @@ const savedByTwo: AdminPlayer = {
 /** Registered row. */
 export const RegisteredRow: Story = { args: { player: registered } }
 export const RegisteredRowLight: Story = { ...RegisteredRow, globals: { theme: 'light' } }
+/** A verified player: Verified in place of Registered (D-2026-11-23-07). */
+export const VerifiedRow: Story = { args: { player: verified } }
+export const VerifiedRowLight: Story = { ...VerifiedRow, globals: { theme: 'light' } }
 /** Unclaimed with an email. */
 export const UnclaimedRow: Story = { args: { player: unclaimed } }
 export const UnclaimedRowLight: Story = { ...UnclaimedRow, globals: { theme: 'light' } }

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 210 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 213 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -464,6 +464,8 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 210 · CANCELLED: 4 · 
 | [2026-11-22-queue-transfer-accounting](2026-11-22-queue-transfer-accounting.md) | Queue: slot transfer accounting, the automatic waiver shown before Approve and the slot history | slot-transfer-history (new), slot-transfer-row (extended with `payment`), payments-checklist/payment-card (extended with `transfer`, `onOpenHistory`), payments-checklist (extended with `totals.waived`, `onOpenSlotHistory`) | IN MOCK APP — #1013 |
 | [2026-11-22-queue-transfer-links](2026-11-22-queue-transfer-links.md) | Queue: transfer links for a recipient with no ROTRA account, first claimant and invalidation | transfer-link-sheet (new), transfer-link-card (new), forms/slot-transfer-form (extended with `onCreateLink`, `isCreatingLink`), my-night-card (extended with `transferLinkOpen`), slot-transfer-row (extended with `viaLink`) | IN MOCK APP — #1012 |
 | [2026-11-22-queue-trusted-hosts](2026-11-22-queue-trusted-hosts.md) | Club settings gets a Trusted hosts section: add and remove trusted hosts from saved players | trusted-hosts-panel, club-settings-menu | IN MOCK APP — #1003 |
+| [2026-11-23-admin-player-verified-status](2026-11-23-admin-player-verified-status.md) | Admin sees who is verified in the Players list and every player header | player-verification-card (reuse its status chip), admin player list row, admin player quick view, segmented control | IN MOCK APP — #1037 |
+| [2026-11-23-player-public-verified-chip](2026-11-23-player-public-verified-chip.md) | The public profile shows whether a registered player is verified | profile hero (player-profile-card), status chip | IN MOCK APP — #1038 |
 | [2026-11-23-queue-link-only-player-wording](2026-11-23-queue-link-only-player-wording.md) | Saved player profile and invite say "a social link" for a player saved without an email | player-profile-sheet, invite-sheet, add-player-sheet | IN MOCK APP — #1019 |
 | [2026-11-23-queue-new-player-phone-picture](2026-11-23-queue-new-player-phone-picture.md) | Add player › New player takes a phone and, from Saved players, a profile picture | new-player-form, club-picture-field (moved out of edit-player-details-form) | IN MOCK APP — PR #1027 |
 | [2026-11-23-queue-public-skill-mix-capacity](2026-11-23-queue-public-skill-mix-capacity.md) | Public page: the Skill mix bar spans the slot budget | skill-distribution-bar, join-request-card | IN MOCK APP — PR #1024 |
@@ -471,4 +473,5 @@ NEW: 67 · TICKETED: 7 · IN PROGRESS: 1 · IN MOCK APP: 210 · CANCELLED: 4 · 
 | [2026-11-23-queue-session-new-player-picture](2026-11-23-queue-session-new-player-picture.md) | Add player › New player has the same fields in a session as in Saved players | new-player-form, add-player-sheet, club-picture-field | IN MOCK APP — PR #1031 |
 | [2026-11-23-queue-social-link-entry-key](2026-11-23-queue-social-link-entry-key.md) | Add player: a social link saves an unclaimed player without an email (#1019) | add-player-sheet, add-player-form, edit-player-details-form | IN MOCK APP — #1019 |
 | [2026-11-23-queue-unclaimed-name-search](2026-11-23-queue-unclaimed-name-search.md) | Player Information finds unclaimed players by name and shows their name and picture | add-player-sheet, player-confirm-card | IN MOCK APP — PR #1030 |
+| [2026-11-23-queue-waitlist-strict-order](2026-11-23-queue-waitlist-strict-order.md) | The waitlist is strictly first come, first served | waitlist-panel, session-setup-form (setup-courts-section) | IN MOCK APP — #1036 |
 <!-- status-index:end -->

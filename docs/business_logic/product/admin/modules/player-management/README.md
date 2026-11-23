@@ -39,6 +39,11 @@ Admin can set **Verified by Admin** for a registered player or clear the overrid
 The Verification card on Player detail shows the status and all three checks. Each successful set or
 clear adds one entry with the required reason to the player's **Record of actions**.
 
+**Owner, November 23, 2026 ([D-2026-11-23-07](../../../../../mvp/decisions/2026-11-23.md#d-2026-11-23-07)):** Admin can
+tell who is verified without opening each player. The Players list, its Quick view and the player
+header show the verification status, and the list filters and counts **Verified** and **Not verified**
+(registered players only). The status is the same derived one: the three checks or Verified by Admin.
+
 ## Reviewed password recovery (#491, owner request November 8, 2026)
 
 Player Forgot password submits the registered email for Admin review, without automatic email.

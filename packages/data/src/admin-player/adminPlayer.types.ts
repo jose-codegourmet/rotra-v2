@@ -70,12 +70,30 @@ export type AdminPlayer = {
   removalReason: string | null
   recentStandardMatches: number
   rankStatus: RankStatus
+  /**
+   * Derived account verification (D-2026-11-16-02, D-2026-11-23-07): the three checks or Verified
+   * by Admin. Null for an unclaimed player, who has no account to verify.
+   */
+  verification: AdminPlayerVerification | null
 }
+
+/** What A-PLAYERS needs to tell who is verified; the private details stay on the Verification card. */
+export type AdminPlayerVerification = Pick<
+  import('../account-verification/accountVerification.types').AccountVerification,
+  'verified' | 'verifiedByAdmin' | 'completedSteps'
+>
 
 export type AdminPlayerAccountFilter = 'all' | 'registered' | 'unclaimed'
 
-/** The toolbar's account switch: the three counted states plus Details required (D-2026-11-16-04). */
-export type AdminPlayerAccountOption = AdminPlayerAccountFilter | 'details'
+/**
+ * The toolbar's account switch: the three counted states, Verified and Not verified (registered
+ * players only; D-2026-11-23-07), and Details required (D-2026-11-16-04).
+ */
+export type AdminPlayerAccountOption =
+  | AdminPlayerAccountFilter
+  | 'verified'
+  | 'unverified'
+  | 'details'
 
 export type AdminPlayerListParams = {
   q?: string
@@ -123,6 +141,9 @@ export type AdminPlayerStats = {
   noRank: number
   registered: number
   unclaimed: number
+  verified: number
+  /** Registered players who aren't verified */
+  unverified: number
 }
 export type AdminPlayerRecord = {
   archivedAt: string | null

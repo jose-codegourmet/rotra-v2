@@ -77,4 +77,5 @@ export const managementPlayer: AdminPlayer = {
   archivedAt: null,
   revision: 1,
   removalReason: null,
+  verification: null,
 }

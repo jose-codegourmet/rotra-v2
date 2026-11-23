@@ -154,6 +154,7 @@ export function SetGamesSheet({
     >
       <KeyValueList items={who} />
       {step === 1 ? (
+        // biome-ignore lint/a11y/useSemanticElements: a grid of two panels; a fieldset would change the drawn layout
         <div
           role="group"
           aria-labelledby="set-games-label"

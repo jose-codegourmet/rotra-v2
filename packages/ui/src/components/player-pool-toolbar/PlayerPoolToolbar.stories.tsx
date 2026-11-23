@@ -12,6 +12,8 @@ const onCourt = new Set(
 const counts = {
   available: roster.filter((p) => p.present && !onCourt.has(p.id)).length,
   present: roster.filter((p) => p.present).length,
+  away: roster.filter((p) => !p.present).length,
+  waitlist: 2,
   everyone: roster.length,
 }
 
@@ -33,6 +35,9 @@ type Story = StoryObj<typeof meta>
 /** Available · 9 is on by default; sort is longest wait */
 export const Counts: Story = {}
 export const Present: Story = { args: { show: 'present', sort: 'least' } }
+export const NotHere: Story = { args: { show: 'away' } }
+/** Waitlist replaces the cards, so the sort menu is hidden */
+export const Waitlist: Story = { args: { show: 'waitlist' } }
 export const Everyone: Story = { args: { show: 'everyone', sort: 'level' } }
 export const NoOneFree: Story = { args: { counts: { ...counts, available: 0 } } }
 

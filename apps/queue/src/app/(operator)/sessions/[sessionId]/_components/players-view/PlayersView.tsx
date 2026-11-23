@@ -1,6 +1,11 @@
 'use client'
 
+import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { useRemoveClubPlayerPicture } from '@rotra/data/club-player/useRemoveClubPlayerPicture'
+import { useSetClubNickname } from '@rotra/data/club-player/useSetClubNickname'
+import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
+import { useUseClubPlayerPreviousPicture } from '@rotra/data/club-player/useUseClubPlayerPreviousPicture'
 import {
   activeMatchFor,
   allPlayers,
@@ -21,6 +26,7 @@ import {
 } from '@rotra/data/match/queue.rules'
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { MockError } from '@rotra/data/mock/errors'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
@@ -36,12 +42,15 @@ import {
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
+import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
+import { EditLivePlayerSheet } from '@rotra/ui/edit-live-player-sheet'
+import type { EditLivePlayerFormValues } from '@rotra/ui/edit-live-player-sheet/schema'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { NoShowPanel } from '@rotra/ui/no-show-panel'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
@@ -103,6 +112,8 @@ const time = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
+const pictureMessage = (error: unknown) =>
+  error instanceof MockError ? (error.fieldErrors?.picture ?? error.message) : errorMessage(error)
 
 /**
  * Q-POOL, the console's Players view: "Players" with "P present of R" and Add late player (the
@@ -110,11 +121,14 @@ const errorMessage = (error: unknown) =>
  * PlayerPoolToolbar filter and sort in local state (Available, longest wait by default), the
  * PlayerPoolCard grid built from the match rules (games, wait minutes, On Court X / Away /
  * Queued · #P / Free), the pick order in local state with the SelectionBar while anyone is picked,
- * the Waitlist panel when anyone waits or the session is full, and the footer line. Set games for
- * all… and each card's Set games played… open SetGamesSheet on useSetGamesPlayed (#717); games is the
- * adjusted count (gamesPlayed). Each card's Move to waitlist (#735) toasts “Finish or remove NAME's
- * match first.” while the player is in a match, otherwise steps them down; Admit player on a full
- * roster asks OverfillConfirm first. Pictures on
+ * the Waitlist panel (under the cards when anyone waits or the session is full; in place of the cards
+ * with no sort menu under the Waitlist filter, which also has Not here for away players), and the
+ * footer line. Set games for all… and each card's Current button open SetGamesSheet on
+ * useSetGamesPlayed (#717); games is the adjusted count (gamesPlayed). Each card's pencil opens
+ * EditLivePlayerSheet (D-EDIT-LIVE-PLAYER): Save changes applies only what changed through the
+ * club nickname, games played and presence hooks (the picture applies at once, as Edit details)
+ * and toasts “Changes saved · NAME” or “No changes”. There is no Move to waitlist on a live card.
+ * Admit player on a full roster asks OverfillConfirm first. Pictures on
  * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
  * filter and reporting one summary with the unique waiting-match attention count.
  */
@@ -144,6 +158,11 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
+  const setPresenceOne = useSetPresence()
+  const setClubNickname = useSetClubNickname()
+  const setPicture = useSetClubPlayerPicture()
+  const removePicture = useRemoveClubPlayerPicture()
+  const previousPicture = useUseClubPlayerPreviousPicture()
   const noShows = useSessionNoShows(sessionId)
   const markNoShow = useMarkNoShow()
   const undoNoShow = useUndoNoShow()
@@ -155,6 +174,11 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   /** Set games played: one roster id, or 'all' */
   const [setGamesFor, setSetGamesFor] = useState<string | 'all' | null>(null)
   const [setGamesError, setSetGamesError] = useState<string | undefined>()
+  /** Edit player (D-EDIT-LIVE-PLAYER): the roster id whose sheet is open */
+  const [editFor, setEditFor] = useState<string | null>(null)
+  const [editError, setEditError] = useState<string | undefined>()
+  const [editPending, setEditPending] = useState(false)
+  const [pictureError, setPictureError] = useState<string | undefined>()
   const [show, setShow] = useState<PlayerPoolShow>('available')
   const [sort, setSort] = useState<PlayerPoolSort>('wait')
   const [held, setHeld] = useState<{ filter: PlayerPoolShow; ids: string[] } | null>(null)
@@ -164,6 +188,13 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const [draft, setDraft] = useState<ReturnType<typeof previewMakeMatch> | null>(null)
   const [arranged, setArranged] = useState(false)
   const [makeError, setMakeError] = useState<string | undefined>()
+
+  // Only an unclaimed player has a club-set picture to edit here.
+  const editRow = roster.data?.roster.find((p) => p.id === editFor)
+  const editClub = clubPlayers.data?.players.find((p) => p.id === editRow?.clubPlayerId)
+  const pictureDetails = useClubPlayerDetails(
+    editClub?.identity === 'unclaimed' ? editClub.id : null,
+  )
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -231,6 +262,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const counts = {
     available: rows.filter((r) => r.player.present && !r.playing).length,
     present: rows.filter((r) => r.player.present).length,
+    away: rows.filter((r) => !r.player.present).length,
+    waitlist: waitlist.length,
     everyone: rows.length,
   }
   const retained = (id: string) =>
@@ -241,7 +274,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         ? (r.player.present && !r.playing) || retained(r.player.id)
         : show === 'present'
           ? r.player.present || retained(r.player.id)
-          : true,
+          : show === 'away'
+            ? !r.player.present || retained(r.player.id)
+            : true,
     )
     .sort(SORTERS[sort])
   if (held?.filter === show && setPresence.pending.size) {
@@ -302,6 +337,103 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     const w = waitlist.find((w) => w.id === waitlistId)
     if (w) onOpenProfile(w.clubPlayerId)
   }
+  const waitlistNode = (
+    <WaitlistPanel
+      live
+      isPending={giveSlot.isPending || fillOpenSlots.isPending || removeFromWaitlist.isPending}
+      serverError={
+        giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error
+          ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error)
+          : undefined
+      }
+      entries={entries}
+      rosterCount={rosterList.length}
+      courtCount={s.courts.length}
+      playersPerCourt={s.playersPerCourt}
+      onFillOpenSlots={() => fillOpenSlots.mutate(sessionId, options)}
+      onGiveSlot={(waitlistId) => {
+        if (full) setOverfillWaiter(waitlistId)
+        else giveSlotTo(waitlistId)
+      }}
+      onRemove={(waitlistId) => removeFromWaitlist.mutate({ sessionId, waitlistId }, options)}
+      onOpenProfile={openProfileFromWaitlist}
+    />
+  )
+
+  const editPlayer = rosterList.find((p) => p.id === editFor)
+  const editRowData = editPlayer ? rows.find((r) => r.player.id === editPlayer.id) : undefined
+  const editClubPlayer = editPlayer ? byClubPlayer(editPlayer.clubPlayerId) : undefined
+  const editKind =
+    editClubPlayer?.identity === 'registered'
+      ? 'registered'
+      : editClubPlayer?.identity === 'unclaimed'
+        ? 'unclaimed'
+        : 'guest'
+  const editClubNickname = editPlayer?.clubNickname ?? editClubPlayer?.clubNickname ?? null
+  const openEdit = (rosterId: string) => {
+    setEditError(undefined)
+    setPictureError(undefined)
+    void setPresence.flush().then(() => setEditFor(rosterId))
+  }
+  const closeEdit = () => {
+    setEditFor(null)
+    setEditError(undefined)
+    setPictureError(undefined)
+  }
+  /** Save changes: only what changed, each through the hook its own screen uses */
+  const saveEdit = async (values: EditLivePlayerFormValues) => {
+    if (!editPlayer || !editRowData || editPending) return
+    setEditError(undefined)
+    setEditPending(true)
+    let changed = false
+    try {
+      if (editKind === 'registered' && values.nickname !== (editClubNickname ?? '')) {
+        await setClubNickname.mutateAsync({
+          clubPlayerId: editPlayer.clubPlayerId,
+          clubNickname: values.nickname,
+        })
+        changed = true
+      }
+      if (values.games !== editRowData.games) {
+        await setGamesPlayed.mutateAsync({
+          sessionId,
+          rosterId: editPlayer.id,
+          games: values.games,
+          operationId: crypto.randomUUID(),
+        })
+        changed = true
+      }
+      if (values.present !== editPlayer.present) {
+        await setPresence.flush()
+        await setPresenceOne.mutateAsync({
+          sessionId,
+          rosterId: editPlayer.id,
+          present: values.present,
+        })
+        changed = true
+      }
+    } catch (error) {
+      setEditError(errorMessage(error))
+      setEditPending(false)
+      return
+    }
+    setEditPending(false)
+    closeEdit()
+    toast(changed ? `Changes saved · ${editPlayer.nameSnapshot}` : 'No changes')
+  }
+  const pictureCallbacks = (message: string) => ({
+    onSuccess: () => toast(`${message} · ${editPlayer?.nameSnapshot ?? ''}`),
+    onError: (error: unknown) => setPictureError(pictureMessage(error)),
+  })
+  const editMatch = editRowData?.playing
+    ? {
+        status:
+          activeMatchFor(editPlayer?.id ?? '', all)?.state === 'on_court'
+            ? ('oncourt' as const)
+            : ('playing' as const),
+        courtLabel: editRowData.status.kind === 'playing' ? editRowData.status.courtLabel : '',
+      }
+    : null
 
   return (
     <div className="flex flex-col gap-5">
@@ -353,7 +485,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           setSort(value)
         }}
       />
-      {shown.length ? (
+      {show === 'waitlist' ? (
+        waitlistNode
+      ) : shown.length ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
           {shown.map((row) => {
             const order = selection.indexOf(row.player.id)
@@ -378,6 +512,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 selected={order >= 0}
                 pickOrder={order >= 0 ? order + 1 : undefined}
                 onToggleSelect={() => toggle(row.player.id)}
+                onEdit={() => openEdit(row.player.id)}
                 onOpenProfile={() => onOpenProfile(row.player.clubPlayerId)}
                 onSetGames={() => {
                   setSetGamesError(undefined)
@@ -408,7 +543,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           <EmptyState>
             {show === 'available'
               ? 'No one is free right now. Try Present or Everyone.'
-              : 'No players yet.'}
+              : show === 'away'
+                ? 'Everyone on the roster is here.'
+                : 'No players yet.'}
           </EmptyState>
         </Card>
       )}
@@ -444,28 +581,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           if (x) onOpenProfile(x.clubPlayerId)
         }}
       />
-      {waitlist.length || full ? (
-        <WaitlistPanel
-          live
-          isPending={giveSlot.isPending || fillOpenSlots.isPending || removeFromWaitlist.isPending}
-          serverError={
-            giveSlot.error || fillOpenSlots.error || removeFromWaitlist.error
-              ? errorMessage(giveSlot.error ?? fillOpenSlots.error ?? removeFromWaitlist.error)
-              : undefined
-          }
-          entries={entries}
-          rosterCount={rosterList.length}
-          courtCount={s.courts.length}
-          playersPerCourt={s.playersPerCourt}
-          onFillOpenSlots={() => fillOpenSlots.mutate(sessionId, options)}
-          onGiveSlot={(waitlistId) => {
-            if (full) setOverfillWaiter(waitlistId)
-            else giveSlotTo(waitlistId)
-          }}
-          onRemove={(waitlistId) => removeFromWaitlist.mutate({ sessionId, waitlistId }, options)}
-          onOpenProfile={openProfileFromWaitlist}
-        />
-      ) : null}
+      {show !== 'waitlist' && (waitlist.length || full) ? waitlistNode : null}
       {draft ? (
         <ConfirmMakeMatchSheet
           open
@@ -539,6 +655,65 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         add the match to the end of the queue. Present controls who can be paired automatically;
         turning someone off never ends their current game.
       </p>
+      {editPlayer && editRowData ? (
+        <EditLivePlayerSheet
+          open
+          shownName={
+            editClubNickname?.trim() || editPlayer.nicknameSnapshot || editPlayer.nameSnapshot
+          }
+          fullName={editPlayer.nameSnapshot}
+          kind={editKind}
+          level={editPlayer.level}
+          photoUrl={photoFor(editPlayer)}
+          match={editMatch}
+          clubNickname={editClubNickname}
+          accountNickname={editClubPlayer?.nickname ?? null}
+          games={Math.min(99, editRowData.games)}
+          present={editPlayer.present}
+          picture={
+            editKind === 'unclaimed' && pictureDetails.data && editClubPlayer
+              ? {
+                  playerId: editClubPlayer.playerId ?? editClubPlayer.id,
+                  picture: pictureDetails.data.picture,
+                  onChange: (choice) => {
+                    setPictureError(undefined)
+                    setPicture.mutate(
+                      choice.kind === 'photo'
+                        ? { clubPlayerId: editClubPlayer.id, kind: 'photo', file: choice.file }
+                        : {
+                            clubPlayerId: editClubPlayer.id,
+                            kind: 'character',
+                            characterId: choice.characterId,
+                          },
+                      pictureCallbacks('Picture updated'),
+                    )
+                  },
+                  onRemove: () => {
+                    setPictureError(undefined)
+                    removePicture.mutate(
+                      { clubPlayerId: editClubPlayer.id },
+                      pictureCallbacks('Using initials'),
+                    )
+                  },
+                  onUsePrevious: () => {
+                    setPictureError(undefined)
+                    previousPicture.mutate(
+                      { clubPlayerId: editClubPlayer.id },
+                      pictureCallbacks('Previous picture restored'),
+                    )
+                  },
+                  pending:
+                    setPicture.isPending || removePicture.isPending || previousPicture.isPending,
+                  error: pictureError,
+                }
+              : undefined
+          }
+          isPending={editPending}
+          error={editError}
+          onSave={(values) => void saveEdit(values)}
+          onCancel={closeEdit}
+        />
+      ) : null}
       {setGamesFor ? (
         <SetGamesSheet
           open

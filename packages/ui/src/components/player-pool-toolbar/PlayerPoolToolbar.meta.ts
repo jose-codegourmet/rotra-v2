@@ -3,10 +3,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerPoolToolbarMeta = {
   name: 'PlayerPoolToolbar',
   description:
-    'The Players view filter and sort: Available · N (present and off court, the default), Present · N, Everyone · N, and the Sort players select (longest wait, least games, most games, level high to low).',
+    'The Players view filter and sort: Available · N (present and off court, the default), Present · N, Not here · N (away), Waitlist · N (hides the sort select), Everyone · N, and the Sort players select (longest wait, least games, most games, level high to low).',
   usage: [
     'Use above the PlayerPoolCard grid in the live console (Q-POOL). The parent filters and sorts the roster; the toolbar only reports the chosen show and sort.',
-    'Counts are live: available excludes players on court, present counts the Present switch, everyone is the whole roster.',
+    'Counts are live: available excludes players on court, present counts the Present switch, Not here counts away players, Waitlist counts the waitlist, everyone is the whole roster.',
     'For the saved players directory use SavedPlayersFilterBar.',
   ],
   prototype: {

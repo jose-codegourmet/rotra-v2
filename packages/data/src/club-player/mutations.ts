@@ -6,7 +6,12 @@ import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
-import { isUnclaimedPerson, savedDisplayName, savedRecordByEmail } from '../player/unclaimed'
+import {
+  clubRecordsOf,
+  isUnclaimedPerson,
+  savedDisplayName,
+  savedRecordByEmail,
+} from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
@@ -165,6 +170,9 @@ export function clubPlayerForProfile(
     addedAt: Date.now(),
     joinedVia,
   }
+  // D-2026-11-23-01: an unclaimed person keeps the picture lookup showed (the first club's record).
+  const firstPicture = unclaimed ? clubRecordsOf(s, profile.id)[0]?.picture : undefined
+  if (firstPicture) player.picture = { ...firstPicture }
   s.clubPlayers.push(player)
   return { player, created: true }
 }

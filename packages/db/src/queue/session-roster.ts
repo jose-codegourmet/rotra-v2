@@ -345,8 +345,9 @@ const OWN_NAME_ERROR = 'Enter a name.'
 /**
  * The club's saved player for a Player lookup match (D-2026-11-16-04), created when the club has
  * not saved them yet. `profileId` is a registered player's id, or the id of an unclaimed person's
- * shared entry: then the club's own record is made with `ownName` (another club's name, picture
- * and level are never shown) and no nickname. A deleted saved player is restored rather than
+ * shared entry: then the club's own record is made with `ownName` and no nickname, starting with the
+ * picture of the club that saved them first, the one Player lookup showed (D-2026-11-23-01; the
+ * level is never copied). A deleted saved player is restored rather than
  * duplicated (one row per person per club). A registered player's row keeps no nickname: the
  * account's shows, and the club nickname is set on its own (D-2026-11-18-03).
  */
@@ -379,6 +380,22 @@ export async function clubPlayerForProfile(
   if (saved && !saved.removedAt) return { clubPlayer: saved, created: false }
   const name = entry ? (ownName?.trim() ?? '') : (player?.fullName ?? '')
   if (!name) throw new ServiceError('invalid', { name: OWN_NAME_ERROR })
+  // D-2026-11-23-01: an unclaimed person keeps the picture lookup showed (the first club's record).
+  const picture = entry
+    ? ((
+        await tx.clubPlayer.findFirst({
+          where: {
+            sharedEntryId: entry.id,
+            removedAt: null,
+            linkedToClubPlayerId: null,
+            playerId: null,
+            NOT: { clubId: context.clubId },
+          },
+          orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+          select: { avatarRef: true },
+        })
+      )?.avatarRef ?? null)
+    : null
   // A deleted saved player is restored rather than duplicated (one saved row per person per club).
   // The guarded write restores once, so a replayed operation tells a registered player once.
   if (saved) {
@@ -388,6 +405,7 @@ export async function clubPlayerForProfile(
         removedAt: null,
         linkedToClubPlayerId: null,
         ...(entry ? { displayName: name } : {}),
+        ...(picture && !saved.avatarRef ? { avatarRef: picture } : {}),
         revision: { increment: 1 },
       },
     })
@@ -403,6 +421,7 @@ export async function clubPlayerForProfile(
       ...key,
       displayName: name,
       nickname: null,
+      avatarRef: picture,
       addedAt: now,
     },
   })

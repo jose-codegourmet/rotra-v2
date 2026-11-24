@@ -4,7 +4,7 @@
 
 **Status:** Design approved by the owner November 15, 2026 (B-50). **Built November 23, 2026 on the live-updates track, not applied
 anywhere shared:** the migration `20261123000400_live_update_events` and the Prisma model exist and were applied to throwaway test
-databases only. Its SQL **still needs owner sign-off** (B-36). Under [B-36](../../backend/open-decisions.md#settled), Prisma in
+databases only. Its SQL was **signed off by the owner on 2026-11-25** (B-36). Under [B-36](../../backend/open-decisions.md#settled), Prisma in
 `packages/db` owns the schema until ship: a migration PR on `main` with owner sign-off, applied to Railway staging, then Supabase
 production, **before** the API build that adds events is deployed (every Go write adds its event in its own transaction, so a database
 without the table fails those writes). Follows [conventions](conventions.md) and the PostgreSQL table-design rules, with the exceptions

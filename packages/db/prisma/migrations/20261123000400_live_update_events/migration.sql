@@ -1,7 +1,7 @@
 -- Live-update events (track live-updates, go-writes-queue R4; B-25, B-26, B-34, B-48, B-49, B-50).
 -- Design: docs/database_design/product/live-updates.md (approved by the owner November 15, 2026, B-50).
 --
--- OWNER SIGN-OFF STILL NEEDED ON THIS SQL (B-36). It has been applied to throwaway test databases only, never to the
+-- Owner signed off this SQL on 2026-11-25 (B-36). Before that it was applied to throwaway test databases only, never to the
 -- shared database. Needs PostgreSQL 13 or later (xid8 and pg_current_xact_id()); confirm on Railway and Supabase first.
 -- Additive: one table, one index and one nullable column. No existing row changes meaning.
 --

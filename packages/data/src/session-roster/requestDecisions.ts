@@ -11,8 +11,8 @@ import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { realKeepDropOut, realRemoveDropOut } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
 import {
-  capacity,
   type ConfirmRequestInput,
+  capacity,
   confirmJoinRequest,
   confirmJoinRequestChange,
   place,

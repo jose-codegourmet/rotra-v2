@@ -75,11 +75,7 @@ function placement(
 }
 
 /** Only the flags that are set, so an ordinary add sends exactly what it did before #735. */
-const placementFlags = ({
-  allowOverfill,
-  toWaitlist,
-  allowOutsideLevels,
-}: RosterAddPlacement) => ({
+const placementFlags = ({ allowOverfill, toWaitlist, allowOutsideLevels }: RosterAddPlacement) => ({
   ...(allowOverfill ? { allowOverfill: true } : {}),
   ...(toWaitlist ? { toWaitlist: true } : {}),
   // D-2026-11-19-12: the second press after the level restriction warning.

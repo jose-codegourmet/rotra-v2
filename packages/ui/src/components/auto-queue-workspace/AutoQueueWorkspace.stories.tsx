@@ -9,7 +9,6 @@ import {
   type AutoQueueMode,
   AutoQueueWorkspace,
   type AutoQueueWorkspaceProps,
-  type QueueWorkspace,
 } from './AutoQueueWorkspace'
 
 const fixture = matchLineupFixtures.autoQueueWorkspace
@@ -66,7 +65,6 @@ const baggingArgs = (enabled: boolean, pairs = baggingFixture.pairs): AutoQueueB
 })
 
 function Demo(args: AutoQueueWorkspaceProps) {
-  const [workspace, setWorkspace] = useState<QueueWorkspace>(args.workspace)
   const [mode, setMode] = useState<AutoQueueMode>(args.mode)
   const [count, setCount] = useState<AutoQueueCount | null>(args.count)
   const [target, setTarget] = useState(args.catchUpTarget)
@@ -77,8 +75,6 @@ function Demo(args: AutoQueueWorkspaceProps) {
     <AutoQueueWorkspace
       {...args}
       bagging={bagging}
-      workspace={workspace}
-      onWorkspaceChange={setWorkspace}
       mode={mode}
       onModeChange={setMode}
       count={count}
@@ -130,13 +126,6 @@ const meta = {
   title: 'Queue/AutoQueueWorkspace',
   component: AutoQueueWorkspace,
   args: {
-    workspace: 'auto',
-    onWorkspaceChange: fn(),
-    mainQueue: (
-      <div className="rounded-lg border border-border p-4 text-fg">
-        Queued matches · Main Queue controls remain here.
-      </div>
-    ),
     mode: 'available',
     onModeChange: fn(),
     count: null,
@@ -164,7 +153,6 @@ type Story = StoryObj<typeof meta>
 
 export const Generated: Story = { args: { count: 2 } }
 export const Empty: Story = { args: { batches: {} } }
-export const MainQueue: Story = { args: { workspace: 'main' } }
 export const CrossTabSelected: Story = {
   args: { selectedIds: ['draft-available-1', 'draft-ahead-1'] },
 }

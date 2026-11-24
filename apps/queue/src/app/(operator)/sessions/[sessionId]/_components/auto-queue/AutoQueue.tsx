@@ -23,20 +23,18 @@ import {
   type AutoQueueMode,
   AutoQueueWorkspace,
   type AutoQueueWorkspaceProps,
-  type QueueWorkspace,
 } from '@rotra/ui/auto-queue-workspace'
 import type { BaggingPlayer } from '@rotra/ui/bagging-pairs-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
-import { type ReactNode, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 
 export type AutoQueueProps = {
   sessionId: string
-  workspace: QueueWorkspace
-  onWorkspaceChange: (workspace: QueueWorkspace) => void
-  mainQueue: ReactNode
+  /** After reviewed drafts join the Main Queue: the console returns to the Main Queue tab */
+  onAddedToMainQueue: () => void
 }
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
@@ -50,7 +48,7 @@ const baggingPlayer = (p: SessionPlayer | undefined, id: string): BaggingPlayer 
 })
 
 /** In-memory draft wiring; accepted matches remain the sole source for dispatch and shared counts. */
-export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }: AutoQueueProps) {
+export function AutoQueue({ sessionId, onAddedToMainQueue }: AutoQueueProps) {
   const session = useQueueSession(sessionId),
     roster = useSessionRoster(sessionId),
     matches = useSessionMatches(sessionId)
@@ -82,7 +80,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   const busy = useRef(false)
   const confirmation = useRef<{ key: string; id: string } | null>(null)
   const failed = [session, roster, matches, drafts].find((query) => query.isError)
-  if (failed) return <QueryError query={failed} title="Couldn't load Generate matches." />
+  if (failed) return <QueryError query={failed} title="Couldn't load Generate Queue." />
   const s = session.data,
     state = drafts.data
   if (!s || !state || !roster.data || !matches.data) return <Skeleton className="h-56 rounded-lg" />
@@ -214,7 +212,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       })
       confirmation.current = null
       toast(result.message)
-      onWorkspaceChange('main')
+      onAddedToMainQueue()
       return true
     } catch (error) {
       setTransferError(errorMessage(error))
@@ -225,9 +223,6 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   }
   return (
     <AutoQueueWorkspace
-      workspace={workspace}
-      onWorkspaceChange={onWorkspaceChange}
-      mainQueue={mainQueue}
       mode={mode}
       onModeChange={setMode}
       count={count}

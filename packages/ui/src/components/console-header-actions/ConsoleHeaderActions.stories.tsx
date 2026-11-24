@@ -16,7 +16,6 @@ const meta = {
     onOpenPayments: fn(),
     onOpenPublicPage: fn(),
     onCopyFacebookPost: fn(),
-    onOpenSessionSettings: fn(),
     onGoHome: fn(),
   },
   // In place: the title block on the left, the cluster at the upper right (under it on phones).
@@ -56,7 +55,7 @@ export const MatchRequestsWaitingLight: Story = {
   globals: { theme: 'light' },
 }
 
-/** The ⋯ More menu open: Public page, Copy Facebook post, Session settings, Home. */
+/** The ⋯ More menu open: Public page, Copy Facebook post, Home. */
 export const MoreMenuOpen: Story = { play: openMore }
 export const MoreMenuOpenLight: Story = { play: openMore, globals: { theme: 'light' } }
 

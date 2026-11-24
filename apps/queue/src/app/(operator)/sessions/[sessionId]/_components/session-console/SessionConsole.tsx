@@ -13,7 +13,6 @@ import { isPermissionRefusal } from '@rotra/data/mock/errors'
 import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
-import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPresence'
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -31,13 +30,14 @@ import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
-import { notFound, useRouter } from 'next/navigation'
+import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
+import { GenerateQueueView } from '@/app/(operator)/sessions/[sessionId]/_components/generate-queue-view/GenerateQueueView'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
 import {
@@ -50,6 +50,7 @@ import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/p
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
 import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
+import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import {
   StartMatch,
@@ -62,7 +63,35 @@ import { ConsoleDeviceNotice } from '../console-device-notice/ConsoleDeviceNotic
 
 export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boolean }
 
-export type ConsoleView = 'session' | 'queue' | 'players' | 'leaderboard' | 'payments'
+/**
+ * The console's tabs, in display order: Courts, Main Queue, Generate Queue, Players, Leaderboard,
+ * Settings. The next ticket adds Match History between Leaderboard and Settings: add its key here,
+ * its `?tab=` value to TAB_PARAMS, its container to VIEWS and its tab to `tabs` and the panels.
+ */
+export type ConsoleView = 'courts' | 'queue' | 'generate' | 'players' | 'leaderboard' | 'settings'
+
+/** The `?tab=` value of each tab; Courts has none. */
+const TAB_PARAMS: Record<ConsoleView, string | null> = {
+  courts: null,
+  queue: 'queue',
+  generate: 'generate',
+  players: 'roster',
+  leaderboard: 'board',
+  settings: 'settings',
+}
+
+/** Values older links may carry, mapped to the nearest tab (Payments is a button on Settings now). */
+const LEGACY_TAB_PARAMS: Record<string, ConsoleView> = {
+  session: 'courts',
+  players: 'players',
+  leaderboard: 'leaderboard',
+  payments: 'settings',
+}
+
+const tabFromParam = (param: string | null): ConsoleView =>
+  (Object.keys(TAB_PARAMS) as ConsoleView[]).find((view) => TAB_PARAMS[view] === param) ??
+  (param ? LEGACY_TAB_PARAMS[param] : undefined) ??
+  'courts'
 export type ConsoleSheet =
   | 'join-requests'
   | 'payments'
@@ -100,12 +129,14 @@ const OFFLINE_NOTICE_REAL =
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
  * soon as it is listed here; an unlisted Queue hides its tab, while unlisted Players and
- * Leaderboard keep their tab and a Skeleton panel.
+ * Leaderboard keep their tab and a Skeleton panel. Courts (SessionView) and Settings (SettingsView)
+ * take extra callbacks and are rendered by the shell.
  */
 const VIEWS: Partial<
-  Record<Exclude<ConsoleView, 'session' | 'payments'>, ComponentType<ConsoleViewProps>>
+  Record<Exclude<ConsoleView, 'courts' | 'settings'>, ComponentType<ConsoleViewProps>>
 > = {
   queue: QueueView,
+  generate: GenerateQueueView,
   players: PlayersView,
   leaderboard: LeaderboardView,
 }
@@ -115,9 +146,10 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 /**
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and, at the
  * upper right, ConsoleHeaderActions: Match requests · N (the Requests sheet, match requests only),
- * Courts and time, Payments and the More menu (Public page, Copy Facebook post, Session settings,
- * Home). Then the view tabs
- * with live counts, the view panels (Session here; the others arrive in their own containers), the
+ * Courts and time, Payments and the More menu (Public page, Copy Facebook post, Home). Then the
+ * view tabs (Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings; on phones one
+ * "Console view" menu) with live counts, the view panels (Courts here; the others arrive in their
+ * own containers), the selected tab in the URL (`?tab=`), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
  * unknown ids to notFound().
@@ -133,8 +165,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const standings = useLiveStandings(sessionId)
-  const payments = useSessionPayments(sessionId)
-  const [view, setView] = useState<ConsoleView>('session')
+  // The selected tab lives in the URL (?tab=); missing or unknown values mean Courts.
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -145,6 +179,19 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const s = session.data
   // Record games off: no Leaderboard tab, a Not recorded chip in the header.
   const unrecorded = s ? !recordsGames(s) : false
+  const requested = tabFromParam(tabParam)
+  const view: ConsoleView = unrecorded && requested === 'leaderboard' ? 'courts' : requested
+  const setView = useCallback(
+    (next: ConsoleView) => {
+      const params = new URLSearchParams(searchParams.toString())
+      const value = TAB_PARAMS[next]
+      if (value) params.set('tab', value)
+      else params.delete('tab')
+      const query = params.toString()
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    },
+    [pathname, router, searchParams],
+  )
   if (session.isError && isPermissionRefusal(session.error)) notFound()
   const redirectTo = s && s.state !== 'active' ? sessionHref(s) : null
   useEffect(() => {
@@ -211,15 +258,15 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
 
   const tabs: TabItem[] = [
     {
-      value: 'session',
-      label: 'Session',
+      value: 'courts',
+      label: 'Courts',
       badges: [{ text: `${inUse}/${courts.length}`, longText: ' courts in use' }],
     },
     ...(VIEWS.queue
       ? [
           {
             value: 'queue',
-            label: 'Queue',
+            label: 'Main Queue',
             badges: [
               { text: String(waiting.length), longText: ' waiting' },
               ...(attention
@@ -229,6 +276,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           },
         ]
       : []),
+    ...(VIEWS.generate ? [{ value: 'generate', label: 'Generate Queue' }] : []),
     {
       value: 'players',
       label: 'Players',
@@ -253,27 +301,16 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               : [],
           },
         ]),
-    {
-      value: 'payments',
-      label: 'Payments',
-      badges: payments.data
-        ? [
-            {
-              text: `${payments.data.totals.paid}/${payments.data.totals.total}`,
-              longText: ' paid',
-            },
-          ]
-        : [],
-    },
+    { value: 'settings', label: 'Settings' },
   ]
 
   const viewProps: ConsoleViewProps = {
     sessionId,
     now,
     onOpenProfile: setProfileId,
-    onOpenQueue: () => setView(VIEWS.queue ? 'queue' : 'session'),
+    onOpenQueue: () => setView(VIEWS.queue ? 'queue' : 'courts'),
   }
-  const panel = (key: Exclude<ConsoleView, 'session' | 'payments'>) => {
+  const panel = (key: Exclude<ConsoleView, 'courts' | 'settings'>) => {
     const View = VIEWS[key]
     return View ? <View {...viewProps} /> : <Skeleton className="h-56 rounded-lg" />
   }
@@ -290,7 +327,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const onStartMatch = (matchId: string, courtId?: string) =>
     setMatchSheet({ mode: 'start', matchId, courtId })
   const onPickAnother = (courtId: string) => setMatchSheet({ mode: 'choose', courtId })
-  const showQueue = () => setView(VIEWS.queue ? 'queue' : 'session')
+  const showQueue = () => setView(VIEWS.queue ? 'queue' : 'courts')
 
   if (session.isError)
     return (
@@ -339,7 +376,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               onOpenPayments={() => setSheet('payments')}
               onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
               onCopyFacebookPost={() => setSheet('post')}
-              onOpenSessionSettings={() => router.push(`/sessions/${sessionId}/preparation`)}
               onGoHome={() => router.push('/')}
             />
           }
@@ -368,7 +404,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
       )}
       <Tabs
+        phoneMenu
         aria-label="Console views"
+        menuLabel="Console view"
         value={view}
         onChange={async (value) => {
           await flushSessionRoster(sessionId)
@@ -377,7 +415,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         }}
         items={tabs}
       >
-        <TabsContent value="session" className="flex flex-col gap-5">
+        <TabsContent value="courts" className="flex flex-col gap-5">
           <SessionView
             {...viewProps}
             onAddCourt={() => setSheet('add-court')}
@@ -398,16 +436,30 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               {...matchEditing}
               onStartMatch={onStartMatch}
               onSuggest={() => setMatchSheet({ mode: 'suggest' })}
+              onOpenGenerate={() => setView('generate')}
               onRegenerate={() => setMatchSheet({ mode: 'regenerate' })}
             />
           ) : (
             panel('queue')
           )}
         </TabsContent>
+        {VIEWS.generate ? (
+          <TabsContent value="generate" forceMount>
+            {panel('generate')}
+          </TabsContent>
+        ) : null}
         <TabsContent value="players">{panel('players')}</TabsContent>
         {unrecorded ? null : <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>}
-        <TabsContent value="payments">
-          <PaymentsPanel sessionId={sessionId} />
+        <TabsContent value="settings">
+          <SettingsView
+            {...viewProps}
+            onOpenCourtsAndTime={() => {
+              setFocusEnd(false)
+              setSheet('adjust')
+            }}
+            onOpenMatchRequests={() => setSheet('join-requests')}
+            onOpenPayments={() => setSheet('payments')}
+          />
         </TabsContent>
       </Tabs>
       <ConsoleFooterBar

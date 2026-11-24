@@ -34,6 +34,8 @@ export type TabsProps = {
   className?: string
   /** Replace the tab row with a menu at 640 px and below. */
   phoneMenu?: boolean
+  /** The phone menu button's label before the current tab ("Console view: Courts"); defaults to aria-label */
+  menuLabel?: string
 }
 
 /**
@@ -83,6 +85,7 @@ export function Tabs({
   children,
   className,
   phoneMenu = false,
+  menuLabel,
   ...aria
 }: TabsProps) {
   useKeyboardNav()
@@ -98,7 +101,7 @@ export function Tabs({
             items={items}
             value={value}
             onChange={onChange}
-            aria-label={aria['aria-label']}
+            aria-label={menuLabel ?? aria['aria-label']}
           />
         </div>
       ) : null}

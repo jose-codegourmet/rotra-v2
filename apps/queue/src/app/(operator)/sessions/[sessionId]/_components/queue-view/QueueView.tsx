@@ -17,7 +17,6 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import type { QueueWorkspace } from '@rotra/ui/auto-queue-workspace'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -32,7 +31,6 @@ import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
-import { AutoQueue } from '@/app/(operator)/sessions/[sessionId]/_components/auto-queue/AutoQueue'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
 
 export type QueueViewProps = ConsoleViewProps & {
@@ -44,6 +42,8 @@ export type QueueViewProps = ConsoleViewProps & {
   onSuggest?: () => void
   /** Regenerate: opens the Regenerate waiting queue? sheet (Q-REGENERATE). Disabled until given, and when the queue is empty. */
   onRegenerate?: () => void
+  /** Generate Queue: opens the Generate Queue tab (Q-AUTO). */
+  onOpenGenerate?: () => void
   /** Start on a card: opens the Start match sheet for that waiting match (Q-DISPATCH, Queue › Match control). Start is hidden until given. */
   onStartMatch?: (matchId: string) => void
 }
@@ -54,14 +54,14 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
 
 /**
- * Q-QUEUE, the console's Queue view: "Queued matches" with Add match, Suggest, Generate matches and
- * Regenerate (primary while anything needs attention, disabled when the queue is empty), the warn
+ * Q-QUEUE, the console's Main Queue tab: "Main Queue" with Add match, Suggest, Generate Queue (opens
+ * the Generate Queue tab) and Regenerate (primary while anything needs attention, disabled when the queue is empty), the warn
  * notice "N waiting matches need attention…", the "One waiting list for every court. MODE mode
  * guides suggestions…" line, and the snake QueueGrid of MatchCards with status from matchStatus.
  * Reorder (drag or arrow keys on ⠿) calls useMoveMatch; Remove × calls useRemoveWaitingMatch at
  * once with its toast (no dialog, per dialogs.md); switching sides on a card calls useSwapPlayers,
  * after which the card shows the lock; pictures open the profile. The sheets behind Add match,
- * Edit, Suggest, Generate matches and Regenerate are Queue › Match editing and Queue generation: they
+ * Edit, Suggest and Regenerate are Queue › Match editing and Queue generation: they
  * arrive through the optional callbacks.
  */
 export function QueueView({
@@ -73,8 +73,8 @@ export function QueueView({
   onSuggest,
   onRegenerate,
   onStartMatch,
+  onOpenGenerate,
 }: QueueViewProps) {
-  const [workspace, setWorkspace] = useState<QueueWorkspace>('main')
   const [search, setSearch] = useState('')
   const [clearOpen, setClearOpen] = useState(false)
   const [clearError, setClearError] = useState<string | undefined>()
@@ -188,103 +188,96 @@ export function QueueView({
   }))
 
   return (
-    <AutoQueue
-      sessionId={sessionId}
-      workspace={workspace}
-      onWorkspaceChange={setWorkspace}
-      mainQueue={
-        <section aria-label="Queued matches" className="flex flex-col gap-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">Queued matches</h2>
-            <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-              <Button size="sm" disabled={!onAddMatch} onClick={onAddMatch} className="sm:w-auto">
-                Add match
-              </Button>
-              <Button size="sm" disabled={!onSuggest} onClick={onSuggest} className="sm:w-auto">
-                Suggest
-              </Button>
-              <Button size="sm" onClick={() => setWorkspace('auto')} className="sm:w-auto">
-                Generate matches
-              </Button>
-              <Button
-                size="sm"
-                variant={attention ? 'primary' : 'secondary'}
-                disabled={!onRegenerate || waiting.length === 0}
-                onClick={onRegenerate}
-                className="sm:w-auto"
-              >
-                Regenerate
-              </Button>
-              <Button
-                size="sm"
-                variant="danger-solid"
-                disabled={waiting.length === 0}
-                onClick={() => {
-                  setClearError(undefined)
-                  setClearOpen(true)
-                }}
-              >
-                Clear queue
-              </Button>
-            </div>
-          </div>
-          {attention ? (
-            <Notice tone="warn">
-              {attention} waiting {attention > 1 ? 'matches need' : 'match needs'} attention. Edit
-              the lineup to swap the player, or regenerate.
-            </Notice>
-          ) : null}
-          <p className="text-[13px] text-fg2">
-            One waiting list for every court. {MODE_LABELS[s.sessionMode]} mode guides suggestions;
-            you can override any of it.
-          </p>
-          <QueueSearchField
-            value={search}
-            onChange={setSearch}
-            matchCount={queueSearchHitCount(waiting, ctx.roster, search)}
-          />
-          {waiting.length ? (
-            <QueueGrid
-              matches={cards}
-              searchText={search}
-              onMove={onMove}
-              onSwapSides={onSwapSides}
-            />
-          ) : (
-            <Card padding="none">
-              <EmptyState>
-                No waiting matches. Use Generate matches to create a few, or add one yourself.
-              </EmptyState>
-            </Card>
-          )}
-          <ConfirmSheet
-            open={clearOpen}
-            onOpenChange={(open) => {
-              setClearOpen(open)
-              if (!open) setClearError(undefined)
+    <section aria-label="Main Queue" className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-bold">Main Queue</h2>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+          <Button size="sm" disabled={!onAddMatch} onClick={onAddMatch} className="sm:w-auto">
+            Add match
+          </Button>
+          <Button size="sm" disabled={!onSuggest} onClick={onSuggest} className="sm:w-auto">
+            Suggest
+          </Button>
+          <Button
+            size="sm"
+            disabled={!onOpenGenerate}
+            onClick={onOpenGenerate}
+            className="sm:w-auto"
+          >
+            Generate Queue
+          </Button>
+          <Button
+            size="sm"
+            variant={attention ? 'primary' : 'secondary'}
+            disabled={!onRegenerate || waiting.length === 0}
+            onClick={onRegenerate}
+            className="sm:w-auto"
+          >
+            Regenerate
+          </Button>
+          <Button
+            size="sm"
+            variant="danger-solid"
+            disabled={waiting.length === 0}
+            onClick={() => {
+              setClearError(undefined)
+              setClearOpen(true)
             }}
-            title="Clear the queue?"
-            consequence={`${waiting.length} waiting match${waiting.length === 1 ? '' : 'es'} will be removed from the Main Queue.`}
-            note="Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards."
-            backLabel="Keep queue"
-            confirmLabel="Clear queue"
-            destructive
-            solidDanger
-            isPending={clearQueue.isPending}
-            error={clearError}
-            onConfirm={() =>
-              clearQueue.mutate(sessionId, {
-                onSuccess: (result) => {
-                  setClearOpen(false)
-                  setClearError(undefined)
-                  toast(result.message)
-                },
-                onError: (error) => setClearError(errorMessage(error)),
-              })
-            }
-          />
-        </section>
-      }
-    />
+          >
+            Clear queue
+          </Button>
+        </div>
+      </div>
+      {attention ? (
+        <Notice tone="warn">
+          {attention} waiting {attention > 1 ? 'matches need' : 'match needs'} attention. Edit the
+          lineup to swap the player, or regenerate.
+        </Notice>
+      ) : null}
+      <p className="text-[13px] text-fg2">
+        One waiting list for every court. {MODE_LABELS[s.sessionMode]} mode guides suggestions; you
+        can override any of it.
+      </p>
+      <QueueSearchField
+        value={search}
+        onChange={setSearch}
+        matchCount={queueSearchHitCount(waiting, ctx.roster, search)}
+      />
+      {waiting.length ? (
+        <QueueGrid matches={cards} searchText={search} onMove={onMove} onSwapSides={onSwapSides} />
+      ) : (
+        <Card padding="none">
+          <EmptyState>
+            No waiting matches. Use Generate matches to create a few, or add one yourself.
+          </EmptyState>
+        </Card>
+      )}
+      <ConfirmSheet
+        open={clearOpen}
+        onOpenChange={(open) => {
+          setClearOpen(open)
+          if (!open) setClearError(undefined)
+        }}
+        title="Clear the queue?"
+        consequence={`${waiting.length} waiting match${waiting.length === 1 ? '' : 'es'} will be removed from the Main Queue.`}
+        note="Matches already on a court and finished matches are not affected. You can add or generate matches again afterwards."
+        backLabel="Keep queue"
+        confirmLabel="Clear queue"
+        destructive
+        solidDanger
+        isPending={clearQueue.isPending}
+        error={clearError}
+        onConfirm={() =>
+          clearQueue.mutate(sessionId, {
+            onSuccess: (result) => {
+              setClearOpen(false)
+              setClearError(undefined)
+              toast(result.message)
+            },
+            onError: (error) => setClearError(errorMessage(error)),
+          })
+        }
+      />
+    </section>
   )
 }

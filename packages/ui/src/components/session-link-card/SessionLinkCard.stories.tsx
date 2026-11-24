@@ -1,8 +1,8 @@
 import { joinRequests } from '@rotra/data/fixtures/joinRequests'
 import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
+import { WhoCanJoinCard } from '@rotra/ui/who-can-join-card'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { WhoCanJoinCard } from '@rotra/ui/who-can-join-card'
 import { SessionLinkCard } from './SessionLinkCard'
 
 const tonight = queueSessionFixtures.sessions[0]

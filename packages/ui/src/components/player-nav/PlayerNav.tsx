@@ -45,10 +45,7 @@ export function PlayerNav(props: PlayerNavProps) {
   const items = navItems(props)
 
   return (
-    <nav
-      aria-label="Main"
-      className="flex gap-0.5 max-[640px]:hidden sm:mr-auto sm:ml-2"
-    >
+    <nav aria-label="Main" className="flex gap-0.5 max-[640px]:hidden sm:mr-auto sm:ml-2">
       {items.map((item) => {
         const common = {
           'aria-current': current === item.key ? ('page' as const) : undefined,

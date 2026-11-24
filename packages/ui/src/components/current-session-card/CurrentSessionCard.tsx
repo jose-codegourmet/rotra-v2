@@ -28,7 +28,9 @@ export function CurrentSessionCard({ session, linkAs: Link = 'a' }: CurrentSessi
       <Card asChild>
         <section aria-labelledby={headingId} className="flex flex-col gap-3">
           <h2 id={headingId}>Current session</h2>
-          <EmptyState>No session right now. When a session you're in starts, it shows here.</EmptyState>
+          <EmptyState>
+            No session right now. When a session you're in starts, it shows here.
+          </EmptyState>
         </section>
       </Card>
     )

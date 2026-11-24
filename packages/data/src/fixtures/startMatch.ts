@@ -8,8 +8,8 @@ import {
   queueMasterName,
   waitingMatches,
 } from '../match/match.rules'
-import { matchLabel } from '../match/matchCategory.rules'
 import type { Match, MatchFormat, MatchStatus } from '../match/match.types'
+import { matchLabel } from '../match/matchCategory.rules'
 import type { SessionCourt } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { createConsoleFixtures } from './consoleSessions'

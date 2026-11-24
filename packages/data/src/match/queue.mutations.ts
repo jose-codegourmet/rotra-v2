@@ -19,7 +19,9 @@ import { balanceTeams, formatForSelection, generateMatches } from './queue.rules
 export function matchContext(s: MockState, sessionId: string) {
   return {
     // Rows carry the club nickname so every message names players as the Queue Master sees them.
-    roster: s.roster.filter((r) => r.sessionId === sessionId).map((r) => withGender(s, withClubNickname(s, r))),
+    roster: s.roster
+      .filter((r) => r.sessionId === sessionId)
+      .map((r) => withGender(s, withClubNickname(s, r))),
     matches: s.matches.filter((m) => m.sessionId === sessionId),
     courts: s.courts.filter((c) => c.sessionId === sessionId && !c.removedAt),
   }

@@ -5,7 +5,7 @@ const M = 'male' as const,
   F = 'female' as const
 
 describe('matchCategory', () => {
-  it('calls an all men match Men\'s and an all women match Women\'s, in any format', () => {
+  it("calls an all men match Men's and an all women match Women's, in any format", () => {
     expect(matchCategory({ teamA: [M, M], teamB: [M, M] })).toBe("Men's")
     expect(matchCategory({ teamA: [M], teamB: [M] })).toBe("Men's")
     expect(matchCategory({ teamA: [F, F], teamB: [F, F] })).toBe("Women's")

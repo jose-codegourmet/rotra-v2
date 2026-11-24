@@ -1,10 +1,6 @@
-import {
-  type MatchContext,
-  matchStatus,
-  queueMasterName,
-} from '../match/match.rules'
-import { matchLabel } from '../match/matchCategory.rules'
+import { type MatchContext, matchStatus, queueMasterName } from '../match/match.rules'
 import type { Match, MatchFormat, MatchStatus } from '../match/match.types'
+import { matchLabel } from '../match/matchCategory.rules'
 import type { MockState } from '../mock/store'
 import type { PlayingLevel } from '../player/player.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'

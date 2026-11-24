@@ -25,4 +25,6 @@ export function exemptionDiff(before: readonly string[], after: readonly string[
 export const exemptionAddedToast = (name: string) => `${name} added to the exemption list`
 export const exemptionRemovedToast = (name: string) => `${name} taken off the exemption list`
 export const exemptionSavedToast = (count: number) =>
-  count ? `Exemption list saved · ${count} player${count === 1 ? '' : 's'}` : 'Exemption list cleared'
+  count
+    ? `Exemption list saved · ${count} player${count === 1 ? '' : 's'}`
+    : 'Exemption list cleared'

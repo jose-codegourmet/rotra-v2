@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createConsoleFixtures } from '../fixtures/consoleSessions'
 import { setMockLatencyEnabled } from '../mock/latency'
 import { mockStore } from '../mock/store'
+import { generateAutoQueueDrafts, getAutoQueueDrafts } from './autoQueue.mutations'
 import {
   addToExemptionList,
   clearExemptionList,
   removeFromExemptionList,
   saveExemptionList,
 } from './exemption.mutations'
-import { generateAutoQueueDrafts, getAutoQueueDrafts } from './autoQueue.mutations'
 import { getExemptionList } from './fetchers'
 import { allPlayers } from './match.rules'
 

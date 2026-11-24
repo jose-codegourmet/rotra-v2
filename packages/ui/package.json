@@ -279,6 +279,7 @@
     "./tabs": "./src/components/tabs/Tabs.tsx",
     "./team-lineup": "./src/components/team-lineup/TeamLineup.tsx",
     "./text-input": "./src/components/text-input/TextInput.tsx",
+    "./tick-tile": "./src/components/tick-tile/TickTile.tsx",
     "./trusted-hosts-panel": "./src/components/trusted-hosts-panel/TrustedHostsPanel.tsx",
     "./textarea": "./src/components/textarea/Textarea.tsx",
     "./theme-provider": "./src/components/theme-provider/ThemeProvider.tsx",

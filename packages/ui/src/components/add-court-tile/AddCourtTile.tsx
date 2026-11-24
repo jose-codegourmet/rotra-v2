@@ -5,11 +5,18 @@ export type AddCourtTileProps = {
   nextNumber: number
   /** Opens Q-ADD-COURT */
   onAdd: () => void
+  /** The muted second line; defaults to "Set a planned court window" (the Settings box says "Set its label and hours") */
+  description?: string
   className?: string
 }
 
 /** The last tile in the Courts grid: a dashed "+ Add court" button. The prototypes' .court.add-court. */
-export function AddCourtTile({ nextNumber, onAdd, className }: AddCourtTileProps) {
+export function AddCourtTile({
+  nextNumber,
+  onAdd,
+  description = 'Set a planned court window',
+  className,
+}: AddCourtTileProps) {
   return (
     <button
       type="button"
@@ -25,7 +32,7 @@ export function AddCourtTile({ nextNumber, onAdd, className }: AddCourtTileProps
         +
       </span>
       <span>Add court</span>
-      <span className="text-[13px] font-medium text-fg2">Set a planned court window</span>
+      <span className="text-[13px] font-medium text-fg2">{description}</span>
     </button>
   )
 }

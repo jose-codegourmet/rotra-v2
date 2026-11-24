@@ -7,7 +7,7 @@ export const authArtProviderMeta = {
   usage: [
     'Wrap the `(auth)/layout.tsx` children: <AuthArtProvider art="/art/auth/queue-club-login-rion.webp">. It renders no element, so a TopBar placed outside the card stays above the art.',
     'AuthCard can also take `art` directly; the prop wins over the provider.',
-    'The art files live in each app\'s public/art/auth/ folder. Never inline the image as base64.',
+    "The art files live in each app's public/art/auth/ folder. Never inline the image as base64.",
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

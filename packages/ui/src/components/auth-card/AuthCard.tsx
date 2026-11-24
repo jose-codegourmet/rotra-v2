@@ -116,7 +116,7 @@ export function AuthCard({
   // The prototypes' .login / .login::before. The fade and darkening use the fixed share-bg colour
   // (never overridden by light mode), so the art reads the same in both themes.
   const artClasses =
-    'relative isolate overflow-hidden bg-share-bg bg-cover bg-[position:22%_center] bg-no-repeat before:absolute before:inset-0 before:-z-10 before:content-[\'\'] before:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-share-bg)_0%,transparent)_25%,color-mix(in_srgb,var(--color-share-bg)_55%,transparent)_60%,color-mix(in_srgb,var(--color-share-bg)_80%,transparent))] max-[899px]:before:bg-[color-mix(in_srgb,var(--color-share-bg)_60%,transparent)] min-[900px]:justify-items-end min-[900px]:pr-[max(7vw,48px)] min-[900px]:pl-12'
+    "relative isolate overflow-hidden bg-share-bg bg-cover bg-[position:22%_center] bg-no-repeat before:absolute before:inset-0 before:-z-10 before:content-[''] before:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-share-bg)_0%,transparent)_25%,color-mix(in_srgb,var(--color-share-bg)_55%,transparent)_60%,color-mix(in_srgb,var(--color-share-bg)_80%,transparent))] max-[899px]:before:bg-[color-mix(in_srgb,var(--color-share-bg)_60%,transparent)] min-[900px]:justify-items-end min-[900px]:pr-[max(7vw,48px)] min-[900px]:pl-12"
   return (
     <main
       className={`grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]${art ? ` ${artClasses}` : ''}`}

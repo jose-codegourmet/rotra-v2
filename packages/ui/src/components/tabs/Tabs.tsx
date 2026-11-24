@@ -140,7 +140,7 @@ export function Tabs({
               <span key={badge.text + (badge.longText ?? '')} className={badgeClass(badge.tone)}>
                 {badge.text}
                 {badge.longText ? (
-                  <span className="max-[640px]:hidden">{badge.longText}</span>
+                  <span className="whitespace-pre max-[640px]:hidden">{badge.longText}</span>
                 ) : null}
               </span>
             ))}

@@ -543,7 +543,9 @@
     "./verification-page": "./src/components/verification-page/VerificationPage.tsx",
     "./verification-card": "./src/components/verification-card/VerificationCard.tsx",
     "./verification-status-chip": "./src/components/verification-status-chip/VerificationStatusChip.tsx",
-    "./verification-step": "./src/components/verification-step/VerificationStep.tsx"
+    "./verification-step": "./src/components/verification-step/VerificationStep.tsx",
+    "./onboarding-frame": "./src/components/onboarding-frame/OnboardingFrame.tsx",
+    "./optional-fold": "./src/components/optional-fold/OptionalFold.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

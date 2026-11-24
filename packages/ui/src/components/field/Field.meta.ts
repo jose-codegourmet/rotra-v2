@@ -9,11 +9,12 @@ export const fieldMeta = {
     'Mark optional fields with optional; never make scores, social links or financial fields required.',
     'Pass the error message from React Hook Form (fieldState.error?.message); it is announced without moving focus.',
     "labelAction puts a small control beside the label (P-LOGIN's Forgot password?); it is opt-in and sits outside the <label>.",
+    'required adds the green Required pill after the label (Player forms, P-ONBOARD step 1); never a red star.',
     'Checkbox and Switch carry their own label and do not need a Field.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Session setup › .field, .hint, .err (also rotra-admin.html form sheets)',
+    screen: 'Session setup › .field, .hint, .err (also rotra-admin.html form sheets); rotra-player.html › field() .req-pill',
   },
   docs: [
     'docs/coding-conventions.md#6-forms',

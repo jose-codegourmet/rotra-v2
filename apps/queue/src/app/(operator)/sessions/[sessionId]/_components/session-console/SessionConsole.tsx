@@ -472,7 +472,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           ) : null}
         </TabsContent>
         {VIEWS.generate ? (
-          <TabsContent value="generate" forceMount>
+          <TabsContent value="generate" forceMount className="data-[state=inactive]:hidden">
             {panel('generate')}
           </TabsContent>
         ) : null}

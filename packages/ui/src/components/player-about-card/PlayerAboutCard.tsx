@@ -5,6 +5,7 @@ import { Chip } from '@rotra/ui/chip'
 import { COURT_POSITIONS } from '@rotra/ui/court-position-card'
 import { FAVORITE_PLAYERS } from '@rotra/ui/favorite-player-chips'
 import { Icon } from '@rotra/ui/icon'
+
 const GENDER_LABEL = { male: 'Male', female: 'Female' } as const
 export type PlayerAboutCardProps = { profile: PlayerProfile; isOwn?: boolean }
 const PROVIDERS = {

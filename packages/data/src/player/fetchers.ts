@@ -2,8 +2,8 @@ import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema
 import { accountVerificationIn } from '../account-verification/mockVerification'
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
-import { getConnectivity } from '../connectivity/connectivity'
 import type { Gender } from '../club-player/clubPlayer.types'
+import { getConnectivity } from '../connectivity/connectivity'
 import { unclaimedClubCount } from '../leaderboard/identity'
 import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
 import { mockLeaderboard } from '../leaderboard/projection'
@@ -337,8 +337,7 @@ export async function setMyGender(gender: Gender | null): Promise<PlayerProfile>
  * D-2026-11-19-11).
  */
 export async function saveMyOnboardingAnswers(input: OnboardingAnswers): Promise<PlayerProfile> {
-  if (isRealDataMode())
-    throw new MockError('permission', NOT_CONNECTED_MESSAGE)
+  if (isRealDataMode()) throw new MockError('permission', NOT_CONNECTED_MESSAGE)
   const checked = normalizeOnboardingAnswers(input)
   if (checked.error !== undefined) throw new MockError('conflict', checked.error)
   await delay(900)

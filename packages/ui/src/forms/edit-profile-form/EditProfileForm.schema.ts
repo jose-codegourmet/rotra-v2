@@ -1,5 +1,5 @@
-import { favoriteOtherCheck, gettingToKnowShape } from '@rotra/schema/getting-to-know'
 import { genderInput } from '@rotra/schema/gender'
+import { favoriteOtherCheck, gettingToKnowShape } from '@rotra/schema/getting-to-know'
 import {
   type PersonalDetailsValues,
   personalDetailsFieldsSchema,

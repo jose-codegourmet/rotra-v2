@@ -15,7 +15,10 @@ export async function POST(request: Request) {
     const gender = body.gender
     if (gender !== null && gender !== 'male' && gender !== 'female')
       throw new ServiceError('invalid', { gender: 'Choose Male or Female.' })
-    const profile = await setMyGender(player, { gender, expectedRevision: text(body.expectedRevision) })
+    const profile = await setMyGender(player, {
+      gender,
+      expectedRevision: text(body.expectedRevision),
+    })
     return { body: { profile, revision: (await readMyAccount(player)).revision } }
   })
 }

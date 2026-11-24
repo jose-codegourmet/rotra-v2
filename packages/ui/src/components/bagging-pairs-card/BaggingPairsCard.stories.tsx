@@ -64,3 +64,13 @@ export const MinimumOfFive: Story = { args: { minimumGames: 5 } }
 export const Disabled: Story = { args: { disabled: true } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+/** The 1280 px right column: 300 px wide, so each row stacks (pictures and name, then games). */
+export const NarrowAside: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-[300px]">
+        <Story />
+      </div>
+    ),
+  ],
+}

@@ -73,47 +73,50 @@ export function BaggingPairsCard({
             {pairs.map((pair) => {
               const names = `${pair.a.shortName} and ${pair.b.shortName}`
               return (
-                <li
-                  key={pair.id}
-                  className="flex flex-wrap items-center gap-2.5 rounded-lg border border-border bg-bg px-3 py-2.5"
-                >
-                  <span className="flex flex-none">
-                    {[pair.a, pair.b].map((player, i) => (
-                      <span
-                        key={player.id}
-                        title={player.levelLabel ?? levelLabel(player.level)}
-                        className={cn(
-                          'inline-flex rounded-full',
-                          levelRingClass(player.level),
-                          i === 1 && '-ml-0.5',
-                        )}
-                      >
-                        <Avatar
-                          name={player.name}
-                          src={player.photoUrl}
-                          size={28}
-                          className="outline-2 outline-offset-1 outline-(--ring)"
-                        />
-                      </span>
-                    ))}
-                  </span>
-                  <b className="min-w-0 flex-1 text-fg [overflow-wrap:anywhere]">{names}</b>
-                  <BaggingGamesRow
-                    games={pair.games}
-                    minimumGames={minimumGames}
-                    disabled={disabled}
-                    aria-label={`Games for ${names}`}
-                    onToggle={(value) => onToggleGame(pair.id, value)}
-                  />
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    disabled={disabled}
-                    aria-label={`Remove pair ${names}`}
-                    onClick={() => onRemove(pair.id)}
-                  >
-                    Remove
-                  </Button>
+                <li key={pair.id} className="@container rounded-lg border border-border bg-bg">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-3 py-2.5">
+                    <span className="flex flex-none">
+                      {[pair.a, pair.b].map((player, i) => (
+                        <span
+                          key={player.id}
+                          title={player.levelLabel ?? levelLabel(player.level)}
+                          className={cn(
+                            'inline-flex rounded-full',
+                            levelRingClass(player.level),
+                            i === 1 && '-ml-0.5',
+                          )}
+                        >
+                          <Avatar
+                            name={player.name}
+                            src={player.photoUrl}
+                            size={28}
+                            className="outline-2 outline-offset-1 outline-(--ring)"
+                          />
+                        </span>
+                      ))}
+                    </span>
+                    <b className="min-w-[8rem] flex-1 text-fg [overflow-wrap:break-word]">
+                      {names}
+                    </b>
+                    <BaggingGamesRow
+                      games={pair.games}
+                      minimumGames={minimumGames}
+                      disabled={disabled}
+                      className="order-3 basis-full @md:order-none @md:basis-auto"
+                      aria-label={`Games for ${names}`}
+                      onToggle={(value) => onToggleGame(pair.id, value)}
+                    />
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      className="order-2 @md:order-none"
+                      disabled={disabled}
+                      aria-label={`Remove pair ${names}`}
+                      onClick={() => onRemove(pair.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </li>
               )
             })}

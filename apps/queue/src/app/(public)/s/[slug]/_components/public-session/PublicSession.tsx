@@ -8,6 +8,7 @@ import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/pub
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type {
   MyJoinRequest,
+  PlayerLevelBlock,
   PlayerSessionAccess,
   PublicCourtNow,
   PublicQueuedMatch,
@@ -32,12 +33,14 @@ import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
 import { useClaimTransferLink } from '@rotra/data/slot-transfer/useClaimTransferLink'
 import { useTransferLink } from '@rotra/data/slot-transfer/useTransferLink'
 import { useWithdrawTransferClaim } from '@rotra/data/slot-transfer/useWithdrawTransferClaim'
+import { levelRestrictionDescription, levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { PublicAccountBar } from '@rotra/ui/public-account-bar'
 import { type PublicParticipant, PublicParticipants } from '@rotra/ui/public-participants'
@@ -122,6 +125,8 @@ type SignedInViewer = {
   onJoinFromWaitlist: () => void
   /** A club member (D-2026-11-12-02): Join as NAME on an upcoming session unless it requires a request */
   member: boolean
+  /** Not open to your level (D-2026-11-19-12): set while their level here can't take a slot; no request is offered */
+  levelBlock: PlayerLevelBlock | null
 }
 
 /** The signed-in Player's ID: the mock session's account, or the Player app's access read. */
@@ -186,6 +191,12 @@ function joinCardProps(
         : { variant: 'confirmed-slot', registerNudge: true }
   }
   if (page.status === 'active') return started
+  if (signedIn?.levelBlock)
+    return {
+      variant: 'not-open-to-level',
+      reason: signedIn.levelBlock.reason,
+      levelLabel: levelLabel(signedIn.levelBlock.level),
+    }
   if (!page.acceptJoinRequests) return { variant: 'off' }
   const availability = signedIn
     ? {
@@ -533,6 +544,8 @@ export function PublicSession({
           realPlayer && !viewerAccount
             ? realPlayer.isClubMember
             : (night.data?.isClubMember ?? false),
+        levelBlock:
+          (realPlayer && !viewerAccount ? realPlayer.levelBlock : night.data?.levelBlock) ?? null,
         waitlistPosition:
           realPlayer && !viewerAccount
             ? (realPlayer.waitlistPosition ?? null)
@@ -793,6 +806,8 @@ export function PublicSession({
                   formats={p.formats}
                   modeLabel={mode.label}
                   modeDescription={mode.text}
+                  levelsLabel={levelRestrictionLabel(p.levelRestriction)}
+                  levelsDescription={levelRestrictionDescription(p.levelRestriction)}
                   scoringLabel={scoringMode(p.scoring).label}
                   scoringDescription={scoringMode(p.scoring).text}
                   minimumGames={p.minimum}

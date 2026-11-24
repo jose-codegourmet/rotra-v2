@@ -210,3 +210,14 @@ export const ScoringBestOfThree: Story = {
   },
 }
 export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }
+/** Slots per level: the Levels tile shows each band's slots and the rule line (D-2026-11-19-12). */
+export const WithLevelsSlotsPerLevel: Story = {
+  args: {
+    levelsLabel: '6 beginner · 5 intermediate · 5 advanced',
+    levelsDescription: 'Set how many beginner, intermediate and advanced slots.',
+  },
+}
+export const WithLevelsSlotsPerLevelLight: Story = {
+  ...WithLevelsSlotsPerLevel,
+  globals: { theme: 'light' },
+}

@@ -21,6 +21,7 @@ import {
   scoringKeyFor,
 } from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
+import { SetupRestrictionsField } from '../setup-restrictions-field/SetupRestrictionsField'
 
 const FORMATS = [
   ['allowSingles', 'Singles', 'Include standard singles when generating matches.'],
@@ -186,6 +187,7 @@ export function SetupFormatsSection({
           </span>
         </div>
       ) : null}
+      <SetupRestrictionsField />
       <div className="flex flex-col gap-1.5">
         <span className="text-[13px] font-semibold text-fg2">Mode</span>
         <Controller

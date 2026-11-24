@@ -148,6 +148,8 @@ export function SessionSetupForm({
       ...initialValues,
       // A session saved before Record games existed has no value and reads as on.
       recordGames: initialValues?.recordGames ?? true,
+      // A session saved before Restrictions existed has no value and reads as All levels.
+      levelRestriction: initialValues?.levelRestriction ?? { kind: 'all' },
       // A session saved before Scoring existed has no value and reads as 16/31.
       scoring: initialValues?.scoring ?? DEFAULT_SCORING,
       // A stored or restored number is the QM's own; empty follows the slot budget.

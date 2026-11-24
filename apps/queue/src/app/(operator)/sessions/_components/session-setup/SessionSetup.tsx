@@ -19,6 +19,7 @@ import {
   type QueueSessionInput,
   type RequestFormats,
   recordsGames,
+  sessionLevelRestriction,
   sessionScoring,
 } from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
@@ -36,6 +37,7 @@ import { useSessionHosts } from '@rotra/data/session-host/useSessionHosts'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useAddTrustedHost } from '@rotra/data/trusted-host/useAddTrustedHost'
 import { useTrustedHosts } from '@rotra/data/trusted-host/useTrustedHosts'
+import { levelRestrictionOf } from '@rotra/schema/level-restriction'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ChooseDateSheet } from '@rotra/ui/choose-date-sheet'
 import { toYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
@@ -231,6 +233,7 @@ export function SessionSetup(props: SessionSetupProps) {
       scheduledEndAt: end,
       sessionMode: values.sessionMode,
       scoring: values.scoring,
+      levelRestriction: levelRestrictionOf(values.levelRestriction),
       allowSingles: values.allowSingles,
       allowDoubles: values.allowDoubles,
       requestFormats: Object.fromEntries(
@@ -359,6 +362,7 @@ export function SessionSetup(props: SessionSetupProps) {
         requestFormats: allowedRequestFormats(s),
         sessionMode: s.sessionMode,
         scoring: sessionScoring(s),
+        levelRestriction: sessionLevelRestriction(s),
         recordGames: recordsGames(s),
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),

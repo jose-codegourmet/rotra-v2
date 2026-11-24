@@ -5,6 +5,7 @@ export const sessionSetupCardMeta = {
   description:
     'Preparation › Overview › Setup card: courts, formats, mode with its description, Record games (On, or Off · no results kept), the minimum with its calculation or "Set by you", the roster count, and optional extra rows (Costs).',
   usage: [
+    'D-2026-11-19-12: pass levelsLabel ("All levels" or "6 beginner · 5 intermediate · 5 advanced") for the Levels row after Mode; omitted reads as All levels.',
     'scoringLabel is the Scoring row (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31. scoringDescription (SCORING[key].text) follows it like the Mode row. With fixedAfterStart it adds “Fixed after start”.',
     'Pass requestFormatLabels to show the Requests row, including an empty array when no formats are allowed.',
     'recordGames defaults to on; pass false for a session that keeps no results. With fixedAfterStart the row adds "Fixed after start".',

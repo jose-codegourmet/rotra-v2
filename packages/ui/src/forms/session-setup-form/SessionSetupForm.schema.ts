@@ -1,5 +1,6 @@
 import { courtWindowError, sessionWindowError } from '@rotra/schema/court-window'
 import { dateField, timeField } from '@rotra/schema/date'
+import { levelRestrictionField, levelSlotsError } from '@rotra/schema/level-restriction'
 import { DEFAULT_SCORING } from '@rotra/schema/scoring'
 import {
   CUSTOM_FEE_ERROR,
@@ -78,6 +79,12 @@ export const sessionSetupSchema = z
     /** Players can request: the formats a signed-in Player may ask for with Request a match */
     requestFormats: z.array(z.enum(REQUEST_FORMAT_VALUES)),
     sessionMode: z.enum(['chill', 'fair', 'hard']),
+    /**
+     * Restrictions (D-2026-11-19-12): which levels can take a slot. Slots per level must add up to
+     * the session's slots (courts × players per court) before saving. A session saved before this
+     * setting reads as All levels.
+     */
+    levelRestriction: levelRestrictionField.default({ kind: 'all' }),
     /** How games are scored (one of the five keys). A session saved before this field reads as 16/31. */
     scoring: z.enum(['31', '31nd', '21', '21x3', '21x3nd']).default(DEFAULT_SCORING),
     /** Record games: off runs the night and keeps no results. A session saved before this field reads as on. */
@@ -120,6 +127,12 @@ export const sessionSetupSchema = z
           path: [court.startsAt >= end ? 'courtStarts' : 'courtEnds', i],
         })
     })
+    const slotsError = levelSlotsError(
+      values.levelRestriction,
+      values.courtLabels.length,
+      values.playersPerCourt,
+    )
+    if (slotsError) ctx.addIssue({ code: 'custom', message: slotsError, path: ['levelRestriction'] })
     if (values.paymentMode === 'custom' && values.customFeePerHead === null)
       ctx.addIssue({ code: 'custom', message: CUSTOM_FEE_ERROR, path: ['customFeePerHead'] })
     if (!values.minimumIsCalculated) {
@@ -152,6 +165,7 @@ export const PAGE_FIELDS: (keyof SessionSetupInput)[][] = [
     'allowSingles',
     'allowDoubles',
     'requestFormats',
+    'levelRestriction',
     'sessionMode',
     'scoring',
     'recordGames',

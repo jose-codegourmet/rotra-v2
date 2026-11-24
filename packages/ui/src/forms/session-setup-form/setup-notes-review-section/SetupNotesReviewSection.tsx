@@ -1,5 +1,6 @@
 'use client'
 
+import { levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
@@ -106,6 +107,7 @@ export function SetupNotesReviewSection({
       ? [{ label: 'Hosts', value: row(hostNames.length ? hostNames.join(', ') : 'None', 0) }]
       : []),
     { label: 'Formats', value: row(`${formatsLabel(values)} · ${mode_?.label ?? ''}`, 1) },
+    { label: 'Levels', value: row(levelRestrictionLabel(values.levelRestriction), 1) },
     { label: 'Scoring', value: row(scoringMode(values.scoring).label, 1) },
     {
       label: 'Record games',

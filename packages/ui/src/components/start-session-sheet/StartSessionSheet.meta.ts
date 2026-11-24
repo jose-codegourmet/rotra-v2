@@ -5,6 +5,7 @@ export const startSessionSheetMeta = {
   description:
     'D-START-SESSION on ConfirmSheet: Session, Courts, Formats, Mode, Scoring, Record games, Minimum and Roster, the level-lock notice, the offline notice (Starting needs an internet connection.) with Start session disabled, Back and Start session. A late or other-day start (T3) first shows "This session was planned for … Set a new end time to start." and a required New end date-and-time picker.',
   usage: [
+    'D-2026-11-19-12: pass levelsLabel ("All levels" or "6 beginner · 5 intermediate · 5 advanced") for the Levels row after Mode; omitted reads as All levels.',
     'scoringLabel is the Scoring row after Mode (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31.',
     'Open from StartSessionBar or the phone dock; the container runs useStartSession and re-checks the blocker at confirm (error shows in the sheet).',
     'Pass plannedStartAt and plannedEndAt so the sheet can tell a late or other-day start (after the planned end, or on another day than planned). Then New end is pre-filled with now plus the planned length rounded up to 15 minutes, offers times after now up to 24 h later, and Start session stays disabled until it is after now.',

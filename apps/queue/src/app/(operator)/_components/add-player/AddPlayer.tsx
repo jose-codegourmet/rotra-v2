@@ -6,9 +6,12 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { MockError } from '@rotra/data/mock/errors'
+import type { PlayingLevel } from '@rotra/data/player/player.types'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
+import { sessionLevelRestriction } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
+import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import type { RosterAddPlacement } from '@rotra/data/session-roster/mutations'
 import { ROSTER_DUPLICATE_ERROR } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
@@ -165,9 +168,16 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
     return true
   }
 
+  /** Shows the level restriction warning in the sheet's error line (D-2026-11-19-12). */
+  const warn = (message: string) => {
+    setErrorReturnsToList(false)
+    setServerError(message)
+  }
+
   return {
     offline,
     begin,
+    warn,
     options,
     sheet: {
       offline,
@@ -273,15 +283,49 @@ function SessionAddPlayer({
     name: string
     run: (placement: RosterAddPlacement) => void
   } | null>(null)
+  /**
+   * D-2026-11-19-12: a level outside the session's restriction (or into a full band) shows the
+   * reason once; pressing the same add again adds anyway. Add to waitlist isn't checked.
+   */
+  const warned = useRef<string | null>(null)
+  const guarded =
+    (name: string, level: PlayingLevel, run: (placement: RosterAddPlacement) => void) =>
+    (placement: RosterAddPlacement) => {
+      const reason = placement.toWaitlist
+        ? null
+        : levelRestrictionBlockFor(
+            sessionLevelRestriction(s),
+            level,
+            rosterList.map((r) => r.level),
+          )
+      if (reason) {
+        const key = `${name}|${level}`
+        if (warned.current !== key) {
+          warned.current = key
+          add.warn(`${reason} Press it again to add ${name} anyway.`)
+          return
+        }
+        warned.current = null
+        run({ ...placement, allowOutsideLevels: true })
+        return
+      }
+      warned.current = null
+      run(placement)
+    }
   /** Runs the add now, or asks once first when the roster is already at the slot budget. */
-  const placeOrAsk = (name: string, run: (placement: RosterAddPlacement) => void) => {
-    if (rosterList.length >= capacity) setOverfill({ name, run })
-    else run({})
+  const placeOrAsk = (
+    name: string,
+    level: PlayingLevel,
+    run: (placement: RosterAddPlacement) => void,
+  ) => {
+    const checked = guarded(name, level, run)
+    if (rosterList.length >= capacity) setOverfill({ name, run: checked })
+    else checked({})
   }
 
   const confirm = ({ candidate, source, level, name }: AddPlayerConfirmInput) => {
     if (!s || !roster.data || !clubPlayers.data) return
-    placeOrAsk(candidate.name, (placement) => {
+    placeOrAsk(candidate.name, level, (placement) => {
       if (!add.begin()) return
       if (source === 'saved')
         addSaved.mutate(
@@ -310,7 +354,7 @@ function SessionAddPlayer({
   const savePicture = useSaveNewPlayerPicture(() => flushSessionRoster(sessionId))
   const submitNewPlayer = (values: NewPlayerFormValues, picture: ClubPictureChoice | null) => {
     if (!s || !roster.data) return
-    placeOrAsk(values.name.trim(), (placement) => {
+    placeOrAsk(values.name.trim(), values.level, (placement) => {
       if (!add.begin()) return
       addNew.mutate(
         {

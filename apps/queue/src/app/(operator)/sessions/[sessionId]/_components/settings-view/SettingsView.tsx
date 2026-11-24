@@ -12,6 +12,7 @@ import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostE
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
 import { useSetAlwaysRequireRequest } from '@rotra/data/session-roster/useSetAlwaysRequireRequest'
+import { levelRestrictionDescription, levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { formatPeso } from '@rotra/schema/money'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
@@ -227,6 +228,11 @@ export function SettingsView({
           rows={[
             { label: 'Formats', value: formats },
             { label: 'Mode', value: MODES[s.sessionMode].label, note: MODES[s.sessionMode].text },
+            {
+              label: 'Levels',
+              value: levelRestrictionLabel(s.levelRestriction),
+              note: levelRestrictionDescription(s.levelRestriction),
+            },
             { label: 'Scoring', value: scoring.label, note: scoring.text },
           ]}
         />

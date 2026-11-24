@@ -85,3 +85,40 @@ export function levelSlotsError(
     ? null
     : `The slots add up to ${sum}; this session has ${capacity} (${courts} court${courts === 1 ? '' : 's'} × ${playersPerCourt}).`
 }
+
+/** The four picks with their names and one-line rules (the Restrictions choice cards, the Details tile). */
+export const LEVEL_RESTRICTION_OPTIONS: readonly {
+  kind: LevelRestrictionKind
+  label: string
+  text: string
+}[] = [
+  { kind: 'all', label: 'All levels', text: 'Any level can take a slot.' },
+  { kind: 'beginners', label: 'Beginners only', text: 'Only beginner levels can take a slot.' },
+  {
+    kind: 'beginners-intermediate',
+    label: 'Beginners to intermediate',
+    text: 'Beginner and intermediate levels; no advanced.',
+  },
+  {
+    kind: 'per-level',
+    label: 'Slots per level',
+    text: 'Set how many beginner, intermediate and advanced slots.',
+  },
+]
+
+/**
+ * The Levels row: the pick's label, or "6 beginner · 5 intermediate · 5 advanced" for slots per
+ * level. A missing restriction reads as All levels.
+ */
+export function levelRestrictionLabel(value: unknown): string {
+  const { kind, slots } = levelRestrictionOf(value)
+  if (kind === 'per-level')
+    return LEVEL_BANDS.map((band) => `${slots?.[band] ?? 0} ${band}`).join(' · ')
+  return LEVEL_RESTRICTION_OPTIONS.find((o) => o.kind === kind)?.label ?? 'All levels'
+}
+
+/** The rule line under the Levels tile; none for All levels. */
+export function levelRestrictionDescription(value: unknown): string | undefined {
+  const { kind } = levelRestrictionOf(value)
+  return kind === 'all' ? undefined : LEVEL_RESTRICTION_OPTIONS.find((o) => o.kind === kind)?.text
+}

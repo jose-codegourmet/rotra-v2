@@ -24,6 +24,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetAcceptJoinRequests } from '@rotra/data/session-roster/useSetAcceptJoinRequests'
 import { useSetAlwaysRequireRequest } from '@rotra/data/session-roster/useSetAlwaysRequireRequest'
 import { courtNextDay } from '@rotra/schema/court-window'
+import { levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { formatPeso } from '@rotra/schema/money'
 import { SCORING } from '@rotra/schema/scoring'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
@@ -414,6 +415,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   formatsLabel={formats}
                   modeLabel={MODES[s.sessionMode].label}
                   modeDescription={MODES[s.sessionMode].text}
+                  levelsLabel={levelRestrictionLabel(s.levelRestriction)}
                   scoringLabel={SCORING[sessionScoring(s)].label}
                   scoringDescription={SCORING[sessionScoring(s)].text}
                   minimumGames={s.minimumGames}
@@ -537,6 +539,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           courts={courts.length}
           formatsLabel={formats}
           modeLabel={MODES[s.sessionMode].label}
+          levelsLabel={levelRestrictionLabel(s.levelRestriction)}
           scoringLabel={SCORING[sessionScoring(s)].label}
           minimumGames={s.minimumGames}
           recordGames={recordsGames(s)}

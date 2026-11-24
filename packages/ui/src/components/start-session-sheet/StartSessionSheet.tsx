@@ -22,6 +22,8 @@ export type StartSessionSheetProps = {
   courts: number
   formatsLabel: string
   modeLabel: string
+  /** The Levels row (D-2026-11-19-12): "All levels" or "6 beginner · 5 intermediate · 5 advanced"; omitted reads as All levels */
+  levelsLabel?: string
   /** The scoring mode's label ("16/31", "11/21 × 3", from SCORING in @rotra/schema/scoring); omitted reads as 16/31 */
   scoringLabel?: string
   /** Record games; omitted reads as on */
@@ -57,6 +59,7 @@ export function StartSessionSheet({
   courts,
   formatsLabel,
   modeLabel,
+  levelsLabel = 'All levels',
   scoringLabel = SCORING['31'].label,
   recordGames = true,
   minimumGames,
@@ -128,6 +131,7 @@ export function StartSessionSheet({
               { label: 'Courts', value: String(courts) },
               { label: 'Formats', value: formatsLabel },
               { label: 'Mode', value: modeLabel },
+              { label: 'Levels', value: levelsLabel },
               { label: 'Scoring', value: scoringLabel },
               { label: 'Record games', value: recordGamesLabel(recordGames) },
               { label: 'Minimum', value: `${minimumGames} games` },

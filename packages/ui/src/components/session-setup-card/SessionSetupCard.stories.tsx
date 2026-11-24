@@ -88,3 +88,9 @@ export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: 
 export const ScoringFixedAfterStart: Story = {
   args: { scoringLabel: '16/31, no deuce', fixedAfterStart: true },
 }
+/** The Levels row (D-2026-11-19-12): a restriction label, or the slots per level. */
+export const LevelsBeginnersOnly: Story = { args: { levelsLabel: 'Beginners only' } }
+export const LevelsSlotsPerLevel: Story = {
+  args: { levelsLabel: '6 beginner · 5 intermediate · 5 advanced' },
+}
+export const LevelsSlotsPerLevelLight: Story = { ...LevelsSlotsPerLevel, globals: { theme: 'light' } }

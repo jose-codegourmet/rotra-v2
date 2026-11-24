@@ -91,3 +91,12 @@ export const LateStartDesktop: Story = {
   args: LateStartYesterday.args,
   globals: { viewport: { value: 'desktop' } },
 }
+
+/** The Levels row (D-2026-11-19-12) with slots per level. */
+export const LevelsSlotsPerLevel: Story = {
+  args: { levelsLabel: '6 beginner · 5 intermediate · 5 advanced' },
+}
+export const LevelsSlotsPerLevelLight: Story = {
+  ...LevelsSlotsPerLevel,
+  globals: { theme: 'light' },
+}

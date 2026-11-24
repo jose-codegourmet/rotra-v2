@@ -1,6 +1,6 @@
 # Queue app: Restrictions in session preparation (which levels can take a slot)
 
-Status: TICKETED — #1071
+Status: IN PROGRESS — #1071 (built in #1076 and #1077; the PR number is added when it merges)
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `RESTRICT`, `restrictOf`, `restrictBlock`, `restrictText`, `restrictError`,

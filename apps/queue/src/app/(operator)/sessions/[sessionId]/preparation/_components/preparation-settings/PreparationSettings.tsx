@@ -8,6 +8,7 @@ import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
+import { levelRestrictionDescription, levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { formatPeso } from '@rotra/schema/money'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
@@ -141,6 +142,11 @@ export function PreparationSettings({ sessionId }: { sessionId: string }) {
           rows={[
             { label: 'Formats', value: formats },
             { label: 'Mode', value: MODES[s.sessionMode].label, note: MODES[s.sessionMode].text },
+            {
+              label: 'Levels',
+              value: levelRestrictionLabel(s.levelRestriction),
+              note: levelRestrictionDescription(s.levelRestriction),
+            },
             { label: 'Scoring', value: scoring.label, note: scoring.text },
             {
               label: 'Match requests',

@@ -41,7 +41,7 @@ Most Improved/Off Day need five **previous** qualifying sessions at that same cl
 
 ## A session with Record games off
 
-**Built in the services (Q28.9, #1080, November 24, 2026; [D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02), replacing the November 18 "leaves no rows" rule of Q23.8 #976).** No table or column changed. The migration `20261120000200_record_games_ranks_only` (every completed decision needs a winner) is applied to local disposable databases only; **not applied to the shared database: owner sign-off needed**, and until then the shared database still refuses a winner on a session with `record_games = false`.
+**Built in the services (Q28.9, #1080, November 24, 2026; [D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02), replacing the November 18 "leaves no rows" rule of Q23.8 #976).** No table or column changed. The migration `20261120000200_record_games_ranks_only` (every completed decision needs a winner) is applied to local disposable databases and recorded as applied in the shared database's migration history (seen 2026-11-24).
 
 When `queue_sessions.record_games` is false, Session done writes the same rows as for any session:
 

@@ -427,8 +427,7 @@ passes the wider CHECK (it accepts everything the old one did). Checked on a dis
 
 ## D-2026-11-20-02 — Record games off takes a winner again
 
-`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
-2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
+`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database 2026-11-20; recorded as applied in the shared database's migration history (seen 2026-11-24).** `CREATE OR REPLACE`
 of `match_decisions_record_games_guard()` only: every completed decision needs a winner, whatever the
 session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)
 and every table, column and row are unchanged, so no-result rows written under the November 19 rule
@@ -497,8 +496,7 @@ completed/invalid current rows frozen, removed and open rows not). Design: [sess
 
 ## D-2026-11-19-12 — Session level restrictions (#1076)
 
-`20261124000100_session_level_restriction` (epic #1071). **Status: written; applied to a local disposable
-database 2026-11-24 only; not applied to the shared database (owner sign-off needed).** One enum, four
+`20261124000100_session_level_restriction` (epic #1071). **Status: written; applied to a local disposable database 2026-11-24; applied to the shared database 2026-11-24 (`prisma migrate deploy`, after the epic #1071 merge).** One enum, four
 columns on `queue_sessions` and one check; additive, no backfill, nothing dropped or rewritten.
 
 | Table | Columns | Checks and triggers |

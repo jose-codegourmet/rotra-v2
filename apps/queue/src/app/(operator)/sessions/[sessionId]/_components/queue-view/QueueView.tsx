@@ -3,11 +3,13 @@
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   courtOpen,
+  gamesPlayedFor,
   type MatchContext,
   matchStatus,
   queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
+import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
 import { queueSearchHitCount } from '@rotra/data/match/queueSearch.rules'
 import type { Match } from '@rotra/data/match/types'
 import { useClearQueue } from '@rotra/data/match/useClearQueue'
@@ -31,6 +33,7 @@ import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
 
 export type QueueViewProps = ConsoleViewProps & {
@@ -40,8 +43,6 @@ export type QueueViewProps = ConsoleViewProps & {
   onEditMatch?: (matchId: string) => void
   /** Suggest: opens the Suggested match sheet (Q-SUGGEST). Disabled until given. */
   onSuggest?: () => void
-  /** Regenerate: opens the Regenerate waiting queue? sheet (Q-REGENERATE). Disabled until given, and when the queue is empty. */
-  onRegenerate?: () => void
   /** Generate Queue: opens the Generate Queue tab (Q-AUTO). */
   onOpenGenerate?: () => void
   /** Start on a card: opens the Start match sheet for that waiting match (Q-DISPATCH, Queue › Match control). Start is hidden until given. */
@@ -55,13 +56,15 @@ const errorMessage = (error: unknown) =>
 
 /**
  * Q-QUEUE, the console's Main Queue tab: "Main Queue" with Add match, Suggest, Generate Queue (opens
- * the Generate Queue tab) and Regenerate (primary while anything needs attention, disabled when the queue is empty), the warn
- * notice "N waiting matches need attention…", the "One waiting list for every court. MODE mode
- * guides suggestions…" line, and the snake QueueGrid of MatchCards with status from matchStatus.
+ * the Generate Queue tab) and Clear queue, the warn notice "N waiting matches need attention. Edit
+ * the lineup to swap the player.", the "One waiting list for every court. MODE mode guides
+ * suggestions…" line, and the QueueGrid of MatchCards (slide or grid, kept per device, with its view
+ * switch) with status from matchStatus, the category label, the games badge on each face (opens
+ * "NAME's games" through usePlayerGames) and the ready highlight.
  * Reorder (drag or arrow keys on ⠿) calls useMoveMatch; Remove × calls useRemoveWaitingMatch at
  * once with its toast (no dialog, per dialogs.md); switching sides on a card calls useSwapPlayers,
  * after which the card shows the lock; pictures open the profile. The sheets behind Add match,
- * Edit, Suggest and Regenerate are Queue › Match editing and Queue generation: they
+ * Edit and Suggest are Queue › Match editing and Queue generation: they
  * arrive through the optional callbacks.
  */
 export function QueueView({
@@ -71,7 +74,6 @@ export function QueueView({
   onAddMatch,
   onEditMatch,
   onSuggest,
-  onRegenerate,
   onStartMatch,
   onOpenGenerate,
 }: QueueViewProps) {
@@ -86,6 +88,7 @@ export function QueueView({
   const moveMatch = useMoveMatch()
   const removeWaitingMatch = useRemoveWaitingMatch()
   const swapPlayers = useSwapPlayers()
+  const playerGames = usePlayerGames()
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -147,6 +150,7 @@ export function QueueView({
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
       level: p?.level ?? null,
+      games: gamesPlayedFor(id, ctx),
     }
   }
   const openProfile = (rosterId: string) => {
@@ -175,12 +179,14 @@ export function QueueView({
     id: m.id,
     matchNo: m.matchNo,
     format: m.format,
+    categoryPrefix: matchCategoryFor(m, ctx.roster),
     origin: m.origin,
     manualProtected: m.manualProtected,
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(player),
     teamB: m.teamB.map(player),
     onSelectPlayer: openProfile,
+    onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     canOpenCourt,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
@@ -208,15 +214,6 @@ export function QueueView({
           </Button>
           <Button
             size="sm"
-            variant={attention ? 'primary' : 'secondary'}
-            disabled={!onRegenerate || waiting.length === 0}
-            onClick={onRegenerate}
-            className="sm:w-auto"
-          >
-            Regenerate
-          </Button>
-          <Button
-            size="sm"
             variant="danger-solid"
             disabled={waiting.length === 0}
             onClick={() => {
@@ -231,7 +228,7 @@ export function QueueView({
       {attention ? (
         <Notice tone="warn">
           {attention} waiting {attention > 1 ? 'matches need' : 'match needs'} attention. Edit the
-          lineup to swap the player, or regenerate.
+          lineup to swap the player.
         </Notice>
       ) : null}
       <p className="text-[13px] text-fg2">

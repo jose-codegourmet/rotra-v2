@@ -27,16 +27,22 @@ export const matchLabelOf = (format: MatchFormat, category: MatchCategory) =>
   `${category} ${FORMAT_LABELS[format]}`
 
 /**
- * The label of a lineup, reading each player's gender from the roster rows (a player missing from
- * the roster counts as not given).
+ * The category of a lineup, reading each player's gender from the roster rows (a player missing
+ * from the roster counts as not given).
  */
+export function matchCategoryFor(
+  lineup: { teamA: string[]; teamB: string[] },
+  roster: readonly { id: string; gender?: Gender | null }[],
+) {
+  const genders = (ids: string[]) =>
+    ids.map((id) => roster.find((p) => p.id === id)?.gender ?? null)
+  return matchCategory({ teamA: genders(lineup.teamA), teamB: genders(lineup.teamB) })
+}
+
+/** The label of a lineup: its category and format ("Mixed Doubles"). */
 export function matchLabel(
   lineup: { format: MatchFormat; teamA: string[]; teamB: string[] },
   roster: readonly { id: string; gender?: Gender | null }[],
 ) {
-  const genders = (ids: string[]) => ids.map((id) => roster.find((p) => p.id === id)?.gender ?? null)
-  return matchLabelOf(
-    lineup.format,
-    matchCategory({ teamA: genders(lineup.teamA), teamB: genders(lineup.teamB) }),
-  )
+  return matchLabelOf(lineup.format, matchCategoryFor(lineup, roster))
 }

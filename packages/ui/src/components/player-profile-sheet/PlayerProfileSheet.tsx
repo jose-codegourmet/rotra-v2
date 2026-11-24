@@ -72,7 +72,7 @@ export type PlayerProfileSheetProps = {
   /** How they joined; null or absent reads "Added by the club" */
   joinedVia?: 'club' | 'session' | null
   /** Opened from a dialog: the footer offers Back to that dialog instead of Close */
-  backLabel?: 'suggestion' | 'match' | 'payments'
+  backLabel?: 'suggestion' | 'match' | 'payments' | 'games'
   onBack?: () => void
   /**
    * Registered players only: the club's own nickname for them. Passing it (null for none) adds the

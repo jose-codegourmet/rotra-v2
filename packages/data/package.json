@@ -223,6 +223,7 @@
     "./match/useSessionMatches": "./src/match/useSessionMatches.ts",
     "./match/useLiveStandings": "./src/match/useLiveStandings.ts",
     "./match/match.rules": "./src/match/match.rules.ts",
+    "./match/matchCategory.rules": "./src/match/matchCategory.rules.ts",
     "./match/fetchers": "./src/match/fetchers.ts",
     "./queue-session/courts": "./src/queue-session/courts.ts",
     "./queue-session/courtFill": "./src/queue-session/courtFill.ts",

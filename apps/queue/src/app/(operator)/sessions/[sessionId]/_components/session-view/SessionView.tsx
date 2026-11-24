@@ -4,7 +4,6 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { canPauseMatch } from '@rotra/data/match/liveMatch.rules'
 import {
   activeMatchFor,
-  countedGames,
   courtFreeSince,
   courtMatches,
   courtOpen,
@@ -12,6 +11,7 @@ import {
   FORMAT_LABELS,
   freeCourtMinutes,
   freeCourts,
+  gamesPlayedFor,
   isBookingEnded,
   type MatchContext,
   matchStatus,
@@ -23,6 +23,8 @@ import {
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
+import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
+import { matchExpectedFinish } from '@rotra/data/match/plan-ahead-rules'
 import type { Match } from '@rotra/data/match/types'
 import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
 import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
@@ -32,6 +34,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
+import { sessionScoring } from '@rotra/data/queue-session/types'
 import { useFillOpenedCourts } from '@rotra/data/queue-session/useFillOpenedCourts'
 import { useOpenAllCourtsEarly } from '@rotra/data/queue-session/useOpenAllCourtsEarly'
 import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
@@ -60,6 +63,7 @@ import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-qu
 import { useEffect, useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
+import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 
 export type SessionViewProps = {
   sessionId: string
@@ -150,6 +154,7 @@ export function SessionView({
   const setCourtFill = useSetCourtFillMode()
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
+  const playerGames = usePlayerGames()
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
@@ -237,20 +242,36 @@ export function SessionView({
         : undefined,
     }
   }
-  /** A court face: the game badge shows the player's counted games this session */
+  /** A court face: the game badge shows the player's games this session (counted plus set by hand) */
   const courtPlayer = (id: string): CourtPlayer => ({
     ...player(id),
-    games: countedGames(id, ctx.matches),
+    games: gamesPlayedFor(id, ctx),
   })
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
+  const scoring = sessionScoring(s)
+  /** The expected finish line of a Playing court: Finishing soon is accent, Running long is warn */
+  const finishLine = (m: Match) => {
+    const finish = matchExpectedFinish(m, scoring, now)
+    return {
+      text: finish.text,
+      tone:
+        finish.phase === 'soon'
+          ? ('accent' as const)
+          : finish.phase === 'long'
+            ? ('warn' as const)
+            : ('muted' as const),
+    }
+  }
   const live = s.state === 'active'
   /** A queue face: the wait timer while the session is live (prototype queueCard wait()) */
   const queuePlayer = (id: string): MatchCardPlayer => {
-    if (!live) return player(id)
+    const games = gamesPlayedFor(id, ctx)
+    if (!live) return { ...player(id), games }
     const p = byId(id)
     const busy = activeMatchFor(id, ctx.matches)
     return {
       ...player(id),
+      games,
       wait: busy
         ? { kind: busy.state === 'on_court' ? 'on-court' : 'playing' }
         : !p || !p.present
@@ -424,6 +445,7 @@ export function SessionView({
         teamA: m.teamA.map(courtPlayer),
         teamB: m.teamB.map(courtPlayer),
         onOpenProfile: openProfile,
+        onOpenGames: playerGames.open,
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
         onDragMove: (courtId: string) => dropOnCourt(m, courtId),
@@ -458,6 +480,7 @@ export function SessionView({
         variant: 'in-game',
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
+        expectedFinish: finishLine(m),
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
         onPause: live && canPauseMatch(m) ? () => pauseOnCourt(m) : undefined,
         onMoveToFree: onOpenMatch ? () => onOpenMatch(m.id, {}) : undefined,
@@ -512,12 +535,14 @@ export function SessionView({
     position: i + 1,
     matchNo: m.matchNo,
     format: m.format,
+    categoryPrefix: matchCategoryFor(m, ctx.roster),
     origin: m.origin,
     manualProtected: m.manualProtected,
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(queuePlayer),
     teamB: m.teamB.map(queuePlayer),
     onSelectPlayer: openProfile,
+    onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     canOpenCourt,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,

@@ -46,10 +46,10 @@ import {
   type MatchLineupRequest,
 } from '@/app/(operator)/sessions/[sessionId]/_components/match-lineup/MatchLineup'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { PlayerGamesProvider } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
-import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
 import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
@@ -108,11 +108,10 @@ export type ConsoleSheet =
   | 'add-court'
   | 'session-done'
   | null
-/** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue, Regenerate */
+/** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue */
 export type MatchSheet =
   | MatchLineupRequest
   | { mode: 'suggest' }
-  | { mode: 'regenerate' }
   /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
   | { mode: 'active'; matchId: string; move?: { courtId?: string } }
   /** Review and start, Start on a queue card, Pick another: the Start match and Choose match sheets (Queue › Match control) */
@@ -338,7 +337,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
 
   // Queue › Match editing and generation: the sheets live here so Edit works from the Session tab
   // too, and a save, an accepted suggestion or an auto queue run switches the console to the Queue
-  // tab. Regenerate (RegenerateQueue) stays on the Queue tab, where its button lives.
+  // tab.
   const matchEditing = {
     onAddMatch: () => setMatchSheet({ mode: 'add' }),
     onEditMatch: (matchId: string) => setMatchSheet({ mode: 'edit', matchId }),
@@ -358,226 +357,224 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     )
 
   return (
-    <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
-      {s ? (
-        <PageHeader
-          eyebrow={
-            <span className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
-                Live session
+    <PlayerGamesProvider sessionId={sessionId}>
+      <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
+        {s ? (
+          <PageHeader
+            eyebrow={
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
+                  Live session
+                </span>
+                <Chip>{MODE_LABELS[s.sessionMode]}</Chip>
+                <Chip>{formats}</Chip>
+                <Chip>Min {s.minimumGames} games</Chip>
+                <Chip>Scoring · {SCORING[sessionScoring(s)].label}</Chip>
+                {unrecorded ? <NotRecordedChip /> : null}
               </span>
-              <Chip>{MODE_LABELS[s.sessionMode]}</Chip>
-              <Chip>{formats}</Chip>
-              <Chip>Min {s.minimumGames} games</Chip>
-              <Chip>Scoring · {SCORING[sessionScoring(s)].label}</Chip>
-              {unrecorded ? <NotRecordedChip /> : null}
-            </span>
-          }
-          // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
-          title={<SessionTitleLink title={s.title} href={`/sessions/${sessionId}/public-page`} />}
-          description={
-            <>
-              {s.venueName} · Started {formatWhen(s.startedAt ?? s.scheduledStartAt, now)} · Ends{' '}
-              {formatWhen(s.scheduledEndAt, now)} ·{' '}
-              {endStatus?.over ? (
-                <span className="text-warn">{endStatus.text}</span>
-              ) : (
-                endStatus?.text
-              )}
-            </>
-          }
-          actions={
-            <ConsoleHeaderActions
-              matchRequestCount={matchRequestCount}
-              onOpenMatchRequests={() => setSheet('join-requests')}
+            }
+            // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
+            title={<SessionTitleLink title={s.title} href={`/sessions/${sessionId}/public-page`} />}
+            description={
+              <>
+                {s.venueName} · Started {formatWhen(s.startedAt ?? s.scheduledStartAt, now)} · Ends{' '}
+                {formatWhen(s.scheduledEndAt, now)} ·{' '}
+                {endStatus?.over ? (
+                  <span className="text-warn">{endStatus.text}</span>
+                ) : (
+                  endStatus?.text
+                )}
+              </>
+            }
+            actions={
+              <ConsoleHeaderActions
+                matchRequestCount={matchRequestCount}
+                onOpenMatchRequests={() => setSheet('join-requests')}
+                onOpenCourtsAndTime={() => {
+                  setFocusEnd(false)
+                  setSheet('adjust')
+                }}
+                onOpenPayments={() => setSheet('payments')}
+                onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
+                onCopyFacebookPost={() => setSheet('post')}
+                onGoHome={() => router.push('/')}
+              />
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="w-24" />
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="w-72" />
+          </div>
+        )}
+        <ConsoleDeviceNotice sessionId={sessionId} />
+        {s ? (
+          <OverdueBanner
+            endsAt={s.scheduledEndAt}
+            now={now}
+            offline={!online}
+            onSetEndTime={() => {
+              setFocusEnd(true)
+              setSheet('adjust')
+            }}
+            onSessionDone={onSessionDone}
+          />
+        ) : null}
+        {online ? null : (
+          <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
+        )}
+        <Tabs
+          phoneMenu
+          aria-label="Console views"
+          menuLabel="Console view"
+          value={view}
+          onChange={async (value) => {
+            await flushSessionRoster(sessionId)
+            await flushSessionPresence(sessionId)
+            setView(value as ConsoleView)
+          }}
+          items={tabs}
+        >
+          <TabsContent value="courts" className="flex flex-col gap-5">
+            <SessionView
+              {...viewProps}
+              onAddCourt={() => setSheet('add-court')}
+              onEditCourt={(courtId) => {
+                setEditCourtId(courtId)
+                setSheet('add-court')
+              }}
+              {...matchEditing}
+              onOpenMatch={(matchId, move) => setMatchSheet({ mode: 'active', matchId, move })}
+              onStartMatch={onStartMatch}
+              onPickAnother={onPickAnother}
+            />
+          </TabsContent>
+          <TabsContent value="queue" className="flex flex-col gap-3">
+            {VIEWS.queue ? (
+              <QueueView
+                {...viewProps}
+                {...matchEditing}
+                onStartMatch={onStartMatch}
+                onSuggest={() => setMatchSheet({ mode: 'suggest' })}
+                onOpenGenerate={() => setView('generate')}
+              />
+            ) : (
+              panel('queue')
+            )}
+            {/* The Players picker under the Main Queue (owner, November 19, 2026): the same view as the
+              Players tab, so matches are made while watching the queue. Only the active tab panel is
+              mounted, so its sheets and state exist once; Make match adds to the queue right above and
+              PlayersView never navigates. */}
+            {VIEWS.players ? (
+              <div className="border-t border-border pt-5">{panel('players')}</div>
+            ) : null}
+          </TabsContent>
+          {VIEWS.generate ? (
+            <TabsContent value="generate" forceMount className="data-[state=inactive]:hidden">
+              {panel('generate')}
+            </TabsContent>
+          ) : null}
+          <TabsContent value="players">{panel('players')}</TabsContent>
+          {unrecorded ? null : (
+            <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
+          )}
+          {unrecorded ? null : <TabsContent value="history">{panel('history')}</TabsContent>}
+          <TabsContent value="settings">
+            <SettingsView
+              {...viewProps}
               onOpenCourtsAndTime={() => {
                 setFocusEnd(false)
                 setSheet('adjust')
               }}
+              onOpenMatchRequests={() => setSheet('join-requests')}
               onOpenPayments={() => setSheet('payments')}
-              onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
-              onCopyFacebookPost={() => setSheet('post')}
-              onGoHome={() => router.push('/')}
             />
-          }
-        />
-      ) : (
-        <div className="flex flex-col gap-2">
-          <Skeleton className="w-24" />
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="w-72" />
-        </div>
-      )}
-      <ConsoleDeviceNotice sessionId={sessionId} />
-      {s ? (
-        <OverdueBanner
-          endsAt={s.scheduledEndAt}
-          now={now}
-          offline={!online}
-          onSetEndTime={() => {
-            setFocusEnd(true)
-            setSheet('adjust')
-          }}
+          </TabsContent>
+        </Tabs>
+        <ConsoleFooterBar
+          gamesRecorded={recorded}
+          inPlay={active.length}
+          waiting={waiting.length}
+          online={online}
           onSessionDone={onSessionDone}
         />
-      ) : null}
-      {online ? null : (
-        <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
-      )}
-      <Tabs
-        phoneMenu
-        aria-label="Console views"
-        menuLabel="Console view"
-        value={view}
-        onChange={async (value) => {
-          await flushSessionRoster(sessionId)
-          await flushSessionPresence(sessionId)
-          setView(value as ConsoleView)
-        }}
-        items={tabs}
-      >
-        <TabsContent value="courts" className="flex flex-col gap-5">
-          <SessionView
-            {...viewProps}
-            onAddCourt={() => setSheet('add-court')}
-            onEditCourt={(courtId) => {
-              setEditCourtId(courtId)
-              setSheet('add-court')
-            }}
-            {...matchEditing}
-            onOpenMatch={(matchId, move) => setMatchSheet({ mode: 'active', matchId, move })}
-            onStartMatch={onStartMatch}
-            onPickAnother={onPickAnother}
-          />
-        </TabsContent>
-        <TabsContent value="queue" className="flex flex-col gap-3">
-          {VIEWS.queue ? (
-            <QueueView
-              {...viewProps}
-              {...matchEditing}
-              onStartMatch={onStartMatch}
-              onSuggest={() => setMatchSheet({ mode: 'suggest' })}
-              onOpenGenerate={() => setView('generate')}
-              onRegenerate={() => setMatchSheet({ mode: 'regenerate' })}
-            />
-          ) : (
-            panel('queue')
-          )}
-          {/* The Players picker under the Main Queue (owner, November 19, 2026): the same view as the
-              Players tab, so matches are made while watching the queue. Only the active tab panel is
-              mounted, so its sheets and state exist once; Make match adds to the queue right above and
-              PlayersView never navigates. */}
-          {VIEWS.players ? (
-            <div className="border-t border-border pt-5">{panel('players')}</div>
-          ) : null}
-        </TabsContent>
-        {VIEWS.generate ? (
-          <TabsContent value="generate" forceMount className="data-[state=inactive]:hidden">
-            {panel('generate')}
-          </TabsContent>
-        ) : null}
-        <TabsContent value="players">{panel('players')}</TabsContent>
-        {unrecorded ? null : <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>}
-        {unrecorded ? null : <TabsContent value="history">{panel('history')}</TabsContent>}
-        <TabsContent value="settings">
-          <SettingsView
-            {...viewProps}
-            onOpenCourtsAndTime={() => {
-              setFocusEnd(false)
-              setSheet('adjust')
-            }}
-            onOpenMatchRequests={() => setSheet('join-requests')}
-            onOpenPayments={() => setSheet('payments')}
-          />
-        </TabsContent>
-      </Tabs>
-      <ConsoleFooterBar
-        gamesRecorded={recorded}
-        inPlay={active.length}
-        waiting={waiting.length}
-        online={online}
-        onSessionDone={onSessionDone}
-      />
-      <Sheet
-        open={sheet === 'join-requests'}
-        onOpenChange={(open) => setSheet(open ? 'join-requests' : null)}
-        title="Requests"
-        wide
-        footer={<Button onClick={() => setSheet(null)}>Done</Button>}
-      >
-        <JoinRequests sessionId={sessionId} variant="sheet" />
-      </Sheet>
-      <Sheet
-        open={sheet === 'payments'}
-        onOpenChange={(open) => setSheet(open ? 'payments' : null)}
-        title="Payments"
-        wide
-        footer={<Button onClick={() => setSheet(null)}>Done</Button>}
-      >
-        <PaymentsPanel sessionId={sessionId} asSheet />
-      </Sheet>
-      <FacebookPost
-        sessionId={sessionId}
-        open={sheet === 'post'}
-        onOpenChange={(open) => setSheet(open ? 'post' : null)}
-      />
-      <CourtsAndTime
-        sessionId={sessionId}
-        open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}
-        onOpenChange={(next) => {
-          if (!next) setEditCourtId(null)
-          setSheet(next)
-        }}
-        editCourtId={editCourtId}
-        focusEnd={focusEnd}
-        now={now}
-      />
-      <MatchLineup
-        sessionId={sessionId}
-        now={now}
-        request={
-          matchSheet && (matchSheet.mode === 'add' || matchSheet.mode === 'edit')
-            ? matchSheet
-            : null
-        }
-        onClose={() => setMatchSheet(null)}
-        onSaved={showQueue}
-      />
-      <SuggestMatch
-        sessionId={sessionId}
-        open={matchSheet?.mode === 'suggest'}
-        onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
-        onEditThenAdd={(lineup) => setMatchSheet({ mode: 'add', lineup })}
-        onAdded={showQueue}
-      />
-      <RegenerateQueue
-        sessionId={sessionId}
-        open={matchSheet?.mode === 'regenerate'}
-        onOpenChange={(open) => setMatchSheet(open ? { mode: 'regenerate' } : null)}
-      />
-      <ActiveMatch
-        sessionId={sessionId}
-        now={now}
-        matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
-        moveFirst={matchSheet?.mode === 'active' ? (matchSheet.move ?? null) : null}
-        onClose={() => setMatchSheet(null)}
-      />
-      <StartMatch
-        sessionId={sessionId}
-        request={
-          matchSheet && (matchSheet.mode === 'start' || matchSheet.mode === 'choose')
-            ? matchSheet
-            : null
-        }
-        onRequestChange={setMatchSheet}
-        onClose={() => setMatchSheet(null)}
-      />
-      <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
-      <SessionDoneFlow
-        sessionId={sessionId}
-        open={sheet === 'session-done'}
-        onOpenChange={(open) => setSheet(open ? 'session-done' : null)}
-      />
-    </main>
+        <Sheet
+          open={sheet === 'join-requests'}
+          onOpenChange={(open) => setSheet(open ? 'join-requests' : null)}
+          title="Requests"
+          wide
+          footer={<Button onClick={() => setSheet(null)}>Done</Button>}
+        >
+          <JoinRequests sessionId={sessionId} variant="sheet" />
+        </Sheet>
+        <Sheet
+          open={sheet === 'payments'}
+          onOpenChange={(open) => setSheet(open ? 'payments' : null)}
+          title="Payments"
+          wide
+          footer={<Button onClick={() => setSheet(null)}>Done</Button>}
+        >
+          <PaymentsPanel sessionId={sessionId} asSheet />
+        </Sheet>
+        <FacebookPost
+          sessionId={sessionId}
+          open={sheet === 'post'}
+          onOpenChange={(open) => setSheet(open ? 'post' : null)}
+        />
+        <CourtsAndTime
+          sessionId={sessionId}
+          open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}
+          onOpenChange={(next) => {
+            if (!next) setEditCourtId(null)
+            setSheet(next)
+          }}
+          editCourtId={editCourtId}
+          focusEnd={focusEnd}
+          now={now}
+        />
+        <MatchLineup
+          sessionId={sessionId}
+          now={now}
+          request={
+            matchSheet && (matchSheet.mode === 'add' || matchSheet.mode === 'edit')
+              ? matchSheet
+              : null
+          }
+          onClose={() => setMatchSheet(null)}
+          onSaved={showQueue}
+        />
+        <SuggestMatch
+          sessionId={sessionId}
+          open={matchSheet?.mode === 'suggest'}
+          onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
+          onEditThenAdd={(lineup) => setMatchSheet({ mode: 'add', lineup })}
+          onAdded={showQueue}
+        />
+        <ActiveMatch
+          sessionId={sessionId}
+          now={now}
+          matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
+          moveFirst={matchSheet?.mode === 'active' ? (matchSheet.move ?? null) : null}
+          onClose={() => setMatchSheet(null)}
+        />
+        <StartMatch
+          sessionId={sessionId}
+          request={
+            matchSheet && (matchSheet.mode === 'start' || matchSheet.mode === 'choose')
+              ? matchSheet
+              : null
+          }
+          onRequestChange={setMatchSheet}
+          onClose={() => setMatchSheet(null)}
+        />
+        <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
+        <SessionDoneFlow
+          sessionId={sessionId}
+          open={sheet === 'session-done'}
+          onOpenChange={(open) => setSheet(open ? 'session-done' : null)}
+        />
+      </main>
+    </PlayerGamesProvider>
   )
 }

@@ -12,13 +12,21 @@ export const liveMatchHistoryMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Q-CONSOLE › Match History › liveHistoryPane(), lhTimeline() (.lh-stack, .lh-court, .lh-time)',
+    screen:
+      'Q-CONSOLE › Match History › liveHistoryPane(), lhTimeline() (.lh-stack, .lh-court, .lh-time)',
   },
   docs: [
     'docs/screens/product/modules/queue/session-console.md',
     'docs/mockup-changes/2026-11-19-queue-live-match-history.md',
     'docs/mockup-changes/2026-11-19-queue-match-history-timeline.md',
   ],
-  variants: ['all courts', 'one court', 'empty', 'a court with no matches', 'invalid', '5v5 on two courts'],
+  variants: [
+    'all courts',
+    'one court',
+    'empty',
+    'a court with no matches',
+    'invalid',
+    '5v5 on two courts',
+  ],
   related: ['MatchCourt', 'CountPills', 'RecordCourtColumns'],
 } satisfies ComponentMeta

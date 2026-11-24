@@ -1,8 +1,8 @@
 import { queueTime } from '@rotra/schema/queue-time'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
-import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { CountPills } from '@rotra/ui/count-pills'
+import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { MatchCourt, type MatchCourtPlayer } from '@rotra/ui/match-court'
 import { substitutionCreditLine } from '@rotra/ui/match-record-card'
 import { formatTime, formatTimeRange } from '@rotra/ui/now-card/helpers'
@@ -166,7 +166,10 @@ export function LiveMatchHistory({
                           invalid={invalid}
                         />
                         {credits.map((s, i) => (
-                          <p key={`${s.outName}-${s.inName}-${i}`} className="m-0 text-[13px] text-fg2">
+                          <p
+                            key={`${s.outName}-${s.inName}-${i}`}
+                            className="m-0 text-[13px] text-fg2"
+                          >
                             {substitutionCreditLine(s, invalid)}
                           </p>
                         ))}

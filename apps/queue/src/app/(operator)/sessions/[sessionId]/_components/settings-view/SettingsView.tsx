@@ -20,6 +20,7 @@ import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
+import { WhoCanJoinCard } from '@rotra/ui/who-can-join-card'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
@@ -197,21 +198,25 @@ export function SettingsView({
       </div>
       {cost.isError ? <QueryError query={cost} title="Couldn't load the cost estimate." /> : null}
       <SessionHosts sessionId={sessionId} />
-      <SessionLinkCard
-        link={sessionLink}
-        pendingCount={pendingRequests}
-        acceptJoinRequests={s.acceptJoinRequests}
-        alwaysRequireRequest={s.alwaysRequireRequest ?? false}
-        onCopyLink={() => void copyLink()}
-        onOpenAsGuest={() => router.push(publicHref)}
-        onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
-        onAcceptJoinRequestsChange={(accept) =>
-          setAcceptJoinRequests.mutate({ sessionId, accept }, options)
-        }
-        onAlwaysRequireRequestChange={(always) =>
-          setAlwaysRequireRequest.mutate({ sessionId, always }, options)
-        }
-      />
+      <div className="grid items-stretch gap-3 sm:grid-cols-2">
+        <SessionLinkCard
+          link={sessionLink}
+          pendingCount={pendingRequests}
+          onCopyLink={() => void copyLink()}
+          onOpenAsGuest={() => router.push(publicHref)}
+          onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
+        />
+        <WhoCanJoinCard
+          acceptJoinRequests={s.acceptJoinRequests}
+          alwaysRequireRequest={s.alwaysRequireRequest ?? false}
+          onAcceptJoinRequestsChange={(accept) =>
+            setAcceptJoinRequests.mutate({ sessionId, accept }, options)
+          }
+          onAlwaysRequireRequestChange={(always) =>
+            setAlwaysRequireRequest.mutate({ sessionId, always }, options)
+          }
+        />
+      </div>
       <div>
         <Button size="sm" onClick={() => router.push(`/sessions/${sessionId}/preparation`)}>
           <Icon name="nav-gear" />

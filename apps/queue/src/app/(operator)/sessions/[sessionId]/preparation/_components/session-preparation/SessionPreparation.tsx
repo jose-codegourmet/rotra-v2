@@ -49,6 +49,7 @@ import { StartSessionBar } from '@rotra/ui/start-session-bar'
 import { StartSessionSheet } from '@rotra/ui/start-session-sheet'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
+import { WhoCanJoinCard } from '@rotra/ui/who-can-join-card'
 import Link from 'next/link'
 import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -475,33 +476,37 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 <QueryError query={cost} title="Couldn't load the cost estimate." />
               ) : null}
               <SessionHosts sessionId={sessionId} />
-              <SessionLinkCard
-                link={sessionLink}
-                pendingCount={pendingRequests}
-                acceptJoinRequests={s.acceptJoinRequests}
-                alwaysRequireRequest={s.alwaysRequireRequest ?? false}
-                onCopyLink={() => void copyLink()}
-                onOpenAsGuest={() => router.push(publicHref)}
-                onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
-                onAcceptJoinRequestsChange={(accept) =>
-                  setAcceptJoinRequests.mutate(
-                    { sessionId, accept },
-                    {
-                      onSuccess: (result) => toast(result.message),
-                      onError: (error) => toast.error(errorMessage(error)),
-                    },
-                  )
-                }
-                onAlwaysRequireRequestChange={(always) =>
-                  setAlwaysRequireRequest.mutate(
-                    { sessionId, always },
-                    {
-                      onSuccess: (result) => toast(result.message),
-                      onError: (error) => toast.error(errorMessage(error)),
-                    },
-                  )
-                }
-              />
+              <div className="grid items-stretch gap-3 sm:grid-cols-2">
+                <SessionLinkCard
+                  link={sessionLink}
+                  pendingCount={pendingRequests}
+                  onCopyLink={() => void copyLink()}
+                  onOpenAsGuest={() => router.push(publicHref)}
+                  onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
+                />
+                <WhoCanJoinCard
+                  acceptJoinRequests={s.acceptJoinRequests}
+                  alwaysRequireRequest={s.alwaysRequireRequest ?? false}
+                  onAcceptJoinRequestsChange={(accept) =>
+                    setAcceptJoinRequests.mutate(
+                      { sessionId, accept },
+                      {
+                        onSuccess: (result) => toast(result.message),
+                        onError: (error) => toast.error(errorMessage(error)),
+                      },
+                    )
+                  }
+                  onAlwaysRequireRequestChange={(always) =>
+                    setAlwaysRequireRequest.mutate(
+                      { sessionId, always },
+                      {
+                        onSuccess: (result) => toast(result.message),
+                        onError: (error) => toast.error(errorMessage(error)),
+                      },
+                    )
+                  }
+                />
+              </div>
             </div>
           ) : roster.isError ? (
             <QueryError query={roster} title="Couldn't load the roster." />

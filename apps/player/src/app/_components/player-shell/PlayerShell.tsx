@@ -8,7 +8,7 @@ import { TopBar } from '@rotra/ui/app-shell/top-bar'
 import { EmailConfirmBanner } from '@rotra/ui/email-confirm-banner'
 import { NotificationBell } from '@rotra/ui/notification-bell'
 import { OfflineBand } from '@rotra/ui/offline-band'
-import { PlayerNav, type PlayerNavCurrent } from '@rotra/ui/player-nav'
+import { PlayerNav, PlayerNavDock, type PlayerNavCurrent } from '@rotra/ui/player-nav'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
@@ -110,6 +110,14 @@ export function PlayerShell({ children }: { children: ReactNode }) {
       ) : (
         children
       )}
+      <PlayerNavDock
+        signedIn={Boolean(account)}
+        current={current}
+        leaderboard={target('/')}
+        profile={target(ownPath ?? '/')}
+        signIn={target('/login')}
+        linkAs={Link}
+      />
     </>
   )
 }

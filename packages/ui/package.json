@@ -545,7 +545,8 @@
     "./verification-status-chip": "./src/components/verification-status-chip/VerificationStatusChip.tsx",
     "./verification-step": "./src/components/verification-step/VerificationStep.tsx",
     "./onboarding-frame": "./src/components/onboarding-frame/OnboardingFrame.tsx",
-    "./optional-fold": "./src/components/optional-fold/OptionalFold.tsx"
+    "./optional-fold": "./src/components/optional-fold/OptionalFold.tsx",
+    "./current-session-card": "./src/components/current-session-card/CurrentSessionCard.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

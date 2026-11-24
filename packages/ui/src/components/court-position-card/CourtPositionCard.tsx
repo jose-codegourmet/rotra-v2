@@ -6,7 +6,11 @@ import { cn } from '@rotra/ui/cn'
 export type CourtPosition = 'front' | 'back' | 'all'
 
 export const COURT_POSITIONS: { value: CourtPosition; title: string; description: string }[] = [
-  { value: 'front', title: 'Front court', description: 'Net play, pushes and quick kills at the front.' },
+  {
+    value: 'front',
+    title: 'Front court',
+    description: 'Net play, pushes and quick kills at the front.',
+  },
   { value: 'back', title: 'Back court', description: 'Clears, smashes and drops from the back.' },
   { value: 'all', title: 'All-round', description: 'Comfortable anywhere on court.' },
 ]

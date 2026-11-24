@@ -46,10 +46,10 @@ import { useState } from 'react'
 import { ClubCard } from '@/app/_components/club-card/ClubCard'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
-import { rankStatusFor } from '@/app/_components/rank-status/rankStatus'
 import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
+import { rankStatusFor } from '@/app/_components/rank-status/rankStatus'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
@@ -203,7 +203,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       onError: (error) => toast.error(error.message),
     })
   const picture = pictureSrc(player.picture, player.playerId, player.fullName) ?? null
-  const missingDetails = isOwn && (!player.playingStyle || !player.experienceYears)
+  const missingDetails = isOwn && (!player.playStyle || !player.experienceYears)
   const updatedLabel = games.dataUpdatedAt
     ? new Date(games.dataUpdatedAt).toLocaleTimeString([], {
         hour: 'numeric',
@@ -279,10 +279,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
             {isOwn ? null : clubs.isPending ? (
               <Skeleton className="h-36" />
             ) : clubs.isError ? (
-              <ErrorState
-                title="Couldn't load the clubs."
-                onRetry={() => void clubs.refetch()}
-              />
+              <ErrorState title="Couldn't load the clubs." onRetry={() => void clubs.refetch()} />
             ) : (
               <PlayerClubsCard
                 isOwn={false}

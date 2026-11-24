@@ -221,7 +221,10 @@ export function EditPlayerDetailsForm({
                   />
                 </Field>
               )}
-              <PersonalDetailsFields sections={['playing-style', 'links']} disabled={isPending} />
+              <PersonalDetailsFields
+                sections={['playing-text', 'playing-style', 'links']}
+                disabled={isPending}
+              />
             </>
           ) : null}
         </form>

@@ -12,6 +12,7 @@
     "./password": "./src/password.ts",
     "./name": "./src/name.ts",
     "./gender": "./src/gender.ts",
+    "./getting-to-know": "./src/getting-to-know.ts",
     "./personal-details": "./src/personal-details.ts",
     "./social-link": "./src/social-link.ts",
     "./club-price": "./src/club-price.ts",

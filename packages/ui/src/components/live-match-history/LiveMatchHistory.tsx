@@ -44,8 +44,6 @@ export type LiveMatchHistoryProps = {
   courts: LiveMatchHistoryCourt[]
   /** The session's finished matches (done and invalid), in any order */
   matches: LiveMatchHistoryMatch[]
-  /** The "N played" chip beside the heading */
-  playedCount: number
   /** "all" or a court id */
   courtFilter: string
   onCourtFilterChange: (value: string) => void
@@ -74,7 +72,6 @@ function lengthLabel(startedAt: number, endedAt: number): string {
 export function LiveMatchHistory({
   courts,
   matches,
-  playedCount,
   courtFilter,
   onCourtFilterChange,
   onOpenPlayer,
@@ -99,16 +96,13 @@ export function LiveMatchHistory({
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="text-lg font-bold">Match History</h2>
-          <p className="m-0 text-[13px] text-fg2">
-            Tonight's finished matches, court by court. In each court the latest match is on top
-            and earlier ones are below. Start time and length sit on top of each match. Winners are
-            highlighted.{invalidCount ? ` ${invalidCount} invalid.` : ''}
-          </p>
-        </div>
-        <Chip>{playedCount} played</Chip>
+      <div className="flex min-w-0 flex-col gap-1">
+        <h2 className="text-lg font-bold">Match History</h2>
+        <p className="m-0 text-[13px] text-fg2">
+          Tonight's finished matches, court by court. In each court the latest match is on top and
+          earlier ones are below. Start time and length sit on top of each match. Winners are
+          highlighted.{invalidCount ? ` ${invalidCount} invalid.` : ''}
+        </p>
       </div>
       <CountPills
         aria-label="Court"

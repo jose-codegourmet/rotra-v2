@@ -101,7 +101,6 @@ const meta = {
   args: {
     courts: courts.slice(0, 2),
     matches,
-    playedCount: matches.length,
     courtFilter: 'all',
     onCourtFilterChange: fn(),
     onOpenPlayer: fn(),
@@ -122,12 +121,12 @@ export const AllCourts: Story = { name: 'All courts' }
 export const OneCourt: Story = { name: 'One court', args: { courtFilter: 'c2' } }
 
 /** Nothing finished yet. */
-export const Empty: Story = { args: { matches: [], playedCount: 0 } }
+export const Empty: Story = { args: { matches: [] } }
 
 /** A court that has hosted nothing shows its own line. */
 export const CourtWithNone: Story = {
   name: 'A court with no matches',
-  args: { courts, playedCount: matches.length },
+  args: { courts },
 }
 
 /** An invalid match stays in its court, desaturated with the Invalid chip and no score. */
@@ -156,6 +155,5 @@ export const FiveVsFiveTwoCourts: Story = {
         score: { teamA: 21, teamB: 18 },
       },
     ],
-    playedCount: matches.length + 1,
   },
 }

@@ -39,6 +39,7 @@ import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { GenerateQueueView } from '@/app/(operator)/sessions/[sessionId]/_components/generate-queue-view/GenerateQueueView'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
+import { HistoryView } from '@/app/(operator)/sessions/[sessionId]/_components/history-view/HistoryView'
 import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
 import {
   MatchLineup,
@@ -65,10 +66,16 @@ export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boole
 
 /**
  * The console's tabs, in display order: Courts, Main Queue, Generate Queue, Players, Leaderboard,
- * Settings. The next ticket adds Match History between Leaderboard and Settings: add its key here,
- * its `?tab=` value to TAB_PARAMS, its container to VIEWS and its tab to `tabs` and the panels.
+ * Match History, Settings.
  */
-export type ConsoleView = 'courts' | 'queue' | 'generate' | 'players' | 'leaderboard' | 'settings'
+export type ConsoleView =
+  | 'courts'
+  | 'queue'
+  | 'generate'
+  | 'players'
+  | 'leaderboard'
+  | 'history'
+  | 'settings'
 
 /** The `?tab=` value of each tab; Courts has none. */
 const TAB_PARAMS: Record<ConsoleView, string | null> = {
@@ -77,6 +84,7 @@ const TAB_PARAMS: Record<ConsoleView, string | null> = {
   generate: 'generate',
   players: 'roster',
   leaderboard: 'board',
+  history: 'history',
   settings: 'settings',
 }
 
@@ -139,6 +147,7 @@ const VIEWS: Partial<
   generate: GenerateQueueView,
   players: PlayersView,
   leaderboard: LeaderboardView,
+  history: HistoryView,
 }
 
 const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
@@ -147,7 +156,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and, at the
  * upper right, ConsoleHeaderActions: Match requests · N (the Requests sheet, match requests only),
  * Courts and time, Payments and the More menu (Public page, Copy Facebook post, Home). Then the
- * view tabs (Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings; on phones one
+ * view tabs (Courts, Main Queue, Generate Queue, Players, Leaderboard, Match History, Settings; on phones one
  * "Console view" menu) with live counts, the view panels (Courts here; the others arrive in their
  * own containers), the selected tab in the URL (`?tab=`), the
  * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
@@ -177,10 +186,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [focusEnd, setFocusEnd] = useState(false)
 
   const s = session.data
-  // Record games off: no Leaderboard tab, a Not recorded chip in the header.
+  // Record games off: no Leaderboard or Match History tab, a Not recorded chip in the header.
   const unrecorded = s ? !recordsGames(s) : false
   const requested = tabFromParam(tabParam)
-  const view: ConsoleView = unrecorded && requested === 'leaderboard' ? 'courts' : requested
+  const view: ConsoleView = unrecorded && (requested === 'leaderboard' || requested === 'history') ? 'courts' : requested
   const setView = useCallback(
     (next: ConsoleView) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -242,6 +251,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const waiting = waitingMatches(all)
   const active = activeMatches(all)
   const recorded = all.filter((m) => m.state === 'completed').length
+  // The Match History tab's "N played": finished matches, invalid ones included (the prototype's count).
+  const played = all.filter((m) => m.state === 'completed' || m.state === 'invalid').length
   const inUse = active.reduce((n, m) => n + m.courtIds.length, 0)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
   const present = rosterList.filter((p) => p.present).length
@@ -299,6 +310,15 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                   },
                 ]
               : [],
+          },
+        ]),
+    ...(unrecorded || !VIEWS.history
+      ? []
+      : [
+          {
+            value: 'history',
+            label: 'Match History',
+            badges: [{ text: String(played), longText: ' played' }],
           },
         ]),
     { value: 'settings', label: 'Settings' },
@@ -450,6 +470,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         ) : null}
         <TabsContent value="players">{panel('players')}</TabsContent>
         {unrecorded ? null : <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>}
+        {unrecorded ? null : <TabsContent value="history">{panel('history')}</TabsContent>}
         <TabsContent value="settings">
           <SettingsView
             {...viewProps}

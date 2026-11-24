@@ -1,6 +1,6 @@
 import 'server-only'
 import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
+import { Pool, type PoolClient } from 'pg'
 import { PrismaClient } from '../generated/prisma/client'
 
 /**
@@ -38,6 +38,28 @@ function keepAwakeUntilIdleClosed(pool: Pool, idleTimeoutMillis: number) {
   })
 }
 
+/**
+ * A Prisma interactive transaction holds one pooled connection, and our services run reads in
+ * parallel on it (`Promise.all` over `tx`). pg 8.23 still queues overlapping queries on a client but
+ * logs "Calling client.query() when the client is already executing a query is deprecated" for each
+ * one, which flooded the Vercel runtime logs (November 24, 2026), and pg@9 drops the queue. One
+ * connection runs one query at a time anyway, so we chain promise-style queries per connection:
+ * same order, same speed, no warning. Callback and submittable queries (the pool's own) pass through.
+ */
+function serializeQueries(client: PoolClient) {
+  const query = client.query.bind(client) as (...args: unknown[]) => unknown
+  let tail: Promise<unknown> = Promise.resolve()
+  client.query = ((...args: unknown[]) => {
+    const first = args[0] as { submit?: unknown } | undefined
+    if (args.some((arg) => typeof arg === 'function') || typeof first?.submit === 'function') {
+      return query(...args)
+    }
+    const run = tail.then(() => query(...args))
+    tail = run.catch(() => undefined)
+    return run
+  }) as PoolClient['query']
+}
+
 function createClient() {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) throw new Error('DATABASE_URL is not set')
@@ -52,6 +74,7 @@ function createClient() {
   })
   // A dropped pooler socket must not crash the instance; the next query opens a fresh one.
   pool.on('error', (error) => console.error('[db] idle connection error', error.name))
+  pool.on('connect', serializeQueries)
   if (serverless) keepAwakeUntilIdleClosed(pool, idleTimeoutMillis)
   const adapter = new PrismaPg(pool)
   return new PrismaClient({

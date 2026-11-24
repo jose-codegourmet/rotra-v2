@@ -1,6 +1,6 @@
 # Queue app: Record games off records the games as usual; only their wins stay out of the leaderboards and win rate
 
-Status: TICKETED — #1071
+Status: IN MOCK APP — #1071
 Date: 2026-11-20
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › session setup (Formats and mode, the review), Preparation and live Settings (Game rules), the Start session sheet, the console header and tabs, sheet `result`, Finishing, the session record (all tabs), the public session page; helpers `recordedOf()`, `NOT_RANKED`

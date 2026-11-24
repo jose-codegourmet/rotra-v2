@@ -1,6 +1,6 @@
 # Queue app: the live Settings tab shows the setup as cards
 
-Status: TICKETED — #1073
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` (from `prepOverview()` when the session is live)

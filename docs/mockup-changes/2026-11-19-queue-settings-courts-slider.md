@@ -1,6 +1,6 @@
 # Queue app: Settings courts are a one-court slider on phones (Embla Carousel)
 
-Status: TICKETED — #1072
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` courts (`.ls-embla`, `.ls-dots`), `setupCourtSlider()`

@@ -1,0 +1,630 @@
+{
+  "kind": "rule",
+  "rule": "expectedFinish",
+  "version": 1,
+  "cases": [
+    {
+      "name": "16/31: Getting ready counts the full typical length",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 15,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "16/31: just started",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 0
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 15,
+        "text": "Ends in about 15 min",
+        "tag": "ends in about 15 min"
+      }
+    },
+    {
+      "name": "16/31: one minute before Finishing soon",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 11
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 4,
+        "text": "Ends in about 4 min",
+        "tag": "ends in about 4 min"
+      }
+    },
+    {
+      "name": "16/31: p = typical − 3 is Finishing soon",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 12
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 3,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "16/31: the last minute before the typical length",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 14
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 1,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "16/31: p = typical is Could end any time and may be in deuce",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 15
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "16/31: one minute before long",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 24
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "16/31: p = long is Running long",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 25
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "16/31: far past long",
+      "input": {
+        "scoring": "31",
+        "minutesPlayed": 45
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "16/31, no deuce: Getting ready counts the full typical length",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 15,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "16/31, no deuce: just started",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 0
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 15,
+        "text": "Ends in about 15 min",
+        "tag": "ends in about 15 min"
+      }
+    },
+    {
+      "name": "16/31, no deuce: one minute before Finishing soon",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 11
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 4,
+        "text": "Ends in about 4 min",
+        "tag": "ends in about 4 min"
+      }
+    },
+    {
+      "name": "16/31, no deuce: p = typical − 3 is Finishing soon",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 12
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 3,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "16/31, no deuce: the last minute before the typical length",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 14
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 1,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "16/31, no deuce: p = typical is Could end any time, no deuce hint",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 15
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "16/31, no deuce: one minute before long",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 17
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "16/31, no deuce: p = long is Running long",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 18
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "16/31, no deuce: far past long",
+      "input": {
+        "scoring": "31nd",
+        "minutesPlayed": 38
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "11/21: Getting ready counts the full typical length",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 10,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "11/21: just started",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 0
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 10,
+        "text": "Ends in about 10 min",
+        "tag": "ends in about 10 min"
+      }
+    },
+    {
+      "name": "11/21: one minute before Finishing soon",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 6
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 4,
+        "text": "Ends in about 4 min",
+        "tag": "ends in about 4 min"
+      }
+    },
+    {
+      "name": "11/21: p = typical − 3 is Finishing soon",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 7
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 3,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "11/21: the last minute before the typical length",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 9
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 1,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "11/21: p = typical is Could end any time and may be in deuce",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 10
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "11/21: one minute before long",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 14
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "11/21: p = long is Running long",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 15
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "11/21: far past long",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": 35
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "11/21 × 3: Getting ready counts the full typical length",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 25,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "11/21 × 3: just started",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 0
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 25,
+        "text": "Ends in about 25 min",
+        "tag": "ends in about 25 min"
+      }
+    },
+    {
+      "name": "11/21 × 3: one minute before Finishing soon",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 21
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 4,
+        "text": "Ends in about 4 min",
+        "tag": "ends in about 4 min"
+      }
+    },
+    {
+      "name": "11/21 × 3: p = typical − 3 is Finishing soon",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 22
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 3,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "11/21 × 3: the last minute before the typical length",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 24
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 1,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "11/21 × 3: p = typical is Could end any time and may be in deuce",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 25
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "11/21 × 3: one minute before long",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 34
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time · may be in deuce",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "11/21 × 3: p = long is Running long",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 35
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "11/21 × 3: far past long",
+      "input": {
+        "scoring": "21x3",
+        "minutesPlayed": 55
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "21 × 3: Getting ready counts the full typical length",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 25,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "21 × 3: just started",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 0
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 25,
+        "text": "Ends in about 25 min",
+        "tag": "ends in about 25 min"
+      }
+    },
+    {
+      "name": "21 × 3: one minute before Finishing soon",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 21
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 4,
+        "text": "Ends in about 4 min",
+        "tag": "ends in about 4 min"
+      }
+    },
+    {
+      "name": "21 × 3: p = typical − 3 is Finishing soon",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 22
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 3,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "21 × 3: the last minute before the typical length",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 24
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 1,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "21 × 3: p = typical is Could end any time, no deuce hint",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 25
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "21 × 3: one minute before long",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 29
+      },
+      "expected": {
+        "phase": "any",
+        "minutesLeft": 0,
+        "text": "Could end any time",
+        "tag": "could end any time"
+      }
+    },
+    {
+      "name": "21 × 3: p = long is Running long",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 30
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "21 × 3: far past long",
+      "input": {
+        "scoring": "21x3nd",
+        "minutesPlayed": 50
+      },
+      "expected": {
+        "phase": "long",
+        "minutesLeft": 0,
+        "text": "Running long",
+        "tag": "running long"
+      }
+    },
+    {
+      "name": "no scoring reads as 16/31",
+      "input": {
+        "minutesPlayed": 13
+      },
+      "expected": {
+        "phase": "soon",
+        "minutesLeft": 2,
+        "text": "Finishing soon",
+        "tag": "finishing soon"
+      }
+    },
+    {
+      "name": "an unknown scoring mode reads as 16/31",
+      "input": {
+        "scoring": "15",
+        "minutesPlayed": null
+      },
+      "expected": {
+        "phase": "notStarted",
+        "minutesLeft": 15,
+        "text": "Not started yet",
+        "tag": "not started yet"
+      }
+    },
+    {
+      "name": "minutes played below zero read as zero",
+      "input": {
+        "scoring": "21",
+        "minutesPlayed": -2
+      },
+      "expected": {
+        "phase": "mid",
+        "minutesLeft": 10,
+        "text": "Ends in about 10 min",
+        "tag": "ends in about 10 min"
+      }
+    }
+  ]
+}

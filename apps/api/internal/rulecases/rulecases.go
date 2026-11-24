@@ -40,6 +40,15 @@ type File struct {
 // A Map result is written as [key, value] pairs, like the TypeScript runners.
 type Runner func(input json.RawMessage, now *int64) (any, error)
 
+// GoCopyPending lists the rules ("<area>/<rule>") written in TypeScript first (@rotra/schema), whose
+// Go copy follows before the next Go merge. Their case files are committed and run against the
+// TypeScript in @rotra/data; the Go tests skip them until the Go rule and its runner exist. Remove a
+// key in the PR that adds its Go rule. The WebAssembly wrapper test skips the same keys
+// (packages/rules-wasm/test/rulesWasm.test.ts, GO_COPY_PENDING).
+var GoCopyPending = map[string]bool{
+	"courts/expectedFinish": true, // Q27.6, D-2026-11-23-08
+}
+
 // RepoRoot finds the monorepo root by walking up from the working directory (a package test's
 // directory) to the first folder that holds packages/rule-cases/cases/v1.
 func RepoRoot() (string, error) {

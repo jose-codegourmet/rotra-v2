@@ -1,3 +1,4 @@
+import { expectedFinish } from '@rotra/schema/scoring'
 import {
   autoFillPlacements,
   canMoveCourt,
@@ -149,6 +150,10 @@ export const RULE_RUNNERS: Record<string, Runner> = {
     endAt: number
     courtBase: number
   }>((i, now) => sessionEndCourtConflict(i.courts, i.endAt, i.courtBase, now as number)),
+  // Written in `@rotra/schema/scoring` first (Q27.6); the Go copy follows before the next Go merge.
+  'courts/expectedFinish': rule<{ scoring?: string; minutesPlayed: number | null }>((i) =>
+    expectedFinish(i.scoring, i.minutesPlayed),
+  ),
 
   'roster/inUnfinishedMatch': rule<{
     rosterId: string

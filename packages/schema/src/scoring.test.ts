@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_SCORING,
+  ENDING_SOON_PHASES,
+  expectedFinish,
   gameScoreError,
   gameScoreValid,
   gamesWon,
@@ -121,5 +123,51 @@ describe('validateResult', () => {
       wins: { A: 2, B: 1 },
       decided: 'A',
     })
+  })
+})
+
+describe('expectedFinish', () => {
+  it('carries the typical and long minutes of every mode', () => {
+    expect(SCORING_KEYS.map((k) => [SCORING[k].typical, SCORING[k].long])).toEqual([
+      [15, 25],
+      [15, 18],
+      [10, 15],
+      [25, 35],
+      [25, 30],
+    ])
+  })
+
+  it('changes phase at typical − 3, typical and long in every mode', () => {
+    for (const key of SCORING_KEYS) {
+      const { typical, long } = SCORING[key]
+      const phases = [typical - 4, typical - 3, typical - 1, typical, long - 1, long].map(
+        (p) => expectedFinish(key, p).phase,
+      )
+      expect(phases, key).toEqual(['mid', 'soon', 'soon', 'any', 'any', 'long'])
+    }
+  })
+
+  it('words each phase like the Playing court card', () => {
+    expect(expectedFinish('31', 4)).toEqual({
+      phase: 'mid',
+      minutesLeft: 11,
+      text: 'Ends in about 11 min',
+      tag: 'ends in about 11 min',
+    })
+    expect(expectedFinish('31', 13)).toMatchObject({ minutesLeft: 2, text: 'Finishing soon' })
+    expect(expectedFinish('31', 20).text).toBe('Could end any time · may be in deuce')
+    expect(expectedFinish('31nd', 16).text).toBe('Could end any time')
+    expect(expectedFinish('21x3nd', 30)).toMatchObject({ minutesLeft: 0, text: 'Running long' })
+  })
+
+  it('counts the full typical length for a match that has not started', () => {
+    expect(expectedFinish('21x3', null)).toEqual({
+      phase: 'notStarted',
+      minutesLeft: 25,
+      text: 'Not started yet',
+      tag: 'not started yet',
+    })
+    expect(expectedFinish(undefined, null).minutesLeft).toBe(15)
+    expect(ENDING_SOON_PHASES).toEqual(['soon', 'any', 'long'])
   })
 })

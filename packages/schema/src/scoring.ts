@@ -5,6 +5,10 @@
  *
  * The result check here is the shared queue rule `validateResult` (Go copy:
  * apps/api/internal/rules/match/match.go, cases: packages/rule-cases/cases/v1/match/validateResult.json).
+ *
+ * `expectedFinish` (Q27.6, D-2026-11-23-08) is a time rule the device and the server both use. It is
+ * written here first, with cases in packages/rule-cases/cases/v1/courts/expectedFinish.json; the Go
+ * copy in apps/api/internal/rules/courts and the .wasm rebuild follow before the next Go merge.
  */
 
 export type ScoringKey = '31' | '31nd' | '21' | '21x3' | '21x3nd'
@@ -23,6 +27,10 @@ export type ScoringMode = {
   games: 1 | 3
   /** true: at target − 1 all, the first pair to lead by 2 wins (no cap) */
   deuce: boolean
+  /** Expected match length in minutes (D-2026-11-23-08): how long a match usually takes */
+  typical: number
+  /** Expected match length in minutes: past this a match is Running long */
+  long: number
 }
 
 export const SCORING: Record<ScoringKey, ScoringMode> = {
@@ -32,6 +40,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 31,
     games: 1,
     deuce: true,
+    typical: 15,
+    long: 25,
   },
   '31nd': {
     label: '16/31, no deuce',
@@ -39,6 +49,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 31,
     games: 1,
     deuce: false,
+    typical: 15,
+    long: 18,
   },
   '21': {
     label: '11/21',
@@ -46,6 +58,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 1,
     deuce: true,
+    typical: 10,
+    long: 15,
   },
   '21x3': {
     label: '11/21 × 3',
@@ -53,6 +67,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 3,
     deuce: true,
+    typical: 25,
+    long: 35,
   },
   '21x3nd': {
     label: '21 × 3',
@@ -60,6 +76,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 3,
     deuce: false,
+    typical: 25,
+    long: 30,
   },
 }
 /** The order the setup choices list in (integer-like object keys would otherwise sort first). */
@@ -231,4 +249,65 @@ export function validateResult(input: ResultValues): ResultCheck {
     if (error) return fail(error)
   }
   return won(decided)
+}
+
+// ---- Expected finish (Q27.6, D-2026-11-23-08; mockup log 2026-11-23-queue-plan-ahead-court-finish) ----
+
+/**
+ * Where a match stands against its mode's expected length: `notStarted` (Getting ready), `mid`
+ * (Ends in about N min), `soon` (Finishing soon), `any` (Could end any time), `long` (Running long).
+ */
+export type ExpectedFinishPhase = 'notStarted' | 'mid' | 'soon' | 'any' | 'long'
+export type ExpectedFinish = {
+  phase: ExpectedFinishPhase
+  /** Expected minutes left: the full typical length when not started, 0 from the typical length on */
+  minutesLeft: number
+  /** The Playing court card's line: "Ends in about 4 min", "Finishing soon", … */
+  text: string
+  /** The same wording in lowercase, for a draft's "Waits for Court 2 · …" line */
+  tag: string
+}
+/** The phases Plan Ahead counts as finishing soon: Finishing soon, Could end any time, Running long. */
+export const ENDING_SOON_PHASES: readonly ExpectedFinishPhase[] = ['soon', 'any', 'long']
+/** Finishing soon starts this many minutes before the typical length. */
+export const FINISHING_SOON_MINUTES = 3
+
+/**
+ * The expected finish of a match, an estimate from time only (ROTRA has no live score). `scoring`
+ * is the session's stored mode (missing or unknown reads as 16/31); `minutesPlayed` is whole
+ * minutes since Start match, or null for a Getting ready match (not started), which counts the
+ * full typical length. With `p` minutes played: `p < typical − 3` Ends in about N min (N at least
+ * 1); `typical − 3 ≤ p < typical` Finishing soon; `typical ≤ p < long` Could end any time (deuce
+ * modes add " · may be in deuce"); `p ≥ long` Running long.
+ */
+export function expectedFinish(scoring: unknown, minutesPlayed: number | null): ExpectedFinish {
+  const mode = scoringMode(scoring)
+  if (minutesPlayed == null)
+    return {
+      phase: 'notStarted',
+      minutesLeft: mode.typical,
+      text: 'Not started yet',
+      tag: 'not started yet',
+    }
+  const played = Math.max(0, minutesPlayed),
+    minutesLeft = Math.max(0, mode.typical - played)
+  if (played < mode.typical - FINISHING_SOON_MINUTES) {
+    const n = Math.max(1, minutesLeft)
+    return {
+      phase: 'mid',
+      minutesLeft,
+      text: `Ends in about ${n} min`,
+      tag: `ends in about ${n} min`,
+    }
+  }
+  if (played < mode.typical)
+    return { phase: 'soon', minutesLeft, text: 'Finishing soon', tag: 'finishing soon' }
+  if (played < mode.long)
+    return {
+      phase: 'any',
+      minutesLeft: 0,
+      text: `Could end any time${mode.deuce ? ' · may be in deuce' : ''}`,
+      tag: 'could end any time',
+    }
+  return { phase: 'long', minutesLeft: 0, text: 'Running long', tag: 'running long' }
 }

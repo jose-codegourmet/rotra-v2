@@ -1,4 +1,4 @@
-import type { QueueSession } from '../queue-session/queueSession.types'
+import { type QueueSession, sessionScoring } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type {
   AutoQueueDraftLineup,
@@ -20,6 +20,12 @@ import {
   waitMinutes,
 } from './match.rules'
 import type { MatchLineup } from './match.types'
+import {
+  comparePlanAhead,
+  notEnoughPlayersText,
+  planAheadEligible,
+  planAheadMinutesLeft,
+} from './planAhead.rules'
 import { splitTeams } from './queue.rules'
 
 export const AUTO_QUEUE_MODES: AutoQueueMode[] = ['available', 'ahead', 'wait', 'fewest', 'catchup']
@@ -253,11 +259,16 @@ export function generateAutoQueueMatches({
   error: string | null
   remainingShortfall?: number
 } {
+  // Plan Ahead (D-2026-11-23-09): free players plus players whose court is Finishing soon, Could end
+  // any time or Running long; courts still mid-game or Getting ready are left out.
+  const scoring = sessionScoring(session)
   const pool = ctx.roster.filter(
     (p) =>
       p.sessionId === session.id &&
       p.present &&
-      (mode === 'ahead' || !activeMatchFor(p.id, ctx.matches)),
+      (mode === 'ahead'
+        ? planAheadEligible(p.id, ctx.matches, scoring, now)
+        : !activeMatchFor(p.id, ctx.matches)),
   )
   // D-2026-11-13-07: a player already in a waiting match in the Main Queue is never available.
   const players = pool.filter((p) => !queuedCount(p.id, ctx.matches))
@@ -290,6 +301,12 @@ export function generateAutoQueueMatches({
     ]),
   )
   const order = new Map(players.map((p, i) => [p.id, i]))
+  /** Plan Ahead tie-break: expected minutes until each player is free (0 for free players). */
+  const minutesLeft = new Map<string, number>(
+    mode === 'ahead'
+      ? players.map((p) => [p.id, planAheadMinutesLeft(p.id, ctx.matches, scoring, now)])
+      : [],
+  )
   const shortfall = () =>
     players.reduce((sum, p) => sum + Math.max(0, target - (load.get(p.id) ?? 0)), 0)
   const pairs = activeBaggingPairs(bagging, session, ctx)
@@ -312,17 +329,14 @@ export function generateAutoQueueMatches({
           : 'singles'
     const size = format === 'doubles' ? 4 : 2
     if (players.length < size && mode === 'catchup') {
-      stopReason = `Made ${matches.length} of ${limit}: not enough free players for another match.`
+      stopReason = notEnoughPlayersText(matches.length, limit, mode)
       break
     }
     if (players.length < size)
       return {
         matches: [],
         stopReason: '',
-        error: queuedNote(
-          `Made 0 of ${limit}: not enough ${mode === 'ahead' ? 'present' : 'free'} players for another match.`,
-          0,
-        ),
+        error: queuedNote(notEnoughPlayersText(0, limit, mode), 0),
       }
     const sorted = [...players].sort((a, b) => {
       const wait =
@@ -336,8 +350,11 @@ export function generateAutoQueueMatches({
           : mode === 'wait'
             ? left - (played.get(a.id) ?? 0) - (right - (played.get(b.id) ?? 0)) || wait
             : mode === 'ahead'
-              ? Number(!!activeMatchFor(a.id, ctx.matches)) -
-                  Number(!!activeMatchFor(b.id, ctx.matches)) || left - right
+              ? // Free and finishing-soon players rank together by load; ties to the soonest free.
+                comparePlanAhead(
+                  { load: left, minutesLeft: minutesLeft.get(a.id) ?? 0 },
+                  { load: right, minutesLeft: minutesLeft.get(b.id) ?? 0 },
+                )
               : left - right
       return priority || wait || (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)
     })

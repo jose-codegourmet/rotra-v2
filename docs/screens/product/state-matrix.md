@@ -122,9 +122,9 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | Generate matches draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
 | Generate matches count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
 | Catch Up target missing / invalid | “Choose a game target, then Generate.”; “Enter a whole number of games, 1 or more.” for invalid input | Enter a target explicitly; the session minimum is only a placeholder and comparison |
-| Generate matches has no eligible players | “No one is free to play right now. Try Plan Ahead to include players who are mid-game.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” | Change player presence or strategy |
+| Generate matches has no eligible players | “No one is free to play right now. Try Plan Ahead to include players whose court is finishing soon.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” Plan Ahead with players present, none free and no court finishing soon: “No one is free and no court is finishing soon. Try again in a few minutes.” | Change player presence or strategy |
 | Generate matches full batch | “Made {n} of {n} matches.” Normal status text | Review before adding |
-| Generate matches short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” | Change eligible players or strategy |
+| Generate matches short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “free or finishing-soon” | Change eligible players or strategy |
 | Catch Up target met in plan | “Everyone available reaches {target} games with these matches.” | Review any drafts; no automatic transfer |
 | Catch Up cannot progress | Keep drafts and show “Made {k} of {n}: no other match helps anyone reach {target} games.” Append “{s} more games are still needed to reach {target}.” when positive | Change target or eligible players, then Generate again |
 

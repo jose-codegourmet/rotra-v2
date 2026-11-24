@@ -1,6 +1,6 @@
 # Queue, Player and Admin apps: ROTRA background art on the auth pages
 
-Status: TICKETED — #1085
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: queue, player, admin
 Mockup: `.login` styles in apps/mockup/queue-app/rotra-queue.html, apps/mockup/player-app/rotra-player.html and

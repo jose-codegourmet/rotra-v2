@@ -1,6 +1,6 @@
 # Player app: bottom dock for the main navigation on phones
 
-Status: TICKETED — #1084
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `topBar` (`.dock`), `NI.user`, `.dock` styles

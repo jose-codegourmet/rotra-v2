@@ -77,7 +77,7 @@ func TestManyReadersOfOneNewVersionShareOneBuild(t *testing.T) {
 	v := newVersioned()
 	v.current.Store(1)
 	ctx := context.Background()
-	c.getAt(ctx, visitorKey, 0, v.load)
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
 	v.current.Store(2)
 	v.gate = make(chan struct{})
 	v.started = make(chan struct{}, 1)
@@ -144,9 +144,10 @@ func TestAnObservedVersionMakesAnOlderCopyStaleForAPlainRead(t *testing.T) {
 	v := newVersioned()
 	v.current.Store(4)
 	ctx := context.Background()
-	c.getAt(ctx, visitorKey, 0, v.load)
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
 	c.Observe(v.session, 4) // nothing newer
-	if c.getAt(ctx, visitorKey, 0, v.load); v.calls.Load() != 1 {
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
+	if v.calls.Load() != 1 {
 		t.Fatal("an observed version equal to the copy's rebuilt it")
 	}
 	c.Observe(v.session, 6)
@@ -157,7 +158,8 @@ func TestAnObservedVersionMakesAnOlderCopyStaleForAPlainRead(t *testing.T) {
 	}
 	// Another session's version leaves it alone.
 	c.Observe(uuid.New(), 100)
-	if c.getAt(ctx, visitorKey, 0, v.load); v.calls.Load() != 2 {
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
+	if v.calls.Load() != 2 {
 		t.Fatal("another session's version rebuilt this copy")
 	}
 }
@@ -184,7 +186,7 @@ func TestAVersionNoBuildCanReachIsBuiltOnceAndAnswered(t *testing.T) {
 		t.Fatalf("%+v %v after %d builds: a version past the database's is answered with what it has", s, err, v.calls.Load())
 	}
 	// It does not stay cached as if it satisfied that version: the next such ask rebuilds (one build per ask, never a loop).
-	c.getAt(context.Background(), visitorKey, 1_000_000, v.load)
+	_, _ = c.getAt(context.Background(), visitorKey, 1_000_000, v.load)
 	if v.calls.Load() != 2 {
 		t.Fatalf("%d builds", v.calls.Load())
 	}
@@ -197,18 +199,18 @@ func TestACopyNobodyReadForTheIdleTimeIsDropped(t *testing.T) {
 	v := newVersioned()
 	v.current.Store(1)
 	other := snapshotKey{slug: "other", view: viewVisitor}
-	c.getAt(ctx, visitorKey, 0, v.load)
-	c.getAt(ctx, other, 0, v.load)
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
+	_, _ = c.getAt(ctx, other, 0, v.load)
 	clk.Advance(6 * time.Minute)
-	c.getAt(ctx, visitorKey, 0, v.load) // read again: stays
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load) // read again: stays
 	c.Observe(v.session, 1)
 	clk.Advance(5 * time.Minute) // "other" has now sat unread for 11 minutes
-	c.getAt(ctx, visitorKey, 0, v.load)
+	_, _ = c.getAt(ctx, visitorKey, 0, v.load)
 	if c.len() != 1 {
 		t.Fatalf("%d copies: the one unread for 11 minutes must be gone", c.len())
 	}
 	clk.Advance(20 * time.Minute)
-	c.getAt(ctx, other, 0, v.load) // a read sweeps what is idle, and the observed versions with it
+	_, _ = c.getAt(ctx, other, 0, v.load) // a read sweeps what is idle, and the observed versions with it
 	c.mu.Lock()
 	seen := len(c.latest)
 	c.mu.Unlock()
@@ -225,13 +227,13 @@ func TestOneCopyPerSessionAndViewUnderTheByteCap(t *testing.T) {
 	v.body = func(int64) []byte { return make([]byte, 40) }
 	for i := 0; i < 10; i++ {
 		v.current.Store(int64(i + 1))
-		c.getAt(ctx, visitorKey, int64(i+1), v.load) // ten versions of one page: one copy
+		_, _ = c.getAt(ctx, visitorKey, int64(i+1), v.load) // ten versions of one page: one copy
 	}
 	if c.len() != 1 || c.bytes() != 40 {
 		t.Fatalf("%d copies, %d bytes after ten versions of one page", c.len(), c.bytes())
 	}
 	for i := 0; i < 20; i++ {
-		c.getAt(ctx, snapshotKey{slug: "s" + strconv.Itoa(i), view: viewVisitor}, 0, v.load)
+		_, _ = c.getAt(ctx, snapshotKey{slug: "s" + strconv.Itoa(i), view: viewVisitor}, 0, v.load)
 		if c.bytes() > 100 {
 			t.Fatalf("%d bytes held, the cap is 100", c.bytes())
 		}

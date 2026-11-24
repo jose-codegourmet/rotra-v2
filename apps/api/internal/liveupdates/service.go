@@ -348,14 +348,13 @@ func (s *Service) catchUp(ctx context.Context, targets []Target, lastEventID str
 	for _, ev := range events {
 		for _, topic := range ev.Topics() {
 			m := byTopic[topic]
-			switch {
-			case m == nil:
+			if m == nil {
 				byTopic[topic] = &moved{version: ev.ID, kind: ev.Kind}
-			default:
-				m.version = max(m.version, ev.ID)
-				if m.kind != ev.Kind {
-					m.kind = ChangedKind // more than one thing moved: re-read the screen
-				}
+				continue
+			}
+			m.version = max(m.version, ev.ID)
+			if m.kind != ev.Kind {
+				m.kind = ChangedKind // more than one thing moved: re-read the screen
 			}
 		}
 	}

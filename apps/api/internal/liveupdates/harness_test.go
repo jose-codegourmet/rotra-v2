@@ -147,11 +147,6 @@ func (h *harness) stop() {
 	<-h.done
 }
 
-func (h *harness) restart() {
-	h.stop()
-	h.start()
-}
-
 // pass signs in once per subject and app.
 func (h *harness) pass(app, subject string) string {
 	h.t.Helper()

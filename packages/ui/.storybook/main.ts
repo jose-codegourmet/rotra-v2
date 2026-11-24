@@ -17,8 +17,13 @@ const selfAliases = Object.entries(pkg.exports)
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.tsx'],
   framework: { name: '@storybook/react-vite', options: {} },
-  // The Queue app's public folder, so illustrated cards show the same /art files here
-  staticDirs: ['../../../apps/queue/public'],
+  // The Queue app's public folder, so illustrated cards show the same /art files here; the Player and Admin
+  // public folders add their /art/auth backgrounds (file names are unique across the three apps)
+  staticDirs: [
+    '../../../apps/queue/public',
+    '../../../apps/player/public',
+    '../../../apps/admin/public',
+  ],
   core: { disableTelemetry: true },
   viteFinal: async (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()]

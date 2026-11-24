@@ -14,7 +14,8 @@ export const fieldMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Session setup › .field, .hint, .err (also rotra-admin.html form sheets); rotra-player.html › field() .req-pill',
+    screen:
+      'Session setup › .field, .hint, .err (also rotra-admin.html form sheets); rotra-player.html › field() .req-pill',
   },
   docs: [
     'docs/coding-conventions.md#6-forms',

@@ -99,7 +99,7 @@ export function Field({
             <label id={labelId} htmlFor={controlId} className="text-[13px] font-semibold text-fg2">
               {label}
               {optional ? ' (optional)' : null}
-                {required ? <RequiredPill /> : null}
+              {required ? <RequiredPill /> : null}
             </label>
           )}
           {children}

@@ -60,7 +60,10 @@ export const Step3: Story = {
   args: {
     step: 3,
     stepName: 'Shots you know',
-    children: question('Which shots do you have?', 'Pick all that apply, or add your own with Others.'),
+    children: question(
+      'Which shots do you have?',
+      'Pick all that apply, or add your own with Others.',
+    ),
   },
 }
 

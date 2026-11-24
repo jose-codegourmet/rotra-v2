@@ -23,7 +23,8 @@ export const Closed: Story = {}
 
 export const Open: Story = { args: { defaultOpen: true } }
 
-export const Error: Story = {
+export const WithError: Story = {
+  name: 'Error',
   args: {
     hasError: true,
     children: (

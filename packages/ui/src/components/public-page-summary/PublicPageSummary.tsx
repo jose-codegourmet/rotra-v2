@@ -34,8 +34,6 @@ export type PublicPageSummaryPublication = {
 export type PublicPageSummaryProps = {
   /** Invalid sessions have no results to share and no publish action */
   invalid: boolean
-  /** False for an unrecorded session (Record games off): no Publish results. Omitted reads as recorded. */
-  recorded?: boolean
   details: PublicPageSummaryDetails
   publication: PublicPageSummaryPublication | null
   /** The N in "Participants · N" */
@@ -59,13 +57,12 @@ const sharedLabel = (p: PublicPageSummaryPublication) =>
 /**
  * The session record's Public page tab (Q-HISTORY › Public page): what anyone with the session link
  * sees. Heading and actions (Open public page; Publish results / Update publication for valid
- * recorded sessions), the Details card, the "Results on the page" card (shared slides, Off Day shared or
+ * sessions), the Details card, the "Results on the page" card (shared slides, Off Day shared or
  * private and the publish time; "Not shared yet…"; or the invalid copy) and the Participants grid.
  * Read-only: publishing happens in the Publish results sheet, reached through onPublish.
  */
 export function PublicPageSummary({
   invalid,
-  recorded = true,
   details,
   publication,
   participantCount,
@@ -88,7 +85,7 @@ export function PublicPageSummary({
           <Button size="sm" onClick={onOpenPublicPage}>
             Open public page
           </Button>
-          {invalid || !recorded ? null : (
+          {invalid ? null : (
             <Button size="sm" variant="primary" onClick={onPublish}>
               {publication ? 'Update publication' : 'Publish results'}
             </Button>

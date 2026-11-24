@@ -1,6 +1,7 @@
 import { completeLineup, countedGames, isPartial } from '../match/match.rules'
 import type { MockState } from '../mock/store'
 import type { PlayerSessionRecord } from '../player/player.types'
+import { recordsGames } from '../queue-session/queueSession.types'
 import { createPlayerCompareFixtures } from './fixtures'
 import type {
   PlayerCompareFilter,
@@ -56,6 +57,8 @@ export function sharedPlayerGames(state: MockState, viewerId: string, otherId: s
       !session ||
       session.state !== 'completed' ||
       session.finalizedAt == null ||
+      // A session with Record games off is not ranked: its wins stay out of the win rate.
+      !recordsGames(session) ||
       match.state !== 'completed' ||
       decision?.kind !== 'completed' ||
       !decision.winningTeam ||

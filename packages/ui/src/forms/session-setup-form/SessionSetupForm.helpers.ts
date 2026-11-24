@@ -128,17 +128,17 @@ export const REPEAT_LABEL = {
   monthly: 'Every month',
 } as const
 
-/** The Record games hint under the switch (and read-only chip): on keeps results, off keeps none. */
+/** The Record games hint under the switch (and read-only chip): on counts wins toward the ROTRA leaderboards, off is not ranked. */
 export function recordGamesHint(recordGames: boolean, locked = false): string {
   const base = recordGames
-    ? 'Results, standings, result slides and awards are kept, and games count toward player records.'
-    : "Games aren't recorded: Match done asks for no result. The queue, courts and minimum games still work, but there are no standings, result slides or awards, and nothing goes to player records or rankings."
+    ? 'Results, standings, result slides and awards are kept, and wins count toward the ROTRA leaderboards and win rate.'
+    : "Games and results are recorded as usual, but wins don't count toward the ROTRA leaderboards or anyone's win rate."
   return locked ? `${base} Record games can't change after Start.` : base
 }
 
 /** The Record games row on the review, the Setup card and the Start session sheet. */
 export function recordGamesLabel(recordGames: boolean): string {
-  return recordGames ? 'On' : 'Off · no results kept'
+  return recordGames ? 'On' : 'Off · not ranked'
 }
 
 /** Which illustration each Mode and Scoring card shows: image URLs the app supplies (apps/queue/public/art). */

@@ -1,7 +1,6 @@
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
-import { recordsGames } from '../queue-session/queueSession.types'
 import { realGetLiveStandings, realGetSessionMatches } from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import { exemptionOf } from './exemption.rules'
@@ -19,8 +18,7 @@ export async function getLiveStandings(sessionId: string) {
   if (isRealDataMode()) return realGetLiveStandings(sessionId)
   await delay()
   const state = readMockState()
-  // An unrecorded session has no Leaderboard: no standings, however many games ran.
-  if (!recordsGames(sessionIn(state, sessionId))) return []
+  sessionIn(state, sessionId)
   return computeStandings(
     state.roster.filter((r) => r.sessionId === sessionId),
     state.matches.filter((m) => m.sessionId === sessionId),

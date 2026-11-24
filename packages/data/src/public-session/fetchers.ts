@@ -142,10 +142,8 @@ function publishedResults(
   const publication = state.publications[sessionId],
     saved = state.resultSnapshots[sessionId],
     // Shown with shared positions without gaps (owner, November 20, 2026); the saved rows never change.
-    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) },
-    session = state.sessions.find((s) => s.id === sessionId)
-  // An unrecorded session has no results, whatever rows exist for it.
-  if (!publication || !snapshot || (session && !recordsGames(session))) return null
+    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) }
+  if (!publication || !snapshot) return null
   const roster = state.roster
     .filter((r) => r.sessionId === sessionId)
     .sort((a, b) => a.confirmedAt - b.confirmedAt)
@@ -539,9 +537,7 @@ function project(
     hasPendingChanges: sync.hasPendingChanges,
     recordGames: recordsGames(s),
     results: status === 'completed' ? publishedResults(state, s.id, viewer, viewerIds) : null,
-    ...(status === 'completed'
-      ? { resultsPublished: recordsGames(s) && state.publications[s.id] !== undefined }
-      : {}),
+    ...(status === 'completed' ? { resultsPublished: state.publications[s.id] !== undefined } : {}),
   }
 }
 
@@ -619,23 +615,22 @@ export async function getSignedInSession(
 /**
  * A finished session's Match history (2026-11-13 finished session and match history courts logs):
  * every finished or invalid match, newest first, with the replay bounds. Until the club shares the
- * results, only the viewer's own matches (the same rule as their own standing only). An unrecorded
- * session has no match history: no matches, `total` 0 and never `shared`.
+ * results, only the viewer's own matches (the same rule as their own standing only). A session with
+ * Record games off has its match history as usual.
  */
 function projectHistory(
   state: MockState,
   session: MockState['sessions'][number],
   viewer: Viewer,
 ): PublicMatchHistory {
-  const recorded = recordsGames(session)
-  const matches = recorded ? state.matches.filter((m) => m.sessionId === session.id) : []
+  const matches = state.matches.filter((m) => m.sessionId === session.id)
   const record = sessionRecordHistory({
     fallbackStart: session.startedAt ?? session.scheduledStartAt,
     courts: state.courts.filter((c) => c.sessionId === session.id),
     roster: state.roster.filter((r) => r.sessionId === session.id),
     matches,
   })
-  const shared = recorded && state.publications[session.id] !== undefined
+  const shared = state.publications[session.id] !== undefined
   const all = record.matches
     .map((m) => ({
       id: m.id,

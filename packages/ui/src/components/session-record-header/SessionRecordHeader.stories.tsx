@@ -76,12 +76,12 @@ export const CompletedPrivateWithInvalidGames: Story = {
   args: { ...propsFor('h2', { games: 19, invalidGames: 2, players: 15 }), published: false },
 }
 
-/** Record games was off: a Not recorded chip instead of Results published / private */
-export const CompletedNotRecorded: Story = {
-  args: { ...propsFor('h2', { games: 19, invalidGames: 0, players: 15 }), recorded: false },
+/** Record games was off: a Not ranked chip next to Results published / private */
+export const CompletedNotRanked: Story = {
+  args: { ...propsFor('h2', { games: 19, invalidGames: 0, players: 15 }), ranked: false },
 }
-export const CompletedNotRecordedLight: Story = {
-  ...CompletedNotRecorded,
+export const CompletedNotRankedLight: Story = {
+  ...CompletedNotRanked,
   globals: { theme: 'light' },
 }
 

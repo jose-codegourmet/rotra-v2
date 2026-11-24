@@ -58,7 +58,7 @@ export const All: Story = { render: () => <Demo initial={all} /> }
 export const Defaults: Story = { render: () => <Demo initial={['doubles']} /> }
 export const Some: Story = { render: () => <Demo initial={['doubles', 'singles']} /> }
 export const None: Story = { render: () => <Demo initial={[]} /> }
-/** Record games switch off: the hint says no results are kept */
+/** Record games switch off: the hint says wins don't count toward the ROTRA leaderboards or win rate */
 export const RecordGamesOff: Story = { render: () => <Demo initial={all} recordGames={false} /> }
 /** After Start: a read-only On chip and "Record games can't change after Start." */
 export const RecordGamesLockedOn: Story = { render: () => <Demo initial={all} locked /> }

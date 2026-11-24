@@ -51,8 +51,8 @@ export type PublicSessionDetailsProps = {
   scoringLabel?: string
   /** The scoring mode's rule (SCORING[key].text), shown after the label like the Mode row */
   scoringDescription?: string
-  /** Record games; false adds the Results tile "Not recorded". Omitted reads as on. */
-  recorded?: boolean
+  /** Record games; false adds the Rankings tile "Not ranked". Omitted reads as ranked. */
+  ranked?: boolean
   minimumGames: number
   /**
    * Payment per player in centavos (the custom amount or the break-even share): shown as the
@@ -104,7 +104,7 @@ function FactTile({ label, value, sub }: { label: string; value: ReactNode; sub?
 /**
  * The public page's Details tab (Q-PUBLIC-DETAILS) as cards (2026-11-19-queue-public-details-cards):
  * the lead cards When and Where, fact tiles (Courts, Formats, Mode, Levels, Scoring, Minimum,
- * Payment and Results when not recorded; per player, never costs or paid states), the Notes card,
+ * Payment and Rankings when not ranked; per player, never costs or paid states), the Notes card,
  * and the "Slots are confirmed with the Queue Master directly" footer with the last sync time. For
  * signed-in viewers of a live session it continues with Courts now and the Queue slot.
  */
@@ -121,7 +121,7 @@ export function PublicSessionDetails({
   levelsDescription,
   scoringLabel = SCORING['31'].label,
   scoringDescription,
-  recorded = true,
+  ranked = true,
   minimumGames,
   amountDuePerPlayer,
   notes,
@@ -168,11 +168,11 @@ export function PublicSessionDetails({
             sub={amountDuePerPlayer === 0 ? undefined : 'per player · paid at the venue'}
           />
         )}
-        {recorded ? null : (
+        {ranked ? null : (
           <FactTile
-            label="Results"
-            value="Not recorded"
-            sub="No results, standings or awards for this session."
+            label="Rankings"
+            value="Not ranked"
+            sub="Wins here don't count toward the ROTRA leaderboards or win rate."
           />
         )}
       </div>

@@ -22,7 +22,7 @@ import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
 import { Icon } from '@rotra/ui/icon'
-import { NotRecordedChip } from '@rotra/ui/not-recorded-chip'
+import { NotRankedChip } from '@rotra/ui/not-ranked-chip'
 import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
@@ -189,11 +189,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [focusEnd, setFocusEnd] = useState(false)
 
   const s = session.data
-  // Record games off: no Leaderboard or Match History tab, a Not recorded chip in the header.
-  const unrecorded = s ? !recordsGames(s) : false
-  const requested = tabFromParam(tabParam)
-  const view: ConsoleView =
-    unrecorded && (requested === 'leaderboard' || requested === 'history') ? 'courts' : requested
+  // Record games off: the night runs and records as usual; a Not ranked chip in the header.
+  const notRanked = s ? !recordsGames(s) : false
+  const view: ConsoleView = tabFromParam(tabParam)
   const setView = useCallback(
     (next: ConsoleView) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -297,26 +295,22 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
       label: 'Players',
       badges: [{ text: `${present}/${rosterList.length}`, longText: ' present' }],
     },
-    ...(unrecorded
-      ? []
-      : [
-          {
-            value: 'leaderboard',
-            label: 'Leaderboard',
-            shortLabel: 'Board',
-            badges: leader
-              ? [
-                  {
-                    text:
-                      leaders.length > 1
-                        ? `${leaders.length} tied`
-                        : `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads`,
-                  },
-                ]
-              : [],
-          },
-        ]),
-    ...(unrecorded || !VIEWS.history
+    {
+      value: 'leaderboard',
+      label: 'Leaderboard',
+      shortLabel: 'Board',
+      badges: leader
+        ? [
+            {
+              text:
+                leaders.length > 1
+                  ? `${leaders.length} tied`
+                  : `${leaderPlayer ? queueMasterName(leaderPlayer) : leader.name} leads`,
+            },
+          ]
+        : [],
+    },
+    ...(!VIEWS.history
       ? []
       : [
           {
@@ -374,7 +368,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                 <Chip>{formats}</Chip>
                 <Chip>Min {s.minimumGames} games</Chip>
                 <Chip>Scoring · {SCORING[sessionScoring(s)].label}</Chip>
-                {unrecorded ? <NotRecordedChip /> : null}
+                {notRanked ? <NotRankedChip /> : null}
               </span>
             }
             // 2026-11-13-queue-session-title-link: the title opens the public page in a new tab.
@@ -486,10 +480,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             </TabsContent>
           ) : null}
           <TabsContent value="players">{panel('players')}</TabsContent>
-          {unrecorded ? null : (
-            <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
-          )}
-          {unrecorded ? null : <TabsContent value="history">{panel('history')}</TabsContent>}
+          <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
+          <TabsContent value="history">{panel('history')}</TabsContent>
           <TabsContent value="settings">
             <SettingsView
               {...viewProps}

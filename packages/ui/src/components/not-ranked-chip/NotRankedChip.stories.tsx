@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { NotRecordedChip } from './NotRecordedChip'
+import { NotRankedChip } from './NotRankedChip'
 
 const meta = {
-  title: 'Queue/NotRecordedChip',
-  component: NotRecordedChip,
-} satisfies Meta<typeof NotRecordedChip>
+  title: 'Queue/NotRankedChip',
+  component: NotRankedChip,
+} satisfies Meta<typeof NotRankedChip>
 
 export default meta
 type Story = StoryObj<typeof meta>

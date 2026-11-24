@@ -53,7 +53,6 @@ import type { ProfileCharacter } from '../profile-character/profileCharacter.typ
 import {
   type DownloadState,
   type QueueSession,
-  recordsGames,
   type SessionCourt,
   type SessionFinalization,
 } from '../queue-session/queueSession.types'
@@ -217,10 +216,10 @@ function seedState(): MockState {
     publicationFixtures = createSessionPublicationFixtures(now),
     financials = createFinancialFixtures([...roster, ...history.roster], now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage
-  // produced; an unrecorded one never reached that stage and has none.
+  // produced, a session with Record games off (not ranked) included.
   const resultSnapshots = Object.fromEntries(
     sessions
-      .filter((s) => s.state === 'completed' && recordsGames(s))
+      .filter((s) => s.state === 'completed')
       .map((s) => [
         s.id,
         createResultSnapshot({

@@ -206,14 +206,13 @@ export type PublicSessionPage = {
   /** The operator's device has changes that have not synced yet */
   hasPendingChanges: boolean
   /**
-   * **Record games** (D-2026-11-18-06): false when the session keeps no results, so the page says
-   * "Not recorded" (Details) and "This session's games were not recorded." (Match history). Missing
-   * reads as true (older wire shapes).
+   * **Record games** (D-2026-11-20-02): false when the session is not ranked, so Details shows the
+   * Rankings tile "Not ranked". Games and results are kept as usual. Missing reads as true (older
+   * wire shapes).
    */
   recordGames?: boolean
   /**
-   * null until results are published (always null for prepared, active and invalid sessions, and
-   * for an unrecorded one)
+   * null until results are published (always null for prepared, active and invalid sessions)
    */
   results: PublicSessionResults | null
   /**

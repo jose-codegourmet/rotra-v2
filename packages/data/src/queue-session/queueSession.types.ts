@@ -47,8 +47,9 @@ export type QueueSession = {
    */
   requestFormats?: RequestFormats
   /**
-   * **Record games** (D-2026-11-18-06): false runs the night and keeps no results. Missing means
-   * true (sessions saved before the switch). Read it through `recordsGames`. Fixed once started.
+   * **Record games** (D-2026-11-20-02): false records the games as usual but keeps the session's
+   * wins out of the ROTRA leaderboards and win rate ("Not ranked"). Missing means true (sessions
+   * saved before the switch). Read it through `recordsGames`. Fixed once started.
    */
   recordGames?: boolean
   /**
@@ -72,9 +73,9 @@ export const sessionLevelRestriction = (
 export const sessionScoring = (session: Pick<QueueSession, 'scoring'> | null | undefined) =>
   scoringOf(session?.scoring)
 /**
- * Whether the session keeps results: the one place the Record games default lives (missing reads
- * as on). An unrecorded session has no winner, score, standings, awards, result slides or
- * publication, and nothing of it goes to player records or ranking.
+ * Whether the session's wins count toward the ROTRA leaderboards and win rate: the one place the
+ * Record games default lives (missing reads as on). With it off the session is "Not ranked", but
+ * its games, results, standings, awards and result slides are kept as usual.
  */
 export const recordsGames = (session: Pick<QueueSession, 'recordGames'>) =>
   session.recordGames !== false
@@ -194,17 +195,8 @@ export const FINALIZATION_STAGES: readonly FinalizationStage[] = [
   'player_records',
   'slides',
 ]
-/** An unrecorded session finishes in two steps: no player records to update, no slides to make. */
-export const UNRECORDED_FINALIZATION_STAGES: readonly FinalizationStage[] = [
-  'checking',
-  'finishing',
-]
-/** The steps Session done runs for this session, in order. */
-export const finalizationStagesFor = (session: Pick<QueueSession, 'recordGames'>) =>
-  recordsGames(session) ? FINALIZATION_STAGES : UNRECORDED_FINALIZATION_STAGES
 /**
  * One finalization per session; `committed` means the session is complete but later work failed.
- * An unrecorded session ends `done` at stage `finishing`.
  */
 export type SessionFinalization = {
   sessionId: string
@@ -232,7 +224,7 @@ export type SessionRecordSummary = {
   playerRecordsUpdatedAt: number | null
   venueName: string
   venueAddress: string
-  /** False when unrecorded ("Not recorded"): games count, wins and losses stay 0. Missing: true. */
+  /** False when not ranked: games and results are recorded as usual. Missing: true. */
   recordGames?: boolean
   games: number
   invalidGames: number

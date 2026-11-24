@@ -29,8 +29,8 @@ export type SessionHistorySpec = {
   invalidSeq?: number[]
   invalidReason?: string
   venueIndex: number
-  /** Record games off: every match ends with no winner or score; no player records are written. */
-  unrecorded?: boolean
+  /** Record games off (not ranked): games and results are kept as usual; only the ranking skips them. */
+  notRanked?: boolean
   /** The session's scoring mode (Q22); missing is 16/31. Seed scores follow it. */
   scoring?: ScoringKey
 }
@@ -84,7 +84,7 @@ export const sessionHistorySpecs: SessionHistorySpec[] = [
       'The original device was lost before its records synced, so this session could not be recorded.',
     venueIndex: 1,
   },
-  // Record games off (D-2026-11-18-06): a finished night with games played and nothing kept.
+  // Record games off (D-2026-11-20-02): a finished night recorded as usual, shown as Not ranked.
   {
     id: 'h4',
     title: 'Friday Social Play',
@@ -98,7 +98,7 @@ export const sessionHistorySpecs: SessionHistorySpec[] = [
     published: false,
     seed: 44,
     venueIndex: 0,
-    unrecorded: true,
+    notRanked: true,
   },
 ]
 /** The prototype's mulberry32 generator, so the same seed yields the same night. */
@@ -165,8 +165,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
   date.setHours(spec.startHour, 0, 0, 0)
   const start = date.getTime(),
     end = start + spec.lengthHours * 3600000,
-    finalizedAt = spec.status === 'completed' ? end + 10 * MINUTE : null,
-    recorded = !spec.unrecorded
+    finalizedAt = spec.status === 'completed' ? end + 10 * MINUTE : null
   const venue = venues[spec.venueIndex]
   if (!venue) throw new Error('Missing venue fixture.')
   const courts: SessionCourt[] = Array.from({ length: spec.courts }, (_, i) => ({
@@ -217,13 +216,13 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     expectedPlayers: null,
     startedAt: start,
     finalizedAt,
-    playerRecordsUpdatedAt: recorded ? finalizedAt : null,
+    playerRecordsUpdatedAt: finalizedAt,
     seriesId: null,
     publicSlug: publicSlugFor(spec.id),
     acceptJoinRequests: true,
     alwaysRequireRequest: false,
-    // Sessions saved before the switch carry no value and read as recorded.
-    ...(recorded ? {} : { recordGames: false }),
+    // Sessions saved before the switch carry no value and read as ranked.
+    ...(spec.notRanked ? { recordGames: false } : {}),
     scoring: spec.scoring ?? DEFAULT_SCORING,
   }
   const games: Record<string, number> = {},
@@ -283,8 +282,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     const dur = 13 + Math.floor(r() * 8)
     seq += 1
     const invalid = (spec.invalidSeq ?? []).includes(seq)
-    // The rng is still consumed for an unrecorded night, so the order of draws never changes.
-    const withScore = !invalid && r() < 0.6 && recorded,
+    const withScore = !invalid && r() < 0.6,
       lose = 9 + Math.floor(r() * 11)
     const endedAt = t0 + dur * MINUTE
     matches.push({
@@ -304,7 +302,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
       substitutions: [],
       decision: {
         kind: invalid ? 'invalid' : 'completed',
-        winningTeam: invalid || !recorded ? null : aWins ? 'A' : 'B',
+        winningTeam: invalid ? null : aWins ? 'A' : 'B',
         teamAScore: null,
         teamBScore: null,
         ...(withScore ? seedScore(spec.scoring ?? DEFAULT_SCORING, aWins, lose) : {}),
@@ -328,14 +326,14 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
             sessionId: spec.id,
             commandId: `${spec.id}-finalization`,
             state: 'done',
-            stage: recorded ? 'slides' : 'finishing',
+            stage: 'slides',
           }
         : null,
   }
 }
 /**
  * h1 Thursday Open Play (one invalid match, seq 14), h2 Sunday Night Queue, h3 Tuesday Drills
- * (invalid), h4 Friday Social Play (Record games off: games played, no results).
+ * (invalid), h4 Friday Social Play (Record games off: recorded as usual, not ranked).
  */
 export function createSessionHistoryFixtures(now = Date.now()) {
   const histories = sessionHistorySpecs.map((spec) => simulateHistory(spec, now))

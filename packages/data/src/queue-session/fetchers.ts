@@ -169,7 +169,7 @@ export async function getSessionRecord(id: string): Promise<SessionRecordSummary
     playerRecordsUpdatedAt: session.playerRecordsUpdatedAt,
     venueName: session.venueName,
     venueAddress: session.venueAddress,
-    // Unrecorded: games still count against the minimum; with no winners, wins and losses are 0.
+    // Not ranked: games and results are recorded as usual; only the leaderboard and win rate skip them.
     recordGames: recordsGames(session),
     games: matches.filter((m) => m.state === 'completed').length,
     invalidGames: matches.filter((m) => m.state === 'invalid').length,
@@ -185,8 +185,7 @@ export async function getSessionRecord(id: string): Promise<SessionRecordSummary
 }
 /**
  * Q-HISTORY › How the night ran: every match that ran, by court, with the replay bounds. An invalid
- * session has no match history (its partial records are not shown), so it returns no matches. Nor
- * does an unrecorded session: there is no match history or replay.
+ * session has no match history (its partial records are not shown), so it returns no matches.
  */
 export async function getSessionRecordHistory(id: string): Promise<SessionRecordHistory> {
   const { session, roster, courts, matches } = await recordInputs(id)
@@ -196,6 +195,6 @@ export async function getSessionRecordHistory(id: string): Promise<SessionRecord
     fallbackStart: session.startedAt ?? session.scheduledStartAt,
     courts,
     roster,
-    matches: session.state === 'invalid' || !recordsGames(session) ? [] : matches,
+    matches: session.state === 'invalid' ? [] : matches,
   })
 }

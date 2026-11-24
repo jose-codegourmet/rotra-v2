@@ -8,6 +8,7 @@ export const leaderboardViewMeta = {
     "Listed in SessionConsole's VIEWS registry under the Leaderboard tab; the standings query refreshes with every confirmed result and presence change, so the rows and games update without local state.",
     "Every face, also inside a shared position, reports the roster player's clubPlayerId through onOpenProfile (the shell's PlayerProfile); onOpenQueue is accepted but unused here.",
     'LiveLeaderboard shows its own empty state ("No completed games yet. Standings appear after the first confirmed result.") when no counted game exists.',
+    'A session with Record games off shows the NotRankedNotice above the table; the rows are the same.',
     'Shows a heading-sized and table-sized Skeleton while the session, roster or standings load and a QueryError when one fails.',
   ],
   docs: [

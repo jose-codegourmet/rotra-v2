@@ -2,9 +2,11 @@
 
 import { groupStandings } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
+import { recordsGames } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { LiveLeaderboard } from '@rotra/ui/live-leaderboard'
+import { NotRankedNotice } from '@rotra/ui/not-ranked-notice'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
@@ -16,7 +18,7 @@ export type LeaderboardViewProps = ConsoleViewProps
  * Q-LEADERBOARD, the console's Leaderboard view: LiveLeaderboard on useLiveStandings (the
  * computeStandings order: most wins, then fewest losses; players on the same wins and losses share
  * one position, grouped with groupStandings) with each player's level from the roster and the
- * session's minimum games. Every face opens that player's profile through onOpenProfile. A working view for the operator, never official history.
+ * session's minimum games (a session with Record games off adds the Not ranked notice above). Every face opens that player's profile through onOpenProfile. A working view for the operator, never official history.
  */
 export function LeaderboardView({ sessionId, onOpenProfile }: LeaderboardViewProps) {
   const session = useQueueSession(sessionId)
@@ -63,5 +65,10 @@ export function LeaderboardView({ sessionId, onOpenProfile }: LeaderboardViewPro
     if (p) onOpenProfile(p.clubPlayerId)
   }
 
-  return <LiveLeaderboard rows={rows} minimumGames={s.minimumGames} onOpenProfile={openProfile} />
+  return (
+    <div className="flex flex-col gap-3">
+      {recordsGames(s) ? null : <NotRankedNotice />}
+      <LiveLeaderboard rows={rows} minimumGames={s.minimumGames} onOpenProfile={openProfile} />
+    </div>
+  )
 }

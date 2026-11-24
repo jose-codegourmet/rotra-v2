@@ -87,7 +87,7 @@ export const sessionSetupSchema = z
     levelRestriction: levelRestrictionField.default({ kind: 'all' }),
     /** How games are scored (one of the five keys). A session saved before this field reads as 16/31. */
     scoring: z.enum(['31', '31nd', '21', '21x3', '21x3nd']).default(DEFAULT_SCORING),
-    /** Record games: off runs the night and keeps no results. A session saved before this field reads as on. */
+    /** Record games: off records games as usual but the session is not ranked. A session saved before this field reads as on. */
     recordGames: z.boolean().default(true),
     minimumIsCalculated: z.boolean(),
     /** Only read when minimumIsCalculated is false */

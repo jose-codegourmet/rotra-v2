@@ -87,11 +87,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Everything on: address, notes, payment, a Levels tile and a not-recorded Results tile. */
+/** Everything on: address, notes, payment, a Levels tile and a Not ranked Rankings tile. */
 export const Full: Story = {
   args: {
     levelsLabel: 'Intermediate and up',
-    recorded: false,
+    ranked: false,
   },
 }
 export const FullLight: Story = { ...Full, globals: { theme: 'light' } }
@@ -126,11 +126,11 @@ export const SinglesAndDoubles: Story = { args: { formats: { singles: true, doub
 export const NoStandardFormat: Story = { args: { formats: { singles: false, doubles: false } } }
 export const NoAddress: Story = { args: { venueAddress: null } }
 
-/** Record games off: a Results row reads "Not recorded" */
-export const NotRecorded: Story = { args: { recorded: false } }
-export const NotRecordedLight: Story = { ...NotRecorded, globals: { theme: 'light' } }
-export const NotRecordedPhone: Story = {
-  ...NotRecorded,
+/** Record games off: a Rankings tile reads "Not ranked" */
+export const NotRanked: Story = { args: { ranked: false } }
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }
+export const NotRankedPhone: Story = {
+  ...NotRanked,
   globals: { viewport: { value: 'phone' } },
 }
 

@@ -60,6 +60,17 @@ export type MatchCourtProps = {
   mine?: boolean
   /** On court at the replay's moment: accent glow */
   now?: boolean
+  /**
+   * A face to point out (D-SESSION-GAMES: the player whose games these are): the `key` of one player.
+   * Their picture gets a warn outline outside the ring and their name pill turns warn, so it never
+   * clashes with the accent ring on the winners.
+   */
+  highlightedPlayerKey?: string
+  /**
+   * A match that has not been played (Planned queue): “VS” on the net instead of the score and result,
+   * no winner ring. Takes precedence over `score`.
+   */
+  versus?: boolean
   className?: string
 }
 
@@ -122,10 +133,13 @@ export function MatchCourt({
   invalid = false,
   mine = false,
   now = false,
+  highlightedPlayerKey,
+  versus = false,
   className,
 }: MatchCourtProps) {
   const face = (player: MatchCourtPlayer, won: boolean) => {
     const games = player.badge ? `, game ${player.badge} of that session` : ''
+    const highlighted = highlightedPlayerKey !== undefined && player.key === highlightedPlayerKey
     const body = (
       <>
         <span className="relative block leading-none">
@@ -136,6 +150,7 @@ export function MatchCourt({
             className={cn(
               'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
               won ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
+              highlighted && 'outline-3 outline-offset-2 outline-warn',
               player.onOpen &&
                 'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
             )}
@@ -155,7 +170,12 @@ export function MatchCourt({
             </i>
           ) : null}
         </span>
-        <b className="max-w-full truncate rounded-full bg-court-level-label px-[7px] text-xs leading-[1.3] font-bold text-on-photo">
+        <b
+          className={cn(
+            'max-w-full truncate rounded-full px-[7px] text-xs leading-[1.3] font-bold',
+            highlighted ? 'bg-warn text-on-accent' : 'bg-court-level-label text-on-photo',
+          )}
+        >
           {player.label}
         </b>
       </>
@@ -166,7 +186,7 @@ export function MatchCourt({
       <button
         key={player.key}
         type="button"
-        aria-label={`${player.name}${games}. View profile`}
+        aria-label={`${player.name}${games}${highlighted ? ' (highlighted)' : ''}. View profile`}
         onClick={player.onOpen}
         className={cn(base, 'cursor-pointer focus-visible:outline-none')}
       >
@@ -181,9 +201,9 @@ export function MatchCourt({
   const side = 'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5 px-1 py-3'
   const names = (players: MatchCourtPlayer[]) => players.map((p) => p.name).join(' and ')
   const leftWon = winner === 'left'
-  const ring = !invalid && !notCounted
+  const ring = !invalid && !notCounted && !versus
   const playerVariant = cornerLabel !== undefined
-  const games = invalid || !score ? [] : (gameScores ?? [])
+  const games = invalid || versus || !score ? [] : (gameScores ?? [])
   const hasGames = games.length > 0
   return (
     <article
@@ -229,7 +249,9 @@ export function MatchCourt({
         {action}
         <div className={side}>{left.map((p) => face(p, ring && leftWon))}</div>
         <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
-          {invalid ? null : score ? (
+          {versus ? (
+            <span className="text-[13px] font-extrabold tracking-[1px] text-on-photo/80">VS</span>
+          ) : invalid ? null : score ? (
             <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
               <span className="sr-only">Score </span>
               {score}
@@ -242,7 +264,7 @@ export function MatchCourt({
               No score
             </span>
           )}
-          {invalid ? (
+          {versus ? null : invalid ? (
             <Chip tone="error">Invalid</Chip>
           ) : notCounted ? (
             <Chip>Not counted</Chip>

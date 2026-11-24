@@ -41,6 +41,12 @@ export type CourtDrawingProps = {
   showLevels?: boolean
   /** Opens a player's profile */
   onOpenProfile?: (playerId: string) => void
+  /**
+   * Opens a player's games this session (D-SESSION-GAMES): the games badge (needs `games`) becomes its
+   * own button beside the face button, “NAME's games this session, N”, tooltip “… · tap to see them”.
+   * Without it the badge is display only.
+   */
+  onOpenGames?: (playerId: string) => void
   /** Faces are named “NAME. View profile” (the public session page) instead of with their team */
   plainProfileLabel?: boolean
   /**
@@ -95,6 +101,7 @@ export function CourtDrawing({
   minimumGames,
   showLevels = false,
   onOpenProfile,
+  onOpenGames,
   plainProfileLabel = false,
   onOpenMatch,
   onDragMove,
@@ -182,13 +189,34 @@ export function CourtDrawing({
             ) : null}
             {p.games !== undefined ? (
               <span
-                aria-hidden
+                aria-hidden={onOpenGames ? undefined : true}
                 className={cn(
                   'pointer-events-none absolute top-0 left-1/2 -translate-x-1/2',
                   courtFaceFrameClass(n),
                 )}
               >
-                <span className={courtGameBadgeClass(n)}>{p.games}</span>
+                {onOpenGames ? (
+                  <button
+                    type="button"
+                    aria-label={`${p.name}'s games this session, ${p.games}`}
+                    title={`${p.name}'s games this session · tap to see them`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onOpenGames(p.id)
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    className={cn(
+                      courtGameBadgeClass(n),
+                      'pointer-events-auto cursor-pointer before:absolute before:-inset-1.5 before:content-[""]',
+                      'hover:!bg-accent hover:!text-on-accent focus-visible:!bg-accent focus-visible:!text-on-accent focus-visible:ring-2 focus-visible:ring-surface',
+                    )}
+                  >
+                    {p.games}
+                  </button>
+                ) : (
+                  <span className={courtGameBadgeClass(n)}>{p.games}</span>
+                )}
               </span>
             ) : null}
           </div>

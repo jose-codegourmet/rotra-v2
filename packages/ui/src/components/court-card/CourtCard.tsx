@@ -37,6 +37,11 @@ type CourtCardMatchBase = CourtCardBase & {
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
   onOpenProfile?: (playerId: string) => void
+  /**
+   * Opens the player's games this session (D-SESSION-GAMES). Makes the games badge on each face its own
+   * button next to the face button, named “NAME's games this session, N”; display only without it.
+   */
+  onOpenGames?: (playerId: string) => void
   /** "Doubles", "5v5 fun" */
   formatLabel: string
   matchNo: number
@@ -340,6 +345,7 @@ function MatchCourtHead({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
   onOpenMatch,
   onDragMove,
   chip,
@@ -355,6 +361,7 @@ function MatchCourtHead({
   | 'teamA'
   | 'teamB'
   | 'onOpenProfile'
+  | 'onOpenGames'
   | 'onOpenMatch'
   | 'onDragMove'
 > & { chip: ReactNode; menu: ReactNode }) {
@@ -375,6 +382,7 @@ function MatchCourtHead({
         teamA={teamA}
         teamB={teamB}
         onOpenProfile={onOpenProfile}
+        onOpenGames={onOpenGames}
         onOpenMatch={onOpenMatch}
         onDragMove={onDragMove}
       />
@@ -391,6 +399,7 @@ function PlayingCourtCard({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
   formatLabel,
   matchNo,
   minutes,
@@ -414,7 +423,7 @@ function PlayingCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenMatch, onDragMove }}
+        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
         chip={<Chip tone="accent">{merged ? 'Merged · Playing' : 'Playing'}</Chip>}
         menu={
           <CourtMenu
@@ -469,6 +478,7 @@ function GettingReadyCourtCard({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
   formatLabel,
   matchNo,
   blockedReason,
@@ -491,7 +501,7 @@ function GettingReadyCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenMatch, onDragMove }}
+        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
         chip={<Chip>{merged ? 'Merged · Getting ready' : 'Getting ready'}</Chip>}
         menu={
           <CourtMenu

@@ -492,3 +492,25 @@ export const DragHoverOnFreeCourtLight: Story = {
   ...DragHoverOnFreeCourt,
   globals: { theme: 'light' },
 }
+
+const withGames = (ids: string[], games: number[]): CourtPlayer[] =>
+  ids.map((id, i) => ({ ...playerOf(id), games: games[i] ?? 0 }))
+
+/** onOpenGames: each face's games badge is its own button, “NAME's games this session, N”; the face still opens the profile. */
+export const GamesBadgeButton: Story = {
+  args: inGame(playing, {
+    teamA: withGames(playing.teamA, [3, 2]),
+    teamB: withGames(playing.teamB, [4, 1]),
+    onOpenProfile: fn(),
+    onOpenGames: fn(),
+  }),
+}
+
+/** Without onOpenGames the badge is display only. */
+export const GamesBadgeDisplayOnly: Story = {
+  args: inGame(playing, {
+    teamA: withGames(playing.teamA, [3, 2]),
+    teamB: withGames(playing.teamB, [4, 1]),
+    onOpenProfile: fn(),
+  }),
+}

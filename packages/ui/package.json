@@ -186,6 +186,7 @@
     "./profile-leaderboard-chips": "./src/components/profile-leaderboard-chips/ProfileLeaderboardChips.tsx",
     "./profile-ranking-card": "./src/components/profile-ranking-card/ProfileRankingCard.tsx",
     "./profile-sessions-card": "./src/components/profile-sessions-card/ProfileSessionsCard.tsx",
+    "./session-games-dialog": "./src/components/session-games-dialog/SessionGamesDialog.tsx",
     "./session-matches-sheet": "./src/components/session-matches-sheet/SessionMatchesSheet.tsx",
     "./stats-fire": "./src/components/stats-fire/StatsFire.tsx",
     "./stats-visibility-card": "./src/components/stats-visibility-card/StatsVisibilityCard.tsx",

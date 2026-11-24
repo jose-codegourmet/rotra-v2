@@ -547,7 +547,14 @@
     "./onboarding-frame": "./src/components/onboarding-frame/OnboardingFrame.tsx",
     "./optional-fold": "./src/components/optional-fold/OptionalFold.tsx",
     "./current-session-card": "./src/components/current-session-card/CurrentSessionCard.tsx",
-    "./auth-art-provider": "./src/components/auth-art-provider/AuthArtProvider.tsx"
+    "./auth-art-provider": "./src/components/auth-art-provider/AuthArtProvider.tsx",
+    "./court-position-card": "./src/components/court-position-card/CourtPositionCard.tsx",
+    "./favorite-player-chips": "./src/components/favorite-player-chips/FavoritePlayerChips.tsx",
+    "./pick-chip": "./src/components/pick-chip/PickChip.tsx",
+    "./pick-chip/variants": "./src/components/pick-chip/PickChip.variants.ts",
+    "./shot-chips": "./src/components/shot-chips/ShotChips.tsx",
+    "./shot-chips/helpers": "./src/components/shot-chips/ShotChips.helpers.ts",
+    "./step-banner": "./src/components/step-banner/StepBanner.tsx"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

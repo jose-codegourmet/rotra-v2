@@ -189,9 +189,7 @@ export function SessionGamesDialog({
           {latestFirst.map((m) => {
             const invalid = m.counting === 'invalid'
             const chip = COUNTING_CHIP[m.counting]
-            const length = queueTime(
-              Math.max(0, Math.round((m.endedAt - m.startedAt) / MINUTE)),
-            )
+            const length = queueTime(Math.max(0, Math.round((m.endedAt - m.startedAt) / MINUTE)))
             return (
               <li key={m.id} className="flex flex-col gap-1.5">
                 <div className="flex items-baseline gap-1.5 border-b-2 border-accent pb-1.5">

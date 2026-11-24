@@ -98,29 +98,31 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
           (allPlayers(m).includes(me.id) ||
             m.substitutions.some((sub) => sub.outId === me.id || sub.inId === me.id)),
       )
-      .map((m): SessionGamesMatch => ({
-        id: m.id,
-        number: m.matchNo,
-        courtLabel: courtLabel(m.courtIds),
-        startedAt: m.startedAt ?? 0,
-        endedAt: m.endedAt ?? m.startedAt ?? 0,
-        counting:
-          m.state === 'invalid' ? 'invalid' : countsFor(m, me.id) ? 'counts' : 'not-counted',
-        fun: m.format.startsWith('fun_'),
-        teamA: m.teamA.map(face),
-        teamB: m.teamB.map(face),
-        winningTeam: m.decision?.winningTeam ?? null,
-        score:
-          m.decision?.teamAScore != null && m.decision.teamBScore != null
-            ? { teamA: m.decision.teamAScore, teamB: m.decision.teamBScore }
-            : null,
-        games: m.decision?.games?.length ? m.decision.games : null,
-        substitutionCredits: m.substitutions.map((sub) => ({
-          outName: face(sub.outId).name,
-          inName: face(sub.inId).name,
-          creditTo: !sub.creditTo || sub.creditTo === 'none' ? 'nobody' : sub.creditTo,
-        })),
-      }))
+      .map(
+        (m): SessionGamesMatch => ({
+          id: m.id,
+          number: m.matchNo,
+          courtLabel: courtLabel(m.courtIds),
+          startedAt: m.startedAt ?? 0,
+          endedAt: m.endedAt ?? m.startedAt ?? 0,
+          counting:
+            m.state === 'invalid' ? 'invalid' : countsFor(m, me.id) ? 'counts' : 'not-counted',
+          fun: m.format.startsWith('fun_'),
+          teamA: m.teamA.map(face),
+          teamB: m.teamB.map(face),
+          winningTeam: m.decision?.winningTeam ?? null,
+          score:
+            m.decision?.teamAScore != null && m.decision.teamBScore != null
+              ? { teamA: m.decision.teamAScore, teamB: m.decision.teamBScore }
+              : null,
+          games: m.decision?.games?.length ? m.decision.games : null,
+          substitutionCredits: m.substitutions.map((sub) => ({
+            outName: face(sub.outId).name,
+            inName: face(sub.inId).name,
+            creditTo: !sub.creditTo || sub.creditTo === 'none' ? 'nobody' : sub.creditTo,
+          })),
+        }),
+      )
     const planned = waitingMatches(matchList).flatMap((m, index) =>
       allPlayers(m).includes(me.id)
         ? [

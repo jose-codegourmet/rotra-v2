@@ -38,8 +38,8 @@ import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/a
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { GenerateQueueView } from '@/app/(operator)/sessions/[sessionId]/_components/generate-queue-view/GenerateQueueView'
-import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { HistoryView } from '@/app/(operator)/sessions/[sessionId]/_components/history-view/HistoryView'
+import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { LeaderboardView } from '@/app/(operator)/sessions/[sessionId]/_components/leaderboard-view/LeaderboardView'
 import {
   MatchLineup,
@@ -51,8 +51,8 @@ import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/p
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { RegenerateQueue } from '@/app/(operator)/sessions/[sessionId]/_components/regenerate-queue/RegenerateQueue'
 import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
-import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
+import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
 import {
   StartMatch,
   type StartMatchRequest,
@@ -189,7 +189,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   // Record games off: no Leaderboard or Match History tab, a Not recorded chip in the header.
   const unrecorded = s ? !recordsGames(s) : false
   const requested = tabFromParam(tabParam)
-  const view: ConsoleView = unrecorded && (requested === 'leaderboard' || requested === 'history') ? 'courts' : requested
+  const view: ConsoleView =
+    unrecorded && (requested === 'leaderboard' || requested === 'history') ? 'courts' : requested
   const setView = useCallback(
     (next: ConsoleView) => {
       const params = new URLSearchParams(searchParams.toString())

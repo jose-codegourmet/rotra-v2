@@ -2,8 +2,8 @@
 
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { playerFacingName } from '@rotra/data/session-roster/sessionRoster.rules'
+import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { LiveMatchHistory, type LiveMatchHistoryMatch } from '@rotra/ui/live-match-history'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { useState } from 'react'

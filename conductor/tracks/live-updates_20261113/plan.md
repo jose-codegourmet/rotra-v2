@@ -13,7 +13,7 @@ Ticket: #879 (one issue for the whole track, under epic #869).
 ## Phase 2: Apps (frontend PR)
 
 - [x] **2.1** Stream client + query invalidation per app (not run against a live stack; see the deviations)
-- [ ] **2.2** `make check`; manual two-browser check locally
+- [x] **2.2** `make check`; manual two-browser check locally (2026-11-24, replay stack with `ROTRA_REPLAY_STREAM_URL` and `/api/stream` in the moved list: a Queue write in tab A reached tab B in about 1 s with no refresh; with the ticket route blocked in B it never did in 40 s; after killing and restarting the API, a new write in A reached B again about 1 s later. One browser, local stack, Queue app only. Not checked: a write through a TypeScript Route Handler, the Player and Admin apps, a phone, CORS from a real domain)
 
 ## Deviations log
 

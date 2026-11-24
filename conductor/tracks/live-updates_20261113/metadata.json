@@ -6,14 +6,14 @@
   "order": 11,
   "status": "in_progress",
   "created": "2026-11-13",
-  "updated": "2026-11-23",
+  "updated": "2026-11-24",
   "depends_on": "go-writes-queue (events), beta-stack (ticket route, B-41)",
   "phases": {
     "total": 2,
-    "completed": 1
+    "completed": 2
   },
   "tasks": {
     "total": 5,
-    "completed": 4
+    "completed": 5
   }
 }

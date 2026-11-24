@@ -50,11 +50,11 @@ import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
 import type { PlayerNotification } from '../player-notifications/playerNotifications.types'
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
-import {
-  type DownloadState,
-  type QueueSession,
-  type SessionCourt,
-  type SessionFinalization,
+import type {
+  DownloadState,
+  QueueSession,
+  SessionCourt,
+  SessionFinalization,
 } from '../queue-session/queueSession.types'
 import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import { isRealDataMode } from '../real/mode'

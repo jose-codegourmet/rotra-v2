@@ -93,4 +93,7 @@ export const LevelsBeginnersOnly: Story = { args: { levelsLabel: 'Beginners only
 export const LevelsSlotsPerLevel: Story = {
   args: { levelsLabel: '6 beginner · 5 intermediate · 5 advanced' },
 }
-export const LevelsSlotsPerLevelLight: Story = { ...LevelsSlotsPerLevel, globals: { theme: 'light' } }
+export const LevelsSlotsPerLevelLight: Story = {
+  ...LevelsSlotsPerLevel,
+  globals: { theme: 'light' },
+}

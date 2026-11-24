@@ -132,7 +132,8 @@ export const sessionSetupSchema = z
       values.courtLabels.length,
       values.playersPerCourt,
     )
-    if (slotsError) ctx.addIssue({ code: 'custom', message: slotsError, path: ['levelRestriction'] })
+    if (slotsError)
+      ctx.addIssue({ code: 'custom', message: slotsError, path: ['levelRestriction'] })
     if (values.paymentMode === 'custom' && values.customFeePerHead === null)
       ctx.addIssue({ code: 'custom', message: CUSTOM_FEE_ERROR, path: ['customFeePerHead'] })
     if (!values.minimumIsCalculated) {

@@ -8,14 +8,15 @@ export const publicSessionDetailsMeta = {
     'Use for the Details tab of the public session page (Q-PUBLIC-DETAILS), in the operator preview and on the real public page.',
     'Pass already-formatted strings (dateLabel "Sun, Oct 26", timeLabel "6:00 PM–9:00 PM · 3 h", and the last-updated time); the component only lays them out. Set hasPendingChanges when the server knows venue changes are still waiting to sync; never call stale data "Live".',
     'Pass ranked={false} for a session with Record games off: a Rankings tile reads "Not ranked" over "Wins here don\'t count toward the ROTRA leaderboards or win rate." Omitted reads as ranked.',
-    'scoringLabel is the Scoring tile\'s value (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31. scoringDescription (SCORING[key].text) is its muted line.',
-    'levelsLabel and levelsDescription fill the Levels tile (after Mode); omit them and the tile is left out. The restrictions ticket sets them from the session\'s levelRestriction.',
+    "scoringLabel is the Scoring tile's value (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31. scoringDescription (SCORING[key].text) is its muted line.",
+    "levelsLabel and levelsDescription fill the Levels tile (after Mode); omit them and the tile is left out. The restrictions ticket sets them from the session's levelRestriction.",
     'Payment is the per-player amount only (amountDuePerPlayer in centavos): "₱200" over "per player · paid at the venue", "Free" at 0, tile omitted when null. Never costs, totals or paid states. The venue is the session venue, never the club founding location.',
     'Signed-in viewers of a live session pass courtsNow (read-only CourtCard per entry, names per the public rule, no score or running time) and queueSlot (PublicSessionQueue); visitors pass neither and the Queue slot shows the login line.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Public page › viewPublic() › Details tab (.pub-details, .pf-lead, .pf-tile), courtsNow()',
+    screen:
+      'Public page › viewPublic() › Details tab (.pub-details, .pf-lead, .pf-tile), courtsNow()',
   },
   docs: [
     'docs/screens/product/modules/queue/public-session.md',
@@ -28,6 +29,6 @@ export const publicSessionDetailsMeta = {
     'PublicRefreshBar',
     'PublicSessionQueue',
     'CourtCard',
-        'Card',
+    'Card',
   ],
 } satisfies ComponentMeta

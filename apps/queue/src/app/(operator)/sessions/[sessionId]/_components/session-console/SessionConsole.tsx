@@ -52,9 +52,9 @@ import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
-import { ShareSession } from '@/app/(operator)/sessions/[sessionId]/_components/share-session/ShareSession'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
+import { ShareSession } from '@/app/(operator)/sessions/[sessionId]/_components/share-session/ShareSession'
 import {
   StartMatch,
   type StartMatchRequest,

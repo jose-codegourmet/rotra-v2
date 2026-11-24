@@ -60,7 +60,9 @@ export function EditProfile() {
   const defaultValues = useMemo(
     () =>
       profile.data
-        ? { ...personalDetailsFromProfile(profile.data), ...gettingToKnowFromProfile(profile.data),
+        ? {
+            ...personalDetailsFromProfile(profile.data),
+            ...gettingToKnowFromProfile(profile.data),
             gender: profile.data.gender ?? ('' as const),
           }
         : undefined,

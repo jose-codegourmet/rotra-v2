@@ -64,7 +64,12 @@ export function ShotChips({
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      <div role="group" aria-label={aria['aria-label'] ?? 'Shots you know'} className="flex flex-wrap gap-2">
+      {/* biome-ignore lint/a11y/useSemanticElements: a chip row labelled as a group, as in the prototype; a fieldset would need a legend. */}
+      <div
+        role="group"
+        aria-label={aria['aria-label'] ?? 'Shots you know'}
+        className="flex flex-wrap gap-2"
+      >
         {SHOTS.map((shot) => (
           <PickChip
             key={shot.value}

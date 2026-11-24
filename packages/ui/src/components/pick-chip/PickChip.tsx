@@ -6,7 +6,7 @@ import { pickChipClass } from './PickChip.variants'
 export type PickChipProps = Omit<ComponentProps<'button'>, 'role'> & {
   /** Picked: accent border and fill, and a check before the label */
   picked?: boolean
-  /** Pass "checkbox" for a multi-pick chip. Leave out for an action chip such as + Others. */
+  /** Pass "checkbox" for a multi-pick chip (a toggle button, aria-pressed). Leave out for an action chip such as + Others. */
   role?: 'checkbox'
 }
 
@@ -15,8 +15,7 @@ export function PickChip({ picked, role, className, children, type, ...props }: 
   return (
     <button
       type={type ?? 'button'}
-      role={role}
-      aria-checked={role === 'checkbox' ? !!picked : undefined}
+      aria-pressed={role === 'checkbox' ? !!picked : undefined}
       className={cn(pickChipClass, className)}
       {...props}
     >

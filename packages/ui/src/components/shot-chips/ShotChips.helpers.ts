@@ -17,7 +17,9 @@ export const SHOTS: { value: string; label: string }[] = [
 export const MAX_OWN_SHOTS = 6
 export const MAX_OWN_SHOT_LENGTH = 24
 
-export type OwnShotResult = { shot: string; error?: undefined } | { shot?: undefined; error: string }
+export type OwnShotResult =
+  | { shot: string; error?: undefined }
+  | { shot?: undefined; error: string }
 
 /**
  * Checks a shot a player typed under Others: trims and collapses spaces, then rejects empty, over 24

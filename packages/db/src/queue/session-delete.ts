@@ -1,6 +1,7 @@
 import 'server-only'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import { appendLiveUpdateEvent } from '../live/append-event'
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import {
@@ -46,6 +47,7 @@ export async function deleteSession(context: ClubContext, sessionId: string) {
       })
       await tx.sessionCourt.deleteMany({ where: { sessionId } })
       await tx.queueSession.delete({ where: { id: sessionId } })
+      await appendLiveUpdateEvent(tx, { clubId: context.clubId, sessionId, kind: 'session' })
       return { id: sessionId, title }
     })
   } catch (error) {

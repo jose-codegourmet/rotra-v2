@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/courts"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
@@ -426,6 +427,7 @@ func (t *txn) createSessions(commandID string, in writes.Body) (createResult, er
 		if err != nil {
 			return createResult{}, err
 		}
+		liveupdates.Note(t.ctx, t.club, id) // each date made is a session the club's screens now list
 		for n, court := range v.courts {
 			planned, err := plannedStart(court.startsAt, v.start)
 			if err != nil {

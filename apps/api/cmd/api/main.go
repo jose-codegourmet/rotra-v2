@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -32,6 +33,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/housekeeping"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/playerwrites"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/queuewrites"
@@ -53,7 +55,7 @@ func run() error {
 	}
 	log := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: cfg.LogLevel})).
 		With(slog.String("service", "rotra-api"))
-	pool, err := db.Open(context.Background(), cfg.DatabaseURL, db.Options{MaxConns: cfg.DBMaxConns})
+	pool, err := db.Open(context.Background(), cfg.DatabaseURL, db.Options{MaxConns: cfg.DBMaxConns, IdleInTxTimeout: cfg.DBIdleInTxTimeout})
 	if err != nil {
 		return err
 	}
@@ -77,11 +79,14 @@ func run() error {
 	ready := httpapi.NewReadiness()
 	// One budget per trusted client IP for every public-read route (B-43); later tracks pass the same limiter.
 	publicLimiter := httpapi.NewRateLimiter(httpapi.PublicReadsPerMinute, nil)
-	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log})}
+	// The session snapshot cache is shared with the live-update publisher, which tells it every version it pushes (B-25).
+	snapshots := publicreads.NewSnapshots(publicreads.SnapshotSettings{})
+	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots})}
+	var authenticator *session.Authenticator // set where sign-in is configured; nil leaves every stream viewer a visitor
 	if cfg.AuthSigningKey == nil {
 		log.Warn("ROTRA_AUTH_SIGNING_KEY is not set: no auth routes are served")
 		// With no sign-in every caller is a visitor, so the reads that depend on the viewer are served as the visitor's.
-		routes = append(routes, publicreads.RegisterVisitorOnly(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log}))
+		routes = append(routes, publicreads.RegisterVisitorOnly(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots}))
 	} else {
 		current := cfg.AuthSigningKey.Public().(ed25519.PublicKey)
 		keys, err := pass.NewKeySet(current, cfg.AuthExtraPublicKeys...)
@@ -110,6 +115,7 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		authenticator = svc.Authenticator()
 		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log, PlayerSession: playerGateHint(pool.Raw(), log, time.Now)})
 		if err != nil {
 			return err
@@ -201,9 +207,28 @@ func run() error {
 		routes = append(routes, signedInRoutes)
 		log.Info("auth signing key loaded", slog.String("kid", pass.KeyID(current)), slog.Int("published_keys", len(keys.JWKS())))
 	}
+	// Live updates (B-26): the publisher reads the events table in transaction order and pushes to the hub; the stream routes
+	// hand each screen the topics it may read. LISTEN needs its own direct connection (PgBouncer does not support it).
+	liveMetrics, err := telemetry.NewLiveMetrics()
+	if err != nil {
+		return err
+	}
+	listenURL := cfg.DatabaseDirectURL
+	if listenURL == "" {
+		listenURL = cfg.DatabaseURL
+		log.Warn("DATABASE_DIRECT_URL is not set: the live update listener uses DATABASE_URL, which breaks if that is a PgBouncer URL (B-26)")
+	}
+	hub := liveupdates.NewHub(0)
+	publisher := liveupdates.NewPublisher(pool.Raw(), func(ctx context.Context) (*pgx.Conn, error) { return pgx.Connect(ctx, listenURL) }, hub,
+		liveupdates.PublisherOptions{Metrics: liveMetrics, Observer: snapshots, Log: log})
+	liveService := liveupdates.NewService(pool.Raw(), authenticator, publisher, log)
 	handler := tracing.Middleware(httpapi.NewHandler(httpapi.Deps{
 		Logger: log, Pinger: pool, Readiness: ready,
 		ProxySecret: cfg.ProxySecret, AllowedOrigins: cfg.AllowedOrigins,
+		Stream: httpapi.StreamOptions{
+			Backend: liveService, Metrics: liveMetrics,
+			MaxStreamsPerIP: cfg.Stream.MaxPerIP, MaxStreams: cfg.Stream.MaxTotal, TicketsPerMinute: cfg.Stream.TicketsPerMinute,
+		},
 	}, routes...))
 	srv := &http.Server{
 		Handler:           handler,
@@ -223,6 +248,7 @@ func run() error {
 	// growing table register its cleanup here, using cfg.Housekeeping retention (go-sign-in, go-writes-queue).
 	hk := housekeeping.New(pool.Raw(), log, housekeeping.Options{Interval: cfg.Housekeeping.Interval, BatchSize: cfg.Housekeeping.BatchSize})
 	// Events first, then the sessions they reference (B-34).
+	hk.Register(liveupdates.Cleanup(cfg.Housekeeping.LiveUpdateEventsDays))
 	hk.Register(authstore.AuthEventsCleanup(cfg.Housekeeping.AuthEventsDays))
 	hk.Register(authstore.AuthSessionsCleanup(cfg.Housekeeping.AuthSessionsDays))
 	hkDone := make(chan struct{})
@@ -230,11 +256,17 @@ func run() error {
 		defer close(hkDone)
 		hk.Run(ctx)
 	}()
+	pubDone := make(chan struct{})
+	go func() {
+		defer close(pubDone)
+		publisher.Run(ctx)
+	}()
 
 	log.Info("listening", slog.String("addr", ln.Addr().String()))
 	err = httpapi.Serve(ctx, srv, ln, ready, cfg.ShutdownTimeout, log)
 	stop()
 	<-hkDone // the loop has released its lock and connection before the pool closes
+	<-pubDone
 	return err
 }
 

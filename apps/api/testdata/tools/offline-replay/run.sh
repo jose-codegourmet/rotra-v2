@@ -78,7 +78,7 @@ ENV
   for attempt in 1 2 3; do
     (cd "$ROOT" && NEXT_PUBLIC_ROTRA_DATA_MODE=real ROTRA_DATA_MODE=real \
       ROTRA_GO_API_URL="http://127.0.0.1:${GO_PORT}" ROTRA_GO_MOVED_AREAS="$(moved_areas)" ROTRA_PROXY_SECRET="$PROXY_SECRET" \
-      ROTRA_VISITOR_RECEIPT_SECRET="$RECEIPT_SECRET" \
+      ROTRA_VISITOR_RECEIPT_SECRET="$RECEIPT_SECRET" NEXT_PUBLIC_ROTRA_STREAM_URL="${ROTRA_REPLAY_STREAM_URL:-}" \
       nohup pnpm --filter @rotra/queue exec next dev --port "$APP_PORT" >"$STATE/app.log" 2>&1 &
       echo $! >"$STATE/app.pid")
     for _ in $(seq 1 90); do app_up && break; sleep 1; done

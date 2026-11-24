@@ -12,6 +12,7 @@ import type { QueueSession as SessionView } from '@rotra/data/queue-session/type
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
+import { appendLiveUpdateEvent } from '../live/append-event'
 import { notifyWaitlistPlace } from '../player/notification-events'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
@@ -309,6 +310,8 @@ export async function createQueueSession(
           hosts ??= placed
         }
         session = await recomputeMinimum(tx, session)
+        // Each date made is a session the club's screens now list (B-26).
+        await appendLiveUpdateEvent(tx, { clubId: context.clubId, sessionId: id, kind: 'session' })
       }
       return {
         firstSessionId: ids[0] as string,

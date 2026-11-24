@@ -18,6 +18,8 @@ chat, a PR, a commit, a log or an `.env.example`. Values below are placeholders.
 | `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` = `30` | Drain streams on deploy (B-44) | old copy is killed at once | no | **not set** |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS` | Traces to Grafana (monitoring track) | telemetry off | headers: yes | **not set** (optional until monitoring) |
 | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_BASE` | Google sign-in for players (all three or none; [setup](google-sign-in-setup.md#in-the-go-api-track-go-sign-in-catch-up)) | Continue with Google answers "unavailable"; with only some of them, or a bad redirect base, Google stays off and the API logs a warning (it still starts) | secret: yes | **not set** (no Google OAuth client exists yet) |
+| `DATABASE_DIRECT_URL` | The live-update listener (LISTEN needs a direct, unpooled connection; PgBouncer does not support it, B-26) | the listener uses `DATABASE_URL` and the API logs a warning | yes | **not set** (needed once live updates are deployed) |
+| `DB_IDLE_IN_TX_TIMEOUT` (default `5s`), `STREAM_MAX_PER_IP` (50), `STREAM_MAX_TOTAL` (3000), `STREAM_TICKETS_PER_MINUTE` (60) | A write left open delays every live update (B-48); the stream limits (B-43) | defaults apply | no | leave unset; also `ALTER ROLE rotra_api SET idle_in_transaction_session_timeout = '5s'` |
 | `ROTRA_AUTH_EXTRA_PUBLIC_KEYS` | Key rotation only (B-47) | nothing | no | not needed now |
 | `ROTRA_AUTH_HASH_CONCURRENCY`, `DB_MAX_CONNS`, `LOG_LEVEL`, `PORT`, `SHUTDOWN_TIMEOUT`, `HOUSEKEEPING_*`, `RETENTION_*` | Tuning | defaults apply | no | leave unset; see `apps/api/README.md` |
 
@@ -61,6 +63,7 @@ Set in staging-verification 1.1. From `packages/db/.env.example` and [infrastruc
 | Variable | Value |
 |---|---|
 | `ROTRA_GO_API_URL` | the Go API's public address, for example `https://api-beta.rotra.club` |
+| `NEXT_PUBLIC_ROTRA_STREAM_URL` | the same address, for the browser: the origin the live stream opens on (B-41), in all three apps, together with `NEXT_PUBLIC_ROTRA_DATA_MODE=real`. Unset: no stream, Refresh as before. The Go API lists the app origins in `ROTRA_ALLOWED_ORIGINS` |
 | `ROTRA_GO_MOVED_AREAS` | the moved `/api/*` entries; applied only at staging-verification, with the stream-ticket route. A plain entry is a whole-segment prefix (`/api/auth`). An entry starting with `=` is one exact path where `*` is exactly one segment: `=/api/register/*/google` moves only Google registration (`POST /api/register/{clubId}/google`) and leaves `/api/register` and `/api/register/google` (the Admin link) in TypeScript. The password route `/api/register/{clubId}` has the same segment count as `/api/register/google`, so no entry can move one and not the other; it stays in TypeScript until the Admin-link registration is ported |
 | `ROTRA_PROXY_SECRET` | same as Railway |
 | `ROTRA_VISITOR_RECEIPT_SECRET` | same as Railway |

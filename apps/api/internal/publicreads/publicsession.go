@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -112,13 +113,26 @@ func validSlug(s string) bool {
 	return true
 }
 
+// SnapshotVersionHeader carries the snapshot version of the copy a read answered with, on a read that sent minVersion. A
+// screen told "version N" by a live message asks again with minVersion=N and gets a copy at least that new.
+const SnapshotVersionHeader = "X-Rotra-Snapshot-Version"
+
+// minVersion reads the version a screen asks for. Anything that is not a whole number of 0 or more asks for no version.
+func minVersion(r *http.Request) int64 {
+	n, err := strconv.ParseInt(r.URL.Query().Get("minVersion"), 10, 64)
+	if err != nil || n < 0 {
+		return 0
+	}
+	return n
+}
+
 func (p *publicSessions) page(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 	if !validSlug(slug) {
 		notFound(w)
 		return
 	}
-	body, err := p.cache.get(r.Context(), snapshotKey{slug: slug, view: viewVisitor}, func(ctx context.Context) ([]byte, error) {
+	snap, err := p.cache.getAt(r.Context(), snapshotKey{slug: slug, view: viewVisitor}, minVersion(r), func(ctx context.Context) (snapshot, error) {
 		return p.build(ctx, slug)
 	})
 	switch {
@@ -126,8 +140,12 @@ func (p *publicSessions) page(w http.ResponseWriter, r *http.Request) {
 		h := w.Header()
 		h.Set("Cache-Control", "public, max-age=0, must-revalidate")
 		h.Set("Content-Type", "application/json")
+		if r.URL.Query().Has("minVersion") {
+			// Only a screen that asked for a version is told which one it got: a plain read keeps the answer the Route Handler gave.
+			h.Set(SnapshotVersionHeader, strconv.FormatInt(snap.version, 10))
+		}
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(body)
+		_, _ = w.Write(snap.body)
 	case errors.Is(err, errPageNotFound):
 		notFound(w)
 	case r.Context().Err() != nil:
@@ -137,9 +155,11 @@ func (p *publicSessions) page(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// build reads one page from one repeatable-read snapshot and returns its JSON.
-func (p *publicSessions) build(ctx context.Context, slug string) ([]byte, error) {
+// build reads one page from one repeatable-read snapshot and returns its JSON with the session's snapshot version.
+func (p *publicSessions) build(ctx context.Context, slug string) (snapshot, error) {
 	var dto publicSessionDTO
+	var version int64
+	var session pgtype.UUID
 	err := readTx(ctx, p.pool, func(q *sqlcgen.Queries) error {
 		s, err := q.GetPublicSessionBySlug(ctx, slug)
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -152,6 +172,10 @@ func (p *publicSessions) build(ctx context.Context, slug string) ([]byte, error)
 		if s.PublicationDeleted {
 			return errPageNotFound
 		}
+		if version, err = q.GetSessionSnapshotVersion(ctx, s.ID); err != nil {
+			return fmt.Errorf("reading the snapshot version: %w", err)
+		}
+		session = s.ID
 		labels, err := q.ListPublicSessionCourts(ctx, s.ID)
 		if err != nil {
 			return fmt.Errorf("listing courts: %w", err)
@@ -179,13 +203,13 @@ func (p *publicSessions) build(ctx context.Context, slug string) ([]byte, error)
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return snapshot{}, err
 	}
 	body, err := json.Marshal(dto)
 	if err != nil {
-		return nil, fmt.Errorf("encoding page: %w", err)
+		return snapshot{}, fmt.Errorf("encoding page: %w", err)
 	}
-	return body, nil
+	return snapshot{body: body, version: version, session: uuid.UUID(session.Bytes)}, nil
 }
 
 func sessionPage(s sqlcgen.GetPublicSessionBySlugRow, labels []string, roster []sqlcgen.ListPublicSessionRosterRow,

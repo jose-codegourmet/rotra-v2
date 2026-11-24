@@ -2638,6 +2638,16 @@ type InventoryItem struct {
 	Revision      int64
 }
 
+type LiveUpdateEvent struct {
+	ID        int64
+	XactID    interface{}
+	ClubID    pgtype.UUID
+	SessionID pgtype.UUID
+	PlayerIds []pgtype.UUID
+	Kind      string
+	CreatedAt pgtype.Timestamptz
+}
+
 type LocationCode struct {
 	ID          pgtype.UUID
 	CountryCode string
@@ -3003,6 +3013,7 @@ type QueueSession struct {
 	AlwaysRequireRequest bool
 	RequestFormats       []MatchFormat
 	RecordGames          bool
+	LatestEventID        pgtype.Int8
 }
 
 type RankingPolicyVersion struct {

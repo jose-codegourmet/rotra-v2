@@ -11,6 +11,7 @@
     "./auth/supabase": "./src/auth/supabase.ts",
     "./auth/proxy-session": "./src/auth/proxy-session.ts",
     "./auth/account-context": "./src/auth/account-context.ts",
+    "./live/append-event": "./src/live/append-event.ts",
     "./service/errors": "./src/service/errors.ts",
     "./service/serialize": "./src/service/serialize.ts",
     "./service/authorize": "./src/service/authorize.ts",

@@ -178,3 +178,22 @@ UPDATE player_rank_current SET skill_level_id = NULL, numeric_rank = NULL, state
   window_end = @window_end, calculated_at = @now, input_watermark = @input_watermark, next_recheck_at = @next_recheck_at, recent_standard_match_count = @recent_standard_match_count,
   last_valid_played_at = @last_valid_played_at, leaderboard_eligible = false, revision = revision + 1, updated_at = @now
 WHERE player_id = @player_id;
+
+-- name: ListMatchRegisteredPlayers :many
+-- The registered players (players.id, never a club player id) who played a match: the player ids of the live-update event of its end
+-- (B-50), so their own night updates live. A player is found through the saved player's link, the way ownEntry finds their roster entry.
+SELECT DISTINCT cp.player_id::uuid AS player_id
+FROM match_participations mp
+JOIN session_players sp ON sp.id = mp.session_player_id
+JOIN club_players cp ON cp.club_id = sp.club_id AND cp.id = sp.club_player_id
+WHERE mp.match_id = @match_id AND cp.player_id IS NOT NULL
+ORDER BY 1;
+
+-- name: ListSessionRegisteredPlayers :many
+-- The registered players on a session's roster (released entries too): the player ids of the live-update event of Session done (B-50),
+-- so their My sessions update live. Found through the saved player's link, as ownEntry does.
+SELECT DISTINCT cp.player_id::uuid AS player_id
+FROM session_players sp
+JOIN club_players cp ON cp.club_id = sp.club_id AND cp.id = sp.club_player_id
+WHERE sp.session_id = @session_id AND cp.player_id IS NOT NULL
+ORDER BY 1;

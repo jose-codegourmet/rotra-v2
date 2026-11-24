@@ -88,3 +88,8 @@ FROM session_publications
 WHERE session_id = @session_id
   AND state = 'published'
   AND public_results IS NOT NULL;
+
+-- name: GetSessionSnapshotVersion :one
+-- The session's snapshot version (B-25): the id of its newest live-update event, 0 before its first. Read in the same
+-- repeatable-read snapshot as the page, so a copy is stamped with exactly what it shows.
+SELECT COALESCE(latest_event_id, 0)::bigint AS version FROM queue_sessions WHERE id = @id;

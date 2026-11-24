@@ -39,10 +39,14 @@ Local: `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` with the `otel-lgtm` 
   the client IP (`httpapi.ClientIPFrom(ctx)`). Without a correct secret every path except `/healthz`, `POST /api/stream/ticket`
   and `GET /stream` answers 404. If the variable is unset, no request is trusted, so only those three answer (including
   local dev: set a secret and send the header to reach other routes).
-- `POST /api/stream/ticket` returns `{ticket, expiresInSeconds}`: 32 random bytes, valid 60 s, single use, held in memory
-  (one instance, B-43; a restart only drops tickets that were 60 s from expiring). 60 tickets a minute per client IP, then 429.
+- `POST /api/stream/ticket` returns `{ticket, expiresInSeconds, topics}`: 32 random bytes, valid 60 s, single use, held in memory
+  (one instance, B-43; a restart only drops tickets that were 60 s from expiring). The optional JSON body `{"topics": [...]}` names
+  what the screen wants to watch; `topics` in the answer is what it may (see Live updates below). 60 tickets a minute per client
+  IP, then 429; a signed-in viewer is never counted.
 - `GET /stream?ticket=...` is Server-Sent Events: the ticket is consumed on open (used, expired, forged or missing: 401, nothing
-  streamed), a `: ping` comment every 20 s, open until the client leaves or draining starts.
+  streamed), a `: ping` comment every 20 s, open until the client leaves or draining starts. More than 50 open streams from one
+  client IP (the IP the ticket was issued to, seen through the proxy), or 3,000 in all, are refused with 429; signed-in screens are
+  never limited.
 - `ROTRA_ALLOWED_ORIGINS` (optional): comma-separated exact origins (`https://queue.rotra.club,http://localhost:9000`; no `*`,
   path or trailing slash, validated at start). CORS headers are sent on the two stream routes only, only for a listed origin.
 - `ROTRA_QUEUE_ORIGINS` (optional): same format; the Queue app origins that may call the credentialed Player stats read
@@ -69,7 +73,40 @@ provider; nothing has run against real Google. Design and differences: [setup](.
 `internal/housekeeping` runs hourly (`HOUSEKEEPING_INTERVAL`, default 1h) under a Postgres advisory lock, in batches of
 `HOUSEKEEPING_BATCH_SIZE` (1000), and stops with the process. Tracks register their cleanup with `Register(...)`
 (helper: `housekeeping.OlderThanDays`). Retention env with B-34 defaults: `RETENTION_LIVE_UPDATE_EVENTS_DAYS` 7,
-`RETENTION_AUTH_EVENTS_DAYS` 90, `RETENTION_AUTH_SESSIONS_DAYS` 90. No cleanup is registered yet: those tables do not exist.
+`RETENTION_AUTH_EVENTS_DAYS` 90, `RETENTION_AUTH_SESSIONS_DAYS` 90. The cleanups registered: live-update events (`liveupdates.Cleanup`),
+`auth_events`, ended `auth_sessions`.
+
+## Live updates (track live-updates; B-25, B-26, B-34, B-43, B-44, B-48, B-49, B-50)
+
+`internal/liveupdates`. Every Go write that changes what a screen shows adds one row to `live_update_events` in its own transaction
+(`writes.InTx` adds what the route noted just before it commits; commands note through `liveupdates.Note(ctx, club, session, players...)`;
+routes are classified in `liveupdates/routes.go`, and `TestEveryWriteRouteIsClassified` fails for a write route that is not). A session
+write locks the session row first, so a session's event ids follow commit order (B-49), and stores the new id as
+`queue_sessions.latest_event_id`, the session's snapshot version (B-25). `NOTIFY live_updates` is sent in the same transaction.
+The migration must be applied before this API build runs: every noted write adds its event, so a database without the table fails them.
+
+The publisher (`Publisher`) reads events in transaction order (B-48: `(xact_id, id) > cursor` and `xact_id < pg_snapshot_xmin(...)`),
+nudged by `LISTEN` on one direct connection (`DATABASE_DIRECT_URL`) and by a 1 s poll, and pushes to the in-memory `Hub` (topics
+`session:<id>`, `club:<id>`, `player:<id>`, `admin`). Set `DB_IDLE_IN_TX_TIMEOUT` (default 5 s): an idle transaction holds every ping back.
+
+Wire format (the frontend codes against this):
+
+- `POST /api/stream/ticket` body `{"topics":["club:<uuid>","session:<uuid>","player:<uuid>","admin","public-session:<slug>"]}` (at most 16) with the
+  app's proxy headers and cookie. Answer `{"ticket","expiresInSeconds":60,"topics":[accepted names]}`; a topic the viewer may not read is dropped,
+  and none accepted answers 401 (a visitor), 403 (signed in) or 404 (a public page that does not exist). An expired pass answers the distinct 401
+  `expired`: refresh once and ask again. A visitor sends no pass and may only ask for `public-session:<slug>`.
+- `GET <api>/stream?ticket=<ticket>[&lastEventId=<id>]` (or the `Last-Event-ID` header). Events, each `id: <xact_id>:<id>` where it moves the position:
+  - `event: ready`, `data: {"position":"<xact_id>:<id>"|null}`: the screen is live from here. Order on a connection: zero or more `changed` with no
+    `id` (the catch-up, only when a last id was sent), then `ready` with the `id`, then live `changed` events with their ids. A screen that sent no last id
+    re-reads once on `ready`.
+  - `event: changed`, `data: {"topic":"<name as asked>","version":<event id>|null,"kind":"<kind>"}`: the topic moved. `version` is the session's new
+    snapshot version (re-read with `?minVersion=<version>`); on a club or player topic it is the newest event id. `kind` is one of `session`,
+    `roster`, `courts`, `queue`, `requests`, `payments`, `results`, `finalization`, `club`, `players`, `inventory`, or `changed` (several things moved, or a
+    `public-session:` topic: a visitor's message never names the kind). After `Last-Event-ID`: one `changed` per topic that moved, with no `id`. An id
+    older than the kept events (7 days), unreadable, or with too much to tell: `changed` on every topic with `"version":null`.
+  - `event: reconnect`, `data: {"retryMs":1000..5000}` and a `retry: <ms>` line: the server is closing (deploy, or the screen fell behind); wait that long, ask
+    for a new ticket (tickets are single use, so a native `EventSource` retry gets 401) and reopen with the last id.
+- `GET /api/public-sessions/{slug}?minVersion=<n>` returns a copy at version `n` or newer; that answer (only) carries `X-Rotra-Snapshot-Version`.
 
 - `internal/config`: environment loader, fails fast on missing `DATABASE_URL`.
 - `internal/db`: pgx pool (`/readyz` pings it) and `sqlcgen` queries. `internal/telemetry`, `internal/housekeeping`, `internal/testpg`: see below.

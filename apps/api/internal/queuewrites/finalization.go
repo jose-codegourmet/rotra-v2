@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/collate"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
@@ -162,7 +163,16 @@ func (s *server) finalizeSession(ctx context.Context, club, session pgtype.UUID,
 	_, err := s.lockedSession(ctx, club, session.String(), false, func(t *txn) (any, error) {
 		w, err := t.finalize(cmd)
 		warnings = w
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+		// Session done changes its registered players' own results (B-50).
+		players, err := t.q.ListSessionRegisteredPlayers(t.ctx, t.sess.ID)
+		if err != nil {
+			return nil, err
+		}
+		liveupdates.Note(t.ctx, t.club, t.sess.ID, players...)
+		return nil, nil
 	})
 	if err == nil {
 		return warnings, nil

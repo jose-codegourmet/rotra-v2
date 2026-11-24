@@ -4,10 +4,13 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/session"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/clubjoin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
@@ -41,7 +44,11 @@ func (s *server) joinClub(r *http.Request, p session.Principal) (writes.Result, 
 	}
 	player := self(p)
 	err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
-		return clubjoin.AddToClub(ctx, q, s.stamp(), player, club.ID)
+		if err := clubjoin.AddToClub(ctx, q, s.stamp(), player, club.ID); err != nil {
+			return err
+		}
+		liveupdates.Note(ctx, club.ID, pgtype.UUID{}) // the club's saved players change
+		return nil
 	})
 	// A second tap that raced the first created the same (club, player) row: already joined.
 	if err != nil && !writes.IsUniqueViolation(err) {
@@ -55,7 +62,14 @@ func (s *server) joinClub(r *http.Request, p session.Principal) (writes.Result, 
 func (s *server) leaveClub(r *http.Request, p session.Principal) (writes.Result, error) {
 	clubText := r.PathValue("clubId")
 	if club, ok := parseUUID(clubText); ok {
-		if err := sqlcgen.New(s.pool).RemoveClubPlayer(r.Context(), sqlcgen.RemoveClubPlayerParams{Now: s.stamp(), ClubID: club, PlayerID: self(p)}); err != nil {
+		// A small transaction of its own, so the live-update event commits with the removal (B-26).
+		if err := writes.InTx(r.Context(), s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
+			if err := q.RemoveClubPlayer(ctx, sqlcgen.RemoveClubPlayerParams{Now: s.stamp(), ClubID: club, PlayerID: self(p)}); err != nil {
+				return err
+			}
+			liveupdates.Note(ctx, club, pgtype.UUID{})
+			return nil
+		}); err != nil {
 			return writes.Result{}, err
 		}
 	}

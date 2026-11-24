@@ -5,8 +5,10 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
@@ -18,6 +20,9 @@ const DefaultMaxConns = 10
 // Options tunes the pool. Zero values mean defaults.
 type Options struct {
 	MaxConns int32
+	// IdleInTxTimeout ends a transaction left idle that long (idle_in_transaction_session_timeout, set on every connection
+	// the pool makes). A write left open holds back every live update (B-48), so the API's connections end it. Zero sets none.
+	IdleInTxTimeout time.Duration
 }
 
 // Pool wraps the pgx pool. It satisfies httpapi.Pinger.
@@ -39,6 +44,15 @@ func Open(ctx context.Context, databaseURL string, o Options) (*Pool, error) {
 		cfg.MaxConns = o.MaxConns
 	}
 	cfg.HealthCheckPeriod = time.Minute
+	if o.IdleInTxTimeout > 0 {
+		// A SET after connecting works behind PgBouncer too, where a startup parameter would be refused. The role setting
+		// (ALTER ROLE ... SET) is the belt to these braces.
+		ms := strconv.FormatInt(o.IdleInTxTimeout.Milliseconds(), 10)
+		cfg.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
+			_, err := c.Exec(ctx, "SET idle_in_transaction_session_timeout = "+ms)
+			return err
+		}
+	}
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("creating pool: %w", err)

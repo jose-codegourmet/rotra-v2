@@ -229,7 +229,7 @@ serialization/error contracts, account-scoped caches, and the Queue working copy
 engine. Mocks are not a fallback after a real write fails. The [command inventory](database_design/product/command-contracts.md)
 records the existing code surface and unresolved transport decisions; it does not approve API URLs.
 
-**No Supabase Realtime.** Screens refetch with TanStack Query. Live updates are decided for the Go API ([D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01), B-08) and not built yet; until then nothing pushes, and refresh stays the fallback afterwards.
+**No Supabase Realtime.** Screens refetch with TanStack Query. Live updates come from the Go API ([D-2026-11-13-01](mvp/decisions/2026-11-13.md#d-2026-11-13-01), B-08): in real mode with `NEXT_PUBLIC_ROTRA_STREAM_URL` set, each app's `LiveBridge` (`packages/data/src/live`) opens one stream and marks the matching TanStack Query roots stale on each `changed`; the session version goes in the read's request (`minVersion`), never in a query key. Otherwise nothing pushes. Refresh, pull-down and tab-return refresh stay the fallback.
 
 ---
 

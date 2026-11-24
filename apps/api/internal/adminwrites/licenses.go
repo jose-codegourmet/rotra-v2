@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/club"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/license"
@@ -123,6 +124,7 @@ func (s *server) activateLicense(r *http.Request, p session.Principal) (writes.R
 		if err != nil {
 			return err
 		}
+		liveupdates.Note(ctx, c.ID, pgtype.UUID{}) // the club's license (what its Queue app may do) and the Admin lists change
 		command, ok := pgUUID(body.Text("sourceCommandId"))
 		if !ok {
 			return writes.Fail(httpapi.ErrInvalid, nil)

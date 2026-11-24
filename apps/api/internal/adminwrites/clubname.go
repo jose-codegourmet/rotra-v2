@@ -14,6 +14,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
@@ -112,6 +113,7 @@ func (s *server) reviewNameChange(ctx context.Context, p session.Principal, requ
 		if err != nil {
 			return err
 		}
+		liveupdates.Note(ctx, c.ID, pgtype.UUID{}) // the club's name and the Admin lists change
 		if req.State != sqlcgen.ClubNameChangeStatePending {
 			if string(req.State) == decision {
 				return nil

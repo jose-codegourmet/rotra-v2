@@ -732,6 +732,37 @@ func (q *Queries) ListFinalizationPlayerIDs(ctx context.Context, sessionID pgtyp
 	return items, nil
 }
 
+const listMatchRegisteredPlayers = `-- name: ListMatchRegisteredPlayers :many
+SELECT DISTINCT cp.player_id::uuid AS player_id
+FROM match_participations mp
+JOIN session_players sp ON sp.id = mp.session_player_id
+JOIN club_players cp ON cp.club_id = sp.club_id AND cp.id = sp.club_player_id
+WHERE mp.match_id = $1 AND cp.player_id IS NOT NULL
+ORDER BY 1
+`
+
+// The registered players (players.id, never a club player id) who played a match: the player ids of the live-update event of its end
+// (B-50), so their own night updates live. A player is found through the saved player's link, the way ownEntry finds their roster entry.
+func (q *Queries) ListMatchRegisteredPlayers(ctx context.Context, matchID pgtype.UUID) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, listMatchRegisteredPlayers, matchID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var player_id pgtype.UUID
+		if err := rows.Scan(&player_id); err != nil {
+			return nil, err
+		}
+		items = append(items, player_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPlayerAttributions = `-- name: ListPlayerAttributions :many
 SELECT club_id, club_player_id FROM player_history_attributions WHERE player_id = $1 AND revoked_at IS NULL ORDER BY id
 `
@@ -969,6 +1000,36 @@ func (q *Queries) ListSessionFinalizationJobs(ctx context.Context, sessionID pgt
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSessionRegisteredPlayers = `-- name: ListSessionRegisteredPlayers :many
+SELECT DISTINCT cp.player_id::uuid AS player_id
+FROM session_players sp
+JOIN club_players cp ON cp.club_id = sp.club_id AND cp.id = sp.club_player_id
+WHERE sp.session_id = $1 AND cp.player_id IS NOT NULL
+ORDER BY 1
+`
+
+// The registered players on a session's roster (released entries too): the player ids of the live-update event of Session done (B-50),
+// so their My sessions update live. Found through the saved player's link, as ownEntry does.
+func (q *Queries) ListSessionRegisteredPlayers(ctx context.Context, sessionID pgtype.UUID) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, listSessionRegisteredPlayers, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var player_id pgtype.UUID
+		if err := rows.Scan(&player_id); err != nil {
+			return nil, err
+		}
+		items = append(items, player_id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

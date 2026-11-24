@@ -2,7 +2,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerProfileMeta = {
   name: 'PlayerProfile',
   description:
-    'P-PUBLIC-PROFILE and P-OWN-PROFILE: identity card (the profile dialog’s banner top, actions one per row), the shared rank and current top-50 leaderboard places; the read-only Weekly Performance; My sessions (own); Recent sessions with the session matches dialog; Recent games; About. The owner also gets Edit profile, My player ID, the private account panel, Add details and Sign out.',
+    'P-PUBLIC-PROFILE and P-OWN-PROFILE: identity card (the profile dialog’s banner top, actions one per row), the shared rank and current top-50 leaderboard places; the read-only Weekly Performance; Recent sessions with the session matches dialog; Recent games; About. The owner also gets Edit profile, My player ID, the private account panel, Add details and Sign out. The own profile has no My sessions or Your clubs (moved to Home, P-HOME); another player's profile keeps its Clubs card.',
   usage: [
     'Ownership is checked before anything private renders: visitors never mount AccountPanel or request useMyAccount.',
     'The owner can change their picture immediately; visitors do not get the editor.',

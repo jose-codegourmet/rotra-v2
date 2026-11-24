@@ -22,13 +22,13 @@ import { returnDestination } from './returnDestination'
 
 type SignInProps = { returnTo?: string; passwordSaved?: boolean }
 
-/** After any sign-in: the Queue public session the player came from, else a safe same-app path, else their profile. */
+/** After any sign-in: the Queue public session the player came from, else a safe same-app path, else Home (P-HOME). */
 function useFinishSignIn(returnTo: string | undefined) {
   const router = useRouter()
-  return (playerId: string) => {
+  return (_playerId: string) => {
     const queueUrl = consumeSessionReturn(returnTo)
     if (queueUrl) window.location.assign(queueUrl)
-    else router.replace(returnDestination(returnTo, `/players/${playerId}`))
+    else router.replace(returnDestination(returnTo, '/home'))
   }
 }
 

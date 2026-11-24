@@ -21,7 +21,7 @@ export function MySessionsCard({ sessions, finished = [], onShareResult }: MySes
   return (
     <Card asChild>
       <section className="flex flex-col gap-3">
-        <h2>My sessions</h2>
+        <h2>Upcoming sessions</h2>
         {sessions.length ? (
           <div>
             {sessions.map((session) => (

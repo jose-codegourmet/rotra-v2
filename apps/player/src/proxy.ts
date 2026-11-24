@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   const goMode = goApiEnabled()
   const protectedPath =
     /^\/players\/[^/]+\/compare\/?$/.test(path) ||
-    ['/me', '/profile', '/notifications'].some(
+    ['/home', '/me', '/profile', '/notifications'].some(
       (prefix) => path === prefix || path.startsWith(`${prefix}/`),
     )
   const toLogin = () => {

@@ -16,7 +16,7 @@ import { isRealDataMode } from '../real/mode'
 import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { savedPlayerName } from './clubNickname.rules'
-import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
+import type { ClubPlayer, Gender, JoinedVia } from './clubPlayer.types'
 import { applyClubEmail, emailAlreadySaved, planClubEmail } from './email'
 import { applyClubSocial, planClubSocial, savedRecordForSocial } from './socialLink'
 
@@ -35,6 +35,8 @@ export const OWN_NAME_ERROR = 'Enter a name.'
 export type NewClubPlayerInput = {
   name: string
   nickname?: string | null
+  /** Optional gender (D-2026-11-19-01); null or missing = not given */
+  gender?: Gender | null
   /** No email saves a guest (D-2026-11-16-04) */
   email?: string | null
   /**
@@ -110,6 +112,7 @@ export function createClubPlayer(
     playerId: null,
     fullName: input.name.trim(),
     nickname: input.nickname?.trim() || null,
+    gender: input.gender ?? null,
     identity: 'guest',
     playingLevel,
     addedAt: Date.now(),

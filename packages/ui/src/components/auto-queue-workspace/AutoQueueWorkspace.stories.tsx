@@ -1,5 +1,9 @@
 import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
 import { toggleBaggingGame } from '@rotra/data/match/auto-queue-rules'
+import {
+  AVAILABLE_PLAYERS_EMPTY,
+  PLAN_AHEAD_NO_PRESENT,
+} from '@rotra/data/match/plan-ahead-rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, fn, within } from 'storybook/test'
@@ -159,7 +163,7 @@ const meta = {
     count: null,
     onCountChange: fn(),
     minimumGames: matchLineupFixtures.session.minimumGames,
-    hasEligiblePlayers: true,
+    noEligibleText: null,
     catchUpTarget: '',
     onCatchUpTargetChange: fn(),
     batches: fixture,
@@ -240,10 +244,10 @@ export const CatchUpWithoutTarget: Story = {
   args: { mode: 'catchup', count: 2, batches: {} },
 }
 export const NoEligiblePlayers: Story = {
-  args: { count: 2, batches: {}, hasEligiblePlayers: false },
+  args: { count: 2, batches: {}, noEligibleText: AVAILABLE_PLAYERS_EMPTY },
 }
 export const NoPresentPlayers: Story = {
-  args: { mode: 'ahead', count: 2, batches: {}, hasEligiblePlayers: false },
+  args: { mode: 'ahead', count: 2, batches: {}, noEligibleText: PLAN_AHEAD_NO_PRESENT },
 }
 export const ShortBatch: Story = {
   args: { count: 2, batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch } },
@@ -268,7 +272,7 @@ export const CatchUpShortfall: Story = {
 export const NoEligiblePlayersAfterGeneration: Story = {
   args: {
     count: 2,
-    hasEligiblePlayers: false,
+    noEligibleText: AVAILABLE_PLAYERS_EMPTY,
     batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch },
   },
 }

@@ -5,6 +5,7 @@ export const newPlayerFormMeta = {
   description:
     'Q-ADD-PLAYER › New player: full or display name (required), nickname, email and social link (optional), and the level for this club. Submits "Confirm player slot", or "Add to waitlist" when every slot is taken.',
   usage: [
+    'Gender (optional): Male, Female or Not given (GenderField, "" is Not given). It sets the match category; the container saves it for guests and unclaimed players. Real mode has no gender column yet, so it is not sent.',
     'Use inside AddPlayerSheet on the New player tab; it works offline because nothing is looked up.',
     'context="club" (Saved players › Add player) uses newSavedPlayerSchema: the level is optional (null when empty), the label reads "Level for this club (optional)" and the submit Save player.',
     'onSubmit receives nickname and email as null when empty and a required level. No email saves a guest; an email saves an unclaimed player with an RTR ID, or links a ROTRA player when the email is already on ROTRA (D-2026-11-16-04). The email is checked with the shared emailField from @rotra/schema.',

@@ -1,6 +1,7 @@
 'use client'
 
 import type { BaggingGames } from '@rotra/data/match/auto-queue-types'
+import { PLAN_AHEAD_DESCRIPTION } from '@rotra/data/match/plan-ahead-rules'
 import type { MatchFormat } from '@rotra/data/match/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { BaggingPairSheet } from '@rotra/ui/bagging-pair-sheet'
@@ -15,7 +16,7 @@ import { cn } from '@rotra/ui/cn'
 import { Chip } from '@rotra/ui/chip'
 import { ExemptionListCard } from '@rotra/ui/exemption-list-card'
 import { Field } from '@rotra/ui/field'
-import { MatchCard, type MatchCardPlayer, type MatchCardPlayerChip } from '@rotra/ui/match-card'
+import { MatchCard, type MatchCardPlayer } from '@rotra/ui/match-card'
 import { Notice } from '@rotra/ui/notice'
 import { OverflowMenu } from '@rotra/ui/overflow-menu'
 import type { ExemptionPlayer } from '@rotra/ui/player-picker-sheet'
@@ -37,11 +38,8 @@ export type AutoQueueDraftPlayer = {
   fullName?: string
   level?: PlayingLevel | null
   photoUrl?: string
-  played: number
-  queued: number
-  suggested: number
-  /** A temporary dependency: this player is in a match now. */
-  playingNow?: boolean
+  /** Games counted this session: the badge on the picture's ring (opens the games dialog) */
+  games: number
 }
 
 export type AutoQueueDraft = {
@@ -49,9 +47,15 @@ export type AutoQueueDraft = {
   format: MatchFormat
   teamA: AutoQueueDraftPlayer[]
   teamB: AutoQueueDraftPlayer[]
+  /**
+   * The status line: "Waits for Court 2 · ends in about 3 min" while a player is on a court, the
+   * draft's own reason otherwise. Drafts can be picked either way.
+   */
   reason: string
-  /** Drafts can be selected for later matches even while someone is playing. */
-  blockedReason?: string
+  /** 'warn' when the awaited match runs long; default muted */
+  statusTone?: 'muted' | 'warn'
+  /** Category prefix of the format chip: "Mixed", "Men's", "Women's" or "Genderless" */
+  categoryPrefix?: string
   /** A transfer conflict that needs the Queue Master's attention. */
   attentionReason?: string
 }
@@ -104,7 +108,11 @@ export type AutoQueueWorkspaceProps = {
   count: AutoQueueCount | null
   onCountChange: (count: AutoQueueCount) => void
   minimumGames: number
-  hasEligiblePlayers: boolean
+  /**
+   * Why this tab has nobody to draw from (autoQueueEmptyText), or null when someone can be used.
+   * Shown in the empty card; "nobody present" and "nobody free" read differently in Plan Ahead.
+   */
+  noEligibleText: string | null
   catchUpTarget: string
   onCatchUpTargetChange: (target: string) => void
   batches: Partial<Record<AutoQueueMode, AutoQueueBatch>>
@@ -127,6 +135,8 @@ export type AutoQueueWorkspaceProps = {
   bagging?: AutoQueueBaggingProps
   /** Exemption list card (side column, below Bagging pairs); omitted to hide it */
   exemption?: AutoQueueExemptionProps
+  /** Opens "NAME's games" from a draft face's games badge (the roster player id) */
+  onOpenGames?: (playerId: string) => void
 }
 
 const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] = [
@@ -139,7 +149,7 @@ const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] 
 
 const MODE_DESCRIPTIONS: Record<AutoQueueMode, string> = {
   available: 'Matches from players who are here and not on a court right now.',
-  ahead: 'Also uses players who are mid-game. Their matches wait until their current game ends.',
+  ahead: PLAN_AHEAD_DESCRIPTION,
   wait: 'Puts the players who have waited longest since their last game first.',
   fewest: 'Puts the players with the fewest games (played + already queued) first.',
   catchup: 'Helps players who are behind reach a number of games you choose.',
@@ -157,17 +167,8 @@ const cardPlayer = (p: AutoQueueDraftPlayer): MatchCardPlayer => ({
   shortName: p.name,
   level: p.level ?? null,
   photoUrl: p.photoUrl,
+  games: p.games,
 })
-
-/** Chips under a draft player's name. Zeros are left out; "suggested" only when another draft has them too. */
-export function draftPlayerChips(p: AutoQueueDraftPlayer): MatchCardPlayerChip[] {
-  return [
-    p.played > 0 && { text: `${p.played} played` },
-    p.queued > 0 && { text: `${p.queued} queued` },
-    p.suggested > 1 && { text: `${p.suggested} suggested` },
-    p.playingNow && { text: 'Playing now', tone: 'warn' as const },
-  ].filter((chip): chip is MatchCardPlayerChip => Boolean(chip))
-}
 
 // "Made 4 of 4 matches." is the normal result: a neutral chip. A shortfall or target note is a notice.
 const isFullBatch = (stopReason: string) => {
@@ -182,7 +183,7 @@ export function AutoQueueWorkspace({
   count,
   onCountChange,
   minimumGames,
-  hasEligiblePlayers,
+  noEligibleText,
   catchUpTarget,
   onCatchUpTargetChange,
   batches,
@@ -200,6 +201,7 @@ export function AutoQueueWorkspace({
   pendingMessage,
   bagging,
   exemption,
+  onOpenGames,
 }: AutoQueueWorkspaceProps) {
   const hintId = useId()
   const hasSide = Boolean(bagging?.enabled || exemption)
@@ -231,10 +233,9 @@ export function AutoQueueWorkspace({
   const generationHintId = `${hintId}-${isPending ? 'pending' : 'generation'}`
   const draftsHintId = `${hintId}-${isPending ? 'pending' : 'drafts'}`
   const replaceHintId = draftsHint ? draftsHintId : generationHintId
-  const emptyMessage = !hasEligiblePlayers
-    ? mode === 'ahead'
-      ? 'No present players. Mark arrivals present in Players.'
-      : 'No one is free to play right now. Try Plan Ahead to include players who are mid-game.'
+  const hasEligiblePlayers = noEligibleText === null
+  const emptyMessage = noEligibleText
+    ? noEligibleText
     : mode === 'catchup' && !validTarget
       ? 'Choose a game target, then Generate.'
       : count === null
@@ -495,26 +496,23 @@ export function AutoQueueWorkspace({
                               position={i + 1}
                               matchNo={i + 1}
                               format={draft.format}
+                              categoryPrefix={draft.categoryPrefix}
                               origin="auto"
                               manualProtected={false}
                               status={
                                 draft.attentionReason
                                   ? { kind: 'needs-attention', reason: draft.attentionReason }
-                                  : { kind: 'blocked', reason: draft.blockedReason ?? draft.reason }
+                                  : { kind: 'blocked', reason: draft.reason }
                               }
                               teamA={draft.teamA.map(cardPlayer)}
                               teamB={draft.teamB.map(cardPlayer)}
+                              onOpenGames={onOpenGames}
                               draft={{
+                                statusTone: draft.statusTone,
                                 selected: pick > 0,
                                 pickOrder: pick || undefined,
                                 disabled: isPending,
                                 onToggle: () => onSelect(draft.id, pick === 0),
-                                playerChips: Object.fromEntries(
-                                  [...draft.teamA, ...draft.teamB].map((p) => [
-                                    p.id,
-                                    draftPlayerChips(p),
-                                  ]),
-                                ),
                               }}
                             />
                           )

@@ -1,4 +1,5 @@
 import { emailField } from '@rotra/schema/email'
+import { genderInput } from '@rotra/schema/gender'
 import { personalDetailsShape } from '@rotra/schema/personal-details'
 import { phoneField } from '@rotra/schema/phone'
 import { socialLinksShape } from '@rotra/schema/social-link'
@@ -12,6 +13,8 @@ import { z } from 'zod'
 export const editPlayerDetailsSchema = z.object({
   ...personalDetailsShape,
   ...socialLinksShape,
+  /** Optional: '' while not given */
+  gender: genderInput,
   /** Level for this club: a playing level code, or '' for none */
   level: z.string(),
   phone: z

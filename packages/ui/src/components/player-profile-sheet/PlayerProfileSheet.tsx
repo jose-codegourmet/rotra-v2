@@ -41,6 +41,8 @@ export type PlayerProfileSheetProps = {
   bannerKey?: string | null
   /** An Admin-uploaded banner image; wins over bannerKey */
   bannerImageUrl?: string | null
+  /** Gender (D-2026-11-19-01): the About › Gender row. Missing or null = not given */
+  gender?: 'male' | 'female' | null
   /** City the profile was first registered in (from the RTR ID) */
   registeredCity: string | null
   /** The Copy RTR ID button under the name; none for guests and unclaimed records */
@@ -98,6 +100,16 @@ export type PlayerProfileSheetProps = {
   getInviteLink?: () => Promise<string>
 }
 
+/** The About › Gender row; a registered player without one is reminded by ROTRA (prototype genderText). */
+const genderText = (gender: 'male' | 'female' | null | undefined, identity: Identity) =>
+  gender === 'male'
+    ? 'Male'
+    : gender === 'female'
+      ? 'Female'
+      : identity === 'registered'
+        ? 'Not given yet · ROTRA reminds them to add it'
+        : 'Not given'
+
 const STATUS: Record<Identity, string> = {
   registered: 'Registered ROTRA player',
   unclaimed: 'Saved by your club with their email. Not registered with ROTRA yet',
@@ -125,6 +137,7 @@ export function PlayerProfileSheet({
   onPhotoClick,
   bannerKey,
   bannerImageUrl,
+  gender,
   registeredCity,
   rtrId,
   profileHref,
@@ -275,6 +288,7 @@ export function PlayerProfileSheet({
         <ProfileCardSection label="About">
           <KeyValueList
             items={[
+              { label: 'Gender', value: genderText(gender, identity) },
               { label: 'Registered in', value: registeredCity ?? 'Not registered yet' },
               { label: 'Joined', value: JOINED_VIA_TEXT[joinedVia ?? 'club-added'] },
             ]}

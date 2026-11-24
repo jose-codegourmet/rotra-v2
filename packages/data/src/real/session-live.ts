@@ -392,7 +392,17 @@ export async function realApplyRosterBatch(input: {
 }) {
   const reply = await realRequest<{ results: WireBatchResult[]; roster: WireRosterRead }>(
     `${sessionPath(input.sessionId)}/roster/batch`,
-    { method: 'POST', body: { operations: input.operations } },
+    {
+      method: 'POST',
+      // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+      body: {
+        operations: input.operations.map((operation) => {
+          if (operation.op !== 'add' || operation.source !== 'new') return operation
+          const { gender: _gender, ...rest } = operation
+          return rest
+        }),
+      },
+    },
   )
   const results: RosterBatchResult[] = reply.results.map((result) => ({
     operationId: result.operationId,

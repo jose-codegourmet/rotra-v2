@@ -1,7 +1,7 @@
 import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import { savedPlayerName, withClubNickname } from '../club-player/clubNickname.rules'
-import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import type { ClubPlayer, Gender } from '../club-player/clubPlayer.types'
 import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { clubPlayerForProfile, createClubPlayer } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
@@ -320,6 +320,8 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   sessionId: string
   name: string
   nickname?: string
+  /** Optional gender (D-2026-11-19-01); missing = not given */
+  gender?: Gender | null
   /** No email adds a guest; an email adds an unclaimed player or links a ROTRA player */
   email?: string
   /** #1019: a social link is an entry key too, and wins over the email */

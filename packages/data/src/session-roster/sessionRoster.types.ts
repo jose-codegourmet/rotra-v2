@@ -199,6 +199,8 @@ export type RosterBatchOperation =
       source: 'new'
       name: string
       nickname?: string
+      /** Optional gender (D-2026-11-19-01); missing = not given */
+      gender?: Gender | null
       /** No email saves a guest; an email saves an unclaimed player or links a ROTRA player */
       email?: string
       /** #1019: a social link is an entry key too, and wins over the email */

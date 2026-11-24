@@ -7,6 +7,7 @@ import { socialLinkKeys } from '@rotra/schema/social-link'
 import { Button } from '@rotra/ui/button'
 import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { Field } from '@rotra/ui/field'
+import { GenderField } from '@rotra/ui/gender-field'
 import { LevelSelect } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
 import { PersonalDetailsFields } from '@rotra/ui/personal-details-fields'
@@ -139,6 +140,13 @@ export function EditPlayerDetailsForm({
             </Notice>
           ) : null}
           <PersonalDetailsFields sections={['name']} disabled={isPending} />
+          <Controller
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <GenderField value={field.value} onChange={field.onChange} disabled={isPending} />
+            )}
+          />
           <Field label="Level for this club" optional error={errors.level?.message}>
             <Controller
               control={form.control}

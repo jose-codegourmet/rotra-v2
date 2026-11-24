@@ -317,6 +317,7 @@ function SessionAddPlayer({
           sessionId,
           name: values.name,
           nickname: values.nickname ?? undefined,
+          gender: values.gender,
           email: values.email ?? undefined,
           socialLink: values.socialLink ?? undefined,
           phone: values.phone ?? undefined,
@@ -396,6 +397,7 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
       {
         name: values.name,
         nickname: values.nickname,
+        gender: values.gender,
         email: values.email,
         socialLink: values.socialLink,
         phone: values.phone,

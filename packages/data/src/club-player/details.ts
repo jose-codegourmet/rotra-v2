@@ -54,6 +54,7 @@ export async function getClubPlayerDetails(id: string): Promise<ClubPlayerDetail
     fullName: row.fullName,
     nickname: row.nickname,
     phoneOnFile: Boolean(state.privatePhones[row.id]),
+    gender: row.gender ?? null,
     level: row.playingLevel ?? null,
     picture: clubPictureState(row, null),
     profile:
@@ -105,6 +106,7 @@ export async function updateClubPlayerDetails({
     }
     row.fullName = values.fullName.trim()
     row.nickname = values.nickname.trim() || null
+    if (values.gender !== undefined) row.gender = values.gender || null
     row.playingLevel = PLAYING_LEVELS.includes(values.level as PlayingLevel)
       ? (values.level as PlayingLevel)
       : null

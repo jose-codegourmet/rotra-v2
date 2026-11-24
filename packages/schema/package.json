@@ -11,6 +11,7 @@
     "./money": "./src/money.ts",
     "./password": "./src/password.ts",
     "./name": "./src/name.ts",
+    "./gender": "./src/gender.ts",
     "./personal-details": "./src/personal-details.ts",
     "./social-link": "./src/social-link.ts",
     "./club-price": "./src/club-price.ts",

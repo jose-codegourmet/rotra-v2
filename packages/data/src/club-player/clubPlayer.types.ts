@@ -99,6 +99,8 @@ export type ClubPlayerDetails = {
   nickname: string | null
   /** The club's own phone for an unclaimed player is on file; a guest never has one */
   phoneOnFile: boolean
+  /** Gender the club gave (D-2026-11-19-01); null or missing = not given */
+  gender?: Gender | null
   /** Level for this club (the saved level, or the latest session one); null for none yet */
   level: PlayingLevel | null
   /**
@@ -120,6 +122,8 @@ export type ClubPlayerDetails = {
 export type ClubPlayerDetailsInput = {
   fullName: string
   nickname: string
+  /** Optional gender: 'male', 'female' or '' for not given */
+  gender?: Gender | ''
   /** Level for this club: a playing level code, or '' for none */
   level: string
   phone: string

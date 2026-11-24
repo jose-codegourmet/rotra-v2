@@ -76,6 +76,7 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         level={profile.suggestion}
         tonightLevel={live ? entry?.level : null}
         tonight={tonight}
+        gender={profile.gender}
         registeredCity={registeredCity(profile.rtrId)}
         rtrId={profile.rtrId}
         profileHref={profile.rtrId ? rotraProfileUrl(profile.rtrId) : null}

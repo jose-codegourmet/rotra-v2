@@ -299,6 +299,7 @@ export function enqueueAddNewPlayer(
       ...placementFlags(input),
       name,
       nickname: input.nickname?.trim() || undefined,
+      ...(input.gender ? { gender: input.gender } : {}),
       ...(email ? { email } : {}),
       ...(socialLink ? { socialLink } : {}),
       ...(phone ? { phone } : {}),

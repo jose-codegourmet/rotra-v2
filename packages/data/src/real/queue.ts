@@ -606,6 +606,8 @@ export async function realAddNewPlayerToSession(input: {
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string
 }) {
+  // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+  const { gender: _gender, ...fields } = input as typeof input & { gender?: unknown }
   const result = await realRequest<{
     rosterEntry: WireRosterEntry | null
     waitlist: WireWaitlistEntry | null
@@ -613,7 +615,7 @@ export async function realAddNewPlayerToSession(input: {
     emailWords?: string | null
   }>(`/api/sessions/${encodeURIComponent(input.sessionId)}/roster`, {
     method: 'POST',
-    body: { ...input, operationId: input.operationId ?? crypto.randomUUID() },
+    body: { ...fields, operationId: input.operationId ?? crypto.randomUUID() },
     fields: { player: 'name' },
   })
   const waitlistPosition = result.waitlist?.position ?? null
@@ -726,6 +728,7 @@ export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetail
     body: {
       fullName: values.fullName,
       nickname: values.nickname,
+      // Gender has no column in real mode yet (D-2026-11-19-01): not sent.
       level: values.level,
       phone: values.phone,
       email: values.email,
@@ -860,13 +863,15 @@ export async function realAddNewSavedPlayer(input: {
   /** The saved level, if one was chosen */
   level?: string | null
 }) {
+  // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+  const { gender: _gender, ...fields } = input as typeof input & { gender?: unknown }
   const saved = await realRequest<{
     clubPlayerId: string
     name: string
     emailWords?: string | null
   }>('/api/club/players', {
     method: 'POST',
-    body: { ...input, operationId: crypto.randomUUID() },
+    body: { ...fields, operationId: crypto.randomUUID() },
   })
   return accepted(
     { clubPlayerId: saved.clubPlayerId },

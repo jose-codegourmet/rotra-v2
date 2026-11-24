@@ -105,37 +105,33 @@ export function createMatchLineupFixtures(now = Date.now()) {
     minimumGames: session.minimumGames,
   }
 
-  const draftPlayer = (p: MatchLineupPlayerFixture, suggested: number, playingNow = false) => ({
+  const draftPlayer = (p: MatchLineupPlayerFixture) => ({
     id: p.id,
     name: p.shortName,
     fullName: p.name,
     level: p.level,
-    played: p.games,
-    queued: 1,
-    suggested,
-    playingNow,
+    games: p.games,
   })
   const draftOne = {
     id: 'draft-available-1',
     format: 'doubles' as const,
-    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
-    teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p)),
+    teamB: belowMinimum.teamB.map((p) => draftPlayer(p)),
     reason: 'Available players with the lowest planned load',
   }
   const draftTwo = {
     id: 'draft-available-2',
     format: 'doubles' as const,
-    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 2)),
-    teamB: belowMinimum.teamB.map((p) => draftPlayer(p, 2)),
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p)),
+    teamB: belowMinimum.teamB.map((p) => draftPlayer(p)),
     reason: 'The same players may appear in a later future match',
   }
   const draftAhead = {
     id: 'draft-ahead-1',
     format: 'doubles' as const,
-    teamA: belowMinimum.teamA.map((p) => draftPlayer(p, 1, true)),
-    teamB: someBelow.teamB.map((p) => draftPlayer(p, 1)),
-    reason: 'Plan ahead with present players',
-    blockedReason: 'A player is playing now; this match waits until they are free.',
+    teamA: belowMinimum.teamA.map((p) => draftPlayer(p)),
+    teamB: someBelow.teamB.map((p) => draftPlayer(p)),
+    reason: 'Waits for Court 2 · ends in about 3 min',
   }
   const autoQueueWorkspace = {
     available: { drafts: [draftOne, draftTwo], stopReason: 'Made 2 of 2 matches.' },
@@ -155,8 +151,6 @@ export function createMatchLineupFixtures(now = Date.now()) {
         {
           ...draftOne,
           id: 'draft-catchup-1',
-          teamA: draftOne.teamA.map((p) => ({ ...p, suggested: 1 })),
-          teamB: draftOne.teamB.map((p) => ({ ...p, suggested: 1 })),
           reason: 'Below the chosen completed-game target',
         },
       ],

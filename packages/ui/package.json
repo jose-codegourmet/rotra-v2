@@ -74,6 +74,7 @@
     "./facebook-post-editor": "./src/components/facebook-post-editor/FacebookPostEditor.tsx",
     "./facebook-post-sheet": "./src/components/facebook-post-sheet/FacebookPostSheet.tsx",
     "./field": "./src/components/field/Field.tsx",
+    "./gender-field": "./src/components/gender-field/GenderField.tsx",
     "./field/variants": "./src/components/field/Field.variants.ts",
     "./finalize-progress": "./src/components/finalize-progress/FinalizeProgress.tsx",
     "./forms/add-court-form": "./src/forms/add-court-form/AddCourtForm.tsx",

@@ -5,6 +5,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { Field } from '@rotra/ui/field'
+import { GenderField } from '@rotra/ui/gender-field'
 import { LevelSelect } from '@rotra/ui/level-select'
 import { Notice } from '@rotra/ui/notice'
 import { PhoneOrEmailInput } from '@rotra/ui/phone-or-email-input'
@@ -196,6 +197,13 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
             )}
           />
         </Field>
+        <Controller
+          control={form.control}
+          name="gender"
+          render={({ field }) => (
+            <GenderField value={field.value} onChange={field.onChange} disabled={isPending} />
+          )}
+        />
         <Field
           label="Email"
           optional

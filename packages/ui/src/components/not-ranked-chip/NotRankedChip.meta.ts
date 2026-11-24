@@ -6,6 +6,7 @@ export const notRankedChipMeta = {
     'The warn "Not ranked" chip of a session with Record games off. It sits in the live console header beside the Min games chip and in the session record header next to Results published / private.',
   usage: [
     'Show it only when the session has Record games off; a session saved before the option existed reads as ranked and shows no chip.',
+    'Player Information: SessionGames (the Games page) and SessionMatchesSheet (the session matches dialog) show it after the club for a session with `ranked: false`.',
     'SessionRecordHeader already shows it for a completed session with ranked={false}; the console header places it itself.',
   ],
   prototype: {
@@ -15,6 +16,7 @@ export const notRankedChipMeta = {
   docs: [
     'docs/business_logic/product/queue/modules/sessions/README.md#record-games',
     'docs/mockup-changes/2026-11-20-queue-record-games-not-ranked.md',
+    'docs/mockup-changes/2026-11-20-player-not-ranked-games.md',
   ],
-  related: ['Chip', 'SessionRecordHeader'],
+  related: ['Chip', 'SessionRecordHeader', 'SessionGames', 'SessionMatchesSheet'],
 } satisfies ComponentMeta

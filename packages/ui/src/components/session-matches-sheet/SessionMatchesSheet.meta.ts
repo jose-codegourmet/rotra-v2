@@ -9,6 +9,7 @@ export const sessionMatchesSheetMeta = {
     'whose is “Your” on your own profile, else the display name (nickname first) with “’s”.',
     'Session page opens the Queue session page in a new tab; hidden when sessionPageUrl is null (no longer available).',
     'onShareGame and onSharePerformance only on your own profile.',
+    'A session with `ranked: false` (Record games off) shows a Not ranked chip after the club; its games count in the record and each carries the not ranked note.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
@@ -17,7 +18,8 @@ export const sessionMatchesSheetMeta = {
   docs: [
     'docs/mockup-changes/2026-11-13-player-latest-sessions.md',
     'docs/mockup-changes/2026-11-13-player-recent-sessions-games.md',
+    'docs/mockup-changes/2026-11-20-player-not-ranked-games.md',
   ],
-  variants: ['own', 'someone else', 'with fun games', 'session page gone'],
-  related: ['ProfileSessionsCard', 'GameRow', 'Sheet'],
+  variants: ['own', 'someone else', 'with fun games', 'session page gone', 'not ranked session'],
+  related: ['ProfileSessionsCard', 'GameRow', 'NotRankedChip', 'Sheet'],
 } satisfies ComponentMeta

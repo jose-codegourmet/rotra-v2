@@ -20,7 +20,21 @@ export function countRecentStandardMatches(
     )
   }, 0)
 }
-/** Counted wins inside the same window as the rank (fun and partial games never count). */
+/**
+ * One session's own Won and Lost (the session row, the session dialog, Share performance): full
+ * singles and doubles games, **including** those of a not ranked session (Record games off,
+ * D-2026-11-20-02). Fun and partial games never count. Everything else that counts games (the
+ * leaderboards, win rate, weekly chart, rank and standard-match counts) reads `counted` only.
+ */
+export function sessionWinLoss(games: readonly { counting: string; result: string }[]): {
+  wins: number
+  losses: number
+} {
+  const full = games.filter((g) => g.counting === 'counted' || g.counting === 'not_ranked')
+  const wins = full.filter((g) => g.result === 'won').length
+  return { wins, losses: full.length - wins }
+}
+/** Counted wins inside the rank window (fun, partial and not ranked games never count). */
 export function countRecentCountedWins(
   sessions: readonly PlayerSessionRecord[],
   now: Date | number,
@@ -122,7 +136,7 @@ export type WeekdayRecord = { wins: number; losses: number }
 /**
  * Weekly performance (2026-11-13 log, P-MATCH-HISTORY and the profile): counted singles and doubles
  * wins and losses per weekday, Sunday first, over sessions that finished in `year` (the same
- * January 1 reset as Latest stats, D-2026-11-13-03). Fun and partial games never count.
+ * January 1 reset as Latest stats, D-2026-11-13-03). Fun, partial and not ranked games never count.
  */
 export function weeklyPerformance(
   sessions: readonly {

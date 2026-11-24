@@ -2,7 +2,10 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionGamesMeta = {
   name: 'SessionGames',
   description: 'Official read-only player game history.',
-  usage: ['Display official records without result editing controls.'],
+  usage: [
+    'Display official records without result editing controls.',
+    'A session with `ranked: false` (Record games off, D-2026-11-20-02) shows a Not ranked chip after the club.',
+  ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',
     screen: 'Games and Profile › Recent games',

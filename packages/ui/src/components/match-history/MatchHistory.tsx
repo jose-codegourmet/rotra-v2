@@ -111,7 +111,7 @@ export function MatchHistory({
           label: 'Singles and doubles',
           badges: [{ text: String(counts.counted) }],
         },
-        { value: 'other', label: 'Fun and partial', badges: [{ text: String(counts.other) }] },
+        { value: 'other', label: 'Fun, partial and not ranked', badges: [{ text: String(counts.other) }] },
       ]}
     >
       {(['counted', 'other'] as const).map((tab) => {
@@ -165,7 +165,7 @@ export function MatchHistory({
                     ? 'No games match this filter.'
                     : tab === 'counted'
                       ? 'No recorded singles or doubles games yet.'
-                      : 'No fun or partial games.'}
+                      : 'No fun, partial or not-ranked games.'}
                 </p>
               )}
               {pages > 1 ? (

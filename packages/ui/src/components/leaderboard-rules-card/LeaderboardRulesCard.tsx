@@ -13,8 +13,8 @@ export function LeaderboardRulesCard({ onOpenRankDetail }: { onOpenRankDetail: (
           </li>
           <li>Each list starts again when a new year, month or week begins.</li>
           <li>
-            Fun games, partial games after a substitution, and invalid games or sessions don&apos;t
-            count.
+            Fun games, partial games after a substitution, games from not-ranked sessions, and
+            invalid games or sessions don&apos;t count.
           </li>
           <li>
             The mark beside a place shows the move since the period before: up, down, or{' '}

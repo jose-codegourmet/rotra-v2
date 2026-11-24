@@ -31,15 +31,21 @@ const FORMATS = {
 
 const firstName = (name: string) => name.split(/\s+/)[0] ?? name
 
+/** Under every game of a not ranked session (Record games off, D-2026-11-20-02) */
+export const NOT_RANKED_NOTE =
+  "Not ranked session · doesn't count toward win rate or the leaderboards"
+
 /**
  * A player game as a small badminton court (P-MATCH-HISTORY, 2026-11-13 game row log; the
  * prototype's gameRow): the Player variant of the shared MatchCourt. The player and partner are on
  * the left, opponents on the right; the format is the corner pill and, on your own games, a share
  * icon sits top-right. Faces open the profile card and carry the games badge (how many games that
- * person had played in the session, this one included; 2026-11-14 log).
+ * person had played in the session, this one included; 2026-11-14 log). A game of a not ranked
+ * session keeps its Won / Lost and carries the not ranked note, without “· not counted”.
  */
 export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowProps) {
   const partial = game.counting === 'partial'
+  const notRanked = game.counting === 'not_ranked'
   const won = game.result === 'won'
   // Without per-player detail (real mode for now) only your own face opens a card.
   const known = !!game.partnerPlayers && !!game.opponentPlayers
@@ -88,7 +94,8 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
       gameScores={game.gameScores}
       mine
       notCounted={partial}
-      note={game.note ?? undefined}
+      note={notRanked ? NOT_RANKED_NOTE : game.note || undefined}
+      plainNote={notRanked}
       dateLine={dateLine}
       action={
         onShare && !partial ? (

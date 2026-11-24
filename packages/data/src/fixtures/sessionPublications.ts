@@ -23,8 +23,8 @@ export function createSessionPublicationFixtures(now = Date.now()) {
       },
     ]
   })
-  // Match the Player mockup: Sunday is unshared; the four older samples are published.
-  for (const id of ['m2', 'm3', 'm4', 'm5'])
+  // Match the Player mockup: Sunday is unshared; the five older samples are published.
+  for (const id of ['m2', 'm6', 'm3', 'm4', 'm5'])
     publications.push({
       sessionId: id,
       publishedSlides: ['standings'],

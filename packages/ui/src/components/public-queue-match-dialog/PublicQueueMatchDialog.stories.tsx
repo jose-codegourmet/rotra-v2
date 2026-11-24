@@ -17,9 +17,7 @@ const fiveVFive = {
   teamA: ['Ben', 'Cai', 'Dan', 'Eli', 'Fox'].map((n, i) =>
     face(n, i % 2 ? 'intermediate_low' : 'beginner_mid'),
   ),
-  teamB: ['Gus', 'Hal', 'Ian', 'Jay', 'Kit'].map((n, i) =>
-    face(n, i % 2 ? 'advanced_mid' : null),
-  ),
+  teamB: ['Gus', 'Hal', 'Ian', 'Jay', 'Kit'].map((n, i) => face(n, i % 2 ? 'advanced_mid' : null)),
 }
 
 const meta = {

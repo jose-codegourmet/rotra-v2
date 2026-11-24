@@ -288,9 +288,7 @@ export function PublicSessionQueue({
         position={viewIndex + 1}
         label={viewed ? (viewed.label ?? FORMAT_LABELS[viewed.format]) : 'Match'}
         match={
-          viewed
-            ? { teamA: viewed.teamA.map(courtFace), teamB: viewed.teamB.map(courtFace) }
-            : null
+          viewed ? { teamA: viewed.teamA.map(courtFace), teamB: viewed.teamB.map(courtFace) } : null
         }
       />
     </section>

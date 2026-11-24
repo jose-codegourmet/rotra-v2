@@ -1,4 +1,4 @@
-import { joseSession } from '@rotra/data/fixtures/player-games'
+import { JOSE_SESSIONS, joseSession } from '@rotra/data/fixtures/player-games'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SessionGames } from './SessionGames'
 
@@ -13,3 +13,9 @@ export const WithLink: Story = {
   },
 }
 export const PageGone: Story = { args: { session: joseSession(3) } }
+/** A session run with Record games off: the Not ranked chip after the club */
+export const NotRanked: Story = {
+  args: { session: JOSE_SESSIONS.find((s) => s.ranked === false) ?? joseSession(0) },
+  globals: { theme: 'dark' },
+}
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }

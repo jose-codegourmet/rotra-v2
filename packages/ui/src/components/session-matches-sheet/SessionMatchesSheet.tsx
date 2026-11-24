@@ -5,6 +5,7 @@ import { Button } from '@rotra/ui/button'
 import { DateBlock, formatSessionDay } from '@rotra/ui/date-block'
 import { GameRow, type GameRowPlayer, type GameRowProps } from '@rotra/ui/game-row'
 import { Icon } from '@rotra/ui/icon'
+import { NotRankedChip } from '@rotra/ui/not-ranked-chip'
 import { SessionRecordText, sessionRecord } from '@rotra/ui/profile-sessions-card'
 import { Sheet } from '@rotra/ui/sheet'
 
@@ -32,7 +33,8 @@ export type SessionMatchesSheetProps = {
  * opened from a Recent sessions row or the Sessions page: titled with the session name; a head row
  * with the date block, the date, the club and the counted record (“counted” under it); then
  * “Your matches · N” / “NAME's matches · N” and every match row of that session, fun games marked
- * “Fun game · not counted”. Footer: Close, Share performance (own) and Session page (new tab;
+ * “Fun game · not counted”; a not ranked session carries a **Not ranked** chip after the club and
+ * its games count in the record. Footer: Close, Share performance (own) and Session page (new tab;
  * hidden when the session page is no longer available).
  */
 export function SessionMatchesSheet({
@@ -75,7 +77,11 @@ export function SessionMatchesSheet({
             <DateBlock at={at} className="size-[46px]" />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <b>{formatSessionDay(at)}</b>
-              <span className="text-[13px] text-fg2">{session.clubName}</span>
+              <span className="text-[13px] text-fg2">
+                {session.clubName}
+                {session.ranked === false ? ' · ' : null}
+                {session.ranked === false ? <NotRankedChip /> : null}
+              </span>
             </div>
             <span className="flex flex-none flex-col items-end gap-0.5 text-right">
               <SessionRecordText wins={record.wins} losses={record.losses} className="text-lg" />
@@ -93,7 +99,7 @@ export function SessionMatchesSheet({
                 me={me}
                 onOpenPlayer={onOpenPlayer}
                 onShare={
-                  onShareGame && game.counting === 'counted'
+                  onShareGame && (game.counting === 'counted' || game.counting === 'not_ranked')
                     ? () => onShareGame(session.id, game.id)
                     : undefined
                 }

@@ -1,3 +1,4 @@
+import { sessionWinLoss } from '@rotra/data/player/rules'
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -5,11 +6,12 @@ import { cn } from '@rotra/ui/cn'
 import { DateBlock, formatSessionDay } from '@rotra/ui/date-block'
 import { Icon } from '@rotra/ui/icon'
 
-/** One session's counted record (wins, losses) and all its matches, fun games included. */
+/**
+ * One session's record (wins, losses) and all its matches, fun games included. The games of a not
+ * ranked session count in its own record (sessionWinLoss, D-2026-11-20-02).
+ */
 export function sessionRecord(session: Pick<PlayerSessionRecord, 'games'>) {
-  const counted = session.games.filter((game) => game.counting === 'counted')
-  const wins = counted.filter((game) => game.result === 'won').length
-  return { wins, losses: counted.length - wins, matches: session.games.length }
+  return { ...sessionWinLoss(session.games), matches: session.games.length }
 }
 
 /** “2W · 2L”: wins in the accent, losses in the error colour. */

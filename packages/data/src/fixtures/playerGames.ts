@@ -27,6 +27,7 @@ function game(
   }
 }
 // These historical sessions have no corresponding Queue fixture. Preserve their games with no link.
+// Newest first: the mock read keeps this order.
 export const JOSE_SESSIONS: PlayerSessionRecord[] = [
   {
     id: 'm1',
@@ -51,6 +52,21 @@ export const JOSE_SESSIONS: PlayerSessionRecord[] = [
       game('doubles', ['Karl'], ['Santino', 'Aaron'], 'won', '21–19'),
       game('doubles', ['Mikee Abellana'], ['Gab', 'Dalton'], 'lost', '17–21'),
       game('doubles', ['Jasper'], ['Raymark', 'Derrick'], 'won', null),
+    ],
+  },
+  // A session the club ran with Record games off (D-2026-11-20-02; the prototype's m6): the games
+  // show with the night's win or loss but never count toward the leaderboards, win rate or rank.
+  {
+    id: 'm6',
+    title: 'Saturday Doubles Night',
+    clubName: 'Mandaue Shuttle Society',
+    finishedAt: daysAgo(9),
+    sessionPageUrl: null,
+    ranked: false,
+    games: [
+      game('doubles', ['Neil'], ['Klent', 'Tricia'], 'won', '31–24', 'not_ranked'),
+      game('doubles', ['Ezzy'], ['Dian Tan', 'Chase'], 'won', '31–27', 'not_ranked'),
+      game('doubles', ['Lalai'], ['Mark', 'Troy'], 'lost', '22–31', 'not_ranked'),
     ],
   },
   {

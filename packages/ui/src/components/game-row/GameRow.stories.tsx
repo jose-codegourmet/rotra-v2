@@ -35,7 +35,17 @@ export const OwnGameShareable: Story = { args: { onShare: () => {} }, globals: {
 export const LostWithoutScore: Story = { args: { game: withFaces(0, 1) } }
 export const Singles: Story = { args: { game: withFaces(0, 2) } }
 export const Fun: Story = { args: { game: withFaces(0, 3) } }
-export const PartialWithNote: Story = { args: { game: withFaces(2, 2) } }
+export const PartialWithNote: Story = { args: { game: withFaces(3, 2) } }
+/** A game of a not ranked session: Won / Lost as usual, the note without “· not counted”. */
+export const NotRanked: Story = {
+  args: { game: withFaces(2, 0), onShare: () => {} },
+  globals: { theme: 'dark' },
+}
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }
+export const NotRankedPhone: Story = {
+  ...NotRanked,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
 export const SomeoneElse: Story = {
   args: { me: { name: 'Mikee Abellana', label: 'Mikee', playerId: 'mikee' } },
 }

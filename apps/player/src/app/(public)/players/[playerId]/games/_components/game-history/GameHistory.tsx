@@ -125,7 +125,7 @@ export function GameHistory({ playerId }: { playerId: string }) {
           onFilterChange={(next) => {
             setFilter(next)
             setPage(1)
-            // Tapping a bar on Fun and partial switches to Singles and doubles and filters there.
+            // Tapping a bar on Fun, partial and not ranked switches to Singles and doubles and filters there.
             if (next) setActiveTab('counted')
           }}
         />

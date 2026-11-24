@@ -37,6 +37,8 @@ export type MatchCourtProps = {
   notCounted?: boolean
   /** Player variant: warn line under the court, “NOTE · not counted” */
   note?: string
+  /** The note stands alone, without “· not counted” (a game of a not ranked session) */
+  plainNote?: boolean
   /** Muted line under the court (Recent games: “session · date · club”) */
   dateLine?: string
   /** A fun format: “· Fun” in the corner pill */
@@ -123,6 +125,7 @@ export function MatchCourt({
   action,
   notCounted = false,
   note,
+  plainNote = false,
   dateLine,
   fun,
   left,
@@ -278,7 +281,12 @@ export function MatchCourt({
         </div>
         <div className={side}>{right.map((p) => face(p, ring && winner === 'right'))}</div>
       </fieldset>
-      {note ? <div className="text-[13px] text-warn">{note} · not counted</div> : null}
+      {note ? (
+        <div className="text-[13px] text-warn">
+          {note}
+          {plainNote ? '' : ' · not counted'}
+        </div>
+      ) : null}
       {dateLine ? <p className="text-[13px] text-fg2">{dateLine}</p> : null}
     </article>
   )

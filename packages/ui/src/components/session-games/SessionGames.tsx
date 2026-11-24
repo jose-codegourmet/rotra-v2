@@ -2,6 +2,7 @@ import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { GameRow, type GameRowPlayer, type GameRowProps } from '@rotra/ui/game-row'
 import { Icon } from '@rotra/ui/icon'
+import { NotRankedChip } from '@rotra/ui/not-ranked-chip'
 import type { ReactNode } from 'react'
 export type SessionGamesProps = {
   session: PlayerSessionRecord
@@ -34,6 +35,8 @@ export function SessionGames({
               timeZone: 'Asia/Manila',
             })}{' '}
             · {session.clubName}
+            {session.ranked === false ? ' · ' : null}
+            {session.ranked === false ? <NotRankedChip /> : null}
           </p>
         </div>
         {session.sessionPageUrl ? (

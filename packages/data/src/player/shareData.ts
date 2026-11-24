@@ -7,11 +7,11 @@ import { maskPublicName } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
 import { realGetMyShareSession } from '../real/my-sessions'
 import { getPlayerGames, getPlayerProfile, getPlayerRank } from './fetchers'
-import { countYearCountedWins } from './player.rules'
+import { countYearCountedWins, sessionWinLoss } from './player.rules'
 import type { PlayerShareGame, PlayerShareParticipant } from './player.types'
 import { isPrivatePlayer } from './visibility'
 
-const SAMPLE_SESSION_POSITIONS: Record<string, number> = { m2: 3, m3: 7, m4: 5, m5: 12 }
+const SAMPLE_SESSION_POSITIONS: Record<string, number> = { m2: 3, m6: 2, m3: 7, m4: 5, m5: 12 }
 
 /** Cards carry no identifying picture for private players or guests. */
 function shareParticipant(name: string): PlayerShareParticipant {
@@ -41,12 +41,12 @@ export async function getPlayerShareData(
   const session = history.find((s) => s.id === sessionId)
   if (!session) return null
   // Totals for Share performance: every game played; Won and Lost count singles and doubles only.
-  const counted = session.games.filter((g) => g.counting === 'counted')
-  const countedWins = counted.filter((g) => g.result === 'won').length
+  // A not ranked session's games count here too: this is the night's own record (D-2026-11-20-02).
+  const record = sessionWinLoss(session.games)
   const totals = {
     totalGames: session.games.length,
-    countedWins,
-    countedLosses: counted.length - countedWins,
+    countedWins: record.wins,
+    countedLosses: record.losses,
   }
   if (isRealDataMode()) {
     const saved = await realGetMyShareSession(sessionId, signal)

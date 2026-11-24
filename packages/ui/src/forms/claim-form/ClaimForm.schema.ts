@@ -1,4 +1,5 @@
 import { emailField } from '@rotra/schema/email'
+import { genderRequiredInput } from '@rotra/schema/gender'
 import { passwordField } from '@rotra/schema/password'
 import { personalDetailsShape } from '@rotra/schema/personal-details'
 import { phoneField } from '@rotra/schema/phone'
@@ -6,7 +7,7 @@ import { socialLinksShape } from '@rotra/schema/social-link'
 import { z } from 'zod'
 
 /**
- * Email and password plus the optional personal details. `phone` is only filled in when the profile
+ * Email and password, the required gender (Male or Female, since the owner's November 19, 2026 comment) plus the optional personal details. `phone` is only filled in when the profile
  * has no phone on file (the form then requires it); a phone on file is shown read-only instead.
  */
 const phoneText = z
@@ -29,6 +30,7 @@ export const claimSchema = z
     password: z.string().min(1, 'Choose a password.').pipe(passwordField),
     confirmPassword: z.string(),
     cityCode: z.string().optional(),
+    gender: genderRequiredInput,
     ...personalDetailsShape,
     ...socialLinksShape,
   })
@@ -45,6 +47,7 @@ export type ClaimValues = z.infer<typeof claimSchema>
 export const claimGoogleSchema = z.object({
   phone: phoneText,
   cityCode: z.string().optional(),
+  gender: genderRequiredInput,
   ...personalDetailsShape,
   ...socialLinksShape,
 })

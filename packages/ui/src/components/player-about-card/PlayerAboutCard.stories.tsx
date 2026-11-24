@@ -19,3 +19,15 @@ export const Full: Story = {}
 export const EmptyPublic: Story = { args: { profile: empty } }
 export const EmptyOwn: Story = { args: { profile: empty, isOwn: true } }
 export const LinksOnly: Story = { args: { profile: linksOnly } }
+const answered = {
+  ...empty,
+  playStyle: 'back' as const,
+  shots: ['smash', 'drop', 'netkill'] as ('smash' | 'drop' | 'netkill')[],
+  shotsOther: ['Crosscourt drop'],
+  favoritePlayer: 'lindan' as const,
+}
+export const WithAnswers: Story = { args: { profile: answered } }
+export const WithAnswersLight: Story = { args: { profile: answered }, globals: { theme: 'light' } }
+export const FavoriteOthers: Story = {
+  args: { profile: { ...answered, favoritePlayer: 'other', favoritePlayerOther: 'Rinov Rivaldy' } },
+}

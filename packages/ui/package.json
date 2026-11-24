@@ -554,7 +554,15 @@
     "./pick-chip/variants": "./src/components/pick-chip/PickChip.variants.ts",
     "./shot-chips": "./src/components/shot-chips/ShotChips.tsx",
     "./shot-chips/helpers": "./src/components/shot-chips/ShotChips.helpers.ts",
-    "./step-banner": "./src/components/step-banner/StepBanner.tsx"
+    "./step-banner": "./src/components/step-banner/StepBanner.tsx",
+    "./gender-chips": "./src/components/gender-chips/GenderChips.tsx",
+    "./getting-to-know-fields": "./src/forms/getting-to-know-fields/GettingToKnowFields.tsx",
+    "./getting-to-know-fields/default-values": "./src/forms/getting-to-know-fields/GettingToKnowFields.defaultValues.ts",
+    "./getting-to-know-fields/schema": "./src/forms/getting-to-know-fields/GettingToKnowFields.schema.ts",
+    "./onboarding-step-form": "./src/forms/onboarding-step-form/OnboardingStepForm.tsx",
+    "./your-details-form": "./src/forms/your-details-form/YourDetailsForm.tsx",
+    "./your-details-form/default-values": "./src/forms/your-details-form/YourDetailsForm.defaultValues.ts",
+    "./your-details-form/schema": "./src/forms/your-details-form/YourDetailsForm.schema.ts"
   },
   "scripts": {
     "storybook": "storybook dev --port 6006",

@@ -21,6 +21,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useGooglePicker, useGoogleReturn } from '@/app/_components/google-sign-in/useGooglePicker'
 import { useNoGoogleSheet } from '@/app/_components/google-sign-in/useNoGoogleSheet'
+import { OnboardingChrome } from '@/app/_components/onboarding/OnboardingChrome'
+import { OnboardingFlow } from '@/app/_components/onboarding/OnboardingFlow'
+import { useSaveRegistrationGender } from '@/app/_components/onboarding/useSaveRegistrationGender'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
@@ -44,6 +47,16 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
   const dispatch = useAppDispatch()
   const [step, setStep] = useState<Step>('check')
   const [done, setDone] = useState<Done | null>(null)
+  // P-ONBOARD: after the account exists the player answers three questions before the done page.
+  const [onboarding, setOnboarding] = useState(false)
+  const saveGender = useSaveRegistrationGender()
+  const finishOnboarding = () => {
+    setOnboarding(false)
+    const back = consumeSessionReturn(returnTo)
+    if (back) window.location.assign(back)
+    window.scrollTo(0, 0)
+    toast('Registration complete')
+  }
   const verification = useMyAccountVerification(done?.googleEmail ? done.playerId : null)
   const pickGoogle = (identity: GoogleIdentity) => {
     setGoogle(identity)
@@ -54,6 +67,15 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
   // Real mode comes back to this page from Google: the form opens with the account it verified.
   useGoogleReturn('claim', pickGoogle)
 
+  if (done && onboarding)
+    return (
+      <OnboardingFlow
+        playerId={done.playerId}
+        firstName={done.firstName}
+        googleEmail={done.googleEmail}
+        onFinish={finishOnboarding}
+      />
+    )
   if (done)
     return (
       <AccountLinkStatus
@@ -152,102 +174,107 @@ export function Claim({ token, returnTo }: { token: string; returnTo?: string })
     return <GoogleMethodStep clubName={data.clubName} error={methodError} onPick={pickGoogle} />
   if (googleOn && google)
     return (
+      <>
+        <OnboardingChrome />
+        <ClaimForm
+          clubName={data.clubName}
+          maskedPhone={data.preview.maskedPhone}
+          defaultValues={data.preset}
+          google={{
+            ...google,
+            onChange: () => {
+              setGoogle(null)
+              completeGoogle.reset()
+              setStep('method')
+              window.scrollTo(0, 0)
+            },
+          }}
+          isPending={completeGoogle.isPending}
+          serverError={
+            completeGoogle.error
+              ? {
+                  message: completeGoogle.error.message,
+                  field:
+                    completeGoogle.error instanceof MockError &&
+                    completeGoogle.error.fieldErrors?.phone
+                      ? 'phone'
+                      : undefined,
+                }
+              : undefined
+          }
+          onSubmit={({
+            confirmPassword: _confirm,
+            email: _email,
+            password: _password,
+            cityCode: _city,
+            gender,
+            ...values
+          }) =>
+            completeGoogle.mutate(
+              { token, google, values },
+              {
+                onSuccess: (result) => {
+                  if (result.outcome === 'taken') {
+                    setGoogle(null)
+                    setMethodError(
+                      `${result.email} is already on another ROTRA account. Pick another Google account or set a password.`,
+                    )
+                    setStep('method')
+                    window.scrollTo(0, 0)
+                    return
+                  }
+                  dispatch(setAccount(result.session.account))
+                  setDone({ ...result, googleEmail: google.email })
+                  setOnboarding(true)
+                  saveGender(gender)
+                  window.scrollTo(0, 0)
+                },
+                onError: (failure) => toast.error(failure.message),
+              },
+            )
+          }
+        />
+      </>
+    )
+  const error = complete.error
+  return (
+    <>
+      <OnboardingChrome />
       <ClaimForm
         clubName={data.clubName}
         maskedPhone={data.preview.maskedPhone}
         defaultValues={data.preset}
-        google={{
-          ...google,
-          onChange: () => {
-            setGoogle(null)
-            completeGoogle.reset()
-            setStep('method')
-            window.scrollTo(0, 0)
-          },
-        }}
-        isPending={completeGoogle.isPending}
+        isPending={complete.isPending}
         serverError={
-          completeGoogle.error
+          error
             ? {
-                message: completeGoogle.error.message,
+                message: error.message,
                 field:
-                  completeGoogle.error instanceof MockError &&
-                  completeGoogle.error.fieldErrors?.phone
-                    ? 'phone'
-                    : undefined,
+                  error instanceof MockError && error.fieldErrors?.email
+                    ? 'email'
+                    : error instanceof MockError && error.fieldErrors?.phone
+                      ? 'phone'
+                      : undefined,
               }
             : undefined
         }
-        onSubmit={({
-          confirmPassword: _confirm,
-          email: _email,
-          password: _password,
-          cityCode: _city,
-          ...values
-        }) =>
-          completeGoogle.mutate(
-            { token, google, values },
+        onSubmit={({ confirmPassword: _confirm, cityCode: _city, gender, ...values }) =>
+          complete.mutate(
+            { token, values },
             {
               onSuccess: (result) => {
-                if (result.outcome === 'taken') {
-                  setGoogle(null)
-                  setMethodError(
-                    `${result.email} is already on another ROTRA account. Pick another Google account or set a password.`,
-                  )
-                  setStep('method')
-                  window.scrollTo(0, 0)
-                  return
-                }
                 dispatch(setAccount(result.session.account))
-                setDone({ ...result, googleEmail: google.email })
-                const back = consumeSessionReturn(returnTo)
-                if (back) window.location.assign(back)
+                setDone(result)
+                setOnboarding(true)
+                saveGender(gender)
                 window.scrollTo(0, 0)
-                toast('Registration complete')
               },
               onError: (failure) => toast.error(failure.message),
             },
           )
         }
       />
-    )
-  const error = complete.error
-  return (
-    <ClaimForm
-      clubName={data.clubName}
-      maskedPhone={data.preview.maskedPhone}
-      defaultValues={data.preset}
-      isPending={complete.isPending}
-      serverError={
-        error
-          ? {
-              message: error.message,
-              field:
-                error instanceof MockError && error.fieldErrors?.email
-                  ? 'email'
-                  : error instanceof MockError && error.fieldErrors?.phone
-                    ? 'phone'
-                    : undefined,
-            }
-          : undefined
-      }
-      onSubmit={({ confirmPassword: _confirm, cityCode: _city, ...values }) =>
-        complete.mutate(
-          { token, values },
-          {
-            onSuccess: (result) => {
-              dispatch(setAccount(result.session.account))
-              setDone(result)
-              const back = consumeSessionReturn(returnTo)
-              if (back) window.location.assign(back)
-              window.scrollTo(0, 0)
-              toast('Registration complete')
-            },
-            onError: (failure) => toast.error(failure.message),
-          },
-        )
-      }
-    />
+    </>
   )
 }
 

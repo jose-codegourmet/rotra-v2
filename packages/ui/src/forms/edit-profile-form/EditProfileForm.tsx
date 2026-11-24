@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { GettingToKnowFields } from '@rotra/ui/getting-to-know-fields'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
@@ -30,7 +31,15 @@ const SECTIONS: [Section, ...Section[]] = [
     id: 'playing-style',
     label: 'Playing style',
     intro: 'Help clubs and other players know your game.',
-    keys: ['playingStyle', 'experienceYears', 'experienceMonths'],
+    keys: [
+      'playStyle',
+      'shots',
+      'shotsOther',
+      'favoritePlayer',
+      'favoritePlayerOther',
+      'experienceYears',
+      'experienceMonths',
+    ],
   },
   {
     id: 'links',
@@ -217,7 +226,16 @@ export function EditProfileForm({
                 </p>
               </>
             ) : (
-              <PersonalDetailsFields sections={[section.id]} disabled={isPending} />
+              <>
+                {section.id === 'playing-style' ? (
+                  <GettingToKnowFields
+                    sections={['court', 'shots', 'favorite']}
+                    labelled
+                    disabled={isPending}
+                  />
+                ) : null}
+                <PersonalDetailsFields sections={[section.id]} disabled={isPending} />
+              </>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3.5 max-[720px]:sticky max-[720px]:bottom-0 max-[720px]:-mx-4 max-[720px]:-mb-4 max-[720px]:rounded-b-lg max-[720px]:bg-surface max-[720px]:px-4 max-[720px]:pt-3 max-[720px]:pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
               <span className="text-sm text-fg2" aria-live="polite">

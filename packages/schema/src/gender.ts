@@ -11,3 +11,11 @@ export const genderInput = z.enum(['male', 'female', ''])
 
 /** The same field as submitted by Add player: '' becomes null. */
 export const genderField = genderInput.transform((value) => (value === '' ? null : value))
+
+/**
+ * Gender as the registration's Your details step holds it: '' until a chip is picked, then male or
+ * female. Required (D-2026-11-19-01, owner comment of November 19, 2026), so '' fails.
+ */
+export const genderRequiredInput = z
+  .enum(['male', 'female', ''])
+  .refine((value) => value !== '', 'Choose Male or Female.')

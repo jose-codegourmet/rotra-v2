@@ -8,7 +8,17 @@ import { type ReactNode, useId } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import type { PersonalDetailsValues } from './PersonalDetailsFields.schema'
 
-export type PersonalDetailsSection = 'name' | 'playing-style' | 'links'
+/**
+ * 'nickname' is the Nickname field alone (the optional fold of Your details); 'name' is Full name and
+ * Nickname; 'playing-style' is Experience (the pickers live in GettingToKnowFields, D-2026-11-19-11);
+ * 'playing-text' is the old free-text Playing style, kept only for the club's Edit details form.
+ */
+export type PersonalDetailsSection =
+  | 'name'
+  | 'nickname'
+  | 'playing-text'
+  | 'playing-style'
+  | 'links'
 export type PersonalDetailsFieldsProps = {
   /** Edit profile shows one section at a time; the claim form shows all three */
   sections: PersonalDetailsSection[]
@@ -66,21 +76,30 @@ export function PersonalDetailsFields({ sections, disabled = false }: PersonalDe
           </Field>
         </div>
       ) : null}
+      {sections.includes('nickname') && !sections.includes('name') ? (
+        <Field
+          label={<Public>Nickname</Public>}
+          hint={error('nickname') ? undefined : 'Optional'}
+          error={error('nickname')}
+        >
+          {text('nickname', { autoComplete: 'nickname' })}
+        </Field>
+      ) : null}
+      {sections.includes('playing-text') ? (
+        <Field
+          label={<Public>Playing style</Public>}
+          hint={error('playingStyle') ? undefined : 'Optional. How you play, in a sentence or two.'}
+          error={error('playingStyle')}
+        >
+          <Controller
+            control={control}
+            name="playingStyle"
+            render={({ field }) => <Textarea {...field} maxLength={280} disabled={disabled} />}
+          />
+        </Field>
+      ) : null}
       {sections.includes('playing-style') ? (
         <>
-          <Field
-            label={<Public>Playing style</Public>}
-            hint={
-              error('playingStyle') ? undefined : 'Optional. How you play, in a sentence or two.'
-            }
-            error={error('playingStyle')}
-          >
-            <Controller
-              control={control}
-              name="playingStyle"
-              render={({ field }) => <Textarea {...field} maxLength={280} disabled={disabled} />}
-            />
-          </Field>
           <fieldset className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
             <legend className="mb-1.5 p-0 text-[13px] font-semibold text-fg2">
               <Public>Experience</Public>

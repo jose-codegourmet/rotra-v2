@@ -84,7 +84,9 @@ export function SetupRestrictionsField() {
       kind === 'per-level'
         ? {
             kind,
-            slots: keep ? { beginner: 0, intermediate: 0, advanced: 0, ...slots } : splitSlots(capacity),
+            slots: keep
+              ? { beginner: 0, intermediate: 0, advanced: 0, ...slots }
+              : splitSlots(capacity),
           }
         : { kind },
       { shouldDirty: true },

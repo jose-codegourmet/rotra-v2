@@ -1,7 +1,7 @@
 'use client'
 
-import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { courtOpen, queueMasterName } from '@rotra/data/match/match.rules'
+import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'

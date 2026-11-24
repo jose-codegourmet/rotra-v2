@@ -10,12 +10,20 @@ export const setupFormatsSectionMeta = {
     'Mode and Scoring cards show the art in cardArt (image URLs the app serves from apps/queue/public/art/session-setup; Storybook serves the same folder). Scoring stores one of the five keys: 31 + Deuce = 31, 31 without = 31nd, 21 = 21, 21 × 3 + Deuce = 21x3, without = 21x3nd. 21 points has only deuce, so its switch is on and disabled; changing the points card keeps Deuce when the new card has both.',
     'Restrictions (D-2026-11-19-12) sits above Mode: SetupRestrictionsField, the form’s levelRestriction pick with its slots per level fields.',
     'Pass scoringLocked once the session has started: Scoring becomes a read-only box with "Scoring can\'t change after Start.".',
-    'Pass an explicit allowedRequestFormats set and callback to show the Players can request tick tiles (TickTile, role=checkbox, label with \"· N of 6 on\"); defaults and form wiring are supplied by the caller.',
+    'Pass an explicit allowedRequestFormats set and callback to show the Players can request tick tiles (TickTile, role=checkbox, label with "· N of 6 on"); defaults and form wiring are supplied by the caller.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
     screen: 'Q-SETUP › viewSetup() part 2 (Formats and mode), MODES',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
-  related: ['SessionSetupForm', 'SetupMinimumSection', 'SetupRestrictionsField', 'ChoiceGroup', 'Switch', 'Chip', 'TickTile'],
+  related: [
+    'SessionSetupForm',
+    'SetupMinimumSection',
+    'SetupRestrictionsField',
+    'ChoiceGroup',
+    'Switch',
+    'Chip',
+    'TickTile',
+  ],
 } satisfies ComponentMeta

@@ -121,7 +121,7 @@ export const Draft: Story = {
   args: {
     ...propsFor(matchCardFixtures.ready),
     status: draftStatus,
-    draft: { selected: false, onToggle: fn(), },
+    draft: { selected: false, onToggle: fn() },
   },
 }
 export const DraftSelected: Story = {
@@ -193,11 +193,7 @@ export const Desktop: Story = {
 /** Same queue tile with static faces and no operator controls; both themes via toolbar. */
 export const PlayerReadOnly: Story = { args: { readOnly: true } }
 
-const LEVELS: PlayingLevel[] = [
-  'beginner_low',
-  'intermediate_mid',
-  'advanced_high',
-]
+const LEVELS: PlayingLevel[] = ['beginner_low', 'intermediate_mid', 'advanced_high']
 
 /** Games 0, 3, 12 and 25 on faces in each band and with no level; the badge opens the games. */
 const withRings = (c: MatchCardFixture): MatchCardProps => {
@@ -256,3 +252,36 @@ export const ReadyNextToWaiting: Story = {
 export const ReadySearchHit: Story = {
   args: { ...withRings(matchCardFixtures.ready), searchState: 'hit' },
 }
+
+const compactDecorators: Story['decorators'] = [
+  (Story) => (
+    <div className="w-[300px]">
+      <Story />
+    </div>
+  ),
+]
+
+/** Courts tab › Upcoming queued matches: 300 px tile, stacked pictures with level rings, names on one line. */
+export const Compact: Story = {
+  args: { ...propsFor(matchCardFixtures.ready), variant: 'compact' },
+  decorators: compactDecorators,
+}
+export const CompactNeedsAttention: Story = {
+  args: { ...propsFor(matchCardFixtures.needsAttention), variant: 'compact' },
+  decorators: compactDecorators,
+}
+export const CompactSingles: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    format: 'singles',
+    teamA: matchCardFixtures.ready.teamA.slice(0, 1),
+    teamB: matchCardFixtures.ready.teamB.slice(0, 1),
+    variant: 'compact',
+  },
+  decorators: compactDecorators,
+}
+export const CompactFiveVsFive: Story = {
+  args: { ...propsFor(matchCardFixtures.waitingForCourts), variant: 'compact' },
+  decorators: compactDecorators,
+}
+export const CompactLight: Story = { ...Compact, globals: { theme: 'light' } }

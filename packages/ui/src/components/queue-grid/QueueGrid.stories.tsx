@@ -77,7 +77,7 @@ function LiveQueueGrid(props: QueueGridProps) {
 const meta = {
   title: 'Queue/QueueGrid',
   component: QueueGrid,
-  args: { matches: waiting, onMove: fn(), onSwapSides: fn(), columns: 3 },
+  args: { matches: waiting, onMove: fn(), onSwapSides: fn(), columns: 3, mode: 'grid' },
   decorators: [
     (Story, { args }) => (
       <div className={(args.columns && widthFor[args.columns]) || 'w-full'}>
@@ -185,3 +185,66 @@ export const InteractiveSearch: Story = {
   },
 }
 export const InteractiveSearchLight: Story = { ...InteractiveSearch, globals: { theme: 'light' } }
+
+const slideDecorators: Story['decorators'] = [
+  (Story) => (
+    <div className="w-[1100px] max-w-full">
+      <Story />
+    </div>
+  ),
+]
+
+/** Slide mode (the default): one row, scroll snap per card, 450 px cards; the right edge fades while more cards wait. */
+export const Slide: Story = {
+  args: { mode: 'slide', columns: undefined },
+  decorators: slideDecorators,
+  render: (args) => <LiveQueueGrid {...args} />,
+}
+
+const scrollSlideTo =
+  (position: 'middle' | 'end') =>
+  async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const el = canvasElement.querySelector<HTMLElement>('[role="region"]')
+    if (!el) return
+    el.style.scrollBehavior = 'auto'
+    el.scrollLeft = position === 'end' ? el.scrollWidth : (el.scrollWidth - el.clientWidth) / 2
+  }
+
+/** Scrolled to the middle: both edges fade. */
+export const SlideMiddle: Story = { ...Slide, play: scrollSlideTo('middle') }
+/** Scrolled to the end: only the left edge fades. */
+export const SlideEnd: Story = { ...Slide, play: scrollSlideTo('end') }
+export const SlideLight: Story = { ...Slide, globals: { theme: 'light' } }
+
+/** One card: no fade, no scrolling. */
+export const OneCard: Story = {
+  args: { mode: 'slide', columns: undefined, matches: waiting.slice(0, 1) },
+  decorators: slideDecorators,
+}
+
+export const SlidePhone: Story = {
+  ...Slide,
+  decorators: [],
+  globals: { viewport: { value: 'phone' } },
+}
+
+/** Grid mode: tiles of 450 px or more, 2 columns on a 1000 px page, 1 column below. */
+export const Grid: Story = {
+  args: { mode: 'grid', columns: undefined },
+  decorators: [
+    (Story) => (
+      <div className="w-[1000px] max-w-full">
+        <Story />
+      </div>
+    ),
+  ],
+  render: (args) => <LiveQueueGrid {...args} />,
+}
+export const GridLight: Story = { ...Grid, globals: { theme: 'light' } }
+
+/** The switch picks the view and keeps it on this device. */
+export const SwitchKeptPerDevice: Story = {
+  args: { mode: undefined, columns: undefined },
+  decorators: slideDecorators,
+  render: (args) => <LiveQueueGrid {...args} />,
+}

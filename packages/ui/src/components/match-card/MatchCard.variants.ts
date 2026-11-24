@@ -23,9 +23,7 @@ export const matchCardVariants = cva(
           'cursor-pointer border-solid border-accent bg-accent-subtle inset-ring-2 inset-ring-accent select-none',
       },
     },
-    compoundVariants: [
-      { status: 'needs-attention', draft: 'idle', className: 'border-warn' },
-    ],
+    compoundVariants: [{ status: 'needs-attention', draft: 'idle', className: 'border-warn' }],
     defaultVariants: { status: 'ready', draft: 'none' },
   },
 )

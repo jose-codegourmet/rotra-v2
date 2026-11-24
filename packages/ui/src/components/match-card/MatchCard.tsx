@@ -6,6 +6,7 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerFaceButton, type PlayerWait } from '@rotra/ui/player-face-button'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
 import { type ComponentProps, Fragment } from 'react'
@@ -103,6 +104,12 @@ export type MatchCardProps = {
   /** Search highlights matching players without changing the match. */
   searchState?: 'hit' | 'dim'
   highlightedPlayerIds?: string[]
+  /**
+   * 'compact' (Courts tab › Upcoming queued matches): no wait times; each team is an overlapping stack
+   * of 34 px pictures with level rings and the short names on one line. Head, status line and
+   * buttons stay. Default 'default'. Draft tiles ignore it.
+   */
+  variant?: 'default' | 'compact'
   className?: string
 }
 
@@ -278,6 +285,119 @@ function StaticFaces({
   )
 }
 
+/** The compact picture's level ring (prototype .qs-f): 2 px outline plus a 3 px surface gap. */
+function compactRingClass(level: PlayingLevel | null) {
+  const colour = level?.startsWith('beginner')
+    ? 'outline-lv-beg'
+    : level?.startsWith('intermediate')
+      ? 'outline-lv-int'
+      : level?.startsWith('advanced')
+        ? 'outline-lv-adv'
+        : 'outline-lv-none'
+  return `outline-2 outline-offset-0 shadow-[0_0_0_3px_var(--surface)] ${colour}`
+}
+
+/** One picture of a compact team: a profile button (a plain picture when read only). */
+function CompactFace({
+  player: p,
+  team,
+  index,
+  swappable,
+  readOnly,
+  highlighted,
+  onSelectPlayer,
+}: {
+  player: MatchCardPlayer
+  team: MatchCardTeam
+  index: number
+  swappable: boolean
+  readOnly: boolean
+  highlighted: boolean
+  onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+}) {
+  const picture = (
+    <Avatar
+      name={p.name}
+      src={p.photoUrl}
+      size={36}
+      className={cn(
+        'size-[34px] text-xs',
+        compactRingClass(p.level),
+        highlighted && 'outline-warn',
+      )}
+    />
+  )
+  if (readOnly)
+    return (
+      <span title={`${p.name} · ${levelLabel(p.level)}`} className="-ml-2 inline-flex rounded-full">
+        {picture}
+      </span>
+    )
+  return (
+    <button
+      type="button"
+      title={`${p.name} · ${levelLabel(p.level)}${swappable ? ' · drag onto the other team to switch sides' : ''}`}
+      aria-label={`${p.name}, ${levelLabel(p.level)}, Team ${team}. View profile${swappable ? '. Left or right arrow switches sides' : ''}`}
+      data-team={swappable ? team : undefined}
+      data-i={swappable ? index : undefined}
+      onClick={() => onSelectPlayer?.(p.id, team)}
+      className="-ml-2 cursor-pointer rounded-full border-0 bg-transparent p-0 hover:relative hover:z-[1]"
+    >
+      {picture}
+    </button>
+  )
+}
+
+/**
+ * The compact variant's team (prototype .qstack-row): an overlapping stack of 34 px pictures with level
+ * rings, then the short names on one line ("Rafa, Migo, Pau"). No wait times, no games badge.
+ * Pictures open the profile and, inside a SwapSidesArea, can be dragged onto the other team.
+ */
+function CompactFaces({
+  players,
+  team,
+  swappable,
+  readOnly,
+  onSelectPlayer,
+  highlightedPlayerIds = [],
+}: {
+  players: MatchCardPlayer[]
+  team: MatchCardTeam
+  swappable: boolean
+  readOnly: boolean
+  onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+  highlightedPlayerIds?: string[]
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5">
+      <div className="flex flex-none pl-2">
+        {players.map((p, i) => {
+          const canSwap = swappable && !readOnly
+          const face = {
+            player: p,
+            team,
+            index: i,
+            swappable: canSwap,
+            readOnly,
+            highlighted: highlightedPlayerIds.includes(p.id),
+            onSelectPlayer,
+          }
+          return canSwap ? (
+            <SwappablePlayer key={p.id} team={team} index={i} className="rounded-full">
+              <CompactFace {...face} />
+            </SwappablePlayer>
+          ) : (
+            <CompactFace key={p.id} {...face} />
+          )
+        })}
+      </div>
+      <span className="min-w-0 truncate text-[13px] font-semibold text-fg">
+        {players.map((p) => p.shortName).join(', ')}
+      </span>
+    </div>
+  )
+}
+
 const teamNames = (players: MatchCardPlayer[]) => players.map((p) => p.shortName).join(' and ')
 
 /**
@@ -311,7 +431,9 @@ export function MatchCard({
   readOnly = false,
   searchState,
   highlightedPlayerIds,
+  variant = 'default',
 }: MatchCardProps) {
+  const compact = variant === 'compact'
   const ready = status.kind === 'ready'
   const badgeMode = gamesBadge ?? (onOpenGames ? 'button' : 'static')
   const formatLabel = categoryPrefix
@@ -388,6 +510,7 @@ export function MatchCard({
       className={cn(
         matchCardVariants({ status: status.kind }),
         'mt-2',
+        compact && 'gap-2',
         searchState === 'hit' &&
           '!border-warn shadow-[0_0_0_2px_var(--warn),0_0_16px_2px_color-mix(in_srgb,var(--warn)_40%,transparent)]',
         searchState === 'dim' && 'opacity-45',
@@ -436,7 +559,16 @@ export function MatchCard({
           </button>
         ) : null}
       </div>
-      {readOnly ? (
+      {compact ? (
+        <CompactFaces
+          players={teamA}
+          team="A"
+          swappable={swappable}
+          readOnly={readOnly}
+          onSelectPlayer={onSelectPlayer}
+          highlightedPlayerIds={highlightedPlayerIds}
+        />
+      ) : readOnly ? (
         <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
       ) : (
         <Faces
@@ -449,8 +581,24 @@ export function MatchCard({
           highlightedPlayerIds={highlightedPlayerIds}
         />
       )}
-      <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-      {readOnly ? (
+      <div
+        className={cn(
+          'text-center text-[10px] font-extrabold tracking-[1px] text-fg3',
+          compact && '-my-0.5',
+        )}
+      >
+        VS
+      </div>
+      {compact ? (
+        <CompactFaces
+          players={teamB}
+          team="B"
+          swappable={swappable}
+          readOnly={readOnly}
+          onSelectPlayer={onSelectPlayer}
+          highlightedPlayerIds={highlightedPlayerIds}
+        />
+      ) : readOnly ? (
         <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
       ) : (
         <Faces

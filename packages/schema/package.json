@@ -21,7 +21,8 @@
     "./admin-player": "./src/admin-player.ts",
     "./rule-cases": "./src/rule-cases.ts",
     "./scoring": "./src/scoring.ts",
-    "./queue-time": "./src/queue-time.ts"
+    "./queue-time": "./src/queue-time.ts",
+    "./level-restriction": "./src/level-restriction.ts"
   },
   "scripts": {
     "lint": "biome check .",

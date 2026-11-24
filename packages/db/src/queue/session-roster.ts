@@ -1,4 +1,5 @@
 import 'server-only'
+import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import {
   normalizeSocialLink,
   SOCIAL_LINK_ERROR,
@@ -19,7 +20,7 @@ import {
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
 import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
-import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
+import { joinRequestDto, levelRestrictionDto, rosterEntryDto, waitlistDto } from './dto'
 import { countedGamesByEntry } from './finalization'
 import { closeStaleMatchRequests } from './match-request-store'
 import {
@@ -28,6 +29,7 @@ import {
   derivedId,
   isOffRoster,
   LIVE_ENTRY,
+  levelCodeFor,
   levelIdFor,
   liveRoster,
   lockSession,
@@ -81,14 +83,42 @@ async function waitlistPosition(tx: Tx, sessionId: string, entryId: string) {
  * Master's explicit choice to go past the slot budget (marked `over_budget_at`); `toWaitlist`
  * always waits. Neither keeps the budget rule.
  */
-export type AddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+export type AddPlacement = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /**
+   * Level restrictions (D-2026-11-19-12): the Queue Master's second press, after the warning, adds
+   * or confirms a player outside the session's restriction (or into a full band). Without it such
+   * a slot is refused with the reason. The waitlist is never checked.
+   */
+  allowOutsideLevels?: boolean
+}
+
+/**
+ * Level restrictions on slots (D-2026-11-19-12): why a player of this level can't take a slot in the
+ * session now, or null. Counts the live roster by band; the caller holds the session lock.
+ */
+export async function levelRestrictionBlockIn(
+  tx: Tx,
+  session: QueueSession,
+  skillLevelId: number | null,
+) {
+  if (session.levelRestriction === 'all' || skillLevelId == null) return null
+  return levelRestrictionBlockFor(
+    levelRestrictionDto(session),
+    levelCodeFor(skillLevelId),
+    (await liveRoster(tx, session.id)).map((entry) => levelCodeFor(entry.skillLevelId)),
+  )
+}
 
 /**
  * Places a club player: a slot while one is open, otherwise the waitlist. `toWaitlist` (a Be
  * waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place, even
  * during play; `allowOverfill` (Add anyway, #735) gives the slot beyond the budget. Refuses a
  * player already live on the roster or waiting. Concurrent admissions are serialized by the session
- * lock, so they cannot exceed capacity without `allowOverfill`. Repeat-safe on `operationId`.
+ * lock, so they cannot exceed capacity without `allowOverfill`. A slot outside the session's level
+ * restriction (D-2026-11-19-12) is refused with the reason unless `allowOutsideLevels`; a retry of
+ * an operation that already placed the player is never re-checked. Repeat-safe on `operationId`.
  */
 async function place(
   tx: Tx,
@@ -100,6 +130,7 @@ async function place(
   addedAt: Date,
   toWaitlist = false,
   allowOverfill = false,
+  allowOutsideLevels = false,
 ) {
   const waitlistId = await derivedId(operationId, 'waitlist')
   // A retry of the same operation returns what it already did.
@@ -145,6 +176,11 @@ async function place(
     await notifyWaitlistPlace(tx, session, clubPlayer.playerId, waiter.id, position)
     return { rosterEntry: null, waitlist: waitlistDto(waiter, position) }
   }
+  if (!allowOutsideLevels) {
+    const blocked = await levelRestrictionBlockIn(tx, session, skillLevelId)
+    // Refused: the transaction rolls back, so nothing of this add or confirm is kept.
+    if (blocked) throw new ServiceError('forbidden', { levelRestriction: blocked })
+  }
   const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
   return {
     rosterEntry: rosterEntryDto(entry, await rosterNamesFor(tx, clubPlayer.id)),
@@ -169,7 +205,20 @@ export function placeClubMember(
   now: Date,
   toWaitlist: boolean,
 ) {
-  return place(tx, context, session, clubPlayer, skillLevelId, operationId, now, toWaitlist)
+  // No level restriction check here (D-2026-11-19-12): the Player's own join ran it before this
+  // call, and a host is the Queue Master's own pick.
+  return place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    operationId,
+    now,
+    toWaitlist,
+    false,
+    true,
+  )
 }
 
 /**
@@ -214,6 +263,7 @@ async function addSavedPlayerIn(
     new Date(),
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
 }
 
@@ -477,6 +527,7 @@ async function addDirectoryPlayerIn(
     now,
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
 }
 
@@ -528,6 +579,7 @@ async function addNewPlayerIn(
     now,
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
   // What the email did, for the toast ("unclaimed · RTR-…"); null for a guest.
   return { ...placed, emailWords: words }
@@ -932,7 +984,14 @@ async function pendingRequest(tx: Tx, context: ClubContext, requestId: string) {
  */
 export async function confirmJoinRequest(
   context: ClubContext,
-  input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
+  input: {
+    operationId: string
+    requestId: string
+    level: string
+    deviceId?: string | null
+    /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+    allowOutsideLevels?: boolean
+  },
 ) {
   levelIdFor(input.level)
   const request = await prisma.sessionJoinRequest.findUnique({
@@ -949,7 +1008,14 @@ async function confirmJoinRequestIn(
   tx: Tx,
   context: ClubContext,
   session: QueueSession,
-  input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
+  input: {
+    operationId: string
+    requestId: string
+    level: string
+    deviceId?: string | null
+    /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+    allowOutsideLevels?: boolean
+  },
 ) {
   const skillLevelId = levelIdFor(input.level)
   const current = await pendingRequest(tx, context, input.requestId)
@@ -1040,6 +1106,8 @@ async function confirmJoinRequestIn(
     input.operationId,
     current.requestedAt,
     current.placement === 'waitlist',
+    false,
+    input.allowOutsideLevels,
   )
   const decided = await tx.sessionJoinRequest.update({
     where: { id: current.id },
@@ -1180,7 +1248,13 @@ export type RosterBatchOperation =
       level: string
     })
   | { op: 'remove'; operationId: string; rosterId: string }
-  | { op: 'acceptRequest'; operationId: string; requestId: string; level: string }
+  | {
+      op: 'acceptRequest'
+      operationId: string
+      requestId: string
+      level: string
+      allowOutsideLevels?: boolean
+    }
   | { op: 'declineRequest'; operationId: string; requestId: string }
 
 export const MAX_ROSTER_BATCH_OPERATIONS = 100

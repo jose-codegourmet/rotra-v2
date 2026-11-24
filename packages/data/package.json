@@ -212,6 +212,7 @@
     "./session-roster/usePlayerDirectorySearch": "./src/session-roster/usePlayerDirectorySearch.ts",
     "./session-roster/usePlayerLookup": "./src/session-roster/usePlayerLookup.ts",
     "./session-roster/sessionRoster.rules": "./src/session-roster/sessionRoster.rules.ts",
+    "./session-roster/levelRestriction.rules": "./src/session-roster/levelRestriction.rules.ts",
     "./session-roster/mutations": "./src/session-roster/mutations.ts",
     "./queue-session/useAddCourt": "./src/queue-session/useAddCourt.ts",
     "./queue-session/useRemoveCourt": "./src/queue-session/useRemoveCourt.ts",

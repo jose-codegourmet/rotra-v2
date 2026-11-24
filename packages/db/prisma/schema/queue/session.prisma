@@ -31,6 +31,16 @@ enum SessionMode {
   @@map("session_mode")
 }
 
+/// Restrictions (D-2026-11-19-12): which levels may take a slot, by level band.
+enum LevelRestriction {
+  all
+  beginners
+  beginners_intermediate
+  slots_per_band
+
+  @@map("level_restriction")
+}
+
 model QueueSession {
   id                   String            @id @db.Uuid
   clubId               String            @map("club_id") @db.Uuid
@@ -77,6 +87,14 @@ model QueueSession {
   /// score, and Session done writes no facts, summaries, result snapshot or publication. Existing
   /// rows read true. Fixed once the session leaves prepared (trigger queue_sessions_record_games_lock).
   recordGames          Boolean           @default(true) @map("record_games")
+  /// Restrictions (D-2026-11-19-12): which levels may take a slot. Existing rows read all. Enforced
+  /// on public join requests; the Queue Master can add or confirm anyone after a warning.
+  levelRestriction     LevelRestriction  @default(all) @map("level_restriction")
+  /// Slots per level: set together, only with slots_per_band (CHECK in SQL), each 0 or more. Their
+  /// sum equals the session's slots when saved (checked in the service: slots follow the courts).
+  beginnerSlots        Int?              @map("beginner_slots")
+  intermediateSlots    Int?              @map("intermediate_slots")
+  advancedSlots        Int?              @map("advanced_slots")
   /// Players can request (D-2026-11-09-05): the formats a signed-in Player may ask for with Request
   /// a match, in any order; empty = the session takes no match requests. New sessions get the
   /// prototype default (2 v 2, plus 1 v 1 when singles is on) from the create command.

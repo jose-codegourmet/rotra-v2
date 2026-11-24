@@ -425,10 +425,22 @@ type WirePlaced = {
   waitlist: { clubPlayerId: string; position: number } | null
 }
 
-export async function realConfirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
+export async function realConfirmJoinRequest(input: {
+  requestId: string
+  level: PlayingLevel
+  /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+  allowOutsideLevels?: boolean
+}) {
   const placed = await realRequest<WirePlaced>(
     `/api/join-requests/${encodeURIComponent(input.requestId)}/confirm`,
-    { method: 'POST', body: { operationId: crypto.randomUUID(), level: input.level } },
+    {
+      method: 'POST',
+      body: {
+        operationId: crypto.randomUUID(),
+        level: input.level,
+        ...(input.allowOutsideLevels ? { allowOutsideLevels: true } : {}),
+      },
+    },
   )
   const waitlistPosition = placed.waitlist?.position ?? 0
   const data = {

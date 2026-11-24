@@ -35,12 +35,14 @@ import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
+import { savedLevelOf } from './club-players'
+import { levelRestrictionDto } from './dto'
 import { closeStaleMatchRequests } from './match-request-store'
 import { peopleFor, readMyMatchRequest } from './match-requests'
 import { matchContext } from './match-store'
 import { readPublishedResults } from './results'
 import { endedState, shownHostRows } from './session-host-snapshots'
-import { placeClubMember, stepDownIn } from './session-roster'
+import { levelRestrictionBlockIn, placeClubMember, stepDownIn } from './session-roster'
 import {
   capacityOf,
   derivedId,
@@ -250,6 +252,8 @@ export async function readPublicSession(slug: string) {
       courts: courts.map((c) => c.label),
       formats: { singles: session.allowSingles, doubles: session.allowDoubles },
       mode: session.sessionMode,
+      /** Restrictions (D-2026-11-19-12): the Levels row in Details. */
+      levelRestriction: levelRestrictionDto(session),
       minimum: session.minimumGames,
       notes: session.notes,
       participantCount: roster.length,
@@ -544,6 +548,41 @@ async function memberOf(tx: Tx, clubId: string, playerId: string) {
   return level ? { clubPlayer, skillLevelId: level.skillLevelId } : null
 }
 
+/**
+ * The Player's level at the club (D-2026-11-19-12): on their current saved record, the level the
+ * club gave outside a session or the latest session assessment, whichever is newer. Null when the
+ * Player is not saved in the club or has no level there yet.
+ */
+async function clubLevelIdOf(tx: Tx, clubId: string, playerId: string) {
+  const clubPlayer = await tx.clubPlayer.findFirst({
+    where: { clubId, playerId, removedAt: null },
+    select: {
+      savedSkillLevelId: true,
+      savedLevelAt: true,
+      assessments: {
+        orderBy: [{ assessedAt: 'desc' }, { id: 'desc' }],
+        take: 1,
+        select: { skillLevelId: true, assessedAt: true },
+      },
+    },
+  })
+  return clubPlayer ? savedLevelOf(clubPlayer) : null
+}
+
+/**
+ * **Not open to your level** (D-2026-11-19-12) for a signed-in Player who holds no slot or waitlist
+ * place on an upcoming session: the reason and their level at the club, or null when they may
+ * request. A Player with no level at the club always may.
+ */
+async function playerLevelBlock(tx: Tx, sessionId: string, playerId: string) {
+  const session = await tx.queueSession.findUnique({ where: { id: sessionId } })
+  if (!session || session.state !== 'prepared' || session.levelRestriction === 'all') return null
+  const skillLevelId = await clubLevelIdOf(tx, session.clubId, playerId)
+  const level = levelCodeFor(skillLevelId)
+  const reason = await levelRestrictionBlockIn(tx, session, skillLevelId)
+  return reason && level ? { reason, level } : null
+}
+
 /** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
@@ -725,6 +764,10 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       ...standing,
       // D-2026-11-12-02: whether the join card offers Join as NAME instead of a request
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
+      // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place
+      levelBlock: standing.inSession
+        ? null
+        : await playerLevelBlock(tx, session.id, context.playerId),
       fullRoster,
       participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
         ...person(entry),
@@ -902,6 +945,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
           : null,
       joinRequest: standing.joinRequest,
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
+      levelBlock: standing.inSession
+        ? null
+        : await playerLevelBlock(tx, session.id, context.playerId),
       canInvite:
         session.state === 'prepared' && session.acceptJoinRequests && (!!row || waitlisted),
       inviteCode: invite?.code ?? null,
@@ -1080,6 +1126,16 @@ export async function joinSessionAsPlayer(
       const standing = await playerStanding(tx, context.playerId, session.id)
       if (standing.joinRequest?.status === 'pending')
         throw new ServiceError('conflict', { request: 'Your request is already sent.' })
+      // D-2026-11-19-12: a Player whose level here is outside the restriction, or whose band's
+      // slots are full, can't request or join. A waitlisted Player's Join from waitlist isn't checked.
+      if (placement !== 'from_waitlist' && !standing.inSession) {
+        const blocked = await levelRestrictionBlockIn(
+          tx,
+          current,
+          await clubLevelIdOf(tx, session.clubId, context.playerId),
+        )
+        if (blocked) throw new ServiceError('forbidden', { request: blocked })
+      }
       const full = await slotsFull(tx, current)
       // D-2026-11-12-02: a club member joins right away (Join from waitlist stays a request).
       const member =

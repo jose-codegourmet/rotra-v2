@@ -1,4 +1,5 @@
 import { courtWindowError } from '@rotra/schema/court-window'
+import { levelRestrictionOf, levelSlotsError } from '@rotra/schema/level-restriction'
 import { scoringOf } from '@rotra/schema/scoring'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
@@ -115,6 +116,11 @@ function validate(state: MockState, input: QueueSessionInput) {
     8
   if (!Number.isInteger(budget) || budget < 2 || budget > 20)
     throw new MockError('permission', 'Players per court must be between 2 and 20.')
+  // Restrictions (D-2026-11-19-12): slots per level add up to the session's slots before saving.
+  if (input.levelRestriction) {
+    const error = levelSlotsError(input.levelRestriction, input.courts.length, budget)
+    if (error) throw new MockError('permission', error)
+  }
   return { venue, budget }
 }
 export function createQueueSession(input: QueueSessionInput) {
@@ -168,6 +174,8 @@ export function createQueueSession(input: QueueSessionInput) {
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
         recordGames: input.recordGames ?? true,
         scoring: scoringOf(input.scoring),
+        // Every date of a series gets the same restriction; left out is All levels.
+        levelRestriction: levelRestrictionOf(input.levelRestriction),
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
@@ -247,6 +255,10 @@ export function updateQueueSession({
         ...(values.recordGames === undefined ? {} : { recordGames: values.recordGames }),
         // Scoring too (Q22): missing keeps the stored mode; an unknown value reads as 16/31.
         ...(values.scoring === undefined ? {} : { scoring: scoringOf(values.scoring) }),
+        // Restrictions (D-2026-11-19-12): missing keeps the stored pick.
+        ...(values.levelRestriction === undefined
+          ? {}
+          : { levelRestriction: levelRestrictionOf(values.levelRestriction) }),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(

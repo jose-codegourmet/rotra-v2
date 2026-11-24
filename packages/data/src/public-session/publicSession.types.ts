@@ -1,3 +1,4 @@
+import type { LevelRestriction } from '@rotra/schema/level-restriction'
 import type { ScoringKey } from '@rotra/schema/scoring'
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
@@ -166,6 +167,11 @@ export type PublicSessionPage = {
    * the setting, and real mode, which does not store it yet.
    */
   scoring?: ScoringKey
+  /**
+   * **Restrictions** (D-2026-11-19-12): which levels may take a slot, for the Levels row in
+   * Details. Missing reads as All levels (`levelRestrictionOf`): older wire shapes.
+   */
+  levelRestriction?: LevelRestriction
   minimum: number
   notes?: string | null
   /** Total before the anonymous 12-tile server cap. */
@@ -397,6 +403,8 @@ export type MyNight = {
   } | null
   /** Same as `PlayerSessionAccess.isClubMember` (D-2026-11-12-02), for the mock-mode join card */
   isClubMember: boolean
+  /** Same as `PlayerSessionAccess.levelBlock` (D-2026-11-19-12), for the mock-mode join card */
+  levelBlock?: PlayerLevelBlock | null
   /** Invite shows only while Prepared, requests are on, and the Player has a slot or waitlist place */
   canInvite: boolean
   /** The Player's Session invite code if one was made already; read-only here, `useSessionInviteCode` makes it */
@@ -423,6 +431,9 @@ export type MyJoinRequest = {
   placement?: JoinRequestPlacement
 }
 
+/** Why a signed-in Player can't request a slot, and their level at the club ("Your level here is …"). */
+export type PlayerLevelBlock = { reason: string; level: PlayingLevel }
+
 /** Narrow Player-hosted projection; never a club session or operator data. */
 export type PlayerSessionAccess = {
   playerId: string
@@ -443,6 +454,13 @@ export type PlayerSessionAccess = {
    * sends a request and the Queue Master sets the level).
    */
   isClubMember: boolean
+  /**
+   * **Not open to your level** (D-2026-11-19-12): set while the Player holds no slot or waitlist
+   * place and their level at the club is outside the session's restriction, or their band's slots
+   * are full; the page then offers no request. Null or missing when they may request (a Player
+   * with no level at the club always may).
+   */
+  levelBlock?: PlayerLevelBlock | null
   /** The Player's latest request for this session (any status), or null */
   joinRequest: MyJoinRequest | null
   fullRoster: boolean

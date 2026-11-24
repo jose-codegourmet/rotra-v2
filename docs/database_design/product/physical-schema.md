@@ -493,3 +493,18 @@ Checked on a disposable local database (`rotra_disposable_e1002`, Postgres 16 on
 also run on a separate throwaway database seeded with host rows before the migration (names filled,
 completed/invalid current rows frozen, removed and open rows not). Design: [sessions and roster ›
 `session_hosts`](queue/modules/sessions-roster.md#session_hosts).
+
+## D-2026-11-19-12 — Session level restrictions (#1076)
+
+`20261124000100_session_level_restriction` (epic #1071). **Status: written; applied to a local disposable
+database 2026-11-24 only; not applied to the shared database (owner sign-off needed).** One enum, four
+columns on `queue_sessions` and one check; additive, no backfill, nothing dropped or rewritten.
+
+| Table | Columns | Checks and triggers |
+|---|---|---|
+| `queue_sessions` (added) | `level_restriction` enum `level_restriction` (`all`, `beginners`, `beginners_intermediate`, `slots_per_band`) NOT NULL DEFAULT `all`; `beginner_slots`, `intermediate_slots`, `advanced_slots` integer, nullable; no index | `queue_sessions_level_slots_check`: with `slots_per_band` all three slot counts are set and 0 or more; otherwise all three are null. The sum against the session's slots is checked in the service |
+
+Checked on a disposable local database (`rotra_disposable_q285`, Postgres on 127.0.0.1:54322): 52
+migrations, rebuild with no drift, seed, 117/117 checks (none new). The check was exercised by hand:
+slot counts with `slots_per_band` accepted, a slot count on an `all` session refused. Design:
+[sessions and roster](queue/modules/sessions-roster.md).

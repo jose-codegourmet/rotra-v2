@@ -26,7 +26,11 @@ import {
 } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { recordsGames, sessionScoring } from '../queue-session/queueSession.types'
+import {
+  recordsGames,
+  sessionLevelRestriction,
+  sessionScoring,
+} from '../queue-session/queueSession.types'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
@@ -52,6 +56,7 @@ import {
   maskPublicName,
   memberClubPlayer,
   myMatchLabel,
+  playerLevelBlock,
   playerSlot,
   publicFirstName,
   publicLevel,
@@ -481,6 +486,7 @@ function project(
     formats: { singles: s.allowSingles, doubles: s.allowDoubles },
     mode: s.sessionMode,
     scoring: sessionScoring(s),
+    levelRestriction: sessionLevelRestriction(s),
     minimum: s.minimumGames,
     notes: s.notes || null,
     participantCount: roster.length,
@@ -800,6 +806,11 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
         }
       : null,
     isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
+    // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place.
+    levelBlock:
+      slot.roster || slot.waitlist || session.state !== 'prepared'
+        ? null
+        : playerLevelBlock(state, session, playerId),
     canInvite:
       session.state === 'prepared' && session.acceptJoinRequests && (!!row || !!slot.waitlist),
     inviteCode:
@@ -990,6 +1001,11 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
     ...sessionPageAccountOf(state, playerId),
     inSession: !!slot.roster || !!slot.waitlist,
     isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
+    // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place.
+    levelBlock:
+      slot.roster || slot.waitlist || session.state !== 'prepared'
+        ? null
+        : playerLevelBlock(state, session, playerId),
     waitlistPosition: slot.waitlist
       ? waitlist.findIndex((w) => w.id === slot.waitlist?.id) + 1 || null
       : null,

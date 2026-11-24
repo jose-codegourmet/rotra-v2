@@ -39,5 +39,7 @@ schema/command-case.schema.json  JSON Schema for a command case file (go-writes-
 (`@rotra/schema/scoring`). The `@rotra/data` and `@rotra/schema` tests read it; the Go tests and the
 WebAssembly wrapper test skip it by name (`GoCopyPending` in `apps/api/internal/rulecases`,
 `GO_COPY_PENDING` in `packages/rules-wasm/test/rulesWasm.test.ts`) until its Go copy lands.
+`v1/roster/levelRestrictionBlock.json` (#1076, session level restrictions, D-2026-11-19-12) is pending the
+same way; its TypeScript is `@rotra/data` `session-roster/levelRestriction.rules.ts`.
 
 Editing a case: change the JSON in the same PR as the rule change (`v1` is edited in place until the swap).

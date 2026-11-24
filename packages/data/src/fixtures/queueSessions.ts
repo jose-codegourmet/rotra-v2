@@ -64,6 +64,7 @@ export function createQueueFixtures(now = Date.now()) {
     alwaysRequireRequest: false,
     // The live example plays the default 16/31 (Q22).
     scoring: '31',
+    levelRestriction: { kind: 'all' },
   }
   const history = createSessionHistoryFixtures(now)
   const sessions: QueueSession[] = [tonight, ...history.sessions]

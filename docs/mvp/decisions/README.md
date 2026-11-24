@@ -82,7 +82,7 @@ This README holds the index, the status conventions and the entry template.
 | [D-2026-11-19-09](2026-11-19.md#d-2026-11-19-09) | Embla Carousel for sliders | approved 2026-11-19 by the owner naming it (scope open) | mockup only (loaded from a CDN) | needed | [Queue](../workstreams/queue.md) |
 | [D-2026-11-19-10](2026-11-19.md#d-2026-11-19-10) | Player Home for signed-in players | approved 2026-11-19 by the owner | mockup only | needed | [Player](../workstreams/player.md) |
 | [D-2026-11-19-11](2026-11-19.md#d-2026-11-19-11) | Invite-link onboarding and getting-to-know answers | approved 2026-11-19 by the owner | mockup only | needed | [Player](../workstreams/player.md) |
-| [D-2026-11-19-12](2026-11-19.md#d-2026-11-19-12) | Session level restrictions | approved 2026-11-19 by the owner | mockup only | needed | [Queue](../workstreams/queue.md) |
+| [D-2026-11-19-12](2026-11-19.md#d-2026-11-19-12) | Session level restrictions | approved 2026-11-19 by the owner | data built (#1076); screens not built | #1071 | [Queue](../workstreams/queue.md) |
 | [D-2026-11-19-13](2026-11-19.md#d-2026-11-19-13) | Player bottom dock on phones | approved 2026-11-19 by the owner | mockup only | needed | [Player](../workstreams/player.md) |
 | [D-2026-11-19-14](2026-11-19.md#d-2026-11-19-14) | Higgsfield art inside the apps | approved 2026-11-19 by the owner | mockup only | needed | [Queue](../workstreams/queue.md), [Player](../workstreams/player.md) |
 | [D-2026-11-18-07](2026-11-18.md#d-2026-11-18-07) | A guest's invite link claims that guest's record | approved 2026-11-18 (details open) | mock app and real mode written, not run against a database yet | #966 (epic Q24) | [Queue](../workstreams/queue.md), [Player](../workstreams/player.md) |

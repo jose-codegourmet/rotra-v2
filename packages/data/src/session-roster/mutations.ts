@@ -46,6 +46,7 @@ import {
   realSetAcceptJoinRequests,
   realSetAlwaysRequireRequest,
 } from '../real/session-live'
+import { levelRestrictionBlockFor } from './levelRestriction.rules'
 import {
   inUnfinishedMatch,
   levelLabel,
@@ -92,7 +93,41 @@ export function settleRoster<T>(s: MockState, sessionId: string, result: T) {
  * is **Add anyway** (a slot beyond the budget), `toWaitlist` is **Add to waitlist**. Neither keeps
  * the old rule: before start a full roster waits.
  */
-export type RosterAddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+export type RosterAddPlacement = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /**
+   * Level restrictions (D-2026-11-19-12): the Queue Master's second press, after the warning, adds
+   * a player outside the session's restriction (or into a full band). Without it the add is
+   * refused with the reason. Add to waitlist is never checked.
+   */
+  allowOutsideLevels?: boolean
+}
+/** A join request confirmed with the level the Queue Master chose; `allowOutsideLevels` as above. */
+export type ConfirmRequestInput = {
+  requestId: string
+  level: PlayingLevel
+  allowOutsideLevels?: boolean
+}
+/**
+ * Level restrictions on slots (D-2026-11-19-12) for the Queue Master's add and confirm: refused
+ * with the reason when the level is outside the session's restriction or its band is full, unless
+ * they pressed again (`allowOutsideLevels`). The waitlist isn't checked.
+ */
+export function requireLevelAllowed(
+  s: MockState,
+  sessionId: string,
+  level: PlayingLevel,
+  { toWaitlist, allowOutsideLevels }: Pick<RosterAddPlacement, 'toWaitlist' | 'allowOutsideLevels'>,
+) {
+  if (toWaitlist || allowOutsideLevels) return
+  const reason = levelRestrictionBlockFor(
+    sessionIn(s, sessionId).levelRestriction,
+    level,
+    s.roster.filter((r) => r.sessionId === sessionId).map((r) => r.level),
+  )
+  if (reason) fail(reason)
+}
 /**
  * Gives a club player a slot, or a waitlist place once a prepared session is full. `toWaitlist`
  * (a Be waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place,
@@ -147,6 +182,7 @@ export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
   if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
     fail('Player not available.')
+  requireLevelAllowed(s, input.sessionId, input.level, input)
   const data = place(
       s,
       input.sessionId,
@@ -294,6 +330,7 @@ export type AddDirectoryPlayerInput = RosterAddPlacement & {
   level: PlayingLevel
 }
 export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
+  requireLevelAllowed(s, input.sessionId, input.level, input)
   const p = clubPlayerForProfile(s, input.playerId, undefined, 'added', input.name).player
   const data = place(
     s,
@@ -333,6 +370,7 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
+  requireLevelAllowed(s, input.sessionId, input.level, input)
   const { player: p, how } = createClubPlayer(s, { ...input, id: input.clubPlayerId }),
     data = place(
       s,
@@ -723,12 +761,13 @@ function pending(s: MockState, id: string) {
  * place. Nothing links a returning guest's request to an earlier record, so it makes a second one
  * (D-2026-11-16-04).
  */
-export function confirmJoinRequestChange(
-  s: MockState,
-  input: { requestId: string; level: PlayingLevel },
-) {
-  const request = pending(s, input.requestId),
-    { player: p } = createClubPlayer(s, {
+export function confirmJoinRequestChange(s: MockState, input: ConfirmRequestInput) {
+  const request = pending(s, input.requestId)
+  requireLevelAllowed(s, request.sessionId, input.level, {
+    toWaitlist: request.placement === 'waitlist',
+    allowOutsideLevels: input.allowOutsideLevels,
+  })
+  const { player: p } = createClubPlayer(s, {
       name: request.name,
       nickname: request.nickname ?? undefined,
     }),
@@ -748,7 +787,7 @@ export function confirmJoinRequestChange(
     text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
   }
 }
-export function confirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
+export function confirmJoinRequest(input: ConfirmRequestInput) {
   if (isRealDataMode()) return realConfirmJoinRequest(input)
   const r = pending(readMockState(), input.requestId)
   return rosterMutation(r.sessionId, (s) => confirmJoinRequestChange(s, input))

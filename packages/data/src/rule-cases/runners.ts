@@ -1,3 +1,4 @@
+import type { LevelBand, LevelRestriction, LevelSlots } from '@rotra/schema/level-restriction'
 import { expectedFinish } from '@rotra/schema/scoring'
 import {
   autoFillPlacements,
@@ -45,6 +46,7 @@ import {
   slotCapacity,
 } from '../queue-session/queueSession.rules'
 import type { CourtFillMode, SessionCourt } from '../queue-session/queueSession.types'
+import { levelRestrictionBlock } from '../session-roster/levelRestriction.rules'
 import { inUnfinishedMatch } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 
@@ -165,6 +167,12 @@ export const RULE_RUNNERS: Record<string, Runner> = {
   'roster/openSlots': rule<{ capacity: number; rosterCount: number }>((i) =>
     openSlots(i.capacity, i.rosterCount),
   ),
+  // Written in TypeScript first (Q28.5, D-2026-11-19-12); the Go copy follows before the next Go merge.
+  'roster/levelRestrictionBlock': rule<{
+    restriction: LevelRestriction | null
+    band: LevelBand | null
+    taken?: Partial<LevelSlots>
+  }>((i) => levelRestrictionBlock(i.restriction, i.band, i.taken)),
 
   'courtfill/autoFillPlacements': rule<
     World & { exceptMatchId?: string; onlyCourtIds?: string[]; exceptCourtIds?: string[] }

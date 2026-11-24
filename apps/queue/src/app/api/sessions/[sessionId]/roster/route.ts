@@ -21,10 +21,14 @@ export async function GET(
   }))
 }
 
-/** Add anyway / Add to waitlist on a full roster (#735); only `true` counts. */
+/**
+ * Add anyway / Add to waitlist on a full roster (#735), and the Queue Master's second press after
+ * the level restriction warning (`allowOutsideLevels`, D-2026-11-19-12); only `true` counts.
+ */
 const placementOf = (body: Record<string, unknown>) => ({
   allowOverfill: body.allowOverfill === true,
   toWaitlist: body.toWaitlist === true,
+  allowOutsideLevels: body.allowOutsideLevels === true,
 })
 
 /**

@@ -15,7 +15,7 @@ import type { QueueSession, SessionCourt, SessionMode } from '../generated/prism
 import { notifyWaitlistPlace } from '../player/notification-events'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
-import { courtDto, requestFormatsInput, sessionDto } from './dto'
+import { courtDto, levelRestrictionInput, requestFormatsInput, sessionDto } from './dto'
 import { autoFillCourts } from './match-control'
 import { liveOpenRequests } from './match-request-store'
 import { assignSessionHostsIn, type HostRegistration, hostIdsInput } from './session-hosts'
@@ -60,6 +60,12 @@ export type QueueSessionInput = {
    * prepared session can be edited, so it never changes after Start (the database refuses it too).
    */
   recordGames?: boolean
+  /**
+   * Restrictions (D-2026-11-19-12): `{ kind, slots? }` as `@rotra/schema/level-restriction` shapes
+   * it. Left out on create, All levels; on edit, unchanged. Slots per level must add up to the
+   * session's slots (courts × players per court) or the save is refused.
+   */
+  levelRestriction?: unknown
   /**
    * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
    * start (null or the session start = follows the session start).
@@ -171,7 +177,13 @@ async function validate(tx: Tx, context: ClubContext, input: QueueSessionInput) 
     )
     if (error) throw new ServiceError('invalid', { courts: Object.values(error)[0] as string })
   }
-  return { venue, start, end, playersPerCourt }
+  // Restrictions (D-2026-11-19-12): refused unless slots per level add up to the session's slots.
+  const levelRestriction = levelRestrictionInput(
+    input.levelRestriction,
+    input.courts.length,
+    playersPerCourt,
+  )
+  return { venue, start, end, playersPerCourt, levelRestriction }
 }
 
 /** The club's sessions that can clash (not invalid, not cancelled), in the shared rule's shape. */
@@ -226,7 +238,11 @@ export async function createQueueSession(
           : 1
         return { firstSessionId: existing.id, created, skipped: null, hosts: null }
       }
-      const { venue, start, end, playersPerCourt } = await validate(tx, context, input)
+      const { venue, start, end, playersPerCourt, levelRestriction } = await validate(
+        tx,
+        context,
+        input,
+      )
       const occurrences = sessionOccurrences(
         {
           scheduledStartAt: start,
@@ -275,6 +291,8 @@ export async function createQueueSession(
               (input.allowSingles ? ['doubles', 'singles'] : ['doubles']),
             // Every date of a series gets the same choice; anything but an explicit false records.
             recordGames: input.recordGames !== false,
+            // Every date of a series gets the same restriction; left out is All levels.
+            ...(levelRestriction ?? {}),
             seriesId,
             publicSlug: `${publicSlugFor(id)}${id.slice(0, 4)}`,
             sourceCommandId: await derivedId(commandId, `session:${index}`),
@@ -342,7 +360,11 @@ export async function updateQueueSession(
       let session = await lockSession(tx, context, sessionId)
       requireState(session, ['prepared'], 'Only prepared sessions can be edited.')
       requireRevision(session.revision, expectedRevision)
-      const { venue, start, end, playersPerCourt } = await validate(tx, context, input)
+      const { venue, start, end, playersPerCourt, levelRestriction } = await validate(
+        tx,
+        context,
+        input,
+      )
       const [date] = sessionOccurrences(
         {
           id: sessionId,
@@ -378,6 +400,7 @@ export async function updateQueueSession(
             ? { requestFormats: requestFormatsInput(input.requestFormats) }
             : {}),
           ...(typeof input.recordGames === 'boolean' ? { recordGames: input.recordGames } : {}),
+          ...(levelRestriction ?? {}),
           revision: { increment: 1 },
         },
       })

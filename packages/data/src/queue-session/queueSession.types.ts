@@ -1,3 +1,4 @@
+import { type LevelRestriction, levelRestrictionOf } from '@rotra/schema/level-restriction'
 import { type ScoringKey, scoringOf } from '@rotra/schema/scoring'
 export type SessionMode = 'chill' | 'fair' | 'hard'
 /** The Manual Queue | Auto Queue switch. Auto places the next ready match On court; it never starts one. */
@@ -56,7 +57,17 @@ export type QueueSession = {
    * Fixed once started.
    */
   scoring?: ScoringKey
+  /**
+   * **Restrictions** (D-2026-11-19-12): which levels may take a slot. Missing means All levels
+   * (sessions saved before the setting). Read it through `sessionLevelRestriction`; the allowed /
+   * full check is `levelRestrictionBlock` in `session-roster/levelRestriction.rules`.
+   */
+  levelRestriction?: LevelRestriction
 }
+/** The session's level restriction: the stored pick, or All levels when missing or unknown. */
+export const sessionLevelRestriction = (
+  session: Pick<QueueSession, 'levelRestriction'> | null | undefined,
+) => levelRestrictionOf(session?.levelRestriction)
 /** The session's scoring mode: the stored value, or 16/31 when missing or unknown. */
 export const sessionScoring = (session: Pick<QueueSession, 'scoring'> | null | undefined) =>
   scoringOf(session?.scoring)
@@ -130,6 +141,7 @@ export type QueueSessionInput = Pick<
   | 'requestFormats'
   | 'recordGames'
   | 'scoring'
+  | 'levelRestriction'
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number

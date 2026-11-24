@@ -139,7 +139,10 @@ Its Go copy in `apps/api/internal/rules/courts`, the runner, the `.wasm` rebuild
 export follow before the next Go merge. Until then the Go tests and the WebAssembly wrapper test
 skip that one file through a named list (`GoCopyPending` in `apps/api/internal/rulecases`,
 `GO_COPY_PENDING` in `packages/rules-wasm/test/rulesWasm.test.ts`); the PR that adds the Go rule
-removes the key from both. The Plan Ahead pool and ranking are a draft-generation strategy, not a
+removes the key from both. `levelRestrictionBlock` (roster; session level restrictions,
+[D-2026-11-19-12](mvp/decisions/2026-11-19.md#d-2026-11-19-12), #1076) is pending the same way: it lives in
+`@rotra/data` (`session-roster/levelRestriction.rules.ts`) with its cases in
+`packages/rule-cases/cases/v1/roster/levelRestrictionBlock.json`. The Plan Ahead pool and ranking are a draft-generation strategy, not a
 shared rule: they live only in `@rotra/data` (`match/planAhead.rules.ts`).
 
 ---

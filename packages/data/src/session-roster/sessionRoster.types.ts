@@ -170,7 +170,12 @@ export type PlayerLookup = {
 }
 
 /** Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL); omitted on an ordinary add. */
-type AddPlacementFlags = { allowOverfill?: boolean; toWaitlist?: boolean }
+type AddPlacementFlags = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /** The second press after the level restriction warning (D-2026-11-19-12); omitted otherwise */
+  allowOutsideLevels?: boolean
+}
 /**
  * One change of the roster burst batch (#718): the Queue Master's adds, removes and join-request
  * decisions of one burst, sent together in click order and applied on the server in one
@@ -215,7 +220,14 @@ export type RosterBatchOperation =
       level: PlayingLevel
     })
   | { op: 'remove'; operationId: string; rosterId: string }
-  | { op: 'acceptRequest'; operationId: string; requestId: string; level: PlayingLevel }
+  | {
+      op: 'acceptRequest'
+      operationId: string
+      requestId: string
+      level: PlayingLevel
+      /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+      allowOutsideLevels?: boolean
+    }
   | { op: 'declineRequest'; operationId: string; requestId: string }
 /** What one operation of the batch ended as: the saved roster row or waitlist entry, if any. */
 export type RosterBatchResult = {

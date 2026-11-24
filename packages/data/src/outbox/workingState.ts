@@ -50,6 +50,7 @@ export function emptyWorkingState(now = Date.now()): MockState {
     playerAccounts: [],
     playerNotifications: {},
     verificationReminderReads: {},
+    genderReminderReads: {},
     resetLinks: {},
     claimLinks: {},
     contactChangeRequests: [],

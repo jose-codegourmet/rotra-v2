@@ -96,6 +96,8 @@ export type MockState = {
   playerAccounts: typeof playerAccounts
   playerNotifications: Record<string, PlayerNotification[]>
   verificationReminderReads: Record<string, string>
+  /** When each player read the derived Add your gender reminder (D-2026-11-19-01). */
+  genderReminderReads: Record<string, string>
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
   /** Player requests and their Admin review/application, in every state */
@@ -261,6 +263,7 @@ function seedState(): MockState {
     playerAccounts,
     playerNotifications: { [JOSE_PLAYER_ID]: createPlayerNotificationFixtures(now) },
     verificationReminderReads: {},
+    genderReminderReads: {},
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),

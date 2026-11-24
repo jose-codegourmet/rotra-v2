@@ -189,7 +189,11 @@ export async function realGetMyAccount(signal?: AbortSignal) {
   return body ? myAccountOf(body.account) : null
 }
 
-/** Strict like the mock: phone, email, the RTR ID or rank in the input are rejected. */
+/**
+ * Strict like the mock: phone, email, the RTR ID or rank in the input are rejected.
+ * The real profile read carries no `gender` or getting-to-know answers yet: there is no gender column
+ * (#1089) and the answers' storage shape is open (D-2026-11-19-11). Those optional fields stay unset.
+ */
 export async function realUpdateMyProfile(input: PersonalProfileValues) {
   const values = personalProfileSchema.parse(input)
   const number = (typed: string) => (typed ? Number(typed) : null)

@@ -3,6 +3,7 @@ import { accountVerificationIn } from '../account-verification/mockVerification'
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import { getConnectivity } from '../connectivity/connectivity'
+import type { Gender } from '../club-player/clubPlayer.types'
 import { unclaimedClubCount } from '../leaderboard/identity'
 import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
 import { mockLeaderboard } from '../leaderboard/projection'
@@ -14,7 +15,7 @@ import { mockStore, readMockState } from '../mock/store'
 import { isProfileBannerShown, resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { PROFILE_BANNER_NOT_PICKABLE } from '../profile-banner/profileBanner.rules'
 import { isProfileCharacterShown, profileCharacterImage } from '../profile-character/fetchers'
-import { isRealDataMode } from '../real/mode'
+import { isRealDataMode, NOT_CONNECTED_MESSAGE } from '../real/mode'
 import {
   realFindPlayerByRtrId,
   realGetMyProfile,
@@ -25,6 +26,7 @@ import {
   realSetMyProfilePicture,
   realUpdateMyProfile,
 } from '../real/player'
+import { normalizeOnboardingAnswers, type OnboardingAnswers } from './onboardingAnswers.rules'
 import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
 import type {
@@ -300,5 +302,59 @@ export async function setMyProfileBanner(bannerId: string): Promise<PlayerProfil
     saved = structuredClone(profile)
   })
   if (!saved) throw new Error('Profile banner save produced no result.')
+  return withBanner(saved)
+}
+
+/**
+ * Sets (or clears, with null) the signed-in player's own gender (D-2026-11-19-01). Mock mode only:
+ * real mode has no gender column yet (#1089), so it says this isn't connected to saved data.
+ */
+export async function setMyGender(gender: Gender | null): Promise<PlayerProfile> {
+  if (isRealDataMode())
+    throw new MockError('permission', NOT_CONNECTED_MESSAGE)
+  if (gender !== null && gender !== 'male' && gender !== 'female')
+    throw new MockError('conflict', 'Choose Male or Female.')
+  await delay(900)
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', "You're offline. Reconnect and try again.")
+  const session = await getSession('player')
+  if (!session) throw new MockError('permission', 'Sign in to edit your profile.')
+  checkMockSave()
+  let saved: PlayerProfile | undefined
+  mockStore.update((draft) => {
+    const profile = draft.playerProfiles.find((entry) => entry.playerId === session.account.id)
+    if (!profile) throw new MockError('permission', 'This profile is not yours to edit.')
+    profile.gender = gender
+    saved = structuredClone(profile)
+  })
+  if (!saved) throw new Error('Gender save produced no result.')
+  return withBanner(saved)
+}
+
+/**
+ * Saves the signed-in player's getting-to-know answers (D-2026-11-19-11): where you play, shots,
+ * favourite player. Every answer may be empty. At most 6 own shots, 24 characters each, none that
+ * repeats the list or another own shot. Mock mode only: the real storage shape is open (#1089,
+ * D-2026-11-19-11).
+ */
+export async function saveMyOnboardingAnswers(input: OnboardingAnswers): Promise<PlayerProfile> {
+  if (isRealDataMode())
+    throw new MockError('permission', NOT_CONNECTED_MESSAGE)
+  const checked = normalizeOnboardingAnswers(input)
+  if (checked.error !== undefined) throw new MockError('conflict', checked.error)
+  await delay(900)
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', "You're offline. Reconnect and try again.")
+  const session = await getSession('player')
+  if (!session) throw new MockError('permission', 'Sign in to edit your profile.')
+  checkMockSave()
+  let saved: PlayerProfile | undefined
+  mockStore.update((draft) => {
+    const profile = draft.playerProfiles.find((entry) => entry.playerId === session.account.id)
+    if (!profile) throw new MockError('permission', 'This profile is not yours to edit.')
+    Object.assign(profile, checked.answers)
+    saved = structuredClone(profile)
+  })
+  if (!saved) throw new Error('Answers save produced no result.')
   return withBanner(saved)
 }

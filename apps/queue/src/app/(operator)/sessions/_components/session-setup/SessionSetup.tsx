@@ -73,7 +73,14 @@ import { QueryError } from '../../../_components/query-error/QueryError'
 
 export type SessionSetupProps =
   | { mode: 'create'; date?: string; venueId?: string }
-  | { mode: 'edit'; sessionId: string }
+  | {
+      mode: 'edit'
+      sessionId: string
+      /** Open the editor on this page (0 date and venue and courts, 1 game rules, 2 costs and notes) */
+      initialStep?: number
+      /** Where Back, Cancel and a save return to: the preparation page's Settings tab instead of Overview */
+      returnToSettings?: boolean
+    }
 
 /** The Mode and Scoring card illustrations, served from apps/queue/public/art/session-setup. */
 const CARD_ART = {
@@ -169,7 +176,9 @@ export function SessionSetup(props: SessionSetupProps) {
   const roster = useSessionRoster(editing ?? '')
   const sessionHosts = useSessionHosts(editing ?? '')
   const isEdit = props.mode === 'edit'
-  const backHref = isEdit ? `/sessions/${editing}/preparation` : '/'
+  const returnToSettings = props.mode === 'edit' && props.returnToSettings
+  const preparationHref = `/sessions/${editing}/preparation${returnToSettings ? '?tab=settings' : ''}`
+  const backHref = isEdit ? preparationHref : '/'
   const backLabel = isEdit ? 'Back to preparation' : 'Home'
 
   if (isEdit) {
@@ -296,7 +305,7 @@ export function SessionSetup(props: SessionSetupProps) {
           onSuccess: (result) => {
             toast(result.message)
             clearDraft()
-            router.push(`/sessions/${editing}/preparation`)
+            router.push(preparationHref)
           },
           onError: (error) => toast.error(errorMessage(error)),
         },
@@ -424,7 +433,9 @@ export function SessionSetup(props: SessionSetupProps) {
         <SessionSetupForm
           ref={formRef}
           mode={props.mode}
-          initialPage={restored?.page}
+          initialPage={
+            props.mode === 'edit' ? (props.initialStep ?? restored?.page) : restored?.page
+          }
           financials={{
             shuttleItems: inventory.data?.items.filter((i) => i.category === 'shuttlecocks') ?? [],
             venueRates: venueList.map((v) => ({

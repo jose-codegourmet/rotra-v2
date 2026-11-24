@@ -1,8 +1,6 @@
 'use client'
 
-import { useClub } from '@rotra/data/club'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
-import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
@@ -39,7 +37,6 @@ import { Icon } from '@rotra/ui/icon'
 import { Notice } from '@rotra/ui/notice'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { PageHeader } from '@rotra/ui/page-header'
-import { SessionJoinQr } from '@rotra/ui/session-join-qr'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SessionSetupCard } from '@rotra/ui/session-setup-card'
 import { SessionTitleLink } from '@rotra/ui/session-title-link'
@@ -57,14 +54,14 @@ import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
-import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
 import { PaymentsPanel } from '@/app/(operator)/sessions/[sessionId]/_components/payments-panel/PaymentsPanel'
+import { ShareSession } from '@/app/(operator)/sessions/[sessionId]/_components/share-session/ShareSession'
 import { SessionHosts } from '@/app/(operator)/sessions/[sessionId]/_components/session-hosts/SessionHosts'
+import { PreparationSettings } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-settings/PreparationSettings'
 import { PreparationRoster } from '@/app/(operator)/sessions/[sessionId]/preparation/_components/preparation-roster/PreparationRoster'
 import { sessionHref } from '@/lib/dates'
 import { useAppSelector } from '@/store/hooks'
-import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 
 const MODES = {
@@ -73,7 +70,7 @@ const MODES = {
   hard: { label: 'Hard', text: 'Demanding runs, including 2–3 consecutive games.' },
 } as const
 
-const TABS = ['overview', 'roster', 'waitlist', 'payments'] as const
+const TABS = ['overview', 'roster', 'waitlist', 'payments', 'settings'] as const
 type PreparationTab = (typeof TABS)[number]
 
 const time = (at: number) =>
@@ -95,8 +92,6 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const dev = useAppSelector(selectDev)
   const offline = !useConnectivity().online
   const session = useQueueSession(sessionId)
-  const clubId = useAppSelector(selectAccount)?.id ?? DEMO_CLUB_ID
-  const club = useClub(clubId)
   const sessions = useQueueSessions()
   const roster = useSessionRoster(sessionId)
   const download = useDownloadSession()
@@ -109,7 +104,10 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
-  const tab: PreparationTab = TABS.find((t) => t === tabParam) ?? 'overview'
+  // Settings is before start only: during play the link falls back to Overview.
+  const tab: PreparationTab =
+    TABS.find((t) => t === tabParam && (t !== 'settings' || session.data?.state === 'prepared')) ??
+    'overview'
   const setTab = (next: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('tab', next)
@@ -119,8 +117,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
     'adjust' | 'add-court' | 'add-player' | 'requests' | 'payments' | null
   >(null)
   const [startOpen, setStartOpen] = useState(false)
-  const [postOpen, setPostOpen] = useState(false)
-  const [qrOpen, setQrOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
@@ -292,34 +289,17 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           description={`${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)} · ${s.venueName}`}
           actions={
             <>
-              <Button
-                size="sm"
-                asChild
-                aria-label={live ? 'Back to live session' : 'Edit preparation'}
-              >
-                {live ? (
+              {live ? (
+                <Button size="sm" asChild aria-label="Back to live session">
                   <Link href={`/sessions/${sessionId}`}>
                     <Icon name="back" />
                     <ActionLabel long="Back to live session" short="Live session" />
                   </Link>
-                ) : (
-                  <Link href={`/sessions/${sessionId}/edit`}>
-                    <Icon name="edit" />
-                    <ActionLabel long="Edit preparation" short="Edit" />
-                  </Link>
-                )}
-              </Button>
-              <Button size="sm" aria-label="Copy invite link" onClick={() => void copyLink()}>
-                <Icon name="link" />
-                <ActionLabel long="Copy invite link" short="Invite link" />
-              </Button>
-              <Button size="sm" onClick={() => setQrOpen(true)}>
-                <Icon name="qr" />
-                Session QR
-              </Button>
-              <Button size="sm" aria-label="Copy Facebook post" onClick={() => setPostOpen(true)}>
-                <Icon name="megaphone" />
-                <ActionLabel long="Copy Facebook post" short="Facebook post" />
+                </Button>
+              ) : null}
+              <Button size="sm" onClick={() => setShareOpen(true)}>
+                <Icon name="share" />
+                Share
               </Button>
             </>
           }
@@ -370,6 +350,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                 ]
               : [],
           },
+          ...(s?.state === 'prepared' ? [{ value: 'settings', label: 'Settings' }] : []),
         ]}
       >
         <TabsContent value="overview">
@@ -523,6 +504,11 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
         <TabsContent value="payments">
           <PaymentsPanel sessionId={sessionId} />
         </TabsContent>
+        {s?.state === 'prepared' ? (
+          <TabsContent value="settings">
+            <PreparationSettings sessionId={sessionId} />
+          </TabsContent>
+        ) : null}
         <TabsContent value="waitlist">
           <PreparationRoster sessionId={sessionId} tab="waitlist" />
         </TabsContent>
@@ -539,24 +525,6 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           presentCount={present}
           onStart={() => setStartOpen(true)}
         />
-      ) : null}
-      {s ? (
-        <Sheet open={qrOpen} onOpenChange={setQrOpen} title="Session QR">
-          {/* The QR holds the visitor link (/s/<slug>), never the public-page preview URL. */}
-          <SessionJoinQr
-            link={sessionLink}
-            slug={s.publicSlug}
-            clubName={club.data?.name ?? 'ROTRA session'}
-            clubInitials={club.data?.initials}
-            clubLogoUrl={club.data?.logoUrl}
-            sessionTitle={s.title}
-            dateLabel={date(s.scheduledStartAt)}
-            timeLabel={`${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)}`}
-            venueName={s.venueName}
-            onDownloaded={() => toast('QR image downloaded')}
-            onError={(message) => toast.error(message)}
-          />
-        </Sheet>
       ) : null}
       {s?.state === 'prepared' ? (
         <StartSessionSheet
@@ -652,7 +620,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
           </Sheet>
         </>
       ) : null}
-      <FacebookPost sessionId={sessionId} open={postOpen} onOpenChange={setPostOpen} />
+      <ShareSession sessionId={sessionId} open={shareOpen} onOpenChange={setShareOpen} />
     </main>
   )
 }

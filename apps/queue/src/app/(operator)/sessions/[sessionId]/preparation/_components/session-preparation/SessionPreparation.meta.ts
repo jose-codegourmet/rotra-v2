@@ -3,10 +3,11 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const sessionPreparationMeta = {
   name: 'SessionPreparation',
   description:
-    'Q-PREPARE container: PageHeader with the public page icon and responsive preparation actions (DeleteSessionSheet on useDeleteSession), the JoinRequests card ("Requests · N", no tabs) above the tabs while a join request or drop-out notice waits, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionHosts (the Hosts card, prepared and live, #1005), SessionLinkCard on useSetAcceptJoinRequests and useSetAlwaysRequireRequest), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock\'s Start session pill through useDockAction.',
+    'Q-PREPARE container: PageHeader with the Share button (ShareSession: Share this session) and, while live, Back to live session; there is no Edit preparation button (the Settings tab cards open the editor) and the responsive preparation actions (DeleteSessionSheet on useDeleteSession), the JoinRequests card ("Requests · N", no tabs) above the tabs while a join request or drop-out notice waits, the Overview tab (SessionSetupCard from estimateMinimum, DeviceDownloadCard on useDownloadSession, SessionHosts (the Hosts card, prepared and live, #1005), SessionLinkCard on useSetAcceptJoinRequests and useSetAlwaysRequireRequest), StartSessionBar from startBlocker, StartSessionSheet on useStartSession, and the dock\'s Start session pill through useDockAction.',
   usage: [
     'Rendered by /sessions/[sessionId]/preparation; active sessions show read-only Session settings with the existing live sheets and Continue session dock action; finalized/invalid sessions go to the record and finalizing sessions to finishing, unknown ids to notFound().',
     'Active sessions reuse CourtsAndTime, AddPlayer, JoinRequests (the "Requests" sheet behind Match requests · N, match requests only) and PaymentsPanel in sheets. Start, delete, edit and pre-start download controls are absent; fixed minimum copy uses the stored target.',
+    'The Settings tab (PreparationSettings, after Payments, before start only, ?tab=settings; during play the link falls back to Overview): cards Date and venue, Courts, Game rules, Costs, Notes, each with an Edit that opens the editor at step 1, 1, 2, 3, 3; Back returns to ?tab=settings.',
     'The Roster and levels (chip N/capacity) and Waitlist (chip N) tabs render PreparationRoster; the start bar and dock pill follow the roster query, so a level set there clears the blocker live. Payments arrives with Queue › Financials.',
     'The session link is window.location.origin + /s/<publicSlug>: Copy link writes it to the clipboard and toasts "Session link copied"; Open as a guest pushes the public page /s/<publicSlug>; The title (SessionTitleLink) opens the operator preview /sessions/[sessionId]/public-page in a new tab; Preview public page (Session link card) pushes it. Turning Accept join requests off only flips the switch text; the card and the Requests card stay.',
   ],
@@ -26,7 +27,8 @@ export const sessionPreparationMeta = {
     'DeviceDownloadCard',
     'StartSessionBar',
     'StartSessionSheet',
-    'FacebookPost',
+    'ShareSession',
+    'PreparationSettings',
     'DeleteSessionSheet',
   ],
 } satisfies ComponentMeta

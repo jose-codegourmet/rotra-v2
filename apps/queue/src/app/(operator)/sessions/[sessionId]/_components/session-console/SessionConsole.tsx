@@ -21,6 +21,7 @@ import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
+import { Icon } from '@rotra/ui/icon'
 import { NotRecordedChip } from '@rotra/ui/not-recorded-chip'
 import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
@@ -51,6 +52,7 @@ import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components
 import { PlayersView } from '@/app/(operator)/sessions/[sessionId]/_components/players-view/PlayersView'
 import { QueueView } from '@/app/(operator)/sessions/[sessionId]/_components/queue-view/QueueView'
 import { SessionDoneFlow } from '@/app/(operator)/sessions/[sessionId]/_components/session-done-flow/SessionDoneFlow'
+import { ShareSession } from '@/app/(operator)/sessions/[sessionId]/_components/share-session/ShareSession'
 import { SessionView } from '@/app/(operator)/sessions/[sessionId]/_components/session-view/SessionView'
 import { SettingsView } from '@/app/(operator)/sessions/[sessionId]/_components/settings-view/SettingsView'
 import {
@@ -154,7 +156,7 @@ const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 /**
  * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and, at the
  * upper right, ConsoleHeaderActions: Match requests · N (the Requests sheet, match requests only),
- * Courts and time, Payments and the More menu (Public page, Copy Facebook post, Home). Then the
+ * Share (the Share this session dialog), Courts and time, Payments and the More menu (Public page, Copy Facebook post, Home). Then the
  * view tabs (Courts, Main Queue, Generate Queue, Players, Leaderboard, Match History, Settings; on phones one
  * "Console view" menu) with live counts, the view panels (Courts here; the others arrive in their
  * own containers), the selected tab in the URL (`?tab=`), the
@@ -180,6 +182,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
+  // The header Share button's Share this session dialog
+  const [shareOpen, setShareOpen] = useState(false)
   const [editCourtId, setEditCourtId] = useState<string | null>(null)
   // Courts and time opened from the overdue banner focuses the New end picker
   const [focusEnd, setFocusEnd] = useState(false)
@@ -387,18 +391,24 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               </>
             }
             actions={
-              <ConsoleHeaderActions
-                matchRequestCount={matchRequestCount}
-                onOpenMatchRequests={() => setSheet('join-requests')}
-                onOpenCourtsAndTime={() => {
-                  setFocusEnd(false)
-                  setSheet('adjust')
-                }}
-                onOpenPayments={() => setSheet('payments')}
-                onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
-                onCopyFacebookPost={() => setSheet('post')}
-                onGoHome={() => router.push('/')}
-              />
+              <div className="flex flex-none flex-wrap items-center justify-end gap-2">
+                <Button size="sm" onClick={() => setShareOpen(true)}>
+                  <Icon name="share" />
+                  Share
+                </Button>
+                <ConsoleHeaderActions
+                  matchRequestCount={matchRequestCount}
+                  onOpenMatchRequests={() => setSheet('join-requests')}
+                  onOpenCourtsAndTime={() => {
+                    setFocusEnd(false)
+                    setSheet('adjust')
+                  }}
+                  onOpenPayments={() => setSheet('payments')}
+                  onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
+                  onCopyFacebookPost={() => setSheet('post')}
+                  onGoHome={() => router.push('/')}
+                />
+              </div>
             }
           />
         ) : (
@@ -483,10 +493,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <TabsContent value="settings">
             <SettingsView
               {...viewProps}
-              onOpenCourtsAndTime={() => {
-                setFocusEnd(false)
-                setSheet('adjust')
-              }}
+              onAddCourt={() => setSheet('add-court')}
               onOpenMatchRequests={() => setSheet('join-requests')}
               onOpenPayments={() => setSheet('payments')}
             />
@@ -517,6 +524,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         >
           <PaymentsPanel sessionId={sessionId} asSheet />
         </Sheet>
+        <ShareSession sessionId={sessionId} open={shareOpen} onOpenChange={setShareOpen} />
         <FacebookPost
           sessionId={sessionId}
           open={sheet === 'post'}

@@ -18,4 +18,4 @@ export const genderField = genderInput.transform((value) => (value === '' ? null
  */
 export const genderRequiredInput = z
   .enum(['male', 'female', ''])
-  .refine((value) => value !== '', 'Choose Male or Female.')
+  .refine((value) => value.length > 0, 'Choose Male or Female.')

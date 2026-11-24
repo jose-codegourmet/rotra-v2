@@ -4,6 +4,8 @@
 
 Ticket: #879 (one issue for the whole track, under epic #869).
 
+**Status (2026-11-25): built and merged in #1095, not closed.** All five tasks are done and the owner signed off the migration SQL. Open before the track can be called complete: apply the migration to the beta database and deploy; set `NEXT_PUBLIC_ROTRA_STREAM_URL`, `ROTRA_ALLOWED_ORIGINS` and add `/api/stream` to `ROTRA_GO_MOVED_AREAS` (staging-verification); club-less writes (BL-20); a Route Handler write reaching a screen, the Player and Admin apps, a phone, CORS on real domains, Grafana panels and staging timing are unverified (staging-verification R3).
+
 ## Phase 1: Server
 
 - [x] **1.1** Event append + notification (Go helper, hooks in every classified write, audit list, 7-day cleanup; the TS helper for the beta's Route Handlers, see the deviations)

@@ -1,6 +1,6 @@
 # Queue app: Match History stacks the courts; each court's matches run newest-first from the top, time on top
 
-Status: TICKETED — #1052
+Status: IN MOCK APP — #1052
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveHistoryPane()`, `lhTimeline()` (stacked courts)

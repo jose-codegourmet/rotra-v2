@@ -1,6 +1,6 @@
 # Queue app: Match History's court filter is a row of pills with count badges
 
-Status: TICKETED — #1052
+Status: IN MOCK APP — #1052
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveHistoryPane()` (`.cfilter`)

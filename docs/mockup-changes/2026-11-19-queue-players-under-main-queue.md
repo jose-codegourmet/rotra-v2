@@ -1,6 +1,6 @@
 # Queue app: the Players picker sits under the Main Queue
 
-Status: TICKETED — #1060
+Status: IN MOCK APP — #1060
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console `pane === 'queue'` (`queuePane()` then `playersPane()`)

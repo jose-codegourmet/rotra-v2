@@ -449,7 +449,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             onPickAnother={onPickAnother}
           />
         </TabsContent>
-        <TabsContent value="queue">
+        <TabsContent value="queue" className="flex flex-col gap-3">
           {VIEWS.queue ? (
             <QueueView
               {...viewProps}
@@ -462,6 +462,13 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           ) : (
             panel('queue')
           )}
+          {/* The Players picker under the Main Queue (owner, November 19, 2026): the same view as the
+              Players tab, so matches are made while watching the queue. Only the active tab panel is
+              mounted, so its sheets and state exist once; Make match adds to the queue right above and
+              PlayersView never navigates. */}
+          {VIEWS.players ? (
+            <div className="border-t border-border pt-5">{panel('players')}</div>
+          ) : null}
         </TabsContent>
         {VIEWS.generate ? (
           <TabsContent value="generate" forceMount>

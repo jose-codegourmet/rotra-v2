@@ -1,6 +1,6 @@
 # Queue app: the live console has six tabs: Courts, Main Queue, Generate Queue, Players, Leaderboard, Settings
 
-Status: TICKETED — #1058
+Status: IN MOCK APP — #1058
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console (`viewConsole()`), `queuePane()`, `autoWorkspace()`

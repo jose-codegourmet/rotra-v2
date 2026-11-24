@@ -1,6 +1,6 @@
 # Queue app: standings positions run on without gaps (1, 1, 2)
 
-Status: TICKETED — #1057
+Status: IN MOCK APP — #1057
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `standings()` (position numbering); read by the console Leaderboard, the record's Standings and Players, the Standings slide, Share leaderboard images and Your position

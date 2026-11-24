@@ -1,3 +1,6 @@
+'use client'
+
+import { useAuthArt } from '@rotra/ui/auth-art-provider'
 import { Card } from '@rotra/ui/card'
 import { Notice } from '@rotra/ui/notice'
 import { RotraLogo } from '@rotra/ui/rotra-logo'
@@ -37,6 +40,13 @@ export type AuthCardProps = {
   footer?: ReactNode
   /** Small line under the card, outside it, such as P-LOGIN's Terms of Service and Privacy Policy note */
   below?: ReactNode
+  /**
+   * Full-bleed background art (public path). Identical in both themes; the card keeps the theme surface.
+   * 900 px and wider: the art fills the page, subject left, card right over a dark fade and a deeper
+   * shadow. Phones: the art is darkened behind the centred card. Defaults to the art of an enclosing
+   * AuthArtProvider; opt-in, nothing changes without it.
+   */
+  art?: string
 }
 
 /**
@@ -58,9 +68,14 @@ export function AuthCard({
   children,
   footer,
   below,
+  art: artProp,
 }: AuthCardProps) {
+  const contextArt = useAuthArt()
+  const art = artProp ?? contextArt
   const card = (
-    <Card className="flex w-[min(420px,100%)] flex-col gap-[18px] p-7">
+    <Card
+      className={`flex w-[min(420px,100%)] flex-col gap-[18px] p-7${art ? ' shadow-[0_24px_60px_color-mix(in_srgb,var(--color-share-bg)_50%,transparent)]' : ''}`}
+    >
       {back}
       {showBrand ? (
         product ? (
@@ -98,8 +113,15 @@ export function AuthCard({
       {footer ? <p className="m-0 text-[13px] text-fg2">{footer}</p> : null}
     </Card>
   )
+  // The prototypes' .login / .login::before. The fade and darkening use the fixed share-bg colour
+  // (never overridden by light mode), so the art reads the same in both themes.
+  const artClasses =
+    'relative isolate overflow-hidden bg-share-bg bg-cover bg-[position:22%_center] bg-no-repeat before:absolute before:inset-0 before:-z-10 before:content-[\'\'] before:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-share-bg)_0%,transparent)_25%,color-mix(in_srgb,var(--color-share-bg)_55%,transparent)_60%,color-mix(in_srgb,var(--color-share-bg)_80%,transparent))] max-[899px]:before:bg-[color-mix(in_srgb,var(--color-share-bg)_60%,transparent)] min-[900px]:justify-items-end min-[900px]:pr-[max(7vw,48px)] min-[900px]:pl-12'
   return (
-    <main className="grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
+    <main
+      className={`grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]${art ? ` ${artClasses}` : ''}`}
+      style={art ? { backgroundImage: `url(${art})` } : undefined}
+    >
       {below ? (
         <div className="flex w-[min(420px,100%)] flex-col gap-3">
           {card}

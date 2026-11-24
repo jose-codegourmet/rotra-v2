@@ -2,6 +2,7 @@
 
 import { useAuthArt } from '@rotra/ui/auth-art-provider'
 import { Card } from '@rotra/ui/card'
+import { cn } from '@rotra/ui/cn'
 import { Notice } from '@rotra/ui/notice'
 import { RotraLogo } from '@rotra/ui/rotra-logo'
 import type { ReactNode } from 'react'
@@ -74,7 +75,10 @@ export function AuthCard({
   const art = artProp ?? contextArt
   const card = (
     <Card
-      className={`flex w-[min(420px,100%)] flex-col gap-[18px] p-7${art ? ' shadow-[0_24px_60px_color-mix(in_srgb,var(--color-share-bg)_50%,transparent)]' : ''}`}
+      className={cn(
+        'flex w-[min(420px,100%)] flex-col gap-[18px] p-7',
+        art && 'shadow-[0_24px_60px_color-mix(in_srgb,var(--color-share-bg)_50%,transparent)]',
+      )}
     >
       {back}
       {showBrand ? (
@@ -119,7 +123,10 @@ export function AuthCard({
     "relative isolate overflow-hidden bg-share-bg bg-cover bg-[position:22%_center] bg-no-repeat before:absolute before:inset-0 before:-z-10 before:content-[''] before:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-share-bg)_0%,transparent)_25%,color-mix(in_srgb,var(--color-share-bg)_55%,transparent)_60%,color-mix(in_srgb,var(--color-share-bg)_80%,transparent))] max-[899px]:before:bg-[color-mix(in_srgb,var(--color-share-bg)_60%,transparent)] min-[900px]:justify-items-end min-[900px]:pr-[max(7vw,48px)] min-[900px]:pl-12"
   return (
     <main
-      className={`grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]${art ? ` ${artClasses}` : ''}`}
+      className={cn(
+        'grid min-h-[calc(100dvh-80px)] place-items-center py-6 pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]',
+        art && artClasses,
+      )}
       style={art ? { backgroundImage: `url(${art})` } : undefined}
     >
       {below ? (

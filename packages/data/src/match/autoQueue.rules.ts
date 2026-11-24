@@ -241,6 +241,7 @@ export function generateAutoQueueMatches({
   rng = Math.random,
   catchUpTarget,
   bagging,
+  exempt = [],
 }: {
   session: QueueSession
   ctx: MatchContext
@@ -252,6 +253,11 @@ export function generateAutoQueueMatches({
   rng?: () => number
   /** Bagging mode and its pairs (#739); ignored while off or without doubles. */
   bagging?: BaggingSettings
+  /**
+   * The session exemption list (D-2026-11-19-07): roster ids every strategy leaves out, Plan Ahead
+   * included. Add match, Make match and Suggest never read it.
+   */
+  exempt?: readonly string[]
 }): {
   /** `reason` is set only when a bagging pair shaped the lineup. */
   matches: (MatchLineup & { reason?: string })[]
@@ -266,6 +272,7 @@ export function generateAutoQueueMatches({
     (p) =>
       p.sessionId === session.id &&
       p.present &&
+      !exempt.includes(p.id) &&
       (mode === 'ahead'
         ? planAheadEligible(p.id, ctx.matches, scoring, now)
         : !activeMatchFor(p.id, ctx.matches)),

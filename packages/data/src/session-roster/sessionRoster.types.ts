@@ -1,3 +1,4 @@
+import type { Gender } from '../club-player/clubPlayer.types'
 import type { PlayingLevel } from '../player/player.types'
 export type SessionPlayer = {
   id: string
@@ -22,6 +23,11 @@ export type SessionPlayer = {
    * roster and match reads send it since P15.8).
    */
   clubNickname?: string | null
+  /**
+   * The saved player's gender (D-2026-11-19-01). Derived by the Queue Master roster and match reads
+   * (`withGender`), never stored on the roster row. Missing = not given: matches are Genderless.
+   */
+  gender?: Gender | null
   /**
    * The linked Player's own **I'm here** (D-2026-11-09-03). The QM's last action wins: the
    * “Checked in themselves” mark shows only while the row is present and no presence change came

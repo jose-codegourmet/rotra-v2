@@ -1,6 +1,9 @@
 import type { PlayerCharacterId } from '../player/picture'
 import type { PlayingLevel } from '../player/player.types'
 
+/** Optional gender (D-2026-11-19-01); decides the match category. Not given reads as null. */
+export type Gender = 'male' | 'female'
+
 /**
  * How a saved player joined the club (D-2026-11-09-06). Missing on older or story rows reads as
  * `added`; use `joinedViaOf` rather than reading the field directly.
@@ -58,6 +61,11 @@ export type ClubPlayer = {
   clubNickname?: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   playingLevel: PlayingLevel | null
+  /**
+   * Optional gender the club gave for this player (D-2026-11-19-01). Missing or null = not given,
+   * which makes any match with them Genderless. Real mode has no column yet: always missing.
+   */
+  gender?: Gender | null
   /** The club deleted this saved player; history still points at it (mock store only) */
   removedAt?: number
   joinedVia?: JoinedVia

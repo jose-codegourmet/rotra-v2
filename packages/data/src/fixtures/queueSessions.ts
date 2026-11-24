@@ -92,6 +92,7 @@ export function createQueueFixtures(now = Date.now()) {
       clubPlayerId: p.id,
       nameSnapshot: p.fullName,
       nicknameSnapshot: p.nickname,
+      gender: p.gender ?? null,
       present: i < 10,
       presentChangedAt: i < 10 ? now : null,
       level:
@@ -111,6 +112,7 @@ export function createQueueFixtures(now = Date.now()) {
       clubPlayerId: p.id,
       nameSnapshot: p.fullName,
       nicknameSnapshot: p.nickname,
+      gender: p.gender ?? null,
       present: true,
       presentChangedAt: now,
       level: p.playingLevel,

@@ -1,9 +1,9 @@
 import {
-  FORMAT_LABELS,
   type MatchContext,
   matchStatus,
   queueMasterName,
 } from '../match/match.rules'
+import { matchLabel } from '../match/matchCategory.rules'
 import type { Match, MatchFormat, MatchStatus } from '../match/match.types'
 import type { MockState } from '../mock/store'
 import type { PlayingLevel } from '../player/player.types'
@@ -56,7 +56,7 @@ export function createMatchCardFixtures(now = Date.now()) {
   }
   const card = (match: Match, context: MatchContext = ctx): MatchCardFixture => ({
     match,
-    formatLabel: FORMAT_LABELS[match.format],
+    formatLabel: matchLabel(match, context.roster),
     status: matchStatus(match, context),
     teamA: match.teamA.map(player(context.roster)),
     teamB: match.teamB.map(player(context.roster)),

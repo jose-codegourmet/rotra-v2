@@ -1,4 +1,5 @@
 import { withClubNickname } from '../club-player/clubNickname.rules'
+import { withGender } from '../club-player/gender.rules'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
@@ -18,7 +19,7 @@ import { balanceTeams, formatForSelection, generateMatches } from './queue.rules
 export function matchContext(s: MockState, sessionId: string) {
   return {
     // Rows carry the club nickname so every message names players as the Queue Master sees them.
-    roster: s.roster.filter((r) => r.sessionId === sessionId).map((r) => withClubNickname(s, r)),
+    roster: s.roster.filter((r) => r.sessionId === sessionId).map((r) => withGender(s, withClubNickname(s, r))),
     matches: s.matches.filter((m) => m.sessionId === sessionId),
     courts: s.courts.filter((c) => c.sessionId === sessionId && !c.removedAt),
   }

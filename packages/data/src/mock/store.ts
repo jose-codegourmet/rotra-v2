@@ -161,6 +161,11 @@ export type MockState = {
   sync: SyncState
   sessionIntegrity: Record<string, SessionIntegrity>
   autoQueueDrafts: Record<string, AutoQueueDraftState>
+  /**
+   * Session exemption lists (D-2026-11-19-07): the roster ids Generate Queue leaves out, by session.
+   * Mock store only (real mode has no column yet). Missing in older saved states.
+   */
+  sessionExemptions?: Record<string, string[]>
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
@@ -289,6 +294,7 @@ function seedState(): MockState {
     downloadInfo: {},
     sessionIntegrity: {},
     autoQueueDrafts: {},
+    sessionExemptions: {},
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,

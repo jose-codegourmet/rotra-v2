@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 59 · IN PROGRESS: 1 · IN MOCK APP: 231 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 269 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -382,17 +382,17 @@ TICKETED: 59 · IN PROGRESS: 1 · IN MOCK APP: 231 · CANCELLED: 4 · MOCKUP ONL
 | [2026-11-18-queue-record-games-option](2026-11-18-queue-record-games-option.md) | Queue app: a Record games switch per session; off runs the night and keeps no results | session-setup-form, session-setup-card, switch, chip, notice, confirm-result-sheet, public-session-details | TICKETED — #961 (superseded by 2026-11-20-queue-record-games-not-ranked.md (what Off does: games are recorded as usual; only their wins stay out of the leaderboards and win rate)) |
 | [2026-11-18-queue-scoring-modes](2026-11-18-queue-scoring-modes.md) | Queue app: a scoring mode per session, and a match result dialog that asks only for what the mode needs | match-result-form, confirm-result-sheet, session-setup-form, session-setup-card, active-match-sheet, match-history, public-match-history, public-session-details, game-row, segmented-control, switch, choice-group, key-value-list | IN MOCK APP — #944 |
 | [2026-11-18-queue-shared-standings-positions](2026-11-18-queue-shared-standings-positions.md) | Queue app: players with the same wins and losses share a standings position, with their faces stacked | live-leaderboard, session-standings, leaderboard-share-card, avatar | TICKETED — #961 |
-| [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | TICKETED — #1089 |
-| [2026-11-19-auth-backgrounds](2026-11-19-auth-backgrounds.md) | Queue, Player and Admin apps: ROTRA background art on the auth pages | auth page frame | TICKETED — #1085 |
+| [2026-11-19-admin-player-gender](2026-11-19-admin-player-gender.md) | Admin app: the player detail shows the player's gender | key-value list (reuse) | IN MOCK APP — #1081 |
+| [2026-11-19-auth-backgrounds](2026-11-19-auth-backgrounds.md) | Queue, Player and Admin apps: ROTRA background art on the auth pages | auth page frame | IN MOCK APP — #1081 |
 | [2026-11-19-court-colors](2026-11-19-court-colors.md) | Queue and Player apps: ROTRA court colours (dark theme) | every drawn court (court card, match card court, setup court picture, player game cards) | CANCELLED — the owner asked to revert to the original court design on November 19, 2026; both mockups are reverted |
-| [2026-11-19-player-court-position-art](2026-11-19-player-court-position-art.md) | Player app: Higgsfield art on the Where you play cards | court-position card | TICKETED — #1081 |
-| [2026-11-19-player-details-step-mobile](2026-11-19-player-details-step-mobile.md) | Player app: a faster, mobile-first Your details step with clear Required fields | details step, Required pill, optional fold, fixed Continue footer | TICKETED — #1081 |
-| [2026-11-19-player-favorite-art](2026-11-19-player-favorite-art.md) | Player app: graphic on the favorite player step | step banner | TICKETED — #1081 |
-| [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | TICKETED — #1081 |
-| [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | TICKETED — #1081 |
-| [2026-11-19-player-invite-onboarding](2026-11-19-player-invite-onboarding.md) | Player app: fullscreen onboarding after an invite link, with play style, shots and favorite player | onboarding frame (header with progress, fixed footer), court-position cards, shot chips, favorite-player chips | TICKETED — #1081 |
-| [2026-11-19-player-mobile-dock](2026-11-19-player-mobile-dock.md) | Player app: bottom dock for the main navigation on phones | top bar, mobile dock (new) | TICKETED — #1084 |
-| [2026-11-19-player-shots-others](2026-11-19-player-shots-others.md) | Player app: shots step gets a graphic and Others (players add their own shots) | step banner, shot chips with Others | TICKETED — #1081 |
+| [2026-11-19-player-court-position-art](2026-11-19-player-court-position-art.md) | Player app: Higgsfield art on the Where you play cards | court-position card | IN MOCK APP — #1081 |
+| [2026-11-19-player-details-step-mobile](2026-11-19-player-details-step-mobile.md) | Player app: a faster, mobile-first Your details step with clear Required fields | details step, Required pill, optional fold, fixed Continue footer | IN MOCK APP — #1081 |
+| [2026-11-19-player-favorite-art](2026-11-19-player-favorite-art.md) | Player app: graphic on the favorite player step | step banner | IN MOCK APP — #1081 |
+| [2026-11-19-player-gender](2026-11-19-player-gender.md) | Player app: optional gender on the profile, with a reminder until it is added | select field, notice, notification item (reuse) | IN MOCK APP — #1081 |
+| [2026-11-19-player-home](2026-11-19-player-home.md) | Player app: Home for signed-in players | home page, current session card, upcoming sessions card, clubs card, rank card, weekly performance card, top bar | IN MOCK APP — #1081 |
+| [2026-11-19-player-invite-onboarding](2026-11-19-player-invite-onboarding.md) | Player app: fullscreen onboarding after an invite link, with play style, shots and favorite player | onboarding frame (header with progress, fixed footer), court-position cards, shot chips, favorite-player chips | IN MOCK APP — #1081 |
+| [2026-11-19-player-mobile-dock](2026-11-19-player-mobile-dock.md) | Player app: bottom dock for the main navigation on phones | top bar, mobile dock (new) | IN MOCK APP — #1081 |
+| [2026-11-19-player-shots-others](2026-11-19-player-shots-others.md) | Player app: shots step gets a graphic and Others (players add their own shots) | step banner, shot chips with Others | IN MOCK APP — #1081 |
 | [2026-11-19-queue-bagging-exempt-rings](2026-11-19-queue-bagging-exempt-rings.md) | Queue app: Bagging pairs and exemption chips show the level ring | picture with level ring (shared helper) | TICKETED — #1061 |
 | [2026-11-19-queue-bigger-court-buttons](2026-11-19-queue-bigger-court-buttons.md) | Queue app: bigger court buttons in Put on court and Move match | court pick tile (new) | IN MOCK APP — #1044 |
 | [2026-11-19-queue-card-characters](2026-11-19-queue-card-characters.md) | Queue app: Rion and Tara drawn into the Mode and Scoring card art | art card (Mode and Scoring choices) | IN MOCK APP — #1071 |
@@ -449,7 +449,7 @@ TICKETED: 59 · IN PROGRESS: 1 · IN MOCK APP: 231 · CANCELLED: 4 · MOCKUP ONL
 | [2026-11-19-queue-swap-partners-playing](2026-11-19-queue-swap-partners-playing.md) | Queue app: drag to swap partners also while a match is playing; tap a card to bring in someone from outside | dialog player card (reuse), drag swap (reuse) | IN MOCK APP — #1042 |
 | [2026-11-19-queue-time-picker-standard](2026-11-19-queue-time-picker-standard.md) | Queue app: every time input opens the time picker dialog (Settings court times included) | date-and-time picker (time field + time dialog) | IN MOCK APP — #1071 |
 | [2026-11-19-queue-upcoming-compact-cards](2026-11-19-queue-upcoming-compact-cards.md) | Queue app: the Courts tab's upcoming queued matches use compact cards | queue match card, compact variant (new): overlapping avatar stack with level rings | TICKETED — #1061 |
-| [2026-11-20-player-not-ranked-games](2026-11-20-player-not-ranked-games.md) | Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate | game-row (note), session-row, chip, notice, tabs | TICKETED — #1090 |
+| [2026-11-20-player-not-ranked-games](2026-11-20-player-not-ranked-games.md) | Player app: games from a not-ranked session show in history but don't count toward the leaderboards or win rate | game-row (note), session-row, chip, notice, tabs | IN MOCK APP — #1081 |
 | [2026-11-20-queue-record-games-not-ranked](2026-11-20-queue-record-games-not-ranked.md) | Queue app: Record games off records the games as usual; only their wins stay out of the leaderboards and win rate | session-setup-form, session-setup-card, chip, notice, confirm-result-sheet, public-session-details | IN MOCK APP — #1071 |
 | [2026-11-20-queue-session-invite-photo-link](2026-11-20-queue-session-invite-photo-link.md) | Queue public page: the Session invite shows the inviter's own picture and an Invite link copy field | share-card (SessionInviteCard), copy-field | IN MOCK APP — PR #992 |
 | [2026-11-22-player-club-membership-leave](2026-11-22-player-club-membership-leave.md) | Player: Leave club says what happens to pending slot transfers | confirm-sheet (copy only, in the club page container) | IN MOCK APP — #1018 |

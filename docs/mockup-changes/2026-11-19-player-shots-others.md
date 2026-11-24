@@ -1,6 +1,6 @@
 # Player app: shots step gets a graphic and Others (players add their own shots)
 
-Status: TICKETED — #1081
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `SHOTS_ART`, `pickSkills`, `ACT.skillOthers` / `skillAdd` / `skillRemove`,

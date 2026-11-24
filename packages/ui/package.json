@@ -136,6 +136,7 @@
     "./license-panel": "./src/components/license-panel/LicensePanel.tsx",
     "./list-row": "./src/components/list-row/ListRow.tsx",
     "./live-leaderboard": "./src/components/live-leaderboard/LiveLeaderboard.tsx",
+    "./live-match-history": "./src/components/live-match-history/LiveMatchHistory.tsx",
     "./match-request-card": "./src/components/match-request-card/MatchRequestCard.tsx",
     "./drop-out-notice-row": "./src/components/drop-out-notice-row/DropOutNoticeRow.tsx",
     "./slot-transfer-row": "./src/components/slot-transfer-row/SlotTransferRow.tsx",

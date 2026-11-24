@@ -266,7 +266,7 @@ const seededJoinedVia = (playerId: string): JoinedVia => joinedViaSeeds[playerId
  * Sample genders for the demo club's saved players (D-2026-11-19-01). Gab and the unclaimed Gab
  * Torres stay unset to show Genderless matches; anyone not listed has no gender.
  */
-const genderSeeds: Record<string, Gender> = {
+export const genderSeeds: Record<string, Gender> = {
   Jose: 'male',
   Aaron: 'male',
   Raymark: 'male',

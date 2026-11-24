@@ -1,3 +1,4 @@
+import type { Gender } from '../club-player/clubPlayer.types'
 import type { LeaderboardPlace } from '../leaderboard/leaderboard.types'
 
 /** The nine playing levels, ordered from Beginner Low to Advanced High. */
@@ -14,6 +15,45 @@ export const PLAYING_LEVELS = [
 ] as const
 
 export type PlayingLevel = (typeof PLAYING_LEVELS)[number]
+
+/**
+ * Getting-to-know answers (D-2026-11-19-11). The ids match the prototype and @rotra/ui's chip lists
+ * (COURT_POS, SKILLS, FAV_PLAYERS); @rotra/data does not import @rotra/ui, so they are repeated here.
+ */
+export const COURT_POSITIONS = ['front', 'back', 'all'] as const
+export type CourtPosition = (typeof COURT_POSITIONS)[number]
+
+/** The 12 listed shots, in the prototype's order. */
+export const SHOT_IDS = [
+  'netting',
+  'smash',
+  'jump',
+  'drop',
+  'slice',
+  'clear',
+  'drive',
+  'lift',
+  'netkill',
+  'push',
+  'block',
+  'backhand',
+] as const
+export type ShotId = (typeof SHOT_IDS)[number]
+
+/** The nine listed favourite players plus `other` (then `favoritePlayerOther` holds the name). */
+export const FAVORITE_PLAYER_IDS = [
+  'lindan',
+  'lcw',
+  'axelsen',
+  'momota',
+  'taufik',
+  'chenlong',
+  'marin',
+  'tty',
+  'anseyoung',
+  'other',
+] as const
+export type FavoritePlayerId = (typeof FAVORITE_PLAYER_IDS)[number]
 
 /** Public identity only. Contacts, account credentials and ranking calculations are separate. */
 export type Player = {
@@ -143,6 +183,25 @@ export type PlayerProfile = {
   /** The resolved banner's uploaded 5:2 image; null for a seeded banner drawn from theme tokens */
   bannerImageUrl?: string | null
   playingStyle: string
+  /**
+   * Gender (D-2026-11-19-01): male, female, or null when not added yet. Public. Unset reads as
+   * null. Real mode has no column yet (#1089), so the real read leaves it unset.
+   */
+  gender?: Gender | null
+  /**
+   * Getting-to-know answers (D-2026-11-19-11), all public and skippable; unset reads as nothing
+   * answered. Real mode leaves them unset until their storage is decided (`players.personal_details`
+   * JSONB or columns, D-2026-11-19-11).
+   */
+  /** Where you play: front, back or all-round. */
+  playStyle?: CourtPosition | null
+  /** Listed shots the player knows. */
+  shots?: ShotId[]
+  /** The player's own shots typed under Others: up to 6, 24 characters each. */
+  shotsOther?: string[]
+  favoritePlayer?: FavoritePlayerId | null
+  /** The typed name when `favoritePlayer` is `other`; empty otherwise. */
+  favoritePlayerOther?: string
   experienceYears: number | null
   experienceMonths: number | null
   socialLinks: { facebook: string; instagram: string; youtube: string; linkedin: string }

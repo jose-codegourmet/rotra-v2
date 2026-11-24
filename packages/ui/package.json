@@ -53,6 +53,7 @@
     "./delete-session-sheet": "./src/components/delete-session-sheet/DeleteSessionSheet.tsx",
     "./console-footer-bar": "./src/components/console-footer-bar/ConsoleFooterBar.tsx",
     "./console-header-actions": "./src/components/console-header-actions/ConsoleHeaderActions.tsx",
+    "./count-pills": "./src/components/count-pills/CountPills.tsx",
     "./count-stepper": "./src/components/count-stepper/CountStepper.tsx",
     "./court-card": "./src/components/court-card/CourtCard.tsx",
     "./court-drawing": "./src/components/court-drawing/CourtDrawing.tsx",

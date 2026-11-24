@@ -42,7 +42,11 @@ export async function readPeriodLeaderboard(
       fullParticipation: true,
       standardMatch: true,
       decision: { kind: 'completed', match: { state: 'completed' } },
-      finalization: { committedAt: { not: null }, session: { state: 'completed' } },
+      // A session with Record games off is not ranked (D-2026-11-20-02): its wins never count here.
+      finalization: {
+        committedAt: { not: null },
+        session: { state: 'completed', recordGames: true },
+      },
     },
     select: {
       playerIdAtFinalization: true,

@@ -387,7 +387,7 @@ export async function readAdminPlayerGames(
             finishedAt: s.finishedAt,
             games: s.games.map((g) => ({
               ...g,
-              counting: g.counting as 'counted' | 'fun' | 'partial',
+              counting: g.counting as 'counted' | 'fun' | 'partial' | 'not_ranked',
               result: g.result as 'won' | 'lost',
             })),
           },

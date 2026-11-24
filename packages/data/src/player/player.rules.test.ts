@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { daysAgo, genSessions, PLAYER_FIXTURE_NOW } from '../fixtures/playerGames'
-import { countRecentStandardMatches, rankDisplayStatus, recentGameStats } from './player.rules'
+import {
+  countRecentStandardMatches,
+  countYearCountedWins,
+  rankDisplayStatus,
+  recentGameStats,
+  yearGameStats,
+} from './player.rules'
 
 const now = PLAYER_FIXTURE_NOW
 const input = {
@@ -94,5 +100,25 @@ describe('Stats · last 90 days (#731)', () => {
     expect(recentGameStats([], now)).toBeNull()
     const old = genSessions('old', 3).map((x) => ({ ...x, finishedAt: daysAgo(120) }))
     expect(recentGameStats(old, now)).toBeNull()
+  })
+})
+
+describe('not ranked games (Record games off, D-2026-11-20-02)', () => {
+  const ranked = genSessions('ranked', 4).map((s) => ({ ...s, finishedAt: daysAgo(1) }))
+  const notRanked = genSessions('not-ranked', 4).map((s) => ({
+    ...s,
+    id: `nr-${s.id}`,
+    finishedAt: daysAgo(1),
+    ranked: false,
+    games: s.games.map((g) => ({ ...g, id: `nr-${g.id}`, counting: 'not_ranked' as const })),
+  }))
+  it('add nothing to the win rate, the counted wins or the standard match count', () => {
+    const both = [...ranked, ...notRanked]
+    expect(yearGameStats(both, now)).toEqual(yearGameStats(ranked, now))
+    expect(countYearCountedWins(both, now)).toEqual(countYearCountedWins(ranked, now))
+    expect(countRecentStandardMatches(both, now)).toBe(countRecentStandardMatches(ranked, now))
+  })
+  it('alone read as no games ("No games yet this year")', () => {
+    expect(yearGameStats(notRanked, now)).toBeNull()
   })
 })

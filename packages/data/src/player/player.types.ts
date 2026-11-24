@@ -29,7 +29,12 @@ export type PlayerGame = {
   format: import('../match/match.types').MatchFormat
   partners: string[]
   opponents: string[]
-  counting: 'counted' | 'fun' | 'partial'
+  /**
+   * `not_ranked`: a full singles or doubles game of a session run with Record games off
+   * (D-2026-11-20-02). It shows with its win or loss, but like `fun` it never counts toward the
+   * leaderboards, win rate, rank or game counts. Set by the real read.
+   */
+  counting: 'counted' | 'fun' | 'partial' | 'not_ranked'
   result: 'won' | 'lost'
   score: string | null
   /** Best of 3 (Q22): every game score read from the player's side ("21–18"), play order; `score` then holds games won. */
@@ -63,6 +68,8 @@ export type PlayerSessionRecord = {
   clubName: string
   finishedAt: string
   sessionPageUrl: string | null
+  /** False for a session run with Record games off (not ranked). Missing reads as true. */
+  ranked?: boolean
   games: PlayerGame[]
 }
 

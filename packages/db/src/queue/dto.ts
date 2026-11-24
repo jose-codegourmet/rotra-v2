@@ -134,7 +134,7 @@ export function sessionDto(session: QueueSession) {
     courtFillMode: session.courtFillMode,
     /** Players can request (D-2026-11-09-05): one switch per format */
     requestFormats: requestFormatsRecord(session.requestFormats),
-    /** Record games (D-2026-11-18-06): false keeps no results; fixed once the session starts. */
+    /** Record games (D-2026-11-20-02): false = not ranked (results kept); fixed once the session starts. */
     recordGames: session.recordGames,
     /** Restrictions (D-2026-11-19-12): which levels may take a slot; default All levels. */
     levelRestriction: levelRestrictionDto(session),

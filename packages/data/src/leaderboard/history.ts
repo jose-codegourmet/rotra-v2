@@ -14,7 +14,9 @@ export function leaderboardHistoryFacts(
           playerId,
           playedAt,
           standardMatch:
-            game.counting !== 'fun' && (game.format === 'singles' || game.format === 'doubles'),
+            game.counting !== 'fun' &&
+            game.counting !== 'not_ranked' &&
+            (game.format === 'singles' || game.format === 'doubles'),
           fullParticipation: game.counting !== 'partial',
           valid: true,
           won: game.result === 'won',

@@ -785,10 +785,8 @@ async function decide(
 /**
  * Winner-only results keep both scores null; scores must agree with the winner.
  *
- * A session with Record games off (D-2026-11-18-06): the match ends with no winner and no score,
- * whatever the call carries; nothing is validated or kept. It still counts toward each player's
- * games and the minimum, like any completed match. A no-result completion is accepted only there:
- * a recorded session still needs a winner (the database refuses the other shape either way).
+ * A session with Record games off stores the winner and score like any other (D-2026-11-20-02):
+ * every completed match needs a winner (the database refuses a completion without one).
  */
 export async function completeMatch(
   context: ClubContext,

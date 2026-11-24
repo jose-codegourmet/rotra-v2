@@ -1,6 +1,6 @@
 # Finalized facts, awards, and publication
 
-**Last verified:** 2026-11-19 for sessions with Record games off ([D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06), Q23.8 #976); 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-24 for sessions with Record games off ([D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02), Q28.9 #1080); 2026-11-18 for the open game scores note ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04)); 2026-11-06 for substitution game credit; 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed data structures, not proposed new award formulas.
 
@@ -41,20 +41,26 @@ Most Improved/Off Day need five **previous** qualifying sessions at that same cl
 
 ## A session with Record games off
 
-**Proposed change (owner, November 20, 2026, [D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); no migration yet, ask first).** The table below is what is built today. The new rule: the games are recorded as usual, and only their wins stay out of the leaderboards, win rate and rank. Finishing would then run exactly as for a recorded session (facts, summaries, snapshot, publication, player-history job), and the period leaderboard, win-rate and rank projections skip facts from a session with `record_games = false` (or the facts carry a `ranked` flag copied at finalization; to decide). Open: whether `club_session_player_summaries` for these sessions feed "has played at this club before" and the award baselines.
+**Built in the services (Q28.9, #1080, November 24, 2026; [D-2026-11-20-02](../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02), replacing the November 18 "leaves no rows" rule of Q23.8 #976).** No table or column changed. The migration `20261120000200_record_games_ranks_only` (every completed decision needs a winner) is applied to local disposable databases only; **not applied to the shared database: owner sign-off needed**, and until then the shared database still refuses a winner on a session with `record_games = false`.
 
-Built in Q23.8 (#976) for [D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); migration `20261119000100_session_record_games`: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` held then, applied to the shared database 2026-11-23). When `queue_sessions.record_games` is false, the session leaves **no rows** in the result, publication or player fact tables:
+When `queue_sessions.record_games` is false, Session done writes the same rows as for any session:
 
 | Table | What Session done and later commands write |
 |---|---|
-| `session_finalizations` | The one row per session is still written (it is the repeat-safe record that the session finished): `state = done`, `stage = finishing`, `committed_at` and `completed_at` set together, `facts_digest` = the digest of an empty fact set. The same barriers apply, including an effective ranking policy, because `policy_version_id` is required |
-| `player_match_facts` | None. The decisions have no winner, so the fact guard would refuse them too |
-| `club_session_player_summaries` | None. The session record counts games from the match evidence instead; "has played at this club before" and the award baselines do not see the session |
-| `projection_jobs` | None, so no result snapshot, player history or rank job runs |
-| `session_result_snapshots` | None. The snapshot writer also returns without writing for such a session |
-| `session_publications`, `session_publication_events`, `result_exports` | None. Publish results and Download images answer "This session has no result slides yet." |
+| `session_finalizations` | As for any session: `state = committed`, `stage = player_records`, then `done` at `slides` when its jobs finish |
+| `player_match_facts` | Written as for any session. There is no `ranked` flag on the fact: the reads join `queue_sessions.record_games` |
+| `club_session_player_summaries` | Written as for any session, so "has played at this club before" and the award baselines see the session (the same as the mock app; whether they should is still open) |
+| `projection_jobs` | `club_session_summaries`, `result_snapshot` and `player_history`. **No `player_rank` job:** the session never moves the skill rank, so no rank recalculation or "Your rank was updated" notification follows |
+| `session_result_snapshots` | Written as for any session (standings, awards, Off Day) |
+| `session_publications`, `session_publication_events`, `result_exports` | Publish results and Download images work as for any session |
 
-Reads: the private results read returns nothing (as for an invalid session); the public session page carries `recordGames: false` and `results: null`; a Player's match history of the session has no matches and is never `shared`. Player history, ranking, the leaderboards and My sessions read facts, so the session is absent from them. The rules above are enforced by the services; the database enforces the column lock and the decision shape only.
+Reads that skip the session's facts (service side, by `queue_sessions.record_games`):
+
+- the Top annual, monthly and weekly leaderboards (`readPeriodLeaderboard`);
+- the skill rank evidence: the recent and older standard match counts and the last valid game date (`recomputeRank`, `readPlayerRank`), so the Provisional and leaderboard game counts never include them;
+- win rates: the player's match history marks each such game `counting: not_ranked` (and the session `ranked: false`), which the year stats, the Compare overall rate and every `counted` count leave out; Compare's shared games leave the session out too.
+
+Reads that keep it: the private results read, the public session page (`recordGames: false` for the **Rankings · Not ranked** tile, with `results` and match history as usual), the Player's match history and My sessions. The finalization status carries `recordGames` for the "… not ranked" toast.
 
 ## Optional public output
 

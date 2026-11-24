@@ -169,7 +169,7 @@ export function statsYearStart(now: Date | number) {
 export function yearGameStats(
   sessions: readonly {
     finishedAt: string | null
-    games: readonly { result: string }[]
+    games: readonly { result: string; counting?: string }[]
   }[],
   now: Date | number,
 ): RecentGameStats | null {
@@ -180,7 +180,8 @@ export function yearGameStats(
       const at = s.finishedAt ? Date.parse(s.finishedAt) : Number.NaN
       return at >= start && at <= end
     })
-    .flatMap((s) => s.games)
+    // Games of a not ranked session (Record games off) never affect the win rate (D-2026-11-20-02).
+    .flatMap((s) => s.games.filter((g) => g.counting !== 'not_ranked'))
   if (!games.length) return null
   const wins = games.filter((g) => g.result === 'won').length
   return {

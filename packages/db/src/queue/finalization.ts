@@ -36,6 +36,10 @@ async function statusDto(tx: Tx | typeof prisma, finalization: SessionFinalizati
     where: { sourceFinalizationId: finalization.sessionId },
     select: { kind: true, status: true, attempts: true, lastErrorCode: true },
   })
+  const session = await tx.queueSession.findUnique({
+    where: { id: finalization.sessionId },
+    select: { recordGames: true },
+  })
   return {
     sessionId: finalization.sessionId,
     commandId: finalization.commandId,
@@ -46,6 +50,8 @@ async function statusDto(tx: Tx | typeof prisma, finalization: SessionFinalizati
     completedAt: toIsoOrNull(finalization.completedAt),
     failedStage: finalization.failedStage,
     failureCode: finalization.failureCode,
+    /** Record games (D-2026-11-20-02): false = not ranked; the done toast says so. */
+    recordGames: session?.recordGames ?? true,
     jobs: jobs.map((j) => ({
       kind: j.kind,
       status: j.status,
@@ -389,11 +395,10 @@ function summaries(
  * already-finalized session gets the same status and never double-counts. Projection or slide
  * failures retry their jobs without repeating this.
  *
- * A session with Record games off (D-2026-11-18-06) runs the same barriers and commits the same one
- * finalization row, already `done` at stage `finishing`, with the digest of an empty fact set. It
- * writes no facts, no session summaries and no projection jobs, so no result snapshot, publication,
- * player history or rank change can follow. The ranking policy barrier still applies: the row's
- * `policy_version_id` is required.
+ * A session with Record games off (D-2026-11-20-02) finishes exactly like any other: the same
+ * barriers, facts, session summaries, result snapshot and player history. Only the leaderboard,
+ * win-rate and rank reads skip its facts (by `queue_sessions.record_games`), so it enqueues no rank
+ * job.
  */
 export async function finalizeSession(
   context: ClubContext,
@@ -424,8 +429,9 @@ export async function finalizeSession(
           digest: s.sealedDigest ? Buffer.from(s.sealedDigest).toString('hex') : null,
         }))
         const warnings = { belowMinimum: await belowMinimum(tx, sessionId, session.minimumGames) }
-        const recorded = session.recordGames
-        const facts = recorded ? await buildFacts(tx, sessionId) : []
+        // Record games off (D-2026-11-20-02): facts, summaries and results are written like any
+        // session; only the leaderboard, win-rate and rank reads skip the session.
+        const facts = await buildFacts(tx, sessionId)
         const factsDigest = await sha256(
           JSON.stringify(
             facts
@@ -446,32 +452,28 @@ export async function finalizeSession(
             sessionId,
             clubId: context.clubId,
             commandId: input.commandId,
-            // Unrecorded: nothing runs after the commit, so the row is finished here.
-            state: recorded ? 'committed' : 'done',
-            stage: recorded ? 'player_records' : 'finishing',
+            state: 'committed',
+            stage: 'player_records',
             streamManifest: manifest,
             manifestDigest: await sha256(JSON.stringify(manifest)),
             acceptedSessionRevision: session.revision,
             policyVersionId: check.policy.id,
             startedAt: now,
             committedAt: now,
-            completedAt: recorded ? null : now,
             factsDigest,
           },
         })
-        if (recorded) {
-          if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
-          const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
-          await tx.clubSessionPlayerSummary.createMany({
-            data: summaries(
-              sessionId,
-              facts,
-              creditedKeys(await completedParticipations(tx, sessionId)),
-              roster,
-              now,
-            ),
-          })
-        }
+        if (facts.length) await tx.playerMatchFact.createMany({ data: facts })
+        const roster = await tx.sessionPlayer.findMany({ where: { sessionId, ...LIVE_ENTRY } })
+        await tx.clubSessionPlayerSummary.createMany({
+          data: summaries(
+            sessionId,
+            facts,
+            creditedKeys(await completedParticipations(tx, sessionId)),
+            roster,
+            now,
+          ),
+        })
         await dropUnstarted(tx, sessionId, now)
         // Finishing closes every open match request (kept on the record, hidden).
         await closeSessionMatchRequests(tx, sessionId, now)
@@ -482,8 +484,6 @@ export async function finalizeSession(
         // #1008: the hosts current at the end are this session's hosts from now on (name refreshed).
         await freezeSessionHostsIn(tx, sessionId, now)
         await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
-        // No summaries, snapshot, history or rank work for an unrecorded session: no jobs at all.
-        if (!recorded) return { status: await statusDto(tx, finalization), warnings }
         await tx.projectionJob.create({
           data: {
             kind: 'club_session_summaries',
@@ -494,7 +494,11 @@ export async function finalizeSession(
             completedAt: now,
           },
         })
-        for (const job of FINALIZATION_JOBS)
+        // A not ranked session never moves the skill rank, so it enqueues no rank job (and sends
+        // no "Your rank was updated" notification); its snapshot and history jobs run as usual.
+        for (const job of FINALIZATION_JOBS.filter(
+          (j) => session.recordGames || j.kind !== 'player_rank',
+        ))
           await tx.projectionJob.create({
             data: {
               kind: job.kind,

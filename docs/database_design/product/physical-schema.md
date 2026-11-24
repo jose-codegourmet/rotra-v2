@@ -433,7 +433,8 @@ of `match_decisions_record_games_guard()` only: every completed decision needs a
 session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)
 and every table, column and row are unchanged, so no-result rows written under the November 19 rule
 stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
-([verification](verification.md)).
+([verification](verification.md)). The services that go with it (facts written for these sessions; the
+leaderboard, win-rate and rank reads skip them) are built in Q28.9 (#1080); no further migration.
 
 ## P12.7 — Registration from the Admin link (D-2026-11-20-01)
 

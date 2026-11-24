@@ -1,6 +1,7 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { startedAgo } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -43,9 +44,9 @@ export type SubstitutionSheetProps = {
   others?: SwapPickerPlayer[]
   /** The session's minimum games */
   minimumGames: number
-  /** When Start match was confirmed (ms since epoch); "Started M min ago" */
+  /** When Start match was confirmed (ms since epoch); "Started 5 min ago" or "Started long time ago" */
   startedAt?: number
-  /** The clock "Started M min ago" is computed against; defaults to the time of render */
+  /** The clock "Started 5 min ago" or "Started long time ago" is computed against; defaults to the time of render */
   now?: number
   /** The pick step, or the Confirm substitution step (D-SUBSTITUTE) */
   step: SubstitutionStep
@@ -90,7 +91,7 @@ function creditWarning(creditTo: SubstitutionCredit, outName: string, inName: st
  * Q-SUBSTITUTE in two steps. Pick, in the SwapPickerSheet: "Who's coming off?" tiles (noting Team A
  * or B), Suggestion (with All players behind Other), or "No present player is free right now.",
  * and "Who gets this game?" (Nobody by default, the incoming player, or the outgoing player) with
- * "Started M min ago". Review substitution needs both players. Confirm (D-SUBSTITUTE): Out, In with
+ * "Started 5 min ago" or "Started long time ago". Review substitution needs both players. Confirm (D-SUBSTITUTE): Out, In with
  * level, Team, Gets this game, and the credit warning, with Back and Confirm substitution. The owner
  * holds the step, the two players and the credit choice, and runs the mutation.
  */
@@ -212,7 +213,7 @@ export function SubstitutionSheet({
             ]}
           />
           <p className="m-0 text-[13px] text-fg2">
-            Started {minutesAgo} min ago. At most one person gets this game; it never counts toward
+            {startedAgo(minutesAgo)}. At most one person gets this game; it never counts toward
             long-term rank.
           </p>
         </fieldset>

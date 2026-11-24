@@ -181,6 +181,18 @@ export const FreeTenMinutes: Story = {
 export const FreeSixteenMinutes: Story = {
   args: free(courtAt(1), [playing, ready], { freeMinutes: 18 }),
 }
+/** Free · 45 min, Free · 2 h, Free · long time ago (from 24 h) */
+export const Free45Minutes: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 45 }),
+}
+export const Free2Hours: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 120 }) }
+export const Free30Hours: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 30 * 60 }),
+}
+/** Match line: "Match N · 45 min", "· 2 h", "· started long time ago" (from 24 h) */
+export const Playing45Minutes: Story = { args: inGame(playing, { minutes: 45 }) }
+export const Playing2Hours: Story = { args: inGame(playing, { minutes: 120 }) }
+export const Playing30Hours: Story = { args: inGame(playing, { minutes: 30 * 60 }) }
 export const FreeSixteenMinutesLight: Story = {
   ...FreeSixteenMinutes,
   globals: { theme: 'light' },

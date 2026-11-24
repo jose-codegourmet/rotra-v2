@@ -1,3 +1,4 @@
+import { plannedEndPassed } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { Notice } from '@rotra/ui/notice'
 
@@ -25,7 +26,7 @@ export function sessionEndStatus(endsAt: number, now: number): SessionEndStatus 
   }
   return {
     over: true,
-    text: `Planned end passed ${formatMinutes(Math.max(1, Math.floor((now - endsAt) / MINUTE)))} ago`,
+    text: plannedEndPassed(Math.max(1, Math.floor((now - endsAt) / MINUTE))),
   }
 }
 

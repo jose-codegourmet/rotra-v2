@@ -1,3 +1,4 @@
+import { elapsedTime } from '@rotra/schema/queue-time'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
@@ -82,7 +83,7 @@ export function ReplayCard({
               <b>{court.label}</b>
               {court.match ? (
                 <Chip tone="accent">
-                  #{court.match.number} · {court.match.minutesIn} min
+                  #{court.match.number} · {elapsedTime(court.match.minutesIn)}
                 </Chip>
               ) : (
                 <FreeCourtChip minutes={court.freeMinutes} />

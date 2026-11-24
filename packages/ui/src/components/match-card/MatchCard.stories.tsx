@@ -74,6 +74,18 @@ export const Wait17Min: Story = {
   name: '17 min wait',
   args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 17 }),
 }
+export const Wait45Min: Story = {
+  name: '45 min wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 45 }),
+}
+export const Wait2Hours: Story = {
+  name: '2 h wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 120 }),
+}
+export const Wait30Hours: Story = {
+  name: 'long time ago wait',
+  args: withWait(matchCardFixtures.ready, { kind: 'minutes', minutes: 30 * 60 }),
+}
 export const WaitOnCourt: Story = {
   args: withWait(matchCardFixtures.ready, { kind: 'on-court' }),
 }

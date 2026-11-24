@@ -1,3 +1,5 @@
+import { queueTime } from '@rotra/schema/queue-time'
+
 /** Wait under a queue-card name: minutes since last game, or why a timer is replaced. */
 export type PlayerWait =
   | { kind: 'minutes'; minutes: number }
@@ -9,7 +11,7 @@ export type PlayerWait =
 export function waitCopy(wait: PlayerWait): string {
   switch (wait.kind) {
     case 'minutes':
-      return `${wait.minutes} min`
+      return queueTime(wait.minutes)
     case 'on-court':
       return 'On court'
     case 'playing':
@@ -33,7 +35,7 @@ export function waitClassName(wait: PlayerWait): string {
  */
 export function labelWithWait(label: string, wait: PlayerWait | undefined): string {
   if (!wait || wait.kind !== 'minutes') return label
-  const insert = `, waiting ${wait.minutes} min`
+  const insert = `, waiting ${queueTime(wait.minutes)}`
   const marker = '. View profile'
   const at = label.indexOf(marker)
   return at === -1 ? `${label}${insert}` : `${label.slice(0, at)}${insert}${label.slice(at)}`

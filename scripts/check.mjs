@@ -78,6 +78,8 @@ const STEPS = [
       'vitest',
       'run',
       'src/rule-cases.test.ts',
+      // Correct Queue Time Format (#1056)
+      'src/queue-time.test.ts',
       '--reporter=dot',
     ],
   ],

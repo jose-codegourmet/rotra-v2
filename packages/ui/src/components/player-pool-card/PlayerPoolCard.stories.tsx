@@ -68,6 +68,12 @@ export const AwayNoShow: Story = { args: { ...away, games: 0, forTheNight: 0, on
 export const AwayNoShowLight: Story = { ...AwayNoShow, globals: { theme: 'light' } }
 /** Present and already in a waiting match */
 export const Queued: Story = { args: queued }
+/** "Queued · #1 · 45 min wait" */
+export const Queued45Min: Story = { args: { ...queued, waitMinutes: 45 } }
+/** "Queued · #1 · 2 h wait" (whole hours, rounded down) */
+export const Queued2Hours: Story = { args: { ...queued, waitMinutes: 120 } }
+/** "Queued · #1 · long time ago" (from 24 h, no "wait") */
+export const Queued30Hours: Story = { args: { ...queued, waitMinutes: 30 * 60 } }
 /** Picked for the next match: accent ring and the pick-order badge */
 export const SelectedWithOrder: Story = { args: { selected: true, pickOrder: 2 } }
 export const NoLevel: Story = { args: { level: null } }

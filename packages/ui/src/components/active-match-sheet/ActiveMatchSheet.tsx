@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import { isLongTimeAgo, queueTime } from '@rotra/schema/queue-time'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Icon } from '@rotra/ui/icon'
@@ -142,8 +143,8 @@ export function ActiveMatchSheet({
       }
     >
       <p className="m-0 text-[13px] text-fg2">
-        {FORMAT_LABEL[format]} · started {formatTime(startedAt)} · {minutesIn} min in · Scoring ·{' '}
-        {scoringLabel}
+        {FORMAT_LABEL[format]} · started {formatTime(startedAt)} ·{' '}
+        {isLongTimeAgo(minutesIn) ? '' : `${queueTime(minutesIn)} in · `}Scoring · {scoringLabel}
       </p>
       <TeamLineup
         teamA={teamA}

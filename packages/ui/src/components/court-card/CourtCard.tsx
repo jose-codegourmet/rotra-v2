@@ -1,3 +1,4 @@
+import { elapsedTime, queueTime } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
@@ -103,7 +104,7 @@ export type CourtCardFreeProps = CourtCardBase & {
   variant: 'free'
   /**
    * Whole minutes since the court became free (the last match on it ended, or it opened): the chip
-   * reads "Free · N min", amber from 10, red from 16. Omit or null for a plain "Free".
+   * reads "Free · N min" ("N h", "long time ago" from 24 h), amber from 10, red from 16. Omit or null for a plain "Free".
    */
   freeMinutes?: number | null
   notOpen?: boolean
@@ -256,7 +257,7 @@ export function FreeCourtChip({ minutes }: { minutes?: number | null }) {
   if (minutes == null) return <Chip>Free</Chip>
   return (
     <Chip tone={minutes >= 16 ? 'error' : minutes >= 10 ? 'warn' : 'neutral'}>
-      Free · {minutes} min
+      Free · {queueTime(minutes)}
     </Chip>
   )
 }
@@ -431,7 +432,7 @@ function PlayingCourtCard({
         }
       />
       <p className="text-[13px] text-fg2">
-        {formatLabel} · Match {matchNo} · {minutes} min
+        {formatLabel} · Match {matchNo} · {elapsedTime(minutes)}
         {substitutions > 0
           ? ` · ${substitutions} substitution${substitutions > 1 ? 's' : ''}`
           : null}

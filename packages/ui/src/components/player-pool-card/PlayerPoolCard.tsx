@@ -1,6 +1,7 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { waitPhrase } from '@rotra/schema/queue-time'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
@@ -279,7 +280,7 @@ export function PlayerPoolCard({
           className={cn('text-[13px] text-fg2', state === 'playing' && 'font-semibold text-accent')}
         >
           {statusText(status)}
-          {showWait ? ` · ${waitMinutes} min wait` : null}
+          {showWait ? ` · ${waitPhrase(waitMinutes)}` : null}
         </span>
         {/* The switch sits inside the card: stop its clicks and keys from reaching the card's selection. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the Switch */}

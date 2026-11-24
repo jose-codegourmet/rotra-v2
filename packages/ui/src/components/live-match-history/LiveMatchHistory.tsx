@@ -1,3 +1,4 @@
+import { queueTime } from '@rotra/schema/queue-time'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
@@ -58,7 +59,7 @@ const MINUTE = 60_000
 /** "16 min" under an hour, "2 h" after, like the prototype's queueTime. */
 function lengthLabel(startedAt: number, endedAt: number): string {
   const minutes = Math.max(0, Math.round((endedAt - startedAt) / MINUTE))
-  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h`
+  return queueTime(minutes)
 }
 
 /**

@@ -146,6 +146,33 @@ export const DraftPlayingNow: Story = {
     draft: { selected: false, onToggle: fn() },
   },
 }
+/** Plan Ahead: the draft waits for one court; the line names it and when it ends (muted, info icon). */
+export const DraftWaitsOneCourt: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: { kind: 'blocked', reason: 'Waits for Court 2 · ends in about 6 min' },
+    draft: { selected: false, onToggle: fn() },
+  },
+}
+/** A 5v5 draft that needs two courts: the line names both and the one that ends last. */
+export const DraftWaitsTwoCourts: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: {
+      kind: 'blocked',
+      reason: 'Waits for Court 1 and Court 2 · Court 2 ends in about 8 min',
+    },
+    draft: { selected: false, onToggle: fn() },
+  },
+}
+/** The awaited match runs long: the same line in the warn tone, info icon kept. */
+export const DraftRunningLong: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    status: { kind: 'blocked', reason: 'Waits for Court 2 · running long' },
+    draft: { selected: false, onToggle: fn(), statusTone: 'warn' },
+  },
+}
 /** A draft with a player who left: keeps its warn border and warning line. */
 export const DraftAttention: Story = {
   args: {

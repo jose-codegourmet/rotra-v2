@@ -59,6 +59,12 @@ type CourtCardMatchBase = CourtCardBase & {
   onRemove?: () => void
 }
 
+export type CourtCardExpectedFinish = {
+  text: string
+  /** Finishing soon is accent, Running long is warn, the rest are muted */
+  tone: 'muted' | 'accent' | 'warn'
+}
+
 /** Playing: a started match. Steady accent glow, chip "Playing", the minutes in the match line. */
 export type CourtCardInGameProps = CourtCardMatchBase & {
   variant: 'in-game'
@@ -71,6 +77,12 @@ export type CourtCardInGameProps = CourtCardMatchBase & {
   onMoveToFree?: () => void
   /** No free court can take the match (a two-court match needs two): the item is disabled with "No court is free" */
   noFreeCourt?: boolean
+  /**
+   * One small line under "FORMAT · Match N · M min" (Playing and merged 5v5), plain text from the caller:
+   * "Ends in about 6 min", "Finishing soon", "Could end any time", "Running long".
+   * Words always carry the meaning; the tone only colours them.
+   */
+  expectedFinish?: CourtCardExpectedFinish
 }
 
 /** The next ready waiting match the ⋯ menu's Swap would put on this court */
@@ -410,6 +422,7 @@ function PlayingCourtCard({
   onMoveToFree,
   noFreeCourt = false,
   openedEarly = false,
+  expectedFinish,
   onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
@@ -446,6 +459,20 @@ function PlayingCourtCard({
           ? ` · ${substitutions} substitution${substitutions > 1 ? 's' : ''}`
           : null}
       </p>
+      {expectedFinish ? (
+        <p
+          className={cn(
+            'text-xs',
+            expectedFinish.tone === 'accent'
+              ? 'text-accent'
+              : expectedFinish.tone === 'warn'
+                ? 'text-warn'
+                : 'text-fg2',
+          )}
+        >
+          {expectedFinish.text}
+        </p>
+      ) : null}
       {onOpenMatch || onPause ? (
         <div className="mt-auto flex flex-wrap items-center gap-2">
           {onOpenMatch ? (

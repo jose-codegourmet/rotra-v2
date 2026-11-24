@@ -167,6 +167,31 @@ export const OneVersusTwoInGame: Story = {
   }),
 }
 export const MergedFiveVersusFive: Story = { args: inGame(merged) }
+/** Q27.5: the expected finish line under the match line, one story per phase */
+export const PlayingEndsInAboutMinutes: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Ends in about 6 min', tone: 'muted' } }),
+}
+export const PlayingFinishingSoon: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Finishing soon', tone: 'accent' } }),
+}
+export const PlayingCouldEndAnyTime: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Could end any time', tone: 'muted' } }),
+}
+export const PlayingCouldEndAnyTimeDeuce: Story = {
+  args: inGame(playing, {
+    expectedFinish: { text: 'Could end any time · may be in deuce', tone: 'muted' },
+  }),
+}
+export const PlayingRunningLong: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Running long', tone: 'warn' } }),
+}
+export const PlayingRunningLongLight: Story = {
+  ...PlayingRunningLong,
+  globals: { theme: 'light' },
+}
+export const Merged5v5: Story = {
+  args: inGame(merged, { expectedFinish: { text: 'Ends in about 8 min', tone: 'muted' } }),
+}
 export const WithSubstitutions: Story = {
   args: inGame({ ...playing, substitutions: withSubs.substitutions }),
 }

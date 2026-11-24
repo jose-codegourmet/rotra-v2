@@ -47,6 +47,11 @@ export type MatchCardDraft = {
   pickOrder?: number
   onToggle: () => void
   disabled?: boolean
+  /**
+   * Status line tone: 'warn' when the awaited match runs long ("Waits for Court 2 · running long").
+   * Default 'muted'; the info icon stays. The text is `status.reason`.
+   */
+  statusTone?: 'muted' | 'warn'
   /** @deprecated Ignored: draft tiles show the ring and the games badge only. */
   playerChips?: Record<string, MatchCardPlayerChip[]>
 }
@@ -446,7 +451,11 @@ export function MatchCard({
     <span
       className={cn(
         'flex items-start gap-1.5 text-xs',
-        ready ? 'text-accent' : attention ? 'text-warn' : 'text-fg2',
+        ready
+          ? 'text-accent'
+          : attention || draft?.statusTone === 'warn'
+            ? 'text-warn'
+            : 'text-fg2',
       )}
     >
       <Icon

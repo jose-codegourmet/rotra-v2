@@ -46,3 +46,21 @@ export const LongLabel: Story = {
   },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const Required: Story = {
+  args: {
+    label: 'Full name',
+    required: true,
+    hint: 'Needed to continue',
+    children: <TextInput autoComplete="name" />,
+  },
+}
+
+export const RequiredWithError: Story = {
+  args: {
+    label: 'Full name',
+    required: true,
+    error: 'Enter your full name.',
+    children: <TextInput autoComplete="name" />,
+  },
+}

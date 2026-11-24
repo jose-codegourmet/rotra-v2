@@ -42,8 +42,7 @@ const states: Partial<SettingsCourtsBoxCourt>[] = [
   { state: 'free' },
   { state: 'playing', teamA, teamB },
 ]
-const courts = (count: number) =>
-  Array.from({ length: count }, (_, i) => court(i + 1, states[i]))
+const courts = (count: number) => Array.from({ length: count }, (_, i) => court(i + 1, states[i]))
 
 /** Keeps the courts in state so a time edit or an added court re-renders like the Settings tab. */
 function Stateful(args: SettingsCourtsBoxProps) {

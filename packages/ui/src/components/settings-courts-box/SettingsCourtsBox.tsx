@@ -127,8 +127,10 @@ export function SettingsCourtsBox({
           ))}
         </div>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: the ARIA carousel container is a group. */}
       <div
         ref={viewportRef}
+        role="group"
         aria-roledescription={phone ? 'carousel' : undefined}
         className={cn(phone && '-mx-0.5 overflow-hidden p-0.5')}
       >
@@ -143,7 +145,7 @@ export function SettingsCourtsBox({
             // biome-ignore lint/a11y/useSemanticElements: ARIA carousel slides use group roles.
             <div
               key={id}
-              role={phone ? 'group' : undefined}
+              role="group"
               aria-roledescription={phone ? 'slide' : undefined}
               aria-label={phone ? `${index + 1} of ${count}: ${court.label}` : undefined}
               className={slideClass}
@@ -159,7 +161,7 @@ export function SettingsCourtsBox({
           ))}
           {/* biome-ignore lint/a11y/useSemanticElements: ARIA carousel slides use group roles. */}
           <div
-            role={phone ? 'group' : undefined}
+            role="group"
             aria-roledescription={phone ? 'slide' : undefined}
             aria-label={phone ? `${count} of ${count}: Add court` : undefined}
             className={slideClass}

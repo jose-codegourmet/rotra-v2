@@ -14,7 +14,8 @@ export const settingsCourtCardMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Live console › Settings › Courts › liveSettings() courtMini(), courtTimePickers() (.ls-cc)',
+    screen:
+      'Live console › Settings › Courts › liveSettings() courtMini(), courtTimePickers() (.ls-cc)',
   },
   docs: [
     'docs/screens/product/modules/queue/session-console.md',

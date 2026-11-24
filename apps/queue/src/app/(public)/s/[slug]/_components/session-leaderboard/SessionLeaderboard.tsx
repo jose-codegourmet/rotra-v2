@@ -43,7 +43,7 @@ async function shareText(text: string, link: string) {
 /**
  * Finished session page › Leaderboard tab (2026-11-13 finished session and share leaderboard
  * logs): SessionStandings from the published standings grouped into positions (players with the same
- * wins and losses share one row, 1, 1, 3), Your position › Share (the system share
+ * wins and losses share one row, 1, 1, 2), Your position › Share (the system share
  * sheet with “I finished #N of M at SESSION · CLUB (NW NL). Played on ROTRA.”, or copied), and
  * Share leaderboard (ShareDialog with LeaderboardShareCard, the viewer's row highlighted).
  */

@@ -11,10 +11,10 @@ import {
 
 type FixtureRow = (typeof liveStandingsFixture.rows)[number]
 
-/** Story-only grouping of the fixtures: same wins and losses share a position (1, 1, 3). */
+/** Story-only grouping of the fixtures: same wins and losses share a position, without gaps (1, 1, 2). */
 function group(fixtureRows: FixtureRow[]): LiveLeaderboardRow[] {
   const out: LiveLeaderboardRow[] = []
-  fixtureRows.forEach((r, i) => {
+  fixtureRows.forEach((r) => {
     const player: LiveLeaderboardPlayer = { playerId: r.playerId, name: r.name, level: r.level }
     const last = out[out.length - 1]
     if (last && last.wins === r.wins && last.losses === r.losses) {
@@ -25,7 +25,7 @@ function group(fixtureRows: FixtureRow[]): LiveLeaderboardRow[] {
       }
     } else
       out.push({
-        position: i + 1,
+        position: r.position,
         players: [player],
         wins: r.wins,
         losses: r.losses,
@@ -59,11 +59,11 @@ const player = (i: number): LiveLeaderboardPlayer => ({
 const players = (from: number, count: number) =>
   Array.from({ length: count }, (_, k) => player(from + k))
 
-/** A leader, then `count` players sharing position 2, then the next position skips the shared places. */
+/** A leader, then `count` players sharing position 2, then the next position is the next number (1, 2, 2, 3). */
 const sharing = (count: number, games: LiveLeaderboardRow['games'] = 6): LiveLeaderboardRow[] => [
   { position: 1, players: players(0, 1), wins: 6, losses: 0, games: 6 },
   { position: 2, players: players(1, count), wins: 4, losses: 2, games },
-  { position: 2 + count, players: players(1 + count, 1), wins: 1, losses: 5, games: 6 },
+  { position: 3, players: players(1 + count, 1), wins: 1, losses: 5, games: 6 },
 ]
 
 const meta = {

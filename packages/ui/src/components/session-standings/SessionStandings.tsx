@@ -26,7 +26,7 @@ export type SessionStandingsPlayer = {
 
 /**
  * One standings row: a position and the players who hold it (same wins and losses share a position,
- * numbered 1, 1, 3). The caller computes the position and orders the players inside it.
+ * numbered 1, 1, 2). The caller computes the position and orders the players inside it.
  */
 export type SessionStandingsRow = {
   id: string

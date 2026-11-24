@@ -39,7 +39,7 @@ const single: SessionStandingsRow[] = Array.from({ length: 6 }, (_, i) => ({
   games: 6,
 }))
 
-/** A leader, then `count` players sharing position 2, then the next position skips the shared places. */
+/** A leader, then `count` players sharing position 2, then the next position is the next number (1, 2, 2, 3). */
 const sharing = (
   count: number,
   viewer = -1,
@@ -49,7 +49,7 @@ const sharing = (
   { id: '2', position: 2, players: players(1, count, viewer), wins: 4, losses: 2, games },
   {
     id: '3',
-    position: 2 + count,
+    position: 3,
     players: players(1 + count, 2, viewer),
     wins: 1,
     losses: 5,
@@ -86,7 +86,7 @@ export const Visitor: Story = {
 }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
 
-/** Two players share position 2 (next is 4). */
+/** Two players share position 2 (next is 3). */
 export const SharedTwo: Story = { args: { rows: sharing(2) }, globals: { theme: 'dark' } }
 export const SharedTwoLight: Story = { args: { rows: sharing(2) }, globals: { theme: 'light' } }
 

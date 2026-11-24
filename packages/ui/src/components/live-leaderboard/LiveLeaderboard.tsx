@@ -25,10 +25,10 @@ export type LiveLeaderboardPlayer = {
 
 /**
  * One standings row: a position and the players who hold it. Players with the same wins and losses
- * share one row (1, 1, 3); the caller computes the position and orders the players inside it.
+ * share one row (1, 1, 2); the caller computes the position and orders the players inside it.
  */
 export type LiveLeaderboardRow = {
-  /** The shared position number: 1, 1, 3 */
+  /** The shared position number: 1, 1, 2 */
   position: number
   /** One or more players, in the order their names and faces show */
   players: LiveLeaderboardPlayer[]
